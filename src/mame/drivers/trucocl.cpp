@@ -95,12 +95,12 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 void trucocl_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(trucocl_state::trucocl_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).ram().w(this, FUNC(trucocl_state::trucocl_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).ram().w(FUNC(trucocl_state::trucocl_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).ram().w(FUNC(trucocl_state::trucocl_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
-	map(0x5000, 0x5000).w(this, FUNC(trucocl_state::irq_enable_w));
+	map(0x5000, 0x5000).w(FUNC(trucocl_state::irq_enable_w));
 	map(0x5000, 0x503f).portr("IN0");
-	map(0x5080, 0x5080).w(this, FUNC(trucocl_state::audio_dac_w));
+	map(0x5080, 0x5080).w(FUNC(trucocl_state::audio_dac_w));
 	map(0x50c0, 0x50c0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xffff).rom();
 }

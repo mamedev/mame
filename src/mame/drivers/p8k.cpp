@@ -148,7 +148,7 @@ void p8k_state::p8k_memmap(address_map &map)
 void p8k_state::p8k_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).rw(this, FUNC(p8k_state::p8k_port0_r), FUNC(p8k_state::p8k_port0_w)); // MH7489
+	map(0x00, 0x07).rw(FUNC(p8k_state::p8k_port0_r), FUNC(p8k_state::p8k_port0_w)); // MH7489
 	map(0x08, 0x0b).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x18, 0x1b).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -157,7 +157,7 @@ void p8k_state::p8k_iomap(address_map &map)
 	map(0x24, 0x27).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x28, 0x2b).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x2c, 0x2f).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 }
 
 

@@ -299,7 +299,7 @@ Timings:
 
 void lviv_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
+	map(0x00, 0xff).rw(FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
 }
 
 /* memory w/r functions */

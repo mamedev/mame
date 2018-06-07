@@ -116,8 +116,8 @@ void shuuz_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x101000, 0x101fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x102000, 0x102001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x103000, 0x103003).r(this, FUNC(shuuz_state::leta_r));
-	map(0x105000, 0x105001).rw(this, FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
+	map(0x103000, 0x103003).r(FUNC(shuuz_state::leta_r));
+	map(0x105000, 0x105001).rw(FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
 	map(0x105002, 0x105003).portr("BUTTONS");
 	map(0x106001, 0x106001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x107000, 0x107007).noprw();

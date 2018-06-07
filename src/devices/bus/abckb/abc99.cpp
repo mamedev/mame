@@ -119,7 +119,7 @@ void abc99_device::abc99_z2_mem(address_map &map)
 
 void abc99_device::abc99_z2_io(address_map &map)
 {
-	map(0x21, 0x21).w(this, FUNC(abc99_device::z2_led_w));
+	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
 	map(0x30, 0x30).portr("X0").nopw();
 	map(0x31, 0x31).portr("X1").nopw();
 	map(0x32, 0x32).portr("X2").nopw();

@@ -1498,23 +1498,23 @@ void sega_32x_device::sh2_main_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).bankr("masterbios");
 
-	map(0x00004000, 0x00004003).rw(this, FUNC(sega_32x_device::_32x_sh2_master_4000_common_4002_r), FUNC(sega_32x_device::_32x_sh2_master_4000_common_4002_w));
-	map(0x00004004, 0x00004007).rw(this, FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_r), FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_w));
+	map(0x00004000, 0x00004003).rw(FUNC(sega_32x_device::_32x_sh2_master_4000_common_4002_r), FUNC(sega_32x_device::_32x_sh2_master_4000_common_4002_w));
+	map(0x00004004, 0x00004007).rw(FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_r), FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_w));
 
-	map(0x00004008, 0x00004013).rw(this, FUNC(sega_32x_device::_32x_dreq_common_r), FUNC(sega_32x_device::_32x_dreq_common_w));
+	map(0x00004008, 0x00004013).rw(FUNC(sega_32x_device::_32x_dreq_common_r), FUNC(sega_32x_device::_32x_dreq_common_w));
 
-	map(0x00004014, 0x00004017).nopr().w(this, FUNC(sega_32x_device::_32x_sh2_master_4014_master_4016_w)); // IRQ clear
-	map(0x00004018, 0x0000401b).nopr().w(this, FUNC(sega_32x_device::_32x_sh2_master_4018_master_401a_w)); // IRQ clear
-	map(0x0000401c, 0x0000401f).nopr().w(this, FUNC(sega_32x_device::_32x_sh2_master_401c_master_401e_w)); // IRQ clear
+	map(0x00004014, 0x00004017).nopr().w(FUNC(sega_32x_device::_32x_sh2_master_4014_master_4016_w)); // IRQ clear
+	map(0x00004018, 0x0000401b).nopr().w(FUNC(sega_32x_device::_32x_sh2_master_4018_master_401a_w)); // IRQ clear
+	map(0x0000401c, 0x0000401f).nopr().w(FUNC(sega_32x_device::_32x_sh2_master_401c_master_401e_w)); // IRQ clear
 
-	map(0x00004020, 0x0000402f).rw(this, FUNC(sega_32x_device::_32x_68k_m_commsram_r), FUNC(sega_32x_device::_32x_68k_m_commsram_w));
-	map(0x00004030, 0x0000403f).rw(this, FUNC(sega_32x_device::_32x_pwm_r), FUNC(sega_32x_device::_32x_pwm_w));
+	map(0x00004020, 0x0000402f).rw(FUNC(sega_32x_device::_32x_68k_m_commsram_r), FUNC(sega_32x_device::_32x_68k_m_commsram_w));
+	map(0x00004030, 0x0000403f).rw(FUNC(sega_32x_device::_32x_pwm_r), FUNC(sega_32x_device::_32x_pwm_w));
 
-	map(0x00004100, 0x0000410b).rw(this, FUNC(sega_32x_device::_32x_common_vdp_regs_r), FUNC(sega_32x_device::_32x_common_vdp_regs_w));
-	map(0x00004200, 0x000043ff).rw(this, FUNC(sega_32x_device::_32x_68k_palette_r), FUNC(sega_32x_device::_32x_68k_palette_w));
+	map(0x00004100, 0x0000410b).rw(FUNC(sega_32x_device::_32x_common_vdp_regs_r), FUNC(sega_32x_device::_32x_common_vdp_regs_w));
+	map(0x00004200, 0x000043ff).rw(FUNC(sega_32x_device::_32x_68k_palette_r), FUNC(sega_32x_device::_32x_68k_palette_w));
 
-	map(0x04000000, 0x0401ffff).rw(this, FUNC(sega_32x_device::_32x_68k_dram_r), FUNC(sega_32x_device::_32x_68k_dram_w));
-	map(0x04020000, 0x0403ffff).rw(this, FUNC(sega_32x_device::_32x_68k_dram_overwrite_r), FUNC(sega_32x_device::_32x_68k_dram_overwrite_w));
+	map(0x04000000, 0x0401ffff).rw(FUNC(sega_32x_device::_32x_68k_dram_r), FUNC(sega_32x_device::_32x_68k_dram_w));
+	map(0x04020000, 0x0403ffff).rw(FUNC(sega_32x_device::_32x_68k_dram_overwrite_r), FUNC(sega_32x_device::_32x_68k_dram_overwrite_w));
 
 	map(0x06000000, 0x0603ffff).ram().share("sh2_shared");
 	map(0x02000000, 0x023fffff).rom().region(":gamecart_sh2", 0); // program is writeable (wwfraw)
@@ -1528,23 +1528,23 @@ void sega_32x_device::sh2_slave_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).bankr("slavebios");
 
-	map(0x00004000, 0x00004003).rw(this, FUNC(sega_32x_device::_32x_sh2_slave_4000_common_4002_r), FUNC(sega_32x_device::_32x_sh2_slave_4000_common_4002_w));
-	map(0x00004004, 0x00004007).rw(this, FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_r), FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_w));
+	map(0x00004000, 0x00004003).rw(FUNC(sega_32x_device::_32x_sh2_slave_4000_common_4002_r), FUNC(sega_32x_device::_32x_sh2_slave_4000_common_4002_w));
+	map(0x00004004, 0x00004007).rw(FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_r), FUNC(sega_32x_device::_32x_sh2_common_4004_common_4006_w));
 
-	map(0x00004008, 0x00004013).rw(this, FUNC(sega_32x_device::_32x_dreq_common_r), FUNC(sega_32x_device::_32x_dreq_common_w));
+	map(0x00004008, 0x00004013).rw(FUNC(sega_32x_device::_32x_dreq_common_r), FUNC(sega_32x_device::_32x_dreq_common_w));
 
-	map(0x00004014, 0x00004017).nopr().w(this, FUNC(sega_32x_device::_32x_sh2_slave_4014_slave_4016_w)); // IRQ clear
-	map(0x00004018, 0x0000401b).nopr().w(this, FUNC(sega_32x_device::_32x_sh2_slave_4018_slave_401a_w)); // IRQ clear
-	map(0x0000401c, 0x0000401f).nopr().w(this, FUNC(sega_32x_device::_32x_sh2_slave_401c_slave_401e_w)); // IRQ clear
+	map(0x00004014, 0x00004017).nopr().w(FUNC(sega_32x_device::_32x_sh2_slave_4014_slave_4016_w)); // IRQ clear
+	map(0x00004018, 0x0000401b).nopr().w(FUNC(sega_32x_device::_32x_sh2_slave_4018_slave_401a_w)); // IRQ clear
+	map(0x0000401c, 0x0000401f).nopr().w(FUNC(sega_32x_device::_32x_sh2_slave_401c_slave_401e_w)); // IRQ clear
 
-	map(0x00004020, 0x0000402f).rw(this, FUNC(sega_32x_device::_32x_68k_m_commsram_r), FUNC(sega_32x_device::_32x_68k_m_commsram_w));
-	map(0x00004030, 0x0000403f).rw(this, FUNC(sega_32x_device::_32x_pwm_r), FUNC(sega_32x_device::_32x_pwm_w));
+	map(0x00004020, 0x0000402f).rw(FUNC(sega_32x_device::_32x_68k_m_commsram_r), FUNC(sega_32x_device::_32x_68k_m_commsram_w));
+	map(0x00004030, 0x0000403f).rw(FUNC(sega_32x_device::_32x_pwm_r), FUNC(sega_32x_device::_32x_pwm_w));
 
-	map(0x00004100, 0x0000410b).rw(this, FUNC(sega_32x_device::_32x_common_vdp_regs_r), FUNC(sega_32x_device::_32x_common_vdp_regs_w));
-	map(0x00004200, 0x000043ff).rw(this, FUNC(sega_32x_device::_32x_68k_palette_r), FUNC(sega_32x_device::_32x_68k_palette_w));
+	map(0x00004100, 0x0000410b).rw(FUNC(sega_32x_device::_32x_common_vdp_regs_r), FUNC(sega_32x_device::_32x_common_vdp_regs_w));
+	map(0x00004200, 0x000043ff).rw(FUNC(sega_32x_device::_32x_68k_palette_r), FUNC(sega_32x_device::_32x_68k_palette_w));
 
-	map(0x04000000, 0x0401ffff).rw(this, FUNC(sega_32x_device::_32x_68k_dram_r), FUNC(sega_32x_device::_32x_68k_dram_w));
-	map(0x04020000, 0x0403ffff).rw(this, FUNC(sega_32x_device::_32x_68k_dram_overwrite_r), FUNC(sega_32x_device::_32x_68k_dram_overwrite_w));
+	map(0x04000000, 0x0401ffff).rw(FUNC(sega_32x_device::_32x_68k_dram_r), FUNC(sega_32x_device::_32x_68k_dram_w));
+	map(0x04020000, 0x0403ffff).rw(FUNC(sega_32x_device::_32x_68k_dram_overwrite_r), FUNC(sega_32x_device::_32x_68k_dram_overwrite_w));
 
 	map(0x06000000, 0x0603ffff).ram().share("sh2_shared");
 	map(0x02000000, 0x023fffff).rom().region(":gamecart_sh2", 0); // program is writeable (wwfraw)

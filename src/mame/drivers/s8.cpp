@@ -119,7 +119,7 @@ void s8_state::s8_main_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(s8_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(s8_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(s8_state::s8)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, s8_state, sound_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 MACHINE_CONFIG_END

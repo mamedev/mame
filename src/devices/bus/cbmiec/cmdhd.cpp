@@ -69,7 +69,7 @@ void cmd_hd_device::cmd_hd_mem(address_map &map)
 	map(0x8400, 0x840f).mirror(0x1f0).w(M6522_2_TAG, FUNC(via6522_device::write));
 	map(0x8800, 0x8803).mirror(0x1fc).w(I8255A_TAG, FUNC(i8255_device::write));
 	map(0x8c00, 0x8c0f).mirror(0x1f0).w(RTC72421A_TAG, FUNC(rtc72421_device::write));
-	map(0x8f00, 0x8f00).mirror(0xff).w(this, FUNC(cmd_hd_device::led_w));
+	map(0x8f00, 0x8f00).mirror(0xff).w(FUNC(cmd_hd_device::led_w));
 }
 
 

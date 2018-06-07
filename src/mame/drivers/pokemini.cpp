@@ -129,8 +129,8 @@ void pokemini_state::pokemini_mem_map(address_map &map)
 {
 	map(0x000000, 0x000fff).rom();                            /* bios */
 	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
-	map(0x002000, 0x0020ff).rw(this, FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
-	map(0x002100, 0x1fffff).r(this, FUNC(pokemini_state::rom_r));                    /* cartridge area */
+	map(0x002000, 0x0020ff).rw(FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(FUNC(pokemini_state::rom_r));                    /* cartridge area */
 }
 
 

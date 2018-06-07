@@ -308,13 +308,13 @@ The function decodes the ports appropriately */
 void spectrum_state::spectrum_plus3_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x4000, 0x4000).w(this, FUNC(spectrum_state::spectrum_plus3_port_7ffd_w)).mirror(0x3ffd);
+	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x4000, 0x4000).w(FUNC(spectrum_state::spectrum_plus3_port_7ffd_w)).mirror(0x3ffd);
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
-	map(0x1000, 0x1000).w(this, FUNC(spectrum_state::spectrum_plus3_port_1ffd_w)).mirror(0x0ffd);
-	map(0x2000, 0x2000).r(this, FUNC(spectrum_state::spectrum_plus3_port_2ffd_r)).mirror(0x0ffd);
-	map(0x3000, 0x3000).rw(this, FUNC(spectrum_state::spectrum_plus3_port_3ffd_r), FUNC(spectrum_state::spectrum_plus3_port_3ffd_w)).mirror(0x0ffd);
+	map(0x1000, 0x1000).w(FUNC(spectrum_state::spectrum_plus3_port_1ffd_w)).mirror(0x0ffd);
+	map(0x2000, 0x2000).r(FUNC(spectrum_state::spectrum_plus3_port_2ffd_r)).mirror(0x0ffd);
+	map(0x3000, 0x3000).rw(FUNC(spectrum_state::spectrum_plus3_port_3ffd_r), FUNC(spectrum_state::spectrum_plus3_port_3ffd_w)).mirror(0x0ffd);
 }
 
 void spectrum_state::spectrum_plus3_mem(address_map &map)

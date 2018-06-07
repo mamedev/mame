@@ -429,16 +429,16 @@ void ace_state::ace_mem(address_map &map)
 
 void ace_state::ace_io(address_map &map)
 {
-	map(0x00, 0x00).mirror(0x00fe).select(0xff00).rw(this, FUNC(ace_state::io_r), FUNC(ace_state::io_w));
+	map(0x00, 0x00).mirror(0x00fe).select(0xff00).rw(FUNC(ace_state::io_r), FUNC(ace_state::io_w));
 	map(0x01, 0x01).mirror(0xff00).portr("JOY");
-	map(0x41, 0x41).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pa_r), FUNC(ace_state::ppi_pa_w));
-	map(0x43, 0x43).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pb_r), FUNC(ace_state::ppi_pb_w));
-	map(0x45, 0x45).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pc_r), FUNC(ace_state::ppi_pc_w));
-	map(0x47, 0x47).mirror(0xff80).rw(this, FUNC(ace_state::ppi_control_r), FUNC(ace_state::ppi_control_w));
-	map(0x81, 0x81).mirror(0xff38).rw(this, FUNC(ace_state::pio_ad_r), FUNC(ace_state::pio_ad_w));
-	map(0x83, 0x83).mirror(0xff38).rw(this, FUNC(ace_state::pio_bd_r), FUNC(ace_state::pio_bd_w));
-	map(0x85, 0x85).mirror(0xff38).rw(this, FUNC(ace_state::pio_ac_r), FUNC(ace_state::pio_ac_w));
-	map(0x87, 0x87).mirror(0xff38).rw(this, FUNC(ace_state::pio_bc_r), FUNC(ace_state::pio_bc_w));
+	map(0x41, 0x41).mirror(0xff80).rw(FUNC(ace_state::ppi_pa_r), FUNC(ace_state::ppi_pa_w));
+	map(0x43, 0x43).mirror(0xff80).rw(FUNC(ace_state::ppi_pb_r), FUNC(ace_state::ppi_pb_w));
+	map(0x45, 0x45).mirror(0xff80).rw(FUNC(ace_state::ppi_pc_r), FUNC(ace_state::ppi_pc_w));
+	map(0x47, 0x47).mirror(0xff80).rw(FUNC(ace_state::ppi_control_r), FUNC(ace_state::ppi_control_w));
+	map(0x81, 0x81).mirror(0xff38).rw(FUNC(ace_state::pio_ad_r), FUNC(ace_state::pio_ad_w));
+	map(0x83, 0x83).mirror(0xff38).rw(FUNC(ace_state::pio_bd_r), FUNC(ace_state::pio_bd_w));
+	map(0x85, 0x85).mirror(0xff38).rw(FUNC(ace_state::pio_ac_r), FUNC(ace_state::pio_ac_w));
+	map(0x87, 0x87).mirror(0xff38).rw(FUNC(ace_state::pio_bc_r), FUNC(ace_state::pio_bc_w));
 	map(0xfd, 0xfd).mirror(0xff00).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0xff, 0xff).mirror(0xff00).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 }
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ace_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

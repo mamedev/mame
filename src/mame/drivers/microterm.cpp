@@ -54,7 +54,7 @@ void microterm_state::mt420_mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x9000, 0x9000).nopw();
-	map(0xc000, 0xc000).r(this, FUNC(microterm_state::c000_r)).nopw();
+	map(0xc000, 0xc000).r(FUNC(microterm_state::c000_r)).nopw();
 	map(0xe000, 0xefff).ram();
 	map(0xeff8, 0xefff).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
 	map(0xf000, 0xf7ff).ram();

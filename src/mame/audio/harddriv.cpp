@@ -395,13 +395,13 @@ void harddriv_sound_board_device::driversnd_68k_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x01ffff).rom();
-	map(0xff0000, 0xff0fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_data_r), FUNC(harddriv_sound_board_device::hdsnd68k_data_w));
-	map(0xff1000, 0xff1fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_switches_r), FUNC(harddriv_sound_board_device::hdsnd68k_latches_w));
-	map(0xff2000, 0xff2fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320port_r), FUNC(harddriv_sound_board_device::hdsnd68k_speech_w));
-	map(0xff3000, 0xff3fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_status_r), FUNC(harddriv_sound_board_device::hdsnd68k_irqclr_w));
-	map(0xff4000, 0xff5fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320ram_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ram_w));
-	map(0xff6000, 0xff7fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320ports_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ports_w));
-	map(0xff8000, 0xffbfff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320com_r), FUNC(harddriv_sound_board_device::hdsnd68k_320com_w));
+	map(0xff0000, 0xff0fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_data_r), FUNC(harddriv_sound_board_device::hdsnd68k_data_w));
+	map(0xff1000, 0xff1fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_switches_r), FUNC(harddriv_sound_board_device::hdsnd68k_latches_w));
+	map(0xff2000, 0xff2fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320port_r), FUNC(harddriv_sound_board_device::hdsnd68k_speech_w));
+	map(0xff3000, 0xff3fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_status_r), FUNC(harddriv_sound_board_device::hdsnd68k_irqclr_w));
+	map(0xff4000, 0xff5fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320ram_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ram_w));
+	map(0xff6000, 0xff7fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320ports_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ports_w));
+	map(0xff8000, 0xffbfff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320com_r), FUNC(harddriv_sound_board_device::hdsnd68k_320com_w));
 	map(0xffc000, 0xffffff).ram();
 }
 
@@ -417,14 +417,14 @@ void harddriv_sound_board_device::driversnd_dsp_program_map(address_map &map)
 
 void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 {
-	map(0, 0).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_rom_r)).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_dac_w));
-	map(1, 1).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_comram_r));
-	map(2, 2).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_compare_r));
+	map(0, 0).r(FUNC(harddriv_sound_board_device::hdsnddsp_rom_r)).w(FUNC(harddriv_sound_board_device::hdsnddsp_dac_w));
+	map(1, 1).r(FUNC(harddriv_sound_board_device::hdsnddsp_comram_r));
+	map(2, 2).r(FUNC(harddriv_sound_board_device::hdsnddsp_compare_r));
 	map(1, 2).nopw();
-	map(3, 3).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_comport_w));
-	map(4, 4).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
-	map(5, 5).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
-	map(6, 7).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
+	map(3, 3).w(FUNC(harddriv_sound_board_device::hdsnddsp_comport_w));
+	map(4, 4).w(FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
+	map(5, 5).w(FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
+	map(6, 7).w(FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
 }
 
 

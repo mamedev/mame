@@ -864,7 +864,7 @@ void usb_sound_device::usb_map(address_map &map)
 
 void usb_sound_device::usb_portmap(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w)).share("workram");
+	map(0x00, 0xff).rw(FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w)).share("workram");
 }
 
 

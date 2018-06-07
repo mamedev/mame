@@ -247,7 +247,7 @@ void prophet600_state::cpu_map(address_map &map)
 	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0);
 	map(0x2000, 0x27ff).ram();
 	map(0x3000, 0x37ff).ram();
-	map(0x4000, 0x4001).w(this, FUNC(prophet600_state::dac_w));
+	map(0x4000, 0x4001).w(FUNC(prophet600_state::dac_w));
 	map(0x6000, 0x6001).w(m_acia, FUNC(acia6850_device::write));
 	map(0xe000, 0xe001).r(m_acia, FUNC(acia6850_device::read));
 }
@@ -255,12 +255,12 @@ void prophet600_state::cpu_map(address_map &map)
 void prophet600_state::io_map(address_map &map)
 {
 	map(0x00, 0x07).mirror(0xff00).rw(PIT_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(prophet600_state::scanrow_w));
-	map(0x09, 0x09).mirror(0xff00).rw(this, FUNC(prophet600_state::comparitor_r), FUNC(prophet600_state::led_w));
-	map(0x0a, 0x0a).mirror(0xff00).rw(this, FUNC(prophet600_state::scan_r), FUNC(prophet600_state::potmux_w));
-	map(0x0b, 0x0b).mirror(0xff00).w(this, FUNC(prophet600_state::gate_w));
-	map(0x0d, 0x0d).mirror(0xff00).w(this, FUNC(prophet600_state::cv_w));
-	map(0x0e, 0x0e).mirror(0xff00).w(this, FUNC(prophet600_state::mask_w));
+	map(0x08, 0x08).mirror(0xff00).w(FUNC(prophet600_state::scanrow_w));
+	map(0x09, 0x09).mirror(0xff00).rw(FUNC(prophet600_state::comparitor_r), FUNC(prophet600_state::led_w));
+	map(0x0a, 0x0a).mirror(0xff00).rw(FUNC(prophet600_state::scan_r), FUNC(prophet600_state::potmux_w));
+	map(0x0b, 0x0b).mirror(0xff00).w(FUNC(prophet600_state::gate_w));
+	map(0x0d, 0x0d).mirror(0xff00).w(FUNC(prophet600_state::cv_w));
+	map(0x0e, 0x0e).mirror(0xff00).w(FUNC(prophet600_state::mask_w));
 }
 
 void prophet600_state::machine_start()

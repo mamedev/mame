@@ -512,7 +512,7 @@ WRITE8_MEMBER( pc1512_base_state::printer_w )
 	{
 	case 0:
 		m_printer_data = data;
-		m_cent_data_out->write(space, 0, data);
+		m_cent_data_out->write(data);
 		break;
 
 	case 2:
@@ -610,7 +610,7 @@ READ8_MEMBER( pc1640_state::io_r )
 void pc1512_state::pc1512_mem(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
-	map(0xb8000, 0xbbfff).rw(this, FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
+	map(0xb8000, 0xbbfff).rw(FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
 	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 
@@ -629,13 +629,13 @@ void pc1512_state::pc1512_io(address_map &map)
 	map(0x000, 0x00f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x060, 0x06f).rw(this, FUNC(pc1512_state::system_r), FUNC(pc1512_state::system_w));
+	map(0x060, 0x06f).rw(FUNC(pc1512_state::system_r), FUNC(pc1512_state::system_w));
 	map(0x070, 0x071).mirror(0x02).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	map(0x078, 0x07f).rw(this, FUNC(pc1512_state::mouse_r), FUNC(pc1512_state::mouse_w));
-	map(0x080, 0x083).w(this, FUNC(pc1512_state::dma_page_w));
-	map(0x0a1, 0x0a1).w(this, FUNC(pc1512_state::nmi_mask_w));
-	map(0x378, 0x37b).rw(this, FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
-	map(0x3d0, 0x3df).rw(this, FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
+	map(0x078, 0x07f).rw(FUNC(pc1512_state::mouse_r), FUNC(pc1512_state::mouse_w));
+	map(0x080, 0x083).w(FUNC(pc1512_state::dma_page_w));
+	map(0x0a1, 0x0a1).w(FUNC(pc1512_state::nmi_mask_w));
+	map(0x378, 0x37b).rw(FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
+	map(0x3d0, 0x3df).rw(FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
 	map(0x3f0, 0x3f7).m(m_fdc, FUNC(pc_fdc_xt_device::map));
 	map(0x3f8, 0x3ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
@@ -658,17 +658,17 @@ void pc1640_state::pc1640_mem(address_map &map)
 
 void pc1640_state::pc1640_io(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(pc1640_state::io_r));
+	map(0x0000, 0xffff).r(FUNC(pc1640_state::io_r));
 
 	map(0x000, 0x00f).w(m_dmac, FUNC(am9517a_device::write));
 	map(0x020, 0x021).w(m_pic, FUNC(pic8259_device::write));
 	map(0x040, 0x043).w(m_pit, FUNC(pit8253_device::write));
-	map(0x060, 0x06f).w(this, FUNC(pc1640_state::system_w));
+	map(0x060, 0x06f).w(FUNC(pc1640_state::system_w));
 	map(0x070, 0x071).mirror(0x02).w(m_rtc, FUNC(mc146818_device::write));
-	map(0x078, 0x07f).w(this, FUNC(pc1640_state::mouse_w));
-	map(0x080, 0x083).w(this, FUNC(pc1640_state::dma_page_w));
-	map(0x0a1, 0x0a1).w(this, FUNC(pc1640_state::nmi_mask_w));
-	map(0x378, 0x37b).w(this, FUNC(pc1640_state::printer_w));
+	map(0x078, 0x07f).w(FUNC(pc1640_state::mouse_w));
+	map(0x080, 0x083).w(FUNC(pc1640_state::dma_page_w));
+	map(0x0a1, 0x0a1).w(FUNC(pc1640_state::nmi_mask_w));
+	map(0x378, 0x37b).w(FUNC(pc1640_state::printer_w));
 	map(0x3f2, 0x3f2).w(m_fdc, FUNC(pc_fdc_xt_device::dor_w));
 	map(0x3f5, 0x3f5).w(PC_FDC_XT_TAG ":upd765", FUNC(upd765_family_device::fifo_w));
 	map(0x3f8, 0x3ff).w(m_uart, FUNC(ins8250_device::ins8250_w));

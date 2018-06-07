@@ -306,8 +306,7 @@ void maxaflex_state::machine_reset()
 {
 	atari_common_state::machine_reset();
 
-	pokey_device *pokey = machine().device<pokey_device>("pokey");
-	pokey->write(15,0);
+	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
 
 	// Supervisor board reset
 	m_portB_out = 0xff;

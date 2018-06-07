@@ -736,21 +736,21 @@ WRITE16_MEMBER(hornet_state::soundtimer_count_w)
 void hornet_state::hornet_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("workram");     /* Work RAM */
-	map(0x74000000, 0x740000ff).rw(this, FUNC(hornet_state::hornet_k037122_reg_r), FUNC(hornet_state::hornet_k037122_reg_w));
-	map(0x74020000, 0x7403ffff).rw(this, FUNC(hornet_state::hornet_k037122_sram_r), FUNC(hornet_state::hornet_k037122_sram_w));
-	map(0x74040000, 0x7407ffff).rw(this, FUNC(hornet_state::hornet_k037122_char_r), FUNC(hornet_state::hornet_k037122_char_w));
-	map(0x74080000, 0x7408000f).rw(this, FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
+	map(0x74000000, 0x740000ff).rw(FUNC(hornet_state::hornet_k037122_reg_r), FUNC(hornet_state::hornet_k037122_reg_w));
+	map(0x74020000, 0x7403ffff).rw(FUNC(hornet_state::hornet_k037122_sram_r), FUNC(hornet_state::hornet_k037122_sram_w));
+	map(0x74040000, 0x7407ffff).rw(FUNC(hornet_state::hornet_k037122_char_r), FUNC(hornet_state::hornet_k037122_char_w));
+	map(0x74080000, 0x7408000f).rw(FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7d000000, 0x7d00ffff).r(this, FUNC(hornet_state::sysreg_r));
-	map(0x7d010000, 0x7d01ffff).w(this, FUNC(hornet_state::sysreg_w));
+	map(0x7d000000, 0x7d00ffff).r(FUNC(hornet_state::sysreg_r));
+	map(0x7d010000, 0x7d01ffff).w(FUNC(hornet_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040004, 0x7d040007).rw(this, FUNC(hornet_state::comm_eeprom_r), FUNC(hornet_state::comm_eeprom_w));
+	map(0x7d040004, 0x7d040007).rw(FUNC(hornet_state::comm_eeprom_r), FUNC(hornet_state::comm_eeprom_w));
 	map(0x7d042000, 0x7d043fff).ram();             /* COMM BOARD 0 */
-	map(0x7d044000, 0x7d044007).r(this, FUNC(hornet_state::comm0_unk_r));
-	map(0x7d048000, 0x7d048003).w(this, FUNC(hornet_state::comm1_w));
-	map(0x7d04a000, 0x7d04a003).w(this, FUNC(hornet_state::comm_rombank_w));
+	map(0x7d044000, 0x7d044007).r(FUNC(hornet_state::comm0_unk_r));
+	map(0x7d048000, 0x7d048003).w(FUNC(hornet_state::comm1_w));
+	map(0x7d04a000, 0x7d04a003).w(FUNC(hornet_state::comm_rombank_w));
 	map(0x7d050000, 0x7d05ffff).bankr("bank1");        /* COMM BOARD 1 */
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);       /* Data ROM */
 	map(0x7f000000, 0x7f3fffff).rom().share("share2");
@@ -767,8 +767,8 @@ void hornet_state::sound_memmap(address_map &map)
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
 	map(0x480000, 0x480001).nopw();
 	map(0x4c0000, 0x4c0001).nopw();
-	map(0x500000, 0x500001).w(this, FUNC(hornet_state::soundtimer_en_w)).nopr();
-	map(0x600000, 0x600001).w(this, FUNC(hornet_state::soundtimer_count_w)).nopr();
+	map(0x500000, 0x500001).w(FUNC(hornet_state::soundtimer_en_w)).nopr();
+	map(0x600000, 0x600001).w(FUNC(hornet_state::soundtimer_count_w)).nopr();
 }
 
 /*****************************************************************************/
@@ -805,9 +805,9 @@ void hornet_state::gn680_memmap(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x203fff).ram();
-	map(0x300000, 0x300001).w(this, FUNC(hornet_state::gn680_sysctrl));
+	map(0x300000, 0x300001).w(FUNC(hornet_state::gn680_sysctrl));
 	map(0x314000, 0x317fff).ram();
-	map(0x400000, 0x400003).rw(this, FUNC(hornet_state::gn680_latch_r), FUNC(hornet_state::gn680_latch_w));
+	map(0x400000, 0x400003).rw(FUNC(hornet_state::gn680_latch_r), FUNC(hornet_state::gn680_latch_w));
 	map(0x400008, 0x400009).nopw();    // writes 0001 00fe each time IRQ 6 triggers
 }
 
@@ -836,7 +836,7 @@ WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 void hornet_state::sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(hornet_state::dsp_dataram0_r), FUNC(hornet_state::dsp_dataram0_w)).share("sharc_dataram0");
+	map(0x0500000, 0x05fffff).rw(FUNC(hornet_state::dsp_dataram0_r), FUNC(hornet_state::dsp_dataram0_w)).share("sharc_dataram0");
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw("voodoo0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
@@ -847,7 +847,7 @@ void hornet_state::sharc0_map(address_map &map)
 void hornet_state::sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(hornet_state::dsp_dataram1_r), FUNC(hornet_state::dsp_dataram1_w)).share("sharc_dataram1");
+	map(0x0500000, 0x05fffff).rw(FUNC(hornet_state::dsp_dataram1_r), FUNC(hornet_state::dsp_dataram1_w)).share("sharc_dataram1");
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw("voodoo1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));

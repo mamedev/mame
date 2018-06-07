@@ -291,7 +291,7 @@ void taitowlf_state::taitowlf_map(address_map &map)
 	#endif
 	map(0x000e0000, 0x000effff).ram();
 	map(0x000f0000, 0x000fffff).bankr("bank1");
-	map(0x000f0000, 0x000fffff).w(this, FUNC(taitowlf_state::bios_ram_w));
+	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 //  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
@@ -304,13 +304,13 @@ void taitowlf_state::taitowlf_io(address_map &map)
 	map(0x00e8, 0x00eb).noprw();
 	map(0x0300, 0x03af).noprw();
 	map(0x03b0, 0x03df).noprw();
-	map(0x0278, 0x027b).w(this, FUNC(taitowlf_state::pnp_config_w));
+	map(0x0278, 0x027b).w(FUNC(taitowlf_state::pnp_config_w));
 	#if ENABLE_VGA
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	#endif
-	map(0x0a78, 0x0a7b).w(this, FUNC(taitowlf_state::pnp_data_w));
+	map(0x0a78, 0x0a7b).w(FUNC(taitowlf_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 

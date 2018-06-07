@@ -886,7 +886,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 
 void pet_state::pet2001_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pet_state::read), FUNC(pet_state::write));
+	map(0x0000, 0xffff).rw(FUNC(pet_state::read), FUNC(pet_state::write));
 }
 
 
@@ -896,7 +896,7 @@ void pet_state::pet2001_mem(address_map &map)
 
 void cbm8296_state::cbm8296_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(cbm8296_state::read), FUNC(cbm8296_state::write));
+	map(0x0000, 0xffff).rw(FUNC(cbm8296_state::read), FUNC(cbm8296_state::write));
 }
 
 

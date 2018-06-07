@@ -593,7 +593,7 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
 
 void mz3500_state::mz3500_master_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mz3500_state::mz3500_master_mem_r), FUNC(mz3500_state::mz3500_master_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(mz3500_state::mz3500_master_mem_r), FUNC(mz3500_state::mz3500_master_mem_w));
 }
 
 void mz3500_state::mz3500_master_io(address_map &map)
@@ -605,15 +605,15 @@ void mz3500_state::mz3500_master_io(address_map &map)
 //  AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
 	map(0xf4, 0xf5).m(m_fdc, FUNC(upd765a_device::map)); // MFD upd765
 //  AM_RANGE(0xf8, 0xfb) MFD I/O port
-	map(0xf8, 0xf8).rw(this, FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
-	map(0xf9, 0xf9).r(this, FUNC(mz3500_state::mz3500_fdc_dma_r));
-	map(0xfc, 0xff).rw(this, FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
+	map(0xf8, 0xf8).rw(FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
+	map(0xf9, 0xf9).r(FUNC(mz3500_state::mz3500_fdc_dma_r));
+	map(0xfc, 0xff).rw(FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
 }
 
 void mz3500_state::mz3500_slave_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("ipl", 0);
-	map(0x2000, 0x27ff).rw(this, FUNC(mz3500_state::mz3500_shared_ram_r), FUNC(mz3500_state::mz3500_shared_ram_w));
+	map(0x2000, 0x27ff).rw(FUNC(mz3500_state::mz3500_shared_ram_r), FUNC(mz3500_state::mz3500_shared_ram_w));
 	map(0x4000, 0x5fff).ram();
 }
 
@@ -626,7 +626,7 @@ void mz3500_state::mz3500_slave_io(address_map &map)
 //  AM_RANGE(0x20, 0x2f) pit8253
 	map(0x30, 0x33).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x40).portr("DSW");
-	map(0x50, 0x5f).ram().w(this, FUNC(mz3500_state::mz3500_crtc_w));
+	map(0x50, 0x5f).ram().w(FUNC(mz3500_state::mz3500_crtc_w));
 	map(0x60, 0x61).rw(m_hgdc2, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x70, 0x71).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }

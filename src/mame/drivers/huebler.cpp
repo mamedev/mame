@@ -99,7 +99,7 @@ void amu880_state::amu880_io(address_map &map)
 //  AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_WRITE(power_off_w)
 //  AM_RANGE(0x04, 0x04) AM_MIRROR(0x02) AM_WRITE(tone_off_w)
 //  AM_RANGE(0x05, 0x05) AM_MIRROR(0x02) AM_WRITE(tone_on_w)
-	map(0x08, 0x09).mirror(0x02).r(this, FUNC(amu880_state::keyboard_r));
+	map(0x08, 0x09).mirror(0x02).r(FUNC(amu880_state::keyboard_r));
 	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x14, 0x17).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));

@@ -115,8 +115,8 @@ void redalert_state::redalert_audio_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
-	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(this, FUNC(redalert_state::redalert_AY8910_w));
-	map(0x1001, 0x1001).mirror(0x0ffe).rw(this, FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
+	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(FUNC(redalert_state::redalert_AY8910_w));
+	map(0x1001, 0x1001).mirror(0x0ffe).rw(FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
 	map(0x2000, 0x6fff).noprw();
 	map(0x7000, 0x77ff).mirror(0x0800).rom();
 }

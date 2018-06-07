@@ -342,11 +342,11 @@ void suprgolf_state::suprgolf_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("bank1");
-	map(0x4000, 0x4000).w(this, FUNC(suprgolf_state::rom2_bank_select_w));
+	map(0x4000, 0x4000).w(FUNC(suprgolf_state::rom2_bank_select_w));
 	map(0x8000, 0xbfff).bankr("bank2");
-	map(0xc000, 0xdfff).rw(this, FUNC(suprgolf_state::bg_vram_r), FUNC(suprgolf_state::bg_vram_w)); // banked background vram
-	map(0xe000, 0xefff).rw(this, FUNC(suprgolf_state::videoram_r), FUNC(suprgolf_state::videoram_w)).share("videoram"); //foreground vram + paletteram
-	map(0xf000, 0xf000).w(this, FUNC(suprgolf_state::pen_w));
+	map(0xc000, 0xdfff).rw(FUNC(suprgolf_state::bg_vram_r), FUNC(suprgolf_state::bg_vram_w)); // banked background vram
+	map(0xe000, 0xefff).rw(FUNC(suprgolf_state::videoram_r), FUNC(suprgolf_state::videoram_w)).share("videoram"); //foreground vram + paletteram
+	map(0xf000, 0xf000).w(FUNC(suprgolf_state::pen_w));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -356,7 +356,7 @@ void suprgolf_state::io_map(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x09).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x0c, 0x0c).w(this, FUNC(suprgolf_state::adpcm_data_w));
+	map(0x0c, 0x0c).w(FUNC(suprgolf_state::adpcm_data_w));
 	}
 
 static INPUT_PORTS_START( suprgolf )

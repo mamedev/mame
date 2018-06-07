@@ -241,8 +241,6 @@ public:
 	//dmac
 	DECLARE_WRITE8_MEMBER(dma_end);
 	DECLARE_WRITE8_MEMBER(dma_error);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -381,7 +379,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 
 void esq5505_state::vfx_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x007fff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
@@ -391,7 +389,7 @@ void esq5505_state::vfx_map(address_map &map)
 
 void esq5505_state::vfxsd_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x00ffff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
@@ -403,7 +401,7 @@ void esq5505_state::vfxsd_map(address_map &map)
 
 void esq5505_state::eps_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x007fff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x240000, 0x2400ff).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -415,7 +413,7 @@ void esq5505_state::eps_map(address_map &map)
 
 void esq5505_state::sq1_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x03ffff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -551,16 +549,6 @@ WRITE8_MEMBER(esq5505_state::dma_error)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(esq5505_state::fdc_read_byte)
-{
-	return m_fdc->data_r();
-}
-
-WRITE8_MEMBER(esq5505_state::fdc_write_byte)
-{
-	m_fdc->data_w(data & 0xff);
-}
-
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
@@ -681,8 +669,8 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(*this, esq5505_state, dma_end))
 	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, esq5505_state, dma_error))
-	MCFG_HD63450_DMA_READ_0_CB(READ8(*this, esq5505_state, fdc_read_byte))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
-	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, esq5505_state, fdc_write_byte))
+	MCFG_HD63450_DMA_READ_0_CB(READ8(m_fdc, wd1772_device, data_r))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
+	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(m_fdc, wd1772_device, data_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::vfxsd)

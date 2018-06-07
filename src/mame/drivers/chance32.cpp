@@ -210,26 +210,26 @@ void chance32_state::chance32_map(address_map &map)
 	map(0x0000, 0xcfff).rom();
 	map(0xd800, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(chance32_state::chance32_fgram_w)).share("fgram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(chance32_state::chance32_bgram_w)).share("bgram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(chance32_state::chance32_fgram_w)).share("fgram");
+	map(0xf800, 0xffff).ram().w(FUNC(chance32_state::chance32_bgram_w)).share("bgram");
 }
 
 void chance32_state::chance32_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x10).nopw();        // writing bit3 constantly... watchdog?
-	map(0x13, 0x13).w(this, FUNC(chance32_state::mux_w));
+	map(0x13, 0x13).w(FUNC(chance32_state::mux_w));
 	map(0x20, 0x20).portr("DSW0");
 	map(0x21, 0x21).portr("DSW1");
 	map(0x22, 0x22).portr("DSW2");
 	map(0x23, 0x23).portr("DSW3");
 	map(0x24, 0x24).portr("DSW4");
-	map(0x25, 0x25).r(this, FUNC(chance32_state::mux_r));
+	map(0x25, 0x25).r(FUNC(chance32_state::mux_r));
 	map(0x26, 0x26).portr("UNK"); // vblank (other bits are checked for different reasons)
 	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x50, 0x50).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x60).w(this, FUNC(chance32_state::muxout_w));
+	map(0x60, 0x60).w(FUNC(chance32_state::muxout_w));
 }
 
 

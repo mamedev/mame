@@ -1692,21 +1692,21 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).share("rombase"); // BIOS
 
 	map(0x00200000, 0x00207fff).ram().share("sram");
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7018, 0x005f702f).mirror(0x02000000).rw("comm_board", FUNC(m3comm_device::naomi_r), FUNC(m3comm_device::naomi_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_g2_ctrl_r), FUNC(naomi_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_g2_ctrl_r), FUNC(naomi_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi_state::naomi_g2bus_r));
+	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi_state::naomi_g2bus_r));
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).mirror(0x02000000).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -1752,20 +1752,20 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).share("rombase"); // BIOS
 
 	map(0x00200000, 0x00207fff).ram().share("sram");
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_g2_ctrl_r), FUNC(naomi2_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_g2_ctrl_r), FUNC(naomi2_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi2_state::naomi_g2bus_r));
+	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi2_state::naomi_g2bus_r));
 
 	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
 	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
@@ -1780,8 +1780,8 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x07000000, 0x07ffffff).ram().share("frameram2");// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	map(0x085f6800, 0x085f69ff).w(this, FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
-	map(0x085f8000, 0x085f9fff).w(this, FUNC(naomi2_state::both_pvr2_ta_w));
+	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
+	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
 	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
@@ -1809,20 +1809,20 @@ void naomi2_state::naomi2_map(address_map &map)
 
 void naomi_state::naomi_port(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(naomi_state::eeprom_93c46a_r), FUNC(naomi_state::eeprom_93c46a_w));
+	map(0x00, 0x0f).rw(FUNC(naomi_state::eeprom_93c46a_r), FUNC(naomi_state::eeprom_93c46a_w));
 }
 
 /*
  * Atomiswave address map, almost identical to Dreamcast
  */
 
-READ64_MEMBER(atomiswave_state::aw_flash_r )
+READ64_MEMBER(atomiswave_state::aw_flash_r)
 {
-	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
-			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
+	return (uint64_t)m_awflash->read(space, offset*8) | (uint64_t)m_awflash->read(space, (offset*8)+1)<<8 | (uint64_t)m_awflash->read(space, (offset*8)+2)<<16 | (uint64_t)m_awflash->read(space, (offset*8)+3)<<24 |
+			(uint64_t)m_awflash->read(space, (offset*8)+4)<<32 | (uint64_t)m_awflash->read(space, (offset*8)+5)<<40 | (uint64_t)m_awflash->read(space, (offset*8)+6)<<48 | (uint64_t)m_awflash->read(space, (offset*8)+7)<<56;
 }
 
-WRITE64_MEMBER(atomiswave_state::aw_flash_w )
+WRITE64_MEMBER(atomiswave_state::aw_flash_w)
 {
 	int i;
 	uint32_t addr = offset * 8;
@@ -1838,7 +1838,7 @@ WRITE64_MEMBER(atomiswave_state::aw_flash_w )
 
 	data >>= (i*8);
 
-	m_awflash->write(addr, data);
+	m_awflash->write(space, addr, data);
 }
 
 // TODO: don't we have a common function for this?
@@ -1925,21 +1925,21 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 void atomiswave_state::aw_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x0001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
-	map(0xa0000000, 0xa001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
+	map(0x00000000, 0x0001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
+	map(0xa0000000, 0xa001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
 
 	map(0x00200000, 0x0021ffff).ram().share("sram");     // battery backed up RAM
-	map(0x005f6800, 0x005f69ff).rw(this, FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).rw(FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).rw(this, FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).rw(FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).rw(this, FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
-	map(0x00700000, 0x00707fff).rw(this, FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).rw(FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
+	map(0x00700000, 0x00707fff).rw(FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).rw(this, FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
@@ -1984,7 +1984,7 @@ void dc_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x007fffff).ram().share("dc_sound_ram");                /* shared with SH-4 */
-	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
+	map(0x00800000, 0x00807fff).rw(FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
 }
 
 /*

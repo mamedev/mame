@@ -103,10 +103,10 @@ void monty_state::mmonty_mem(address_map &map)
 void monty_state::monty_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(monty_state::ioCommandWrite0_w));
-	map(0x01, 0x01).w(this, FUNC(monty_state::sound_w));
-	map(0x02, 0x02).w(this, FUNC(monty_state::ioCommandWrite1_w));
-	map(0x80, 0xff).w(this, FUNC(monty_state::ioDisplayWrite_w));
+	map(0x00, 0x00).w(FUNC(monty_state::ioCommandWrite0_w));
+	map(0x01, 0x01).w(FUNC(monty_state::sound_w));
+	map(0x02, 0x02).w(FUNC(monty_state::ioCommandWrite1_w));
+	map(0x80, 0xff).w(FUNC(monty_state::ioDisplayWrite_w));
 
 	// 7 reads from a bit shifted IO port
 	map(0x01, 0x01).portr("X1");

@@ -449,16 +449,16 @@ void md_base_state::megadriv_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	map(0xa00000, 0xa01fff).rw(this, FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(this, FUNC(md_base_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(this, FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
+	map(0xa00000, 0xa01fff).rw(FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).w(FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).rw(FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
 
-	map(0xa06000, 0xa06001).w(this, FUNC(md_base_state::megadriv_68k_z80_bank_write));
+	map(0xa06000, 0xa06001).w(FUNC(md_base_state::megadriv_68k_z80_bank_write));
 
-	map(0xa10000, 0xa1001f).rw(this, FUNC(md_base_state::megadriv_68k_io_read), FUNC(md_base_state::megadriv_68k_io_write));
+	map(0xa10000, 0xa1001f).rw(FUNC(md_base_state::megadriv_68k_io_read), FUNC(md_base_state::megadriv_68k_io_write));
 
-	map(0xa11100, 0xa11101).rw(this, FUNC(md_base_state::megadriv_68k_check_z80_bus), FUNC(md_base_state::megadriv_68k_req_z80_bus));
-	map(0xa11200, 0xa11201).w(this, FUNC(md_base_state::megadriv_68k_req_z80_reset));
+	map(0xa11100, 0xa11101).rw(FUNC(md_base_state::megadriv_68k_check_z80_bus), FUNC(md_base_state::megadriv_68k_req_z80_bus));
+	map(0xa11200, 0xa11201).w(FUNC(md_base_state::megadriv_68k_req_z80_reset));
 
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xd00000, 0xd0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w)); // the earth defend
@@ -703,7 +703,7 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 		case 0x15:
 		case 0x17:
 			// accessed by either segapsg_device or sn76496_device
-			m_snsnd->write(space, 0, data);
+			m_snsnd->write(data);
 			break;
 
 		default:
@@ -730,14 +730,14 @@ void md_base_state::megadriv_z80_map(address_map &map)
 	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
 	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym2612_device::read), FUNC(ym2612_device::write));
 
-	map(0x6000, 0x6000).w(this, FUNC(md_base_state::megadriv_z80_z80_bank_w));
-	map(0x6001, 0x6001).w(this, FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
+	map(0x6000, 0x6000).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
+	map(0x6001, 0x6001).w(FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
 
-	map(0x6100, 0x7eff).r(this, FUNC(md_base_state::megadriv_z80_unmapped_read));
+	map(0x6100, 0x7eff).r(FUNC(md_base_state::megadriv_z80_unmapped_read));
 
-	map(0x7f00, 0x7fff).rw(this, FUNC(md_base_state::megadriv_z80_vdp_read), FUNC(md_base_state::megadriv_z80_vdp_write));
+	map(0x7f00, 0x7fff).rw(FUNC(md_base_state::megadriv_z80_vdp_read), FUNC(md_base_state::megadriv_z80_vdp_write));
 
-	map(0x8000, 0xffff).rw(this, FUNC(md_base_state::z80_read_68k_banked_data), FUNC(md_base_state::z80_write_68k_banked_data)); // The Z80 can read the 68k address space this way
+	map(0x8000, 0xffff).rw(FUNC(md_base_state::z80_read_68k_banked_data), FUNC(md_base_state::z80_write_68k_banked_data)); // The Z80 can read the 68k address space this way
 }
 
 void md_base_state::megadriv_z80_io_map(address_map &map)

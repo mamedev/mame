@@ -251,7 +251,7 @@ void super80_state::super80_map(address_map &map)
 	map(0x0000, 0x3fff).bankrw("boot").region("maincpu", 0x0000);
 	map(0x4000, 0xbfff).ram().region("maincpu", 0x4000);
 	map(0xc000, 0xefff).rom();
-	map(0xf000, 0xffff).r(this, FUNC(super80_state::super80_read_ff)).nopw();
+	map(0xf000, 0xffff).r(FUNC(super80_state::super80_read_ff)).nopw();
 }
 
 void super80_state::super80m_map(address_map &map)
@@ -267,19 +267,19 @@ void super80_state::super80v_map(address_map &map)
 	map(0x0000, 0x3fff).bankrw("boot");
 	map(0x4000, 0xbfff).ram();
 	map(0xc000, 0xefff).rom();
-	map(0xf000, 0xf7ff).rw(this, FUNC(super80_state::super80v_low_r), FUNC(super80_state::super80v_low_w));
-	map(0xf800, 0xffff).rw(this, FUNC(super80_state::super80v_high_r), FUNC(super80_state::super80v_high_w));
+	map(0xf000, 0xf7ff).rw(FUNC(super80_state::super80v_low_r), FUNC(super80_state::super80v_low_w));
+	map(0xf800, 0xffff).rw(FUNC(super80_state::super80v_high_r), FUNC(super80_state::super80v_high_w));
 }
 
 void super80_state::super80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xdc, 0xdc).w(this, FUNC(super80_state::super80_dc_w));
-	map(0xe0, 0xe0).mirror(0x14).w(this, FUNC(super80_state::super80_f0_w));
-	map(0xe1, 0xe1).mirror(0x14).w(this, FUNC(super80_state::super80_f1_w));
-	map(0xe2, 0xe2).mirror(0x14).r(this, FUNC(super80_state::super80_f2_r));
+	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xdc, 0xdc).w(FUNC(super80_state::super80_dc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80_state::super80_f0_w));
+	map(0xe1, 0xe1).mirror(0x14).w(FUNC(super80_state::super80_f1_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80_state::super80_f2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
@@ -287,11 +287,11 @@ void super80_state::super80e_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xbc, 0xbc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xbc, 0xbc).w(this, FUNC(super80_state::super80_dc_w));
-	map(0xe0, 0xe0).mirror(0x14).w(this, FUNC(super80_state::super80_f0_w));
-	map(0xe1, 0xe1).mirror(0x14).w(this, FUNC(super80_state::super80_f1_w));
-	map(0xe2, 0xe2).mirror(0x14).r(this, FUNC(super80_state::super80_f2_r));
+	map(0xbc, 0xbc).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xbc, 0xbc).w(FUNC(super80_state::super80_dc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80_state::super80_f0_w));
+	map(0xe1, 0xe1).mirror(0x14).w(FUNC(super80_state::super80_f1_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80_state::super80_f2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
@@ -299,17 +299,17 @@ void super80_state::super80r_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x10, 0x10).w(this, FUNC(super80_state::super80v_10_w));
+	map(0x10, 0x10).w(FUNC(super80_state::super80v_10_w));
 	map(0x11, 0x11).r(m_crtc, FUNC(mc6845_device::register_r));
-	map(0x11, 0x11).w(this, FUNC(super80_state::super80v_11_w));
-	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x11, 0x11).w(FUNC(super80_state::super80v_11_w));
+	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x38, 0x3b).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0x3e, 0x3e).r(this, FUNC(super80_state::port3e_r));
-	map(0x3f, 0x3f).w(this, FUNC(super80_state::port3f_w));
-	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xdc, 0xdc).w(this, FUNC(super80_state::super80_dc_w));
-	map(0xe0, 0xe0).mirror(0x14).w(this, FUNC(super80_state::super80r_f0_w));
-	map(0xe2, 0xe2).mirror(0x14).r(this, FUNC(super80_state::super80_f2_r));
+	map(0x3e, 0x3e).r(FUNC(super80_state::port3e_r));
+	map(0x3f, 0x3f).w(FUNC(super80_state::port3f_w));
+	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xdc, 0xdc).w(FUNC(super80_state::super80_dc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80_state::super80r_f0_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80_state::super80_f2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
@@ -317,13 +317,13 @@ void super80_state::super80v_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x10, 0x10).w(this, FUNC(super80_state::super80v_10_w));
+	map(0x10, 0x10).w(FUNC(super80_state::super80v_10_w));
 	map(0x11, 0x11).r(m_crtc, FUNC(mc6845_device::register_r));
-	map(0x11, 0x11).w(this, FUNC(super80_state::super80v_11_w));
-	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xdc, 0xdc).w(this, FUNC(super80_state::super80_dc_w));
-	map(0xe0, 0xe0).mirror(0x14).w(this, FUNC(super80_state::super80_f0_w));
-	map(0xe2, 0xe2).mirror(0x14).r(this, FUNC(super80_state::super80_f2_r));
+	map(0x11, 0x11).w(FUNC(super80_state::super80v_11_w));
+	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xdc, 0xdc).w(FUNC(super80_state::super80_dc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80_state::super80_f0_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80_state::super80_f2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 

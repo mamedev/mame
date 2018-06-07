@@ -395,7 +395,7 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 
 	// IEEE-488
-	m_ieee488->dio_w(data);
+	m_ieee488->write_dio(data);
 }
 
 DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )

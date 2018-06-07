@@ -49,7 +49,7 @@ void isbc_208_device::map(address_map &map)
 {
 	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x10, 0x11).m("fdc", FUNC(i8272a_device::map));
-	map(0x12, 0x15).rw(this, FUNC(isbc_208_device::stat_r), FUNC(isbc_208_device::aux_w));
+	map(0x12, 0x15).rw(FUNC(isbc_208_device::stat_r), FUNC(isbc_208_device::aux_w));
 }
 
 

@@ -64,12 +64,12 @@ WRITE8_MEMBER(gamemasters_state::output_1540)
 void gamemasters_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x1100, 0x1100).w(this, FUNC(gamemasters_state::output_1100));
-	map(0x1300, 0x1300).w(this, FUNC(gamemasters_state::output_1300));
+	map(0x1100, 0x1100).w(FUNC(gamemasters_state::output_1100));
+	map(0x1300, 0x1300).w(FUNC(gamemasters_state::output_1300));
 	map(0x1400, 0x1400).portr("IN0");
 	map(0x1500, 0x1500).portr("IN1");
-	map(0x1520, 0x1520).w(this, FUNC(gamemasters_state::output_1520));
-	map(0x1540, 0x1540).select(0x20).w(this, FUNC(gamemasters_state::output_1540));
+	map(0x1520, 0x1520).w(FUNC(gamemasters_state::output_1520));
+	map(0x1540, 0x1540).select(0x20).w(FUNC(gamemasters_state::output_1540));
 	map(0x1600, 0x1601).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x1601, 0x1601).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);

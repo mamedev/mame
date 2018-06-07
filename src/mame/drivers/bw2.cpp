@@ -205,7 +205,7 @@ WRITE8_MEMBER( bw2_state::write )
 void bw2_state::bw2_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(bw2_state::read), FUNC(bw2_state::write));
+	map(0x0000, 0xffff).rw(FUNC(bw2_state::read), FUNC(bw2_state::write));
 }
 
 
@@ -223,7 +223,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
 	map(0x40, 0x40).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
 }

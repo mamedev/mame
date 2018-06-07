@@ -99,13 +99,13 @@ void instantm_state::main_map(address_map &map)
 void instantm_state::sub_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
-	map(0x0000, 0x0000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0000, 0x0000).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 void instantm_state::sub_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).rw(this, FUNC(instantm_state::port01_r), FUNC(instantm_state::port01_w));
+	map(0x01, 0x01).rw(FUNC(instantm_state::port01_r), FUNC(instantm_state::port01_w));
 }
 
 static INPUT_PORTS_START( instantm )

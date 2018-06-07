@@ -419,7 +419,7 @@ void drw80pkr_state::map(address_map &map)
 
 void drw80pkr_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(drw80pkr_state::io_r), FUNC(drw80pkr_state::io_w));
+	map(0x00, 0xff).rw(FUNC(drw80pkr_state::io_r), FUNC(drw80pkr_state::io_w));
 }
 
 /*************************

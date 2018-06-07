@@ -403,7 +403,7 @@ MACHINE_CONFIG_END
 
 void coco_state::coco_floating_map(address_map &map)
 {
-	map(0x0000, 0xFFFF).r(this, FUNC(coco_state::floating_bus_read));
+	map(0x0000, 0xFFFF).r(FUNC(coco_state::floating_bus_r));
 }
 
 

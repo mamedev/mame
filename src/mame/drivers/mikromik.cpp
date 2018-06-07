@@ -266,7 +266,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 
 void mm1_state::mm1_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mm1_state::read), FUNC(mm1_state::write));
+	map(0x0000, 0xffff).rw(FUNC(mm1_state::read), FUNC(mm1_state::write));
 }
 
 

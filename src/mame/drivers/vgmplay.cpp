@@ -1700,7 +1700,7 @@ INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).r(this, FUNC(vgmplay_state::file_r));
+	map(0x00000000, 0xffffffff).r(FUNC(vgmplay_state::file_r));
 }
 
 void vgmplay_state::soundchips16_map(address_map &map)
@@ -1710,7 +1710,7 @@ void vgmplay_state::soundchips16_map(address_map &map)
 
 void vgmplay_state::soundchips_map(address_map &map)
 {
-	map(vgmplay_device::REG_SIZE, vgmplay_device::REG_SIZE+3).r(this, FUNC(vgmplay_state::file_size_r));
+	map(vgmplay_device::REG_SIZE, vgmplay_device::REG_SIZE+3).r(FUNC(vgmplay_state::file_size_r));
 	map(vgmplay_device::A_YM2612, vgmplay_device::A_YM2612+3).w(m_ym2612, FUNC(ym2612_device::write));
 	map(vgmplay_device::A_YM2151, vgmplay_device::A_YM2151+1).w(m_ym2151, FUNC(ym2151_device::write));
 	map(vgmplay_device::A_YM2413, vgmplay_device::A_YM2413+1).w(m_ym2413, FUNC(ym2413_device::write));
@@ -1723,18 +1723,18 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_AY8910B, vgmplay_device::A_AY8910B).w("ay8910b", FUNC(ay8910_device::data_w));
 	map(vgmplay_device::A_AY8910B+1, vgmplay_device::A_AY8910B+1).w("ay8910b", FUNC(ay8910_device::address_w));
 //  AM_RANGE(vgmplay_device::A_SN76496+0,      vgmplay_device::A_SN76496+0)      AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
-	map(vgmplay_device::A_SN76496+1, vgmplay_device::A_SN76496+1).w(m_sn76496, FUNC(sn76496_device::write));
+	map(vgmplay_device::A_SN76496+1, vgmplay_device::A_SN76496+1).w(m_sn76496, FUNC(sn76496_device::command_w));
 	map(vgmplay_device::A_K053260, vgmplay_device::A_K053260+0x2f).w(m_k053260, FUNC(k053260_device::write));
 	map(vgmplay_device::A_C6280, vgmplay_device::A_C6280+0xf).w(m_c6280, FUNC(c6280_device::c6280_w));
 	map(vgmplay_device::A_OKIM6295A, vgmplay_device::A_OKIM6295A).w("okim6295a", FUNC(okim6295_device::write));
-	map(vgmplay_device::A_OKIM6295A+0x8, vgmplay_device::A_OKIM6295A+0xb).w(this, FUNC(vgmplay_state::okim6295_clock_w<0>));
-	map(vgmplay_device::A_OKIM6295A+0xc, vgmplay_device::A_OKIM6295A+0xc).w(this, FUNC(vgmplay_state::okim6295_pin7_w<0>));
+	map(vgmplay_device::A_OKIM6295A+0x8, vgmplay_device::A_OKIM6295A+0xb).w(FUNC(vgmplay_state::okim6295_clock_w<0>));
+	map(vgmplay_device::A_OKIM6295A+0xc, vgmplay_device::A_OKIM6295A+0xc).w(FUNC(vgmplay_state::okim6295_pin7_w<0>));
 	map(vgmplay_device::A_OKIM6295A+0xe, vgmplay_device::A_OKIM6295A+0xe).w("vgmplay", FUNC(vgmplay_device::okim6295_nmk112_enable_w<0>));
 	map(vgmplay_device::A_OKIM6295A+0xf, vgmplay_device::A_OKIM6295A+0xf).w("vgmplay", FUNC(vgmplay_device::okim6295_bank_w<0>));
 	map(vgmplay_device::A_OKIM6295A+0x10, vgmplay_device::A_OKIM6295A+0x13).w("vgmplay", FUNC(vgmplay_device::okim6295_nmk112_bank_w<0>));
 	map(vgmplay_device::A_OKIM6295B, vgmplay_device::A_OKIM6295B).w("okim6295b", FUNC(okim6295_device::write));
-	map(vgmplay_device::A_OKIM6295B+0x8, vgmplay_device::A_OKIM6295B+0xb).w(this, FUNC(vgmplay_state::okim6295_clock_w<1>));
-	map(vgmplay_device::A_OKIM6295B+0xc, vgmplay_device::A_OKIM6295B+0xc).w(this, FUNC(vgmplay_state::okim6295_pin7_w<1>));
+	map(vgmplay_device::A_OKIM6295B+0x8, vgmplay_device::A_OKIM6295B+0xb).w(FUNC(vgmplay_state::okim6295_clock_w<1>));
+	map(vgmplay_device::A_OKIM6295B+0xc, vgmplay_device::A_OKIM6295B+0xc).w(FUNC(vgmplay_state::okim6295_pin7_w<1>));
 	map(vgmplay_device::A_OKIM6295B+0xe, vgmplay_device::A_OKIM6295B+0xe).w("vgmplay", FUNC(vgmplay_device::okim6295_nmk112_enable_w<1>));
 	map(vgmplay_device::A_OKIM6295B+0xf, vgmplay_device::A_OKIM6295B+0xf).w("vgmplay", FUNC(vgmplay_device::okim6295_bank_w<1>));
 	map(vgmplay_device::A_OKIM6295B+0x10, vgmplay_device::A_OKIM6295B+0x13).w("vgmplay", FUNC(vgmplay_device::okim6295_nmk112_bank_w<1>));
@@ -1757,7 +1757,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K054539A, vgmplay_device::A_K054539A+0x22f).w("k054539a", FUNC(k054539_device::write));
 	map(vgmplay_device::A_K054539B, vgmplay_device::A_K054539B+0x22f).w("k054539b", FUNC(k054539_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND+0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
-	map(vgmplay_device::A_K051649, vgmplay_device::A_K051649+0xf).w(this, FUNC(vgmplay_state::scc_w));
+	map(vgmplay_device::A_K051649, vgmplay_device::A_K051649+0xf).w(FUNC(vgmplay_state::scc_w));
 }
 
 void vgmplay_state::segapcm_map(address_map &map)

@@ -67,13 +67,13 @@ void circus_state::circus_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x1000, 0x1fff).rom();
-	map(0x2000, 0x2000).w(this, FUNC(circus_state::circus_clown_x_w));
-	map(0x3000, 0x3000).w(this, FUNC(circus_state::circus_clown_y_w));
-	map(0x4000, 0x43ff).ram().w(this, FUNC(circus_state::circus_videoram_w)).share("videoram");
-	map(0x8000, 0x8000).ram().w(this, FUNC(circus_state::circus_clown_z_w));
+	map(0x2000, 0x2000).w(FUNC(circus_state::circus_clown_x_w));
+	map(0x3000, 0x3000).w(FUNC(circus_state::circus_clown_y_w));
+	map(0x4000, 0x43ff).ram().w(FUNC(circus_state::circus_videoram_w)).share("videoram");
+	map(0x8000, 0x8000).ram().w(FUNC(circus_state::circus_clown_z_w));
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xc000, 0xc000).portr("DSW");
-	map(0xd000, 0xd000).r(this, FUNC(circus_state::circus_paddle_r));
+	map(0xd000, 0xd000).r(FUNC(circus_state::circus_paddle_r));
 	map(0xf000, 0xffff).rom();
 }
 

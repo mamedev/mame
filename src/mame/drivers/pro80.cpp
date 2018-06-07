@@ -128,9 +128,9 @@ void pro80_state::pro80_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x44, 0x47).r(this, FUNC(pro80_state::kp_r));
-	map(0x48, 0x4b).w(this, FUNC(pro80_state::digit_w));
-	map(0x4c, 0x4f).w(this, FUNC(pro80_state::segment_w));
+	map(0x44, 0x47).r(FUNC(pro80_state::kp_r));
+	map(0x48, 0x4b).w(FUNC(pro80_state::digit_w));
+	map(0x4c, 0x4f).w(FUNC(pro80_state::segment_w));
 }
 
 /* Input ports */

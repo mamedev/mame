@@ -528,13 +528,13 @@ WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 
 WRITE8_MEMBER(sms_state::sms_psg_w)
 {
-	m_psg_sms->write(space, offset, data, mem_mask);
+	m_psg_sms->write(data);
 }
 
 
 WRITE8_MEMBER(sms_state::gg_psg_w)
 {
-	m_psg_gg->write(space, offset, data, mem_mask);
+	m_psg_gg->write(data);
 }
 
 

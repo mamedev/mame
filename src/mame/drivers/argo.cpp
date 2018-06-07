@@ -150,12 +150,12 @@ void argo_state::mem_map(address_map &map)
 	map(0x0000, 0x07ff).bankrw("boot");
 	map(0x0800, 0xf7af).ram();
 	map(0xf7b0, 0xf7ff).ram().share("videoram");
-	map(0xf800, 0xffff).rom().w(this, FUNC(argo_state::argo_videoram_w));
+	map(0xf800, 0xffff).rom().w(FUNC(argo_state::argo_videoram_w));
 }
 
 void argo_state::io_map(address_map &map)
 {
-	map(0x0000, 0xFFFF).rw(this, FUNC(argo_state::argo_io_r), FUNC(argo_state::argo_io_w));
+	map(0x0000, 0xFFFF).rw(FUNC(argo_state::argo_io_r), FUNC(argo_state::argo_io_w));
 }
 
 /* Input ports */

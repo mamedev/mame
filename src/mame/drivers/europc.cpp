@@ -504,9 +504,9 @@ void europc_pc_state::europc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
-	map(0x0250, 0x025f).rw(this, FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
-	map(0x02e0, 0x02e0).r(this, FUNC(europc_pc_state::europc_jim2_r));
+	map(0x0060, 0x0063).rw(FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
+	map(0x0250, 0x025f).rw(FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
+	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
 
 /* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */

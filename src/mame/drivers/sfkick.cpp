@@ -475,10 +475,10 @@ void sfkick_state::sfkick_map(address_map &map)
 	map(0xa000, 0xbfff).bankr("bank6");
 	map(0xc000, 0xdfff).bankr("bank7");
 	map(0xe000, 0xffff).bankr("bank8");
-	map(0x0000, 0x3fff).w(this, FUNC(sfkick_state::page0_w));
-	map(0x4000, 0x7fff).w(this, FUNC(sfkick_state::page1_w));
-	map(0x8000, 0xbfff).w(this, FUNC(sfkick_state::page2_w));
-	map(0xc000, 0xffff).w(this, FUNC(sfkick_state::page3_w));
+	map(0x0000, 0x3fff).w(FUNC(sfkick_state::page0_w));
+	map(0x4000, 0x7fff).w(FUNC(sfkick_state::page1_w));
+	map(0x8000, 0xbfff).w(FUNC(sfkick_state::page2_w));
+	map(0xc000, 0xffff).w(FUNC(sfkick_state::page3_w));
 }
 
 void sfkick_state::sfkick_io_map(address_map &map)

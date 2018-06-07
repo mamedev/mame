@@ -99,7 +99,7 @@ void dms86_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x1ffff).ram();
 	map(0xfe000, 0xfffff).rom().region("roms", 0);
-	map(0xfed03, 0xfed03).w(this, FUNC(dms86_state::m1_ack_w));
+	map(0xfed03, 0xfed03).w(FUNC(dms86_state::m1_ack_w));
 }
 
 void dms86_state::io_map(address_map &map)
@@ -109,8 +109,8 @@ void dms86_state::io_map(address_map &map)
 	map(0x80, 0x87).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x88, 0x8f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x90, 0x97).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x9A, 0x9B).r(this, FUNC(dms86_state::port9a_r)); // parallel SASI port
-	map(0x9c, 0x9d).r(this, FUNC(dms86_state::port9c_r));
+	map(0x9A, 0x9B).r(FUNC(dms86_state::port9a_r)); // parallel SASI port
+	map(0x9c, 0x9d).r(FUNC(dms86_state::port9c_r));
 	map(0x9c, 0x9c).w("terminal", FUNC(generic_terminal_device::write));
 }
 

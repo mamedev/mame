@@ -343,7 +343,7 @@ void gal3_state::cpu_mst_map(address_map &map)
 	map(0x20000000, 0x20001fff).ram().share("nvmem");   //NVRAM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
 	map(0x44000000, 0x44000003).portr("DSW_CPU_mst");
-	map(0x44800000, 0x44800003).r(this, FUNC(gal3_state::led_mst_r)).w(this, FUNC(gal3_state::led_mst_w)); //LEDs
+	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_mst_r)).w(FUNC(gal3_state::led_mst_w)); //LEDs
 	map(0x48000000, 0x48000003).nopr(); //irq1 v-blank ack
 	map(0x4c000000, 0x4c000003).nopr(); //irq3 ack
 	map(0x60000000, 0x60007fff).ram().share("share1");  //CRAM
@@ -352,7 +352,7 @@ void gal3_state::cpu_mst_map(address_map &map)
 /// AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP    //upload?
 	map(0xc000000c, 0xc000000f).nopr(); //irq2 ack
 /// AM_RANGE(0xd8000000, 0xd800000f) AM_RAM // protection or 68681?
-	map(0xf2800000, 0xf2800fff).rw(this, FUNC(gal3_state::rso_r), FUNC(gal3_state::rso_w)); //RSO PCB
+	map(0xf2800000, 0xf2800fff).rw(FUNC(gal3_state::rso_r), FUNC(gal3_state::rso_w)); //RSO PCB
 }
 
 void gal3_state::cpu_slv_map(address_map &map)
@@ -360,7 +360,7 @@ void gal3_state::cpu_slv_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
 	map(0x44000000, 0x44000003).portr("DSW_CPU_slv");
-	map(0x44800000, 0x44800003).r(this, FUNC(gal3_state::led_slv_r)).w(this, FUNC(gal3_state::led_slv_w)); //LEDs
+	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_slv_r)).w(FUNC(gal3_state::led_slv_w)); //LEDs
 	map(0x48000000, 0x48000003).nopr(); //irq1 ack
 /// AM_RANGE(0x50000000, 0x50000003) AM_READ() AM_WRITE()
 /// AM_RANGE(0x54000000, 0x54000003) AM_READ() AM_WRITE()
@@ -373,10 +373,10 @@ void gal3_state::cpu_slv_map(address_map &map)
 /// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w)
 /// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
-	map(0xf1700000, 0xf170ffff).rw(this, FUNC(gal3_state::c355_obj_ram_r), FUNC(gal3_state::c355_obj_ram_w)).share("objram");
-	map(0xf1720000, 0xf1720007).rw(this, FUNC(gal3_state::c355_obj_position_r), FUNC(gal3_state::c355_obj_position_w));
-	map(0xf1740000, 0xf175ffff).rw(this, FUNC(gal3_state::paletteram32_r), FUNC(gal3_state::paletteram32_w));
-	map(0xf1760000, 0xf1760003).rw(this, FUNC(gal3_state::namcos21_video_enable_r), FUNC(gal3_state::namcos21_video_enable_w));
+	map(0xf1700000, 0xf170ffff).rw(FUNC(gal3_state::c355_obj_ram_r), FUNC(gal3_state::c355_obj_ram_w)).share("objram");
+	map(0xf1720000, 0xf1720007).rw(FUNC(gal3_state::c355_obj_position_r), FUNC(gal3_state::c355_obj_position_w));
+	map(0xf1740000, 0xf175ffff).rw(FUNC(gal3_state::paletteram32_r), FUNC(gal3_state::paletteram32_w));
+	map(0xf1760000, 0xf1760003).rw(FUNC(gal3_state::namcos21_video_enable_r), FUNC(gal3_state::namcos21_video_enable_w));
 
 	map(0xf2200000, 0xf220ffff).ram();
 	map(0xf2700000, 0xf270ffff).ram(); //AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")

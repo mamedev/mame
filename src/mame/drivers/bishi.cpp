@@ -148,11 +148,11 @@ void bishi_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x407fff).ram();                     // Work RAM
-	map(0x800000, 0x800001).rw(this, FUNC(bishi_state::control_r), FUNC(bishi_state::control_w));
+	map(0x800000, 0x800001).rw(FUNC(bishi_state::control_r), FUNC(bishi_state::control_w));
 	map(0x800004, 0x800005).portr("DSW");
 	map(0x800006, 0x800007).portr("SYSTEM");
 	map(0x800008, 0x800009).portr("INPUTS");
-	map(0x810000, 0x810003).w(this, FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
+	map(0x810000, 0x810003).w(FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
 	map(0x820000, 0x820001).nopw();            // lamps (see lamp test in service menu)
 	map(0x830000, 0x83003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x840000, 0x840007).w(m_k056832, FUNC(k056832_device::b_word_w));    // VSCCS
@@ -161,8 +161,8 @@ void bishi_state::main_map(address_map &map)
 	map(0x880000, 0x880003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // Graphic planes
 	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb04000, 0xb047ff).r(this, FUNC(bishi_state::bishi_mirror_r));    // bug in the ram/rom test?
-	map(0xc00000, 0xc01fff).r(this, FUNC(bishi_state::bishi_K056832_rom_r));
+	map(0xb04000, 0xb047ff).r(FUNC(bishi_state::bishi_mirror_r));    // bug in the ram/rom test?
+	map(0xc00000, 0xc01fff).r(FUNC(bishi_state::bishi_K056832_rom_r));
 }
 
 static INPUT_PORTS_START( bishi )

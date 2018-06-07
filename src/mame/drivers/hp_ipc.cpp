@@ -475,18 +475,18 @@ void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask
 
 void hp_ipc_state::hp_ipc_mem_outer(address_map &map)
 {
-	map(0x000000, 0xFFFFFF).rw(this, FUNC(hp_ipc_state::mem_r), FUNC(hp_ipc_state::mem_w));
+	map(0x000000, 0xFFFFFF).rw(FUNC(hp_ipc_state::mem_r), FUNC(hp_ipc_state::mem_w));
 }
 
 void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 {
 // bus error handler
-	map(0x0000000, 0x1FFFFFF).rw(this, FUNC(hp_ipc_state::trap_r), FUNC(hp_ipc_state::trap_w));
+	map(0x0000000, 0x1FFFFFF).rw(FUNC(hp_ipc_state::trap_r), FUNC(hp_ipc_state::trap_w));
 
 // user mode
-	map(0x1000000, 0x17FFFFF).rw(this, FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
+	map(0x1000000, 0x17FFFFF).rw(FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
 	map(0x1800000, 0x187FFFF).rom().region("maincpu", 0);
-	map(0x1E00000, 0x1E0FFFF).rw(this, FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
+	map(0x1E00000, 0x1E0FFFF).rw(FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
 	map(0x1E20000, 0x1E2000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
 	map(0x1E40000, 0x1E4002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 
@@ -494,8 +494,8 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0000000, 0x007FFFF).rom().region("maincpu", 0);       // Internal ROM (operating system PCA)
 	map(0x0080000, 0x00FFFFF).unmaprw();     // Internal ROM (option ROM PCA)
 	map(0x0100000, 0x04FFFFF).unmaprw();     // External ROM modules
-	map(0x0600000, 0x060FFFF).rw(this, FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
-	map(0x0610000, 0x0610007).rw(this, FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
+	map(0x0600000, 0x060FFFF).rw(FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
+	map(0x0610000, 0x0610007).rw(FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
 	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
@@ -504,7 +504,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
 	map(0x0680000, 0x068FFFF).noprw();       // 'SIMON (98628) fast HP-IB card' -- sys/simon.h
 	map(0x0700000, 0x07FFFFF).unmaprw();     // External I/O
-	map(0x0800000, 0x0FFFFFF).rw(this, FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
+	map(0x0800000, 0x0FFFFFF).rw(FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
 }
 
 void hp_ipc_state::hp_ipc_mem_inner_9807a(address_map &map)

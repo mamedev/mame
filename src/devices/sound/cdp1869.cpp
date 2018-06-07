@@ -66,23 +66,23 @@ DEFINE_DEVICE_TYPE(CDP1869, cdp1869_device, "cdp1869", "RCA CDP1869 VIS")
 // I/O map
 void cdp1869_device::io_map(address_map &map)
 {
-	map(0x03, 0x03).w(this, FUNC(cdp1869_device::out3_w));
-	map(0x04, 0x04).w(this, FUNC(cdp1869_device::out4_w));
-	map(0x05, 0x05).w(this, FUNC(cdp1869_device::out5_w));
-	map(0x06, 0x06).w(this, FUNC(cdp1869_device::out6_w));
-	map(0x07, 0x07).w(this, FUNC(cdp1869_device::out7_w));
+	map(0x03, 0x03).w(FUNC(cdp1869_device::out3_w));
+	map(0x04, 0x04).w(FUNC(cdp1869_device::out4_w));
+	map(0x05, 0x05).w(FUNC(cdp1869_device::out5_w));
+	map(0x06, 0x06).w(FUNC(cdp1869_device::out6_w));
+	map(0x07, 0x07).w(FUNC(cdp1869_device::out7_w));
 }
 
 // character RAM map
 void cdp1869_device::char_map(address_map &map)
 {
-	map(0x000, 0x3ff).rw(this, FUNC(cdp1869_device::char_ram_r), FUNC(cdp1869_device::char_ram_w));
+	map(0x000, 0x3ff).rw(FUNC(cdp1869_device::char_ram_r), FUNC(cdp1869_device::char_ram_w));
 }
 
 // page RAM map
 void cdp1869_device::page_map(address_map &map)
 {
-	map(0x000, 0x7ff).rw(this, FUNC(cdp1869_device::page_ram_r), FUNC(cdp1869_device::page_ram_w));
+	map(0x000, 0x7ff).rw(FUNC(cdp1869_device::page_ram_r), FUNC(cdp1869_device::page_ram_w));
 }
 
 // default address map

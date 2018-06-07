@@ -48,7 +48,7 @@ void concept_state::concept_memmap(address_map &map)
 	map(0x000008, 0x000fff).ram();                                     /* static RAM */
 	map(0x010000, 0x011fff).rom().region("maincpu", 0x010000);  /* boot ROM */
 	map(0x020000, 0x021fff).rom().region("macsbug", 0x0);       /* macsbugs ROM (optional) */
-	map(0x030000, 0x03ffff).rw(this, FUNC(concept_state::concept_io_r), FUNC(concept_state::concept_io_w));    /* I/O space */
+	map(0x030000, 0x03ffff).rw(FUNC(concept_state::concept_io_r), FUNC(concept_state::concept_io_w));    /* I/O space */
 
 	map(0x080000, 0x0fffff).ram().share("videoram");/* AM_RAMBANK(2) */ /* DRAM */
 }

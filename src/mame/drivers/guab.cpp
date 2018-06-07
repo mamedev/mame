@@ -139,7 +139,7 @@ void guab_state::guab_map(address_map &map)
 	map(0x080000, 0x080fff).ram();
 	map(0x100001, 0x100001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0x100003, 0x100003).w("ef9369", FUNC(ef9369_device::address_w));
-	map(0x800000, 0xb0ffff).rw(this, FUNC(guab_state::tms34061_r), FUNC(guab_state::tms34061_w));
+	map(0x800000, 0xb0ffff).rw(FUNC(guab_state::tms34061_r), FUNC(guab_state::tms34061_w));
 	map(0xb10000, 0xb1ffff).ram();
 	map(0xb80000, 0xb8ffff).ram();
 	map(0xb90000, 0xb9ffff).ram();

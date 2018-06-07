@@ -375,30 +375,30 @@ ROM_END
 
 void sb16_lle_device::sb16_io(address_map &map)
 {
-	map(0x0000, 0x0000).mirror(0xff00).rw(this, FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
+	map(0x0000, 0x0000).mirror(0xff00).rw(FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
 //  AM_RANGE(0x0001, 0x0001) // MIDI related?
 //  AM_RANGE(0x0002, 0x0002)
-	map(0x0004, 0x0004).mirror(0xff00).rw(this, FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
-	map(0x0005, 0x0005).mirror(0xff00).rw(this, FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
-	map(0x0006, 0x0006).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma_stat_r));
+	map(0x0004, 0x0004).mirror(0xff00).rw(FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
+	map(0x0005, 0x0005).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
+	map(0x0006, 0x0006).mirror(0xff00).r(FUNC(sb16_lle_device::dma_stat_r));
 //  AM_RANGE(0x0007, 0x0007) // unknown
-	map(0x0008, 0x0008).mirror(0xff00).rw(this, FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
-	map(0x0009, 0x0009).mirror(0xff00).w(this, FUNC(sb16_lle_device::rate_w));
-	map(0x000A, 0x000A).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_cnt_lo_r));
-	map(0x000B, 0x000B).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma8_len_lo_w));
-	map(0x000C, 0x000C).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma8_len_hi_w));
-	map(0x000D, 0x000D).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_cnt_hi_r));
-	map(0x000E, 0x000E).mirror(0xff00).rw(this, FUNC(sb16_lle_device::dac_fifo_ctrl_r), FUNC(sb16_lle_device::dac_fifo_ctrl_w));
-	map(0x000F, 0x000F).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_ready_r));
-	map(0x0010, 0x0010).mirror(0xff00).rw(this, FUNC(sb16_lle_device::ctrl16_r), FUNC(sb16_lle_device::ctrl16_w));
-	map(0x0013, 0x0013).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma16_len_lo_w));
-	map(0x0014, 0x0014).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma16_len_hi_w));
-	map(0x0016, 0x0016).mirror(0xff00).rw(this, FUNC(sb16_lle_device::adc_fifo_ctrl_r), FUNC(sb16_lle_device::adc_fifo_ctrl_w));
-	map(0x0017, 0x0017).mirror(0xff00).r(this, FUNC(sb16_lle_device::adc_data_ready_r));
-	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(sb16_lle_device::dac_data_w));
-	map(0x001B, 0x001B).mirror(0xff00).r(this, FUNC(sb16_lle_device::adc_data_r));
-	map(0x001D, 0x001D).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma8_w));
-	map(0x001F, 0x001F).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_r));
+	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
+	map(0x0009, 0x0009).mirror(0xff00).w(FUNC(sb16_lle_device::rate_w));
+	map(0x000A, 0x000A).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_lo_r));
+	map(0x000B, 0x000B).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_len_lo_w));
+	map(0x000C, 0x000C).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_len_hi_w));
+	map(0x000D, 0x000D).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_hi_r));
+	map(0x000E, 0x000E).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_fifo_ctrl_r), FUNC(sb16_lle_device::dac_fifo_ctrl_w));
+	map(0x000F, 0x000F).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_ready_r));
+	map(0x0010, 0x0010).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl16_r), FUNC(sb16_lle_device::ctrl16_w));
+	map(0x0013, 0x0013).mirror(0xff00).w(FUNC(sb16_lle_device::dma16_len_lo_w));
+	map(0x0014, 0x0014).mirror(0xff00).w(FUNC(sb16_lle_device::dma16_len_hi_w));
+	map(0x0016, 0x0016).mirror(0xff00).rw(FUNC(sb16_lle_device::adc_fifo_ctrl_r), FUNC(sb16_lle_device::adc_fifo_ctrl_w));
+	map(0x0017, 0x0017).mirror(0xff00).r(FUNC(sb16_lle_device::adc_data_ready_r));
+	map(0x0019, 0x0019).mirror(0xff00).w(FUNC(sb16_lle_device::dac_data_w));
+	map(0x001B, 0x001B).mirror(0xff00).r(FUNC(sb16_lle_device::adc_data_r));
+	map(0x001D, 0x001D).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_w));
+	map(0x001F, 0x001F).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_r));
 //  AM_RANGE(0x0080, 0x0080) // ASP comms
 //  AM_RANGE(0x0081, 0x0081)
 //  AM_RANGE(0x0082, 0x0082)

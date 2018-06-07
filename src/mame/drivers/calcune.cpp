@@ -127,18 +127,18 @@ void calcune_state::calcune_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 
-	map(0x700000, 0x700001).r(this, FUNC(calcune_state::cal_700000_r));
+	map(0x700000, 0x700001).r(FUNC(calcune_state::cal_700000_r));
 
 	map(0x710000, 0x710001).portr("710000");
 	map(0x720000, 0x720001).portr("720000");
 //  AM_RANGE(0x730000, 0x730001) possible Z80 control?
 	map(0x760000, 0x760003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 
-	map(0x770000, 0x770001).w(this, FUNC(calcune_state::cal_770000_w));
+	map(0x770000, 0x770001).w(FUNC(calcune_state::cal_770000_w));
 
 	map(0xA14100, 0xA14101).noprw(); // on startup, possible z80 control
 
-	map(0xc00000, 0xc0001f).rw(this, FUNC(calcune_state::cal_vdp_r), FUNC(calcune_state::cal_vdp_w));
+	map(0xc00000, 0xc0001f).rw(FUNC(calcune_state::cal_vdp_r), FUNC(calcune_state::cal_vdp_w));
 
 	map(0xff0000, 0xffffff).ram().share("nvram"); // battery on PCB
 }

@@ -111,14 +111,14 @@ void flicker_state::flicker_status(address_map &map)
 
 void flicker_state::flicker_rom_ports(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0x0700).w(this, FUNC(flicker_state::rom0_out));
-	map(0x0010, 0x001f).mirror(0x0700).w(this, FUNC(flicker_state::rom1_out));
-	map(0x0020, 0x002f).mirror(0x0700).r(this, FUNC(flicker_state::rom2_in));
+	map(0x0000, 0x000f).mirror(0x0700).w(FUNC(flicker_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x0700).w(FUNC(flicker_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(flicker_state::rom2_in));
 }
 
 void flicker_state::flicker_ram_ports(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(flicker_state::ram0_out));
+	map(0x00, 0x00).w(FUNC(flicker_state::ram0_out));
 }
 
 static INPUT_PORTS_START( flicker )

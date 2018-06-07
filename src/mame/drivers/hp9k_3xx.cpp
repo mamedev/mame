@@ -198,11 +198,11 @@ uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bi
 // shared mappings for all 9000/3xx systems
 void hp9k3xx_state::hp9k3xx_common(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
-	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
+	map(0x00000000, 0xffffffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
-	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
@@ -216,14 +216,14 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
 	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
-	map(0x470000, 0x47001f).mirror(0x00ffe0).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x470000, 0x47001f).mirror(0x00ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
-	map(0x510000, 0x510003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
-	map(0x538000, 0x538003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
-	map(0x5c0000, 0x5c0003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no add-on FP coprocessor
+	map(0x510000, 0x510003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
+	map(0x538000, 0x538003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
+	map(0x5c0000, 0x5c0003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no add-on FP coprocessor
 
 	map(0x5f8000, 0x5f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0x600000, 0x7fffff).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // prevent reading invalid DIO slots
+	map(0x600000, 0x7fffff).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // prevent reading invalid DIO slots
 	map(0x800000, 0xffffff).ram();
 }
 
@@ -246,7 +246,7 @@ void hp9k3xx_state::hp9k330_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -258,7 +258,7 @@ void hp9k3xx_state::hp9k332_map(address_map &map)
 	map(0x00200000, 0x002fffff).ram().share("vram");    // 98544 mono framebuffer
 	map(0x00560000, 0x00563fff).rom().region("graphics", 0x0000);   // 98544 mono ROM
 
-	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -267,7 +267,7 @@ void hp9k3xx_state::hp9k370_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xff700000, 0xff7fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xff700000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xff800000, 0xffffffff).ram();
 }
 
@@ -276,9 +276,9 @@ void hp9k3xx_state::hp9k380_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0x0051a000, 0x0051afff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
+	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 
-	map(0xc0000000, 0xff7fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xc0000000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xff800000, 0xffffffff).ram();
 }
 
@@ -287,10 +287,10 @@ void hp9k3xx_state::hp9k382_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 
-	map(0x0051a000, 0x0051afff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
+	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 }
 
 void hp9k3xx_state::iocpu_map(address_map &map)

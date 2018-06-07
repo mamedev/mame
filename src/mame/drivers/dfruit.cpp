@@ -167,20 +167,20 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(dfruit_state::dfruit_rom_r));
+	map(0x6000, 0x7fff).r(FUNC(dfruit_state::dfruit_rom_r));
 
 	map(0x8000, 0x9fff).ram();
 
-	map(0xc000, 0xcfff).rw(this, FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
-	map(0xd000, 0xdfff).rw(this, FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
-	map(0xe000, 0xefff).rw(this, FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
-	map(0xf000, 0xfdff).rw(this, FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
+	map(0xc000, 0xcfff).rw(FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
+	map(0xd000, 0xdfff).rw(FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
+	map(0xe000, 0xefff).rw(FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
+	map(0xf000, 0xfdff).rw(FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
 
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(this, FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
-	map(0xff03, 0xff03).rw(this, FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
-	map(0xff04, 0xff07).rw(this, FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
-	map(0xff08, 0xff08).rw(this, FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
+	map(0xff00, 0xff02).rw(FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
+	map(0xff03, 0xff03).rw(FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
+	map(0xff08, 0xff08).rw(FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
 }
 
 

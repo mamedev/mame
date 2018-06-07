@@ -60,9 +60,9 @@ Pleiads:
 void phoenix_state::phoenix_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
-	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::phoenix_videoreg_w));
-	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6000, 0x63ff).w("cust", FUNC(phoenix_sound_device::control_a_w));
 	map(0x6800, 0x6bff).w("cust", FUNC(phoenix_sound_device::control_b_w));
 	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 */
@@ -72,9 +72,9 @@ void phoenix_state::phoenix_memory_map(address_map &map)
 void phoenix_state::pleiads_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
-	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::pleiads_videoreg_w));
-	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::pleiads_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6000, 0x63ff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_a_w));
 	map(0x6800, 0x6bff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_b_w));
 	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 + protection */
@@ -84,12 +84,12 @@ void phoenix_state::pleiads_memory_map(address_map &map)
 void phoenix_state::survival_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
-	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::phoenix_videoreg_w));
-	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6800, 0x68ff).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x6900, 0x69ff).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x7000, 0x73ff).r(this, FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
+	map(0x7000, 0x73ff).r(FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
 	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
 }
 

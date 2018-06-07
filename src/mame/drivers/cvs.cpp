@@ -449,11 +449,11 @@ void cvs_state::cvs_main_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x14ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_bullet_ram_or_palette_r), FUNC(cvs_state::cvs_bullet_ram_or_palette_w)).share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_s2636_2_or_character_ram_r), FUNC(cvs_state::cvs_s2636_2_or_character_ram_w));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_s2636_1_or_character_ram_r), FUNC(cvs_state::cvs_s2636_1_or_character_ram_w));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_s2636_0_or_character_ram_r), FUNC(cvs_state::cvs_s2636_0_or_character_ram_w));
-	map(0x1800, 0x1bff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_video_or_color_ram_r), FUNC(cvs_state::cvs_video_or_color_ram_w)).share("video_ram");
+	map(0x1400, 0x14ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_bullet_ram_or_palette_r), FUNC(cvs_state::cvs_bullet_ram_or_palette_w)).share("bullet_ram");
+	map(0x1500, 0x15ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_2_or_character_ram_r), FUNC(cvs_state::cvs_s2636_2_or_character_ram_w));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_1_or_character_ram_r), FUNC(cvs_state::cvs_s2636_1_or_character_ram_w));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_0_or_character_ram_r), FUNC(cvs_state::cvs_s2636_0_or_character_ram_w));
+	map(0x1800, 0x1bff).mirror(0x6000).rw(FUNC(cvs_state::cvs_video_or_color_ram_r), FUNC(cvs_state::cvs_video_or_color_ram_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
 	map(0x4000, 0x53ff).rom();
@@ -462,13 +462,13 @@ void cvs_state::cvs_main_cpu_map(address_map &map)
 
 void cvs_state::cvs_main_cpu_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(cvs_state::cvs_input_r), FUNC(cvs_state::cvs_scroll_w));
+	map(0x00, 0xff).rw(FUNC(cvs_state::cvs_input_r), FUNC(cvs_state::cvs_scroll_w));
 }
 
 void cvs_state::cvs_main_cpu_data_map(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(cvs_state::cvs_collision_r), FUNC(cvs_state::audio_command_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(cvs_state::cvs_collision_clear), FUNC(cvs_state::cvs_video_fx_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(cvs_state::cvs_collision_r), FUNC(cvs_state::audio_command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::cvs_collision_clear), FUNC(cvs_state::cvs_video_fx_w));
 }
 
 /*************************************
@@ -483,9 +483,9 @@ void cvs_state::cvs_dac_cpu_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x107f).ram();
 	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::write));
-	map(0x1880, 0x1883).w(this, FUNC(cvs_state::cvs_4_bit_dac_data_w)).share("4bit_dac");
-	map(0x1884, 0x1887).w(this, FUNC(cvs_state::cvs_unknown_w)).share("dac3_state");  /* ???? not connected to anything */
+	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
+	map(0x1880, 0x1883).w(FUNC(cvs_state::cvs_4_bit_dac_data_w)).share("4bit_dac");
+	map(0x1884, 0x1887).w(FUNC(cvs_state::cvs_unknown_w)).share("dac3_state");  /* ???? not connected to anything */
 }
 
 
@@ -500,11 +500,11 @@ void cvs_state::cvs_speech_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).rom();
-	map(0x1d00, 0x1d00).w(this, FUNC(cvs_state::cvs_speech_rom_address_lo_w));
-	map(0x1d40, 0x1d40).w(this, FUNC(cvs_state::cvs_speech_rom_address_hi_w));
-	map(0x1d80, 0x1d80).r(this, FUNC(cvs_state::cvs_speech_command_r));
-	map(0x1ddc, 0x1dde).w(this, FUNC(cvs_state::cvs_tms5110_ctl_w)).share("tms5110_ctl");
-	map(0x1ddf, 0x1ddf).w(this, FUNC(cvs_state::cvs_tms5110_pdc_w));
+	map(0x1d00, 0x1d00).w(FUNC(cvs_state::cvs_speech_rom_address_lo_w));
+	map(0x1d40, 0x1d40).w(FUNC(cvs_state::cvs_speech_rom_address_hi_w));
+	map(0x1d80, 0x1d80).r(FUNC(cvs_state::cvs_speech_command_r));
+	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::cvs_tms5110_ctl_w)).share("tms5110_ctl");
+	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::cvs_tms5110_pdc_w));
 }
 
 

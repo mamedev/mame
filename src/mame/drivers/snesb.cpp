@@ -299,9 +299,9 @@ READ8_MEMBER(snesb_state::snesb_coin_r)
 
 void snesb_state::snesb_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
+	map(0x000000, 0x7dffff).rw(FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
 	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(this, FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x800000, 0xffffff).rw(FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
 READ8_MEMBER(snesb_state::spc_ram_100_r)
@@ -318,7 +318,7 @@ void snesb_state::spc_mem(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(snesb_state::spc_ram_100_r), FUNC(snesb_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(snesb_state::spc_ram_100_r), FUNC(snesb_state::spc_ram_100_w));
 }
 
 static INPUT_PORTS_START( snes_common )

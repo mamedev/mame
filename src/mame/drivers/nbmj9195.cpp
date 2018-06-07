@@ -227,28 +227,28 @@ void nbmj9195_state::init_nbmj9195()
 void nbmj9195_state::sailorws_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
 	map(0xf800, 0xffff).ram().share("nvram");
 }
 
 void nbmj9195_state::mjuraden_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
 	map(0xf800, 0xffff).ram();
 }
 
 void nbmj9195_state::koinomp_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
-	map(0xe000, 0xe1ff).ram().w(this, FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
 	map(0xe800, 0xefff).ram().share("nvram");
 }
 
 void nbmj9195_state::ngpgal_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom();
-	map(0xd000, 0xd1ff).ram().w(this, FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xd000, 0xd1ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
 	map(0xd800, 0xdfff).ram();
 }
 
@@ -256,7 +256,7 @@ void nbmj9195_state::mscoutm_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe5ff).ram();
-	map(0xe600, 0xebff).ram().w(this, FUNC(nbmj9195_state::nb22090_palette_w)).share("paletteram");
+	map(0xe600, 0xebff).ram().w(FUNC(nbmj9195_state::nb22090_palette_w)).share("paletteram");
 	map(0xec00, 0xf1ff).ram();
 	map(0xf200, 0xffff).ram();
 }
@@ -264,7 +264,7 @@ void nbmj9195_state::mscoutm_map(address_map &map)
 void nbmj9195_state::mjegolf_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
-	map(0xe000, 0xe5ff).ram().w(this, FUNC(nbmj9195_state::nb22090_palette_w)).share("paletteram");
+	map(0xe000, 0xe5ff).ram().w(FUNC(nbmj9195_state::nb22090_palette_w)).share("paletteram");
 	map(0xe600, 0xebff).ram();
 	map(0xec00, 0xf1ff).ram();
 	map(0xf200, 0xffff).ram();
@@ -272,75 +272,75 @@ void nbmj9195_state::mjegolf_map(address_map &map)
 
 void nbmj9195_state::mjuraden_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
 	map(0xb0, 0xb0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb2, 0xb2).mirror(0xff00).nopw();
 	map(0xb4, 0xb4).mirror(0xff00).nopw();
-	map(0xb6, 0xb6).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb6, 0xb6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::koinomp_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xa0, 0xa1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xa0, 0xaf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xb0, 0xbf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xc0, 0xc0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc2, 0xc2).mirror(0xff00).nopw();
 	map(0xc4, 0xc4).mirror(0xff00).nopw();
-	map(0xc6, 0xc6).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xc6, 0xc6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 	map(0xcf, 0xcf).mirror(0xff00).nopw();
 }
 
 void nbmj9195_state::patimono_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
 
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa4, 0xa4).mirror(0xff00).nopw();
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb8).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 }
 
 void nbmj9195_state::mmehyou_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa4, 0xa4).mirror(0xff00).nopw();
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::gal10ren_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xa0, 0xa1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xa0, 0xaf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xb0, 0xbf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xc0, 0xc0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc8, 0xc8).mirror(0xff00).nopw();
 	map(0xd0, 0xd0).mirror(0xff00).nopw();
-	map(0xd8, 0xd8).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::renaiclb_io_map(address_map &map)
@@ -348,15 +348,15 @@ void nbmj9195_state::renaiclb_io_map(address_map &map)
 	map(0x20, 0x20).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x24, 0x24).mirror(0xff00).nopw();
 	map(0x28, 0x28).mirror(0xff00).nopw();
-	map(0x2c, 0x2c).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0x2c, 0x2c).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
-	map(0xe0, 0xe1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xe0, 0xef).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0xf0, 0xff).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 }
 
 void nbmj9195_state::mjlaman_io_map(address_map &map)
@@ -364,156 +364,156 @@ void nbmj9195_state::mjlaman_io_map(address_map &map)
 	map(0x20, 0x20).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x22, 0x22).mirror(0xff00).nopw();
 	map(0x24, 0x24).mirror(0xff00).nopw();
-	map(0x26, 0x26).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0x26, 0x26).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xe0, 0xe1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xe0, 0xef).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xf0, 0xff).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 }
 
 void nbmj9195_state::mkeibaou_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xa0, 0xa1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xa0, 0xaf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xb0, 0xbf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xd8, 0xd8).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xda, 0xda).mirror(0xff00).nopw();
 	map(0xdc, 0xdc).mirror(0xff00).nopw();
-	map(0xde, 0xde).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xde, 0xde).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::pachiten_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xa0, 0xa1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xa0, 0xaf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xb0, 0xbf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xe0, 0xe0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe2, 0xe2).mirror(0xff00).nopw();
 	map(0xe4, 0xe4).mirror(0xff00).nopw();
-	map(0xe6, 0xe6).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xe6, 0xe6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::sailorws_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xf0, 0xf0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf2, 0xf2).mirror(0xff00).nopw();
 	map(0xf4, 0xf4).mirror(0xff00).nopw();
-	map(0xf6, 0xf6).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xf6, 0xf6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::sailorwr_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xf8, 0xf8).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfa, 0xfa).mirror(0xff00).nopw();
 	map(0xfc, 0xfc).mirror(0xff00).nopw();
-	map(0xfe, 0xfe).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xfe, 0xfe).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::psailor1_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xf0, 0xf0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf2, 0xf2).mirror(0xff00).nopw();
 	map(0xf4, 0xf4).mirror(0xff00).nopw();
-	map(0xf6, 0xf6).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xf6, 0xf6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::psailor2_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xa0, 0xa1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xa0, 0xaf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xb0, 0xbf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xe0, 0xe0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe2, 0xe2).mirror(0xff00).nopw();
 	map(0xe4, 0xe4).mirror(0xff00).nopw();
-	map(0xf6, 0xf6).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xf6, 0xf6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::otatidai_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
 	map(0xb0, 0xb0).mirror(0xff00).nopw();
-	map(0xb8, 0xb8).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb8, 0xb8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::yosimoto_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
 	map(0x90, 0x90).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x94, 0x94).mirror(0xff00).nopw();
 	map(0x98, 0x98).mirror(0xff00).nopw();
-	map(0x9c, 0x9c).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0x9c, 0x9c).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 }
 
 void nbmj9195_state::yosimotm_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
-	map(0xf0, 0xf0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xf0, 0xf0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 	map(0xfc, 0xfc).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf4, 0xf4).mirror(0xff00).noprw();
 	map(0xf8, 0xf8).mirror(0xff00).noprw();
@@ -521,18 +521,18 @@ void nbmj9195_state::yosimotm_io_map(address_map &map)
 
 void nbmj9195_state::jituroku_io_map(address_map &map)
 {
-	map(0x60, 0x61).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x60, 0x6f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x70, 0x7f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
 	map(0xe0, 0xe0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe8, 0xe8).mirror(0xff00).nopw();
 	map(0xf0, 0xf0).mirror(0xff00).nopw();
-	map(0xf8, 0xf8).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xf8, 0xf8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::ngpgal_io_map(address_map &map)
@@ -540,47 +540,47 @@ void nbmj9195_state::ngpgal_io_map(address_map &map)
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa4, 0xa4).mirror(0xff00).nopw();
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 }
 
 void nbmj9195_state::mjgottsu_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa4, 0xa4).mirror(0xff00).nopw();
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::cmehyou_io_map(address_map &map)
 {
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 	map(0xb4, 0xb4).mirror(0xff00).nopw();
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 }
 
 void nbmj9195_state::mjkoiura_io_map(address_map &map)
 {
-	map(0x80, 0x81).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0x80, 0x8f).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0x90, 0x9f).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa4, 0xa4).mirror(0xff00).nopw();
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 }
 
 void nbmj9195_state::mkoiuraa_io_map(address_map &map)
@@ -588,64 +588,64 @@ void nbmj9195_state::mkoiuraa_io_map(address_map &map)
 	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa4, 0xa4).mirror(0xff00).nopw();
 	map(0xa8, 0xa8).mirror(0xff00).nopw();
-	map(0xb0, 0xb0).mirror(0xff00).w(this, FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 }
 
 void nbmj9195_state::mscoutm_io_map(address_map &map)
 {
-	map(0x80, 0x80).mirror(0xff00).r(this, FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
-	map(0x82, 0x82).mirror(0xff00).r(this, FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
+	map(0x80, 0x80).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
+	map(0x82, 0x82).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
 	map(0x84, 0x84).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0xa0, 0xa6).mirror(0xff00).nopw();            // nb22090 param ?
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
 
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
-	map(0xe0, 0xe1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xe0, 0xef).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
 
-	map(0xf0, 0xff).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 }
 
 void nbmj9195_state::imekura_io_map(address_map &map)
 {
-	map(0x80, 0x80).mirror(0xff00).r(this, FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
-	map(0x82, 0x82).mirror(0xff00).r(this, FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
+	map(0x80, 0x80).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
+	map(0x82, 0x82).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
 	map(0x84, 0x84).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0xb0, 0xb6).mirror(0xff00).nopw();            // nb22090 param ?
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
 
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xe0, 0xe1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xe0, 0xef).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
-	map(0xf0, 0xff).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 }
 
 void nbmj9195_state::mjegolf_io_map(address_map &map)
 {
 	map(0x80, 0x86).mirror(0xff00).nopw();            // nb22090 param ?
 
-	map(0xa0, 0xa1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_0_r));
-	map(0xa0, 0xaf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_0_w));
-	map(0xb0, 0xbf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_0_w));
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
 
-	map(0xc0, 0xc1).mirror(0xff00).r(this, FUNC(nbmj9195_state::blitter_1_r));
-	map(0xc0, 0xcf).mirror(0xff00).w(this, FUNC(nbmj9195_state::blitter_1_w));
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
 
-	map(0xd0, 0xdf).mirror(0xff00).w(this, FUNC(nbmj9195_state::clut_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
 
-	map(0xe0, 0xe0).mirror(0xff00).r(this, FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
-	map(0xe2, 0xe2).mirror(0xff00).r(this, FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
+	map(0xe0, 0xe0).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
+	map(0xe2, 0xe2).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
 	map(0xe4, 0xe4).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -2544,8 +2544,8 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_DEVICE_IO_MAP(sailorws_sound_io_map)
 	MCFG_TMPZ84C011_ZC0_CB(WRITELINE("audiocpu", tmpz84c011_device, trg3))
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(*this, nbmj9195_state, soundbank_w)) \
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8("dac1", dac_byte_interface, write)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8("dac2", dac_byte_interface, write)) \
+	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8("dac1", dac_byte_interface, data_w)) \
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8("dac2", dac_byte_interface, data_w)) \
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8("soundlatch", generic_latch_8_device, read)) \
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, nbmj9195_state, soundcpu_porte_w))
 

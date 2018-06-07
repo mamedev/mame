@@ -69,13 +69,13 @@ void blstroid_state::main_map(address_map &map)
 	map.global_mask(0x83ffff);
 	map(0x000000, 0x03ffff).mirror(0x000000).rom();
 	map(0x800000, 0x800001).mirror(0x0381fe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x800200, 0x800201).mirror(0x0381fe).w(this, FUNC(blstroid_state::scanline_int_ack_w));
-	map(0x800400, 0x800401).mirror(0x0381fe).w(this, FUNC(blstroid_state::video_int_ack_w));
+	map(0x800200, 0x800201).mirror(0x0381fe).w(FUNC(blstroid_state::scanline_int_ack_w));
+	map(0x800400, 0x800401).mirror(0x0381fe).w(FUNC(blstroid_state::video_int_ack_w));
 	map(0x800600, 0x800601).mirror(0x0381fe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x800800, 0x8009ff).mirror(0x038000).writeonly().share("priorityram");
 	map(0x800a01, 0x800a01).mirror(0x0381fe).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
 	map(0x800c00, 0x800c01).mirror(0x0381fe).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
-	map(0x800e00, 0x800e01).mirror(0x0381fe).w(this, FUNC(blstroid_state::blstroid_halt_until_hblank_0_w));
+	map(0x800e00, 0x800e01).mirror(0x0381fe).w(FUNC(blstroid_state::blstroid_halt_until_hblank_0_w));
 	map(0x801401, 0x801401).mirror(0x0383fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
 	map(0x801800, 0x801801).mirror(0x0383f8).portr("DIAL0");
 	map(0x801804, 0x801805).mirror(0x0383f8).portr("DIAL1");

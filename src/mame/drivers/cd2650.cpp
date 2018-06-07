@@ -132,7 +132,7 @@ void cd2650_state::cd2650_io(address_map &map)
 
 void cd2650_state::cd2650_data(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
 }
 
 /* Input ports */

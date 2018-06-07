@@ -250,26 +250,26 @@ WRITE8_MEMBER(jedi_state::nvram_enable_w)
 void jedi_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x08ff).mirror(0x0300).ram().w(this, FUNC(jedi_state::nvram_data_w)).share("nvram");
+	map(0x0800, 0x08ff).mirror(0x0300).ram().w(FUNC(jedi_state::nvram_data_w)).share("nvram");
 	map(0x0c00, 0x0c00).mirror(0x03fe).portr("0c00").nopw();
 	map(0x0c01, 0x0c01).mirror(0x03fe).portr("0c01").nopw();
 	map(0x1000, 0x13ff).noprw();
-	map(0x1400, 0x1400).mirror(0x03ff).r(this, FUNC(jedi_state::jedi_audio_ack_latch_r)).nopw();
+	map(0x1400, 0x1400).mirror(0x03ff).r(FUNC(jedi_state::jedi_audio_ack_latch_r)).nopw();
 	map(0x1800, 0x1800).mirror(0x03ff).r("adc", FUNC(adc0808_device::data_r)).nopw();
-	map(0x1c00, 0x1c01).mirror(0x007e).nopr().w(this, FUNC(jedi_state::nvram_enable_w));
+	map(0x1c00, 0x1c01).mirror(0x007e).nopr().w(FUNC(jedi_state::nvram_enable_w));
 	map(0x1c80, 0x1c87).mirror(0x0078).nopr().w("adc", FUNC(adc0808_device::address_offset_start_w));
 	map(0x1d00, 0x1d00).mirror(0x007f).noprw();   /* write: NVRAM store */
 	map(0x1d80, 0x1d80).mirror(0x007f).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x1e00, 0x1e00).mirror(0x007f).nopr().w(this, FUNC(jedi_state::main_irq_ack_w));
+	map(0x1e00, 0x1e00).mirror(0x007f).nopr().w(FUNC(jedi_state::main_irq_ack_w));
 	map(0x1e80, 0x1e87).mirror(0x0078).nopr().w("outlatch", FUNC(ls259_device::write_d7));
-	map(0x1f00, 0x1f00).mirror(0x007f).nopr().w(this, FUNC(jedi_state::jedi_audio_latch_w));
-	map(0x1f80, 0x1f80).mirror(0x007f).nopr().w(this, FUNC(jedi_state::rom_banksel_w));
+	map(0x1f00, 0x1f00).mirror(0x007f).nopr().w(FUNC(jedi_state::jedi_audio_latch_w));
+	map(0x1f80, 0x1f80).mirror(0x007f).nopr().w(FUNC(jedi_state::rom_banksel_w));
 	map(0x2000, 0x27ff).ram().share("backgroundram");
 	map(0x2800, 0x2fff).ram().share("paletteram");
 	map(0x3000, 0x37bf).ram().share("foregroundram");
 	map(0x37c0, 0x3bff).ram().share("spriteram");
-	map(0x3c00, 0x3c01).mirror(0x00fe).nopr().w(this, FUNC(jedi_state::jedi_vscroll_w));
-	map(0x3d00, 0x3d01).mirror(0x00fe).nopr().w(this, FUNC(jedi_state::jedi_hscroll_w));
+	map(0x3c00, 0x3c01).mirror(0x00fe).nopr().w(FUNC(jedi_state::jedi_vscroll_w));
+	map(0x3d00, 0x3d01).mirror(0x00fe).nopr().w(FUNC(jedi_state::jedi_hscroll_w));
 	map(0x3e00, 0x3e00).mirror(0x01ff).writeonly().share("smoothing_table");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();

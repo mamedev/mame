@@ -1895,14 +1895,14 @@ void model1_state::copro_data_map(address_map &map)
 
 void model1_state::copro_io_map(address_map &map)
 {
-	map(0x0008, 0x0008).rw(this, FUNC(model1_state::copro_ramadr_r), FUNC(model1_state::copro_ramadr_w));
-	map(0x0009, 0x0009).rw(this, FUNC(model1_state::copro_ramdata_r), FUNC(model1_state::copro_ramdata_w));
-	map(0x0020, 0x0023).rw(this, FUNC(model1_state::copro_sincos_r), FUNC(model1_state::copro_sincos_w));
-	map(0x0024, 0x0027).rw(this, FUNC(model1_state::copro_atan_r), FUNC(model1_state::copro_atan_w));
-	map(0x0028, 0x0029).rw(this, FUNC(model1_state::copro_inv_r), FUNC(model1_state::copro_inv_w));
-	map(0x002a, 0x002b).rw(this, FUNC(model1_state::copro_isqrt_r), FUNC(model1_state::copro_isqrt_w));
-	map(0x002e, 0x002e).w(this, FUNC(model1_state::copro_data_w));
-	map(0x8000, 0xffff).r(this, FUNC(model1_state::copro_data_r));
+	map(0x0008, 0x0008).rw(FUNC(model1_state::copro_ramadr_r), FUNC(model1_state::copro_ramadr_w));
+	map(0x0009, 0x0009).rw(FUNC(model1_state::copro_ramdata_r), FUNC(model1_state::copro_ramdata_w));
+	map(0x0020, 0x0023).rw(FUNC(model1_state::copro_sincos_r), FUNC(model1_state::copro_sincos_w));
+	map(0x0024, 0x0027).rw(FUNC(model1_state::copro_atan_r), FUNC(model1_state::copro_atan_w));
+	map(0x0028, 0x0029).rw(FUNC(model1_state::copro_inv_r), FUNC(model1_state::copro_inv_w));
+	map(0x002a, 0x002b).rw(FUNC(model1_state::copro_isqrt_r), FUNC(model1_state::copro_isqrt_w));
+	map(0x002e, 0x002e).w(FUNC(model1_state::copro_data_w));
+	map(0x8000, 0xffff).r(FUNC(model1_state::copro_data_r));
 }
 
 void model1_state::copro_rf_map(address_map &map)

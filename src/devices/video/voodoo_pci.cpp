@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(VOODOO_3_PCI, voodoo_3_pci_device, "voodoo_3_pci", "Voodoo 3 
 void voodoo_pci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x40, 0x5f).rw(this, FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
+	map(0x40, 0x5f).rw(FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
 }
 
 // VOODOO_1 & VOODOO_2 map

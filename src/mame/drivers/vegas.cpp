@@ -1669,31 +1669,31 @@ INPUT_PORTS_END
 *************************************/
 void vegas_state::vegas_cs2_map(address_map &map)
 {
-	map(0x00000000, 0x00007003).rw(this, FUNC(vegas_state::sio_r), FUNC(vegas_state::sio_w));
+	map(0x00000000, 0x00007003).rw(FUNC(vegas_state::sio_r), FUNC(vegas_state::sio_w));
 }
 
 void vegas_state::vegas_cs3_map(address_map &map)
 {
-	map(0x00000000, 0x00000003).rw(this, FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
+	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
 	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
 }
 
 void vegas_state::vegas_cs4_map(address_map &map)
 {
-	map(0x00000000, 0x00007fff).rw(this, FUNC(vegas_state::timekeeper_r), FUNC(vegas_state::timekeeper_w));
+	map(0x00000000, 0x00007fff).rw(FUNC(vegas_state::timekeeper_r), FUNC(vegas_state::timekeeper_w));
 }
 
 void vegas_state::vegas_cs5_map(address_map &map)
 {
-	map(0x00000000, 0x00000003).rw(this, FUNC(vegas_state::cpu_io_r), FUNC(vegas_state::cpu_io_w));
-	map(0x00100000, 0x001fffff).r(this, FUNC(vegas_state::unknown_r));
+	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::cpu_io_r), FUNC(vegas_state::cpu_io_w));
+	map(0x00100000, 0x001fffff).r(FUNC(vegas_state::unknown_r));
 }
 
 void vegas_state::vegas_cs6_map(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::packed_r), FUNC(midway_ioasic_device::packed_w));
-	map(0x00001000, 0x00001003).w(this, FUNC(vegas_state::asic_fifo_w));
-	map(0x00003000, 0x00003003).w(this, FUNC(vegas_state::dcs3_fifo_full_w));  // if (m_dcs_idma_cs != 0)
+	map(0x00001000, 0x00001003).w(FUNC(vegas_state::asic_fifo_w));
+	map(0x00003000, 0x00003003).w(FUNC(vegas_state::dcs3_fifo_full_w));  // if (m_dcs_idma_cs != 0)
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 6)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 6)
 }
@@ -1701,7 +1701,7 @@ void vegas_state::vegas_cs6_map(address_map &map)
 void vegas_state::vegas_cs7_map(address_map &map)
 {
 	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
-	map(0x00001000, 0x0000100f).rw(this, FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
+	map(0x00001000, 0x0000100f).rw(FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 7)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 7)
 }
@@ -1710,8 +1710,8 @@ void vegas_state::vegas_cs8_map(address_map &map)
 {
 	map(0x01000000, 0x0100001f).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial ttyS01 (TL16C552 CS0)
 	map(0x01400000, 0x0140001f).rw(m_uart2, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial ttyS02 (TL16C552 CS1)
-	map(0x01800000, 0x0180001f).rw(this, FUNC(vegas_state::parallel_r), FUNC(vegas_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
-	map(0x01c00000, 0x01c00000).w(this, FUNC(vegas_state::mpsreset_w)); // MPS Reset
+	map(0x01800000, 0x0180001f).rw(FUNC(vegas_state::parallel_r), FUNC(vegas_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
+	map(0x01c00000, 0x01c00000).w(FUNC(vegas_state::mpsreset_w)); // MPS Reset
 }
 
 /*************************************

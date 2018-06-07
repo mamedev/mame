@@ -203,7 +203,7 @@ void polyplay_state::polyplay_mem_zre(address_map &map)
 	map(0x0c00, 0x0fff).ram();
 	map(0x1000, 0x8fff).rom();
 	map(0xe800, 0xebff).rom().region("gfx1", 0);
-	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
+	map(0xec00, 0xf7ff).ram().w(FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
 	map(0xf800, 0xffff).ram().share("videoram");
 }
 
@@ -216,7 +216,7 @@ void polyplay_state::polyplay_mem_zrepp(address_map &map)
 	map(0xd000, 0xd7ff).rom().region("gfx1", 0);
 
 	map(0xea00, 0xebff).ram();
-	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
+	map(0xec00, 0xf7ff).ram().w(FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
 
 	map(0xf800, 0xffff).ram().share("videoram");
 }

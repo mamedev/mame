@@ -182,14 +182,14 @@ void nsmpoker_state::nsmpoker_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x9000, 0xafff).ram(); // OK... cleared at beginning.
 	map(0xb000, 0xcfff).rom(); // WRONG... just to map the last rom somewhere.
-	map(0xe000, 0xefff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
-	map(0xf000, 0xffff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
+	map(0xe000, 0xefff).ram().w(FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
+	map(0xf000, 0xffff).ram().w(FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
 }
 
 void nsmpoker_state::nsmpoker_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).r(this, FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
+	map(0xf0, 0xf0).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
 }
 
 /* I/O byte R/W

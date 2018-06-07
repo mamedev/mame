@@ -214,15 +214,15 @@ void cabaret_state::cabaret_portmap(address_map &map)
 
 	map(0x00e0, 0x00e1).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x2000, 0x27ff).ram().w(this, FUNC(cabaret_state::fg_tile_w)).share("fg_tile_ram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(cabaret_state::fg_color_w)).share("fg_color_ram");
+	map(0x2000, 0x27ff).ram().w(FUNC(cabaret_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x2800, 0x2fff).ram().w(FUNC(cabaret_state::fg_color_w)).share("fg_color_ram");
 
 	map(0x3000, 0x37ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3800, 0x3fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	map(0x1000, 0x103f).ram().w(this, FUNC(cabaret_state::bg_scroll_w)).share("bg_scroll");
+	map(0x1000, 0x103f).ram().w(FUNC(cabaret_state::bg_scroll_w)).share("bg_scroll");
 
-	map(0x1800, 0x19ff).ram().w(this, FUNC(cabaret_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x1800, 0x19ff).ram().w(FUNC(cabaret_state::bg_tile_w)).share("bg_tile_ram");
 	map(0x8000, 0xffff).rom().region("gfx3", 0);
 }
 

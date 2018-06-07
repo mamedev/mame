@@ -72,7 +72,7 @@ void sc2_state::sc2_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x13ff).ram();
 	map(0x2000, 0x33ff).rom();
-	map(0x3c00, 0x3c00).r(this, FUNC(sc2_state::sc2_beep));
+	map(0x3c00, 0x3c00).r(FUNC(sc2_state::sc2_beep));
 }
 
 void sc2_state::sc2_io(address_map &map)

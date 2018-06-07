@@ -143,7 +143,7 @@ void ms0515_state::ms0515_mem(address_map &map)
 
 	map(0160000, 0177377).rom().nopw();
 
-	map(0177400, 0177437).w(this, FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
+	map(0177400, 0177437).w(FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
 
 	map(0177440, 0177440).r(m_i8251kbd, FUNC(i8251_device::data_r));
 	map(0177442, 0177442).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -171,7 +171,7 @@ void ms0515_state::ms0515_mem(address_map &map)
 	map(0177720, 0177720).w(m_i8251line, FUNC(i8251_device::data_w));
 	map(0177722, 0177722).w(m_i8251line, FUNC(i8251_device::control_w));
 
-	map(0177770, 0177771).rw(this, FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
+	map(0177770, 0177771).rw(FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
 }
 
 /*

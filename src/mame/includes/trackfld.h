@@ -5,6 +5,10 @@
     Track'n'Field
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_TRACKFLD_H
+#define MAME_INCLUDES_TRACKFLD_H
+
+#pragma once
 
 #include "audio/trackfld.h"
 #include "sound/dac.h"
@@ -42,7 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(trackfld_speech_r);
 	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
 
 	void reaktor(machine_config &config);
 	void atlantol(machine_config &config);
@@ -120,3 +124,5 @@ private:
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
+
+#endif // MAME_INCLUDES_TRACKFLD_H

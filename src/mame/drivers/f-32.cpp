@@ -107,7 +107,7 @@ void mosaicf2_state::mosaicf2_io(address_map &map)
 	map(0x4003, 0x4003).r("oki", FUNC(okim6295_device::read));
 	map(0x4813, 0x4813).r("ymsnd", FUNC(ym2151_device::status_r));
 	map(0x5000, 0x5003).portr("P1");
-	map(0x5200, 0x5203).r(this, FUNC(mosaicf2_state::f32_input_port_1_r));
+	map(0x5200, 0x5203).r(FUNC(mosaicf2_state::f32_input_port_1_r));
 	map(0x5400, 0x5403).portr("EEPROMIN");
 	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
 	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));

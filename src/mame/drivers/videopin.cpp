@@ -222,13 +222,13 @@ WRITE8_MEMBER(videopin_state::note_dvsr_w)
 void videopin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x07ff).ram().w(this, FUNC(videopin_state::video_ram_w)).share("video_ram");
-	map(0x0800, 0x0800).r(this, FUNC(videopin_state::misc_r)).w(this, FUNC(videopin_state::note_dvsr_w));
-	map(0x0801, 0x0801).w(this, FUNC(videopin_state::led_w));
+	map(0x0200, 0x07ff).ram().w(FUNC(videopin_state::video_ram_w)).share("video_ram");
+	map(0x0800, 0x0800).r(FUNC(videopin_state::misc_r)).w(FUNC(videopin_state::note_dvsr_w));
+	map(0x0801, 0x0801).w(FUNC(videopin_state::led_w));
 	map(0x0802, 0x0802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0804, 0x0804).w(this, FUNC(videopin_state::ball_w));
-	map(0x0805, 0x0805).w(this, FUNC(videopin_state::out1_w));
-	map(0x0806, 0x0806).w(this, FUNC(videopin_state::out2_w));
+	map(0x0804, 0x0804).w(FUNC(videopin_state::ball_w));
+	map(0x0805, 0x0805).w(FUNC(videopin_state::out1_w));
+	map(0x0806, 0x0806).w(FUNC(videopin_state::out2_w));
 	map(0x1000, 0x1000).portr("IN0");
 	map(0x1800, 0x1800).portr("DSW");
 	map(0x2000, 0x3fff).rom();

@@ -1849,8 +1849,8 @@ void goldnpkr_state::goldnpkr_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x7fff).rom(); /* superdbl uses 0x2000..0x3fff address space */
 }
 
@@ -1862,8 +1862,8 @@ void goldnpkr_state::pottnpkr_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -1875,8 +1875,8 @@ void goldnpkr_state::witchcrd_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 //  map(0x2108, 0x210b).noprw(); /* unknown 40-pin device */
 	map(0x2800, 0x2fff).ram();
@@ -1901,8 +1901,8 @@ void goldnpkr_state::witchcrd_falcon_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -1917,8 +1917,8 @@ void goldnpkr_state::wildcard_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2200, 0x27ff).rom(); /* for VK set */
 	map(0x2800, 0x2fff).ram(); /* for VK set */
@@ -1939,8 +1939,8 @@ void goldnpkr_state::wcrdxtnd_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2200, 0x27ff).rom(); /* for VK hardware */
 	map(0x2800, 0x2fff).ram().share("nvram");   /* Dallas ds1210 + battery backed RAM */
@@ -1959,8 +1959,8 @@ void goldnpkr_state::wildcrdb_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -1997,8 +1997,8 @@ void goldnpkr_state::genie_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x17ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1fff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x17ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -2011,8 +2011,8 @@ void goldnpkr_state::mondial_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x4000, 0x7fff).bankr("bank1");
 }
 
@@ -2024,8 +2024,8 @@ void goldnpkr_state::bchancep_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x7fff).rom();
 }
 
@@ -4631,17 +4631,17 @@ void blitz_state::megadpkr_map(address_map &map)
     map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
     map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 */
-	map(0x1000, 0x13ff).ram().w(this, FUNC(blitz_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(blitz_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(blitz_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(blitz_state::goldnpkr_colorram_w)).share("colorram");
 
 	map(0x4000, 0x7fff).rw(m_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0xbfff).nopr().w(this, FUNC(blitz_state::mcu_command_w));
+	map(0x8000, 0xbfff).nopr().w(FUNC(blitz_state::mcu_command_w));
 	map(0xc000, 0xffff).rom();
 }
 
 void blitz_state::megadpkr_banked_map(address_map &map)
 {
-	map(0x00000, 0x07fff).r(this, FUNC(blitz_state::cpubank_decrypt_r));
+	map(0x00000, 0x07fff).r(FUNC(blitz_state::cpubank_decrypt_r));
 	map(0x08000, 0x087ff).rw("timekpr", FUNC(m48t02_device::read), FUNC(m48t02_device::write));
 }
 

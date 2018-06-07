@@ -1019,13 +1019,13 @@ void peplus_state::peplus_map(address_map &map)
 void peplus_state::peplus_iomap(address_map &map)
 {
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	map(0x0000, 0x1fff).ram().w(this, FUNC(peplus_state::peplus_cmos_w)).share("cmos");
+	map(0x0000, 0x1fff).ram().w(FUNC(peplus_state::peplus_cmos_w)).share("cmos");
 
 	// CRT Controller
-	map(0x2008, 0x2008).w(this, FUNC(peplus_state::peplus_crtc_mode_w));
+	map(0x2008, 0x2008).w(FUNC(peplus_state::peplus_crtc_mode_w));
 	map(0x2080, 0x2080).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2081, 0x2081).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2083, 0x2083).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(peplus_state::peplus_crtc_display_w));
+	map(0x2083, 0x2083).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(peplus_state::peplus_crtc_display_w));
 
 	// Superboard Data
 	map(0x3000, 0x3fff).ram().share("s3000_ram");
@@ -1038,7 +1038,7 @@ void peplus_state::peplus_iomap(address_map &map)
 	map(0x5000, 0x5fff).ram().share("s5000_ram");
 
 	// Background Color Latch
-	map(0x6000, 0x6000).r(this, FUNC(peplus_state::peplus_bgcolor_r)).w(this, FUNC(peplus_state::peplus_bgcolor_w));
+	map(0x6000, 0x6000).r(FUNC(peplus_state::peplus_bgcolor_r)).w(FUNC(peplus_state::peplus_bgcolor_w));
 
 	// Bogus Location for Video RAM
 	map(0x06001, 0x06400).ram().share("videoram");
@@ -1047,25 +1047,25 @@ void peplus_state::peplus_iomap(address_map &map)
 	map(0x7000, 0x7fff).ram().share("s7000_ram");
 
 	// Input Bank A, Output Bank C
-	map(0x8000, 0x8000).r(this, FUNC(peplus_state::peplus_input_bank_a_r)).w(this, FUNC(peplus_state::peplus_output_bank_c_w));
+	map(0x8000, 0x8000).r(FUNC(peplus_state::peplus_input_bank_a_r)).w(FUNC(peplus_state::peplus_output_bank_c_w));
 
 	// Drop Door, I2C EEPROM Writes
-	map(0x9000, 0x9000).r(this, FUNC(peplus_state::peplus_dropdoor_r)).w(this, FUNC(peplus_state::i2c_nvram_w));
+	map(0x9000, 0x9000).r(FUNC(peplus_state::peplus_dropdoor_r)).w(FUNC(peplus_state::i2c_nvram_w));
 
 	// Input Banks B & C, Output Bank B
-	map(0xa000, 0xa000).r(this, FUNC(peplus_state::peplus_input0_r)).w(this, FUNC(peplus_state::peplus_output_bank_b_w));
+	map(0xa000, 0xa000).r(FUNC(peplus_state::peplus_input0_r)).w(FUNC(peplus_state::peplus_output_bank_b_w));
 
 	// Superboard Data
 	map(0xb000, 0xbfff).ram().share("sb000_ram");
 
 	// Output Bank A
-	map(0xc000, 0xc000).r(this, FUNC(peplus_state::peplus_watchdog_r)).w(this, FUNC(peplus_state::peplus_output_bank_a_w));
+	map(0xc000, 0xc000).r(FUNC(peplus_state::peplus_watchdog_r)).w(FUNC(peplus_state::peplus_output_bank_a_w));
 
 	// Superboard Data
 	map(0xd000, 0xdfff).ram().share("sd000_ram");
 
 	// DUART
-	map(0xe000, 0xe00f).rw(this, FUNC(peplus_state::peplus_duart_r), FUNC(peplus_state::peplus_duart_w));
+	map(0xe000, 0xe00f).rw(FUNC(peplus_state::peplus_duart_r), FUNC(peplus_state::peplus_duart_w));
 
 	// Superboard Data
 	map(0xf000, 0xffff).ram().share("sf000_ram");

@@ -188,7 +188,7 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 void apple2gs_state::vectors_map(address_map &map)
 {
-	map(0x00, 0x1f).r(this, FUNC(apple2gs_state::apple2gs_read_vector));
+	map(0x00, 0x1f).r(FUNC(apple2gs_state::apple2gs_read_vector));
 }
 
 // ADB microcontroller emulation

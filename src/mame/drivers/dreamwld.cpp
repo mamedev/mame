@@ -412,18 +412,18 @@ void dreamwld_state::baryon_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x800000, 0x801fff).ram().w(this, FUNC(dreamwld_state::vram_w<0>)).share("vram_0");
-	map(0x802000, 0x803fff).ram().w(this, FUNC(dreamwld_state::vram_w<1>)).share("vram_1");
-	map(0x804000, 0x8043ff).rw(this, FUNC(dreamwld_state::lineram16_r), FUNC(dreamwld_state::lineram16_w));  // linescroll
+	map(0x800000, 0x801fff).ram().w(FUNC(dreamwld_state::vram_w<0>)).share("vram_0");
+	map(0x802000, 0x803fff).ram().w(FUNC(dreamwld_state::vram_w<1>)).share("vram_1");
+	map(0x804000, 0x8043ff).rw(FUNC(dreamwld_state::lineram16_r), FUNC(dreamwld_state::lineram16_w));  // linescroll
 	map(0x804400, 0x805fff).ram().share("vregs");
 
 	map(0xc00000, 0xc00003).portr("INPUTS");
 	map(0xc00004, 0xc00007).portr("c00004");
 
-	map(0xc0000c, 0xc0000f).w(this, FUNC(dreamwld_state::okibank_w<0>)); // sfx
+	map(0xc0000c, 0xc0000f).w(FUNC(dreamwld_state::okibank_w<0>)); // sfx
 	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
 
-	map(0xc00030, 0xc00033).r(this, FUNC(dreamwld_state::protdata_r)); // it reads protection data (irq code) from here and puts it at ffd000
+	map(0xc00030, 0xc00033).r(FUNC(dreamwld_state::protdata_r)); // it reads protection data (irq code) from here and puts it at ffd000
 
 	map(0xfe0000, 0xffffff).ram().share("workram"); // work ram
 }
@@ -432,7 +432,7 @@ void dreamwld_state::dreamwld_map(address_map &map)
 {
 	baryon_map(map);
 
-	map(0xc0002c, 0xc0002f).w(this, FUNC(dreamwld_state::okibank_w<1>)); // sfx
+	map(0xc0002c, 0xc0002f).w(FUNC(dreamwld_state::okibank_w<1>)); // sfx
 	map(0xc00028, 0xc00028).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
 }
 

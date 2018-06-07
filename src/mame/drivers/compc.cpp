@@ -182,14 +182,14 @@ void compc_state::compc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(compc_state::pio_r), FUNC(compc_state::pio_w));
+	map(0x0060, 0x0063).rw(FUNC(compc_state::pio_r), FUNC(compc_state::pio_w));
 }
 
 void compc_state::compciii_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
+	map(0x0060, 0x0063).rw(FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
 }
 
 MACHINE_CONFIG_START(compc_state::compc)

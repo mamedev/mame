@@ -177,8 +177,8 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x08, 0x08).portr("JOY1");
 
 	/* printer */
-	map(0x10, 0x10).r(this, FUNC(vg5k_state::printer_r));
-	map(0x11, 0x11).w(this, FUNC(vg5k_state::printer_w));
+	map(0x10, 0x10).r(FUNC(vg5k_state::printer_r));
+	map(0x11, 0x11).w(FUNC(vg5k_state::printer_w));
 
 	/* keyboard */
 	map(0x80, 0x80).portr("ROW1");
@@ -191,11 +191,11 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x87, 0x87).portr("ROW8");
 
 	/* EF9345 */
-	map(0x8f, 0x8f).w(this, FUNC(vg5k_state::ef9345_offset_w));
-	map(0xcf, 0xcf).rw(this, FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
+	map(0x8f, 0x8f).w(FUNC(vg5k_state::ef9345_offset_w));
+	map(0xcf, 0xcf).rw(FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
 
 	/* cassette */
-	map(0xaf, 0xaf).rw(this, FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
+	map(0xaf, 0xaf).rw(FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
 }
 
 /* Input ports */

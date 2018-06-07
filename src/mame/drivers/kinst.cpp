@@ -476,9 +476,9 @@ void kinst_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("rambase");
 	map(0x08000000, 0x087fffff).ram().share("rambase2");
-	map(0x10000080, 0x100000ff).rw(this, FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
-	map(0x10000100, 0x1000013f).rw(this, FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
-	map(0x10000170, 0x10000173).rw(this, FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
+	map(0x10000080, 0x100000ff).rw(FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
+	map(0x10000100, 0x1000013f).rw(FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
+	map(0x10000170, 0x10000173).rw(FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0).share("rombase");
 }
 

@@ -339,12 +339,12 @@ void bigbord2_state::bigbord2_io(address_map &map)
 	map(0x80, 0x83).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // u16
 	map(0x84, 0x87).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // u37 has issues
 	map(0x88, 0x8b).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // u21
-	map(0x8c, 0x8f).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // u62
+	map(0x8c, 0x8f).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // u62
 	map(0xc0, 0xc3).w("proglatch", FUNC(ls259_device::write_nibble_d3)); // u41 - eprom programming port
-	map(0xc4, 0xc7).r(this, FUNC(bigbord2_state::status_port_r)); // u11
+	map(0xc4, 0xc7).r(FUNC(bigbord2_state::status_port_r)); // u11
 	map(0xc8, 0xcb).w(m_syslatch1, FUNC(ls259_device::write_nibble_d3)); // u14
-	map(0xcc, 0xcf).w(this, FUNC(bigbord2_state::syslatch2_w));
-	map(0xd0, 0xd3).r(this, FUNC(bigbord2_state::kbd_r)); // u1
+	map(0xcc, 0xcf).w(FUNC(bigbord2_state::syslatch2_w));
+	map(0xd0, 0xd3).r(FUNC(bigbord2_state::kbd_r)); // u1
 	map(0xd4, 0xd7).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)); // u10
 	//AM_RANGE(0xd8, 0xdb) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
 	map(0xd9, 0xd9).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96

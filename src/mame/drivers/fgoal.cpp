@@ -212,31 +212,31 @@ void fgoal_state::cpu_map(address_map &map)
 
 	map(0x0000, 0x00ef).ram();
 
-	map(0x00f0, 0x00f0).r(this, FUNC(fgoal_state::row_r));
-	map(0x00f1, 0x00f1).r(this, FUNC(fgoal_state::analog_r));
+	map(0x00f0, 0x00f0).r(FUNC(fgoal_state::row_r));
+	map(0x00f1, 0x00f1).r(FUNC(fgoal_state::analog_r));
 	map(0x00f2, 0x00f2).portr("IN0");
 	map(0x00f3, 0x00f3).portr("IN1");
-	map(0x00f4, 0x00f4).r(this, FUNC(fgoal_state::address_hi_r));
-	map(0x00f5, 0x00f5).r(this, FUNC(fgoal_state::address_lo_r));
-	map(0x00f6, 0x00f6).r(this, FUNC(fgoal_state::shifter_r));
-	map(0x00f7, 0x00f7).r(this, FUNC(fgoal_state::shifter_reverse_r));
-	map(0x00f8, 0x00fb).r(this, FUNC(fgoal_state::nmi_reset_r));
-	map(0x00fc, 0x00ff).r(this, FUNC(fgoal_state::irq_reset_r));
+	map(0x00f4, 0x00f4).r(FUNC(fgoal_state::address_hi_r));
+	map(0x00f5, 0x00f5).r(FUNC(fgoal_state::address_lo_r));
+	map(0x00f6, 0x00f6).r(FUNC(fgoal_state::shifter_r));
+	map(0x00f7, 0x00f7).r(FUNC(fgoal_state::shifter_reverse_r));
+	map(0x00f8, 0x00fb).r(FUNC(fgoal_state::nmi_reset_r));
+	map(0x00fc, 0x00ff).r(FUNC(fgoal_state::irq_reset_r));
 
-	map(0x00f0, 0x00f0).w(this, FUNC(fgoal_state::row_w));
-	map(0x00f1, 0x00f1).w(this, FUNC(fgoal_state::col_w));
-	map(0x00f2, 0x00f2).w(this, FUNC(fgoal_state::row_w));
-	map(0x00f3, 0x00f3).w(this, FUNC(fgoal_state::col_w));
+	map(0x00f0, 0x00f0).w(FUNC(fgoal_state::row_w));
+	map(0x00f1, 0x00f1).w(FUNC(fgoal_state::col_w));
+	map(0x00f2, 0x00f2).w(FUNC(fgoal_state::row_w));
+	map(0x00f3, 0x00f3).w(FUNC(fgoal_state::col_w));
 	map(0x00f4, 0x00f7).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x00f8, 0x00fb).w(this, FUNC(fgoal_state::sound1_w));
-	map(0x00fc, 0x00ff).w(this, FUNC(fgoal_state::sound2_w));
+	map(0x00f8, 0x00fb).w(FUNC(fgoal_state::sound1_w));
+	map(0x00fc, 0x00ff).w(FUNC(fgoal_state::sound2_w));
 
 	map(0x0100, 0x03ff).ram();
 	map(0x4000, 0x7fff).ram().share("video_ram");
 
-	map(0x8000, 0x8000).w(this, FUNC(fgoal_state::ypos_w));
-	map(0x8001, 0x8001).w(this, FUNC(fgoal_state::xpos_w));
-	map(0x8002, 0x8002).w(this, FUNC(fgoal_state::color_w));
+	map(0x8000, 0x8000).w(FUNC(fgoal_state::ypos_w));
+	map(0x8001, 0x8001).w(FUNC(fgoal_state::xpos_w));
+	map(0x8002, 0x8002).w(FUNC(fgoal_state::color_w));
 
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xffff).rom();

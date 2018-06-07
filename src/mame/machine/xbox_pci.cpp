@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device, "nv2a_ram", "NV2A Memory Controlle
 void nv2a_ram_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x6c, 0x6f).rw(this, FUNC(nv2a_ram_device::config_register_r), FUNC(nv2a_ram_device::config_register_w));
+	map(0x6c, 0x6f).rw(FUNC(nv2a_ram_device::config_register_r), FUNC(nv2a_ram_device::config_register_w));
 }
 
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -84,7 +84,7 @@ DEFINE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device, "mcpx_lpc", "MCPX HUB Interface - 
 
 void mcpx_lpc_device::lpc_io(address_map &map)
 {
-	map(0x00000000, 0x000000ff).rw(this, FUNC(mcpx_lpc_device::lpc_r), FUNC(mcpx_lpc_device::lpc_w));
+	map(0x00000000, 0x000000ff).rw(FUNC(mcpx_lpc_device::lpc_r), FUNC(mcpx_lpc_device::lpc_w));
 }
 
 mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -127,7 +127,7 @@ void mcpx_smbus_device::smbus_io0(address_map &map)
 
 void mcpx_smbus_device::smbus_io1(address_map &map)
 {
-	map(0x00000000, 0x0000000f).rw(this, FUNC(mcpx_smbus_device::smbus_r), FUNC(mcpx_smbus_device::smbus_w));
+	map(0x00000000, 0x0000000f).rw(FUNC(mcpx_smbus_device::smbus_r), FUNC(mcpx_smbus_device::smbus_w));
 }
 
 void mcpx_smbus_device::smbus_io2(address_map &map)
@@ -225,7 +225,7 @@ DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Cont
 
 void mcpx_ohci_device::ohci_mmio(address_map &map)
 {
-	map(0x00000000, 0x00000fff).rw(this, FUNC(mcpx_ohci_device::ohci_r), FUNC(mcpx_ohci_device::ohci_w));
+	map(0x00000000, 0x00000fff).rw(FUNC(mcpx_ohci_device::ohci_r), FUNC(mcpx_ohci_device::ohci_w));
 }
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -324,12 +324,12 @@ DEFINE_DEVICE_TYPE(MCPX_ETH, mcpx_eth_device, "mcpx_eth", "MCP Networking Adapte
 
 void mcpx_eth_device::eth_mmio(address_map &map)
 {
-	map(0x00000000, 0x0000003ff).rw(this, FUNC(mcpx_eth_device::eth_r), FUNC(mcpx_eth_device::eth_w));
+	map(0x00000000, 0x0000003ff).rw(FUNC(mcpx_eth_device::eth_r), FUNC(mcpx_eth_device::eth_w));
 }
 
 void mcpx_eth_device::eth_io(address_map &map)
 {
-	map(0x00000000, 0x000000007).rw(this, FUNC(mcpx_eth_device::eth_io_r), FUNC(mcpx_eth_device::eth_io_w));
+	map(0x00000000, 0x000000007).rw(FUNC(mcpx_eth_device::eth_io_r), FUNC(mcpx_eth_device::eth_io_w));
 }
 
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -378,7 +378,7 @@ DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 
 void mcpx_apu_device::apu_mmio(address_map &map)
 {
-	map(0x00000000, 0x00007ffff).rw(this, FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
+	map(0x00000000, 0x00007ffff).rw(FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
 }
 
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -565,17 +565,17 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "
 
 void mcpx_ac97_audio_device::ac97_mmio(address_map &map)
 {
-	map(0x00000000, 0x000000fff).rw(this, FUNC(mcpx_ac97_audio_device::ac97_audio_r), FUNC(mcpx_ac97_audio_device::ac97_audio_w));
+	map(0x00000000, 0x000000fff).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_r), FUNC(mcpx_ac97_audio_device::ac97_audio_w));
 }
 
 void mcpx_ac97_audio_device::ac97_io0(address_map &map)
 {
-	map(0x00000000, 0x0000000ff).rw(this, FUNC(mcpx_ac97_audio_device::ac97_audio_io0_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io0_w));
+	map(0x00000000, 0x0000000ff).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_io0_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io0_w));
 }
 
 void mcpx_ac97_audio_device::ac97_io1(address_map &map)
 {
-	map(0x00000000, 0x00000007f).rw(this, FUNC(mcpx_ac97_audio_device::ac97_audio_io1_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io1_w));
+	map(0x00000000, 0x00000007f).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_io1_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io1_w));
 }
 
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -749,12 +749,12 @@ DEFINE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device, "nv2a_gpu", "NVIDIA NV2A GPU")
 
 void nv2a_gpu_device::nv2a_mmio(address_map &map)
 {
-	map(0x00000000, 0x00ffffff).ram().rw(this, FUNC(nv2a_gpu_device::geforce_r), FUNC(nv2a_gpu_device::geforce_w));
+	map(0x00000000, 0x00ffffff).ram().rw(FUNC(nv2a_gpu_device::geforce_r), FUNC(nv2a_gpu_device::geforce_w));
 }
 
 void nv2a_gpu_device::nv2a_mirror(address_map &map)
 {
-	map(0x00000000, 0x07ffffff).ram().rw(this, FUNC(nv2a_gpu_device::nv2a_mirror_r), FUNC(nv2a_gpu_device::nv2a_mirror_w));
+	map(0x00000000, 0x07ffffff).ram().rw(FUNC(nv2a_gpu_device::nv2a_mirror_r), FUNC(nv2a_gpu_device::nv2a_mirror_w));
 }
 
 nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

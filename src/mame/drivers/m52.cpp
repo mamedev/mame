@@ -63,12 +63,12 @@
 void m52_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(m52_state::m52_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(m52_state::m52_colorram_w)).share("colorram");
-	map(0x8800, 0x8800).mirror(0x07ff).r(this, FUNC(m52_state::m52_protection_r));
+	map(0x8000, 0x83ff).ram().w(FUNC(m52_state::m52_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(m52_state::m52_colorram_w)).share("colorram");
+	map(0x8800, 0x8800).mirror(0x07ff).r(FUNC(m52_state::m52_protection_r));
 	map(0xc800, 0xcbff).mirror(0x0400).writeonly().share("spriteram");
 	map(0xd000, 0xd000).mirror(0x07fc).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).mirror(0x07fc).w(this, FUNC(m52_state::m52_flipscreen_w));   /* + coin counters */
+	map(0xd001, 0xd001).mirror(0x07fc).w(FUNC(m52_state::m52_flipscreen_w));   /* + coin counters */
 	map(0xd000, 0xd000).mirror(0x07f8).portr("IN0");
 	map(0xd001, 0xd001).mirror(0x07f8).portr("IN1");
 	map(0xd002, 0xd002).mirror(0x07f8).portr("IN2");
@@ -81,12 +81,12 @@ void m52_state::main_map(address_map &map)
 void m52_state::alpha1v_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(m52_state::m52_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(m52_state::m52_colorram_w)).share("colorram");
-	map(0x8800, 0x8800).mirror(0x07ff).r(this, FUNC(m52_state::m52_protection_r)); // result is ignored
+	map(0x8000, 0x83ff).ram().w(FUNC(m52_state::m52_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(m52_state::m52_colorram_w)).share("colorram");
+	map(0x8800, 0x8800).mirror(0x07ff).r(FUNC(m52_state::m52_protection_r)); // result is ignored
 	map(0xc800, 0xc9ff).writeonly().share("spriteram"); // bigger or mirrored?
 	map(0xd000, 0xd000).portr("IN0").w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).portr("IN1").w(this, FUNC(m52_state::alpha1v_flipscreen_w));
+	map(0xd001, 0xd001).portr("IN1").w(FUNC(m52_state::alpha1v_flipscreen_w));
 	map(0xd002, 0xd002).portr("IN2");
 	map(0xd003, 0xd003).portr("DSW1");
 	map(0xd004, 0xd004).portr("DSW2");
@@ -97,12 +97,12 @@ void m52_state::alpha1v_map(address_map &map)
 void m52_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).mirror(0x1f).w(this, FUNC(m52_state::m52_scroll_w));
-	map(0x40, 0x40).mirror(0x1f).w(this, FUNC(m52_state::m52_bg1xpos_w));
-	map(0x60, 0x60).mirror(0x1f).w(this, FUNC(m52_state::m52_bg1ypos_w));
-	map(0x80, 0x80).mirror(0x1f).w(this, FUNC(m52_state::m52_bg2xpos_w));
-	map(0xa0, 0xa0).mirror(0x1f).w(this, FUNC(m52_state::m52_bg2ypos_w));
-	map(0xc0, 0xc0).mirror(0x1f).w(this, FUNC(m52_state::m52_bgcontrol_w));
+	map(0x00, 0x00).mirror(0x1f).w(FUNC(m52_state::m52_scroll_w));
+	map(0x40, 0x40).mirror(0x1f).w(FUNC(m52_state::m52_bg1xpos_w));
+	map(0x60, 0x60).mirror(0x1f).w(FUNC(m52_state::m52_bg1ypos_w));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(m52_state::m52_bg2xpos_w));
+	map(0xa0, 0xa0).mirror(0x1f).w(FUNC(m52_state::m52_bg2ypos_w));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(m52_state::m52_bgcontrol_w));
 }
 
 

@@ -195,7 +195,7 @@ void sapi1_state::sapi1_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x27ff).rw(this, FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
+	map(0x2400, 0x27ff).rw(FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
@@ -209,8 +209,8 @@ void sapi1_state::sapi2_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x27ff).r(this, FUNC(sapi1_state::sapi2_keyboard_status_r));
-	map(0x2800, 0x28ff).r(this, FUNC(sapi1_state::sapi2_keyboard_data_r));
+	map(0x2400, 0x27ff).r(FUNC(sapi1_state::sapi2_keyboard_status_r));
+	map(0x2800, 0x28ff).r(FUNC(sapi1_state::sapi2_keyboard_data_r));
 	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
 	map(0x4000, 0x7fff).ram(); // REM-1
 }
@@ -245,29 +245,29 @@ void sapi1_state::sapi3_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
-	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
 }
 
 void sapi1_state::sapi3a_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
-	map(0x10, 0x10).rw(this, FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
-	map(0x11, 0x11).rw(this, FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x10, 0x10).rw(FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
+	map(0x11, 0x11).rw(FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
 	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0x13, 0x13).w(this, FUNC(sapi1_state::uart_reset_w));
-	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x13, 0x13).w(FUNC(sapi1_state::uart_reset_w));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
 }
 
 void sapi1_state::sapi3b_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
-	map(0x0c, 0x0c).r(this, FUNC(sapi1_state::sapi3_0c_r));
-	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x0c, 0x0c).r(FUNC(sapi1_state::sapi3_0c_r));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
 	map(0xe0, 0xe0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe1, 0xe1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }

@@ -39,10 +39,10 @@ void partner_state::partner_mem(address_map &map)
 	map(0xd000, 0xd7ff).bankrw("bank10");
 	map(0xd800, 0xd8ff).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write));  // video
 	map(0xd900, 0xd9ff).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xda00, 0xdaff).w(this, FUNC(partner_state::partner_mem_page_w));
+	map(0xda00, 0xdaff).w(FUNC(partner_state::partner_mem_page_w));
 	map(0xdb00, 0xdbff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xdc00, 0xddff).bankrw("bank11");
-	map(0xde00, 0xdeff).w(this, FUNC(partner_state::partner_win_memory_page_w));
+	map(0xde00, 0xdeff).w(FUNC(partner_state::partner_win_memory_page_w));
 	map(0xe000, 0xe7ff).bankrw("bank12");
 	map(0xe800, 0xffff).bankrw("bank13");
 }

@@ -130,15 +130,15 @@ void pcx_video_device::pcx_vid_map(address_map &map)
 void pcx_video_device::pcx_vid_io(address_map &map)
 {
 	map(0x8000, 0x8007).rw("crtc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
-	map(0x8008, 0x8008).r(this, FUNC(pcx_video_device::unk_r));
-	map(0xa000, 0xa001).rw(this, FUNC(pcx_video_device::vram_latch_r), FUNC(pcx_video_device::vram_latch_w));
-	map(0xa002, 0xa003).rw(this, FUNC(pcx_video_device::term_mcu_r), FUNC(pcx_video_device::term_mcu_w));
+	map(0x8008, 0x8008).r(FUNC(pcx_video_device::unk_r));
+	map(0xa000, 0xa001).rw(FUNC(pcx_video_device::vram_latch_r), FUNC(pcx_video_device::vram_latch_w));
+	map(0xa002, 0xa003).rw(FUNC(pcx_video_device::term_mcu_r), FUNC(pcx_video_device::term_mcu_w));
 	map(0xc000, 0xc7ff).ram();
 }
 
 void pcx_video_device::pcx_vram(address_map &map)
 {
-	map(0x0000, 0x07ff).rw(this, FUNC(pcx_video_device::vram_r), FUNC(pcx_video_device::vram_w));
+	map(0x0000, 0x07ff).rw(FUNC(pcx_video_device::vram_r), FUNC(pcx_video_device::vram_w));
 }
 
 MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
@@ -433,7 +433,7 @@ void pcd_video_device::map(address_map &map)
 {
 	map(0x00, 0x0f).w("crtc", FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0x00, 0x0f).r("crtc", FUNC(scn2674_device::read)).umask16(0xff00);
-	map(0x20, 0x20).w(this, FUNC(pcd_video_device::vram_sw_w));
+	map(0x20, 0x20).w(FUNC(pcd_video_device::vram_sw_w));
 	map(0x30, 0x33).rw("graphics", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w)).umask16(0x00ff);
 }
 
@@ -460,7 +460,7 @@ void pcx_video_device::device_reset()
 
 void pcx_video_device::map(address_map &map)
 {
-	map(0x0, 0xf).rw(this, FUNC(pcx_video_device::term_r), FUNC(pcx_video_device::term_w));
+	map(0x0, 0xf).rw(FUNC(pcx_video_device::term_r), FUNC(pcx_video_device::term_w));
 }
 
 READ8_MEMBER(pcx_video_device::rx_callback)

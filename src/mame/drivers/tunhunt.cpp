@@ -140,11 +140,11 @@ void tunhunt_state::main_map(address_map &map)
 	map(0x1800, 0x1800).writeonly();   /* SHEL0H */
 	map(0x1a00, 0x1a00).writeonly();   /* SHEL1H */
 	map(0x1c00, 0x1c00).writeonly();   /* MOBJV */
-	map(0x1e00, 0x1eff).w(this, FUNC(tunhunt_state::videoram_w)).share("videoram");  /* ALPHA */
+	map(0x1e00, 0x1eff).w(FUNC(tunhunt_state::videoram_w)).share("videoram");  /* ALPHA */
 	map(0x2000, 0x2000).nopw();    /* watchdog */
-	map(0x2000, 0x2007).r(this, FUNC(tunhunt_state::button_r));
+	map(0x2000, 0x2007).r(FUNC(tunhunt_state::button_r));
 	map(0x2400, 0x2400).nopw();    /* INT ACK */
-	map(0x2800, 0x2800).w(this, FUNC(tunhunt_state::control_w));
+	map(0x2800, 0x2800).w(FUNC(tunhunt_state::control_w));
 	map(0x2c00, 0x2fff).writeonly().share("spriteram");
 	map(0x3000, 0x300f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x4000, 0x400f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));

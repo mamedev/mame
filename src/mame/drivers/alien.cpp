@@ -89,10 +89,10 @@ READ64_MEMBER( alien_state::test_r )
 void alien_state::alien_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).rom();
-	map(0x08000000, 0x08000007).r(this, FUNC(alien_state::test_r)); //hangs if zero
+	map(0x08000000, 0x08000007).r(FUNC(alien_state::test_r)); //hangs if zero
 	map(0x0cfe0000, 0x0cffffff).ram();
 	map(0x10000000, 0x13ffffff).ram();
-	map(0x18000000, 0x1800000f).r(this, FUNC(alien_state::test_r)).nopw();
+	map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw();
 }
 
 

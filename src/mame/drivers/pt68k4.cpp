@@ -260,11 +260,11 @@ void pt68k4_state::pt68k2_mem(address_map &map)
 	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
 	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0xfe0080, 0xfe00bf).r(this, FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
-	map(0xfe00c0, 0xfe00ff).w(this, FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
+	map(0xfe0080, 0xfe00bf).r(FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
+	map(0xfe00c0, 0xfe00ff).w(FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
 	map(0xfe0100, 0xfe013f).rw(m_wdfdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
-	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xfe01c0, 0xfe01c3).rw(FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
 	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 }
 
@@ -277,8 +277,8 @@ void pt68k4_state::pt68k4_mem(address_map &map)
 	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
 	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
-	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xfe01c0, 0xfe01c3).rw(FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
 	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 }
 

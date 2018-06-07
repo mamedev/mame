@@ -301,14 +301,14 @@ void mc10_state::mc10_mem(address_map &map)
 	map(0x4000, 0x4fff).bankrw("bank1"); /* 4k internal ram */
 	map(0x5000, 0x8fff).bankrw("bank2"); /* 16k memory expansion */
 	map(0x9000, 0xbffe).noprw(); /* unused */
-	map(0xbfff, 0xbfff).rw(this, FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 
 void mc10_state::mc10_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(mc10_state::mc10_port1_r), FUNC(mc10_state::mc10_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(mc10_state::mc10_port2_r), FUNC(mc10_state::mc10_port2_w));
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(mc10_state::mc10_port1_r), FUNC(mc10_state::mc10_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(mc10_state::mc10_port2_r), FUNC(mc10_state::mc10_port2_w));
 }
 
 void mc10_state::alice32_mem(address_map &map)
@@ -318,7 +318,7 @@ void mc10_state::alice32_mem(address_map &map)
 	map(0x5000, 0x8fff).bankrw("bank2"); /* 16k memory expansion */
 	map(0x9000, 0xafff).noprw(); /* unused */
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
-	map(0xbfff, 0xbfff).rw(this, FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::alice32_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 
@@ -327,7 +327,7 @@ void mc10_state::alice90_mem(address_map &map)
 	map(0x0100, 0x2fff).noprw(); /* unused */
 	map(0x3000, 0xafff).bankrw("bank1");    /* 32k internal ram */
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
-	map(0xbfff, 0xbfff).rw(this, FUNC(mc10_state::alice90_bfff_r), FUNC(mc10_state::alice32_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::alice90_bfff_r), FUNC(mc10_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 

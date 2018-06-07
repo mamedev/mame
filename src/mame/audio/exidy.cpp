@@ -742,10 +742,10 @@ void venture_sound_device::venture_audio_map(address_map &map)
 	map(0x0000, 0x007f).mirror(0x0780).ram();
 	map(0x0800, 0x087f).mirror(0x0780).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x1000, 0x1003).mirror(0x07fc).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).mirror(0x07fc).w(this, FUNC(venture_sound_device::sh8253_w));
-	map(0x2000, 0x27ff).w(this, FUNC(venture_sound_device::filter_w));
-	map(0x2800, 0x2807).mirror(0x07f8).rw(this, FUNC(venture_sound_device::sh6840_r), FUNC(venture_sound_device::sh6840_w));
-	map(0x3000, 0x3003).mirror(0x07fc).w(this, FUNC(venture_sound_device::sfxctrl_w));
+	map(0x1800, 0x1803).mirror(0x07fc).w(FUNC(venture_sound_device::sh8253_w));
+	map(0x2000, 0x27ff).w(FUNC(venture_sound_device::filter_w));
+	map(0x2800, 0x2807).mirror(0x07f8).rw(FUNC(venture_sound_device::sh6840_r), FUNC(venture_sound_device::sh6840_w));
+	map(0x3000, 0x3003).mirror(0x07fc).w(FUNC(venture_sound_device::sfxctrl_w));
 	map(0x5800, 0x7fff).rom();
 }
 
@@ -830,7 +830,7 @@ void mtrap_sound_device::cvsd_map(address_map &map)
 void mtrap_sound_device::cvsd_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(mtrap_sound_device::voiceio_r), FUNC(mtrap_sound_device::voiceio_w));
+	map(0x00, 0xff).rw(FUNC(mtrap_sound_device::voiceio_r), FUNC(mtrap_sound_device::voiceio_w));
 }
 
 
@@ -972,10 +972,10 @@ void victory_sound_device::victory_audio_map(address_map &map)
 	map(0x0000, 0x00ff).mirror(0x0f00).ram();
 	map(0x1000, 0x107f).mirror(0x0f80).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x3000, 0x3003).mirror(0x0ffc).w(this, FUNC(victory_sound_device::sh8253_w));
+	map(0x3000, 0x3003).mirror(0x0ffc).w(FUNC(victory_sound_device::sh8253_w));
 	map(0x4000, 0x4fff).noprw();
-	map(0x5000, 0x5007).mirror(0x0ff8).rw(this, FUNC(victory_sound_device::sh6840_r), FUNC(victory_sound_device::sh6840_w));
-	map(0x6000, 0x6003).mirror(0x0ffc).w(this, FUNC(victory_sound_device::sfxctrl_w));
+	map(0x5000, 0x5007).mirror(0x0ff8).rw(FUNC(victory_sound_device::sh6840_r), FUNC(victory_sound_device::sh6840_w));
+	map(0x6000, 0x6003).mirror(0x0ffc).w(FUNC(victory_sound_device::sfxctrl_w));
 	map(0x7000, 0xafff).noprw();
 	map(0xb000, 0xffff).rom();
 }

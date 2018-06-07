@@ -255,7 +255,7 @@ void voyager_state::voyager_map(address_map &map)
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	map(0x000e0000, 0x000fffff).bankr("bank1");
-	map(0x000e0000, 0x000fffff).w(this, FUNC(voyager_state::bios_ram_w));
+	map(0x000e0000, 0x000fffff).w(FUNC(voyager_state::bios_ram_w));
 	map(0x00100000, 0x03ffffff).ram();  // 64MB
 	map(0x04000000, 0x28ffffff).noprw();
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
@@ -276,7 +276,7 @@ void voyager_state::voyager_io(address_map &map)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	map(0x0170, 0x0177).noprw(); //To debug
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 	map(0x0200, 0x021f).noprw(); //To debug
 	map(0x0260, 0x026f).noprw(); //To debug
 	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
@@ -294,7 +294,7 @@ void voyager_state::voyager_io(address_map &map)
 	map(0x0378, 0x037f).noprw(); //To debug
 	// AM_RANGE(0x0300, 0x03af) AM_NOP
 	// AM_RANGE(0x03b0, 0x03df) AM_NOP
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
 	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));

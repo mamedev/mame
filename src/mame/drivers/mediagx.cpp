@@ -756,9 +756,9 @@ void mediagx_state::mediagx_map(address_map &map)
 	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
 	map(0x000c0000, 0x000fffff).ram().share("bios_ram");
 	map(0x00100000, 0x00ffffff).ram();
-	map(0x40008000, 0x400080ff).rw(this, FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
-	map(0x40008300, 0x400083ff).rw(this, FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
-	map(0x40008400, 0x400084ff).rw(this, FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
+	map(0x40008000, 0x400080ff).rw(FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
+	map(0x40008300, 0x400083ff).rw(FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
+	map(0x40008400, 0x400084ff).rw(FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
 	map(0x40800000, 0x40bfffff).ram().share("vram");
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -766,12 +766,12 @@ void mediagx_state::mediagx_map(address_map &map)
 void mediagx_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0022, 0x0023).rw(this, FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
+	map(0x0022, 0x0023).rw(FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
-	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x0378, 0x037b).rw(this, FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
-	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
-	map(0x0400, 0x04ff).rw(this, FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
+	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 

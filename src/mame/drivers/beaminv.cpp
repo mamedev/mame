@@ -247,8 +247,8 @@ void beaminv_state::main_map(address_map &map)
 	map(0x1800, 0x1fff).ram();
 	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
 	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
-	map(0x3400, 0x3400).mirror(0x03ff).r(this, FUNC(beaminv_state::controller_r));
-	map(0x3800, 0x3800).mirror(0x03ff).r(this, FUNC(beaminv_state::v128_r));
+	map(0x3400, 0x3400).mirror(0x03ff).r(FUNC(beaminv_state::controller_r));
+	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(beaminv_state::v128_r));
 	map(0x4000, 0x5fff).ram().share("videoram");
 }
 
@@ -263,7 +263,7 @@ void beaminv_state::main_map(address_map &map)
 void beaminv_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(beaminv_state::controller_select_w)); /* to be confirmed */
+	map(0x00, 0x00).w(FUNC(beaminv_state::controller_select_w)); /* to be confirmed */
 }
 
 

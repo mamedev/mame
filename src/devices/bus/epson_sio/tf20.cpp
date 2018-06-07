@@ -40,9 +40,9 @@ void epson_tf20_device::cpu_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw("3a", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
-	map(0xf6, 0xf6).r(this, FUNC(epson_tf20_device::rom_disable_r));
+	map(0xf6, 0xf6).r(FUNC(epson_tf20_device::rom_disable_r));
 	map(0xf7, 0xf7).portr("tf20_dip");
-	map(0xf8, 0xf8).rw(this, FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
+	map(0xf8, 0xf8).rw(FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
 	map(0xfa, 0xfb).m("5a", FUNC(upd765a_device::map));
 }
 

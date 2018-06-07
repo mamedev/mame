@@ -283,7 +283,7 @@ void shougi_state::sub_map(address_map &map)
 void shougi_state::readport_sub(address_map &map)
 {
 	map.global_mask(0x00ff);
-	map(0x00, 0x00).r(this, FUNC(shougi_state::semaphore_r));
+	map(0x00, 0x00).r(FUNC(shougi_state::semaphore_r));
 }
 
 

@@ -385,12 +385,12 @@ void interpro_state::interpro_common_map(address_map &map)
 	map(0x4f007e00, 0x4f007eff).m(m_sga, FUNC(interpro_sga_device::map));
 
 	map(0x7f000100, 0x7f00011f).m(m_fdc, FUNC(upd765_family_device::map)).umask32(0x000000ff);
-	map(0x7f000300, 0x7f000301).r(this, FUNC(interpro_state::sreg_error_r));
-	map(0x7f000304, 0x7f000305).rw(this, FUNC(interpro_state::sreg_status_r), FUNC(interpro_state::sreg_led_w));
-	map(0x7f000308, 0x7f000309).rw(this, FUNC(interpro_state::sreg_ctrl1_r), FUNC(interpro_state::sreg_ctrl1_w));
-	map(0x7f00030c, 0x7f00030d).rw(this, FUNC(interpro_state::sreg_ctrl2_r), FUNC(interpro_state::sreg_ctrl2_w));
+	map(0x7f000300, 0x7f000301).r(FUNC(interpro_state::sreg_error_r));
+	map(0x7f000304, 0x7f000305).rw(FUNC(interpro_state::sreg_status_r), FUNC(interpro_state::sreg_led_w));
+	map(0x7f000308, 0x7f000309).rw(FUNC(interpro_state::sreg_ctrl1_r), FUNC(interpro_state::sreg_ctrl1_w));
+	map(0x7f00030c, 0x7f00030d).rw(FUNC(interpro_state::sreg_ctrl2_r), FUNC(interpro_state::sreg_ctrl2_w));
 
-	map(0x7f00031c, 0x7f00031d).rw(this, FUNC(interpro_state::sreg_ctrl3_r), FUNC(interpro_state::sreg_ctrl3_w));
+	map(0x7f00031c, 0x7f00031d).rw(FUNC(interpro_state::sreg_ctrl3_r), FUNC(interpro_state::sreg_ctrl3_w));
 
 	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
@@ -429,7 +429,7 @@ void emerald_state::emerald_base_map(address_map &map)
 	map(0x7f000229, 0x7f000229).w(m_scsi, FUNC(ncr53c90a_device::test_w));
 	map(0x7f00022d, 0x7f00022d).rw(m_scsi, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 
-	map(0x7f000300, 0x7f000300).w(this, FUNC(emerald_state::sreg_error_w));
+	map(0x7f000300, 0x7f000300).w(FUNC(emerald_state::sreg_error_w));
 
 	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
 }
@@ -462,7 +462,7 @@ void turquoise_state::turquoise_base_map(address_map &map)
 	map(0x7f000229, 0x7f000229).w(m_scsi, FUNC(ncr53c90a_device::test_w));
 	map(0x7f00022d, 0x7f00022d).rw(m_scsi, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 
-	map(0x7f000300, 0x7f000300).w(this, FUNC(turquoise_state::sreg_error_w));
+	map(0x7f000300, 0x7f000300).w(FUNC(turquoise_state::sreg_error_w));
 
 	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
 }
@@ -482,7 +482,7 @@ void sapphire_state::sapphire_base_map(address_map &map)
 	map(0x40000000, 0x4000004f).m(INTERPRO_MCGA_TAG, FUNC(interpro_fmcc_device::map));
 	map(0x7f000200, 0x7f0002ff).m(m_arbga, FUNC(interpro_arbga_device::map));
 
-	map(0x7f000600, 0x7f00060f).r(this, FUNC(sapphire_state::nodeid_r)).umask32(0x000000ff);
+	map(0x7f000600, 0x7f00060f).r(FUNC(sapphire_state::nodeid_r)).umask32(0x000000ff);
 
 	// scsi registers have unusual address mapping
 	map(0x7f001001, 0x7f001001).rw(m_scsi, FUNC(ncr53c94_device::tcounter_lo_r), FUNC(ncr53c94_device::tcount_lo_w));
@@ -503,7 +503,7 @@ void sapphire_state::sapphire_base_map(address_map &map)
 
 void sapphire_state::sapphire_main_map(address_map &map)
 {
-	//map(0x00000000, 0xffffffff).rw(this, FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
+	//map(0x00000000, 0xffffffff).rw(FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
 
 	sapphire_base_map(map);
 
@@ -536,7 +536,7 @@ void turquoise_state::turquoise_io_map(address_map &map)
 
 void sapphire_state::sapphire_io_map(address_map &map)
 {
-	//map(0x00000000, 0xffffffff).rw(this, FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
+	//map(0x00000000, 0xffffffff).rw(FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
 
 	sapphire_base_map(map);
 

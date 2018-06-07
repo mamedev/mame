@@ -114,13 +114,13 @@ void play_2_state::play_2_map(address_map &map)
 
 void play_2_state::play_2_io(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(play_2_state::port01_w)); // digits
-	map(0x02, 0x02).w(this, FUNC(play_2_state::port02_w));
+	map(0x01, 0x01).w(FUNC(play_2_state::port01_w)); // digits
+	map(0x02, 0x02).w(FUNC(play_2_state::port02_w));
 	map(0x03, 0x03).w(m_1863, FUNC(cdp1863_device::str_w));
-	map(0x04, 0x04).r(this, FUNC(play_2_state::port04_r));
-	map(0x05, 0x05).r(this, FUNC(play_2_state::port05_r));
-	map(0x06, 0x06).w(this, FUNC(play_2_state::port06_w));
-	map(0x07, 0x07).w(this, FUNC(play_2_state::port07_w));
+	map(0x04, 0x04).r(FUNC(play_2_state::port04_r));
+	map(0x05, 0x05).r(FUNC(play_2_state::port05_r));
+	map(0x06, 0x06).w(FUNC(play_2_state::port06_w));
+	map(0x07, 0x07).w(FUNC(play_2_state::port07_w));
 }
 
 void play_2_state::zira_sound_map(address_map &map)

@@ -252,8 +252,8 @@ void ti990_4_state::cru_map(address_map &map)
 	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
 	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	map(0x1fe, 0x1ff).r(this, FUNC(ti990_4_state::panel_read));
-	map(0xff0, 0xfff).w(this, FUNC(ti990_4_state::panel_write));
+	map(0x1fe, 0x1ff).r(FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
 }
 
 void ti990_4_state::cru_map_v(address_map &map)
@@ -264,8 +264,8 @@ void ti990_4_state::cru_map_v(address_map &map)
 	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
 	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	map(0x1fe, 0x1ff).r(this, FUNC(ti990_4_state::panel_read));
-	map(0xff0, 0xfff).w(this, FUNC(ti990_4_state::panel_write));
+	map(0x1fe, 0x1ff).r(FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
 }
 
 

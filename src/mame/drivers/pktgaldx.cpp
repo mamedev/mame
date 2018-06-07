@@ -118,9 +118,9 @@ void pktgaldx_state::pktgaldx_map(address_map &map)
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 	map(0x161800, 0x16180f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
-	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
-	map(0x167800, 0x167fff).rw(this, FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
+	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
 
 	map(0x170000, 0x17ffff).ram();
 }
@@ -172,17 +172,17 @@ void pktgaldx_state::pktgaldb_map(address_map &map)
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
-	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
-	map(0x16500a, 0x16500b).r(this, FUNC(pktgaldx_state::pckgaldx_unknown_r));
-	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x16500a, 0x16500b).r(FUNC(pktgaldx_state::pckgaldx_unknown_r));
+	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
 	/* should we really be using these to read the i/o in the BOOTLEG?
 	  these look like i/o through protection ... */
 	map(0x167842, 0x167843).portr("INPUTS");
 	map(0x167c4c, 0x167c4d).portr("DSW");
 	map(0x167db2, 0x167db3).portr("SYSTEM");
 
-	map(0x167d10, 0x167d11).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
-	map(0x167d1a, 0x167d1b).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
+	map(0x167d10, 0x167d11).r(FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
+	map(0x167d1a, 0x167d1b).r(FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
 
 	map(0x170000, 0x17ffff).ram();
 

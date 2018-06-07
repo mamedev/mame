@@ -23,8 +23,8 @@ static void microdisc_floppies(device_slot_interface &device)
 void microdisc_device::map(address_map &map)
 {
 	map(0x310, 0x313).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x314, 0x314).rw(this, FUNC(microdisc_device::port_314_r), FUNC(microdisc_device::port_314_w));
-	map(0x318, 0x318).r(this, FUNC(microdisc_device::port_318_r));
+	map(0x314, 0x314).rw(FUNC(microdisc_device::port_314_r), FUNC(microdisc_device::port_314_w));
+	map(0x318, 0x318).r(FUNC(microdisc_device::port_318_r));
 }
 
 microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

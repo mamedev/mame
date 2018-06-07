@@ -428,7 +428,7 @@ void e100_state::e100_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x87ff).rom().region("roms", 0);
 	map(0xc000, 0xc3ff).ram().share("videoram");
-	map(0xc800, 0xc81f).rw(this, FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
+	map(0xc800, 0xc81f).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
 	map(0xd000, 0xffff).rom().region("roms", 0x1000);
 }
 

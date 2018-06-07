@@ -121,17 +121,17 @@ void shangha3_state::shangha3_map(address_map &map)
 	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x200000, 0x200001).portr("INPUTS");
 	map(0x200002, 0x200003).portr("SYSTEM");
-	map(0x200008, 0x200009).w(this, FUNC(shangha3_state::blitter_go_w));
-	map(0x20000a, 0x20000b).w(this, FUNC(shangha3_state::irq_ack_w));
-	map(0x20000c, 0x20000d).w(this, FUNC(shangha3_state::shangha3_coinctrl_w));
+	map(0x200008, 0x200009).w(FUNC(shangha3_state::blitter_go_w));
+	map(0x20000a, 0x20000b).w(FUNC(shangha3_state::irq_ack_w));
+	map(0x20000c, 0x20000d).w(FUNC(shangha3_state::shangha3_coinctrl_w));
 	map(0x20001f, 0x20001f).r("aysnd", FUNC(ym2149_device::data_r));
 	map(0x20002f, 0x20002f).w("aysnd", FUNC(ym2149_device::data_w));
 	map(0x20003f, 0x20003f).w("aysnd", FUNC(ym2149_device::address_w));
-	map(0x20004e, 0x20004f).rw(this, FUNC(shangha3_state::shangha3_prot_r), FUNC(shangha3_state::shangha3_prot_w));
+	map(0x20004e, 0x20004f).rw(FUNC(shangha3_state::shangha3_prot_r), FUNC(shangha3_state::shangha3_prot_w));
 	map(0x20006f, 0x20006f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
-	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
-	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x340000, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
 }
 
 void shangha3_state::heberpop_map(address_map &map)
@@ -141,13 +141,13 @@ void shangha3_state::heberpop_map(address_map &map)
 	map(0x200000, 0x200001).portr("INPUTS");
 	map(0x200002, 0x200003).portr("SYSTEM");
 	map(0x200004, 0x200005).portr("DSW");
-	map(0x200008, 0x200009).w(this, FUNC(shangha3_state::blitter_go_w));
-	map(0x20000a, 0x20000b).w(this, FUNC(shangha3_state::irq_ack_w));
-	map(0x20000c, 0x20000d).w(this, FUNC(shangha3_state::heberpop_coinctrl_w));
+	map(0x200008, 0x200009).w(FUNC(shangha3_state::blitter_go_w));
+	map(0x20000a, 0x20000b).w(FUNC(shangha3_state::irq_ack_w));
+	map(0x20000c, 0x20000d).w(FUNC(shangha3_state::heberpop_coinctrl_w));
 	map(0x20000f, 0x20000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
-	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
-	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x340000, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
 	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
 }
 
@@ -157,14 +157,14 @@ void shangha3_state::blocken_map(address_map &map)
 	map(0x100000, 0x100001).portr("INPUTS");
 	map(0x100002, 0x100003).portr("SYSTEM").nopw(); // w -> unknown purpose
 	map(0x100004, 0x100005).portr("DSW");
-	map(0x100008, 0x100009).w(this, FUNC(shangha3_state::blitter_go_w));
-	map(0x10000a, 0x10000b).nopr().w(this, FUNC(shangha3_state::irq_ack_w)); // r -> unknown purpose (value doesn't matter, left-over?)
-	map(0x10000c, 0x10000d).w(this, FUNC(shangha3_state::blocken_coinctrl_w));
+	map(0x100008, 0x100009).w(FUNC(shangha3_state::blitter_go_w));
+	map(0x10000a, 0x10000b).nopr().w(FUNC(shangha3_state::irq_ack_w)); // r -> unknown purpose (value doesn't matter, left-over?)
+	map(0x10000c, 0x10000d).w(FUNC(shangha3_state::blocken_coinctrl_w));
 	map(0x10000f, 0x10000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
-	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
-	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x340000, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
 	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
 }
 

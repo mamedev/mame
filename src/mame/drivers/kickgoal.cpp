@@ -480,12 +480,12 @@ void kickgoal_state::kickgoal_program_map(address_map &map)
 	map(0x800000, 0x800001).portr("P1_P2");
 	map(0x800002, 0x800003).portr("SYSTEM");
 /// AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)
-	map(0x800004, 0x800005).w(this, FUNC(kickgoal_state::actionhw_snd_w));
-	map(0x900000, 0x900005).w(this, FUNC(kickgoal_state::kickgoal_eeprom_w));
-	map(0x900006, 0x900007).r(this, FUNC(kickgoal_state::kickgoal_eeprom_r));
-	map(0xa00000, 0xa03fff).ram().w(this, FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
-	map(0xa04000, 0xa07fff).ram().w(this, FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
-	map(0xa08000, 0xa0bfff).ram().w(this, FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
+	map(0x800004, 0x800005).w(FUNC(kickgoal_state::actionhw_snd_w));
+	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
+	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
+	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
+	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
+	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
 	map(0xa0c000, 0xa0ffff).ram(); // more tilemap?
 	map(0xa10000, 0xa1000f).writeonly().share("scrram"); /* Scroll Registers */
 	map(0xb00000, 0xb007ff).writeonly().share("spriteram"); /* Sprites */

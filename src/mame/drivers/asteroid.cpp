@@ -237,16 +237,16 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(this, FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3600, 0x3600).w(this, FUNC(asteroid_state::asteroid_explode_w));
-	map(0x3a00, 0x3a00).w(this, FUNC(asteroid_state::asteroid_thump_w));
+	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
+	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::asteroid_thump_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::asteroid_noise_reset_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x5000, 0x57ff).rom();                     /* vector rom */
 	map(0x6800, 0x7fff).rom();
@@ -259,18 +259,18 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(this, FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2c40, 0x2c7f).r("earom", FUNC(atari_vg_earom_device::read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
 	map(0x3200, 0x323f).w("earom", FUNC(atari_vg_earom_device::write)).nopr();
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3600, 0x3600).w(this, FUNC(asteroid_state::asteroid_explode_w));
+	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
 	map(0x3a00, 0x3a00).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::asteroid_noise_reset_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x57ff).rom();                     /* vector rom */
 	map(0x6000, 0x7fff).rom();
@@ -282,14 +282,14 @@ void asteroid_state::llander_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).ram().mirror(0x1f00);
 	map(0x2000, 0x2000).portr("IN0");
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c00).portr("THRUST");
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(asteroid_state::llander_sounds_w));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::llander_snd_reset_w));
+	map(0x3c00, 0x3c00).w(FUNC(asteroid_state::llander_sounds_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::llander_snd_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x5fff).rom();                     /* vector rom */
 	map(0x5800, 0x5800).nopw(); // INC access?

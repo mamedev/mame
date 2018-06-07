@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100, bbc_tube_zep100_device, "bbc_tube_zep100", "
 
 void bbc_tube_zep100_device::tube_zep100_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_zep100_device::mem_r), FUNC(bbc_tube_zep100_device::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_zep100_device::mem_r), FUNC(bbc_tube_zep100_device::mem_w));
 }
 
 //-------------------------------------------------
@@ -37,7 +37,7 @@ void bbc_tube_zep100_device::tube_zep100_mem(address_map &map)
 void bbc_tube_zep100_device::tube_zep100_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).mirror(0xff00).rw(this, FUNC(bbc_tube_zep100_device::io_r), FUNC(bbc_tube_zep100_device::io_w));
+	map(0x00, 0x07).mirror(0xff00).rw(FUNC(bbc_tube_zep100_device::io_r), FUNC(bbc_tube_zep100_device::io_w));
 }
 
 //-------------------------------------------------

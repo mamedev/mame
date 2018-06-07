@@ -93,7 +93,7 @@ void icecold_state::icecold_map(address_map &map)
 	map(0x4020, 0x4023).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4040, 0x4043).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));   // not used
 	map(0x4080, 0x4081).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x4100, 0x4100).w(this, FUNC(icecold_state::motors_w));
+	map(0x4100, 0x4100).w(FUNC(icecold_state::motors_w));
 	map(0xa000, 0xffff).rom();
 }
 

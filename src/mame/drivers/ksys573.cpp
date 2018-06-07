@@ -628,14 +628,14 @@ void ksys573_state::konami573_map(address_map &map)
 	map(0x1f400004, 0x1f400007).portr("IN1");
 	map(0x1f400008, 0x1f40000b).portr("IN2");
 	map(0x1f40000c, 0x1f40000f).portr("IN3");
-	map(0x1f480000, 0x1f48000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
-	map(0x1f500000, 0x1f500001).rw(this, FUNC(ksys573_state::control_r), FUNC(ksys573_state::control_w));    // Konami can't make a game without a "control" register.
-	map(0x1f560000, 0x1f560001).w(this, FUNC(ksys573_state::atapi_reset_w));
+	map(0x1f480000, 0x1f48000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
+	map(0x1f500000, 0x1f500001).rw(FUNC(ksys573_state::control_r), FUNC(ksys573_state::control_w));    // Konami can't make a game without a "control" register.
+	map(0x1f560000, 0x1f560001).w(FUNC(ksys573_state::atapi_reset_w));
 	map(0x1f5c0000, 0x1f5c0003).nopw();                // watchdog?
 	map(0x1f600000, 0x1f600003).portw("LAMPS");
 	map(0x1f620000, 0x1f623fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask32(0x00ff00ff);
 	map(0x1f680000, 0x1f68001f).rw(m_duart, FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
-	map(0x1f6a0000, 0x1f6a0001).rw(this, FUNC(ksys573_state::security_r), FUNC(ksys573_state::security_w));
+	map(0x1f6a0000, 0x1f6a0001).rw(FUNC(ksys573_state::security_r), FUNC(ksys573_state::security_w));
 }
 
 void ksys573_state::flashbank_map(address_map &map)
@@ -661,19 +661,19 @@ void ksys573_state::konami573d_map(address_map &map)
 void ksys573_state::konami573a_map(address_map &map)
 {
 	konami573_map(map);
-	map(0x1f640000, 0x1f6400ff).rw(this, FUNC(ksys573_state::gx700pwbf_io_r), FUNC(ksys573_state::gx700pwbf_io_w));
+	map(0x1f640000, 0x1f6400ff).rw(FUNC(ksys573_state::gx700pwbf_io_r), FUNC(ksys573_state::gx700pwbf_io_w));
 }
 
 void ksys573_state::fbaitbc_map(address_map &map)
 {
 	konami573_map(map);
-	map(0x1f640000, 0x1f6400ff).rw(this, FUNC(ksys573_state::ge765pwbba_r), FUNC(ksys573_state::ge765pwbba_w));
+	map(0x1f640000, 0x1f6400ff).rw(FUNC(ksys573_state::ge765pwbba_r), FUNC(ksys573_state::ge765pwbba_w));
 }
 
 void ksys573_state::gunmania_map(address_map &map)
 {
 	konami573_map(map);
-	map(0x1f640000, 0x1f6400ff).rw(this, FUNC(ksys573_state::gunmania_r), FUNC(ksys573_state::gunmania_w));
+	map(0x1f640000, 0x1f6400ff).rw(FUNC(ksys573_state::gunmania_r), FUNC(ksys573_state::gunmania_w));
 }
 
 READ16_MEMBER( ksys573_state::control_r )

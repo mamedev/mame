@@ -131,14 +131,14 @@ void cdi_state::cdi910_mem(address_map &map)
 
 void cdi_state::cdimono2_servo_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(cdi_state::servo_io_r), FUNC(cdi_state::servo_io_w));
+	map(0x0000, 0x001f).rw(FUNC(cdi_state::servo_io_r), FUNC(cdi_state::servo_io_w));
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region("servo", 0x100);
 }
 
 void cdi_state::cdimono2_slave_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(cdi_state::slave_io_r), FUNC(cdi_state::slave_io_w));
+	map(0x0000, 0x001f).rw(FUNC(cdi_state::slave_io_r), FUNC(cdi_state::slave_io_w));
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region("slave", 0x100);
 }

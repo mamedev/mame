@@ -248,8 +248,8 @@ void trackfld_state::main_map(address_map &map)
 	map(0x1c40, 0x1c5f).ram().share(m_scroll2);
 	map(0x1c60, 0x1fff).ram();
 	map(0x2800, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -278,9 +278,9 @@ WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
 
 void trackfld_state::yieartf_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(trackfld_state::trackfld_speech_r)).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0x0001, 0x0001).w(this, FUNC(trackfld_state::konami_SN76496_w));
-	map(0x0002, 0x0002).w(this, FUNC(trackfld_state::trackfld_VLM5030_control_w));
+	map(0x0000, 0x0000).r(FUNC(trackfld_state::trackfld_speech_r)).w(FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0x0001, 0x0001).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0x0002, 0x0002).w(FUNC(trackfld_state::trackfld_VLM5030_control_w));
 	map(0x0003, 0x0003).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
 	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -298,8 +298,8 @@ void trackfld_state::yieartf_map(address_map &map)
 	map(0x1c40, 0x1c5f).ram().share(m_scroll2);
 	map(0x1c60, 0x1fff).ram();
 	map(0x2800, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -323,8 +323,8 @@ void trackfld_state::reaktor_map(address_map &map)
 	map(0x9c60, 0x9fff).ram();
 	map(0xa800, 0xabff).ram();
 	map(0xac00, 0xafff).ram().share("nvram");
-	map(0xb000, 0xb7ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
-	map(0xb800, 0xbfff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
+	map(0xb000, 0xb7ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0xb800, 0xbfff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 }
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
@@ -356,8 +356,8 @@ void trackfld_state::mastkin_map(address_map &map)
 	map(0x2000, 0x27ff).ram(); // initialized at POST
 	map(0x2800, 0x2bff).ram();
 	map(0x2c00, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -380,9 +380,9 @@ void trackfld_state::wizzquiz_map(address_map &map)
 	map(0x1c60, 0x1fff).ram();
 	map(0x2800, 0x2bff).ram();
 	map(0x2c00, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
-	map(0xc000, 0xc000).w(this, FUNC(trackfld_state::questions_bank_w));
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
+	map(0xc000, 0xc000).w(FUNC(trackfld_state::questions_bank_w));
 	map(0x6000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xffff).rom();
 }
@@ -400,9 +400,9 @@ void trackfld_state::sound_map(address_map &map)
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).mirror(0x1fff).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sh_timer_r));
-	map(0xa000, 0xa000).mirror(0x1fff).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(trackfld_state::trackfld_SN76496_r)).w(this, FUNC(trackfld_state::konami_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::write));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76496_r)).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
 	map(0xe002, 0xe002).mirror(0x1ff8).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_speech_r));
 	map(0xe003, 0xe003).mirror(0x1c78).select(0x0380).w(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sound_w));
@@ -415,9 +415,9 @@ void trackfld_state::hyprolyb_sound_map(address_map &map)
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).mirror(0x1fff).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sh_timer_r));
-	map(0xa000, 0xa000).mirror(0x1fff).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(trackfld_state::trackfld_SN76496_r)).w(this, FUNC(trackfld_state::konami_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::write));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76496_r)).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
 	map(0xe002, 0xe002).mirror(0x1ff8).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::busy_r));
 	map(0xe003, 0xe003).mirror(0x1ff8).nopw();

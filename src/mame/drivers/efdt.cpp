@@ -343,7 +343,7 @@ void efdt_state::efdt_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 
-	map(0x8800, 0x8803).rw(this, FUNC(efdt_state::main_soundlatch_r), FUNC(efdt_state::main_soundlatch_w));
+	map(0x8800, 0x8803).rw(FUNC(efdt_state::main_soundlatch_r), FUNC(efdt_state::main_soundlatch_w));
 //	map(0x8800, 0x8803).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));  // TODO...
 
 	map(0x9000, 0x93ff).portr("P1");

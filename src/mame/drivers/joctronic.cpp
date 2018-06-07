@@ -132,17 +132,17 @@ void joctronic_state::maincpu_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
 	map(0x8000, 0x87ff).mirror(0x0800).ram().share("nvram");
-	map(0x9000, 0x9007).mirror(0x0ff8).r(this, FUNC(joctronic_state::csin_r)); // CSIN
+	map(0x9000, 0x9007).mirror(0x0ff8).r(FUNC(joctronic_state::csin_r)); // CSIN
 	map(0xa000, 0xa007).mirror(0x0ff8).w("mainlatch", FUNC(ls259_device::write_d0)); // PORTDS
-	map(0xc000, 0xc000).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_1_w)); // CSD1
-	map(0xc008, 0xc008).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_2_w)); // CSD2
-	map(0xc010, 0xc010).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_3_w)); // CSD3
-	map(0xc018, 0xc018).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_4_w)); // CSD4
-	map(0xc020, 0xc020).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_a_w)); // CSDA
-	map(0xc028, 0xc028).mirror(0x0fc7).w(this, FUNC(joctronic_state::drivers_l_w)); // OL
-	map(0xc030, 0xc030).mirror(0x0fc7).w(this, FUNC(joctronic_state::drivers_b_w)); // OB
-	map(0xc038, 0xc03f).mirror(0x0fc0).w(this, FUNC(joctronic_state::drivers_w)); // OA
-	map(0xe000, 0xe000).mirror(0x0fff).w(this, FUNC(joctronic_state::soundlatch_nmi_w)); // PSON
+	map(0xc000, 0xc000).mirror(0x0fc7).w(FUNC(joctronic_state::display_1_w)); // CSD1
+	map(0xc008, 0xc008).mirror(0x0fc7).w(FUNC(joctronic_state::display_2_w)); // CSD2
+	map(0xc010, 0xc010).mirror(0x0fc7).w(FUNC(joctronic_state::display_3_w)); // CSD3
+	map(0xc018, 0xc018).mirror(0x0fc7).w(FUNC(joctronic_state::display_4_w)); // CSD4
+	map(0xc020, 0xc020).mirror(0x0fc7).w(FUNC(joctronic_state::display_a_w)); // CSDA
+	map(0xc028, 0xc028).mirror(0x0fc7).w(FUNC(joctronic_state::drivers_l_w)); // OL
+	map(0xc030, 0xc030).mirror(0x0fc7).w(FUNC(joctronic_state::drivers_b_w)); // OB
+	map(0xc038, 0xc03f).mirror(0x0fc0).w(FUNC(joctronic_state::drivers_w)); // OA
+	map(0xe000, 0xe000).mirror(0x0fff).w(FUNC(joctronic_state::soundlatch_nmi_w)); // PSON
 }
 
 READ8_MEMBER(joctronic_state::inputs_r)
@@ -184,15 +184,15 @@ void joctronic_state::slalom03_maincpu_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).mirror(0x0800).ram().share("nvram");
 	map(0x9000, 0x9007).mirror(0x0ff8).w("mainlatch", FUNC(ls259_device::write_d0)); // CSPORT
-	map(0xa008, 0xa008).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_strobe_w)); // STROBE
-	map(0xa010, 0xa017).mirror(0x0fc0).w(this, FUNC(joctronic_state::drivers_w));
-	map(0xa018, 0xa018).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_ck_w)); // CKD
-	map(0xa020, 0xa020).mirror(0x0fc7).r(this, FUNC(joctronic_state::inputs_r)); // CSS
+	map(0xa008, 0xa008).mirror(0x0fc7).w(FUNC(joctronic_state::display_strobe_w)); // STROBE
+	map(0xa010, 0xa017).mirror(0x0fc0).w(FUNC(joctronic_state::drivers_w));
+	map(0xa018, 0xa018).mirror(0x0fc7).w(FUNC(joctronic_state::display_ck_w)); // CKD
+	map(0xa020, 0xa020).mirror(0x0fc7).r(FUNC(joctronic_state::inputs_r)); // CSS
 	map(0xa028, 0xa028).mirror(0x0fc7).nopr(); // N.C.
 	map(0xa030, 0xa030).mirror(0x0fc7).nopr(); // N.C.
-	map(0xa038, 0xa038).mirror(0x0fc7).r(this, FUNC(joctronic_state::ports_r)); // CSP
-	map(0xe000, 0xe000).mirror(0x0fff).r(this, FUNC(joctronic_state::csint_r)); // CSINT
-	map(0xf000, 0xf000).mirror(0x0fff).w(this, FUNC(joctronic_state::soundlatch_nmi_pulse_w)); // CSSON
+	map(0xa038, 0xa038).mirror(0x0fc7).r(FUNC(joctronic_state::ports_r)); // CSP
+	map(0xe000, 0xe000).mirror(0x0fff).r(FUNC(joctronic_state::csint_r)); // CSINT
+	map(0xf000, 0xf000).mirror(0x0fff).w(FUNC(joctronic_state::soundlatch_nmi_pulse_w)); // CSSON
 }
 
 READ8_MEMBER(joctronic_state::bldyrolr_unknown_r)
@@ -209,7 +209,7 @@ WRITE8_MEMBER(joctronic_state::bldyrolr_unknown_w)
 void joctronic_state::bldyrolr_maincpu_map(address_map &map)
 {
 	slalom03_maincpu_map(map);
-	map(0xc000, 0xc000).rw(this, FUNC(joctronic_state::bldyrolr_unknown_r), FUNC(joctronic_state::bldyrolr_unknown_w));
+	map(0xc000, 0xc000).rw(FUNC(joctronic_state::bldyrolr_unknown_r), FUNC(joctronic_state::bldyrolr_unknown_w));
 }
 
 void joctronic_state::maincpu_io_map(address_map &map)
@@ -269,8 +269,8 @@ void joctronic_state::joctronic_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram(); // only lower half of 2016 used?
-	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(joctronic_state::soundlatch_nmi_r)); // SCSP
-	map(0xe000, 0xe000).mirror(0x1fff).w(this, FUNC(joctronic_state::resint_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(joctronic_state::soundlatch_nmi_r)); // SCSP
+	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(joctronic_state::resint_w));
 }
 
 void joctronic_state::joctronic_sound_io_map(address_map &map)
@@ -296,8 +296,8 @@ void joctronic_state::slalom03_sound_io_map(address_map &map)
 	map(0x01, 0x01).w("aysnd1", FUNC(ay8910_device::data_w));
 	map(0x02, 0x02).w("aysnd2", FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).w("aysnd2", FUNC(ay8910_device::data_w));
-	map(0x04, 0x04).mirror(0x01).r(this, FUNC(joctronic_state::soundlatch_r)); // CSPORT
-	map(0x06, 0x06).mirror(0x01).w(this, FUNC(joctronic_state::resint_w)); // RESINT
+	map(0x04, 0x04).mirror(0x01).r(FUNC(joctronic_state::soundlatch_r)); // CSPORT
+	map(0x06, 0x06).mirror(0x01).w(FUNC(joctronic_state::resint_w)); // RESINT
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -363,8 +363,8 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 
 	// Datasheet suggests YM2203 as a possible replacement for this AY8910
 	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r1", dac_8bit_r2r_device, write))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("r2r2", dac_8bit_r2r_device, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r1", dac_8bit_r2r_device, data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("r2r2", dac_8bit_r2r_device, data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r", dac_8bit_r2r_device, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r", dac_8bit_r2r_device, data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("r2r", DAC_8BIT_R2R, 0)

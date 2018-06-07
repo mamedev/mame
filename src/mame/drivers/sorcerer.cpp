@@ -199,10 +199,10 @@ void sorcerer_state::sorcerer_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xfc, 0xfc).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xfd, 0xfd).rw(this, FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
-	map(0xfe, 0xfe).rw(this, FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
-	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xff, 0xff).w(this, FUNC(sorcerer_state::sorcerer_ff_w));
+	map(0xfd, 0xfd).rw(FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
+	map(0xfe, 0xfe).rw(FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
+	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xff, 0xff).w(FUNC(sorcerer_state::sorcerer_ff_w));
 }
 
 static INPUT_PORTS_START(sorcerer)
