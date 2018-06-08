@@ -187,41 +187,41 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 void taito_f3_state::f3_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x300000, 0x30007f).w(this, FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x300000, 0x30007f).w(FUNC(taito_f3_state::f3_sound_bankswitch_w));
 	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
-	map(0x440000, 0x447fff).ram().w(this, FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
-	map(0x4a0000, 0x4a001f).rw(this, FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
-	map(0x4c0000, 0x4c0003).w(this, FUNC(taito_f3_state::f3_unk_w));
-	map(0x600000, 0x60ffff).rw(this, FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
-	map(0x610000, 0x61bfff).rw(this, FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
-	map(0x61c000, 0x61dfff).rw(this, FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
-	map(0x61e000, 0x61ffff).rw(this, FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
-	map(0x620000, 0x62ffff).rw(this, FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
-	map(0x630000, 0x63ffff).rw(this, FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
-	map(0x660000, 0x66000f).w(this, FUNC(taito_f3_state::f3_control_0_w));
-	map(0x660010, 0x66001f).w(this, FUNC(taito_f3_state::f3_control_1_w));
+	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001f).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(FUNC(taito_f3_state::f3_control_1_w));
 	map(0xc00000, 0xc007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xc80000, 0xc80003).w(this, FUNC(taito_f3_state::f3_sound_reset_0_w));
-	map(0xc80100, 0xc80103).w(this, FUNC(taito_f3_state::f3_sound_reset_1_w));
+	map(0xc80000, 0xc80003).w(FUNC(taito_f3_state::f3_sound_reset_0_w));
+	map(0xc80100, 0xc80103).w(FUNC(taito_f3_state::f3_sound_reset_1_w));
 }
 
 void taito_f3_state::bubsympb_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x300000, 0x30007f).w(this, FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x300000, 0x30007f).w(FUNC(taito_f3_state::f3_sound_bankswitch_w));
 	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
-	map(0x440000, 0x447fff).ram().w(this, FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
-	map(0x4a0000, 0x4a001b).rw(this, FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
-	map(0x4a001c, 0x4a001f).rw(this, FUNC(taito_f3_state::bubsympb_oki_r), FUNC(taito_f3_state::bubsympb_oki_w));
-	map(0x4c0000, 0x4c0003).w(this, FUNC(taito_f3_state::f3_unk_w));
-	map(0x600000, 0x60ffff).rw(this, FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
-	map(0x610000, 0x61bfff).rw(this, FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
-	map(0x61c000, 0x61dfff).rw(this, FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
-	map(0x61e000, 0x61ffff).rw(this, FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
-	map(0x620000, 0x62ffff).rw(this, FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
-	map(0x630000, 0x63ffff).rw(this, FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
-	map(0x660000, 0x66000f).w(this, FUNC(taito_f3_state::f3_control_0_w));
-	map(0x660010, 0x66001f).w(this, FUNC(taito_f3_state::f3_control_1_w));
+	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001b).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4a001c, 0x4a001f).rw(FUNC(taito_f3_state::bubsympb_oki_r), FUNC(taito_f3_state::bubsympb_oki_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(FUNC(taito_f3_state::f3_control_1_w));
 	map(0xc00000, 0xc007ff).ram();
 }
 
@@ -451,10 +451,11 @@ void taito_f3_state::machine_start()
 	save_item(NAME(m_coin_word));
 }
 
-MACHINE_RESET_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_reset()
 {
 	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if(m_audiocpu)
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(taito_f3_state::f3)
@@ -464,9 +465,7 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 	MCFG_DEVICE_PROGRAM_MAP(f3_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
-	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -481,8 +480,6 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_f3)
 	MCFG_PALETTE_ADD("palette", 0x2000)
-
-	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
@@ -516,16 +513,16 @@ MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
 	f3(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
 	f3_224b(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 static const gfx_layout bubsympb_sprite_layout =
@@ -564,7 +561,7 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	MCFG_DEVICE_PROGRAM_MAP(bubsympb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -579,8 +576,6 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bubsympb)
 	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3123,6 +3118,36 @@ ROM_START( bubblem )
 	ROM_LOAD( "bubblem.nv", 0x0000, 0x0080, CRC(9a59326e) SHA1(071dbfbfd77f7020476ddb54c93f5fafa7a08159) )
 ROM_END
 
+ROM_START( bubblemu )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("e21-17.20", 0x000000, 0x080000, CRC(0b72e8f1) SHA1(1b0289cafb1d4d3387c6ec42c0e8599229c79bba) )
+	ROM_LOAD32_BYTE("e21-16.19", 0x000001, 0x080000, CRC(b47354cc) SHA1(08e66573cae3ce21a6dbdbd79e32a2ab050f9bbd) )
+	ROM_LOAD32_BYTE("e21-15.18", 0x000002, 0x080000, CRC(64bf2c24) SHA1(be2d81fdc307841340a86a4ca0409a2bdbd35532) )
+	ROM_LOAD32_BYTE("e21-14.17", 0x000003, 0x080000, CRC(48aecd47) SHA1(3d2b7d3474968b0450731644e593338c9cf6f5b0) )
+
+	ROM_REGION(0x800000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("e21-02.rom", 0x000000, 0x200000, CRC(b7cb9232) SHA1(ba71cb98d49eadebb26d9f53bbaec1dc211077f5) )
+	ROM_LOAD16_BYTE("e21-01.rom", 0x000001, 0x200000, CRC(a11f2f99) SHA1(293c5996600cad05bf98f936f5f820d93d546099) )
+	ROM_FILL       (              0x400000, 0x400000, 0x00 )
+
+	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("e21-07.rom", 0x000000, 0x100000, CRC(7789bf7c) SHA1(bc8ef1696adac99a1fabae9b79afcd3461cf323b) )
+	ROM_LOAD16_BYTE("e21-06.rom", 0x000001, 0x100000, CRC(997fc0d7) SHA1(58a546f739072fedebfe7c972fe85f72107726b2) )
+	ROM_LOAD       ("e21-05.rom", 0x300000, 0x100000, CRC(07eab58f) SHA1(ae2d7b839b39d88d11652df74804a39230674467) )
+	ROM_FILL       (              0x200000, 0x100000, 0x00 )
+
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* Sound CPU */
+	ROM_LOAD16_BYTE("e21-12.32", 0x100000, 0x40000, CRC(34093de1) SHA1(d69d6b5f10b8fe86f727d739ed5aecceb15e01f7) )
+	ROM_LOAD16_BYTE("e21-13.33", 0x100001, 0x40000, CRC(9e9ec437) SHA1(b0265b688846c642d240b2f3677d2330d31eaa87) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("e21-03.rom", 0x000000, 0x200000, CRC(54c5f83d) SHA1(10a993199c8d5a1361bd29a4b92c404451c6da01) )    // C8 C9 CA CB
+	ROM_LOAD16_BYTE("e21-04.rom", 0x400000, 0x200000, CRC(e5af2a2d) SHA1(62a49504decc7160b710260218920d2d6d2af8f0) )    // CC CD -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "bubblemu.nv", 0x0000, 0x0080, CRC(a503276c) SHA1(f07dd49decee7e8e7551e37b9b0f612bfaf8a2b0) )
+ROM_END
+
 ROM_START( bubblemj )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("e21-11.20", 0x000000, 0x080000, CRC(df0eeae4) SHA1(4cc8d350da881947c1b9c4e0b8fbe220494f6c38) )
@@ -4271,6 +4296,7 @@ GAME( 1995, tcobra2,  0,        f3,      f3, taito_f3_state, init_ktiger2,  ROT2
 GAME( 1995, tcobra2u, tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 )
 GAME( 1995, ktiger2,  tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 )
 GAME( 1995, bubblem,  0,        f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation Japan",   "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)", 0 )
+GAME( 1995, bubblemu, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito America Corporation", "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)", 0 )
 GAME( 1995, bubblemj, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
 GAME( 1996, cleopatr, 0,        f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
 GAME( 1996, pbobble3, 0,        f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )

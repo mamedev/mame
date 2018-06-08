@@ -198,8 +198,8 @@ void vp415_state::z80_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x0f).rw(SCSI_TAG, FUNC(ncr5385_device::read), FUNC(ncr5385_device::write));
 	// 0x20, 0x21: Connected to A0 + D0..D7 of SLAVE i8041
-	map(0x34, 0x34).w(this, FUNC(vp415_state::sel34_w));
-	map(0x37, 0x37).r(this, FUNC(vp415_state::sel37_r));
+	map(0x34, 0x34).w(FUNC(vp415_state::sel34_w));
+	map(0x37, 0x37).r(FUNC(vp415_state::sel37_r));
 }
 
 void vp415_state::datamcu_program_map(address_map &map)
@@ -336,7 +336,7 @@ void vp415_state::ctrl_program_map(address_map &map)
 void vp415_state::ctrl_io_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share(CTRLRAM_TAG);
-	map(0xe000, 0xffff).rw(this, FUNC(vp415_state::ctrl_regs_r), FUNC(vp415_state::ctrl_regs_w)).mask(0x1e00);
+	map(0xe000, 0xffff).rw(FUNC(vp415_state::ctrl_regs_r), FUNC(vp415_state::ctrl_regs_w)).mask(0x1e00);
 }
 
 void vp415_state::ctrlmcu_program_map(address_map &map)

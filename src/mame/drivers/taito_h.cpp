@@ -239,7 +239,7 @@ void taitoh_state::syvalion_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("m68000_mainram");
-	map(0x200001, 0x200001).r(this, FUNC(taitoh_state::syvalion_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
+	map(0x200001, 0x200001).r(FUNC(taitoh_state::syvalion_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x200003, 0x200003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::port_r), FUNC(tc0040ioc_device::port_w));
 	map(0x300000, 0x300001).nopr();
 	map(0x300001, 0x300001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
@@ -298,7 +298,7 @@ void taitoh_state::sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw();        /* ? */
 	map(0xf000, 0xf000).nopw();        /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(taitoh_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(taitoh_state::sound_bankswitch_w));
 }
 
 

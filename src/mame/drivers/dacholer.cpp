@@ -45,43 +45,18 @@ class dacholer_state : public driver_device
 {
 public:
 	dacholer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this,"audiocpu"),
-		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_spriteram(*this, "spriteram") { }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_fgvideoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	uint8_t    m_scroll_x;
-	uint8_t    m_scroll_y;
-
-	/* sound-related */
-	int m_msm_data;
-	int m_msm_toggle;
-	uint8_t m_snd_interrupt_enable;
-	uint8_t m_music_interrupt_enable;
-	uint8_t m_snd_ack;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_audiocpu(*this,"audiocpu")
+		, m_msm(*this, "msm")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_bgvideoram(*this, "bgvideoram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_spriteram(*this, "spriteram")
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
@@ -97,9 +72,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dacholer);
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
@@ -114,6 +86,42 @@ public:
 	void main_map(address_map &map);
 	void snd_io_map(address_map &map);
 	void snd_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	output_finder<2> m_leds;
+
+	/* video-related */
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
+	int      m_bg_bank;
+	uint8_t    m_scroll_x;
+	uint8_t    m_scroll_y;
+
+	/* sound-related */
+	int m_msm_data;
+	int m_msm_toggle;
+	uint8_t m_snd_interrupt_enable;
+	uint8_t m_music_interrupt_enable;
+	uint8_t m_snd_ack;
+
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -223,8 +231,8 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	output().set_led_value(0, data & 4);
-	output().set_led_value(1, data & 8);
+	m_leds[0] = BIT(data, 2);
+	m_leds[1] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
@@ -237,8 +245,8 @@ void dacholer_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8800, 0x97ff).ram();
-	map(0xc000, 0xc3ff).mirror(0x400).ram().w(this, FUNC(dacholer_state::background_w)).share("bgvideoram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(dacholer_state::foreground_w)).share("fgvideoram");
+	map(0xc000, 0xc3ff).mirror(0x400).ram().w(FUNC(dacholer_state::background_w)).share("bgvideoram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(dacholer_state::foreground_w)).share("fgvideoram");
 	map(0xe000, 0xe0ff).ram().share("spriteram");
 }
 
@@ -258,11 +266,11 @@ void dacholer_state::main_io_map(address_map &map)
 	map(0x03, 0x03).portr("DSWA");
 	map(0x04, 0x04).portr("DSWB");
 	map(0x05, 0x05).nopr(); // watchdog in itaten
-	map(0x20, 0x20).w(this, FUNC(dacholer_state::coins_w));
-	map(0x21, 0x21).w(this, FUNC(dacholer_state::bg_bank_w));
-	map(0x22, 0x22).w(this, FUNC(dacholer_state::bg_scroll_x_w));
-	map(0x23, 0x23).w(this, FUNC(dacholer_state::bg_scroll_y_w));
-	map(0x24, 0x24).w(this, FUNC(dacholer_state::main_irq_ack_w));
+	map(0x20, 0x20).w(FUNC(dacholer_state::coins_w));
+	map(0x21, 0x21).w(FUNC(dacholer_state::bg_bank_w));
+	map(0x22, 0x22).w(FUNC(dacholer_state::bg_scroll_x_w));
+	map(0x23, 0x23).w(FUNC(dacholer_state::bg_scroll_y_w));
+	map(0x24, 0x24).w(FUNC(dacholer_state::main_irq_ack_w));
 	map(0x27, 0x27).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -311,10 +319,10 @@ void dacholer_state::snd_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x04, 0x04).w(this, FUNC(dacholer_state::music_irq_w));
-	map(0x08, 0x08).w(this, FUNC(dacholer_state::snd_irq_w));
-	map(0x0c, 0x0c).w(this, FUNC(dacholer_state::snd_ack_w));
-	map(0x80, 0x80).w(this, FUNC(dacholer_state::adpcm_w));
+	map(0x04, 0x04).w(FUNC(dacholer_state::music_irq_w));
+	map(0x08, 0x08).w(FUNC(dacholer_state::snd_irq_w));
+	map(0x0c, 0x0c).w(FUNC(dacholer_state::snd_ack_w));
+	map(0x80, 0x80).w(FUNC(dacholer_state::adpcm_w));
 	map(0x86, 0x87).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x8a, 0x8b).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x8e, 0x8f).w("ay3", FUNC(ay8910_device::data_address_w));
@@ -596,6 +604,8 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 
 void dacholer_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_toggle));

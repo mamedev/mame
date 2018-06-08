@@ -451,8 +451,8 @@ void dec0_state::dec0_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
-	map(0x30c000, 0x30c00b).r(this, FUNC(dec0_state::dec0_controls_r));
-	map(0x30c010, 0x30c01f).w(this, FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
+	map(0x30c000, 0x30c00b).r(FUNC(dec0_state::dec0_controls_r));
+	map(0x30c010, 0x30c01f).w(FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
 	map(0x30c012, 0x30c013).nopr(); // clr.w for sprite DMA
 	map(0x30c018, 0x30c019).nopr(); // clr.w for irq ack
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -476,7 +476,7 @@ void dec0_state::hippodrm_sub_map(address_map &map)
 	map(0x1a0000, 0x1a0007).w(m_tilegen3, FUNC(deco_bac06_device::pf_control0_8bit_packed_w));
 	map(0x1a0010, 0x1a001f).w(m_tilegen3, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
 	map(0x1a1000, 0x1a17ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x1d0000, 0x1d00ff).rw(this, FUNC(dec0_state::hippodrm_prot_r), FUNC(dec0_state::hippodrm_prot_w));
+	map(0x1d0000, 0x1d00ff).rw(FUNC(dec0_state::hippodrm_prot_r), FUNC(dec0_state::hippodrm_prot_w));
 	map(0x1f0000, 0x1f1fff).bankrw("bank8"); /* Main ram */
 	map(0x1ff400, 0x1ff403).w(m_subcpu, FUNC(h6280_device::irq_status_w));
 	map(0x1ff402, 0x1ff403).portr("VBLANK");
@@ -573,8 +573,8 @@ READ16_MEMBER(dec0_state::slyspy_state_r)
 
 void dec0_state::slyspy_protection_map(address_map &map)
 {
-	map(0x04000, 0x04001).mirror(0x30000).r(this, FUNC(dec0_state::slyspy_state_r)).nopw();
-	map(0x0a000, 0x0a001).mirror(0x30000).w(this, FUNC(dec0_state::slyspy_state_w));
+	map(0x04000, 0x04001).mirror(0x30000).r(FUNC(dec0_state::slyspy_state_r)).nopw();
+	map(0x0a000, 0x0a001).mirror(0x30000).w(FUNC(dec0_state::slyspy_state_w));
 	// Default state (called by Traps 1, 3, 4, 7, C)
 	map(0x00000, 0x00007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_0_w));
 	map(0x00010, 0x00017).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_1_w));
@@ -616,9 +616,9 @@ void dec0_state::slyspy_map(address_map &map)
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x314002, 0x314003).w(this, FUNC(dec0_state::dec0_priority_w));
-	map(0x314008, 0x31400f).r(this, FUNC(dec0_state::slyspy_controls_r));
-	map(0x31c000, 0x31c00f).r(this, FUNC(dec0_state::slyspy_protection_r)).nopw();
+	map(0x314002, 0x314003).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x314008, 0x31400f).r(FUNC(dec0_state::slyspy_controls_r));
+	map(0x31c000, 0x31c00f).r(FUNC(dec0_state::slyspy_protection_r)).nopw();
 }
 
 
@@ -628,8 +628,8 @@ void dec0_state::midres_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("ram");
 	map(0x120000, 0x1207ff).ram().share("spriteram");
 	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x160000, 0x160001).w(this, FUNC(dec0_state::dec0_priority_w));
-	map(0x180000, 0x18000f).r(this, FUNC(dec0_state::midres_controls_r));
+	map(0x160000, 0x160001).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x180000, 0x18000f).r(FUNC(dec0_state::midres_controls_r));
 	map(0x180008, 0x18000f).nopw(); /* ?? watchdog ?? */
 	map(0x1a0001, 0x1a0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
@@ -656,10 +656,10 @@ void dec0_state::midres_map(address_map &map)
 void dec0_state::midresb_map(address_map &map)
 {
 	midres_map(map);
-	map(0x160010, 0x160011).w(this, FUNC(dec0_state::dec0_priority_w));
-	map(0x180000, 0x18000f).r(this, FUNC(dec0_state::dec0_controls_r));
+	map(0x160010, 0x160011).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x180000, 0x18000f).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x180012, 0x180013).noprw();
-	map(0x180014, 0x180015).w(this, FUNC(dec0_state::midres_sound_w));
+	map(0x180014, 0x180015).w(FUNC(dec0_state::midres_sound_w));
 	map(0x180018, 0x180019).noprw();
 	map(0x1a0000, 0x1a0001).portr("AN0");
 	map(0x1a0008, 0x1a0009).portr("AN1");
@@ -710,8 +710,8 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
 
 void dec0_state::slyspy_sound_protection_map(address_map &map)
 {
-	map(0x020000, 0x020001).mirror(0x180000).r(this, FUNC(dec0_state::slyspy_sound_state_r)); /* Protection counter */
-	map(0x050000, 0x050001).mirror(0x180000).r(this, FUNC(dec0_state::slyspy_sound_state_reset_r));
+	map(0x020000, 0x020001).mirror(0x180000).r(FUNC(dec0_state::slyspy_sound_state_r)); /* Protection counter */
+	map(0x050000, 0x050001).mirror(0x180000).r(FUNC(dec0_state::slyspy_sound_state_reset_r));
 	// state 0
 	map(0x010000, 0x010001).w("ym2", FUNC(ym3812_device::write));
 	map(0x030000, 0x030001).w("ym1", FUNC(ym2203_device::write));
@@ -801,14 +801,14 @@ void dec0_automat_state::automat_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
-	map(0x30c000, 0x30c00b).r(this, FUNC(dec0_automat_state::dec0_controls_r));
-	map(0x30c000, 0x30c01f).w(this, FUNC(dec0_automat_state::automat_control_w));            /* Priority, sound, etc. */
-	map(0x310000, 0x3107ff).rw(this, FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
+	map(0x30c000, 0x30c00b).r(FUNC(dec0_automat_state::dec0_controls_r));
+	map(0x30c000, 0x30c01f).w(FUNC(dec0_automat_state::automat_control_w));            /* Priority, sound, etc. */
+	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
 	map(0x314000, 0x3147ff).ram();
 
 	// video regs are moved to here..
-	map(0x400000, 0x400007).w(this, FUNC(dec0_automat_state::automat_scroll_w));
-	map(0x400008, 0x400009).w(this, FUNC(dec0_automat_state::dec0_priority_w));
+	map(0x400000, 0x400007).w(FUNC(dec0_automat_state::automat_scroll_w));
+	map(0x400008, 0x400009).w(FUNC(dec0_automat_state::dec0_priority_w));
 
 	map(0x500000, 0x500001).nopw(); // ???
 
@@ -831,7 +831,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 //  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
 //  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
 
-	map(0x314008, 0x31400f).r(this, FUNC(dec0_automat_state::slyspy_controls_r));
+	map(0x314008, 0x31400f).r(FUNC(dec0_automat_state::slyspy_controls_r));
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0x300000, 0x300007).ram();
@@ -840,7 +840,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 	map(0x300c00, 0x300fff).ram();
 	map(0x301000, 0x3017ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x301800, 0x307fff).ram().share("ram"); /* Sly spy main ram */
-	map(0x310000, 0x3107ff).rw(this, FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
+	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
 	map(0xb08000, 0xb08fff).ram().share("spriteram"); /* Sprites */
 }
 
@@ -854,7 +854,7 @@ void dec0_automat_state::automat_s_map(address_map &map)
 	map(0xd000, 0xd001).rw("2203b", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).w(m_adpcm_select2, FUNC(ls157_device::ba_w));
-	map(0xe800, 0xe800).w(this, FUNC(dec0_automat_state::sound_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
 	map(0xf000, 0xf000).w(m_adpcm_select1, FUNC(ls157_device::ba_w));
 }
 
@@ -867,7 +867,7 @@ void dec0_automat_state::secretab_s_map(address_map &map)
 	map(0xd000, 0xd001).rw("ym3812", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).w(m_adpcm_select2, FUNC(ls157_device::ba_w));
-	map(0xe800, 0xe800).w(this, FUNC(dec0_automat_state::sound_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
 	map(0xf000, 0xf000).w(m_adpcm_select1, FUNC(ls157_device::ba_w));
 }
 

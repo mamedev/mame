@@ -346,6 +346,7 @@ VIDEOS["TMS3556"] = true
 VIDEOS["TMS9927"] = true
 VIDEOS["TMS9928A"] = true
 VIDEOS["TOPCAT"] = true
+VIDEOS["NEREID"] = true
 VIDEOS["UPD3301"] = true
 VIDEOS["UPD7220"] = true
 VIDEOS["UPD7227"] = true
@@ -2723,6 +2724,8 @@ files {
 createMESSProjects(_target, _subtarget, "poly")
 files {
 	MAME_DIR .. "src/mame/drivers/poly.cpp",
+	MAME_DIR .. "src/mame/includes/poly.h",
+	MAME_DIR .. "src/mame/machine/poly.cpp",
 	MAME_DIR .. "src/mame/drivers/proteus.cpp",
 }
 

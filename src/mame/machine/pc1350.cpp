@@ -130,6 +130,6 @@ void pc1350_state::machine_start()
 	uint8_t *ram = memregion("maincpu")->base() + 0x2000;
 	uint8_t *cpu = m_maincpu->internal_ram();
 
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x5000);
+	subdevice<nvram_device>("cpu_nvram")->set_base(cpu, 96);
+	subdevice<nvram_device>("ram_nvram")->set_base(ram, 0x5000);
 }

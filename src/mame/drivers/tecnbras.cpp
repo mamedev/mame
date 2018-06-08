@@ -67,8 +67,8 @@ void tecnbras_state::i80c31_prg(address_map &map)
 #define DMD_OFFSET 24 //This is a guess. We should verify the real hardware behaviour
 void tecnbras_state::i80c31_io(address_map &map)
 {
-	map(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET).w(this, FUNC(tecnbras_state::set_x_position_w));
-	map(0x06B8, 0x06BC).w(this, FUNC(tecnbras_state::print_column_w));
+	map(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET).w(FUNC(tecnbras_state::set_x_position_w));
+	map(0x06B8, 0x06BC).w(FUNC(tecnbras_state::print_column_w));
 }
 
 WRITE8_MEMBER(tecnbras_state::set_x_position_w)

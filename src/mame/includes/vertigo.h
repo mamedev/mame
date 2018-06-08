@@ -30,8 +30,7 @@ public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_custom(*this, "custom"),
+		m_custom(*this, "440audio"),
 		m_ttl74148(*this, "74148"),
 		m_vector(*this, "vector"),
 		m_adc(*this, "adc"),
@@ -132,7 +131,6 @@ private:
 	void update_irq_encoder(int line, int state);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<exidy440_sound_device> m_custom;
 	required_device<ttl74148_device> m_ttl74148;
 	required_device<vector_device> m_vector;

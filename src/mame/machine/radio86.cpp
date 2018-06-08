@@ -202,8 +202,6 @@ I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap;
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}

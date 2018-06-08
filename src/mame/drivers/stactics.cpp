@@ -186,18 +186,18 @@ void stactics_state::main_map(address_map &map)
 	map(0x6000, 0x6007).mirror(0x0f08).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0x6010, 0x6017).mirror(0x0f08).w("audiolatch", FUNC(ls259_device::write_d0));
 	map(0x6020, 0x6027).mirror(0x0f08).w("lamplatch", FUNC(ls259_device::write_d0));
-	map(0x6030, 0x6030).mirror(0x0f0f).w(this, FUNC(stactics_state::speed_latch_w));
-	map(0x6040, 0x6040).mirror(0x0f0f).w(this, FUNC(stactics_state::shot_trigger_w));
-	map(0x6050, 0x6050).mirror(0x0f0f).w(this, FUNC(stactics_state::shot_flag_clear_w));
+	map(0x6030, 0x6030).mirror(0x0f0f).w(FUNC(stactics_state::speed_latch_w));
+	map(0x6040, 0x6040).mirror(0x0f0f).w(FUNC(stactics_state::shot_trigger_w));
+	map(0x6050, 0x6050).mirror(0x0f0f).w(FUNC(stactics_state::shot_flag_clear_w));
 	map(0x6060, 0x606f).mirror(0x0f00).writeonly().share("display_buffer");
 	map(0x6070, 0x609f).mirror(0x0f00).nopw();
 	/* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(sound2_w) */
 	map(0x60f0, 0x60ff).mirror(0x0f00).nopw();
 	map(0x7000, 0x7000).mirror(0x0fff).portr("IN2");
 	map(0x8000, 0x8000).mirror(0x0fff).portr("IN3");
-	map(0x8000, 0x87ff).mirror(0x0800).w(this, FUNC(stactics_state::scroll_ram_w));
-	map(0x9000, 0x9000).mirror(0x0fff).r(this, FUNC(stactics_state::vert_pos_r));
-	map(0xa000, 0xa000).mirror(0x0fff).r(this, FUNC(stactics_state::horiz_pos_r));
+	map(0x8000, 0x87ff).mirror(0x0800).w(FUNC(stactics_state::scroll_ram_w));
+	map(0x9000, 0x9000).mirror(0x0fff).r(FUNC(stactics_state::vert_pos_r));
+	map(0xa000, 0xa000).mirror(0x0fff).r(FUNC(stactics_state::horiz_pos_r));
 	map(0xb000, 0xbfff).ram().share("videoram_b");
 	map(0xc000, 0xcfff).noprw();
 	map(0xd000, 0xdfff).ram().share("videoram_d");

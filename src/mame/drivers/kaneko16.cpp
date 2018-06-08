@@ -300,22 +300,22 @@ void kaneko16_berlwall_state::berlwall(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();     // ROM
 	map(0x200000, 0x20ffff).ram();     // Work RAM
-	map(0x30e000, 0x30ffff).rw(this, FUNC(kaneko16_berlwall_state::berlwall_spriteram_r), FUNC(kaneko16_berlwall_state::berlwall_spriteram_w)).share("spriteram");       // Sprites (scrambled RAM)
+	map(0x30e000, 0x30ffff).rw(FUNC(kaneko16_berlwall_state::berlwall_spriteram_r), FUNC(kaneko16_berlwall_state::berlwall_spriteram_w)).share("spriteram");       // Sprites (scrambled RAM)
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                // Palette
 	map(0x480000, 0x480001).ram().share("bg15_scroll");                                                       // High Color Background
-	map(0x500000, 0x500001).rw(this, FUNC(kaneko16_berlwall_state::kaneko16_bg15_bright_r), FUNC(kaneko16_berlwall_state::kaneko16_bg15_bright_w)).share("bg15_bright"); // ""
-	map(0x580000, 0x580001).rw(this, FUNC(kaneko16_berlwall_state::kaneko16_bg15_select_r), FUNC(kaneko16_berlwall_state::kaneko16_bg15_select_w)).share("bg15_select"); // ""
-	map(0x600000, 0x60003f).rw(this, FUNC(kaneko16_berlwall_state::berlwall_spriteregs_r), FUNC(kaneko16_berlwall_state::berlwall_spriteregs_w));                           // Sprite Regs (scrambled RAM)
+	map(0x500000, 0x500001).rw(FUNC(kaneko16_berlwall_state::kaneko16_bg15_bright_r), FUNC(kaneko16_berlwall_state::kaneko16_bg15_bright_w)).share("bg15_bright"); // ""
+	map(0x580000, 0x580001).rw(FUNC(kaneko16_berlwall_state::kaneko16_bg15_select_r), FUNC(kaneko16_berlwall_state::kaneko16_bg15_select_w)).share("bg15_select"); // ""
+	map(0x600000, 0x60003f).rw(FUNC(kaneko16_berlwall_state::berlwall_spriteregs_r), FUNC(kaneko16_berlwall_state::berlwall_spriteregs_w));                           // Sprite Regs (scrambled RAM)
 	map(0x680000, 0x680001).portr("P1");
 	map(0x680002, 0x680003).portr("P2");
 	map(0x680004, 0x680005).portr("SYSTEM");
 //  map(0x680006, 0x680007) AM_READ_PORT("UNK")
-	map(0x700000, 0x700001).w(this, FUNC(kaneko16_berlwall_state::kaneko16_coin_lockout_w));  // Coin Lockout
+	map(0x700000, 0x700001).w(FUNC(kaneko16_berlwall_state::kaneko16_coin_lockout_w));  // Coin Lockout
 	map(0x780000, 0x780001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x800000, 0x80001f).rw(this, FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<0>)); // Sound
-	map(0x800200, 0x80021f).rw(this, FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<1>));
+	map(0x800000, 0x80001f).rw(FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<0>)); // Sound
+	map(0x800200, 0x80021f).rw(FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<1>));
 	map(0x8003fe, 0x8003ff).noprw(); // for OKI when accessed as .l
-	map(0x800400, 0x800401).rw(this, FUNC(kaneko16_berlwall_state::berlwall_oki_r), FUNC(kaneko16_berlwall_state::berlwall_oki_w));
+	map(0x800400, 0x800401).rw(FUNC(kaneko16_berlwall_state::berlwall_oki_r), FUNC(kaneko16_berlwall_state::berlwall_oki_w));
 	map(0xc00000, 0xc03fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
 	map(0xd00000, 0xd0001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 }
@@ -333,10 +333,10 @@ void kaneko16_state::bakubrkr(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
 	map(0x100000, 0x10ffff).ram();     // Work RAM
-	map(0x400000, 0x40001f).r(this, FUNC(kaneko16_state::kaneko16_ay_YM2149_r<0>)); // Sound
-	map(0x400000, 0x40001d).w(this, FUNC(kaneko16_state::kaneko16_ay_YM2149_w<0>));
-	map(0x40001f, 0x40001f).w(this, FUNC(kaneko16_state::oki_bank0_w<7>)); // OKI bank Switch
-	map(0x400200, 0x40021f).rw(this, FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));          // Sound
+	map(0x400000, 0x40001f).r(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<0>)); // Sound
+	map(0x400000, 0x40001d).w(FUNC(kaneko16_state::kaneko16_ay_YM2149_w<0>));
+	map(0x40001f, 0x40001f).w(FUNC(kaneko16_state::oki_bank0_w<7>)); // OKI bank Switch
+	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));          // Sound
 	map(0x400401, 0x400401).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  //
 	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
 	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
@@ -346,7 +346,7 @@ void kaneko16_state::bakubrkr(address_map &map)
 	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0xa80000, 0xa80001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xb00000, 0xb0001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0xd00000, 0xd00001).w(this, FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
+	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
 	map(0xe00000, 0xe00001).portr("P1");
 	map(0xe00002, 0xe00003).portr("P2");
 	map(0xe00004, 0xe00005).portr("SYSTEM");
@@ -372,7 +372,7 @@ void kaneko16_state::blazeon(address_map &map)
 	map(0xc00002, 0xc00003).portr("DSW1_P2");
 	map(0xc00004, 0xc00005).portr("UNK");
 	map(0xc00006, 0xc00007).portr("SYSTEM");
-	map(0xd00000, 0xd00001).w(this, FUNC(kaneko16_state::kaneko16_coin_lockout_w));  // Coin Lockout
+	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_coin_lockout_w));  // Coin Lockout
 	map(0xe00000, 0xe00001).nopr(); // Read = IRQ Ack ?
 	map(0xe00000, 0xe00000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe40000, 0xe40001).nopr(); // IRQ Ack ?
@@ -420,11 +420,11 @@ void kaneko16_gtmr_state::bloodwar(address_map &map)
 	map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("EXTRA");
-	map(0xb80000, 0xb80001).w(this, FUNC(kaneko16_gtmr_state::bloodwar_coin_lockout_w));  // Coin Lockout
-	map(0xc00000, 0xc00001).w(this, FUNC(kaneko16_gtmr_state::kaneko16_display_enable));
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::bloodwar_coin_lockout_w));  // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));
 	map(0xd00000, 0xd00001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
-	map(0xe00001, 0xe00001).w(this, FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));
-	map(0xe80001, 0xe80001).w(this, FUNC(kaneko16_gtmr_state::oki_bank1_w<0x3>));
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0x3>));
 }
 
 
@@ -456,11 +456,11 @@ void kaneko16_gtmr_state::bonkadv(address_map &map)
 	map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("UNK");
-	map(0xb80000, 0xb80001).w(this, FUNC(kaneko16_gtmr_state::bloodwar_coin_lockout_w));  // Coin Lockout
-	map(0xc00000, 0xc00001).w(this, FUNC(kaneko16_gtmr_state::kaneko16_display_enable));
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::bloodwar_coin_lockout_w));  // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));
 	map(0xd00000, 0xd00001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
-	map(0xe00001, 0xe00001).w(this, FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));
-	map(0xe80001, 0xe80001).w(this, FUNC(kaneko16_gtmr_state::oki_bank1_w<0xf>));
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0xf>));
 }
 
 
@@ -486,7 +486,7 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr_wheel_r)
 void kaneko16_gtmr_state::gtmr_map(address_map &map)
 {
 	map(0x000000, 0x0ffffd).rom();                                                                     // ROM
-	map(0x0ffffe, 0x0fffff).r(this, FUNC(kaneko16_gtmr_state::gtmr_wheel_r));                                                      // Wheel Value
+	map(0x0ffffe, 0x0fffff).r(FUNC(kaneko16_gtmr_state::gtmr_wheel_r));                                                      // Wheel Value
 
 	map(0x100000, 0x10ffff).ram();                                                                     // Work RAM
 	map(0x200000, 0x20ffff).ram().share("mcuram");                                          // Shared With MCU
@@ -518,13 +518,13 @@ void kaneko16_gtmr_state::gtmr_map(address_map &map)
 	map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("UNK");
-	map(0xb80000, 0xb80001).w(this, FUNC(kaneko16_gtmr_state::kaneko16_coin_lockout_w));                                          // Coin Lockout
-	map(0xc00000, 0xc00001).w(this, FUNC(kaneko16_gtmr_state::kaneko16_display_enable));                                          // might do more than that
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::kaneko16_coin_lockout_w));                                          // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));                                          // might do more than that
 
 	map(0xd00000, 0xd00001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
 
-	map(0xe00001, 0xe00001).w(this, FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));                                        // Samples Bankswitching
-	map(0xe80001, 0xe80001).w(this, FUNC(kaneko16_gtmr_state::oki_bank1_w<0x1>));
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));                                        // Samples Bankswitching
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0x1>));
 }
 
 /***************************************************************************
@@ -556,7 +556,7 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr2_IN1_r)
 void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 {
 	map(0x000000, 0x0ffffd).rom(); // ROM
-	map(0x0ffffe, 0x0fffff).r(this, FUNC(kaneko16_gtmr_state::gtmr2_wheel_r)); // Wheel Value
+	map(0x0ffffe, 0x0fffff).r(FUNC(kaneko16_gtmr_state::gtmr2_wheel_r)); // Wheel Value
 
 	map(0x100000, 0x10ffff).ram(); // Work RAM
 	map(0x200000, 0x20ffff).ram().share("mcuram"); // Shared With MCU
@@ -584,16 +584,16 @@ void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 
 	map(0xb00000, 0xb00001).portr("P1");
 //  map(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	map(0xb00002, 0xb00003).r(this, FUNC(kaneko16_gtmr_state::gtmr2_IN1_r));
+	map(0xb00002, 0xb00003).r(FUNC(kaneko16_gtmr_state::gtmr2_IN1_r));
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("EXTRA");
-	map(0xb80000, 0xb80001).w(this, FUNC(kaneko16_gtmr_state::kaneko16_coin_lockout_w));  // Coin Lockout
-	map(0xc00000, 0xc00001).w(this, FUNC(kaneko16_gtmr_state::kaneko16_display_enable));  // might do more than that
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::kaneko16_coin_lockout_w));  // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));  // might do more than that
 
 	map(0xd00000, 0xd00001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
 
-	map(0xe00001, 0xe00001).w(this, FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));    // Samples Bankswitching
-	map(0xe80001, 0xe80001).w(this, FUNC(kaneko16_gtmr_state::oki_bank1_w<0x1>));
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));    // Samples Bankswitching
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0x1>));
 }
 
 /***************************************************************************
@@ -604,8 +604,8 @@ void kaneko16_state::mgcrystl(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
 	map(0x300000, 0x30ffff).ram();     // Work RAM
-	map(0x400000, 0x40001f).rw(this, FUNC(kaneko16_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<0>)); // Sound
-	map(0x400200, 0x40021f).rw(this, FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));
+	map(0x400000, 0x40001f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<0>)); // Sound
+	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));
 	map(0x400401, 0x400401).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x600000, 0x603fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
@@ -618,7 +618,7 @@ void kaneko16_state::mgcrystl(address_map &map)
 	map(0xc00000, 0xc00001).portr("DSW_P1");
 	map(0xc00002, 0xc00003).portr("P2");
 	map(0xc00004, 0xc00005).portr("SYSTEM");
-	map(0xd00000, 0xd00001).w(this, FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
+	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
 }
 
 
@@ -660,7 +660,7 @@ void kaneko16_shogwarr_state::shogwarr(address_map &map)
 	map(0xb80004, 0xb80005).portr("SYSTEM");
 	map(0xb80006, 0xb80007).portr("UNK");
 	map(0xd00000, 0xd00001).noprw();                         // ? (bit 0)
-	map(0xe00000, 0xe00001).w(this, FUNC(kaneko16_shogwarr_state::shogwarr_oki_bank_w));  // Samples Bankswitching
+	map(0xe00000, 0xe00001).w(FUNC(kaneko16_shogwarr_state::shogwarr_oki_bank_w));  // Samples Bankswitching
 }
 
 /***************************************************************************
@@ -700,7 +700,7 @@ void kaneko16_state::wingforc_soundport(address_map &map)
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0a, 0x0a).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0c, 0x0c).w(this, FUNC(kaneko16_state::oki_bank0_w<0x3>));
+	map(0x0c, 0x0c).w(FUNC(kaneko16_state::oki_bank0_w<0x3>));
 }
 
 
@@ -1848,7 +1848,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2060,7 +2060,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2188,7 +2188,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2309,8 +2309,8 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(shogwarr_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(shogwarr_default_eeprom, 128)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2387,8 +2387,8 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
 	MCFG_KANEKO_HIT_TYPE(2)
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(brapboys_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(brapboys_default_eeprom, 128)
 MACHINE_CONFIG_END
 
 /***************************************************************************

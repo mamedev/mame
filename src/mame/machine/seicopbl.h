@@ -30,7 +30,7 @@ public:
 	DECLARE_READ16_MEMBER( prng_r );
 	DECLARE_READ16_MEMBER( scale_r );
 	DECLARE_WRITE16_MEMBER( scale_w );
-	
+
 	void seibucopbl_map(address_map &map);
 protected:
 	// device-level overrides

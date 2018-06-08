@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/jedi.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "speaker.h"
 
@@ -136,8 +135,7 @@ WRITE8_MEMBER(jedi_state::speech_strobe_w)
 
 	if ((new_speech_strobe_state != m_speech_strobe_state) && new_speech_strobe_state)
 	{
-		tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-		tms5220->data_w(space, 0, *m_speech_data);
+		m_tms->data_w(space, 0, *m_speech_data);
 	}
 	m_speech_strobe_state = new_speech_strobe_state;
 }
@@ -145,8 +143,7 @@ WRITE8_MEMBER(jedi_state::speech_strobe_w)
 
 READ8_MEMBER(jedi_state::speech_ready_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return (tms5220->readyq_r()) << 7;
+	return m_tms->readyq_r() << 7;
 }
 
 
@@ -170,14 +167,14 @@ void jedi_state::audio_map(address_map &map)
 	map(0x0810, 0x081f).mirror(0x07c0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0820, 0x082f).mirror(0x07c0).rw("pokey3", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0830, 0x083f).mirror(0x07c0).rw("pokey4", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1000, 0x1000).mirror(0x00ff).nopr().w(this, FUNC(jedi_state::irq_ack_w));
+	map(0x1000, 0x1000).mirror(0x00ff).nopr().w(FUNC(jedi_state::irq_ack_w));
 	map(0x1100, 0x1100).mirror(0x00ff).nopr().writeonly().share("speech_data");
-	map(0x1200, 0x13ff).nopr().w(this, FUNC(jedi_state::speech_strobe_w));
-	map(0x1400, 0x1400).mirror(0x00ff).nopr().w(this, FUNC(jedi_state::audio_ack_latch_w));
-	map(0x1500, 0x1500).mirror(0x00ff).nopr().w(this, FUNC(jedi_state::speech_reset_w));
+	map(0x1200, 0x13ff).nopr().w(FUNC(jedi_state::speech_strobe_w));
+	map(0x1400, 0x1400).mirror(0x00ff).nopr().w(FUNC(jedi_state::audio_ack_latch_w));
+	map(0x1500, 0x1500).mirror(0x00ff).nopr().w(FUNC(jedi_state::speech_reset_w));
 	map(0x1600, 0x17ff).noprw();
-	map(0x1800, 0x1800).mirror(0x03ff).r(this, FUNC(jedi_state::audio_latch_r)).nopw();
-	map(0x1c00, 0x1c00).mirror(0x03fe).r(this, FUNC(jedi_state::speech_ready_r)).nopw();
+	map(0x1800, 0x1800).mirror(0x03ff).r(FUNC(jedi_state::audio_latch_r)).nopw();
+	map(0x1c00, 0x1c00).mirror(0x03fe).r(FUNC(jedi_state::speech_ready_r)).nopw();
 	map(0x1c01, 0x1c01).mirror(0x03fe).readonly().nopw().share("audio_comm_stat");
 	map(0x2000, 0x7fff).noprw();
 	map(0x8000, 0xffff).rom();

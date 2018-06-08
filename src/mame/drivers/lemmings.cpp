@@ -70,15 +70,15 @@ void lemmings_state::lemmings_map(address_map &map)
 	map(0x120000, 0x1207ff).ram().share("spriteram1");
 	map(0x140000, 0x1407ff).ram().share("spriteram2");
 	map(0x160000, 0x160fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x170000, 0x17000f).ram().w(this, FUNC(lemmings_state::lemmings_control_w)).share("control_data");
-	map(0x190000, 0x19000f).r(this, FUNC(lemmings_state::lemmings_trackball_r));
-	map(0x1a0000, 0x1a3fff).rw(this, FUNC(lemmings_state::lem_protection_region_0_146_r), FUNC(lemmings_state::lem_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x170000, 0x17000f).ram().w(FUNC(lemmings_state::lemmings_control_w)).share("control_data");
+	map(0x190000, 0x19000f).r(FUNC(lemmings_state::lemmings_trackball_r));
+	map(0x1a0000, 0x1a3fff).rw(FUNC(lemmings_state::lem_protection_region_0_146_r), FUNC(lemmings_state::lem_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
 	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
 	map(0x1e0000, 0x1e0001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
-	map(0x200000, 0x201fff).ram().w(this, FUNC(lemmings_state::lemmings_vram_w)).share("vram_data");
+	map(0x200000, 0x201fff).ram().w(FUNC(lemmings_state::lemmings_vram_w)).share("vram_data");
 	map(0x202000, 0x202fff).ram();
-	map(0x300000, 0x37ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_0_w)).share("pixel_0_data");
-	map(0x380000, 0x39ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_1_w)).share("pixel_1_data");
+	map(0x300000, 0x37ffff).ram().w(FUNC(lemmings_state::lemmings_pixel_0_w)).share("pixel_0_data");
+	map(0x380000, 0x39ffff).ram().w(FUNC(lemmings_state::lemmings_pixel_1_w)).share("pixel_1_data");
 }
 
 /******************************************************************************/

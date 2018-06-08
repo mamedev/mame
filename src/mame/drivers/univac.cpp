@@ -74,6 +74,9 @@ public:
 		, m_framecnt(0)
 	{ }
 
+	void uts20(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -86,10 +89,8 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void uts20(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
@@ -119,7 +120,7 @@ READ8_MEMBER( univac_state::ram_r )
 	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effects_disabled())
 	{
 		LOGPARITY("parity check failed offset = %04X\n", offset);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	return m_p_videoram[offset];
 }
@@ -192,8 +193,8 @@ void univac_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x4fff).rom().region("roms", 0);
-	map(0x8000, 0xbfff).rw(this, FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
-	map(0xc000, 0xffff).ram().w(this, FUNC(univac_state::ram_w)).share("videoram");
+	map(0x8000, 0xbfff).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
+	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
 }
 
 void univac_state::io_map(address_map &map)
@@ -202,10 +203,10 @@ void univac_state::io_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x03).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x20, 0x23).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x43, 0x43).w(this, FUNC(univac_state::port43_w));
-	map(0x80, 0xbf).ram().w(this, FUNC(univac_state::nvram_w)).share("nvram");
-	map(0xc4, 0xc4).w(this, FUNC(univac_state::portc4_w));
-	map(0xe6, 0xe6).w(this, FUNC(univac_state::porte6_w));
+	map(0x43, 0x43).w(FUNC(univac_state::port43_w));
+	map(0x80, 0xbf).ram().w(FUNC(univac_state::nvram_w)).share("nvram");
+	map(0xc4, 0xc4).w(FUNC(univac_state::portc4_w));
+	map(0xe6, 0xe6).w(FUNC(univac_state::porte6_w));
 }
 
 /* Input ports */

@@ -146,9 +146,9 @@ void ltcasino_state::ltcasino_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0xcfff).rom();
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(ltcasino_state::ltcasino_tile_num_w)).share("tile_nuram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(ltcasino_state::ltcasino_tile_num_w)).share("tile_nuram");
 	map(0xd800, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(ltcasino_state::ltcasino_tile_atr_w)).share("tile_atr_ram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(ltcasino_state::ltcasino_tile_atr_w)).share("tile_atr_ram");
 	map(0xe800, 0xebff).ram();
 
 	map(0xec00, 0xec00).portr("IN0");

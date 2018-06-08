@@ -117,7 +117,7 @@ void mk14_state::mem_map(address_map &map)
 	map(0x000, 0x1ff).mirror(0x600).rom(); // ROM
 	map(0x800, 0x87f).mirror(0x600).rw("ic8", FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w)); // I/O
 	map(0x880, 0x8ff).mirror(0x600).ram(); // 128 I/O chip RAM
-	map(0x900, 0x9ff).mirror(0x400).rw(this, FUNC(mk14_state::keyboard_r), FUNC(mk14_state::display_w));
+	map(0x900, 0x9ff).mirror(0x400).rw(FUNC(mk14_state::keyboard_r), FUNC(mk14_state::display_w));
 	map(0xb00, 0xbff).ram(); // VDU RAM
 	map(0xf00, 0xfff).ram(); // Standard RAM
 }
@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(mk14_state::mk14)
 	/* devices */
 	MCFG_DEVICE_ADD("ic8", INS8154, 0)
 	MCFG_INS8154_OUT_A_CB(WRITE8(*this, mk14_state, port_a_w))
-	MCFG_INS8154_OUT_B_CB(WRITE8("dac8", dac_byte_interface, write))
+	MCFG_INS8154_OUT_B_CB(WRITE8("dac8", dac_byte_interface, data_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

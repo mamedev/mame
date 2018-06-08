@@ -341,7 +341,7 @@ void tourvision_state::pce_mem(address_map &map)
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(tourvision_state::pce_joystick_r), FUNC(tourvision_state::pce_joystick_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(tourvision_state::pce_joystick_r), FUNC(tourvision_state::pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
@@ -364,7 +364,7 @@ void tourvision_state::tourvision_8085_map(address_map &map)
 	map(0xa000, 0xa000).portr("DSW2");
 	map(0xb000, 0xb000).nopr(); // unknown (must NOT be == 0x03 ? code at 0x1154)
 	map(0xc000, 0xc000).portr("SYSTEM");
-	map(0xd000, 0xd000).w(this, FUNC(tourvision_state::tourvision_8085_d000_w));
+	map(0xd000, 0xd000).w(FUNC(tourvision_state::tourvision_8085_d000_w));
 	map(0xe000, 0xe1ff).ram();
 	map(0xf000, 0xf000).nopr(); // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 }
@@ -443,21 +443,21 @@ MACHINE_CONFIG_END
 #define TOURVISION_BIOS \
 	ROM_REGION( 0x8000, "subcpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "60", "V4-60" ) \
-	ROMX_LOAD( "v4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
+	ROMX_LOAD( "v4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "55", "V4-55" ) \
-	ROMX_LOAD( "v4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
+	ROMX_LOAD( "v4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 2, "53", "V4-53" ) \
-	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(3) ) \
+	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "52", "V4-52" ) \
-	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(4) ) \
+	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) ) \
 	ROM_SYSTEM_BIOS( 4, "43", "V4-43" ) \
-	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
+	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(4) ) \
 	ROM_SYSTEM_BIOS( 5, "40", "V4-40" ) \
-	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(6) ) \
+	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(5) ) \
 	ROM_SYSTEM_BIOS( 6, "20", "VT-20" ) \
-	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(7) ) \
+	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(6) ) \
 	ROM_SYSTEM_BIOS( 7, "11", "VT-11" ) \
-	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(8) )
+	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(7) )
 
 
 ROM_START(tourvis)

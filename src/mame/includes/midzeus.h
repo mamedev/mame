@@ -49,8 +49,6 @@ public:
 	DECLARE_WRITE32_MEMBER(disk_asic_w);
 	DECLARE_READ32_MEMBER(disk_asic_jr_r);
 	DECLARE_WRITE32_MEMBER(disk_asic_jr_w);
-	DECLARE_READ32_MEMBER(crusnexo_leds_r);
-	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
 	DECLARE_READ32_MEMBER(firewire_r);
 	DECLARE_WRITE32_MEMBER(firewire_w);
 	DECLARE_READ32_MEMBER(tms32031_control_r);
@@ -68,8 +66,6 @@ public:
 	DECLARE_READ32_MEMBER(trackball_r);
 	void init_invasn();
 	void init_mk4();
-	void init_thegrid();
-	void init_crusnexo();
 	DECLARE_MACHINE_START(midzeus);
 	DECLARE_MACHINE_RESET(midzeus);
 	DECLARE_VIDEO_START(midzeus);

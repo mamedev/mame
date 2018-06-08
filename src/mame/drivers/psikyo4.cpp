@@ -326,20 +326,20 @@ void psikyo4_state::ps4_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom();     // program ROM (1 meg)
 	map(0x02000000, 0x021fffff).rom().region("maincpu", 0x100000); // data ROM
 	map(0x03000000, 0x030037ff).ram().share("spriteram");
-	map(0x03003fe0, 0x03003fe3).rw(this, FUNC(psikyo4_state::ps4_eeprom_r), FUNC(psikyo4_state::ps4_eeprom_w));
-	map(0x03003fe4, 0x03003fef).ram().w(this, FUNC(psikyo4_state::ps4_vidregs_w)).share("vidregs"); // vid regs?
+	map(0x03003fe0, 0x03003fe3).rw(FUNC(psikyo4_state::ps4_eeprom_r), FUNC(psikyo4_state::ps4_eeprom_w));
+	map(0x03003fe4, 0x03003fef).ram().w(FUNC(psikyo4_state::ps4_vidregs_w)).share("vidregs"); // vid regs?
 	map(0x03003fe4, 0x03003fe7).nopr(); // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	map(0x03003ff0, 0x03003ff3).w(this, FUNC(psikyo4_state::ps4_screen1_brt_w)); // screen 1 brightness
-	map(0x03003ff4, 0x03003ff7).w(this, FUNC(psikyo4_state::ps4_bgpen_1_dword_w)).share("bgpen_1"); // screen 1 clear colour
-	map(0x03003ff8, 0x03003ffb).w(this, FUNC(psikyo4_state::ps4_screen2_brt_w)); // screen 2 brightness
-	map(0x03003ffc, 0x03003fff).w(this, FUNC(psikyo4_state::ps4_bgpen_2_dword_w)).share("bgpen_2"); // screen 2 clear colour
-	map(0x03004000, 0x03005fff).ram().w(this, FUNC(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)).share("paletteram"); // palette
+	map(0x03003ff0, 0x03003ff3).w(FUNC(psikyo4_state::ps4_screen1_brt_w)); // screen 1 brightness
+	map(0x03003ff4, 0x03003ff7).w(FUNC(psikyo4_state::ps4_bgpen_1_dword_w)).share("bgpen_1"); // screen 1 clear colour
+	map(0x03003ff8, 0x03003ffb).w(FUNC(psikyo4_state::ps4_screen2_brt_w)); // screen 2 brightness
+	map(0x03003ffc, 0x03003fff).w(FUNC(psikyo4_state::ps4_bgpen_2_dword_w)).share("bgpen_2"); // screen 2 clear colour
+	map(0x03004000, 0x03005fff).ram().w(FUNC(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)).share("paletteram"); // palette
 	map(0x03006000, 0x03007fff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 	map(0x05800000, 0x05800003).portr("P1_P2");
 	map(0x05800004, 0x05800007).portr("P3_P4");
-	map(0x05800008, 0x0580000b).w(this, FUNC(psikyo4_state::io_select_w)); // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
+	map(0x05800008, 0x0580000b).w(FUNC(psikyo4_state::io_select_w)); // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 
 	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
 }
@@ -659,8 +659,8 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
-	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)

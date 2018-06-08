@@ -134,19 +134,19 @@ void bombjack_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(bombjack_state::bombjack_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(bombjack_state::bombjack_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(bombjack_state::bombjack_videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(bombjack_state::bombjack_colorram_w)).share("colorram");
 	map(0x9820, 0x987f).writeonly().share("spriteram");
 	map(0x9a00, 0x9a00).nopw();
 	map(0x9c00, 0x9cff).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9e00, 0x9e00).w(this, FUNC(bombjack_state::bombjack_background_w));
+	map(0x9e00, 0x9e00).w(FUNC(bombjack_state::bombjack_background_w));
 	map(0xb000, 0xb000).portr("P1");
-	map(0xb000, 0xb000).w(this, FUNC(bombjack_state::irq_mask_w));
+	map(0xb000, 0xb000).w(FUNC(bombjack_state::irq_mask_w));
 	map(0xb001, 0xb001).portr("P2");
 	map(0xb002, 0xb002).portr("SYSTEM");
 	map(0xb003, 0xb003).nopr(); /* watchdog reset? */
 	map(0xb004, 0xb004).portr("DSW1");
-	map(0xb004, 0xb004).w(this, FUNC(bombjack_state::bombjack_flipscreen_w));
+	map(0xb004, 0xb004).w(FUNC(bombjack_state::bombjack_flipscreen_w));
 	map(0xb005, 0xb005).portr("DSW2");
 	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xdfff).rom();
@@ -156,7 +156,7 @@ void bombjack_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x6000, 0x6000).r(this, FUNC(bombjack_state::soundlatch_read_and_clear));
+	map(0x6000, 0x6000).r(FUNC(bombjack_state::soundlatch_read_and_clear));
 }
 
 void bombjack_state::audio_io_map(address_map &map)

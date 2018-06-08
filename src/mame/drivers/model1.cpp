@@ -919,12 +919,12 @@ void model1_state::model1_mem(address_map &map)
 	map(0x100000, 0x1fffff).bankr("bank1");
 	map(0x200000, 0x2fffff).rom();
 
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(model1_state::mr2_w)).share("mr2");
-	map(0x500000, 0x53ffff).ram().w(this, FUNC(model1_state::mr_w)).share("mr");
+	map(0x400000, 0x40ffff).ram().w(FUNC(model1_state::mr2_w)).share("mr2");
+	map(0x500000, 0x53ffff).ram().w(FUNC(model1_state::mr_w)).share("mr");
 
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(model1_state::md0_w)).share("display_list0");
-	map(0x610000, 0x61ffff).ram().w(this, FUNC(model1_state::md1_w)).share("display_list1");
-	map(0x680000, 0x680003).rw(this, FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
+	map(0x600000, 0x60ffff).ram().w(FUNC(model1_state::md0_w)).share("display_list0");
+	map(0x610000, 0x61ffff).ram().w(FUNC(model1_state::md1_w)).share("display_list1");
+	map(0x680000, 0x680003).rw(FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
 	map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
 	map(0x720000, 0x720001).nopw();        // Unknown, always 0
@@ -933,21 +933,21 @@ void model1_state::model1_mem(address_map &map)
 	map(0x770000, 0x770001).nopw();        // Video synchronization switch
 	map(0x780000, 0x7fffff).rw(m_tiles, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
 
-	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
+	map(0x900000, 0x903fff).ram().w(FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc00fff).r(this, FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
+	map(0xc00000, 0xc00fff).r(FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
 
 	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	map(0xd00000, 0xd00001).rw(this, FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w));
-	map(0xd20000, 0xd20003).w(this, FUNC(model1_state::v60_copro_ram_w));
-	map(0xd80000, 0xd80003).w(this, FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
-	map(0xdc0000, 0xdc0003).r(this, FUNC(model1_state::fifoin_status_r));
+	map(0xd00000, 0xd00001).rw(FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w));
+	map(0xd20000, 0xd20003).w(FUNC(model1_state::v60_copro_ram_w));
+	map(0xd80000, 0xd80003).w(FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
+	map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r));
 
-	map(0xe00000, 0xe00000).w(this, FUNC(model1_state::irq_control_w));
-	map(0xe00004, 0xe00005).w(this, FUNC(model1_state::bank_w));
+	map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
+	map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
 	map(0xe0000c, 0xe0000f).nopw();
 
 	map(0xf80000, 0xffffff).rom();
@@ -955,8 +955,8 @@ void model1_state::model1_mem(address_map &map)
 
 void model1_state::model1_io(address_map &map)
 {
-	map(0xd20000, 0xd20003).r(this, FUNC(model1_state::v60_copro_ram_r));
-	map(0xd80000, 0xd80003).r(this, FUNC(model1_state::v60_copro_fifo_r));
+	map(0xd20000, 0xd20003).r(FUNC(model1_state::v60_copro_ram_r));
+	map(0xd80000, 0xd80003).r(FUNC(model1_state::v60_copro_fifo_r));
 }
 
 void model1_state::model1_comm_mem(address_map &map)
@@ -967,6 +967,38 @@ void model1_state::model1_comm_mem(address_map &map)
 	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(m1comm_device::cn_r), FUNC(m1comm_device::cn_w));
 	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(m1comm_device::fg_r), FUNC(m1comm_device::fg_w));
 }
+
+static INPUT_PORTS_START( ioboard_dipswitches )
+	PORT_START("ioboard:dsw1")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("ioboard:dsw2")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("ioboard:dsw3")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW3:8")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( vf )
 	PORT_START("IN.0")
@@ -998,6 +1030,8 @@ static INPUT_PORTS_START( vf )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
+
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vr )
@@ -1033,6 +1067,7 @@ static INPUT_PORTS_START( vr )
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL2 ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swa )
@@ -1070,6 +1105,8 @@ static INPUT_PORTS_START( swa )
 
 	PORT_START("STICK2Y")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)  PORT_PLAYER(2)
+
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingwar )
@@ -1102,35 +1139,7 @@ static INPUT_PORTS_START( wingwar )
 	PORT_START("THROTTLE")
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("ioboard:dsw1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
-
-	PORT_START("ioboard:dsw2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
-
-	PORT_START("ioboard:dsw3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingwar360 )
@@ -1170,35 +1179,7 @@ static INPUT_PORTS_START( netmerc )
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ioboard:dsw1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
-
-	PORT_START("ioboard:dsw2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
-
-	PORT_START("ioboard:dsw3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 
@@ -1715,8 +1696,8 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
+	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
@@ -1750,6 +1731,7 @@ MACHINE_CONFIG_START(model1_state::vf)
 	model1_hle(config);
 
 	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_DEVICE_BIOS("epr14869b");
 	MCFG_MODEL1IO_IN2_CB(IOPORT("IN.2"))
 	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vf_outputs_w))
 MACHINE_CONFIG_END
@@ -1784,6 +1766,7 @@ MACHINE_CONFIG_START(model1_state::swa)
 	model1_hle(config);
 
 	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_DEVICE_BIOS("epr14869b");
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STICK1X"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("STICK1Y"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))

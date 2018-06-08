@@ -365,12 +365,12 @@ void tv912_state::io_map(address_map &map)
 void tv912_state::bank_map(address_map &map)
 {
 	map(0x000, 0x0ff).mirror(0x300).ram();
-	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(this, FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
+	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
 	map(0x404, 0x404).mirror(0x3f3).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x408, 0x40b).mirror(0x3f0).r(this, FUNC(tv912_state::uart_status_r));
+	map(0x408, 0x40b).mirror(0x3f0).r(FUNC(tv912_state::uart_status_r));
 	map(0x408, 0x408).mirror(0x3f3).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x40c, 0x40f).mirror(0x3f0).r(this, FUNC(tv912_state::keyboard_r));
-	map(0x40c, 0x40c).mirror(0x3f3).w(this, FUNC(tv912_state::output_40c));
+	map(0x40c, 0x40f).mirror(0x3f0).r(FUNC(tv912_state::keyboard_r));
+	map(0x40c, 0x40c).mirror(0x3f3).w(FUNC(tv912_state::output_40c));
 	map(0x800, 0xfff).bankrw("dispram");
 }
 

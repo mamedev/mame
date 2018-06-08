@@ -9,59 +9,59 @@ DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge"
 
 void pci_device::config_map(address_map &map)
 {
-	map(0x00, 0x01).r(this, FUNC(pci_device::vendor_r));
-	map(0x02, 0x03).r(this, FUNC(pci_device::device_r));
-	map(0x04, 0x05).rw(this, FUNC(pci_device::command_r), FUNC(pci_device::command_w));
-	map(0x06, 0x07).r(this, FUNC(pci_device::status_r));
-	map(0x08, 0x0b).r(this, FUNC(pci_device::class_rev_r));
-	map(0x0c, 0x0c).r(this, FUNC(pci_device::cache_line_size_r));
-	map(0x0d, 0x0d).r(this, FUNC(pci_device::latency_timer_r));
-	map(0x0e, 0x0e).r(this, FUNC(pci_device::header_type_r));
-	map(0x0f, 0x0f).r(this, FUNC(pci_device::bist_r));
+	map(0x00, 0x01).r(FUNC(pci_device::vendor_r));
+	map(0x02, 0x03).r(FUNC(pci_device::device_r));
+	map(0x04, 0x05).rw(FUNC(pci_device::command_r), FUNC(pci_device::command_w));
+	map(0x06, 0x07).r(FUNC(pci_device::status_r));
+	map(0x08, 0x0b).r(FUNC(pci_device::class_rev_r));
+	map(0x0c, 0x0c).r(FUNC(pci_device::cache_line_size_r));
+	map(0x0d, 0x0d).r(FUNC(pci_device::latency_timer_r));
+	map(0x0e, 0x0e).r(FUNC(pci_device::header_type_r));
+	map(0x0f, 0x0f).r(FUNC(pci_device::bist_r));
 	map(0x0c, 0x0f).nopw();
-	map(0x10, 0x27).rw(this, FUNC(pci_device::address_base_r), FUNC(pci_device::address_base_w));
+	map(0x10, 0x27).rw(FUNC(pci_device::address_base_r), FUNC(pci_device::address_base_w));
 	// Cardbus CIS pointer at 28
-	map(0x2c, 0x2d).r(this, FUNC(pci_device::subvendor_r));
-	map(0x2e, 0x2f).r(this, FUNC(pci_device::subsystem_r));
+	map(0x2c, 0x2d).r(FUNC(pci_device::subvendor_r));
+	map(0x2e, 0x2f).r(FUNC(pci_device::subsystem_r));
 	map(0x2c, 0x2f).nopw();
-	map(0x30, 0x33).rw(this, FUNC(pci_device::expansion_base_r), FUNC(pci_device::expansion_base_w));
-	map(0x34, 0x34).r(this, FUNC(pci_device::capptr_r));
-	map(0x3c, 0x3c).rw(this, FUNC(pci_device::interrupt_line_r), FUNC(pci_device::interrupt_line_w));
-	map(0x3d, 0x3d).rw(this, FUNC(pci_device::interrupt_pin_r), FUNC(pci_device::interrupt_pin_w));
+	map(0x30, 0x33).rw(FUNC(pci_device::expansion_base_r), FUNC(pci_device::expansion_base_w));
+	map(0x34, 0x34).r(FUNC(pci_device::capptr_r));
+	map(0x3c, 0x3c).rw(FUNC(pci_device::interrupt_line_r), FUNC(pci_device::interrupt_line_w));
+	map(0x3d, 0x3d).rw(FUNC(pci_device::interrupt_pin_r), FUNC(pci_device::interrupt_pin_w));
 }
 
 void pci_bridge_device::config_map(address_map &map)
 {
-	map(0x00, 0x01).r(this, FUNC(pci_bridge_device::vendor_r));
-	map(0x02, 0x03).r(this, FUNC(pci_bridge_device::device_r));
-	map(0x04, 0x05).rw(this, FUNC(pci_bridge_device::command_r), FUNC(pci_bridge_device::command_w));
-	map(0x06, 0x07).r(this, FUNC(pci_bridge_device::status_r));
-	map(0x08, 0x0b).r(this, FUNC(pci_bridge_device::class_rev_r));
-	map(0x0c, 0x0c).r(this, FUNC(pci_bridge_device::cache_line_size_r));
-	map(0x0d, 0x0d).r(this, FUNC(pci_bridge_device::latency_timer_r));
-	map(0x0e, 0x0e).r(this, FUNC(pci_bridge_device::header_type_r));
-	map(0x0f, 0x0f).r(this, FUNC(pci_bridge_device::bist_r));
-	map(0x10, 0x17).rw(this, FUNC(pci_bridge_device::b_address_base_r), FUNC(pci_bridge_device::b_address_base_w));
-	map(0x18, 0x18).rw(this, FUNC(pci_bridge_device::primary_bus_r), FUNC(pci_bridge_device::primary_bus_w));
-	map(0x19, 0x19).rw(this, FUNC(pci_bridge_device::secondary_bus_r), FUNC(pci_bridge_device::secondary_bus_w));
-	map(0x1a, 0x1a).rw(this, FUNC(pci_bridge_device::subordinate_bus_r), FUNC(pci_bridge_device::subordinate_bus_w));
-	map(0x1b, 0x1b).rw(this, FUNC(pci_bridge_device::secondary_latency_r), FUNC(pci_bridge_device::secondary_latency_w));
-	map(0x1c, 0x1c).rw(this, FUNC(pci_bridge_device::iobase_r), FUNC(pci_bridge_device::iobase_w));
-	map(0x1d, 0x1d).rw(this, FUNC(pci_bridge_device::iolimit_r), FUNC(pci_bridge_device::iolimit_w));
-	map(0x1e, 0x1f).rw(this, FUNC(pci_bridge_device::secondary_status_r), FUNC(pci_bridge_device::secondary_status_w));
-	map(0x20, 0x21).rw(this, FUNC(pci_bridge_device::memory_base_r), FUNC(pci_bridge_device::memory_base_w));
-	map(0x22, 0x23).rw(this, FUNC(pci_bridge_device::memory_limit_r), FUNC(pci_bridge_device::memory_limit_w));
-	map(0x24, 0x25).rw(this, FUNC(pci_bridge_device::prefetch_base_r), FUNC(pci_bridge_device::prefetch_base_w));
-	map(0x26, 0x27).rw(this, FUNC(pci_bridge_device::prefetch_limit_r), FUNC(pci_bridge_device::prefetch_limit_w));
-	map(0x28, 0x2b).rw(this, FUNC(pci_bridge_device::prefetch_baseu_r), FUNC(pci_bridge_device::prefetch_baseu_w));
-	map(0x2c, 0x2f).rw(this, FUNC(pci_bridge_device::prefetch_limitu_r), FUNC(pci_bridge_device::prefetch_limitu_w));
-	map(0x30, 0x31).rw(this, FUNC(pci_bridge_device::iobaseu_r), FUNC(pci_bridge_device::iobaseu_w));
-	map(0x32, 0x33).rw(this, FUNC(pci_bridge_device::iolimitu_r), FUNC(pci_bridge_device::iolimitu_w));
-	map(0x34, 0x34).r(this, FUNC(pci_bridge_device::capptr_r));
-	map(0x38, 0x3b).rw(this, FUNC(pci_bridge_device::expansion_base_r), FUNC(pci_bridge_device::expansion_base_w));
-	map(0x3c, 0x3c).rw(this, FUNC(pci_bridge_device::interrupt_line_r), FUNC(pci_bridge_device::interrupt_line_w));
-	map(0x3d, 0x3d).rw(this, FUNC(pci_bridge_device::interrupt_pin_r), FUNC(pci_bridge_device::interrupt_pin_w));
-	map(0x3e, 0x3f).rw(this, FUNC(pci_bridge_device::bridge_control_r), FUNC(pci_bridge_device::bridge_control_w));
+	map(0x00, 0x01).r(FUNC(pci_bridge_device::vendor_r));
+	map(0x02, 0x03).r(FUNC(pci_bridge_device::device_r));
+	map(0x04, 0x05).rw(FUNC(pci_bridge_device::command_r), FUNC(pci_bridge_device::command_w));
+	map(0x06, 0x07).r(FUNC(pci_bridge_device::status_r));
+	map(0x08, 0x0b).r(FUNC(pci_bridge_device::class_rev_r));
+	map(0x0c, 0x0c).r(FUNC(pci_bridge_device::cache_line_size_r));
+	map(0x0d, 0x0d).r(FUNC(pci_bridge_device::latency_timer_r));
+	map(0x0e, 0x0e).r(FUNC(pci_bridge_device::header_type_r));
+	map(0x0f, 0x0f).r(FUNC(pci_bridge_device::bist_r));
+	map(0x10, 0x17).rw(FUNC(pci_bridge_device::b_address_base_r), FUNC(pci_bridge_device::b_address_base_w));
+	map(0x18, 0x18).rw(FUNC(pci_bridge_device::primary_bus_r), FUNC(pci_bridge_device::primary_bus_w));
+	map(0x19, 0x19).rw(FUNC(pci_bridge_device::secondary_bus_r), FUNC(pci_bridge_device::secondary_bus_w));
+	map(0x1a, 0x1a).rw(FUNC(pci_bridge_device::subordinate_bus_r), FUNC(pci_bridge_device::subordinate_bus_w));
+	map(0x1b, 0x1b).rw(FUNC(pci_bridge_device::secondary_latency_r), FUNC(pci_bridge_device::secondary_latency_w));
+	map(0x1c, 0x1c).rw(FUNC(pci_bridge_device::iobase_r), FUNC(pci_bridge_device::iobase_w));
+	map(0x1d, 0x1d).rw(FUNC(pci_bridge_device::iolimit_r), FUNC(pci_bridge_device::iolimit_w));
+	map(0x1e, 0x1f).rw(FUNC(pci_bridge_device::secondary_status_r), FUNC(pci_bridge_device::secondary_status_w));
+	map(0x20, 0x21).rw(FUNC(pci_bridge_device::memory_base_r), FUNC(pci_bridge_device::memory_base_w));
+	map(0x22, 0x23).rw(FUNC(pci_bridge_device::memory_limit_r), FUNC(pci_bridge_device::memory_limit_w));
+	map(0x24, 0x25).rw(FUNC(pci_bridge_device::prefetch_base_r), FUNC(pci_bridge_device::prefetch_base_w));
+	map(0x26, 0x27).rw(FUNC(pci_bridge_device::prefetch_limit_r), FUNC(pci_bridge_device::prefetch_limit_w));
+	map(0x28, 0x2b).rw(FUNC(pci_bridge_device::prefetch_baseu_r), FUNC(pci_bridge_device::prefetch_baseu_w));
+	map(0x2c, 0x2f).rw(FUNC(pci_bridge_device::prefetch_limitu_r), FUNC(pci_bridge_device::prefetch_limitu_w));
+	map(0x30, 0x31).rw(FUNC(pci_bridge_device::iobaseu_r), FUNC(pci_bridge_device::iobaseu_w));
+	map(0x32, 0x33).rw(FUNC(pci_bridge_device::iolimitu_r), FUNC(pci_bridge_device::iolimitu_w));
+	map(0x34, 0x34).r(FUNC(pci_bridge_device::capptr_r));
+	map(0x38, 0x3b).rw(FUNC(pci_bridge_device::expansion_base_r), FUNC(pci_bridge_device::expansion_base_w));
+	map(0x3c, 0x3c).rw(FUNC(pci_bridge_device::interrupt_line_r), FUNC(pci_bridge_device::interrupt_line_w));
+	map(0x3d, 0x3d).rw(FUNC(pci_bridge_device::interrupt_pin_r), FUNC(pci_bridge_device::interrupt_pin_w));
+	map(0x3e, 0x3f).rw(FUNC(pci_bridge_device::bridge_control_r), FUNC(pci_bridge_device::bridge_control_w));
 }
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -829,8 +829,8 @@ void agp_bridge_device::device_reset()
 
 void pci_host_device::io_configuration_access_map(address_map &map)
 {
-	map(0xcf8, 0xcfb).rw(this, FUNC(pci_host_device::config_address_r), FUNC(pci_host_device::config_address_w));
-	map(0xcfc, 0xcff).rw(this, FUNC(pci_host_device::config_data_r), FUNC(pci_host_device::config_data_w));
+	map(0xcf8, 0xcfb).rw(FUNC(pci_host_device::config_address_r), FUNC(pci_host_device::config_address_w));
+	map(0xcfc, 0xcff).rw(FUNC(pci_host_device::config_data_r), FUNC(pci_host_device::config_data_w));
 }
 
 

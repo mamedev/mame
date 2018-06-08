@@ -48,7 +48,7 @@ public:
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_unknown;
 	required_shared_ptr<uint16_t> m_priority;
-	
+
 	required_memory_bank m_soundbank;
 
 	/* video-related */

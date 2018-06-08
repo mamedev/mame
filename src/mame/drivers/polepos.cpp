@@ -412,17 +412,17 @@ void polepos_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x37ff).mirror(0x0800).ram().share("nvram");                 /* Battery Backup */
-	map(0x4000, 0x47ff).rw(this, FUNC(polepos_state::polepos_sprite_r), FUNC(polepos_state::polepos_sprite_w));           /* Motion Object */
-	map(0x4800, 0x4bff).rw(this, FUNC(polepos_state::polepos_road_r), FUNC(polepos_state::polepos_road_w));               /* Road Memory */
-	map(0x4c00, 0x4fff).rw(this, FUNC(polepos_state::polepos_alpha_r), FUNC(polepos_state::polepos_alpha_w));             /* Alphanumeric (char ram) */
-	map(0x5000, 0x57ff).rw(this, FUNC(polepos_state::polepos_view_r), FUNC(polepos_state::polepos_view_w));               /* Background Memory */
+	map(0x4000, 0x47ff).rw(FUNC(polepos_state::polepos_sprite_r), FUNC(polepos_state::polepos_sprite_w));           /* Motion Object */
+	map(0x4800, 0x4bff).rw(FUNC(polepos_state::polepos_road_r), FUNC(polepos_state::polepos_road_w));               /* Road Memory */
+	map(0x4c00, 0x4fff).rw(FUNC(polepos_state::polepos_alpha_r), FUNC(polepos_state::polepos_alpha_w));             /* Alphanumeric (char ram) */
+	map(0x5000, 0x57ff).rw(FUNC(polepos_state::polepos_view_r), FUNC(polepos_state::polepos_view_w));               /* Background Memory */
 
 	map(0x8000, 0x83bf).mirror(0x0c00).ram();                                   /* Sound Memory */
 	map(0x83c0, 0x83ff).mirror(0x0c00).rw(m_namco_sound, FUNC(namco_device::polepos_sound_r), FUNC(namco_device::polepos_sound_w));    /* Sound data */
 
 	map(0x9000, 0x9000).mirror(0x0eff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
 	map(0x9100, 0x9100).mirror(0x0eff).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
-	map(0xa000, 0xa000).mirror(0x0cff).r(this, FUNC(polepos_state::polepos_ready_r));                 /* READY */
+	map(0xa000, 0xa000).mirror(0x0cff).r(FUNC(polepos_state::polepos_ready_r));                 /* READY */
 	map(0xa000, 0xa007).mirror(0x0cf8).w(m_latch, FUNC(ls259_device::write_d0));
 	map(0xa100, 0xa100).mirror(0x0cff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa200, 0xa200).mirror(0x0cff).w("polepos", FUNC(polepos_sound_device::polepos_engine_sound_lsb_w));    /* Car Sound ( Lower Nibble ) */
@@ -432,7 +432,7 @@ void polepos_state::z80_map(address_map &map)
 void polepos_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(polepos_state::polepos_adc_r)).nopw();
+	map(0x00, 0x00).r(FUNC(polepos_state::polepos_adc_r)).nopw();
 }
 
 
@@ -440,24 +440,24 @@ void polepos_state::z80_io(address_map &map)
 void polepos_state::z8002_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).rw(this, FUNC(polepos_state::polepos_sprite16_r), FUNC(polepos_state::polepos_sprite16_w)).share("sprite16_memory");   /* Motion Object */
-	map(0x9000, 0x97ff).rw(this, FUNC(polepos_state::polepos_road16_r), FUNC(polepos_state::polepos_road16_w)).share("road16_memory");     /* Road Memory */
-	map(0x9800, 0x9fff).rw(this, FUNC(polepos_state::polepos_alpha16_r), FUNC(polepos_state::polepos_alpha16_w)).share("alpha16_memory");  /* Alphanumeric (char ram) */
-	map(0xa000, 0xafff).rw(this, FUNC(polepos_state::polepos_view16_r), FUNC(polepos_state::polepos_view16_w)).share("view16_memory");     /* Background memory */
-	map(0xc000, 0xc001).mirror(0x38fe).w(this, FUNC(polepos_state::polepos_view16_hscroll_w));                       /* Background horz scroll position */
-	map(0xc100, 0xc101).mirror(0x38fe).w(this, FUNC(polepos_state::polepos_road16_vscroll_w));                       /* Road vertical position */
+	map(0x8000, 0x8fff).rw(FUNC(polepos_state::polepos_sprite16_r), FUNC(polepos_state::polepos_sprite16_w)).share("sprite16_memory");   /* Motion Object */
+	map(0x9000, 0x97ff).rw(FUNC(polepos_state::polepos_road16_r), FUNC(polepos_state::polepos_road16_w)).share("road16_memory");     /* Road Memory */
+	map(0x9800, 0x9fff).rw(FUNC(polepos_state::polepos_alpha16_r), FUNC(polepos_state::polepos_alpha16_w)).share("alpha16_memory");  /* Alphanumeric (char ram) */
+	map(0xa000, 0xafff).rw(FUNC(polepos_state::polepos_view16_r), FUNC(polepos_state::polepos_view16_w)).share("view16_memory");     /* Background memory */
+	map(0xc000, 0xc001).mirror(0x38fe).w(FUNC(polepos_state::polepos_view16_hscroll_w));                       /* Background horz scroll position */
+	map(0xc100, 0xc101).mirror(0x38fe).w(FUNC(polepos_state::polepos_road16_vscroll_w));                       /* Road vertical position */
 }
 
 void polepos_state::z8002_map_1(address_map &map)
 {
 	z8002_map(map);
-	map(0x6000, 0x6001).mirror(0x0ffe).w(this, FUNC(polepos_state::polepos_z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
+	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::polepos_z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 void polepos_state::z8002_map_2(address_map &map)
 {
 	z8002_map(map);
-	map(0x6000, 0x6001).mirror(0x0ffe).w(this, FUNC(polepos_state::polepos_z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
+	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::polepos_z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 
@@ -938,7 +938,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
 	/* engine sound */
-	MCFG_DEVICE_ADD("polepos", POLEPOS_SOUND, 0)
+	MCFG_DEVICE_ADD("polepos", POLEPOS_SOUND, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_CONFIG_END
@@ -956,9 +956,9 @@ void polepos_state::topracern_io(address_map &map)
 	z80_io(map);
 	// extra direct mapped inputs read
 	map(0x02, 0x02).portr("STEER").nopw();
-	map(0x03, 0x03).portr("IN0").w("dac", FUNC(dac_byte_interface::write));
+	map(0x03, 0x03).portr("IN0").w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x04, 0x04).portr("DSWA").nopw(); // explosion sound trigger
-	map(0x05, 0x05).portr("DSWB").w(this, FUNC(polepos_state::bootleg_soundlatch_w));
+	map(0x05, 0x05).portr("DSWB").w(FUNC(polepos_state::bootleg_soundlatch_w));
 }
 
 void polepos_state::sound_z80_bootleg_map(address_map &map)

@@ -249,24 +249,24 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 
 void astrafr_state::astrafr_master_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
 }
 
 
 void astrafr_state::astrafr_master_alt_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
 }
 
 void astrafr_state::astra_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
 }
 
 // probably identical, afaik they're linked units..
 void astrafr_state::astrafr_slave_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_slave_mem_r), FUNC(astrafr_state::astrafr_slave_mem_w));
+	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_slave_mem_r), FUNC(astrafr_state::astrafr_slave_mem_w));
 }
 
 

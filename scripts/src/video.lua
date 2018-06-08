@@ -158,7 +158,6 @@ if (VIDEOS["EF9340_1"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ef9340_1.cpp",
 		MAME_DIR .. "src/devices/video/ef9340_1.h",
-		MAME_DIR .. "src/devices/video/ef9341_chargen.h",
 	}
 end
 
@@ -1078,5 +1077,16 @@ if (VIDEOS["TOPCAT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/topcat.cpp",
 		MAME_DIR .. "src/devices/video/topcat.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/nereid.h,VIDEOS["NEREID"] = true
+--------------------------------------------------
+if (VIDEOS["NEREID"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/nereid.cpp",
+		MAME_DIR .. "src/devices/video/nereid.h",
 	}
 end

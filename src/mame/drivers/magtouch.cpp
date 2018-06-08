@@ -149,7 +149,7 @@ void magtouch_state::magtouch_map(address_map &map)
 void magtouch_state::magtouch_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x02e0, 0x02e7).rw(this, FUNC(magtouch_state::magtouch_io_r), FUNC(magtouch_state::magtouch_io_w));
+	map(0x02e0, 0x02e7).rw(FUNC(magtouch_state::magtouch_io_r), FUNC(magtouch_state::magtouch_io_w));
 	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
@@ -172,7 +172,7 @@ void magtouch_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	m_rombank->set_entry(0);
-	machine().device<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
 }
 
 static void magtouch_isa8_cards(device_slot_interface &device)

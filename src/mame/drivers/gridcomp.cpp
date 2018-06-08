@@ -325,7 +325,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
-	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
 
@@ -342,7 +342,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
-	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
 
@@ -465,24 +465,24 @@ ROM_START( grid1101 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
-	ROMX_LOAD("1101even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD("1101odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD("1101even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("1101odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START( grid1109 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
-	ROMX_LOAD("1109even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD("1109odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD("1109even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("1109odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START( grid1121 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
-	ROMX_LOAD("1121even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD("1121odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD("1121even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("1121odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START( grid1129 )
@@ -490,12 +490,12 @@ ROM_START( grid1129 )
 	ROM_DEFAULT_BIOS("patched")
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
-	ROMX_LOAD("1129even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD("1129odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD("1129even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("1129odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "patched", "patched 1139 bios")
-	ROMX_LOAD("1139even.bin", 0x0000, 0x2000, CRC(67071849) SHA1(782239c155fa5821f8dbd2607cee9152d175e90e),ROM_SKIP(1)|ROM_BIOS(2))
-	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e),ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD("1139even.bin", 0x0000, 0x2000, CRC(67071849) SHA1(782239c155fa5821f8dbd2607cee9152d175e90e), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e), ROM_SKIP(1) | ROM_BIOS(1))
 
 	// change bubble driver setup to read floppy images with 512-byte sectors
 	ROM_FILL(0x3114,1,0x00)
@@ -598,16 +598,16 @@ ROM_START( grid1131 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
-	ROMX_LOAD("1131even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD("1131odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD("1131even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("1131odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START( grid1139 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
 
 	ROM_SYSTEM_BIOS(0, "normal", "normal bios")
-	ROMX_LOAD("1139even.bin", 0x0000, 0x2000, CRC(67071849) SHA1(782239c155fa5821f8dbd2607cee9152d175e90e),ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e),ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD("1139even.bin", 0x0000, 0x2000, CRC(67071849) SHA1(782239c155fa5821f8dbd2607cee9152d175e90e), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 

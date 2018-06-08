@@ -113,6 +113,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_aysnd(*this, "aysnd"),
+		m_tms(*this, "tms"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -171,8 +173,10 @@ private:
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_aysnd;
+	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -360,9 +364,8 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -450,22 +453,14 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 
 WRITE_LINE_MEMBER(looping_state::ay_enable_w)
 {
-	device_t *device = machine().device("aysnd");
-	int output;
-
-	device_sound_interface *sound;
-	device->interface(sound);
-	for (output = 0; output < 3; output++)
-		sound->set_output_gain(output, state ? 1.0 : 0.0);
+	for (int output = 0; output < 3; output++)
+		m_aysnd->set_output_gain(output, state ? 1.0 : 0.0);
 }
 
 
 WRITE_LINE_MEMBER(looping_state::speech_enable_w)
 {
-	device_t *device = machine().device("tms");
-	device_sound_interface *sound;
-	device->interface(sound);
-	sound->set_output_gain(0, state ? 1.0 : 0.0);
+	m_tms->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
 
@@ -553,19 +548,19 @@ void looping_state::looping_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0x9000, 0x93ff).ram().w(this, FUNC(looping_state::looping_videoram_w)).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::looping_videoram_w)).share("videoram");
 
-	map(0x9800, 0x983f).mirror(0x0700).ram().w(this, FUNC(looping_state::looping_colorram_w)).share("colorram");
+	map(0x9800, 0x983f).mirror(0x0700).ram().w(FUNC(looping_state::looping_colorram_w)).share("colorram");
 	map(0x9840, 0x987f).mirror(0x0700).ram().share("spriteram");
 	map(0x9880, 0x98ff).mirror(0x0700).ram();
 
 	map(0xb000, 0xb007).mirror(0x07f8).w("videolatch", FUNC(ls259_device::write_d0));
 
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(this, FUNC(looping_state::out_0_w));                 /* /OUT0 */
-	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(this, FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
-	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(this, FUNC(looping_state::out_2_w));                /* /OUT2 */
-	map(0xf803, 0xf803).mirror(0x03fc).rw(this, FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
+	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(FUNC(looping_state::out_0_w));                 /* /OUT0 */
+	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
+	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(FUNC(looping_state::out_2_w));                /* /OUT2 */
+	map(0xf803, 0xf803).mirror(0x03fc).rw(FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
 }
 
 void looping_state::looping_io_map(address_map &map)

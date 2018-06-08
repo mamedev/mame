@@ -70,9 +70,9 @@ void dms5000_state::dms5000_mem(address_map &map)
 void dms5000_state::dms5000_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x20, 0x2f).r(this, FUNC(dms5000_state::status_r)).umask16(0xff00);
+	map(0x20, 0x2f).r(FUNC(dms5000_state::status_r)).umask16(0xff00);
 	map(0x40, 0x4f).w("cntlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x50, 0x57).w(this, FUNC(dms5000_state::brightness_w)).umask16(0x00ff);
+	map(0x50, 0x57).w(FUNC(dms5000_state::brightness_w)).umask16(0x00ff);
 }
 
 /* Input ports */

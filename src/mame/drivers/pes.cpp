@@ -233,9 +233,9 @@ void pes_state::i80c31_mem(address_map &map)
 void pes_state::i80c31_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0, 0x0).w(this, FUNC(pes_state::rsq_wsq_w)); /* /WS(0) and /RS(1) */
-	map(0x1, 0x1).rw(this, FUNC(pes_state::port1_r), FUNC(pes_state::port1_w)); /* tms5220 reads and writes */
-	map(0x3, 0x3).rw(this, FUNC(pes_state::port3_r), FUNC(pes_state::port3_w)); /* writes and reads from port 3, see top of file */
+	map(0x0, 0x0).w(FUNC(pes_state::rsq_wsq_w)); /* /WS(0) and /RS(1) */
+	map(0x1, 0x1).rw(FUNC(pes_state::port1_r), FUNC(pes_state::port1_w)); /* tms5220 reads and writes */
+	map(0x3, 0x3).rw(FUNC(pes_state::port3_r), FUNC(pes_state::port3_w)); /* writes and reads from port 3, see top of file */
 }
 
 /******************************************************************************
@@ -271,9 +271,9 @@ ROM_START( pes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("kevbios")
 	ROM_SYSTEM_BIOS( 0, "orig", "PES box with original firmware v2.5")
-	ROMX_LOAD( "vpu_2-5.bin",   0x0000, 0x2000, CRC(b27cfdf7) SHA1(c52acf9c080823de5ef26ac55abe168ad53a7d38), ROM_BIOS(1)) // original firmware, rather buggy, 4800bps serial, buggy RTS/CTS flow control, no buffer
+	ROMX_LOAD( "vpu_2-5.bin",   0x0000, 0x2000, CRC(b27cfdf7) SHA1(c52acf9c080823de5ef26ac55abe168ad53a7d38), ROM_BIOS(0)) // original firmware, rather buggy, 4800bps serial, buggy RTS/CTS flow control, no buffer
 	ROM_SYSTEM_BIOS( 1, "kevbios", "PES box with kevtris' rewritten firmware")
-	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(2)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
+	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(1)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
 ROM_END
 
 /******************************************************************************

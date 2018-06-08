@@ -67,7 +67,7 @@ void adam_spi_device::adam_spi_mem(address_map &map)
 
 void adam_spi_device::adam_spi_io(address_map &map)
 {
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_spi_device::p2_r), FUNC(adam_spi_device::p2_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_spi_device::p2_r), FUNC(adam_spi_device::p2_w));
 }
 
 

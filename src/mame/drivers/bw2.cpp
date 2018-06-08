@@ -205,7 +205,7 @@ WRITE8_MEMBER( bw2_state::write )
 void bw2_state::bw2_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(bw2_state::read), FUNC(bw2_state::write));
+	map(0x0000, 0xffff).rw(FUNC(bw2_state::read), FUNC(bw2_state::write));
 }
 
 
@@ -223,7 +223,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
 	map(0x40, 0x40).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
 }
@@ -575,7 +575,7 @@ void bw2_state::machine_start()
 
 MACHINE_CONFIG_START(bw2_state::bw2)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(bw2_mem)
 	MCFG_DEVICE_IO_MAP(bw2_io)
 
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 
 	// devices
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/4) // 8251 USART TXC, RXC
+	MCFG_PIT8253_CLK0(16_MHz_XTAL / 4) // 8251 USART TXC, RXC
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_TAG, i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(11000) // LCD controller
@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, bw2_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bw2_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, XTAL(16'000'000))
+	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, 16_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
@@ -624,13 +624,13 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bw2_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
-	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL(16'000'000), bw2_expansion_cards, nullptr)
+	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
@@ -655,9 +655,9 @@ ROM_START( bw2 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v20" )
 	ROM_SYSTEM_BIOS( 0, "v12", "BW 2 v1.2" )
-	ROMX_LOAD( "bw2-12.ic8", 0x0000, 0x1000, CRC(0ab42d10) SHA1(430b232631eee9b715151b8d191b7eb9449ac513), ROM_BIOS(1) )
+	ROMX_LOAD( "bw2-12.ic8", 0x0000, 0x1000, CRC(0ab42d10) SHA1(430b232631eee9b715151b8d191b7eb9449ac513), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v20", "BW 2 v2.0" )
-	ROMX_LOAD( "bw2-20.ic8", 0x0000, 0x1000, CRC(86f36471) SHA1(a3e2ba4edd50ff8424bb0675bdbb3b9f13c04c9d), ROM_BIOS(2) )
+	ROMX_LOAD( "bw2-20.ic8", 0x0000, 0x1000, CRC(86f36471) SHA1(a3e2ba4edd50ff8424bb0675bdbb3b9f13c04c9d), ROM_BIOS(1) )
 ROM_END
 
 

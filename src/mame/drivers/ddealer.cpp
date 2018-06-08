@@ -489,10 +489,10 @@ void ddealer_state::ddealer(address_map &map)
 	map(0x092000, 0x092fff).ram().share("left_fg_vrabot");
 	map(0x093000, 0x093fff).ram().share("right_fg_vrabot");
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
-	map(0x098000, 0x098001).w(this, FUNC(ddealer_state::flipscreen_w));
-	map(0x09c000, 0x09cfff).ram().w(this, FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
+	map(0x098000, 0x098001).w(FUNC(ddealer_state::flipscreen_w));
+	map(0x09c000, 0x09cfff).ram().w(FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
 	map(0x0f0000, 0x0fdfff).ram().share("work_ram");
-	map(0x0fe000, 0x0fefff).ram().w(this, FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
+	map(0x0fe000, 0x0fefff).ram().w(FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
 	map(0x0ff000, 0x0fffff).ram();
 }
 

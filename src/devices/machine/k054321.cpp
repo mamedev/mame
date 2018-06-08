@@ -39,21 +39,21 @@ DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu
 
 void k054321_device::main_map(address_map &map)
 {
-	map(0x0, 0x0).w(this, FUNC(k054321_device::active_w));
-	map(0x2, 0x2).w(this, FUNC(k054321_device::volume_reset_w));
-	map(0x3, 0x3).w(this, FUNC(k054321_device::volume_up_w));
-	map(0x4, 0x4).w(this, FUNC(k054321_device::dummy_w));
-	map(0x6, 0x6).w(this, FUNC(k054321_device::main1_w));
-	map(0x7, 0x7).w(this, FUNC(k054321_device::main2_w));
-	map(0x8, 0x8).r(this, FUNC(k054321_device::busy_r));
-	map(0xa, 0xa).r(this, FUNC(k054321_device::sound1_r));
+	map(0x0, 0x0).w(FUNC(k054321_device::active_w));
+	map(0x2, 0x2).w(FUNC(k054321_device::volume_reset_w));
+	map(0x3, 0x3).w(FUNC(k054321_device::volume_up_w));
+	map(0x4, 0x4).w(FUNC(k054321_device::dummy_w));
+	map(0x6, 0x6).w(FUNC(k054321_device::main1_w));
+	map(0x7, 0x7).w(FUNC(k054321_device::main2_w));
+	map(0x8, 0x8).r(FUNC(k054321_device::busy_r));
+	map(0xa, 0xa).r(FUNC(k054321_device::sound1_r));
 }
 
 void k054321_device::sound_map(address_map &map)
 {
-	map(0x0, 0x0).w(this, FUNC(k054321_device::sound1_w));
-	map(0x2, 0x2).r(this, FUNC(k054321_device::main1_r));
-	map(0x3, 0x3).r(this, FUNC(k054321_device::main2_r));
+	map(0x0, 0x0).w(FUNC(k054321_device::sound1_w));
+	map(0x2, 0x2).r(FUNC(k054321_device::main1_r));
+	map(0x3, 0x3).r(FUNC(k054321_device::main2_r));
 }
 
 k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -155,17 +155,17 @@ void novag68k_state::diablo68k_map(address_map &map)
 	map(0x280000, 0x28ffff).ram();
 	map(0x300000, 0x300007).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	map(0x380000, 0x380001).nopr();
-	map(0x380000, 0x380000).w(this, FUNC(novag68k_state::diablo68k_leds_w));
-	map(0x3a0000, 0x3a0000).w(this, FUNC(novag68k_state::diablo68k_lcd_data_w));
-	map(0x3c0000, 0x3c0000).rw(this, FUNC(novag68k_state::diablo68k_input2_r), FUNC(novag68k_state::diablo68k_control_w));
-	map(0x3e0000, 0x3e0000).r(this, FUNC(novag68k_state::diablo68k_input1_r));
+	map(0x380000, 0x380000).w(FUNC(novag68k_state::diablo68k_leds_w));
+	map(0x3a0000, 0x3a0000).w(FUNC(novag68k_state::diablo68k_lcd_data_w));
+	map(0x3c0000, 0x3c0000).rw(FUNC(novag68k_state::diablo68k_input2_r), FUNC(novag68k_state::diablo68k_control_w));
+	map(0x3e0000, 0x3e0000).r(FUNC(novag68k_state::diablo68k_input1_r));
 	map(0xff8000, 0xffbfff).ram().share("nvram");
 }
 
 void novag68k_state::scorpio68k_map(address_map &map)
 {
 	diablo68k_map(map);
-	map(0x380000, 0x380000).w(this, FUNC(novag68k_state::scorpio68k_control_w));
+	map(0x380000, 0x380000).w(FUNC(novag68k_state::scorpio68k_control_w));
 	map(0x3c0000, 0x3c0001).nopw();
 }
 
@@ -288,7 +288,7 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START( diablo68 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
 	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) )
 	ROM_LOAD16_BYTE("book.bin",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
@@ -296,7 +296,7 @@ ROM_END
 
 
 ROM_START( scorpio68 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("s_evn_904.u3", 0x00000, 0x8000, CRC(a8f63245) SHA1(0ffdc6eb8ecad730440b0bfb2620fb00820e1aea) )
 	ROM_LOAD16_BYTE("s_odd_c18.u2", 0x00001, 0x8000, CRC(4f033319) SHA1(fce228b1705b7156d4d01ef92b22a875d0f6f321) )
 	ROM_LOAD16_BYTE("502.u4",       0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom

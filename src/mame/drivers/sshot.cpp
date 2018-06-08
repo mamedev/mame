@@ -271,14 +271,14 @@ WRITE8_MEMBER(supershot_state::supershot_output1_w)
 void supershot_state::supershot_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(supershot_state::supershot_vidram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(supershot_state::supershot_vidram_w)).share("videoram");
 	map(0x4100, 0x41ff).ram();
 	map(0x4200, 0x4200).portr("GUNX");
 	map(0x4201, 0x4201).portr("GUNY");
 	map(0x4202, 0x4202).portr("IN0");
 	map(0x4203, 0x4203).portr("DSW");
-	map(0x4206, 0x4206).w(this, FUNC(supershot_state::supershot_output0_w));
-	map(0x4207, 0x4207).w(this, FUNC(supershot_state::supershot_output1_w));
+	map(0x4206, 0x4206).w(FUNC(supershot_state::supershot_output0_w));
+	map(0x4207, 0x4207).w(FUNC(supershot_state::supershot_output1_w));
 }
 
 

@@ -54,7 +54,7 @@ NOTES : Shadow Fighters appears to have been dumped from an earlier
             from Virtual Combat have been used.
         The Shadow Fighters bottom board has an extra 20 mhz xtal on it.
         The data stored in "samples" is simply a series of
-            Creative Media VOC files concatenated to eachother.
+            Creative Media VOC files concatenated to each other.
         The sound program ("sound") is about 640 bytes long.
         The hardware is said to run at medium resolution.
         The SRAM module dump can likely be thrown away for both games.
@@ -106,13 +106,29 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_vid_0(*this, "vid_0"),
 		m_vid_1(*this, "vid_1"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_crtc(*this, "crtc") { }
+
+	void init_shadfgtr();
+	void init_vcombat();
+
+	void shadfgtr(machine_config &config);
+	void vcombat(machine_config &config);
+
+private:
+	required_device<tlc34076_device> m_tlc34076;
+	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<i860_cpu_device> m_vid_0;
+	optional_device<i860_cpu_device> m_vid_1;
+	required_device<dac_word_interface> m_dac;
+	optional_device<mc6845_device> m_crtc;
 
 	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
 	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
-	required_device<tlc34076_device> m_tlc34076;
-	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	int m_crtc_select;
+
 	DECLARE_WRITE16_MEMBER(main_video_write);
 	DECLARE_READ16_MEMBER(control_1_r);
 	DECLARE_READ16_MEMBER(control_2_r);
@@ -126,20 +142,13 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
-	void init_shadfgtr();
-	void init_vcombat();
+
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<i860_cpu_device> m_vid_0;
-	optional_device<i860_cpu_device> m_vid_1;
-	required_device<dac_word_interface> m_dac;
-	void shadfgtr(machine_config &config);
-	void vcombat(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void vid_0_map(address_map &map);
@@ -285,7 +294,7 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
@@ -335,15 +344,13 @@ WRITE64_MEMBER(vcombat_state::v1_fb_w)
 
 WRITE16_MEMBER(vcombat_state::crtc_w)
 {
-	mc6845_device *crtc = machine().device<mc6845_device>("crtc");
-
-	if (crtc == nullptr)
+	if (m_crtc == nullptr)
 		return;
 
 	if (m_crtc_select == 0)
-		crtc->address_w(space, 0, data >> 8);
+		m_crtc->address_w(space, 0, data >> 8);
 	else
-		crtc->register_w(space, 0, data >> 8);
+		m_crtc->register_w(space, 0, data >> 8);
 
 	m_crtc_select ^= 1;
 }
@@ -359,28 +366,28 @@ void vcombat_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
-	map(0x300000, 0x30ffff).w(this, FUNC(vcombat_state::main_video_write));
+	map(0x300000, 0x30ffff).w(FUNC(vcombat_state::main_video_write));
 
 	map(0x400000, 0x43ffff).ram().share("vid_0_ram");   /* First i860 shared RAM */
 	map(0x440000, 0x440003).ram().share("share6");      /* M0->P0 i860 #1 com 1 */
 	map(0x480000, 0x480003).ram().share("share7");      /* M0<-P0 i860 #1 com 2 */
-	map(0x4c0000, 0x4c0003).w(this, FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
+	map(0x4c0000, 0x4c0003).w(FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
 
 	map(0x500000, 0x53ffff).ram().share("vid_1_ram");   /* Second i860 shared RAM */
 	map(0x540000, 0x540003).ram().share("share8");      /* M0->P1 i860 #2 com 1 */
 	map(0x580000, 0x580003).ram().share("share9");      /* M0<-P1 i860 #2 com 2 */
-	map(0x5c0000, 0x5c0003).w(this, FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
+	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
 
-	map(0x600000, 0x600001).r(this, FUNC(vcombat_state::control_1_r));   /* IN0 port */
+	map(0x600000, 0x600001).r(FUNC(vcombat_state::control_1_r));   /* IN0 port */
 	map(0x600004, 0x600005).ram().share("share5");      /* M0<-M1 */
-	map(0x600008, 0x600009).r(this, FUNC(vcombat_state::control_2_r));   /* IN1 port */
+	map(0x600008, 0x600009).r(FUNC(vcombat_state::control_2_r));   /* IN1 port */
 	map(0x60001c, 0x60001d).noprw();
 
-	map(0x60000c, 0x60000d).w(this, FUNC(vcombat_state::crtc_w));
+	map(0x60000c, 0x60000d).w(FUNC(vcombat_state::crtc_w));
 	map(0x600010, 0x600011).ram().share("fb_control");
 	map(0x700000, 0x7007ff).ram().share("nvram");
-	map(0x701000, 0x701001).r(this, FUNC(vcombat_state::main_irqiack_r));
-	map(0x702000, 0x702001).r(this, FUNC(vcombat_state::control_3_r));
+	map(0x701000, 0x701001).r(FUNC(vcombat_state::main_irqiack_r));
+	map(0x702000, 0x702001).r(FUNC(vcombat_state::control_3_r));
 	map(0x705000, 0x705001).ram().share("share4");      /* M1->M0 */
 
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
@@ -393,7 +400,7 @@ void vcombat_state::main_map(address_map &map)
 /* The first i860 - middle board */
 void vcombat_state::vid_0_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().w(this, FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
+	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
 	map(0x20000000, 0x20000007).ram().share("share6");      /* M0<-P0 com 1 (0x440000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
 	map(0x80000000, 0x80000007).ram().share("share7");      /* M0->P0 com 2 (0x480000 in 68k-land) */
@@ -405,7 +412,7 @@ void vcombat_state::vid_0_map(address_map &map)
 /* The second i860 - top board */
 void vcombat_state::vid_1_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().w(this, FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
+	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
 	map(0x20000000, 0x20000007).ram().share("share8");      /* M0->P1 com 1 (0x540000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
 	map(0x80000000, 0x80000007).ram().share("share9");          /* M0<-P1 com 2      (0x580000 in 68k-land) */
@@ -419,8 +426,8 @@ void vcombat_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x08ffff).ram();
-	map(0x0c0000, 0x0c0001).w(this, FUNC(vcombat_state::vcombat_dac_w));
-	map(0x140000, 0x140001).r(this, FUNC(vcombat_state::sound_resetmain_r));   /* Ping M0's reset line */
+	map(0x0c0000, 0x0c0001).w(FUNC(vcombat_state::vcombat_dac_w));
+	map(0x140000, 0x140001).r(FUNC(vcombat_state::sound_resetmain_r));   /* Ping M0's reset line */
 	map(0x180000, 0x180001).ram().share("share4");   /* M1<-M0 */
 	map(0x1c0000, 0x1c0001).ram().share("share5");   /* M1->M0 */
 	map(0x200000, 0x37ffff).rom().region("samples", 0);

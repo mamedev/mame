@@ -25,7 +25,7 @@ void lynx_state::lynx_mem(address_map &map)
 	map(0xfd00, 0xfdff).ram().share("mem_fd00");
 	map(0xfe00, 0xfff7).bankr("bank3").writeonly().share("mem_fe00");
 	map(0xfff8, 0xfff8).ram();
-	map(0xfff9, 0xfff9).rw(this, FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
+	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
 	map(0xfffa, 0xffff).bankr("bank4").writeonly().share("mem_fffa");
 }
 
@@ -137,9 +137,9 @@ MACHINE_CONFIG_END
 ROM_START(lynx)
 	ROM_REGION(0x200,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "default",   "rom save" )
-	ROMX_LOAD( "lynx.bin",  0x00000, 0x200, BAD_DUMP CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(1))
+	ROMX_LOAD("lynx.bin",  0x00000, 0x200, BAD_DUMP CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
-	ROMX_LOAD( "lynxa.bin", 0x00000, 0x200, BAD_DUMP CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb), ROM_BIOS(2))
+	ROMX_LOAD("lynxa.bin", 0x00000, 0x200, BAD_DUMP CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb), ROM_BIOS(1))
 
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
 ROM_END

@@ -780,11 +780,6 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 READ8_MEMBER( pokey_device::read )
 {
-	return read(offset);
-}
-
-uint8_t pokey_device::read(offs_t offset)
-{
 	int data, pot;
 
 	synchronize(SYNC_NOOP); /* force resync */
@@ -872,7 +867,6 @@ uint8_t pokey_device::read(offs_t offset)
 		break;
 	}
 	return data;
-
 }
 
 
@@ -880,14 +874,9 @@ uint8_t pokey_device::read(offs_t offset)
 //  write - memory interface for write
 //-------------------------------------------------
 
-void pokey_device::write(offs_t offset, uint8_t data)
-{
-	synchronize(SYNC_WRITE, (offset<<8) | data);
-}
-
 WRITE8_MEMBER( pokey_device::write )
 {
-	write(offset, data);
+	synchronize(SYNC_WRITE, (offset<<8) | data);
 }
 
 void pokey_device::write_internal(offs_t offset, uint8_t data)

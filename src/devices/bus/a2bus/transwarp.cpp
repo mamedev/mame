@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_TRANSWARP, a2bus_transwarp_device, "a2twarp", "Applied 
 
 void a2bus_transwarp_device::m65c02_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
 }
 
 ROM_START( warprom )

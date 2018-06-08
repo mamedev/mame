@@ -234,7 +234,7 @@ READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
 
 READ8_MEMBER(hp98034_io_card_device::hpib_data_r)
 {
-	return ~m_ieee488->dio_r();
+	return ~m_ieee488->read_dio();
 }
 
 READ8_MEMBER(hp98034_io_card_device::idr_r)
@@ -303,7 +303,7 @@ void hp98034_io_card_device::update_data_out()
 	if (m_clr_hpib) {
 		m_data_out = 0;
 	}
-	m_ieee488->dio_w(~m_data_out);
+	m_ieee488->write_dio(~m_data_out);
 }
 
 void hp98034_io_card_device::update_ctrl_out()
@@ -348,14 +348,14 @@ void hp98034_io_card_device::np_program_map(address_map &map)
 void hp98034_io_card_device::np_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0, 0).w(this, FUNC(hp98034_io_card_device::hpib_data_w));
-	map(1, 1).w(this, FUNC(hp98034_io_card_device::hpib_ctrl_w));
-	map(2, 2).r(this, FUNC(hp98034_io_card_device::hpib_ctrl_r));
-	map(3, 3).r(this, FUNC(hp98034_io_card_device::hpib_data_r));
-	map(4, 4).r(this, FUNC(hp98034_io_card_device::idr_r));
-	map(5, 5).w(this, FUNC(hp98034_io_card_device::odr_w));
-	map(6, 6).rw(this, FUNC(hp98034_io_card_device::mode_reg_r), FUNC(hp98034_io_card_device::mode_reg_clear_w));
-	map(7, 7).r(this, FUNC(hp98034_io_card_device::switch_r));
+	map(0, 0).w(FUNC(hp98034_io_card_device::hpib_data_w));
+	map(1, 1).w(FUNC(hp98034_io_card_device::hpib_ctrl_w));
+	map(2, 2).r(FUNC(hp98034_io_card_device::hpib_ctrl_r));
+	map(3, 3).r(FUNC(hp98034_io_card_device::hpib_data_r));
+	map(4, 4).r(FUNC(hp98034_io_card_device::idr_r));
+	map(5, 5).w(FUNC(hp98034_io_card_device::odr_w));
+	map(6, 6).rw(FUNC(hp98034_io_card_device::mode_reg_r), FUNC(hp98034_io_card_device::mode_reg_clear_w));
+	map(7, 7).r(FUNC(hp98034_io_card_device::switch_r));
 }
 
 const tiny_rom_entry *hp98034_io_card_device::device_rom_region() const

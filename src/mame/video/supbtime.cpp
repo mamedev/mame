@@ -2,10 +2,10 @@
 // copyright-holders: Bryan McPhail, David Haywood, Dirk Best
 /***************************************************************************
 
-	Super Burger Time
-	
-	Video mixing
-	
+    Super Burger Time
+
+    Video mixing
+
 ***************************************************************************/
 
 #include "emu.h"

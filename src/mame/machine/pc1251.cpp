@@ -92,8 +92,8 @@ void pc1251_state::machine_start()
 	uint8_t *ram = memregion("maincpu")->base() + 0x8000;
 	uint8_t *cpu = m_maincpu->internal_ram();
 
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x4800);
+	m_cpu_nvram->set_base(cpu, 96);
+	m_ram_nvram->set_base(ram, 0x4800);
 }
 
 MACHINE_START_MEMBER(pc1251_state,pc1260 )
@@ -101,8 +101,8 @@ MACHINE_START_MEMBER(pc1251_state,pc1260 )
 	uint8_t *ram = memregion("maincpu")->base() + 0x4000;
 	uint8_t *cpu = m_maincpu->internal_ram();
 
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
+	m_cpu_nvram->set_base(cpu, 96);
+	m_ram_nvram->set_base(ram, 0x2800);
 }
 
 void pc1251_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

@@ -220,9 +220,9 @@ void simpbowl_state::simpbowl_map(address_map &map)
 {
 	konamigv_map(map);
 
-	map(0x1f680080, 0x1f68008f).rw(this, FUNC(simpbowl_state::flash_r), FUNC(simpbowl_state::flash_w));
+	map(0x1f680080, 0x1f68008f).rw(FUNC(simpbowl_state::flash_r), FUNC(simpbowl_state::flash_w));
 	map(0x1f6800c0, 0x1f6800c7).r("upd", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
-	map(0x1f6800c9, 0x1f6800c9).r("upd", FUNC(upd4701_device::reset_xy));
+	map(0x1f6800c9, 0x1f6800c9).r("upd", FUNC(upd4701_device::reset_xy_r));
 }
 
 void konamigv_state::btchamp_map(address_map &map)
@@ -232,7 +232,7 @@ void konamigv_state::btchamp_map(address_map &map)
 	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0x1f680080, 0x1f680087).r("upd1", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
 	map(0x1f680080, 0x1f680087).r("upd2", FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
-	map(0x1f680088, 0x1f680089).w(this, FUNC(konamigv_state::btc_trackball_w));
+	map(0x1f680088, 0x1f680089).w(FUNC(konamigv_state::btc_trackball_w));
 	map(0x1f6800e0, 0x1f6800e3).nopw();
 }
 
@@ -253,8 +253,8 @@ void konamigv_state::tmosh_map(address_map &map)
 {
 	konamigv_map(map);
 
-	map(0x1f680080, 0x1f680081).r(this, FUNC(konamigv_state::tokimeki_serial_r));
-	map(0x1f680090, 0x1f680091).w(this, FUNC(konamigv_state::tokimeki_serial_w));
+	map(0x1f680080, 0x1f680081).r(FUNC(konamigv_state::tokimeki_serial_r));
+	map(0x1f680090, 0x1f680091).w(FUNC(konamigv_state::tokimeki_serial_w));
 }
 
 /* SCSI */
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
@@ -467,8 +467,8 @@ READ16_MEMBER(simpbowl_state::flash_r)
 	{
 		int chip = (m_flash_address >= 0x200000) ? 2 : 0;
 
-		int ret = ( m_flash8[chip]->read(m_flash_address & 0x1fffff) & 0xff ) |
-			( m_flash8[chip+1]->read(m_flash_address & 0x1fffff) << 8 );
+		int ret = ( m_flash8[chip]->read(space, m_flash_address & 0x1fffff) & 0xff ) |
+			( m_flash8[chip+1]->read(space, m_flash_address & 0x1fffff) << 8 );
 
 		m_flash_address++;
 
@@ -486,8 +486,8 @@ WRITE16_MEMBER(simpbowl_state::flash_w)
 	{
 		case 0:
 			chip = (m_flash_address >= 0x200000) ? 2 : 0;
-			m_flash8[chip]->write(m_flash_address & 0x1fffff, data&0xff);
-			m_flash8[chip+1]->write(m_flash_address & 0x1fffff, (data>>8)&0xff);
+			m_flash8[chip]->write(space, m_flash_address & 0x1fffff, data&0xff);
+			m_flash8[chip+1]->write(space, m_flash_address & 0x1fffff, (data>>8)&0xff);
 			break;
 
 		case 1:

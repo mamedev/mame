@@ -236,9 +236,9 @@ void koikoi_state::koikoi_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x6000, 0x67ff).ram();
-	map(0x7000, 0x77ff).ram().w(this, FUNC(koikoi_state::vram_w)).share("videoram");
+	map(0x7000, 0x77ff).ram().w(FUNC(koikoi_state::vram_w)).share("videoram");
 	map(0x8000, 0x8000).portr("DSW");
-	map(0x9000, 0x9007).rw(this, FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
+	map(0x9000, 0x9007).rw(FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
 }
 
 void koikoi_state::koikoi_io_map(address_map &map)

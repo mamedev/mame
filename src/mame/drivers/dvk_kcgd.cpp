@@ -123,13 +123,13 @@ protected:
 void kcgd_state::kcgd_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0000000, 0077777).rw(this, FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
+	map(0000000, 0077777).rw(FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
 	map(0100000, 0157777).rom();
-	map(0160000, 0160001).mirror(03774).rw(this, FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
-	map(0160002, 0160003).mirror(03774).rw(this, FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
-	map(0167770, 0167771).rw(this, FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
-	map(0167772, 0167772).rw(this, FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
-	map(0167773, 0167773).rw(this, FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
+	map(0160000, 0160001).mirror(03774).rw(FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
+	map(0160002, 0160003).mirror(03774).rw(FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
+	map(0167770, 0167771).rw(FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
+	map(0167772, 0167772).rw(FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
+	map(0167773, 0167773).rw(FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
 //  map(0176560, 0176567).ram();  // USART2 -- host
 //  map(0177560, 0177567).ram();  // USART3 -- keyboard
 }
@@ -378,9 +378,9 @@ ROM_START( dvk_kcgd )
 	ROM_REGION16_BE(0x100000,"maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("181")
 	ROM_SYSTEM_BIOS(0, "181", "mask 181")
-	ROMX_LOAD("kr1801re2-181.bin", 0100000, 020000, CRC(acac124f) SHA1(412c3eb71bece6f791fc5a9d707cf4692fd0b45b), ROM_BIOS(1))
+	ROMX_LOAD("kr1801re2-181.bin", 0100000, 020000, CRC(acac124f) SHA1(412c3eb71bece6f791fc5a9d707cf4692fd0b45b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "182", "mask 182")
-	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(2))
+	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

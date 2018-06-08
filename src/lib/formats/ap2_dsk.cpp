@@ -665,7 +665,7 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 			else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
-			}	// check for subnodule disk
+			}   // check for subnodule disk
 			else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;

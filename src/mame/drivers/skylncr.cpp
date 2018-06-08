@@ -137,8 +137,8 @@
 class skylncr_state : public driver_device
 {
 public:
-	skylncr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	skylncr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_reeltiles_1_ram(*this, "reeltiles_1_ram"),
@@ -156,29 +156,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper") { }
-
-	tilemap_t *m_tmap;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_reeltiles_1_ram;
-	required_shared_ptr<uint8_t> m_reeltiles_2_ram;
-	required_shared_ptr<uint8_t> m_reeltiles_3_ram;
-	required_shared_ptr<uint8_t> m_reeltiles_4_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_1_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_2_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_3_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_4_ram;
-	tilemap_t *m_reel_1_tilemap;
-	tilemap_t *m_reel_2_tilemap;
-	tilemap_t *m_reel_3_tilemap;
-	tilemap_t *m_reel_4_tilemap;
-	required_shared_ptr<uint8_t> m_reelscroll1;
-	required_shared_ptr<uint8_t> m_reelscroll2;
-	required_shared_ptr<uint8_t> m_reelscroll3;
-	required_shared_ptr<uint8_t> m_reelscroll4;
-	uint8_t m_nmi_enable;
-	bool m_mbutrfly_prot;
+		m_hopper(*this, "hopper"),
+		m_lamps(*this, "lamp%u", 1U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
 	DECLARE_WRITE8_MEMBER(skylncr_colorram_w);
@@ -207,13 +187,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	virtual void video_start() override;
 	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<ticket_dispenser_device> m_hopper;
 	void neraidou(machine_config &config);
 	void sstar97(machine_config &config);
 	void bdream97(machine_config &config);
@@ -225,6 +200,37 @@ public:
 	void mem_map_skylncr(address_map &map);
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+	tilemap_t *m_tmap;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_reeltiles_1_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_2_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_3_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_4_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_1_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_2_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_3_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_4_ram;
+	tilemap_t *m_reel_1_tilemap;
+	tilemap_t *m_reel_2_tilemap;
+	tilemap_t *m_reel_3_tilemap;
+	tilemap_t *m_reel_4_tilemap;
+	required_shared_ptr<uint8_t> m_reelscroll1;
+	required_shared_ptr<uint8_t> m_reelscroll2;
+	required_shared_ptr<uint8_t> m_reelscroll3;
+	required_shared_ptr<uint8_t> m_reelscroll4;
+	uint8_t m_nmi_enable;
+	bool m_mbutrfly_prot;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_hopper;
+	output_finder<7> m_lamps;
 };
 
 
@@ -429,13 +435,13 @@ WRITE8_MEMBER(skylncr_state::skylncr_nmi_enable_w)
 
 WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
 {
-	machine().output().set_lamp_value(1, BIT(data, 0)); // Slot Stop 2
-	machine().output().set_lamp_value(2, BIT(data, 1)); // Slot Stop 1
-	machine().output().set_lamp_value(3, BIT(data, 2)); // Take
-	machine().output().set_lamp_value(4, BIT(data, 3)); // Bet
-	machine().output().set_lamp_value(5, BIT(data, 4)); // Slot Stop 3
-	machine().output().set_lamp_value(6, BIT(data, 5)); // Start
-	machine().output().set_lamp_value(7, BIT(data, 6)); // Payout
+	m_lamps[0] = BIT(data, 0); // Slot Stop 2
+	m_lamps[1] = BIT(data, 1); // Slot Stop 1
+	m_lamps[2] = BIT(data, 2); // Take
+	m_lamps[3] = BIT(data, 3); // Bet
+	m_lamps[4] = BIT(data, 4); // Slot Stop 3
+	m_lamps[5] = BIT(data, 5); // Start
+	m_lamps[6] = BIT(data, 6); // Payout
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
@@ -460,55 +466,55 @@ void skylncr_state::mem_map_skylncr(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
 
-	map(0x8800, 0x8fff).ram().w(this, FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
+	map(0x8800, 0x8fff).ram().w(FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
+	map(0x9000, 0x97ff).ram().w(FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
 
-	map(0x9800, 0x99ff).ram().w(this, FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
-	map(0x9a00, 0x9bff).ram().w(this, FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
-	map(0x9c00, 0x9dff).ram().w(this, FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
-	map(0x9e00, 0x9fff).ram().w(this, FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
-	map(0xa200, 0xa3ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
-	map(0xa400, 0xa5ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
-	map(0xa600, 0xa7ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
+	map(0x9800, 0x99ff).ram().w(FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
+	map(0x9a00, 0x9bff).ram().w(FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
+	map(0x9c00, 0x9dff).ram().w(FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
+	map(0x9e00, 0x9fff).ram().w(FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
+	map(0xa200, 0xa3ff).ram().w(FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
+	map(0xa400, 0xa5ff).ram().w(FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
+	map(0xa600, 0xa7ff).ram().w(FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
 
-	map(0xaa55, 0xaa55).r(this, FUNC(skylncr_state::ret_ff));
+	map(0xaa55, 0xaa55).r(FUNC(skylncr_state::ret_ff));
 
-	map(0xb000, 0xb03f).ram().w(this, FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
-	map(0xb040, 0xb07f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb080, 0xb0bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb0c0, 0xb0ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb100, 0xb13f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb140, 0xb17f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb180, 0xb1bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb1c0, 0xb1ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb000, 0xb03f).ram().w(FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
+	map(0xb040, 0xb07f).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb080, 0xb0bf).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb0c0, 0xb0ff).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb100, 0xb13f).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb140, 0xb17f).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb180, 0xb1bf).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb1c0, 0xb1ff).ram().w(FUNC(skylncr_state::reelscroll1_w));
 
-	map(0xb200, 0xb23f).ram().w(this, FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
-	map(0xb240, 0xb27f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb280, 0xb2bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb2c0, 0xb2ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb300, 0xb33f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb340, 0xb37f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb380, 0xb3bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb3c0, 0xb3ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb200, 0xb23f).ram().w(FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
+	map(0xb240, 0xb27f).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb280, 0xb2bf).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb2c0, 0xb2ff).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb300, 0xb33f).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb340, 0xb37f).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb380, 0xb3bf).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb3c0, 0xb3ff).ram().w(FUNC(skylncr_state::reelscroll2_w));
 
-	map(0xb400, 0xb43f).ram().w(this, FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
-	map(0xb440, 0xb47f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb480, 0xb4bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb4c0, 0xb4ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb500, 0xb53f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb540, 0xb57f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb580, 0xb5bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb5c0, 0xb5ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb400, 0xb43f).ram().w(FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
+	map(0xb440, 0xb47f).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb480, 0xb4bf).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb4c0, 0xb4ff).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb500, 0xb53f).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb540, 0xb57f).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb580, 0xb5bf).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb5c0, 0xb5ff).ram().w(FUNC(skylncr_state::reelscroll3_w));
 
-	map(0xb600, 0xb63f).ram().w(this, FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
-	map(0xb640, 0xb67f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb680, 0xb6bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb6c0, 0xb6ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb700, 0xb73f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb740, 0xb77f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb780, 0xb7bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb7c0, 0xb7ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb600, 0xb63f).ram().w(FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
+	map(0xb640, 0xb67f).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb680, 0xb6bf).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb6c0, 0xb6ff).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb700, 0xb73f).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb740, 0xb77f).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb780, 0xb7bf).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb7c0, 0xb7ff).ram().w(FUNC(skylncr_state::reelscroll4_w));
 
 	map(0xc000, 0xffff).rom();
 }
@@ -521,7 +527,7 @@ void skylncr_state::io_map_skylncr(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 
-	map(0x20, 0x20).w(this, FUNC(skylncr_state::skylncr_coin_w));
+	map(0x20, 0x20).w(FUNC(skylncr_state::skylncr_coin_w));
 
 	map(0x30, 0x31).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x31, 0x31).r("aysnd", FUNC(ay8910_device::data_r));
@@ -534,7 +540,7 @@ void skylncr_state::io_map_skylncr(address_map &map)
 	map(0x51, 0x51).w("ramdac2", FUNC(ramdac_device::pal_w));
 	map(0x52, 0x52).w("ramdac2", FUNC(ramdac_device::mask_w));
 
-	map(0x70, 0x70).w(this, FUNC(skylncr_state::skylncr_nmi_enable_w));
+	map(0x70, 0x70).w(FUNC(skylncr_state::skylncr_nmi_enable_w));
 }
 
 
@@ -542,13 +548,13 @@ void skylncr_state::io_map_mbutrfly(address_map &map)
 {
 	map.global_mask(0xff);
 	io_map_skylncr(map);
-	map(0x60, 0x60).w(this, FUNC(skylncr_state::mbutrfly_prot_w));
+	map(0x60, 0x60).w(FUNC(skylncr_state::mbutrfly_prot_w));
 }
 
 
 void skylncr_state::bdream97_opcode_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(skylncr_state::bdream97_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(skylncr_state::bdream97_opcode_r));
 }
 
 
@@ -1626,7 +1632,7 @@ INPUT_PORTS_END
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
-	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

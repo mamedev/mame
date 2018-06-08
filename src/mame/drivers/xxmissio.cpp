@@ -103,11 +103,11 @@ void xxmissio_state::map1(address_map &map)
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("STATUS");
-	map(0xa002, 0xa002).w(this, FUNC(xxmissio_state::status_m_w));
-	map(0xa003, 0xa003).w(this, FUNC(xxmissio_state::flipscreen_w));
+	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
+	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
 
 	map(0xc000, 0xc7ff).ram().share("fgram");
-	map(0xc800, 0xcfff).rw(this, FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share("bgram");
+	map(0xc800, 0xcfff).rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share("bgram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -124,16 +124,16 @@ void xxmissio_state::map2(address_map &map)
 
 	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8006, 0x8006).w(this, FUNC(xxmissio_state::bank_sel_w));
+	map(0x8006, 0x8006).w(FUNC(xxmissio_state::bank_sel_w));
 
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("STATUS");
-	map(0xa002, 0xa002).w(this, FUNC(xxmissio_state::status_s_w));
-	map(0xa003, 0xa003).w(this, FUNC(xxmissio_state::flipscreen_w));
+	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_s_w));
+	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
 
 	map(0xc000, 0xc7ff).share("fgram").ram();
-	map(0xc800, 0xcfff).share("bgram").rw(this, FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
+	map(0xc800, 0xcfff).share("bgram").rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
 	map(0xd000, 0xd7ff).share("spriteram").ram();
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");

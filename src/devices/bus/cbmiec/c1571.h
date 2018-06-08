@@ -107,6 +107,7 @@ protected:
 	required_device<c64h156_device> m_ga;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
+	output_finder<2> m_leds;
 
 	// signals
 	int m_1_2mhz;                           // clock speed

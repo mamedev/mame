@@ -306,7 +306,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	m_pic->ir7_w(BIT(data, 2));
 
 	// processor LED
-	output().set_led_value(0, BIT(data, 3));
+	m_led = BIT(data, 3);
 
 	// centronics
 	m_centronics->write_strobe(BIT(data, 4));
@@ -379,6 +379,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sage2_state::machine_start()
 {
+	m_led.resolve();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base()); // Avoid the 68000 reading from lalaland in its reset handler
 }
@@ -424,7 +425,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi0_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, sage2_state, ppi1_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi1_pc_w))
 

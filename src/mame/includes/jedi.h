@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "sound/tms5220.h"
 #include "screen.h"
 
 
@@ -37,6 +38,7 @@ public:
 		m_speech_data(*this, "speech_data"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_tms(*this, "tms"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -110,6 +112,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<tms5220_device> m_tms;
 	required_device<screen_device> m_screen;
 };
 

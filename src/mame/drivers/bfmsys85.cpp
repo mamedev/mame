@@ -74,7 +74,8 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),
@@ -82,28 +83,14 @@ public:
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
 		m_acia6850_0(*this, "acia6850_0"),
-		m_meters(*this, "meters")
-	{
-	}
+		m_meters(*this, "meters"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_alpha_clock;
-	int m_irq_status;
-	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	int m_locked;
-	int m_is_timer_enabled;
-	int m_coin_inhibits;
-	int m_mux_output_strobe;
-	int m_mux_input_strobe;
-	int m_mux_input;
-	uint8_t m_Inputs[64];
-	uint8_t m_codec_data[256];
-	uint8_t m_sys85_data_line_t;
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -122,10 +109,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	void init_decode();
 	void init_nodecode();
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	int b85_find_project_string();
+	void bfmsys85(machine_config &config);
+	void memmap(address_map &map);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	int b85_find_project_string( );
+
+	int m_mmtr_latch;
+	int m_triac_latch;
+	int m_alpha_clock;
+	int m_irq_status;
+	int m_optic_pattern;
+	int m_locked;
+	int m_is_timer_enabled;
+	int m_coin_inhibits;
+	int m_mux_output_strobe;
+	int m_mux_input_strobe;
+	int m_mux_input;
+	uint8_t m_Inputs[64];
+	uint8_t m_codec_data[256];
+	uint8_t m_sys85_data_line_t;
 	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
@@ -134,8 +140,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
-	void bfmsys85(machine_config &config);
-	void memmap(address_map &map);
+	output_finder<256> m_lamps;
 };
 
 #define MASTER_CLOCK    (XTAL(4'000'000))
@@ -310,13 +315,11 @@ READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
 
 WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 {
-	int pattern = 0x01, i,
-	off = m_mux_output_strobe<<4;
+	int off = m_mux_output_strobe<<4;
 
-	for ( i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++ )
 	{
-		output().set_lamp_value(off, (data & pattern ? 1 : 0));
-		pattern <<= 1;
+		m_lamps[off] = BIT(data, i);
 		off++;
 	}
 }
@@ -352,6 +355,7 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////
@@ -360,17 +364,17 @@ void bfmsys85_state::memmap(address_map &map)
 {
 
 	map(0x0000, 0x1fff).ram().share("nvram"); //8k RAM
-	map(0x2000, 0x21FF).w(this, FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
-	map(0x2200, 0x23FF).w(this, FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
-	map(0x2400, 0x25FF).w(this, FUNC(bfmsys85_state::vfd_w));            // vfd latch
+	map(0x2000, 0x21FF).w(FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
+	map(0x2200, 0x23FF).w(FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
+	map(0x2400, 0x25FF).w(FUNC(bfmsys85_state::vfd_w));            // vfd latch
 
-	map(0x2600, 0x27FF).rw(this, FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
-	map(0x2800, 0x2800).r(this, FUNC(bfmsys85_state::triac_r));           // payslide triacs
-	map(0x2800, 0x29FF).w(this, FUNC(bfmsys85_state::triac_w));          // triacs
+	map(0x2600, 0x27FF).rw(FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
+	map(0x2800, 0x2800).r(FUNC(bfmsys85_state::triac_r));           // payslide triacs
+	map(0x2800, 0x29FF).w(FUNC(bfmsys85_state::triac_w));          // triacs
 
-	map(0x2A00, 0x2A00).rw(this, FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
-	map(0x2A01, 0x2A01).rw(this, FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
-	map(0x2E00, 0x2E00).r(this, FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
+	map(0x2A00, 0x2A00).rw(FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
+	map(0x2A01, 0x2A01).rw(FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
+	map(0x2E00, 0x2E00).r(FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
 
 	map(0x3000, 0x3000).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3001, 0x3001).nopr(); //sound latch
@@ -379,10 +383,10 @@ void bfmsys85_state::memmap(address_map &map)
 	map(0x3402, 0x3403).w(m_acia6850_0, FUNC(acia6850_device::write));
 	map(0x3406, 0x3407).r(m_acia6850_0, FUNC(acia6850_device::read));
 
-	map(0x3600, 0x3600).w(this, FUNC(bfmsys85_state::mux_enable_w));     // mux enable
+	map(0x3600, 0x3600).w(FUNC(bfmsys85_state::mux_enable_w));     // mux enable
 
 	map(0x4000, 0xffff).rom();                     // 48K ROM
-	map(0x8000, 0xFFFF).w(this, FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
+	map(0x8000, 0xFFFF).w(FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
 
 }
 

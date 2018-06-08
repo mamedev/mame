@@ -139,10 +139,10 @@ void ms6102_state::ms6102_io(address_map &map)
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
+	map(0x40, 0x41).rw(FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
 	map(0x50, 0x5f).noprw(); // video disable?
-	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
-	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_status_r));
+	map(0x60, 0x6f).w(FUNC(ms6102_state::pic_w));
+	map(0x70, 0x7f).r(FUNC(ms6102_state::misc_status_r));
 }
 
 static const gfx_layout ms6102_charlayout =
@@ -185,7 +185,7 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
-	if (linecount < 12 && !vsp)
+	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
 	if (rvv)
@@ -284,23 +284,23 @@ void ms6102_state::machine_start()
 	// copy over the ascii chars into their new positions (lines 0-7)
 	for (i = 0x20; i < 0x80; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// copy the russian symbols to codes 0xc0-0xff for now
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// for punctuation, get the last 4 lines into place
 	for (i = 0x20; i < 0x40; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1700+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1700+i*8+j];
 	// for letters, get the last 4 lines into place
 	for (i = 0x40; i < 0x80; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1a00+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1a00+i*8+j];
 	// for russian, get the last 4 lines into place
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1604+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1604+i*8+j];
 }
 
 

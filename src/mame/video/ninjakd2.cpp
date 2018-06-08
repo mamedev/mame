@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "includes/ninjakd2.h"
 
+#include <algorithm>
 
 /*************************************
  *
@@ -46,7 +47,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 			TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(mnight_state::mnight_get_bg_tile_info)
 {
 	int const lo = m_bg_videoram[(tile_index << 1)];
 	int const hi = m_bg_videoram[(tile_index << 1) | 1];
@@ -60,28 +61,27 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
 			flipy ? TILE_FLIPY : 0);
 }
 
-TILEMAP_MAPPER_MEMBER(ninjakd2_state::robokid_bg_scan)
+TILEMAP_MAPPER_MEMBER(robokid_state::robokid_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x10) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(ninjakd2_state::omegaf_bg_scan)
+TILEMAP_MAPPER_MEMBER(omegaf_state::omegaf_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
 }
 
 template<int Layer>
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info<0>)
 {
-	const uint16_t *videoram = m_robokid_bg_videoram[Layer].get();
-	int const lo = videoram[(tile_index << 1)];
-	int const hi = videoram[(tile_index << 1) | 1];
+	int const lo = m_robokid_bg_videoram[Layer][(tile_index << 1)];
+	int const hi = m_robokid_bg_videoram[Layer][(tile_index << 1) | 1];
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2+Layer,
+	SET_TILE_INFO_MEMBER(Layer + 2,
 			tile,
 			color,
 			0);
@@ -93,21 +93,9 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg_tile_info)
  *  Video system start
  *
  *************************************/
-
-void ninjakd2_state::video_init_common(uint32_t vram_alloc_size)
+ 
+void ninjakd2_state::video_init_common()
 {
-	// create video ram
-	if (vram_alloc_size)
-	{
-		m_robokid_bg_videoram[0] = make_unique_clear<uint8_t[]>(vram_alloc_size);
-		m_robokid_bg_videoram[1] = make_unique_clear<uint8_t[]>(vram_alloc_size);
-		m_robokid_bg_videoram[2] = make_unique_clear<uint8_t[]>(vram_alloc_size);
-
-		save_pointer(NAME(m_robokid_bg_videoram[0].get()), vram_alloc_size);
-		save_pointer(NAME(m_robokid_bg_videoram[1].get()), vram_alloc_size);
-		save_pointer(NAME(m_robokid_bg_videoram[2].get()), vram_alloc_size);
-	}
-
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 
@@ -120,6 +108,22 @@ void ninjakd2_state::video_init_common(uint32_t vram_alloc_size)
 	// register for save states
 	save_item(NAME(m_sprites_updated));
 	save_item(NAME(m_next_sprite_overdraw_enabled));
+}
+
+void robokid_state::video_init_banked(uint32_t vram_alloc_size)
+{
+	// create video ram
+	if (vram_alloc_size)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_robokid_bg_videoram[i] = make_unique_clear<uint8_t[]>(vram_alloc_size);
+
+			save_pointer(NAME(m_robokid_bg_videoram[i].get()), vram_alloc_size, i);
+		}
+		m_vram_bank_mask = (vram_alloc_size >> 10) - 1;
+	}
+
 	save_item(NAME(m_robokid_bg_bank));
 }
 
@@ -131,60 +135,60 @@ static bool stencil_omegaf(   uint16_t pal );
 
 void ninjakd2_state::video_start()
 {
-	video_init_common(0);
+	video_init_common();
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_ninjakd2;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,mnight)
+VIDEO_START_MEMBER(mnight_state,mnight)
 {
-	video_init_common(0);
+	video_init_common();
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mnight_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_mnight;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,arkarea)
+VIDEO_START_MEMBER(mnight_state,arkarea)
 {
-	video_init_common(0);
+	video_init_common();
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mnight_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_arkarea;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,robokid)
+VIDEO_START_MEMBER(robokid_state,robokid)
 {
-	video_init_common(0x0800);
-	m_vram_bank_mask = 1;
+	video_init_common();
+	video_init_banked(0x0800);
 	m_robokid_sprites = 1;
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg_tile_info<2>),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_robokid_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg_tile_info<2>),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
 
-	m_bg_tilemap[1]->set_transparent_pen(0xf);
-	m_bg_tilemap[2]->set_transparent_pen(0xf);
+	m_robokid_tilemap[1]->set_transparent_pen(0xf);
+	m_robokid_tilemap[2]->set_transparent_pen(0xf);
 
 	m_stencil_compare_function = stencil_robokid;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,omegaf)
+VIDEO_START_MEMBER(omegaf_state,omegaf)
 {
-	video_init_common(0x2000);
-	m_vram_bank_mask = 7;
+	video_init_common();
+	video_init_banked(0x2000);
 	m_robokid_sprites = 1;
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg_tile_info<2>),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_robokid_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg_tile_info<2>),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
 
-	m_bg_tilemap[0]->set_transparent_pen(0xf);
-	m_bg_tilemap[1]->set_transparent_pen(0xf);
-	m_bg_tilemap[2]->set_transparent_pen(0xf);
+	m_robokid_tilemap[0]->set_transparent_pen(0xf);
+	m_robokid_tilemap[1]->set_transparent_pen(0xf);
+	m_robokid_tilemap[2]->set_transparent_pen(0xf);
 
 	m_stencil_compare_function = stencil_omegaf;
 }
@@ -200,7 +204,7 @@ VIDEO_START_MEMBER(ninjakd2_state,omegaf)
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_bgvideoram_w)
 {
 	m_bg_videoram[offset] = data;
-	m_bg_tilemap[0]->mark_tile_dirty(offset >> 1);
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
@@ -209,10 +213,36 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
+
+void ninjakd2_state::bg_ctrl(int offset, int data, tilemap_t* tilemap)
+{
+	int scrollx = tilemap->scrollx(0);
+	int scrolly = tilemap->scrolly(0);
+	int mask = std::max(1,m_vram_bank_mask) << 8;
+
+	switch (offset)
+	{
+		case 0: scrollx = ((scrollx &  mask) | data);        break;
+		case 1: scrollx = ((scrollx & 0x0ff) | (data << 8)); break;
+		case 2: scrolly = ((scrolly & 0x100) | data);        break;
+		case 3: scrolly = ((scrolly & 0x0ff) | (data << 8)); break;
+		case 4: tilemap->enable(data & 1); break;
+	}
+
+	tilemap->set_scrollx(0, scrollx);
+	tilemap->set_scrolly(0, scrolly);
+}
+
+WRITE8_MEMBER(ninjakd2_state::ninjakd2_bg_ctrl_w)
+{
+	bg_ctrl(offset, data, m_bg_tilemap);
+}
+
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
 {
 	m_next_sprite_overdraw_enabled = data & 1;
 }
+
 
 
 /*************************************
@@ -246,7 +276,7 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 			int sx = sprptr[1] - ((sprptr[2] & 0x01) << 8);
 			int sy = sprptr[0];
 			// Ninja Kid II doesn't use the topmost bit (it has smaller ROMs) so it might not be connected on the board
-			int code = sprptr[3] | ((sprptr[2] & 0xc0) << 2) | ((sprptr[2] & 0x08) << 7);
+			int code = sprptr[3] + ((sprptr[2] & 0xc0) << 2) + ((sprptr[2] & 0x08) << 7);
 			int flipx = (sprptr[2] & 0x10) >> 4;
 			int flipy = (sprptr[2] & 0x20) >> 5;
 			int const color = sprptr[4] & 0x0f;
@@ -355,39 +385,39 @@ uint32_t ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_in
 
 	bitmap.fill(0, cliprect);
 
-	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, m_sprites_bitmap, 0, 0, 0, 0, cliprect, 0xf);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-uint32_t ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t robokid_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
 	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
 
-	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_robokid_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_robokid_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, m_sprites_bitmap, 0, 0, 0, 0, cliprect, 0xf);
-	m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	m_robokid_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-uint32_t ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t omegaf_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
 	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
 
-	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	m_robokid_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_robokid_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_robokid_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, m_sprites_bitmap, 0, 0, 0, 0, cliprect, 0xf);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

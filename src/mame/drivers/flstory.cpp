@@ -38,16 +38,16 @@ void flstory_state::base_map(address_map &map)
 
 	// rumba lumber reads area 0xc800-0xcfff
 	// onna34ro checks the whole range during POST but having a mirror or not doesn't make any difference for the check to pass
-	map(0xc000, 0xc7ff).mirror(0x800).ram().w(this, FUNC(flstory_state::flstory_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).mirror(0x800).ram().w(FUNC(flstory_state::flstory_videoram_w)).share("videoram");
 
 	map(0xd001, 0xd001).nopw();    /* watchdog */
 	map(0xd002, 0xd002).noprw();         /* unknown read & coin lock out? */
 
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xd400, 0xd400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd403, 0xd403).nopr().w(this, FUNC(flstory_state::snd_reset_w)); // unknown read (set/clr side effect?)
+	map(0xd403, 0xd403).nopr().w(FUNC(flstory_state::snd_reset_w)); // unknown read (set/clr side effect?)
 
-	map(0xd401, 0xd401).r(this, FUNC(flstory_state::snd_flag_r));
+	map(0xd401, 0xd401).r(FUNC(flstory_state::snd_flag_r));
 	map(0xd800, 0xd800).portr("DSW0");
 	map(0xd801, 0xd801).portr("DSW1");
 	map(0xd802, 0xd802).portr("DSW2");
@@ -56,9 +56,9 @@ void flstory_state::base_map(address_map &map)
 	map(0xd806, 0xd806).portr("P2");
 
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(flstory_state::flstory_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).ram().w(FUNC(flstory_state::flstory_scrlram_w)).share("scrlram");
 
-	map(0xdd00, 0xdeff).rw(this, FUNC(flstory_state::flstory_palette_r), FUNC(flstory_state::flstory_palette_w));
+	map(0xdd00, 0xdeff).rw(FUNC(flstory_state::flstory_palette_r), FUNC(flstory_state::flstory_palette_w));
 
 	// victorious nine read 0xf80a during attract, unknown purpose
 	map(0xe000, 0xe7ff).mirror(0x1800).ram().share("workram"); /* work RAM */
@@ -69,10 +69,10 @@ void flstory_state::flstory_map(address_map &map)
 	base_map(map);
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 
-	map(0xd805, 0xd805).r(this, FUNC(flstory_state::flstory_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
 	map(0xdcc0, 0xdcff).ram(); /* unknown */
-	map(0xdf03, 0xdf03).w(this, FUNC(flstory_state::flstory_gfxctrl_w));
+	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
 }
 
 void flstory_state::onna34ro_map(address_map &map)
@@ -82,14 +82,14 @@ void flstory_state::onna34ro_map(address_map &map)
 //  AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
 	map(0xdcc0, 0xdcff).ram(); /* unknown */
-	map(0xdf03, 0xdf03).w(this, FUNC(flstory_state::flstory_gfxctrl_w));
+	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
 }
 
 void flstory_state::onna34ro_mcu_map(address_map &map)
 {
 	onna34ro_map(map);
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xd805, 0xd805).r(this, FUNC(flstory_state::flstory_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 }
 
 CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
@@ -102,12 +102,12 @@ CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 void flstory_state::victnine_map(address_map &map)
 {
 	base_map(map);
-	map(0xd000, 0xd000).rw(this, FUNC(flstory_state::victnine_mcu_r), FUNC(flstory_state::victnine_mcu_w));
+	map(0xd000, 0xd000).rw(FUNC(flstory_state::victnine_mcu_r), FUNC(flstory_state::victnine_mcu_w));
 
 	map(0xd805, 0xd805).portr("EXTRA_P1");   /* also mcu */
 	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	map(0xdce0, 0xdce0).rw(this, FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
+	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
 	map(0xdce1, 0xdce1).nopw();    /* unknown */
 }
 
@@ -116,10 +116,10 @@ void flstory_state::rumba_map(address_map &map)
 	base_map(map);
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 
-	map(0xd805, 0xd805).r(this, FUNC(flstory_state::flstory_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	map(0xdce0, 0xdce0).rw(this, FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
+	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
 }
 
@@ -174,13 +174,13 @@ void flstory_state::sound_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xc801).w(m_ay, FUNC(ym2149_device::address_data_w));
 	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
-	map(0xcc00, 0xcc00).w(this, FUNC(flstory_state::sound_control_0_w));
-	map(0xce00, 0xce00).w(this, FUNC(flstory_state::sound_control_1_w));
+	map(0xcc00, 0xcc00).w(FUNC(flstory_state::sound_control_0_w));
+	map(0xce00, 0xce00).w(FUNC(flstory_state::sound_control_1_w));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xd800, 0xd800).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0xda00, 0xda00).r(this, FUNC(flstory_state::snd_flag_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
+	map(0xda00, 0xda00).r(FUNC(flstory_state::snd_flag_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
 	map(0xdc00, 0xdc00).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
-	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::write)); /* signed 8-bit DAC &  unknown read */
+	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* signed 8-bit DAC &  unknown read */
 	map(0xe000, 0xefff).rom();                                         /* space for diagnostics ROM */
 }
 

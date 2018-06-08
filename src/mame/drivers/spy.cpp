@@ -376,14 +376,14 @@ WRITE8_MEMBER(spy_state::k052109_051960_w)
 
 void spy_state::spy_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rw(this, FUNC(spy_state::spy_bankedram1_r), FUNC(spy_state::spy_bankedram1_w)).share("ram");
+	map(0x0000, 0x07ff).rw(FUNC(spy_state::spy_bankedram1_r), FUNC(spy_state::spy_bankedram1_w)).share("ram");
 	map(0x0800, 0x1aff).ram();
-	map(0x2000, 0x5fff).rw(this, FUNC(spy_state::k052109_051960_r), FUNC(spy_state::k052109_051960_w));
-	map(0x3f80, 0x3f80).w(this, FUNC(spy_state::bankswitch_w));
-	map(0x3f90, 0x3f90).w(this, FUNC(spy_state::spy_3f90_w));
+	map(0x2000, 0x5fff).rw(FUNC(spy_state::k052109_051960_r), FUNC(spy_state::k052109_051960_w));
+	map(0x3f80, 0x3f80).w(FUNC(spy_state::bankswitch_w));
+	map(0x3f90, 0x3f90).w(FUNC(spy_state::spy_3f90_w));
 	map(0x3fa0, 0x3fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3fb0, 0x3fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x3fc0, 0x3fc0).w(this, FUNC(spy_state::spy_sh_irqtrigger_w));
+	map(0x3fc0, 0x3fc0).w(FUNC(spy_state::spy_sh_irqtrigger_w));
 	map(0x3fd0, 0x3fd0).portr("SYSTEM");
 	map(0x3fd1, 0x3fd1).portr("P1");
 	map(0x3fd2, 0x3fd2).portr("P2");
@@ -397,7 +397,7 @@ void spy_state::spy_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(spy_state::sound_bank_w));
+	map(0x9000, 0x9000).w(FUNC(spy_state::sound_bank_w));
 	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));

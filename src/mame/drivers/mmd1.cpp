@@ -268,9 +268,9 @@ void mmd1_state::mmd1_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x07);
-	map(0x00, 0x00).rw(this, FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
-	map(0x01, 0x01).w(this, FUNC(mmd1_state::mmd1_port1_w));
-	map(0x02, 0x02).w(this, FUNC(mmd1_state::mmd1_port2_w));
+	map(0x00, 0x00).rw(FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).w(FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
 }
 
 void mmd1_state::mmd2_mem(address_map &map)
@@ -286,12 +286,12 @@ void mmd1_state::mmd2_mem(address_map &map)
 void mmd1_state::mmd2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).w(this, FUNC(mmd1_state::mmd1_port0_w));
-	map(0x01, 0x01).rw(this, FUNC(mmd1_state::mmd2_01_r), FUNC(mmd1_state::mmd1_port1_w));
-	map(0x02, 0x02).w(this, FUNC(mmd1_state::mmd1_port2_w));
+	map(0x00, 0x00).w(FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).rw(FUNC(mmd1_state::mmd2_01_r), FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
 	map(0x03, 0x03).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x04, 0x04).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
-	map(0x05, 0x07).r(this, FUNC(mmd1_state::mmd2_bank_r));
+	map(0x05, 0x07).r(FUNC(mmd1_state::mmd2_bank_r));
 }
 
 

@@ -20,77 +20,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-// optional enable for streaming reads
-#define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
-	downcast<eeprom_serial_base_device &>(*device).enable_streaming(true);
-// optional enable for output on falling clock
-#define MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
-	downcast<eeprom_serial_base_device &>(*device).enable_output_on_falling_clock(true);
-
-// standard 93CX6 class of 16-bit EEPROMs
-#define MCFG_EEPROM_SERIAL_93C06_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C06_16BIT)
-#define MCFG_EEPROM_SERIAL_93C46_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C46_16BIT)
-#define MCFG_EEPROM_SERIAL_93C56_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C56_16BIT)
-#define MCFG_EEPROM_SERIAL_93C57_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C57_16BIT)
-#define MCFG_EEPROM_SERIAL_93C66_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C66_16BIT)
-#define MCFG_EEPROM_SERIAL_93C76_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C76_16BIT)
-#define MCFG_EEPROM_SERIAL_93C86_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C86_16BIT)
-
-// some manufacturers use pin 6 as an "ORG" pin which, when pulled low, configures memory for 8-bit accesses
-#define MCFG_EEPROM_SERIAL_93C46_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C46_8BIT)
-#define MCFG_EEPROM_SERIAL_93C56_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C56_8BIT)
-#define MCFG_EEPROM_SERIAL_93C57_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C57_8BIT)
-#define MCFG_EEPROM_SERIAL_93C66_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C66_8BIT)
-#define MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C76_8BIT)
-#define MCFG_EEPROM_SERIAL_93C86_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C86_8BIT)
-
-// ER5911 has a separate ready pin, a reduced command set, and supports 8/16 bit out of the box
-#define MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_ER5911_8BIT)
-#define MCFG_EEPROM_SERIAL_ER5911_16BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_ER5911_16BIT)
-
-#define MCFG_EEPROM_SERIAL_MSM16911_8BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_MSM16911_8BIT)
-#define MCFG_EEPROM_SERIAL_MSM16911_16BIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_MSM16911_16BIT)
-
-// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
-// The output is updated on the falling edge of the clock. Streaming is enabled
-#define MCFG_EEPROM_SERIAL_S29190_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29190_16BIT) \
-	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-#define MCFG_EEPROM_SERIAL_S29290_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29290_16BIT) \
-	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-#define MCFG_EEPROM_SERIAL_S29390_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29390_16BIT) \
-	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-
-// X24c44 16 bit ram/eeprom combo
-#define MCFG_EEPROM_SERIAL_X24C44_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_X24C44_16BIT)
-
-// pass-throughs to the base class for setting default data
-#define MCFG_EEPROM_SERIAL_DATA MCFG_EEPROM_DATA
-#define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
-
 #define MCFG_EEPROM_SERIAL_DO_CALLBACK(_devcb) \
 	devcb = &downcast<eeprom_serial_base_device &>(*device).set_do_callback(DEVCB_##_devcb);
 
@@ -99,6 +28,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+enum : bool
+{
+	EEPROM_SERIAL_NO_STREAMING = false,
+	EEPROM_SERIAL_ENABLE_STREAMING = true
+};
 
 // ======================> eeprom_serial_base_device
 
@@ -113,7 +47,7 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -211,10 +145,24 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
+};
+
+
+// ======================> eeprom_serial_s29x90_device
+
+class eeprom_serial_s29x90_device : public eeprom_serial_93cxx_device
+{
+protected:
+	// construction/destruction
+	eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool ignored = EEPROM_SERIAL_NO_STREAMING)
+		: eeprom_serial_93cxx_device(mconfig, devtype, tag, owner, true)
+	{
+		enable_output_on_falling_clock(true);
+	}
 };
 
 
@@ -234,7 +182,7 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
@@ -258,7 +206,7 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
@@ -285,7 +233,7 @@ protected:
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 
@@ -314,9 +262,9 @@ DECLARE_SERIAL_EEPROM_DEVICE(er5911, msm16911, MSM16911, 16)
 
 // Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
 // The output is updated on the falling edge of the clock. Streaming is enabled
-DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16)
-DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16)
-DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(s29x90, s29190, S29190, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(s29x90, s29290, S29290, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(s29x90, s29390, S29390, 16)
 
 // X24c44 16 bit 32byte ram/eeprom combo
 DECLARE_SERIAL_EEPROM_DEVICE(x24c44, x24c44, X24C44, 16)

@@ -127,16 +127,16 @@ READ8_MEMBER(tceptor_state::input1_r)
 void tceptor_state::m6809_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(tceptor_state::tceptor_tile_ram_w)).share("tile_ram");
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(tceptor_state::tceptor_tile_attr_w)).share("tile_attr");
-	map(0x2000, 0x3fff).ram().w(this, FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram");  // background (VIEW RAM)
+	map(0x1800, 0x1bff).ram().w(FUNC(tceptor_state::tceptor_tile_ram_w)).share("tile_ram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(tceptor_state::tceptor_tile_attr_w)).share("tile_attr");
+	map(0x2000, 0x3fff).ram().w(FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram");  // background (VIEW RAM)
 	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
-	map(0x4800, 0x4800).w(this, FUNC(tceptor_state::tceptor2_shutter_w));
+	map(0x4800, 0x4800).w(FUNC(tceptor_state::tceptor2_shutter_w));
 	map(0x4f00, 0x4f07).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
-	map(0x5000, 0x5006).w(this, FUNC(tceptor_state::tceptor_bg_scroll_w));  // bg scroll
+	map(0x5000, 0x5006).w(FUNC(tceptor_state::tceptor_bg_scroll_w));  // bg scroll
 	map(0x6000, 0x7fff).ram().share("m68k_shared_ram"); // COM RAM
-	map(0x8000, 0x8000).w(this, FUNC(tceptor_state::m6809_irq_disable_w));
-	map(0x8800, 0x8800).w(this, FUNC(tceptor_state::m6809_irq_enable_w));
+	map(0x8000, 0x8000).w(FUNC(tceptor_state::m6809_irq_disable_w));
+	map(0x8800, 0x8800).w(FUNC(tceptor_state::m6809_irq_enable_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -158,7 +158,7 @@ void tceptor_state::m6502_b_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().share("share2");
 	map(0x0100, 0x01ff).ram();
-	map(0x4000, 0x4000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x4000, 0x4000).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x5000, 0x5000).writeonly();           // voice ctrl??
 	map(0x8000, 0xffff).rom();
 }
@@ -172,8 +172,8 @@ void tceptor_state::m68k_map(address_map &map)
 	map(0x300000, 0x300001).writeonly();
 	map(0x400000, 0x4001ff).writeonly().share("sprite_ram");
 	map(0x500000, 0x51ffff).w(m_c45_road, FUNC(namco_c45_road_device::write));
-	map(0x600000, 0x600001).w(this, FUNC(tceptor_state::m68k_irq_enable_w));    // not sure
-	map(0x700000, 0x703fff).rw(this, FUNC(tceptor_state::m68k_shared_r), FUNC(tceptor_state::m68k_shared_w)).umask16(0x00ff);
+	map(0x600000, 0x600001).w(FUNC(tceptor_state::m68k_irq_enable_w));    // not sure
+	map(0x700000, 0x703fff).rw(FUNC(tceptor_state::m68k_shared_r), FUNC(tceptor_state::m68k_shared_w)).umask16(0x00ff);
 }
 
 
@@ -185,12 +185,12 @@ void tceptor_state::mcu_map(address_map &map)
 	map(0x1400, 0x154d).ram();
 	map(0x17c0, 0x17ff).ram();
 	map(0x2000, 0x20ff).ram().share("share3");
-	map(0x2100, 0x2100).r(this, FUNC(tceptor_state::dsw0_r));
-	map(0x2101, 0x2101).r(this, FUNC(tceptor_state::dsw1_r));
-	map(0x2200, 0x2200).r(this, FUNC(tceptor_state::input0_r));
-	map(0x2201, 0x2201).r(this, FUNC(tceptor_state::input1_r));
-	map(0x8000, 0x8000).w(this, FUNC(tceptor_state::mcu_irq_disable_w));
-	map(0x8800, 0x8800).w(this, FUNC(tceptor_state::mcu_irq_enable_w));
+	map(0x2100, 0x2100).r(FUNC(tceptor_state::dsw0_r));
+	map(0x2101, 0x2101).r(FUNC(tceptor_state::dsw1_r));
+	map(0x2200, 0x2200).r(FUNC(tceptor_state::input0_r));
+	map(0x2201, 0x2201).r(FUNC(tceptor_state::input1_r));
+	map(0x8000, 0x8000).w(FUNC(tceptor_state::mcu_irq_disable_w));
+	map(0x8800, 0x8800).w(FUNC(tceptor_state::mcu_irq_enable_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xdfff).ram().share("nvram");   // Battery Backup

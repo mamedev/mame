@@ -16,28 +16,16 @@ class mainevt_state : public driver_device
 {
 public:
 	mainevt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_upd7759(*this, "upd"),
-		m_k007232(*this, "k007232"),
-		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960"),
-		m_rombank(*this, "rombank") { }
-
-	/* misc */
-	int        m_nmi_enable;
-	uint8_t      m_sound_irq_mask;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<upd7759_device> m_upd7759;
-	required_device<k007232_device> m_k007232;
-	required_device<k052109_device> m_k052109;
-	required_device<k051960_device> m_k051960;
-
-	required_memory_bank m_rombank;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_upd7759(*this, "upd")
+		, m_k007232(*this, "k007232")
+		, m_k052109(*this, "k052109")
+		, m_k051960(*this, "k051960")
+		, m_rombank(*this, "rombank")
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(dv_nmienable_w);
 	DECLARE_WRITE8_MEMBER(mainevt_bankswitch_w);
@@ -50,8 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	DECLARE_READ8_MEMBER(mainevt_sh_busy_r);
 	DECLARE_WRITE8_MEMBER(dv_sh_bankswitch_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mainevt_interrupt);
@@ -69,4 +55,23 @@ public:
 	void devstors_sound_map(address_map &map);
 	void mainevt_map(address_map &map);
 	void mainevt_sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	/* misc */
+	int        m_nmi_enable;
+	uint8_t      m_sound_irq_mask;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<upd7759_device> m_upd7759;
+	required_device<k007232_device> m_k007232;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+
+	required_memory_bank m_rombank;
+	output_finder<4> m_leds;
 };

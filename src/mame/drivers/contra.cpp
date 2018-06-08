@@ -62,7 +62,7 @@ WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 
 void contra_state::contra_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(this, FUNC(contra_state::contra_K007121_ctrl_0_w));
+	map(0x0000, 0x0007).w(FUNC(contra_state::contra_K007121_ctrl_0_w));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
 	map(0x0012, 0x0012).portr("P2");
@@ -71,29 +71,29 @@ void contra_state::contra_map(address_map &map)
 	map(0x0015, 0x0015).portr("DSW2");
 	map(0x0016, 0x0016).portr("DSW3");
 
-	map(0x0018, 0x0018).w(this, FUNC(contra_state::contra_coin_counter_w));
-	map(0x001a, 0x001a).w(this, FUNC(contra_state::contra_sh_irqtrigger_w));
+	map(0x0018, 0x0018).w(FUNC(contra_state::contra_coin_counter_w));
+	map(0x001a, 0x001a).w(FUNC(contra_state::contra_sh_irqtrigger_w));
 	map(0x001c, 0x001c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x001e, 0x001e).nopw();    /* ? */
-	map(0x0060, 0x0067).w(this, FUNC(contra_state::contra_K007121_ctrl_1_w));
+	map(0x0060, 0x0067).w(FUNC(contra_state::contra_K007121_ctrl_1_w));
 
 	map(0x0c00, 0x0cff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 
 	map(0x1000, 0x1fff).ram();
 
 	map(0x2000, 0x5fff).readonly();
-	map(0x2000, 0x23ff).w(this, FUNC(contra_state::contra_fg_cram_w)).share("fg_cram");
-	map(0x2400, 0x27ff).w(this, FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
-	map(0x2800, 0x2bff).w(this, FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
-	map(0x2c00, 0x2fff).w(this, FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
+	map(0x2000, 0x23ff).w(FUNC(contra_state::contra_fg_cram_w)).share("fg_cram");
+	map(0x2400, 0x27ff).w(FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
+	map(0x2800, 0x2bff).w(FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
+	map(0x2c00, 0x2fff).w(FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
 	map(0x3000, 0x37ff).writeonly().share("spriteram");/* 2nd bank is at 0x5000 */
 	map(0x3800, 0x3fff).writeonly(); // second sprite buffer
-	map(0x4000, 0x43ff).w(this, FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
-	map(0x4400, 0x47ff).w(this, FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
+	map(0x4000, 0x43ff).w(FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
+	map(0x4400, 0x47ff).w(FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
 	map(0x4800, 0x5fff).writeonly();
 
 	map(0x6000, 0x7fff).bankr("bank1");
-	map(0x7000, 0x7000).w(this, FUNC(contra_state::contra_bankswitch_w));
+	map(0x7000, 0x7000).w(FUNC(contra_state::contra_bankswitch_w));
 
 	map(0x8000, 0xffff).rom();
 }
@@ -102,7 +102,7 @@ void contra_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x4000, 0x4000).w(this, FUNC(contra_state::sirq_clear_w)); /* read triggers irq reset and latch read (in the hardware only). */
+	map(0x4000, 0x4000).w(FUNC(contra_state::sirq_clear_w)); /* read triggers irq reset and latch read (in the hardware only). */
 	map(0x6000, 0x67ff).ram();
 	map(0x8000, 0xffff).rom();
 }

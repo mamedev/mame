@@ -63,7 +63,7 @@ void ccs300_state::ccs300_io(address_map &map)
 	map(0x18, 0x1b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // init bytes seem to be for a CTC
 	map(0x30, 0x33); // fdc?
 	map(0x34, 0x34); // motor control?
-	map(0x40, 0x40).w(this, FUNC(ccs300_state::port40_w));
+	map(0x40, 0x40).w(FUNC(ccs300_state::port40_w));
 	map(0xf0, 0xf0); // unknown, long sequence of init bytes
 	map(0xf2, 0xf2); // dip or jumper?
 }

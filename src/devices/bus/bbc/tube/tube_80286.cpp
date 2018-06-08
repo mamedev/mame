@@ -38,8 +38,8 @@ void bbc_tube_80286_device::tube_80286_mem(address_map &map)
 void bbc_tube_80286_device::tube_80286_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x50, 0x50).r(this, FUNC(bbc_tube_80286_device::disable_boot_rom));
-	map(0x60, 0x60).w(this, FUNC(bbc_tube_80286_device::irq_latch_w));
+	map(0x50, 0x50).r(FUNC(bbc_tube_80286_device::disable_boot_rom));
+	map(0x60, 0x60).w(FUNC(bbc_tube_80286_device::irq_latch_w));
 	map(0x80, 0x8f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask16(0x00ff);
 }
 

@@ -220,19 +220,19 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x10000000, 0x100fffff).bankrw("bank2");
 	map(0x20000000, 0x201fffff).rom().region("data", 0);
 	map(0x30000000, 0x30001fff).ram().share("nvram"); /* nvram */
-	map(0x30100000, 0x30100003).w(this, FUNC(namcofl_state::namcofl_spritebank_w));
+	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::namcofl_spritebank_w));
 	map(0x30284000, 0x3028bfff).ram().share("shareram");
 	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
-	map(0x30380000, 0x303800ff).r(this, FUNC(namcofl_state::fl_network_r)); /* network registers */
-	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(this, FUNC(namcofl_state::namcofl_c116_w));
-	map(0x30800000, 0x3080ffff).rw(this, FUNC(namcofl_state::c123_tilemap_videoram_r), FUNC(namcofl_state::c123_tilemap_videoram_w));
-	map(0x30a00000, 0x30a0003f).rw(this, FUNC(namcofl_state::c123_tilemap_control_r), FUNC(namcofl_state::c123_tilemap_control_w));
-	map(0x30c00000, 0x30c1ffff).rw(this, FUNC(namcofl_state::c169_roz_videoram_r), FUNC(namcofl_state::c169_roz_videoram_w)).share("rozvideoram");
-	map(0x30d00000, 0x30d0001f).rw(this, FUNC(namcofl_state::c169_roz_control_r), FUNC(namcofl_state::c169_roz_control_w));
-	map(0x30e00000, 0x30e1ffff).rw(this, FUNC(namcofl_state::c355_obj_ram_r), FUNC(namcofl_state::c355_obj_ram_w)).share("objram");
+	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::fl_network_r)); /* network registers */
+	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::namcofl_c116_w));
+	map(0x30800000, 0x3080ffff).rw(FUNC(namcofl_state::c123_tilemap_videoram_r), FUNC(namcofl_state::c123_tilemap_videoram_w));
+	map(0x30a00000, 0x30a0003f).rw(FUNC(namcofl_state::c123_tilemap_control_r), FUNC(namcofl_state::c123_tilemap_control_w));
+	map(0x30c00000, 0x30c1ffff).rw(FUNC(namcofl_state::c169_roz_videoram_r), FUNC(namcofl_state::c169_roz_videoram_w)).share("rozvideoram");
+	map(0x30d00000, 0x30d0001f).rw(FUNC(namcofl_state::c169_roz_control_r), FUNC(namcofl_state::c169_roz_control_w));
+	map(0x30e00000, 0x30e1ffff).rw(FUNC(namcofl_state::c355_obj_ram_r), FUNC(namcofl_state::c355_obj_ram_w)).share("objram");
 	map(0x30f00000, 0x30f0000f).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
-	map(0x40000000, 0x4000005f).rw(this, FUNC(namcofl_state::namcofl_sysreg_r), FUNC(namcofl_state::namcofl_sysreg_w));
-	map(0xfffffffc, 0xffffffff).r(this, FUNC(namcofl_state::fl_unk1_r));
+	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::namcofl_sysreg_r), FUNC(namcofl_state::namcofl_sysreg_w));
+	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::fl_unk1_r));
 }
 
 
@@ -315,22 +315,22 @@ READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
 void namcofl_state::namcoc75_am(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).ram().w(this, FUNC(namcofl_state::mcu_shared_w)).share("shareram");
+	map(0x004000, 0x00bfff).ram().w(FUNC(namcofl_state::mcu_shared_w)).share("shareram");
 	map(0x200000, 0x27ffff).rom().region("c75data", 0);
 }
 
 void namcofl_state::namcoc75_io(address_map &map)
 {
-	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namcofl_state::port6_r), FUNC(namcofl_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).r(this, FUNC(namcofl_state::port7_r));
-	map(M37710_ADC7_L, M37710_ADC7_L).r(this, FUNC(namcofl_state::dac7_r));
-	map(M37710_ADC6_L, M37710_ADC6_L).r(this, FUNC(namcofl_state::dac6_r));
-	map(M37710_ADC5_L, M37710_ADC5_L).r(this, FUNC(namcofl_state::dac5_r));
-	map(M37710_ADC4_L, M37710_ADC4_L).r(this, FUNC(namcofl_state::dac4_r));
-	map(M37710_ADC3_L, M37710_ADC3_L).r(this, FUNC(namcofl_state::dac3_r));
-	map(M37710_ADC2_L, M37710_ADC2_L).r(this, FUNC(namcofl_state::dac2_r));
-	map(M37710_ADC1_L, M37710_ADC1_L).r(this, FUNC(namcofl_state::dac1_r));
-	map(M37710_ADC0_L, M37710_ADC0_L).r(this, FUNC(namcofl_state::dac0_r));
+	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcofl_state::port6_r), FUNC(namcofl_state::port6_w));
+	map(M37710_PORT7, M37710_PORT7).r(FUNC(namcofl_state::port7_r));
+	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namcofl_state::dac7_r));
+	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namcofl_state::dac6_r));
+	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namcofl_state::dac5_r));
+	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namcofl_state::dac4_r));
+	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namcofl_state::dac3_r));
+	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namcofl_state::dac2_r));
+	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namcofl_state::dac1_r));
+	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namcofl_state::dac0_r));
 }
 
 
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_C352_ADD("c352", 48384000/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, 48384000/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.

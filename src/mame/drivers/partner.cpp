@@ -39,10 +39,10 @@ void partner_state::partner_mem(address_map &map)
 	map(0xd000, 0xd7ff).bankrw("bank10");
 	map(0xd800, 0xd8ff).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write));  // video
 	map(0xd900, 0xd9ff).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xda00, 0xdaff).w(this, FUNC(partner_state::partner_mem_page_w));
+	map(0xda00, 0xdaff).w(FUNC(partner_state::partner_mem_page_w));
 	map(0xdb00, 0xdbff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xdc00, 0xddff).bankrw("bank11");
-	map(0xde00, 0xdeff).w(this, FUNC(partner_state::partner_win_memory_page_w));
+	map(0xde00, 0xdeff).w(FUNC(partner_state::partner_win_memory_page_w));
 	map(0xe000, 0xe7ff).bankrw("bank12");
 	map(0xe800, 0xffff).bankrw("bank13");
 }
@@ -171,7 +171,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(partner_state::partner)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_ADD("maincpu", I8080, 16_MHz_XTAL / 9)
 	MCFG_DEVICE_PROGRAM_MAP(partner_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(partner_state, partner )
@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(partner_state::partner)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
+	MCFG_DEVICE_ADD("i8275", I8275, 16_MHz_XTAL / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(partner_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
@@ -201,7 +201,7 @@ MACHINE_CONFIG_START(partner_state::partner)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_ADD("dma8257", I8257, 16_MHz_XTAL / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, partner_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
@@ -217,7 +217,7 @@ MACHINE_CONFIG_START(partner_state::partner)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","partner_cass")
 
-	MCFG_FD1793_ADD("wd1793", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("wd1793", FD1793, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma8257", i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", partner_floppies, "525qd", partner_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", partner_floppies, "525qd", partner_state::floppy_formats)

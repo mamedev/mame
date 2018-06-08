@@ -1700,12 +1700,12 @@ void cobra_state::cobra_main_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("main_ram");
 	map(0x07c00000, 0x07ffffff).ram();
-	map(0x80000cf8, 0x80000cff).rw(this, FUNC(cobra_state::main_mpc106_r), FUNC(cobra_state::main_mpc106_w));
+	map(0x80000cf8, 0x80000cff).rw(FUNC(cobra_state::main_mpc106_r), FUNC(cobra_state::main_mpc106_w));
 	map(0xc0000000, 0xc03fffff).ram().share("gfx_main_ram_0");              // GFX board main ram, bank 0
 	map(0xc7c00000, 0xc7ffffff).ram().share("gfx_main_ram_1");              // GFX board main ram, bank 1
 	map(0xfff00000, 0xfff7ffff).rom().region("user1", 0);                   /* Boot ROM */
-	map(0xfff80000, 0xfffbffff).rw(this, FUNC(cobra_state::main_comram_r), FUNC(cobra_state::main_comram_w));
-	map(0xffff0000, 0xffff0007).rw(this, FUNC(cobra_state::main_fifo_r), FUNC(cobra_state::main_fifo_w));
+	map(0xfff80000, 0xfffbffff).rw(FUNC(cobra_state::main_comram_r), FUNC(cobra_state::main_comram_w));
+	map(0xffff0000, 0xffff0007).rw(FUNC(cobra_state::main_fifo_r), FUNC(cobra_state::main_fifo_w));
 }
 
 
@@ -2040,24 +2040,24 @@ WRITE8_MEMBER(cobra_state::sub_jvs_w)
 void cobra_state::cobra_sub_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("sub_ram");                       // Main RAM
-	map(0x70000000, 0x7003ffff).rw(this, FUNC(cobra_state::sub_comram_r), FUNC(cobra_state::sub_comram_w));         // Double buffered shared RAM between Main and Sub
+	map(0x70000000, 0x7003ffff).rw(FUNC(cobra_state::sub_comram_r), FUNC(cobra_state::sub_comram_w));         // Double buffered shared RAM between Main and Sub
 //  AM_RANGE(0x78000000, 0x780000ff) AM_NOP                                           // SCSI controller (unused)
 	map(0x78040000, 0x7804ffff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
-	map(0x78080000, 0x7808000f).rw(this, FUNC(cobra_state::sub_ata0_r), FUNC(cobra_state::sub_ata0_w));
-	map(0x780c0010, 0x780c001f).rw(this, FUNC(cobra_state::sub_ata1_r), FUNC(cobra_state::sub_ata1_w));
+	map(0x78080000, 0x7808000f).rw(FUNC(cobra_state::sub_ata0_r), FUNC(cobra_state::sub_ata0_w));
+	map(0x780c0010, 0x780c001f).rw(FUNC(cobra_state::sub_ata1_r), FUNC(cobra_state::sub_ata1_w));
 	map(0x78200000, 0x782000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));              // PSAC registers
-	map(0x78210000, 0x78217fff).ram().w(this, FUNC(cobra_state::sub_psac_palette_w)).share("paletteram");                      // PSAC palette RAM
+	map(0x78210000, 0x78217fff).ram().w(FUNC(cobra_state::sub_psac_palette_w)).share("paletteram");                      // PSAC palette RAM
 	map(0x78220000, 0x7823ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));            // PSAC tile RAM
 	map(0x78240000, 0x7827ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));            // PSAC character RAM
 	map(0x78280000, 0x7828000f).noprw();                                           // ???
-	map(0x78300000, 0x7830000f).rw(this, FUNC(cobra_state::sub_psac2_r), FUNC(cobra_state::sub_psac2_w));           // PSAC
-	map(0x7e000000, 0x7e000003).rw(this, FUNC(cobra_state::sub_unk7e_r), FUNC(cobra_state::sub_debug_w));
+	map(0x78300000, 0x7830000f).rw(FUNC(cobra_state::sub_psac2_r), FUNC(cobra_state::sub_psac2_w));           // PSAC
+	map(0x7e000000, 0x7e000003).rw(FUNC(cobra_state::sub_unk7e_r), FUNC(cobra_state::sub_debug_w));
 	map(0x7e040000, 0x7e041fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));    /* M48T58Y RTC/NVRAM */
-	map(0x7e180000, 0x7e180003).rw(this, FUNC(cobra_state::sub_unk1_r), FUNC(cobra_state::sub_unk1_w));             // TMS57002?
-	map(0x7e200000, 0x7e200003).rw(this, FUNC(cobra_state::sub_config_r), FUNC(cobra_state::sub_config_w));
+	map(0x7e180000, 0x7e180003).rw(FUNC(cobra_state::sub_unk1_r), FUNC(cobra_state::sub_unk1_w));             // TMS57002?
+	map(0x7e200000, 0x7e200003).rw(FUNC(cobra_state::sub_config_r), FUNC(cobra_state::sub_config_w));
 	map(0x7e280000, 0x7e28ffff).noprw();                                           // LANC
 	map(0x7e300000, 0x7e30ffff).noprw();                                           // LANC
-	map(0x7e380000, 0x7e380003).rw(this, FUNC(cobra_state::sub_mainbd_r), FUNC(cobra_state::sub_mainbd_w));
+	map(0x7e380000, 0x7e380003).rw(FUNC(cobra_state::sub_mainbd_r), FUNC(cobra_state::sub_mainbd_w));
 	map(0x7ff80000, 0x7fffffff).rom().region("user2", 0);                     /* Boot ROM */
 }
 
@@ -3148,15 +3148,15 @@ void cobra_state::cobra_gfx_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("gfx_main_ram_0");
 	map(0x07c00000, 0x07ffffff).ram().share("gfx_main_ram_1");
-	map(0x10000000, 0x100007ff).w(this, FUNC(cobra_state::gfx_fifo0_w));
-	map(0x18000000, 0x180007ff).w(this, FUNC(cobra_state::gfx_fifo1_w));
-	map(0x1e000000, 0x1e0007ff).w(this, FUNC(cobra_state::gfx_fifo2_w));
-	map(0x20000000, 0x20000007).w(this, FUNC(cobra_state::gfx_buf_w));                            // this might really map to 0x1e000000, depending on the pagetable
+	map(0x10000000, 0x100007ff).w(FUNC(cobra_state::gfx_fifo0_w));
+	map(0x18000000, 0x180007ff).w(FUNC(cobra_state::gfx_fifo1_w));
+	map(0x1e000000, 0x1e0007ff).w(FUNC(cobra_state::gfx_fifo2_w));
+	map(0x20000000, 0x20000007).w(FUNC(cobra_state::gfx_buf_w));                            // this might really map to 0x1e000000, depending on the pagetable
 	map(0x7f000000, 0x7f00ffff).ram().share("pagetable");
 	map(0xfff00000, 0xfff7ffff).rom().region("user3", 0);                   /* Boot ROM */
-	map(0xfff80000, 0xfff80007).w(this, FUNC(cobra_state::gfx_debug_state_w));
-	map(0xffff0000, 0xffff0007).rw(this, FUNC(cobra_state::gfx_unk1_r), FUNC(cobra_state::gfx_unk1_w));
-	map(0xffff0010, 0xffff001f).r(this, FUNC(cobra_state::gfx_fifo_r));
+	map(0xfff80000, 0xfff80007).w(FUNC(cobra_state::gfx_debug_state_w));
+	map(0xffff0000, 0xffff0007).rw(FUNC(cobra_state::gfx_unk1_r), FUNC(cobra_state::gfx_unk1_w));
+	map(0xffff0010, 0xffff001f).r(FUNC(cobra_state::gfx_fifo_r));
 }
 
 
@@ -3327,7 +3327,7 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_M48T58_ADD("m48t58")
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
 	MCFG_DEVICE_ADD("k001604", K001604, 0)     // on the LAN board in Racing Jam DX
 	MCFG_K001604_LAYER_SIZE(0)

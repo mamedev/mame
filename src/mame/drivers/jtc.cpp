@@ -278,8 +278,8 @@ void jtces40_state::jtc_es40_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0800, 0x1fff).rom();
-	map(0x4000, 0x5fff).rw(this, FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
-	map(0x6000, 0x63ff).w(this, FUNC(jtces40_state::banksel_w));
+	map(0x4000, 0x5fff).rw(FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
+	map(0x6000, 0x63ff).w(FUNC(jtces40_state::banksel_w));
 	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
 	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
 	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");

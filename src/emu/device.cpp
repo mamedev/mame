@@ -486,31 +486,30 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool pre_map, bool isvalidation) const
+bool device_t::findit(bool isvalidation) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
-		if (autodev->is_pre_map() == pre_map)
+	{
+		if (isvalidation)
 		{
-			if (isvalidation)
+			// sanity checking
+			char const *const tag = autodev->finder_tag();
+			if (!tag)
 			{
-				// sanity checking
-				char const *const tag = autodev->finder_tag();
-				if (!tag)
-				{
-					osd_printf_error("Finder tag is null!\n");
-					allfound = false;
-					continue;
-				}
-				if (tag[0] == '^' && tag[1] == ':')
-				{
-					osd_printf_error("Malformed finder tag: %s\n", tag);
-					allfound = false;
-					continue;
-				}
+				osd_printf_error("Finder tag is null!\n");
+				allfound = false;
+				continue;
 			}
-			allfound &= autodev->findit(isvalidation);
+			if (tag[0] == '^' && tag[1] == ':')
+			{
+				osd_printf_error("Malformed finder tag: %s\n", tag);
+				allfound = false;
+				continue;
+			}
 		}
+		allfound &= autodev->findit(isvalidation);
+	}
 	return allfound;
 }
 
@@ -524,21 +523,16 @@ void device_t::resolve_pre_map()
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
-
-	// find all the registered pre-map objects
-	if (!findit(true, false))
-		throw emu_fatalerror("Missing some required devices, unable to proceed");
 }
 
 //-------------------------------------------------
-//  resolve_post_map - find objects that are created
-//  in memory maps
+//  resolve - find objects
 //-------------------------------------------------
 
 void device_t::resolve_post_map()
 {
 	// find all the registered post-map objects
-	if (!findit(false, false))
+	if (!findit(false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// allow implementation to do additional setup

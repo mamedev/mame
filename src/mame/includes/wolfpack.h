@@ -28,7 +28,8 @@ public:
 		m_s14001a(*this, "speech"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led0")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
@@ -88,6 +89,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<> m_led;
 
 	bool m_collision;
 	unsigned m_current_index;

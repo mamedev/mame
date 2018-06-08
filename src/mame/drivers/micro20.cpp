@@ -143,7 +143,7 @@ READ32_MEMBER(micro20_state::buserror_r)
 void micro20_state::micro20_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("mainram");
-	map(0x00200000, 0x002fffff).r(this, FUNC(micro20_state::buserror_r));
+	map(0x00200000, 0x002fffff).r(FUNC(micro20_state::buserror_r));
 	map(0x00800000, 0x0083ffff).rom().region("bootrom", 0);
 	map(0xffff8000, 0xffff8000).rw(FDC_TAG, FUNC(wd1772_device::status_r), FUNC(wd1772_device::cmd_w));
 	map(0xffff8001, 0xffff8001).rw(FDC_TAG, FUNC(wd1772_device::track_r), FUNC(wd1772_device::track_w));
@@ -156,26 +156,26 @@ void micro20_state::micro20_map(address_map &map)
 
 MACHINE_CONFIG_START(micro20_state::micro20)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, M68020, XTAL(16'670'000))
+	MCFG_DEVICE_ADD(MAINCPU_TAG, M68020, 16.67_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(micro20_map)
 
-	MCFG_DEVICE_ADD(DUART_A_TAG, MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD(DUART_A_TAG, MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(DUART_A_TAG, mc68681_device, rx_a_w))
 
-	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, 3.6864_MHz_XTAL)
 
-	MCFG_WD1772_ADD(FDC_TAG, XTAL(16'670'000) / 2)
+	MCFG_DEVICE_ADD(FDC_TAG, WD1772, 16.67_MHz_XTAL / 2)
 
-	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL(16'670'000) / 2)
+	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, 16.67_MHz_XTAL / 2)
 	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE(*this, micro20_state, timerirq_w))
 	MCFG_PIT68230_H4_CB(WRITELINE(*this, micro20_state, h4_w))
 	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, micro20_state, portb_w))
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, micro20_state, portc_w))
 
-	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL(32'768))
+	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, 32.768_kHz_XTAL)
 	MCFG_MSM58321_DEFAULT_24H(false)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb0_w))
 	MCFG_MSM58321_D1_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb1_w))

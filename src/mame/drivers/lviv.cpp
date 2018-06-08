@@ -299,7 +299,7 @@ Timings:
 
 void lviv_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
+	map(0x00, 0xff).rw(FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
 }
 
 /* memory w/r functions */
@@ -482,11 +482,11 @@ MACHINE_CONFIG_END
 ROM_START(lviv)
 	ROM_REGION(0x14000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "lviv", "Lviv/L'vov" )
-	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(1))
+	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "lviva", "Lviv/L'vov (alternate)" )
-	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(2))
+	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "lvivp", "Lviv/L'vov (prototype)" )
-	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
+	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(2))
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME      FLAGS */

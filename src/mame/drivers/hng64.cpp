@@ -954,47 +954,47 @@ void hng64_state::hng_map(address_map &map)
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
 	// Ports
-	map(0x1f700000, 0x1f702fff).rw(this, FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	map(0x1f700000, 0x1f702fff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	map(0x1F800000, 0x1F803fff).ram().share("nvram");
 
 	// Dualport RAM
-	map(0x1F808000, 0x1F8087ff).rw(this, FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).share("dualport");
+	map(0x1F808000, 0x1F8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).share("dualport");
 
 	// BIOS
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
 	// Video
 	map(0x20000000, 0x2000bfff).ram().share("spriteram");
-	map(0x2000d800, 0x2000e3ff).w(this, FUNC(hng64_state::hng64_sprite_clear_even_w));
-	map(0x2000e400, 0x2000efff).w(this, FUNC(hng64_state::hng64_sprite_clear_odd_w));
+	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::hng64_sprite_clear_even_w));
+	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::hng64_sprite_clear_odd_w));
 	map(0x20010000, 0x20010013).ram().share("spriteregs");
-	map(0x20100000, 0x2017ffff).ram().w(this, FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
-	map(0x20190000, 0x20190037).ram().w(this, FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
+	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
 	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x20208000, 0x2020805f).rw(this, FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
-	map(0x20300000, 0x203001ff).w(this, FUNC(hng64_state::dl_w)); // 3d Display List
-	map(0x20300200, 0x20300203).w(this, FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
-	map(0x20300214, 0x20300217).w(this, FUNC(hng64_state::dl_control_w));
-	map(0x20300218, 0x2030021b).r(this, FUNC(hng64_state::unk_vreg_r));
+	map(0x20208000, 0x2020805f).rw(FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
+	map(0x20300200, 0x20300203).w(FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
+	map(0x20300214, 0x20300217).w(FUNC(hng64_state::dl_control_w));
+	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::unk_vreg_r));
 
 	// 3d?
 	map(0x30000000, 0x3000002f).ram().share("3dregs");
-	map(0x30100000, 0x3015ffff).rw(this, FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
-	map(0x30200000, 0x3025ffff).rw(this, FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
+	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
 
 	// Sound
-	map(0x60000000, 0x601fffff).rw(this, FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
-	map(0x60200000, 0x603fffff).rw(this, FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
+	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
+	map(0x60200000, 0x603fffff).rw(FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
-	map(0x68000000, 0x6800000f).rw(this, FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
-	map(0x6f000000, 0x6f000003).w(this, FUNC(hng64_state::hng64_soundcpu_enable_w));
+	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
+	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::hng64_soundcpu_enable_w));
 
 	// Communications
-	map(0xc0000000, 0xc0000fff).rw(this, FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
-	map(0xc0001000, 0xc0001007).rw(this, FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
+	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
+	map(0xc0001000, 0xc0001007).rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1564,7 +1564,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios))
 
 // all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
 #define HNG64_BIOS \

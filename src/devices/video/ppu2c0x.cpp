@@ -90,7 +90,7 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 void ppu2c0x_device::ppu2c0x(address_map &map)
 {
 	map(0x0000, 0x3eff).ram();
-	map(0x3f00, 0x3fff).rw(this, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+	map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
 }
 

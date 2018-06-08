@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback))
@@ -557,7 +557,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback_pal))

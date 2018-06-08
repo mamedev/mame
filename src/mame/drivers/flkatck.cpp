@@ -94,12 +94,12 @@ WRITE8_MEMBER(flkatck_state::multiply_w)
 
 void flkatck_state::flkatck_map(address_map &map)
 {
-	map(0x0000, 0x0007).ram().w(this, FUNC(flkatck_state::flkatck_k007121_regs_w));                                   /* 007121 registers */
+	map(0x0000, 0x0007).ram().w(FUNC(flkatck_state::flkatck_k007121_regs_w));                                   /* 007121 registers */
 	map(0x0008, 0x03ff).ram();                                                                 /* RAM */
-	map(0x0400, 0x041f).rw(this, FUNC(flkatck_state::flkatck_ls138_r), FUNC(flkatck_state::flkatck_ls138_w));                         /* inputs, DIPS, bankswitch, counters, sound command */
+	map(0x0400, 0x041f).rw(FUNC(flkatck_state::flkatck_ls138_r), FUNC(flkatck_state::flkatck_ls138_w));                         /* inputs, DIPS, bankswitch, counters, sound command */
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette"); /* palette */
 	map(0x1000, 0x1fff).ram();                                                                 /* RAM */
-	map(0x2000, 0x3fff).ram().w(this, FUNC(flkatck_state::flkatck_k007121_w)).share("k007121_ram");                    /* Video RAM (007121) */
+	map(0x2000, 0x3fff).ram().w(FUNC(flkatck_state::flkatck_k007121_w)).share("k007121_ram");                    /* Video RAM (007121) */
 	map(0x4000, 0x5fff).bankr("bank1");                                                            /* banked ROM */
 	map(0x6000, 0xffff).rom();                                                                 /* ROM */
 }
@@ -108,9 +108,9 @@ void flkatck_state::flkatck_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();                                             /* ROM */
 	map(0x8000, 0x87ff).ram();                                             /* RAM */
-	map(0x9000, 0x9000).r(this, FUNC(flkatck_state::multiply_r));                                // 007452: Protection (see wecleman, but unused here?)
+	map(0x9000, 0x9000).r(FUNC(flkatck_state::multiply_r));                                // 007452: Protection (see wecleman, but unused here?)
 	map(0x9001, 0x9001).nopr();                                         // 007452: ?
-	map(0x9000, 0x9001).w(this, FUNC(flkatck_state::multiply_w));                               // 007452: Protection (see wecleman, but unused here?)
+	map(0x9000, 0x9001).w(FUNC(flkatck_state::multiply_w));                               // 007452: Protection (see wecleman, but unused here?)
 	map(0x9004, 0x9004).nopr();                                         // 007452: ?
 	map(0x9006, 0x9006).nopw();                                        // 007452: ?
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));

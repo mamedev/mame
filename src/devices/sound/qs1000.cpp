@@ -146,7 +146,7 @@ void qs1000_device::qs1000_prg_map(address_map &map)
 void qs1000_device::qs1000_io_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
-	map(0x0200, 0x0211).w(this, FUNC(qs1000_device::wave_w));
+	map(0x0200, 0x0211).w(FUNC(qs1000_device::wave_w));
 }
 
 

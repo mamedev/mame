@@ -150,7 +150,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_sio->rxcb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_sio->txca_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_sio->txcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_sio->rxtxcb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_sio->synca_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_sio->syncb_w(state); }
 

@@ -45,22 +45,22 @@ void ohmygod_state::ohmygod_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x300000, 0x303fff).ram();
-	map(0x304000, 0x307fff).ram().w(this, FUNC(ohmygod_state::ohmygod_videoram_w)).share("videoram");
+	map(0x304000, 0x307fff).ram().w(FUNC(ohmygod_state::ohmygod_videoram_w)).share("videoram");
 	map(0x308000, 0x30ffff).ram();
-	map(0x400000, 0x400001).w(this, FUNC(ohmygod_state::ohmygod_scrollx_w));
-	map(0x400002, 0x400003).w(this, FUNC(ohmygod_state::ohmygod_scrolly_w));
+	map(0x400000, 0x400001).w(FUNC(ohmygod_state::ohmygod_scrollx_w));
+	map(0x400002, 0x400003).w(FUNC(ohmygod_state::ohmygod_scrolly_w));
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x703fff).ram().share("spriteram");
 	map(0x704000, 0x707fff).ram();
 	map(0x708000, 0x70ffff).ram();     /* Work RAM */
 	map(0x800000, 0x800001).portr("P1");
 	map(0x800002, 0x800003).portr("P2");
-	map(0x900000, 0x900001).w(this, FUNC(ohmygod_state::ohmygod_ctrl_w));
+	map(0x900000, 0x900001).w(FUNC(ohmygod_state::ohmygod_ctrl_w));
 	map(0xa00000, 0xa00001).portr("DSW1");
 	map(0xa00002, 0xa00003).portr("DSW2");
 	map(0xb00001, 0xb00001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc00000, 0xc00001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0xd00000, 0xd00001).w(this, FUNC(ohmygod_state::ohmygod_spritebank_w));
+	map(0xd00000, 0xd00001).w(FUNC(ohmygod_state::ohmygod_spritebank_w));
 }
 
 void ohmygod_state::oki_map(address_map &map)

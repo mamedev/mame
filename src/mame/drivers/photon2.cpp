@@ -269,11 +269,11 @@ void photon2_state::spectrum_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x1f, 0x1f).portr("JOY");
-	map(0x5b, 0x5b).portr("COIN").w(this, FUNC(photon2_state::misc_w));
-	map(0x7a, 0x7a).w(this, FUNC(photon2_state::membank_w));
+	map(0x5b, 0x5b).portr("COIN").w(FUNC(photon2_state::misc_w));
+	map(0x7a, 0x7a).w(FUNC(photon2_state::membank_w));
 	map(0x7b, 0x7b).nopw(); // unknown write
-	map(0x7e, 0x7e).w(this, FUNC(photon2_state::membank_w));
-	map(0xfe, 0xfe).rw(this, FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
+	map(0x7e, 0x7e).w(FUNC(photon2_state::membank_w));
+	map(0xfe, 0xfe).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
 }
 
 /*************************************
@@ -339,7 +339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
 	{
 		if ( m_nmi_enable )
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }

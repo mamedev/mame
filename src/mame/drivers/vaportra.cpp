@@ -49,7 +49,7 @@ void vaportra_state::main_map(address_map &map)
 	map(0x100000, 0x100001).portr("PLAYERS");
 	map(0x100002, 0x100003).portr("COINS");
 	map(0x100004, 0x100005).portr("DSW");
-	map(0x100000, 0x100003).w(this, FUNC(vaportra_state::priority_w));
+	map(0x100000, 0x100003).w(FUNC(vaportra_state::priority_w));
 	map(0x100007, 0x100007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
@@ -57,9 +57,9 @@ void vaportra_state::main_map(address_map &map)
 	map(0x280000, 0x281fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x282000, 0x283fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x2c0000, 0x2c000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x300000, 0x3009ff).ram().w(this, FUNC(vaportra_state::palette_w)).share("palette");
-	map(0x304000, 0x3049ff).ram().w(this, FUNC(vaportra_state::palette_ext_w)).share("palette_ext");
-	map(0x308001, 0x308001).rw(this, FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
+	map(0x300000, 0x3009ff).ram().w(FUNC(vaportra_state::palette_w)).share("palette");
+	map(0x304000, 0x3049ff).ram().w(FUNC(vaportra_state::palette_ext_w)).share("palette_ext");
+	map(0x308001, 0x308001).rw(FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
 	map(0x30c000, 0x30c001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x318000, 0x3187ff).mirror(0xce0000).ram().share("spriteram");
 	map(0xffc000, 0xffffff).ram();

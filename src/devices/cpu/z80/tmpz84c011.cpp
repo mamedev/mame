@@ -19,16 +19,16 @@ void tmpz84c011_device::tmpz84c011_internal_io_map(address_map &map)
 {
 	map(0x10, 0x13).mirror(0xff00).rw("tmpz84c011_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	map(0x50, 0x50).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_pa_r), FUNC(tmpz84c011_device::tmpz84c011_pa_w));
-	map(0x51, 0x51).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_pb_r), FUNC(tmpz84c011_device::tmpz84c011_pb_w));
-	map(0x52, 0x52).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_pc_r), FUNC(tmpz84c011_device::tmpz84c011_pc_w));
-	map(0x30, 0x30).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_pd_r), FUNC(tmpz84c011_device::tmpz84c011_pd_w));
-	map(0x40, 0x40).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_pe_r), FUNC(tmpz84c011_device::tmpz84c011_pe_w));
-	map(0x54, 0x54).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_dir_pa_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pa_w));
-	map(0x55, 0x55).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_dir_pb_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pb_w));
-	map(0x56, 0x56).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_dir_pc_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pc_w));
-	map(0x34, 0x34).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_dir_pd_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pd_w));
-	map(0x44, 0x44).mirror(0xff00).rw(this, FUNC(tmpz84c011_device::tmpz84c011_dir_pe_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pe_w));
+	map(0x50, 0x50).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pa_r), FUNC(tmpz84c011_device::tmpz84c011_pa_w));
+	map(0x51, 0x51).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pb_r), FUNC(tmpz84c011_device::tmpz84c011_pb_w));
+	map(0x52, 0x52).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pc_r), FUNC(tmpz84c011_device::tmpz84c011_pc_w));
+	map(0x30, 0x30).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pd_r), FUNC(tmpz84c011_device::tmpz84c011_pd_w));
+	map(0x40, 0x40).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pe_r), FUNC(tmpz84c011_device::tmpz84c011_pe_w));
+	map(0x54, 0x54).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_dir_pa_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pa_w));
+	map(0x55, 0x55).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_dir_pb_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pb_w));
+	map(0x56, 0x56).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_dir_pc_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pc_w));
+	map(0x34, 0x34).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_dir_pd_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pd_w));
+	map(0x44, 0x44).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_dir_pe_r), FUNC(tmpz84c011_device::tmpz84c011_dir_pe_w));
 }
 
 

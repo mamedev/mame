@@ -896,32 +896,32 @@ void next_state::next_mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom().region("user1", 0);
 	map(0x01000000, 0x0101ffff).rom().region("user1", 0);
-	map(0x02000000, 0x020001ff).mirror(0x300200).rw(this, FUNC(next_state::dma_ctrl_r), FUNC(next_state::dma_ctrl_w));
-	map(0x02004000, 0x020041ff).mirror(0x300200).rw(this, FUNC(next_state::dma_regs_r), FUNC(next_state::dma_regs_w));
+	map(0x02000000, 0x020001ff).mirror(0x300200).rw(FUNC(next_state::dma_ctrl_r), FUNC(next_state::dma_ctrl_w));
+	map(0x02004000, 0x020041ff).mirror(0x300200).rw(FUNC(next_state::dma_regs_r), FUNC(next_state::dma_regs_w));
 	map(0x02006000, 0x0200600f).mirror(0x300000).m(net, FUNC(mb8795_device::map));
 //  AM_RANGE(0x02006010, 0x02006013) AM_MIRROR(0x300000) memory timing
-	map(0x02007000, 0x02007003).mirror(0x300000).r(this, FUNC(next_state::irq_status_r));
-	map(0x02007800, 0x02007803).mirror(0x300000).rw(this, FUNC(next_state::irq_mask_r), FUNC(next_state::irq_mask_w));
-	map(0x02008000, 0x02008003).mirror(0x300000).r(this, FUNC(next_state::dsp_r));
-	map(0x0200c000, 0x0200c003).mirror(0x300000).r(this, FUNC(next_state::scr1_r));
-	map(0x0200c800, 0x0200c803).mirror(0x300000).r(this, FUNC(next_state::rom_map_r));
-	map(0x0200d000, 0x0200d003).mirror(0x300000).rw(this, FUNC(next_state::scr2_r), FUNC(next_state::scr2_w));
+	map(0x02007000, 0x02007003).mirror(0x300000).r(FUNC(next_state::irq_status_r));
+	map(0x02007800, 0x02007803).mirror(0x300000).rw(FUNC(next_state::irq_mask_r), FUNC(next_state::irq_mask_w));
+	map(0x02008000, 0x02008003).mirror(0x300000).r(FUNC(next_state::dsp_r));
+	map(0x0200c000, 0x0200c003).mirror(0x300000).r(FUNC(next_state::scr1_r));
+	map(0x0200c800, 0x0200c803).mirror(0x300000).r(FUNC(next_state::rom_map_r));
+	map(0x0200d000, 0x0200d003).mirror(0x300000).rw(FUNC(next_state::scr2_r), FUNC(next_state::scr2_w));
 //  AM_RANGE(0x0200d800, 0x0200d803) AM_MIRROR(0x300000) RMTINT
 	map(0x0200e000, 0x0200e00b).mirror(0x300000).m(keyboard, FUNC(nextkbd_device::amap));
 //  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
 //  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
 	map(0x02012000, 0x0201201f).mirror(0x300000).m(mo, FUNC(nextmo_device::map));
 	map(0x02014000, 0x0201400f).mirror(0x300000).m(scsi, FUNC(ncr5390_device::map));
-	map(0x02014020, 0x02014023).mirror(0x300000).rw(this, FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
-	map(0x02016000, 0x02016003).mirror(0x300000).rw(this, FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
-	map(0x02016004, 0x02016007).mirror(0x300000).rw(this, FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
+	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
+	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
+	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
 	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w));
 //  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
 //  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
 //  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
-	map(0x0201a000, 0x0201a003).mirror(0x300000).r(this, FUNC(next_state::event_counter_r)); // EVENTC
+	map(0x0201a000, 0x0201a003).mirror(0x300000).r(FUNC(next_state::event_counter_r)); // EVENTC
 //  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
-	map(0x020c0030, 0x020c0037).mirror(0x300000).rw(this, FUNC(next_state::phy_r), FUNC(next_state::phy_w));
+	map(0x020c0030, 0x020c0037).mirror(0x300000).rw(FUNC(next_state::phy_r), FUNC(next_state::phy_w));
 	map(0x04000000, 0x07ffffff).ram(); //work ram
 //  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
 //  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
@@ -943,7 +943,7 @@ void next_state::next_fdc_mem(address_map &map)
 {
 	next_mem(map);
 	map(0x02014100, 0x02014107).mirror(0x300000).m(fdc, FUNC(n82077aa_device::map));
-	map(0x02014108, 0x0201410b).mirror(0x300000).rw(this, FUNC(next_state::fdc_control_r), FUNC(next_state::fdc_control_w));
+	map(0x02014108, 0x0201410b).mirror(0x300000).rw(FUNC(next_state::fdc_control_r), FUNC(next_state::fdc_control_w));
 }
 
 void next_state::next_0b_m_mem(address_map &map)
@@ -962,14 +962,14 @@ void next_state::next_0c_c_mem(address_map &map)
 {
 	next_fdc_mem(map);
 	map(0x0c000000, 0x0c1fffff).ram().share("vram");
-	map(0x02018180, 0x02018183).mirror(0x300000).w(this, FUNC(next_state::ramdac_w));
+	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
 }
 
 void next_state::next_2c_c_mem(address_map &map)
 {
 	next_fdc_mem(map);
 	map(0x2c000000, 0x2c1fffff).ram().share("vram");
-	map(0x02018180, 0x02018183).mirror(0x300000).w(this, FUNC(next_state::ramdac_w));
+	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
 }
 
 
@@ -1110,33 +1110,33 @@ MACHINE_CONFIG_END
 #define ROM_NEXT_V1 \
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
 	ROM_SYSTEM_BIOS( 0, "v12", "v1.2" ) /* MAC address/serial number word at 0xC: 005AD0 */ \
-	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(1)) /* Label: "(C) 1990 NeXT, Inc. // All Rights Reserved. // Release 1.2 // 1142.02", underlabel exists but unknown */ \
+	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(0)) /* Label: "(C) 1990 NeXT, Inc. // All Rights Reserved. // Release 1.2 // 1142.02", underlabel exists but unknown */ \
 	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" ) /* MAC address/serial number word at 0xC: 003090 */ \
-	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */ \
+	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(1)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */ \
 	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 v41 alternate" ) /* MAC address/serial number word at 0xC: 0023D9 */ \
-	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(f44974f9) SHA1(09eaf9f5d47e379cfa0e4dc377758a97d2869ddc), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
+	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(f44974f9) SHA1(09eaf9f5d47e379cfa0e4dc377758a97d2869ddc), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
 
 #define ROM_NEXT_V2 \
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
 	ROM_SYSTEM_BIOS( 0, "v25", "v2.5 v66" ) /* MAC address/serial number word at 0xC: 00F302 */ \
-	ROMX_LOAD( "rev_2.5_v66.bin", 0x0000, 0x20000, CRC(f47e0bfe) SHA1(b3534796abae238a0111299fc406a9349f7fee24), ROM_BIOS(1)) \
+	ROMX_LOAD( "rev_2.5_v66.bin", 0x0000, 0x20000, CRC(f47e0bfe) SHA1(b3534796abae238a0111299fc406a9349f7fee24), ROM_BIOS(0)) \
 	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" ) /* MAC address/serial number word at 0xC: 00A634 */ \
-	ROMX_LOAD( "rev_2.4_v65.bin", 0x0000, 0x20000, CRC(74e9e541) SHA1(67d195351288e90818336c3a84d55e6a070960d2), ROM_BIOS(2)) \
+	ROMX_LOAD( "rev_2.4_v65.bin", 0x0000, 0x20000, CRC(74e9e541) SHA1(67d195351288e90818336c3a84d55e6a070960d2), ROM_BIOS(1)) \
 	ROM_SYSTEM_BIOS( 2, "v22", "v2.2 v63" ) /* MAC address/serial number word at 0xC: 00894C */ \
-	ROMX_LOAD( "rev_2.2_v63.bin", 0x0000, 0x20000, CRC(739d7c07) SHA1(48ffe54cf2038782a92a0850337c5c6213c98571), ROM_BIOS(3)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */ \
+	ROMX_LOAD( "rev_2.2_v63.bin", 0x0000, 0x20000, CRC(739d7c07) SHA1(48ffe54cf2038782a92a0850337c5c6213c98571), ROM_BIOS(2)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */ \
 	ROM_SYSTEM_BIOS( 3, "v21", "v2.1 v59" ) /* MAC address/serial number word at 0xC: 0072FE */ \
-	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(4)) \
+	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(3)) \
 	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) /* MAC address/serial number word at 0xC: 006372 */ \
-	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(b815b6a4) SHA1(97d8b09d03616e1487e69d26609487486db28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
+	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(b815b6a4) SHA1(97d8b09d03616e1487e69d26609487486db28090), ROM_BIOS(4)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
 
 #define ROM_NEXT_V3 \
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
 	ROM_SYSTEM_BIOS( 0, "v33", "v3.3 v74" ) /* MAC address/serial number word at 0xC: 123456 */ \
-	ROMX_LOAD( "rev_3.3_v74.bin", 0x0000, 0x20000, CRC(fbc3a2cd) SHA1(a9bef655f26f97562de366e4a33bb462e764c929), ROM_BIOS(1)) \
+	ROMX_LOAD( "rev_3.3_v74.bin", 0x0000, 0x20000, CRC(fbc3a2cd) SHA1(a9bef655f26f97562de366e4a33bb462e764c929), ROM_BIOS(0)) \
 	ROM_SYSTEM_BIOS( 1, "v32", "v3.2 v72" ) /* MAC address/serial number word at 0xC: 012f31 */ \
-	ROMX_LOAD( "rev_3.2_v72.bin", 0x0000, 0x20000, CRC(e750184f) SHA1(ccebf03ed090a79c36f761265ead6cd66fb04329), ROM_BIOS(2)) \
+	ROMX_LOAD( "rev_3.2_v72.bin", 0x0000, 0x20000, CRC(e750184f) SHA1(ccebf03ed090a79c36f761265ead6cd66fb04329), ROM_BIOS(1)) \
 	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" ) /* MAC address/serial number word at 0xC: 0106e8 */ \
-	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(3))
+	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(2))
 
 
 ROM_START(next)

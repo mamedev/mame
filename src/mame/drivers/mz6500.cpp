@@ -85,7 +85,7 @@ void mz6500_state::mz6500_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
 //  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
-	map(0xc0000, 0xeffff).rw(this, FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
+	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 

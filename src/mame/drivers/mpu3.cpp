@@ -814,21 +814,21 @@ WRITE8_MEMBER(mpu3_state::mpu3ptm_w)
 {
 	ptm6840_device *ptm2 = machine().device<ptm6840_device>("ptm_ic2");
 
-	ptm2->write(offset >>2,data);//((offset & 0x1f) >>2),data);
+	ptm2->write(space, offset >>2,data);//((offset & 0x1f) >>2),data);
 }
 
 READ8_MEMBER(mpu3_state::mpu3ptm_r)
 {
 	ptm6840_device *ptm2 = machine().device<ptm6840_device>("ptm_ic2");
 
-	return ptm2->read(offset >>2);
+	return ptm2->read(space, offset >>2);
 }
 
 void mpu3_state::mpu3_basemap(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x1000, 0xffff).rom();
-	map(0x8800, 0x881f).rw(this, FUNC(mpu3_state::mpu3ptm_r), FUNC(mpu3_state::mpu3ptm_w));/* PTM6840 IC2 */
+	map(0x8800, 0x881f).rw(FUNC(mpu3_state::mpu3ptm_r), FUNC(mpu3_state::mpu3ptm_w));/* PTM6840 IC2 */
 	map(0x9000, 0x9003).rw("pia_ic3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC3 */
 	map(0x9800, 0x9803).rw("pia_ic4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC4 */
 	map(0xa000, 0xa003).rw("pia_ic5", FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC5 */

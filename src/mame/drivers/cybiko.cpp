@@ -64,7 +64,7 @@ ToDo:
 void cybiko_state::cybikov1_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom();
-	map(0x600000, 0x600001).rw(this, FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w));
+	map(0x600000, 0x600001).rw(FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w));
 //  AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
 }
 
@@ -106,18 +106,18 @@ void cybiko_state::cybikov2_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom();
 	map(0x100000, 0x13ffff).r("flash2", FUNC(sst_39vf020_device::read)).mirror(0x0c0000);
-	map(0x600000, 0x600001).rw(this, FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w)).mirror(0x1ffffe);
-	map(0xe00000, 0xffdbff).r(this, FUNC(cybiko_state::cybikov2_key_r));
+	map(0x600000, 0x600001).rw(FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w)).mirror(0x1ffffe);
+	map(0xe00000, 0xffdbff).r(FUNC(cybiko_state::cybikov2_key_r));
 }
 
 // 2048 kbyte ram + 512 kbyte memory mapped flash
 void cybiko_state::cybikoxt_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().mirror(0x038000);
-	map(0x100000, 0x100001).rw(this, FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w));
-	map(0x200000, 0x200003).w(this, FUNC(cybiko_state::cybiko_usb_w));
+	map(0x100000, 0x100001).rw(FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w));
+	map(0x200000, 0x200003).w(FUNC(cybiko_state::cybiko_usb_w));
 	map(0x600000, 0x67ffff).r("flashxt", FUNC(sst_39vf400a_device::read)).mirror(0x180000);
-	map(0xe00000, 0xefffff).r(this, FUNC(cybiko_state::cybikoxt_key_r));
+	map(0xe00000, 0xefffff).r(FUNC(cybiko_state::cybikoxt_key_r));
 }
 
 WRITE16_MEMBER(cybiko_state::serflash_w)
@@ -187,25 +187,25 @@ READ16_MEMBER(cybiko_state::port0_r)
 
 void cybiko_state::cybikov1_io(address_map &map)
 {
-	map(h8_device::PORT_3, h8_device::PORT_3).w(this, FUNC(cybiko_state::serflash_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).rw(this, FUNC(cybiko_state::clock_r), FUNC(cybiko_state::clock_w));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(this, FUNC(cybiko_state::adc1_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(this, FUNC(cybiko_state::adc2_r));
+	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(cybiko_state::serflash_w));
+	map(h8_device::PORT_F, h8_device::PORT_F).rw(FUNC(cybiko_state::clock_r), FUNC(cybiko_state::clock_w));
+	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(cybiko_state::adc1_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(cybiko_state::adc2_r));
 }
 
 void cybiko_state::cybikov2_io(address_map &map)
 {
-	map(h8_device::PORT_1, h8_device::PORT_1).r(this, FUNC(cybiko_state::port0_r));
-	map(h8_device::PORT_3, h8_device::PORT_3).w(this, FUNC(cybiko_state::serflash_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).rw(this, FUNC(cybiko_state::clock_r), FUNC(cybiko_state::clock_w));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(this, FUNC(cybiko_state::adc1_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(this, FUNC(cybiko_state::adc2_r));
+	map(h8_device::PORT_1, h8_device::PORT_1).r(FUNC(cybiko_state::port0_r));
+	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(cybiko_state::serflash_w));
+	map(h8_device::PORT_F, h8_device::PORT_F).rw(FUNC(cybiko_state::clock_r), FUNC(cybiko_state::clock_w));
+	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(cybiko_state::adc1_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(cybiko_state::adc2_r));
 }
 
 void cybiko_state::cybikoxt_io(address_map &map)
 {
-	map(h8_device::PORT_A, h8_device::PORT_A).r(this, FUNC(cybiko_state::xtpower_r));
-	map(h8_device::PORT_F, h8_device::PORT_F).rw(this, FUNC(cybiko_state::xtclock_r), FUNC(cybiko_state::xtclock_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).r(FUNC(cybiko_state::xtpower_r));
+	map(h8_device::PORT_F, h8_device::PORT_F).rw(FUNC(cybiko_state::xtclock_r), FUNC(cybiko_state::xtclock_w));
 }
 
 /////////////////
@@ -515,14 +515,14 @@ ROM_START( cybikov2 )
 	ROM_SYSTEM_BIOS( 2, "v1355", "v1.3.55" )
 
 	ROM_REGION( 0x84000, "flash1", 0 )
-	ROMX_LOAD( "flash_v1358.bin", 0, 0x84000, CRC(e485880f) SHA1(e414d6d2f876c7c811946bcdfcb6212999412381), ROM_BIOS(1) )
-	ROMX_LOAD( "flash_v1357.bin", 0, 0x84000, CRC(9fd3c058) SHA1(dad0c3db0f11c91747db6ccc1900004432afb881), ROM_BIOS(2) )
-	ROMX_LOAD( "flash_v1355.bin", 0, 0x84000, CRC(497a5bbe) SHA1(0af611424cbf287b26c668a3109fb0861a27f603), ROM_BIOS(3) )
+	ROMX_LOAD( "flash_v1358.bin", 0, 0x84000, CRC(e485880f) SHA1(e414d6d2f876c7c811946bcdfcb6212999412381), ROM_BIOS(0) )
+	ROMX_LOAD( "flash_v1357.bin", 0, 0x84000, CRC(9fd3c058) SHA1(dad0c3db0f11c91747db6ccc1900004432afb881), ROM_BIOS(1) )
+	ROMX_LOAD( "flash_v1355.bin", 0, 0x84000, CRC(497a5bbe) SHA1(0af611424cbf287b26c668a3109fb0861a27f603), ROM_BIOS(2) )
 
 	ROM_REGION( 0x40000, "flash2", 0 )
-	ROMX_LOAD( "cyos_v1358.bin", 0, 0x40000, CRC(05ca4ece) SHA1(eee329e8541e1e36c22acb1317378ce23ccd1e12), ROM_BIOS(1) )
-	ROMX_LOAD( "cyos_v1357.bin", 0, 0x40000, CRC(54ba7d43) SHA1(c6e0f7982e0f7a5fa65f2cecc8b27cb21909a407), ROM_BIOS(2) )
-	ROMX_LOAD( "cyos_v1355.bin", 0, 0x40000, CRC(02d3dba5) SHA1(4ed728940bbcb3d2464fc7fba14d17924ece94aa), ROM_BIOS(3) )
+	ROMX_LOAD( "cyos_v1358.bin", 0, 0x40000, CRC(05ca4ece) SHA1(eee329e8541e1e36c22acb1317378ce23ccd1e12), ROM_BIOS(0) )
+	ROMX_LOAD( "cyos_v1357.bin", 0, 0x40000, CRC(54ba7d43) SHA1(c6e0f7982e0f7a5fa65f2cecc8b27cb21909a407), ROM_BIOS(1) )
+	ROMX_LOAD( "cyos_v1355.bin", 0, 0x40000, CRC(02d3dba5) SHA1(4ed728940bbcb3d2464fc7fba14d17924ece94aa), ROM_BIOS(2) )
 ROM_END
 
 ROM_START( cybikoxt )
@@ -532,7 +532,7 @@ ROM_START( cybikoxt )
 	ROM_SYSTEM_BIOS( 0, "v1508", "v1.5.08" )
 
 	ROM_REGION16_BE( 0x80000, "flashxt", 0 )
-	ROMX_LOAD( "cyos_v1508.bin", 0, 0x80000, CRC(f79400ba) SHA1(537a88e238746b3944b0cdfd4b0a9396460b2977), ROM_BIOS(1) )
+	ROMX_LOAD( "cyos_v1508.bin", 0, 0x80000, CRC(f79400ba) SHA1(537a88e238746b3944b0cdfd4b0a9396460b2977), ROM_BIOS(0) )
 ROM_END
 
 //////////////

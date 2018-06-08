@@ -79,12 +79,12 @@ void fruitpc_state::fruitpc_map(address_map &map)
 void fruitpc_state::fruitpc_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
-	map(0x0310, 0x0313).r(this, FUNC(fruitpc_state::fruit_inp_r));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
+	map(0x0310, 0x0313).r(FUNC(fruitpc_state::fruit_inp_r));
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 }
 
 static INPUT_PORTS_START( fruitpc )

@@ -116,7 +116,7 @@ void chessmst_state::chessmst_io(address_map &map)
 void chessmst_state::chessmstdm_io(address_map &map)
 {
 	chessmst_io(map);
-	map(0x4c, 0x4c).w(this, FUNC(chessmst_state::digits_w));
+	map(0x4c, 0x4c).w(FUNC(chessmst_state::digits_w));
 }
 
 WRITE_LINE_MEMBER( chessmst_state::timer_555_w )
@@ -136,7 +136,7 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 	// pressing both VIEW and MONITOR buttons causes a reset
 	if ((m_extra->read() & 0x03) == 0x03)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		machine_reset();
 	}
 }

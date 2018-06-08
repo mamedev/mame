@@ -136,7 +136,7 @@ READ8_MEMBER(wms_state::test_r)
 
 void wms_state::wms_io(address_map &map)
 {
-	map(0x1207, 0x1207).r(this, FUNC(wms_state::test_r));
+	map(0x1207, 0x1207).r(FUNC(wms_state::test_r));
 }
 
 

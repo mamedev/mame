@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "cpu/upd7725/upd7725.h"
 #include "machine/pic8259.h"
 #include "machine/terminal.h"
 
@@ -50,7 +51,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<upd7725_device> m_dsp;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<pic8259_device> m_pic;
 

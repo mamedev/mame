@@ -63,7 +63,7 @@ void homez80_state::homez80_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();  // Monitor
 	map(0x2000, 0x23ff).ram().share("videoram"); // Video RAM
-	map(0x7020, 0x702f).r(this, FUNC(homez80_state::homez80_keyboard_r));
+	map(0x7020, 0x702f).r(FUNC(homez80_state::homez80_keyboard_r));
 	map(0x8000, 0xffff).ram();  // 32 K RAM
 }
 

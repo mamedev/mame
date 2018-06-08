@@ -137,28 +137,28 @@ READ32_MEMBER(southbridge_device::ide1_read32_cs0_r)
 {
 	if (!m_ide_io_ports_enabled)
 		return 0xffffffff;
-	return m_ide->read_cs0(space, offset, mem_mask);
+	return m_ide->read_cs0(offset, mem_mask);
 }
 
 WRITE32_MEMBER(southbridge_device::ide1_write32_cs0_w)
 {
 	if (!m_ide_io_ports_enabled)
 		return;
-	m_ide->write_cs0(space, offset, data, mem_mask);
+	m_ide->write_cs0(offset, data, mem_mask);
 }
 
 READ32_MEMBER(southbridge_device::ide2_read32_cs0_r)
 {
 	if (!m_ide_io_ports_enabled)
 		return 0xffffffff;
-	return m_ide2->read_cs0(space, offset, mem_mask);
+	return m_ide2->read_cs0(offset, mem_mask);
 }
 
 WRITE32_MEMBER(southbridge_device::ide2_write32_cs0_w)
 {
 	if (!m_ide_io_ports_enabled)
 		return;
-	m_ide2->write_cs0(space, offset, data, mem_mask);
+	m_ide2->write_cs0(offset, data, mem_mask);
 }
 
 READ8_MEMBER(southbridge_device::ide1_read_cs1_r)

@@ -7,12 +7,26 @@
     This component implements the custom video controller and interface chip
     from the TI-99/2 console.
 
+    May 2018
+
 ***************************************************************************/
 
 #include "emu.h"
+#include "998board.h"
+
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CRU         (1U<<2)     // CRU logging
+#define LOG_CASSETTE    (1U<<3)     // Cassette logging
+#define LOG_HEXBUS      (1U<<4)     // Hexbus logging
+#define LOG_BANK        (1U<<5)     // Change ROM banks
+#define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
+
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+
+#include "logmacro.h"
 #include "992board.h"
 
-/**
+/*
     Emulation of the CRT Gate Array of the TI-99/2
 
     Video display controller
@@ -41,7 +55,6 @@
     CRU Bit VIDENA: disables the scan line generation; blank white screen
 
     Clock: 10.7 MHz
-    Divided by 2 for 9995 CLKIN
 
     Scanline refresh:
     - Pull down HOLD
@@ -52,7 +65,7 @@
       - Push the byte to the shift register
       - Get the bits for the scanline from the register
 
-   EF00: Control byte
+    EF00: Control byte
          +--+--+--+--+--+--+--+--+
          |- |- |- |- |- |T |B |S |
          +--+--+--+--+--+--+--+--+
@@ -94,7 +107,9 @@
         279..304: Hor sync
    ------------------------------
 
-   Later versions define a "bitmap mode" [2]
+   Later versions define a "bitmap mode". [2]
+   There are no known consoles with this capability, and it would require at
+   least 6 KiB of RAM.
 
    EF00: Control byte
          +--+--+--+--+--+--+--+--+
@@ -109,11 +124,11 @@
    [2] VDC Controller CF40052
 */
 
-#include "emu.h"
-#include "992board.h"
-
 DEFINE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device, "video992_24", "TI-99/2 CRT Controller 24K version")
 DEFINE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device, "video992_32", "TI-99/2 CRT Controller 32K version")
+DEFINE_DEVICE_TYPE_NS(IO99224, bus::ti99::internal, io992_24_device, "io992_24", "TI-99/2 I/O controller 24K version")
+DEFINE_DEVICE_TYPE_NS(IO99232, bus::ti99::internal, io992_32_device, "io992_32", "TI-99/2 I/O controller 32K version")
+
 
 namespace bus { namespace ti99 { namespace internal {
 
@@ -170,6 +185,11 @@ void video992_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	if (m_videna)
 	{
 		// Hold the CPU
+		// We should expect the HOLDA (HOLD acknowledge) line to go to the
+		// same circuit that issued the HOLD, but this is not the case.
+		// The HOLDA line goes to the I/O circuit, which (obviously) allows
+		// access to the RAM at that point. There is no
+		// indication of any other effect on the video controller.
 		m_hold_time = machine().time();
 		m_hold_cb(ASSERT_LINE);
 	}
@@ -262,7 +282,7 @@ uint32_t video992_device::screen_update( screen_device &screen, bitmap_rgb32 &bi
 }
 
 /*
-    VIDENA pin, negative logic
+    VIDENA pin, positive logic
 */
 WRITE_LINE_MEMBER( video992_device::videna )
 {
@@ -290,6 +310,302 @@ void video992_device::device_start()
 void video992_device::device_reset()
 {
 	m_free_timer->adjust(screen().time_until_pos(0, HORZ_DISPLAY_START));
+}
+
+/*
+    Emulation of the I/O Gate Array of the TI-99/2 [3]
+
+    The I/O controller is a TAL004 Low Power Schottky-TTL bipolar Gate Array
+    that provides the interface between the CPU, the keyboard, the Hexbus,
+    and the cassette interface. It delivers memory select lines for use by the
+    CPU and by the VDC. It also offers a synchronized RESET signal and a
+    divider for the CPU clock (which is seemingly not used in the real
+    machines).
+
+    It is mapped into the CRU I/O address space at addresses E000 and E800:
+
+    I/O map (CRU map)
+    -----------------
+    0000 - 1DFE: unmapped
+    1E00 - 1EFE: TMS9995-internal CRU addresses
+    1F00 - 1FD8: unmapped
+    1FDA:        TMS9995 MID flag
+    1FDC - 1FFF: unmapped
+    2000 - DFFE: unmapped
+    E000 - E00E: Read: Keyboard column input
+    E000 - E00A: Write: Keyboard row selection
+    E00C:        Write: unmapped
+    E00E:        Write: Video enable (VIDENA)
+    E010 - E7FE: Mirrors of the above
+    E800 - E80C: Hexbus
+       E800 - E806: Data lines
+       E808: HSK line
+       E80A: BAV line
+       E80C: Inhibit (Write only)
+    E80E: Cassette
+
+    [3] I/O Controller CF40051, Preliminary specification, Texas Instruments
+*/
+
+io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: bus::hexbus::hexbus_chained_device(mconfig, type, tag, owner, clock),
+		m_hexbus(*this, "^" TI_HEXBUS_TAG),
+		m_cassette(*this, "^" TI_CASSETTE),
+		m_videoctrl(*this, "^" TI992_VDC_TAG),
+		m_keyboard(*this, "LINE%u", 0U),
+		m_set_rom_bank(*this),
+		m_key_row(0),
+		m_latch_out(0xd7),
+		m_latch_in(0xd7),
+		m_communication_disable(true)
+{
+}
+
+io992_24_device::io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: io992_device(mconfig, IO99224, tag, owner, clock)
+{
+	m_have_banked_rom = false;
+}
+
+io992_32_device::io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: io992_device(mconfig, IO99232, tag, owner, clock)
+{
+	m_have_banked_rom = true;
+}
+
+/*
+    54-key keyboard
+*/
+static INPUT_PORTS_START( keys992 )
+
+	PORT_START("LINE0")    /* col 0 */
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 ! DEL") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @ INS") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $ CLEAR") PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 % BEGIN") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^ PROC'D") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 & AID") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 * REDO") PORT_CODE(KEYCODE_8)
+
+	PORT_START("LINE1")    /* col 1 */
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q Q") PORT_CODE(KEYCODE_Q)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w W ~") PORT_CODE(KEYCODE_W)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e E (UP)") PORT_CODE(KEYCODE_E)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r R [") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t T ]") PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y Y") PORT_CODE(KEYCODE_Y)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i I ?") PORT_CODE(KEYCODE_I)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 ( BACK") PORT_CODE(KEYCODE_9)
+
+	PORT_START("LINE2")    /* col 2 */
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a A") PORT_CODE(KEYCODE_A)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s S (LEFT)") PORT_CODE(KEYCODE_S)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d D (RIGHT)") PORT_CODE(KEYCODE_D)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f F {") PORT_CODE(KEYCODE_F)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h H") PORT_CODE(KEYCODE_H)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u U _") PORT_CODE(KEYCODE_U)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o O '") PORT_CODE(KEYCODE_O)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0)
+
+	PORT_START("LINE3")    /* col 3 */
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z Z \\") PORT_CODE(KEYCODE_Z)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x X (DOWN)") PORT_CODE(KEYCODE_X)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c C `") PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g G }") PORT_CODE(KEYCODE_G)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j J") PORT_CODE(KEYCODE_J)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k K") PORT_CODE(KEYCODE_K)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p P \"") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= + QUIT") PORT_CODE(KEYCODE_EQUALS)
+
+	PORT_START("LINE4")    /* col 4 */
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v V") PORT_CODE(KEYCODE_V)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n N") PORT_CODE(KEYCODE_N)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l L") PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ -") PORT_CODE(KEYCODE_SLASH)
+
+	PORT_START("LINE5")    /* col 5 */
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b B") PORT_CODE(KEYCODE_B)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m M") PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_LALT)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
+
+	PORT_START("LINE6")    /* col 6 */
+		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("LINE7")    /* col 7 */
+		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+
+INPUT_PORTS_END
+
+void io992_device::device_start()
+{
+	set_outbound_hexbus(m_hexbus.target());
+
+	// Establish callback for inbound propagations
+	m_hexbus_outbound->set_chain_element(this);
+
+	m_set_rom_bank.resolve();
+}
+
+READ8_MEMBER(io992_device::cruread)
+{
+	int address = offset << 4;
+	uint8_t value = 0x7f;  // All Hexbus lines high
+	double inp = 0;
+	int i;
+	uint8_t bit = 1;
+
+	switch (address)
+	{
+	case 0xe000:
+		// CRU E000-E7fE: Keyboard
+		//   Read: 0000 1110 0*** **** (mirror 007f)
+		value = m_keyboard[m_key_row]->read();
+		break;
+	case 0xe800:
+		// CRU E800-EFFE: Hexbus and other functions
+		//  Read: 0000 1110 1*** **** (mirror 007f)
+		for (i=0; i < 6; i++)
+		{
+			if ((m_latch_in & m_hexbval[i])==0) value &= ~bit;
+			bit <<= 1;
+		}
+
+		inp = m_cassette->input();
+		if (inp > 0)
+			value |= 0x80;
+		LOGMASKED(LOG_CASSETTE, "value=%f\n", inp);
+		break;
+	default:
+		LOGMASKED(LOG_CRU, "Unknown access to %04x\n", address);
+	}
+
+	LOGMASKED(LOG_CRU, "CRU %04x ->  %02x\n", address, value);
+
+	return value;
+}
+
+WRITE8_MEMBER(io992_device::cruwrite)
+{
+	int address = (offset << 1) & 0xf80e;
+
+	LOGMASKED(LOG_CRU, "CRU %04x <- %1x\n", address, data);
+
+	uint8_t olddata = m_latch_out;
+
+	switch (address)
+	{
+	// Select the current keyboard row. Also, bit 0 is used to switch the
+	// ROM bank. I guess that means we won't be able to read the keyboard
+	// when processing that particular ROM area.
+	// CRU E000-E7fE: Keyboard
+	//   Write: 1110 0*** **** XXX0 (mirror 07f0)
+	case 0xe000:
+		if (m_have_banked_rom)
+		{
+			LOGMASKED(LOG_BANK, "set bank = %d\n", data);
+			m_set_rom_bank(data==1);
+		}
+		// no break
+	case 0xe002:
+	case 0xe004:
+	case 0xe006:
+	case 0xe008:
+	case 0xe00a:
+		if (data == 0) m_key_row = offset&7;
+		break;
+	case 0xe00c:
+		LOGMASKED(LOG_WARN, "Unmapped CRU write to address e00c\n");
+		break;
+	case 0xe00e:
+		LOGMASKED(LOG_CRU, "VIDENA = %d\n", data);
+		m_videoctrl->videna(data);
+		break;
+
+	//  Write: 1110 1*** **** XXX0 (mirror 07f0)
+	case 0xe800:  // ID0
+	case 0xe802:  // ID1
+	case 0xe804:  // ID2
+	case 0xe806:  // ID3
+		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
+		else m_latch_out &= ~m_hexbval[offset & 0x07];
+		LOGMASKED(LOG_HEXBUS, "Hexbus latch out = %02x\n", m_latch_out);
+		break;
+	case 0xe808:  // HSK
+	case 0xe80a:  // BAV
+		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
+		else m_latch_out &= ~m_hexbval[offset & 0x07];
+
+		if (m_latch_out != olddata)
+		{
+			LOGMASKED(LOG_HEXBUS, "%s %s\n", (address==0xe808)? "HSK*" : "BAV*", (data==0)? "assert" : "clear");
+			if (m_communication_disable)
+			{
+				// This is not explicitly stated in the specs, but since they
+				// also claim that communication is disabled on power-up,
+				// we must turn it on here; the ROM fails to do it.
+				LOGMASKED(LOG_HEXBUS, "Enabling Hexbus\n");
+				m_communication_disable = false;
+			}
+			hexbus_write(m_latch_out);
+			// Check how the bus has changed. This depends on the states of all
+			// connected peripherals
+			m_latch_in = hexbus_read();
+		}
+		break;
+	case 0xe80c:
+		LOGMASKED(LOG_HEXBUS, "Hexbus inhibit = %d\n", data);
+		if (data == 1)
+		{
+			m_latch_in = 0xd7;
+			m_communication_disable = true;
+		}
+		else m_communication_disable = false;
+		break;
+	case 0xe80e:
+		LOGMASKED(LOG_CRU, "Cassette output = %d\n", data);
+		// Tape output. See also ti99_4x.cpp.
+		m_cassette->output((data==1)? +1 : -1);
+		break;
+	}
+}
+
+/*
+    Input from the Hexbus. Since it cannot trigger any interrupt on the
+    CPU, it must be polled via CRU.
+
+            Line state received via the Hexbus
+    +------+------+------+------+------+------+------+------+
+    | ID3  | ID2  |  -   | HSK* |  0   | BAV* | ID1  | ID0  |
+    +------+------+------+------+------+------+------+------+
+
+*/
+void io992_device::hexbus_value_changed(uint8_t data)
+{
+	// Only latch the incoming data when BAV* is asserted and the Hexbus
+	// is not inhibited
+	bool bav_asserted = ((m_latch_out & bus::hexbus::HEXBUS_LINE_BAV)==0);
+	if (!m_communication_disable && bav_asserted)
+	{
+		LOGMASKED(LOG_HEXBUS, "Hexbus changed and latched: %02x\n", data);
+		m_latch_in = data;
+	}
+	else
+		LOGMASKED(LOG_HEXBUS, "Ignoring Hexbus change (to %02x), latch=%s, BAV*=%d\n", data, m_communication_disable? "inhibit":"enabled", bav_asserted? 0:1);
+}
+
+ioport_constructor io992_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( keys992 );
 }
 
 }   }   }
