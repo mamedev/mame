@@ -161,14 +161,8 @@ MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
 	/* 256-bit eeprom */
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C06_16BIT)
 
-	/* steppers */
-	MCFG_STEPPER_ADD("pf_stepper")
-	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
-	MCFG_STEPPER_INIT_PHASE(4)
-
-	MCFG_STEPPER_ADD("cr_stepper")
-	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
-	MCFG_STEPPER_INIT_PHASE(2)
+	STEPPER(config, "pf_stepper", (uint8_t)4);
+	STEPPER(config, "cr_stepper", (uint8_t)2);
 
 MACHINE_CONFIG_END
 
