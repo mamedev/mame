@@ -503,6 +503,7 @@ ROM_START( bking )
 ROM_END
 
 ROM_START( bking2 ) // Top board: DMO70003A, middle board: DMO00001A, bottom board: DMO70002A
+	ROM_REGION( 0x10000, "main_cpu", 0 )
 	ROM_LOAD( "ad6_01.13f",       0x0000, 0x1000, CRC(078ada3f) SHA1(5e82a6d27c65fe29d664dbfc2ede547c0f4869f0) )
 	ROM_LOAD( "ad6_02.11f",       0x1000, 0x1000, CRC(c37d110a) SHA1(7aec6c949d1cf136c3037140bd86597feaf29108) )
 	ROM_LOAD( "ad6_03.10f",       0x2000, 0x1000, CRC(2ba5c681) SHA1(d0df24f5e52e6162b40308d8aa38b0348a100f37) )
@@ -534,10 +535,10 @@ ROM_START( bking2 ) // Top board: DMO70003A, middle board: DMO00001A, bottom boa
 	ROM_LOAD( "dm_02.e9",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )  /* ball 2 graphics. Only the first 128 bytes used */
 
 	ROM_REGION( 0x0020, "user1", 0 )
-	ROM_LOAD( "mb7051.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) )  /* collision detection */
+	ROM_LOAD( "dm_04.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) )  /* collision detection, mb7051(?) */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s141.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )    /* palette */
+	ROM_LOAD( "dm_03.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )    /* palette, 82s141 */
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16l8.1",  0x0000, 0x0104, CRC(e75d19f5) SHA1(d51cbb247760312b8884bbd0478a321eee05034f) )
