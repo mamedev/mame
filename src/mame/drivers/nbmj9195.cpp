@@ -3491,8 +3491,18 @@ ROM_START( shabdama )
 		DISK_IMAGE_READONLY( "shabdama", 0, NO_DUMP )
 ROM_END
 
-// PCB pics are rather blurry, might better fit in another driver
+
 // LD QUIZ 第4弾 答えたもん勝ち!
+// This runs on slightly different hardware, which might need a dedicated driver when the LD dump becomes available:
+// 1 x TMPZ84C011AF-6 main CPU
+// 1 x 21.47727MHz OSC
+// 1 x Z0840004PSC audio CPU
+// 1 x 4.000MHz OSC
+// 1 x Yamaha V9938
+// 1 x uPC1352C
+// 1 x Yamaha YM3812
+// 2 x 8 dip switch banks
+
 ROM_START( ldquiz4 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 27512
 	ROM_LOAD( "1.e3", 0x00000,  0x10000, CRC(49255f66) SHA1(bdd01987331c2aadea7f588d39c48c70cd43fc71) )
