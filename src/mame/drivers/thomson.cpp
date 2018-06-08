@@ -579,22 +579,22 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_0_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_0), state);
+	thomson_index_callback(0, state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_1_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_1), state);
+	thomson_index_callback(1, state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_2_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_2), state);
+	thomson_index_callback(2, state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_3), state);
+	thomson_index_callback(3, state);
 }
 
 static const floppy_interface thomson_floppy_interface =
@@ -677,16 +677,16 @@ MACHINE_CONFIG_START(thomson_state::to7)
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
 
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_0_w))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[1], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_1_w))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[2], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_2_w))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[3], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
