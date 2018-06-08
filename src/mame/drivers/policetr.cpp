@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_screen, SCREEN, SCREEN_TYPE_RASTER);
+	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 262);  /* needs to be verified */

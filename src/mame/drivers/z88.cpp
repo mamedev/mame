@@ -21,10 +21,6 @@
 #include "emu.h"
 #include "includes/z88.h"
 
-#include "screen.h"
-#include "speaker.h"
-
-
 /* Assumption:
 
 all banks can access the same memory blocks in the same way.
@@ -63,9 +59,6 @@ WRITE8_MEMBER(z88_state::bank3_cart_w) { m_carts[m_bank[3].slot]->write(space, (
 
 UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 {
-	char bank_tag[6];
-	sprintf(bank_tag, "bank%d", bank + 2);
-
 	// bank 0 is always even
 	if (bank == 0)  page &= 0xfe;
 
@@ -74,12 +67,12 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 		// install read bank
 		if (m_bank_type[bank] != Z88_BANK_ROM)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(bank<<14, (bank<<14) + 0x3fff, m_banks[bank + 1]);
 			m_maincpu->space(AS_PROGRAM).unmap_write(bank<<14, (bank<<14) + 0x3fff);
 			m_bank_type[bank] = Z88_BANK_ROM;
 		}
 
-		membank(bank_tag)->set_entry(page);
+		m_banks[bank + 1]->set_entry(page);
 	}
 	else if (page < 0x40)   // internal RAM
 	{
@@ -88,12 +81,12 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 			// install readwrite bank
 			if (m_bank_type[bank] != Z88_BANK_RAM)
 			{
-				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, m_banks[bank + 1]);
 				m_bank_type[bank] = Z88_BANK_RAM;
 			}
 
 			// set the bank
-			membank(bank_tag)->set_entry(page);
+			m_banks[bank + 1]->set_entry(page);
 		}
 		else
 		{
@@ -135,31 +128,31 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 	// override setting for lower 8k of bank 0
 	if (bank == 0)
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0, 0x1fff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0, 0x1fff, m_banks[0]);
 
 		// enable RAM
 		if (rams)
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0, 0x1fff, "bank1");
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0, 0x1fff, m_banks[0]);
 		else
 			m_maincpu->space(AS_PROGRAM).unmap_write(0, 0x1fff);
 
-		membank("bank1")->set_entry(rams & 1);
+		m_banks[0]->set_entry(rams & 1);
 	}
 }
 
 
 void z88_state::z88_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).bankrw("bank1");
-	map(0x2000, 0x3fff).bankrw("bank2");
-	map(0x4000, 0x7fff).bankrw("bank3");
-	map(0x8000, 0xbfff).bankrw("bank4");
-	map(0xc000, 0xffff).bankrw("bank5");
+	map(0x0000, 0x1fff).bankrw(m_banks[0]);
+	map(0x2000, 0x3fff).bankrw(m_banks[1]);
+	map(0x4000, 0x7fff).bankrw(m_banks[2]);
+	map(0x8000, 0xbfff).bankrw(m_banks[3]);
+	map(0xc000, 0xffff).bankrw(m_banks[4]);
 }
 
 void z88_state::z88_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw("blink", FUNC(upd65031_device::read), FUNC(upd65031_device::write));
+	map(0x0000, 0xffff).rw(m_blink, FUNC(upd65031_device::read), FUNC(upd65031_device::write));
 }
 
 
@@ -556,24 +549,21 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (uint8_t*)memregion("bios")->base();
+	m_bios = (uint8_t*)m_bios_region->base();
 	m_ram_base = (uint8_t*)m_ram->pointer();
 
 	// configure the memory banks
-	membank("bank1")->configure_entry(0, m_bios);
-	membank("bank1")->configure_entry(1, m_ram_base);
-	membank("bank2")->configure_entries(0, 32, m_bios, 0x4000);
-	membank("bank3")->configure_entries(0, 32, m_bios, 0x4000);
-	membank("bank4")->configure_entries(0, 32, m_bios, 0x4000);
-	membank("bank5")->configure_entries(0, 32, m_bios, 0x4000);
-	membank("bank2")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
-	membank("bank3")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
-	membank("bank4")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
-	membank("bank5")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
 
-	m_carts[1] = machine().device<z88cart_slot_device>("slot1");
-	m_carts[2] = machine().device<z88cart_slot_device>("slot2");
-	m_carts[3] = machine().device<z88cart_slot_device>("slot3");
+	m_banks[0]->configure_entry(0, m_bios);
+	m_banks[0]->configure_entry(1, m_ram_base);
+	m_banks[1]->configure_entries(0, 32, m_bios, 0x4000);
+	m_banks[2]->configure_entries(0, 32, m_bios, 0x4000);
+	m_banks[3]->configure_entries(0, 32, m_bios, 0x4000);
+	m_banks[4]->configure_entries(0, 32, m_bios, 0x4000);
+	m_banks[1]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	m_banks[2]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	m_banks[3]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	m_banks[4]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
 }
 
 void z88_state::machine_reset()
@@ -585,29 +575,11 @@ READ8_MEMBER(z88_state::kb_r)
 {
 	uint8_t data = 0xff;
 
-	if (!(offset & 0x80))
-		data &= ioport("LINE7")->read();
-
-	if (!(offset & 0x40))
-		data &= ioport("LINE6")->read();
-
-	if (!(offset & 0x20))
-		data &= ioport("LINE5")->read();
-
-	if (!(offset & 0x10))
-		data &= ioport("LINE4")->read();
-
-	if (!(offset & 0x08))
-		data &= ioport("LINE3")->read();
-
-	if (!(offset & 0x04))
-		data &= ioport("LINE2")->read();
-
-	if (!(offset & 0x02))
-		data &= ioport("LINE1")->read();
-
-	if (!(offset & 0x01))
-		data &= ioport("LINE0")->read();
+	for (int i = 7; i >= 0; i--)
+	{
+		if (!BIT(offset, i))
+			data &= m_lines[i]->read();
+	}
 
 	return data;
 }
@@ -626,36 +598,36 @@ static void z88_cart(device_slot_interface &device)
 
 MACHINE_CONFIG_START(z88_state::z88)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(9'830'400)/3)  // divided by 3 through the uPD65031
-	MCFG_DEVICE_PROGRAM_MAP(z88_mem)
-	MCFG_DEVICE_IO_MAP(z88_io)
+	Z80(config, m_maincpu, XTAL(9'830'400)/3);  // divided by 3 through the uPD65031
+	m_maincpu->set_addrmap(AS_PROGRAM, &z88_state::z88_mem);
+	m_maincpu->set_addrmap(AS_IO, &z88_state::z88_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1))
+	device = &SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT);
+	m_screen->set_visarea(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1));
+	m_screen->set_palette(m_palette);
 	MCFG_SCREEN_UPDATE_DEVICE("blink", upd65031_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", Z88_NUM_COLOURS)
+	MCFG_PALETTE_ADD(m_palette, Z88_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_DEVICE_ADD("blink", UPD65031, XTAL(9'830'400))
+	MCFG_DEVICE_ADD(m_blink, UPD65031, XTAL(9'830'400))
 	MCFG_UPD65031_KB_CALLBACK(READ8(*this, z88_state, kb_r))
-	MCFG_UPD65031_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_UPD65031_NMI_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_UPD65031_SPKR_CALLBACK(WRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_UPD65031_INT_CALLBACK(INPUTLINE(m_maincpu, INPUT_LINE_IRQ0))
+	MCFG_UPD65031_NMI_CALLBACK(INPUTLINE(m_maincpu, INPUT_LINE_NMI))
+	MCFG_UPD65031_SPKR_CALLBACK(WRITELINE(m_speaker, speaker_sound_device, level_w))
 	MCFG_UPD65031_SCR_UPDATE_CB(z88_state, lcd_update)
 	MCFG_UPD65031_MEM_UPDATE_CB(z88_state, bankswitch_update)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, m_mono).front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -663,13 +635,13 @@ MACHINE_CONFIG_START(z88_state::z88)
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
 
 	/* cartridges */
-	MCFG_DEVICE_ADD("slot1", Z88CART_SLOT, 0)
+	MCFG_DEVICE_ADD(m_carts[1], Z88CART_SLOT)
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
-	MCFG_DEVICE_ADD("slot2", Z88CART_SLOT, 0)
+	MCFG_DEVICE_ADD(m_carts[2], Z88CART_SLOT)
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
-	MCFG_DEVICE_ADD("slot3", Z88CART_SLOT, 0)
+	MCFG_DEVICE_ADD(m_carts[3], Z88CART_SLOT)
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
 
