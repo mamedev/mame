@@ -313,7 +313,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			}
 		}
 
-		if ((m_status & ST_IE) && m_scanline == m_irq_scanline)
+		if ((m_status & ST_IE) && !(m_status & ST_IR) && m_scanline == m_irq_scanline)
 		{
 			//LOG("I8275 y %u x %u IRQ 1\n", y, x);
 			m_status |= ST_IR;
@@ -557,7 +557,7 @@ WRITE8_MEMBER( i8275_device::write )
 		case CMD_RESET:
 			LOG("I8275 Reset\n");
 
-			m_status &= ~(ST_IE | ST_VE);
+			m_status &= ~(ST_IE | ST_IR | ST_VE);
 			LOG("I8275 IRQ 0\n");
 			m_write_irq(CLEAR_LINE);
 			m_write_drq(0);
