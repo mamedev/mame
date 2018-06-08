@@ -386,7 +386,7 @@ WRITE8_MEMBER(robokid_state::robokid_bg_videoram_w)
 }
 
 template<int Layer>
-WRITE8_MEMBER(robokid_state::robokid_bg_ctrl_w<0>)
+WRITE8_MEMBER(robokid_state::robokid_bg_ctrl_w)
 {
 	bg_ctrl(offset, data, m_robokid_tilemap[Layer]);
 }
