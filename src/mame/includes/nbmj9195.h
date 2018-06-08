@@ -122,7 +122,6 @@ public:
 	void mjuraden(machine_config &config);
 	void psailor1(machine_config &config);
 	void ngpgal(machine_config &config);
-	void shabdama(machine_config &config);
 	void mjgottsu(machine_config &config);
 	void mkeibaou(machine_config &config);
 	void gal10ren(machine_config &config);
@@ -178,8 +177,6 @@ public:
 	void sailorws_map(address_map &map);
 	void sailorws_sound_io_map(address_map &map);
 	void sailorws_sound_map(address_map &map);
-	void shabdama_io_map(address_map &map);
-	void shabdama_map(address_map &map);
 	void yosimotm_io_map(address_map &map);
 	void yosimoto_io_map(address_map &map);
 protected:

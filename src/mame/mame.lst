@@ -29586,7 +29586,6 @@ imekura                         // (c) 1994 SPHINX/AV JAPAN
 janbari                         // (c) 1992 Nichibutsu/Yubis/AV JAPAN
 jituroku                        // (c) 1993 Windom
 koinomp                         // (c) 1992
-ldquiz4                         // (c) 1992
 mjanbari                        // (c) 1992 Nichibutsu/Yubis/AV JAPAN
 mjegolf                         // (c) 1994 FUJIC/AV JAPAN
 mjgottsu                        // (c) 1991
@@ -29607,7 +29606,6 @@ renaiclb                        // (c) 1993 FUJIC
 sailorwa                        // (c) 1993
 sailorwr                        // (c) 1993
 sailorws                        // (c) 1993
-shabdama                        // (c) 199?
 ultramhm                        // (c) 1993 Apple
 wcatcher                        // (c) 1993
 yosimotm                        // (c) 1994 Nichibutsu/Yoshimoto Kougyou
@@ -30047,6 +30045,10 @@ ngpc                            // NeoGeo Pocket Color
 
 @source:nibble.cpp
 l9nibble                        // unknown Nibble game.
+
+@source:nichild.cpp
+ldquiz4                         // (c) 1992
+shabdama                        // (c) 1991
 
 @source:nightgal.cpp
 ngalsumr                        // (c) 1985
