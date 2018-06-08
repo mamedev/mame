@@ -2134,6 +2134,27 @@ ROM_START( attackf )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) ) // not dumped from this PCB, believed to match
 ROM_END
 
+ROM_START( galwars2 ) // 2 board stack: CPU and ROM boards
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "9d-1-2532.bin",  0x0d000, 0x1000, CRC(ebc93622) SHA1(bd1c098e91b24409925d01aa25de013451dba8e6) )
+	ROM_LOAD( "9c-2-2532.bin",  0x0e000, 0x1000, CRC(2a4f4f44) SHA1(8c0519fcb631e05e967cf0953ab2749183655594) )
+	ROM_LOAD( "8d-3-2532.bin",  0x0f000, 0x1000, CRC(a4112f91) SHA1(aad7ae81da7c20c7f4c1ef41697c8900a0c81f8e) )
+	ROM_LOAD( "4c-10-2716.bin", 0x10000, 0x0800, CRC(7a1e5998) SHA1(c133f43427540b39a383db7f46298942420d138a) )
+	ROM_LOAD( "5d-7-2716.bin",  0x10800, 0x0800, CRC(a9bdacdc) SHA1(aa6f31a127c5e744c1267705fffa659c03c38329) )
+	ROM_LOAD( "4d-9-2716.bin",  0x11000, 0x0800, CRC(906dca8f) SHA1(ae77945f1628f5c60040dcc3fa650ace3bbe8720) )
+	ROM_LOAD( "6c-6-2716.bin",  0x11800, 0x0800, CRC(6d748030) SHA1(060ddf95eeb1318695a25c8c082a670fcdf117e7) )
+	ROM_LOAD( "5c-8-2716.bin",  0x12000, 0x0800, CRC(52d5438b) SHA1(087268ca30a42c00dbeceb4df901ddf80ae50125) )
+	ROM_LOAD( "6d-5-2716.bin",  0x12800, 0x0800, CRC(4a270340) SHA1(317fcc3156a099dbe48a0658757a9d6c4c54b23a) )
+	ROM_LOAD( "7c-4-2716.bin",  0x16000, 0x0800, CRC(e13f457c) SHA1(c706babc0005dfeb3c1b880047da6ec04bce407d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "3f-11-2716.bin", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+
+	ROM_REGION( 0x1000, "user1", 0 ) // these are on the main CPU board. What are they used for?
+	ROM_LOAD( "1l-13-8516.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00, identical to rom11.bin in maydayb
+	ROM_LOAD( "1a-12-8516.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00, identical to rom12.bin in maydayb
+ROM_END
+
 ROM_START( mayday )
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "ic03-3.bin",  0x0d000, 0x1000, CRC(a1ff6e62) SHA1(c3c60ce94c6bdc4b07e45f386eff9a4aa4816953) )
@@ -2175,7 +2196,7 @@ ROM_START( maydayb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic28-8.bin",  0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
-	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms?
+	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms? rom11.bin and rom12.bin were also found on galwars2 PCB
 	ROM_LOAD( "rom11.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom12.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom6a.bin",   0x1000, 0x0800, CRC(8e4e981f) SHA1(685c1fca9373f4129c7c6b86f18900a1bd324019) )
@@ -3310,6 +3331,7 @@ GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, init
 GAME( 1981, defence,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, attackf,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Famare SA)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Sonic)", "Galaxy Wars II (Defender bootleg)", MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega Sa, only displays Sonic on title screen
 
 GAME( 1980, mayday,     0,        defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
