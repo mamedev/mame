@@ -611,12 +611,12 @@ MACHINE_CONFIG_START(z88_state::z88)
 	m_screen->set_palette(m_palette);
 	MCFG_SCREEN_UPDATE_DEVICE("blink", upd65031_device, screen_update)
 
-	MCFG_PALETTE_ADD(m_palette, Z88_NUM_COLOURS)
+	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
 	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_DEVICE_ADD(m_blink, UPD65031, XTAL(9'830'400))
+	device = &UPD65031(config, m_blink, XTAL(9'830'400));
 	MCFG_UPD65031_KB_CALLBACK(READ8(*this, z88_state, kb_r))
 	MCFG_UPD65031_INT_CALLBACK(INPUTLINE(m_maincpu, INPUT_LINE_IRQ0))
 	MCFG_UPD65031_NMI_CALLBACK(INPUTLINE(m_maincpu, INPUT_LINE_NMI))
@@ -635,13 +635,15 @@ MACHINE_CONFIG_START(z88_state::z88)
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
 
 	/* cartridges */
-	MCFG_DEVICE_ADD(m_carts[1], Z88CART_SLOT)
+	device = &Z88CART_SLOT(config, m_carts[1]);
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
-	MCFG_DEVICE_ADD(m_carts[2], Z88CART_SLOT)
+
+	device = &Z88CART_SLOT(config, m_carts[2]);
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
-	MCFG_DEVICE_ADD(m_carts[3], Z88CART_SLOT)
+
+	device = &Z88CART_SLOT(config, m_carts[3]);
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
 
