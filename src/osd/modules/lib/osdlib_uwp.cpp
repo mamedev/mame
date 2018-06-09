@@ -182,6 +182,6 @@ char *osd_get_clipboard_text(void)
 
 int osd_getpid(void)
 {
-	return -1;
+	return GetCurrentProcessId();
 }
 
