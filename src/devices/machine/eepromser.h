@@ -233,7 +233,7 @@ protected:
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 

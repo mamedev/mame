@@ -1123,7 +1123,7 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool enable_streaming) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, bool enable_streaming) \
 	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner, (bool)enable_streaming) \
 { \
 	set_size(_cells, _bits); \
