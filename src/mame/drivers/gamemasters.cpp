@@ -119,6 +119,7 @@ static INPUT_PORTS_START(gmsshoot)
 	PORT_DIPNAME(0x80, 0x00, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
+	// SW1 also exists, but appears to be just a DS1232 reset button.
 
 	PORT_START("IN0")
 	PORT_BIT(0x01, 0x01, IPT_UNKNOWN)
