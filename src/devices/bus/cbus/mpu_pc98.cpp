@@ -62,7 +62,7 @@ mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag,
 
 void mpu_pc98_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(MPU_CORE_TAG, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
+	map(0x0, 0x3).rw(MPU_CORE_TAG, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w)).umask16(0x00ff);
 }
 
 //-------------------------------------------------
