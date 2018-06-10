@@ -1663,6 +1663,10 @@ files {
 createMESSProjects(_target, _subtarget, "booth")
 files {
 	MAME_DIR .. "src/mame/drivers/apexc.cpp",
+	MAME_DIR .. "src/mame/includes/apexc.h",
+	MAME_DIR .. "src/mame/machine/apexc.h",
+	MAME_DIR .. "src/mame/machine/apexc.cpp",
+	MAME_DIR .. "src/mame/video/apexc.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "camputers")
