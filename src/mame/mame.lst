@@ -13836,7 +13836,8 @@ suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
 @source:geneve.cpp
-geneve                          // 1987? Myarc Geneve 9640
+geneve                          // 1987 Myarc Geneve 9640
+genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
 
 @source:geniusiq.cpp
 iq128                           // 1997 Genius IQ 128 (Germany)
