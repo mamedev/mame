@@ -2562,7 +2562,7 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, EEPROM_SERIAL_ENABLE_STREAMING)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2817,7 +2817,7 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, EEPROM_SERIAL_ENABLE_STREAMING)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2871,7 +2871,7 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, EEPROM_SERIAL_ENABLE_STREAMING)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 

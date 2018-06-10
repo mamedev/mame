@@ -28,10 +28,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-enum : bool
+enum class eeprom_serial_streaming : bool
 {
-	EEPROM_SERIAL_NO_STREAMING = false,
-	EEPROM_SERIAL_ENABLE_STREAMING = true
+	DISABLE = false,
+	ENABLE = true
 };
 
 // ======================> eeprom_serial_base_device
@@ -40,14 +40,13 @@ class eeprom_serial_base_device : public eeprom_base_device
 {
 public:
 	// inline configuration helpers
-	void set_address_bits(int addrbits) { m_command_address_bits = addrbits; }
 	void enable_streaming(bool enable) { m_streaming_enabled = enable; }
 	void enable_output_on_falling_clock(bool enable) { m_output_on_falling_clock_enabled = enable; }
 	template<class Object> devcb_base &set_do_callback(Object &&cb) { return m_do_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// construction/destruction
-	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
+	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -91,6 +90,7 @@ protected:
 	};
 
 	// internal helpers
+	void set_address_bits(int addrbits) { m_command_address_bits = addrbits; }
 	void set_state(eeprom_state newstate);
 	void execute_write_command();
 
@@ -145,7 +145,7 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
+	using eeprom_serial_base_device::eeprom_serial_base_device;
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
@@ -158,11 +158,7 @@ class eeprom_serial_s29x90_device : public eeprom_serial_93cxx_device
 {
 protected:
 	// construction/destruction
-	eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool ignored = EEPROM_SERIAL_NO_STREAMING)
-		: eeprom_serial_93cxx_device(mconfig, devtype, tag, owner, true)
-	{
-		enable_output_on_falling_clock(true);
-	}
+	eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming ignored);
 };
 
 
@@ -182,7 +178,7 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
+	using eeprom_serial_base_device::eeprom_serial_base_device;
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
@@ -206,7 +202,7 @@ public:
 
 protected:
 	// construction/destruction
-	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING);
+	using eeprom_serial_base_device::eeprom_serial_base_device;
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
@@ -233,7 +229,8 @@ protected:
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, bool enable_streaming = EEPROM_SERIAL_NO_STREAMING); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming = eeprom_serial_streaming::DISABLE); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 
