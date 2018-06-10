@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
 	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 
-	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9122c")
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 	MCFG_IEEE488_BUS_ADD()
 
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
 	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 
-	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9122c")
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 	MCFG_IEEE488_BUS_ADD()
 
