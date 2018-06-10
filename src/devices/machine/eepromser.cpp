@@ -621,7 +621,7 @@ void eeprom_serial_base_device::execute_write_command()
 //  STANDARD INTERFACE IMPLEMENTATION
 //**************************************************************************
 
-eeprom_serial_s29x90_device::eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming ignored);
+eeprom_serial_s29x90_device::eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming ignored)
 	: eeprom_serial_93cxx_device(mconfig, devtype, tag, owner, eeprom_serial_streaming::ENABLE)
 {
 	enable_output_on_falling_clock(true);
