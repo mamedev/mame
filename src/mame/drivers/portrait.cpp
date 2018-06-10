@@ -23,10 +23,15 @@ Pierpaolo Prazzoli, xx-07-2004
    ON    ON -> camera test
 
 TODO:
- - add sound
- - add colors
- - fix sprites positions
-
+ - add sound;
+ - add colors (maybe not RGB555);
+ - fix sprites positions (zooming?);
+ - video priority bits;
+ - offset background scrolling positions (i.e. monkey climbing on trees);
+ - camera device (type?);
+ - misc unknown input/outputs;
+ 
+ 
 RAM Location 9240: Controls what level you are on: 0-3 (for each scene)
 
 -------------------------------------------------------------------------
@@ -392,5 +397,5 @@ ROM_END
 
 
 
-GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

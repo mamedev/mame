@@ -35,6 +35,8 @@ public:
 	void portrait_map(address_map &map);
 	void portrait_sound_map(address_map &map);
 
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
