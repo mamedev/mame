@@ -20,19 +20,19 @@
 #define LVIV_SNAPSHOT_SIZE  82219
 
 
-void lviv_state::lviv_update_memory ()
+void lviv_state::lviv_update_memory()
 {
 	uint8_t *ram = m_ram->pointer();
 
 	if (m_ppi_port_outputs[0][2] & 0x02)
 	{
-		membank("bank1")->set_base(ram);
-		membank("bank2")->set_base(ram + 0x4000);
+		m_bank[0]->set_base(ram);
+		m_bank[1]->set_base(ram + 0x4000);
 	}
 	else
 	{
-		membank("bank1")->set_base(ram + 0x8000);
-		membank("bank2")->set_base(ram + 0xc000);
+		m_bank[0]->set_base(ram + 0x8000);
+		m_bank[1]->set_base(ram + 0xc000);
 	}
 }
 
@@ -56,7 +56,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
 	uint8_t data = m_ppi_port_outputs[0][2] & 0x0f;
 	if (m_cassette->input() > 0.038)
 		data |= 0x10;
-	if (m_ppi_port_outputs[0][0] & ioport("JOY")->read())
+	if (m_ppi_port_outputs[0][0] & m_joy_port->read())
 		data |= 0x80;
 	return data;
 }
@@ -88,22 +88,22 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_porta_r)
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
 {
-	return  ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : ioport("KEY0")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : ioport("KEY1")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x04) ? 0xff : ioport("KEY2")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x08) ? 0xff : ioport("KEY3")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x10) ? 0xff : ioport("KEY4")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x20) ? 0xff : ioport("KEY5")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x40) ? 0xff : ioport("KEY6")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x80) ? 0xff : ioport("KEY7")->read());
+	return ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : m_key[0]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : m_key[1]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x04) ? 0xff : m_key[2]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x08) ? 0xff : m_key[3]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x10) ? 0xff : m_key[4]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x20) ? 0xff : m_key[5]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x40) ? 0xff : m_key[6]->read()) &
+		   ((m_ppi_port_outputs[1][0] & 0x80) ? 0xff : m_key[7]->read());
 }
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
 {
-	return  ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : ioport("KEY8")->read()) &
-		((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : ioport("KEY9" )->read()) &
-		((m_ppi_port_outputs[1][2] & 0x04) ? 0xff : ioport("KEY10")->read()) &
-		((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : ioport("KEY11")->read());
+	return ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : m_key[ 8]->read()) &
+		   ((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : m_key[ 9]->read()) &
+		   ((m_ppi_port_outputs[1][2] & 0x04) ? 0xff : m_key[10]->read()) &
+		   ((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : m_key[11]->read());
 }
 
 WRITE8_MEMBER(lviv_state::lviv_ppi_1_porta_w)/* kayboard scaning */
@@ -131,13 +131,12 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 	}
 	else
 	{
-		switch ((offset >> 4) & 0x3)
+		const uint8_t switch_val = (offset >> 4) & 0x3;
+		switch (switch_val)
 		{
 		case 0:
-			return machine().device<i8255_device>("ppi8255_0")->read(space, offset & 3);
-
 		case 1:
-			return machine().device<i8255_device>("ppi8255_1")->read(space, offset & 3);
+			return m_ppi[switch_val]->read(space, offset & 3);
 
 		case 2:
 		case 3:
@@ -162,21 +161,19 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 		cpuspace.install_write_bank(0x8000, 0xbfff, "bank3");
 		cpuspace.unmap_write(0xC000, 0xffff);
 
-		membank("bank1")->set_base(ram);
-		membank("bank2")->set_base(ram + 0x4000);
-		membank("bank3")->set_base(ram + 0x8000);
-		membank("bank4")->set_base(memregion("maincpu")->base() + 0x010000);
+		m_bank[0]->set_base(ram);
+		m_bank[1]->set_base(ram + 0x4000);
+		m_bank[2]->set_base(ram + 0x8000);
+		m_bank[3]->set_base(m_maincpu_region->base() + 0x010000);
 	}
 	else
 	{
-		switch ((offset >> 4) & 0x3)
+		const uint8_t switch_val = (offset >> 4) & 0x3;
+		switch (switch_val)
 		{
 		case 0:
-			machine().device<i8255_device>("ppi8255_0")->write(space, offset & 3, data);
-			break;
-
 		case 1:
-			machine().device<i8255_device>("ppi8255_1")->write(space, offset & 3, data);
+			m_ppi[switch_val]->write(space, offset & 3, data);
 			break;
 
 		case 2:
@@ -191,7 +188,6 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 void lviv_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t *mem;
 
 	m_video_ram = m_ram->pointer() + 0xc000;
 
@@ -202,11 +198,11 @@ void lviv_state::machine_reset()
 	space.unmap_write(0x8000, 0xbfff);
 	space.unmap_write(0xC000, 0xffff);
 
-	mem = memregion("maincpu")->base();
-	membank("bank1")->set_base(mem + 0x010000);
-	membank("bank2")->set_base(mem + 0x010000);
-	membank("bank3")->set_base(mem + 0x010000);
-	membank("bank4")->set_base(mem + 0x010000);
+	uint8_t *mem = m_maincpu_region->base();
+	m_bank[0]->set_base(mem + 0x010000);
+	m_bank[1]->set_base(mem + 0x010000);
+	m_bank[2]->set_base(mem + 0x010000);
+	m_bank[3]->set_base(mem + 0x010000);
 
 	/*memset(m_ram->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }

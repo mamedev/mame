@@ -288,7 +288,6 @@ Timings:
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -306,10 +305,10 @@ void lviv_state::io_map(address_map &map)
 
 void lviv_state::lviv_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).bankrw(m_bank[0]);
+	map(0x4000, 0x7fff).bankrw(m_bank[1]);
+	map(0x8000, 0xbfff).bankrw(m_bank[2]);
+	map(0xc000, 0xffff).bankrw(m_bank[3]);
 }
 
 
@@ -424,12 +423,12 @@ INPUT_PORTS_END
 /* machine definition */
 MACHINE_CONFIG_START(lviv_state::lviv)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2500000)
+	MCFG_DEVICE_ADD(m_maincpu, I8080, 2500000)
 	MCFG_DEVICE_PROGRAM_MAP(lviv_mem)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	MCFG_DEVICE_ADD(m_ppi[0], I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, lviv_state, lviv_ppi_0_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lviv_state, lviv_ppi_0_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, lviv_state, lviv_ppi_0_portb_r))
@@ -437,7 +436,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, lviv_state, lviv_ppi_0_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lviv_state, lviv_ppi_0_portc_w))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_DEVICE_ADD(m_ppi[1], I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, lviv_state, lviv_ppi_1_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lviv_state, lviv_ppi_1_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, lviv_state, lviv_ppi_1_portb_r))
@@ -445,7 +444,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, lviv_state, lviv_ppi_1_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lviv_state, lviv_ppi_1_portc_w))
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(0)
 
@@ -453,9 +452,9 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update_lviv)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", sizeof (lviv_palette) / 3)
+	MCFG_PALETTE_ADD(m_palette, sizeof (lviv_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
 
 	/* sound hardware */
