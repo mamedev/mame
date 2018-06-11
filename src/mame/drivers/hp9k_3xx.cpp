@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
 	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 
-	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9122c")
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 	MCFG_IEEE488_BUS_ADD()
 
@@ -509,7 +509,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 0.0f, 250000.0f)
+	MCFG_PTM6840_O3_CB(WRITELINE(PTM6840_TAG, ptm6840_device , set_c2))
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
@@ -534,7 +535,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
 	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 
-	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9122c")
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 	MCFG_IEEE488_BUS_ADD()
 
