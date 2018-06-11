@@ -17,14 +17,14 @@
 DEFINE_DEVICE_TYPE(HP9122C, hp9122c_device, "hp9122c", "HP9122C Dual High density disk drive")
 
 hp9122c_device::hp9122c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP9122C, tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
+	: device_t{mconfig, HP9122C, tag, owner, clock},
+	  device_ieee488_interface{mconfig, *this},
 	  m_cpu{*this , "cpu"},
 	  m_i8291a{*this, "i8291a"},
 	  m_fdc{*this, "mb8876"},
 	  m_floppy{*this, "floppy%u", 0},
-	  m_hpib_addr{*this , "HPIB address"},
-	  m_testmode{*this, "Testmode"},
+	  m_hpib_addr{*this , "ADDRESS"},
+	  m_testmode{*this, "TESTMODE"},
 	  m_intsel{3},
 	  m_fdc_irq{false},
 	  m_i8291a_irq{false},
@@ -39,7 +39,7 @@ hp9122c_device::hp9122c_device(const machine_config &mconfig, const char *tag, d
 }
 
 static INPUT_PORTS_START(hp9122c_port)
-	PORT_START("HPIB address")
+	PORT_START("ADDRESS")
 	PORT_CONFNAME(0x1f, 0x00 , "HPIB address")
 	PORT_CONFSETTING(0, "0")
 	PORT_CONFSETTING(1, "1")
@@ -58,10 +58,10 @@ static INPUT_PORTS_START(hp9122c_port)
 	PORT_CONFSETTING(7, "14")
 	PORT_CONFSETTING(7, "15")
 
-	PORT_START("Testmode")
-	PORT_CONFNAME(0x01, 0x00, "Testmode")
-	PORT_CONFSETTING(1, "Off")
-	PORT_CONFSETTING(0, "On")
+	PORT_START("TESTMODE")
+	PORT_CONFNAME(0x01, 0x01, "Testmode")
+	PORT_CONFSETTING(1, DEF_STR(Off))
+	PORT_CONFSETTING(0, DEF_STR(On))
 
 INPUT_PORTS_END
 
@@ -72,8 +72,19 @@ ioport_constructor hp9122c_device::device_input_ports() const
 
 void hp9122c_device::device_start()
 {
-	for(auto floppy : m_floppy)
+	for (auto &floppy : m_floppy)
 		floppy->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&hp9122c_device::index_pulse_cb, this));
+
+	save_item(NAME(m_intsel));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_i8291a_irq));
+	save_item(NAME(m_i8291a_drq));
+	save_item(NAME(m_cpuirq));
+	save_item(NAME(m_cpufirq));
+	save_item(NAME(m_index_int));
+	save_item(NAME(m_ds0));
+	save_item(NAME(m_ds1));
 }
 
 void hp9122c_device::device_reset()
@@ -122,42 +133,42 @@ void hp9122c_device::ieee488_ren(int state)
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_eoi_w)
 {
-	m_bus->eoi_w(this , state);
+	m_bus->eoi_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_dav_w)
 {
-	m_bus->dav_w(this , state);
+	m_bus->dav_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_nrfd_w)
 {
-	m_bus->nrfd_w(this , state);
+	m_bus->nrfd_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_ndac_w)
 {
-	m_bus->ndac_w(this , state);
+	m_bus->ndac_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_ifc_w)
 {
-	m_bus->ifc_w(this , state);
+	m_bus->ifc_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_srq_w)
 {
-	m_bus->srq_w(this , state);
+	m_bus->srq_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_atn_w)
 {
-	m_bus->atn_w(this , state);
+	m_bus->atn_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_ren_w)
 {
-	m_bus->ren_w(this , state);
+	m_bus->ren_w(this, state);
 }
 
 WRITE_LINE_MEMBER(hp9122c_device::i8291a_int_w)
@@ -188,7 +199,7 @@ void hp9122c_device::update_intsel()
 {
 	bool irq = false, firq = false;
 
-	switch(m_intsel & 3) {
+	switch (m_intsel & 3) {
 	case 0:
 		/* fdc int connected */
 		irq = m_fdc_drq;
@@ -227,7 +238,7 @@ READ8_MEMBER(hp9122c_device::i8291a_dio_r)
 
 WRITE8_MEMBER(hp9122c_device::i8291a_dio_w)
 {
-	m_bus->dio_w(this , data);
+	m_bus->dio_w(this, data);
 }
 
 READ8_MEMBER(hp9122c_device::status_r)
@@ -257,8 +268,8 @@ READ8_MEMBER(hp9122c_device::status_r)
 
 WRITE8_MEMBER(hp9122c_device::cmd_w)
 {
-	auto floppy0 = m_floppy[0]->get_device();
-	auto floppy1 = m_floppy[1]->get_device();
+	floppy_image_device *floppy0 = m_floppy[0]->get_device();
+	floppy_image_device *floppy1 = m_floppy[1]->get_device();
 
 	m_ds0 = !(data & REG_CNTL_DS0) && floppy0;
 	m_ds1 = !(data & REG_CNTL_DS1) && floppy1;
