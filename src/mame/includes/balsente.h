@@ -10,6 +10,7 @@
 
 #include "machine/pit8253.h"
 #include "machine/timer.h"
+#include "machine/x2212.h"
 #include "machine/74259.h"
 #include "sound/cem3394.h"
 #include "screen.h"
@@ -51,6 +52,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_outlatch(*this, "outlatch")
+		, m_novram(*this, "nov%u", 0U)
 		, m_generic_paletteram_8(*this, "paletteram")
 	{ }
 
@@ -227,6 +229,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ls259_device> m_outlatch;
+	required_device_array<x2212_device, 2> m_novram;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 

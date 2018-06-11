@@ -231,7 +231,6 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/cem3394.h"
 #include "speaker.h"
@@ -267,7 +266,8 @@ void balsente_state::cpu1_map(address_map &map)
 	map(0x9903, 0x9903).portr("IN1").nopw();
 	map(0x9a00, 0x9a03).r(FUNC(balsente_state::random_num_r));
 	map(0x9a04, 0x9a05).rw(FUNC(balsente_state::m6850_r), FUNC(balsente_state::m6850_w));
-	map(0x9b00, 0x9cff).ram().share("nvram");   /* system+cart NOVRAM */
+	map(0x9b00, 0x9bff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0x9c00, 0x9cff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).bankr("bank2");
 }
@@ -1305,7 +1305,8 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_X2212_ADD_AUTOSAVE("nov0") // system NOVRAM
+	MCFG_X2212_ADD_AUTOSAVE("nov1") // cart NOVRAM
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

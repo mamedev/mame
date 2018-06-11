@@ -312,7 +312,8 @@ WRITE_LINE_MEMBER(balsente_state::out6_w)
 
 WRITE_LINE_MEMBER(balsente_state::nvrecall_w)
 {
-	logerror("nvrecall_w=%d\n", state);
+	m_novram[0]->recall(!state);
+	m_novram[1]->recall(!state);
 }
 
 
