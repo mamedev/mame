@@ -32,10 +32,11 @@ void i82371sb_isa_device::config_map(address_map &map)
 
 void i82371sb_isa_device::internal_io_map(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_isabus, FUNC(isa16_device::io16_r), FUNC(isa16_device::io16_w));
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x0061, 0x0061).rw(FUNC(i82371sb_isa_device::at_portb_r), FUNC(i82371sb_isa_device::at_portb_w));
+	map(0x0060, 0x0061).rw(FUNC(i82371sb_isa_device::at_portb_r), FUNC(i82371sb_isa_device::at_portb_w));
 	map(0x0080, 0x009f).rw(FUNC(i82371sb_isa_device::at_page8_r), FUNC(i82371sb_isa_device::at_page8_w));
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
@@ -97,14 +98,6 @@ MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir2_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
-
-//  MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
-//  MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir6_w))
-//  MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
-//
-//  MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "cdrom", nullptr, false)
-//  MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir7_w))
-//  MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -183,15 +176,12 @@ void i82371sb_isa_device::device_reset()
 	ctlmtr = 0x00;
 	cthmtr = 0x00;
 
-
-
 	m_at_spkrdata = 0;
 	m_pit_out2 = 1;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	m_nmi_enabled = 0;
 	m_refresh = false;
-
 }
 
 void i82371sb_isa_device::reset_all_mappings()
@@ -396,13 +386,12 @@ void i82371sb_isa_device::map_bios(address_space *memory_space, uint32_t start, 
 void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	io_space->install_readwrite_handler(0, 0xffff, read16_delegate(FUNC(isa16_device::io16_r), &(*m_isabus)), write16_delegate(FUNC(isa16_device::io16_w), &(*m_isabus)));
 	memory_space->install_readwrite_handler(0, 0xfffff, read16_delegate(FUNC(isa16_device::mem16_r), &(*m_isabus)), write16_delegate(FUNC(isa16_device::mem16_w), &(*m_isabus)));
 
 	// assume that map_extra of the southbridge is called before the one of the northbridge
 	map_bios(memory_space, 0xfffc0000, 0xffffffff);
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
-	io_space->install_device(0, 0xff, *this, &i82371sb_isa_device::internal_io_map);
+	io_space->install_device(0, 0xffff, *this, &i82371sb_isa_device::internal_io_map);
 
 #if 0
 	if(fwh_dec_en1 & 0x80) {
@@ -681,27 +670,41 @@ WRITE_LINE_MEMBER( i82371sb_isa_device::pc_dack7_w ) { pc_select_dma_channel(7, 
 
 READ8_MEMBER( i82371sb_isa_device::at_portb_r )
 {
-	uint8_t data = m_at_speaker;
-	data &= ~0xd0; /* AT BIOS don't likes this being set */
-
-	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
-	data |= m_refresh ? 0x10 : 0;
-
-	if (m_pit_out2)
-		data |= 0x20;
+	if (offset == 0)
+	{
+		return m_isabus->io16_r(space, 0x60 / 2, 0x00ff);
+	}
 	else
-		data &= ~0x20; /* ps2m30 wants this */
+	{
+		uint8_t data = m_at_speaker;
+		data &= ~0xd0; /* AT BIOS don't likes this being set */
 
-	return data;
+		/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
+		data |= m_refresh ? 0x10 : 0;
+
+		if (m_pit_out2)
+			data |= 0x20;
+		else
+			data &= ~0x20; /* ps2m30 wants this */
+
+		return data;
+	}
 }
 
 WRITE8_MEMBER( i82371sb_isa_device::at_portb_w )
 {
-	m_at_speaker = data;
-	m_pit8254->write_gate2(BIT(data, 0));
-	at_speaker_set_spkrdata( BIT(data, 1));
-	m_channel_check = BIT(data, 3);
-	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	if (offset == 0)
+	{
+		m_isabus->io16_w(space, 0x60 / 2, data, 0x00ff);
+	}
+	else
+	{
+		m_at_speaker = data;
+		m_pit8254->write_gate2(BIT(data, 0));
+		at_speaker_set_spkrdata( BIT(data, 1));
+		m_channel_check = BIT(data, 3);
+		m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	}
 }
 
 READ8_MEMBER( i82371sb_isa_device::at_dma8237_2_r )
@@ -746,4 +749,178 @@ void i82371sb_isa_device::update_smireq_line()
 		m_smi_callback(1);
 	else
 		m_smi_callback(0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+DEFINE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device, "i82371sb_ide", "Intel 82371 southbridge IDE interface")
+
+void i82371sb_ide_device::config_map(address_map &map)
+{
+	map(0x04, 0x05).rw(FUNC(i82371sb_ide_device::command_r), FUNC(i82371sb_ide_device::command_w));
+	map(0x20, 0x23).rw(FUNC(i82371sb_ide_device::bmiba_r), FUNC(i82371sb_ide_device::bmiba_w));
+	map(0x40, 0x41).rw(FUNC(i82371sb_ide_device::idetim_primary_r), FUNC(i82371sb_ide_device::idetim_primary_w));
+	map(0x42, 0x43).rw(FUNC(i82371sb_ide_device::idetim_secondary_r), FUNC(i82371sb_ide_device::idetim_secondary_w));
+	map(0x44, 0x44).rw(FUNC(i82371sb_ide_device::sidetim_r), FUNC(i82371sb_ide_device::sidetim_w));
+}
+
+void i82371sb_ide_device::internal_io_map(address_map &map)
+{
+	map(0x0170, 0x0177).rw(FUNC(i82371sb_ide_device::ide2_read32_cs0_r), FUNC(i82371sb_ide_device::ide2_write32_cs0_w));
+	map(0x01f0, 0x01f7).rw(FUNC(i82371sb_ide_device::ide1_read32_cs0_r), FUNC(i82371sb_ide_device::ide1_write32_cs0_w));
+	map(0x0376, 0x0376).rw(FUNC(i82371sb_ide_device::ide2_read_cs1_r), FUNC(i82371sb_ide_device::ide2_write_cs1_w));
+	map(0x03f6, 0x03f6).rw(FUNC(i82371sb_ide_device::ide1_read_cs1_r), FUNC(i82371sb_ide_device::ide1_write_cs1_w));
+}
+
+MACHINE_CONFIG_START(i82371sb_ide_device::device_add_mconfig)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide1", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, i82371sb_ide_device, primary_int))
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "cdrom", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, i82371sb_ide_device, secondary_int))
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+MACHINE_CONFIG_END
+
+i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, I82371SB_IDE, tag, owner, clock)
+	, command(2)
+	, bmiba(1)
+	, idetim_primary(0)
+	, idetim_secondary(0)
+	, sidetim(0)
+	, m_irq_pri_callback(*this)
+	, m_irq_sec_callback(*this)
+	, m_ide1(*this, "ide1")
+	, m_ide2(*this, "ide2")
+{
+	set_ids(0x80867010, 0x03, 0x010180, 0x00000000);
+}
+
+void i82371sb_ide_device::device_start()
+{
+}
+
+void i82371sb_ide_device::device_reset()
+{
+}
+
+void i82371sb_ide_device::reset_all_mappings()
+{
+}
+
+void i82371sb_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	if (command & 1)
+	{
+		offs_t m_base = bmiba & 0xfff0;
+
+		io_space->install_device(0, 0x3ff, *this, &i82371sb_ide_device::internal_io_map);
+		io_space->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide1)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide1)), 0xffffffff);
+		io_space->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide2)), 0xffffffff);
+	}
+}
+
+WRITE_LINE_MEMBER(i82371sb_ide_device::primary_int)
+{
+	m_irq_pri_callback(state);
+}
+
+WRITE_LINE_MEMBER(i82371sb_ide_device::secondary_int)
+{
+	m_irq_sec_callback(state);
+}
+
+READ16_MEMBER(i82371sb_ide_device::command_r)
+{
+	return command;
+}
+
+WRITE16_MEMBER(i82371sb_ide_device::command_w)
+{
+	mem_mask &= 5;
+	COMBINE_DATA(&command);
+	if (mem_mask & 1)
+		remap_cb();
+}
+
+READ32_MEMBER(i82371sb_ide_device::bmiba_r)
+{
+	return bmiba;
+}
+
+WRITE32_MEMBER(i82371sb_ide_device::bmiba_w)
+{
+	mem_mask &= 0xfff0;
+	COMBINE_DATA(&bmiba);
+	if (command & 1)
+		remap_cb();
+}
+
+READ16_MEMBER(i82371sb_ide_device::idetim_primary_r)
+{
+	return idetim_primary;
+}
+
+WRITE16_MEMBER(i82371sb_ide_device::idetim_primary_w)
+{
+}
+
+READ16_MEMBER(i82371sb_ide_device::idetim_secondary_r)
+{
+	return idetim_secondary;
+}
+
+WRITE16_MEMBER(i82371sb_ide_device::idetim_secondary_w)
+{
+}
+
+READ8_MEMBER(i82371sb_ide_device::sidetim_r)
+{
+	return sidetim;
+}
+
+WRITE8_MEMBER(i82371sb_ide_device::sidetim_w)
+{
+}
+
+READ32_MEMBER(i82371sb_ide_device::ide1_read32_cs0_r)
+{
+	return m_ide1->read_cs0(offset, mem_mask);
+}
+
+WRITE32_MEMBER(i82371sb_ide_device::ide1_write32_cs0_w)
+{
+	m_ide1->write_cs0(offset, data, mem_mask);
+}
+
+READ32_MEMBER(i82371sb_ide_device::ide2_read32_cs0_r)
+{
+	return m_ide2->read_cs0(offset, mem_mask);
+}
+
+WRITE32_MEMBER(i82371sb_ide_device::ide2_write32_cs0_w)
+{
+	m_ide2->write_cs0(offset, data, mem_mask);
+}
+
+READ8_MEMBER(i82371sb_ide_device::ide1_read_cs1_r)
+{
+	return m_ide1->read_cs1(1, 0xff0000) >> 16;
+}
+
+WRITE8_MEMBER(i82371sb_ide_device::ide1_write_cs1_w)
+{
+	m_ide1->write_cs1(1, data << 16, 0xff0000);
+}
+
+READ8_MEMBER(i82371sb_ide_device::ide2_read_cs1_r)
+{
+	return m_ide2->read_cs1(1, 0xff0000) >> 16;
+}
+
+WRITE8_MEMBER(i82371sb_ide_device::ide2_write_cs1_w)
+{
+	m_ide2->write_cs1(1, data << 16, 0xff0000);
 }
