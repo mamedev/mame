@@ -349,6 +349,13 @@ ifndef NOASM
 endif
 endif
 
+ifeq ($(findstring riscv64,$(UNAME)),riscv64)
+ARCHITECTURE :=
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
 # Emscripten
 ifeq ($(findstring emcc,$(CC)),emcc)
 TARGETOS := asmjs
