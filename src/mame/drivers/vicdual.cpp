@@ -123,6 +123,20 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 	}
 }
 
+INPUT_CHANGED_MEMBER( headonsa_state::headonsa_coin_inserted )
+{
+	if (newval)
+	{
+		/* increment the coin counter */
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
+		
+		// hooked up to NMI instead of RESET line
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+		//m_coinstate_timer->adjust(attotime::from_msec(70));
+	}
+}
 
 #define PORT_COIN_DEFAULT                               \
 	PORT_START("COIN")                                  \
@@ -675,6 +689,31 @@ static INPUT_PORTS_START( headons )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
 INPUT_PORTS_END
 
+// e7f1: coin counter
+static INPUT_PORTS_START( headonsa )
+	PORT_INCLUDE( headons )
+
+	// flipped activeness, added a start button while at it
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_4WAY
+	
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	// checks after a coin is inserted, timer or coin status?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, headonsa_state, headonsa_coin_inserted, nullptr)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( supcrash )
 	PORT_START("IN0")
@@ -3834,7 +3873,7 @@ GAME( 1979, headon,     0,        headon,    headon,    vicdual_state, empty_ini
 GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state, empty_init, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state, empty_init, ROT270, "Nintendo", "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonsa,   headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
+GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state,empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state, empty_init, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state, empty_init, ROT0,   "bootleg (VGG)", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hocrash,    headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
