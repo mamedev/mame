@@ -249,24 +249,24 @@ DIP locations verified for:
 void balsente_state::cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("spriteram");
-	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::balsente_videoram_w)).share("videoram");
-	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::balsente_paletteram_w)).share("paletteram");
-	map(0x9000, 0x9007).w(FUNC(balsente_state::balsente_adc_select_w));
-	map(0x9400, 0x9401).r(FUNC(balsente_state::balsente_adc_data_r));
+	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram");
+	map(0x9000, 0x9007).w(FUNC(balsente_state::adc_select_w));
+	map(0x9400, 0x9401).r(FUNC(balsente_state::adc_data_r));
 	map(0x9800, 0x981f).mirror(0x0060).lw8("outlatch_w",
 						   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 						 m_outlatch->write_d7(space, offset >> 2, data, mem_mask);
 						   });
-	map(0x9880, 0x989f).w(FUNC(balsente_state::balsente_random_reset_w));
-	map(0x98a0, 0x98bf).w(FUNC(balsente_state::balsente_rombank_select_w));
-	map(0x98c0, 0x98df).w(FUNC(balsente_state::balsente_palette_select_w));
+	map(0x9880, 0x989f).w(FUNC(balsente_state::random_reset_w));
+	map(0x98a0, 0x98bf).w(FUNC(balsente_state::rombank_select_w));
+	map(0x98c0, 0x98df).w(FUNC(balsente_state::palette_select_w));
 	map(0x98e0, 0x98ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x9900, 0x9900).portr("SWH");
 	map(0x9901, 0x9901).portr("SWG");
 	map(0x9902, 0x9902).portr("IN0");
 	map(0x9903, 0x9903).portr("IN1").nopw();
-	map(0x9a00, 0x9a03).r(FUNC(balsente_state::balsente_random_num_r));
-	map(0x9a04, 0x9a05).rw(FUNC(balsente_state::balsente_m6850_r), FUNC(balsente_state::balsente_m6850_w));
+	map(0x9a00, 0x9a03).r(FUNC(balsente_state::random_num_r));
+	map(0x9a04, 0x9a05).rw(FUNC(balsente_state::m6850_r), FUNC(balsente_state::m6850_w));
 	map(0x9b00, 0x9cff).ram().share("nvram");   /* system+cart NOVRAM */
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).bankr("bank2");
@@ -284,20 +284,20 @@ void balsente_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x5fff).ram();
-	map(0x6000, 0x7fff).w(FUNC(balsente_state::balsente_m6850_sound_w));
-	map(0xe000, 0xffff).r(FUNC(balsente_state::balsente_m6850_sound_r));
+	map(0x6000, 0x7fff).w(FUNC(balsente_state::m6850_sound_w));
+	map(0xe000, 0xffff).r(FUNC(balsente_state::m6850_sound_r));
 }
 
 
 void balsente_state::cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw(FUNC(balsente_state::balsente_counter_8253_r), FUNC(balsente_state::balsente_counter_8253_w));
-	map(0x08, 0x0f).r(FUNC(balsente_state::balsente_counter_state_r));
-	map(0x08, 0x09).w(FUNC(balsente_state::balsente_counter_control_w));
-	map(0x0a, 0x0b).w(FUNC(balsente_state::balsente_dac_data_w));
-	map(0x0c, 0x0d).w(FUNC(balsente_state::balsente_register_addr_w));
-	map(0x0e, 0x0f).w(FUNC(balsente_state::balsente_chip_select_w));
+	map(0x00, 0x03).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x08, 0x0f).r(FUNC(balsente_state::counter_state_r));
+	map(0x08, 0x09).w(FUNC(balsente_state::counter_control_w));
+	map(0x0a, 0x0b).w(FUNC(balsente_state::dac_data_w));
+	map(0x0c, 0x0d).w(FUNC(balsente_state::register_addr_w));
+	map(0x0e, 0x0f).w(FUNC(balsente_state::chip_select_w));
 }
 
 
@@ -1295,11 +1295,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(20'000'000)/16) /* xtal verified but not speed */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 20_MHz_XTAL / 16) /* xtal verified but not speed */
 	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", balsente_state, update_analog_inputs)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* xtal verified but not speed */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL / 2) /* xtal verified but not speed */
 	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 	MCFG_DEVICE_IO_MAP(cpu2_io_map)
 
@@ -1309,10 +1309,14 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, balsente_interrupt_timer)
-	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, balsente_clock_counter_0_ff)
-	MCFG_TIMER_DRIVER_ADD("8253_1_timer", balsente_state, balsente_counter_callback)
-	MCFG_TIMER_DRIVER_ADD("8253_2_timer", balsente_state, balsente_counter_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, interrupt_timer)
+	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, clock_counter_0_ff)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, balsente_state, counter_0_set_out))
+	MCFG_PIT8253_OUT2_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	MCFG_PIT8253_CLK1(8_MHz_XTAL / 4)
+	MCFG_PIT8253_CLK2(8_MHz_XTAL / 4)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U9H
 	// these outputs are generally used to control the various lamps
@@ -2350,32 +2354,32 @@ void balsente_state::init_toggle()    { expand_roms(EXPAND_ALL);  config_shooter
 void balsente_state::init_nametune()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
+	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
 	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */);
 }
 void balsente_state::init_nstocker()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
+	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
 	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(true, 1);
 }
 void balsente_state::init_sfootbal()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
+	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
 	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 0);
 }
 void balsente_state::init_spiker()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0x9f80, 0x9f8f, read8_delegate(FUNC(balsente_state::spiker_expand_r),this), write8_delegate(FUNC(balsente_state::spiker_expand_w),this));
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
+	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
 	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 1);
 }
 void balsente_state::init_stompin()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
+	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
 	expand_roms(0x0c | SWAP_HALVES); config_shooter_adc(false, 32);
 }
 void balsente_state::init_rescraid()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
