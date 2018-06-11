@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // actually ec1840.0003 -- w/o mouse port
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0003", false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
@@ -259,9 +259,9 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false)   // cga
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // fdc + mouse port
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "hdc", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // fdc (IRQ6) + mouse port (IRQ2..5)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0004", false)   // lpt (IRQ7||5) [+ serial (IRQx)]
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "hdc", false)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
