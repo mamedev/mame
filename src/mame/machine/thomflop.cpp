@@ -932,12 +932,12 @@ int thomson_state::thmfc_floppy_is_qdd ( legacy_floppy_image_device *image )
 
 void thomson_state::thmfc_floppy_index_pulse_cb( int index, int state )
 {
-	legacy_floppy_image_device *image = m_floppy_image[index];
+	legacy_floppy_image_device *const image = m_floppy_image[index];
 
 	if ( image != thmfc_floppy_image())
 		return;
 
-	if ( thmfc_floppy_is_qdd(m_floppy_image[index]))
+	if ( thmfc_floppy_is_qdd(image) )
 	{
 		/* pulse each time the whole-disk spiraling track ends */
 		image->floppy_drive_set_rpm( 16.92f /* 423/25 */ );
@@ -964,7 +964,7 @@ void thomson_state::thmfc_floppy_index_pulse_cb( int index, int state )
 
 int thomson_state::thmfc_floppy_find_sector( chrn_id* dst )
 {
-	legacy_floppy_image_device* img = thmfc_floppy_image();
+	legacy_floppy_image_device *const img = thmfc_floppy_image();
 	chrn_id id;
 	int r = 0;
 
@@ -1006,7 +1006,7 @@ void thomson_state::thmfc_floppy_cmd_complete()
 
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
-		legacy_floppy_image_device * img = thmfc_floppy_image();
+		legacy_floppy_image_device *const img = thmfc_floppy_image();
 		img->floppy_drive_write_sector_data( thmfc1->side, thmfc1->sector_id, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
 				thom_floppy_active( 1 );
 	}

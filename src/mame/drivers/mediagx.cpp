@@ -390,19 +390,18 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 
 void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *cga = m_cga_ram;
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
+	uint32_t const *const cga = m_cga_ram;
 	int index = 0;
 
-	for (j=0; j < 25; j++)
+	for (int j=0; j < 25; j++)
 	{
-		for (i=0; i < 80; i+=2)
+		for (int i=0; i < 80; i+=2)
 		{
-			int att0 = (cga[index] >> 8) & 0xff;
-			int ch0 = (cga[index] >> 0) & 0xff;
-			int att1 = (cga[index] >> 24) & 0xff;
-			int ch1 = (cga[index] >> 16) & 0xff;
+			int const att0 = (cga[index] >> 8) & 0xff;
+			int const ch0 = (cga[index] >> 0) & 0xff;
+			int const att1 = (cga[index] >> 24) & 0xff;
+			int const ch1 = (cga[index] >> 16) & 0xff;
 
 			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
 			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
@@ -478,9 +477,8 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 			m_pal[m_pal_index] = data & 0xff;
 			m_pal_index++;
 			if (m_pal_index >= 768)
-			{
 				m_pal_index = 0;
-			}
+
 			m_ramdac->pal_w( space, 0, data );
 		}
 	}
@@ -692,8 +690,8 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 				m_ad1847_sample_rate = 24576000 / divide_factor[(data >> 1) & 0x7];
 			}
 
-		m_dmadac[0]->set_frequency(m_ad1847_sample_rate);
-		m_dmadac[1]->set_frequency(m_ad1847_sample_rate);
+			m_dmadac[0]->set_frequency(m_ad1847_sample_rate);
+			m_dmadac[1]->set_frequency(m_ad1847_sample_rate);
 
 			if (data & 0x20)
 			{
@@ -964,23 +962,19 @@ const read32_delegate mediagx_state::s_speedup_handlers[]
 #ifdef MAME_DEBUG
 void mediagx_state::report_speedups()
 {
-	int i;
-
-	for (i = 0; i < m_speedup_count; i++)
+	for (int i = 0; i < m_speedup_count; i++)
 		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, m_speedup_table[i].offset, m_speedup_table[i].pc, m_speedup_hits[i]);
 }
 #endif
 
 void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
-	int i;
-
 	assert(count < ARRAY_LENGTH(s_speedup_handlers));
 
 	m_speedup_table = entries;
 	m_speedup_count = count;
 
-	for (i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		read32_delegate func = s_speedup_handlers[i];
 		func.late_bind(*this);
 		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
