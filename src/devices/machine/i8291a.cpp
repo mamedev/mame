@@ -13,7 +13,10 @@
 
 #include "i8291a.h"
 
+#define VERBOSE 0
+
 #include "logmacro.h"
+
 #define LOG_STATE_MASK  (LOG_GENERAL << 1)
 #define LOG_STATE(...)  LOGMASKED(LOG_STATE_MASK, __VA_ARGS__)
 #define LOG_REG_MASK    (LOG_STATE_MASK << 1)
@@ -22,17 +25,16 @@
 #define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
 #define LOG_CMD_MASK	(LOG_INT_MASK << 1)
 #define LOG_CMD(...)	LOGMASKED(LOG_CMD_MASK, __VA_ARGS__)
-#undef VERBOSE
-#define VERBOSE (LOG_GENERAL)//|LOG_REG_MASK|LOG_CMD_MASK|LOG_STATE_MASK|LOG_STATE_MASK)
+
 
 DEFINE_DEVICE_TYPE(I8291A, i8291a_device, "i8291a", "I8291A")
 
 i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 		device_t *owner, uint32_t clock) :
-		device_t(mconfig, I8291A, tag, owner, clock),
-		m_int_write_func(*this),
-		m_dreq_write_func(*this),
-		m_trig_write_func(*this),
+		device_t{mconfig, I8291A, tag, owner, clock},
+		m_int_write_func{*this},
+		m_dreq_write_func{*this},
+		m_trig_write_func{*this},
 		m_eoi_write_func{*this},
 		m_dav_write_func{*this},
 		m_nrfd_write_func{*this},
@@ -40,7 +42,7 @@ i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 		m_srq_write_func{*this},
 		m_dio_write_func{*this},
 		m_dio_read_func{*this}
-				{
+{
 }
 
 void i8291a_device::device_reset()
@@ -51,7 +53,6 @@ void i8291a_device::device_reset()
 	m_auxa = 0;
 	m_auxb = 0;
 	m_spoll_mode = 0;
-	// TODO: clear parallel poll
 	m_address_status &= ~REG_ADDRESS_STATUS_EOI;
 	m_rdy = true;
 	m_nba = false;
@@ -65,16 +66,16 @@ void i8291a_device::device_reset()
 	m_nrfd = false;
 	m_atn = false;
 	m_ren = false;
-	update_state(m_t_state, TalkerState::TIDS);
-	update_state(m_tp_state, TalkerPrimaryState::TPIS);
-	update_state(m_tsp_state, TalkerSerialPollState::SPIS);
-	update_state(m_l_state, ListenerState::LIDS);
-	update_state(m_rl_state, RemoteLocalState::LOCS);
-	update_state(m_pp_state, ParallelPollState::PPIS);
-	update_state(m_dc_state, DeviceClearState::DCIS);
-	update_state(m_dt_state, DeviceTriggerState::DTIS);
-	update_state(m_sh_state, SourceHandshake::SIDS);
-	update_state(m_ah_state, AcceptorHandshake::AIDS);
+	update_state(m_t_state, talker_state::TIDS);
+	update_state(m_tp_state, talker_primary_state::TPIS);
+	update_state(m_tsp_state, talker_serial_poll_state::SPIS);
+	update_state(m_l_state, listener_state::LIDS);
+	update_state(m_rl_state, remote_local_state::LOCS);
+	update_state(m_pp_state, parallel_poll_state::PPIS);
+	update_state(m_dc_state, device_clear_state::DCIS);
+	update_state(m_dt_state, device_trigger_state::DTIS);
+	update_state(m_sh_state, source_handshake_state::SIDS);
+	update_state(m_ah_state, acceptor_handshake_state::AIDS);
 }
 
 void i8291a_device::device_start()
@@ -89,15 +90,60 @@ void i8291a_device::device_start()
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
 
+	save_item(NAME(m_din));
+	save_item(NAME(m_dout));
+	save_item(NAME(m_ints1));
+	save_item(NAME(m_ints2));
+	save_item(NAME(m_ie1));
+	save_item(NAME(m_ie2));
+	save_item(NAME(m_address0));
+	save_item(NAME(m_address1));
+	save_item(NAME(m_eos));
+	save_item(NAME(m_spoll_mode));
+	save_item(NAME(m_address_mode));
+	save_item(NAME(m_address_status));
+	save_item(NAME(m_cpt));
+	save_item(NAME(m_auxa));
+	save_item(NAME(m_auxb));
+	save_item(NAME(m_atn));
+	save_item(NAME(m_ren));
+	save_item(NAME(m_nrfd));
+	save_item(NAME(m_ndac));
+	save_item(NAME(m_dav));
+	save_item(NAME(m_srq));
+	save_item(NAME(m_ifc));
+	save_item(NAME(m_eoi));
+	save_item(NAME(m_dio));
+	save_item(NAME(m_nrfd_out));
+	save_item(NAME(m_ndac_out));
+	save_item(NAME(m_dav_out));
+	save_item(NAME(m_srq_out));
+	save_item(NAME(m_eoi_out));
+	save_item(NAME(m_pon));
+	save_item(NAME(m_rdy));
+	save_item(NAME(m_lpe));
+	save_item(NAME(m_ist));
+	save_item(NAME(m_rtl));
+	save_item(NAME(m_apt_flag));
+	save_item(NAME(m_cpt_flag));
+	save_item(NAME(m_din_flag));
+	save_item(NAME(m_nba));
+	save_item(NAME(m_pp_sense));
+	save_item(NAME(m_pp_line));
+	save_item(NAME(m_send_eoi));
+	save_item(NAME(m_intr_out));
+	save_item(NAME(m_dreq_out));
 }
 
 READ8_MEMBER(i8291a_device::din_r)
 {
 	LOG_REG("%s: %02X\n", __FUNCTION__, m_din);
-	m_din_flag = false;
-	m_ints1 &= ~REG_INTS1_BI;
-	update_int();
-	run_fsm();
+	if (!machine().side_effects_disabled()) {
+		m_din_flag = false;
+		m_ints1 &= ~REG_INTS1_BI;
+		update_int();
+		run_fsm();
+	}
 	return m_din;
 }
 
@@ -133,26 +179,29 @@ void i8291a_device::update_int()
 		m_int_write_func(intr);
 		m_intr_out = intr;
 	}
-
-
-
 }
 
 READ8_MEMBER(i8291a_device::ints1_r)
 {
 	uint8_t ret = m_ints1;
-	LOG_REG("%s: %02X\n", __FUNCTION__, ret);
-	m_ints1 = 0;
-	update_int();
+
+	if (!machine().side_effects_disabled()) {
+		LOG_REG("%s: %02X\n", __FUNCTION__, ret);
+		m_ints1 = 0;
+		update_int();
+	}
 	return ret;
 }
 
 READ8_MEMBER(i8291a_device::ints2_r)
 {
 	uint8_t ret = m_ints2;
-	LOG_REG("%s: %02X\n", __FUNCTION__, ret);
-	m_ints2 = 0;
-	update_int();
+
+	if (!machine().side_effects_disabled()) {
+		LOG_REG("%s: %02X\n", __FUNCTION__, ret);
+		m_ints2 = 0;
+		update_int();
+	}
 	return ret;
 }
 
@@ -252,7 +301,7 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 
 		case AUXCMD_TRIGGER:
 			LOG_REG("AUXCMD_TRIGGER\n");
-			update_state(m_dt_state, DeviceTriggerState::DTAS);
+			update_state(m_dt_state, device_trigger_state::DTAS);
 			break;
 
 		case AUXCMD_CLEAR_RTL:
@@ -282,16 +331,16 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 
 		case AUXCMD_VALID_SA:
 			LOG_REG("AUXCMD_VALID_SA: APT %d\n", m_apt_flag);
-			if (m_tp_state == TalkerPrimaryState::TPAS)
-				update_state(m_t_state, TalkerState::TADS);
+			if (m_tp_state == talker_primary_state::TPAS)
+				update_state(m_t_state, talker_state::TADS);
 
-			if (m_lp_state == ListenerPrimaryState::LPAS) {
-				update_state(m_l_state, ListenerState::LADS);
-				if ((m_address_mode & 3) != 1 && m_lp_state == ListenerPrimaryState::LPAS) {
-					if (m_rl_state == RemoteLocalState::LOCS && !m_rtl)
-						update_state(m_rl_state, RemoteLocalState::REMS);
-					if (m_rl_state == RemoteLocalState::LWLS)
-						update_state(m_rl_state, RemoteLocalState::RWLS);
+			if (m_lp_state == listener_primary_state::LPAS) {
+				update_state(m_l_state, listener_state::LADS);
+				if ((m_address_mode & 3) != 1 && m_lp_state == listener_primary_state::LPAS) {
+					if (m_rl_state == remote_local_state::LOCS && !m_rtl)
+						update_state(m_rl_state, remote_local_state::REMS);
+					if (m_rl_state == remote_local_state::LWLS)
+						update_state(m_rl_state, remote_local_state::RWLS);
 				}
 			}
 
@@ -317,7 +366,7 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 			m_auxb = data;
 			break;
 		case 3:
-			LOG_REG("PPOLL %s\n", (data & 0x10) ? "disable" : "enable");
+			LOG_REG("PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
 			m_lpe = !!!(data & 0x10);
 			m_pp_sense = data & 0x08;
 			m_pp_line = data & 7;
@@ -437,36 +486,36 @@ void i8291a_device::set_srq(bool state)
 void i8291a_device::run_sh_fsm()
 {
 
-	if (m_pon || m_atn || !(m_t_state == TalkerState::TACS || m_t_state == TalkerState::SPAS)) {
-		update_state(m_sh_state, SourceHandshake::SIDS);
+	if (m_pon || m_atn || !(m_t_state == talker_state::TACS || m_t_state == talker_state::SPAS)) {
+		update_state(m_sh_state, source_handshake_state::SIDS);
 	}
 
 	switch (m_sh_state) {
-	case SourceHandshake::SIDS:
+	case source_handshake_state::SIDS:
 		m_dio_write_func(0xff);
 		set_eoi(false);
 		m_nba = false;
-		if (m_t_state == TalkerState::TACS || m_t_state == TalkerState::SPAS) {
-			update_state(m_sh_state, SourceHandshake::SGNS);
+		if (m_t_state == talker_state::TACS || m_t_state == talker_state::SPAS) {
+			update_state(m_sh_state, source_handshake_state::SGNS);
 			m_ints1 |= REG_INTS1_BO;
 		}
 		break;
 
-	case SourceHandshake::SGNS:
+	case source_handshake_state::SGNS:
 		set_dav(false);
 
 		if (m_nba) {
-			update_state(m_sh_state, SourceHandshake::SDYS);
+			update_state(m_sh_state, source_handshake_state::SDYS);
 			m_ints1 &= ~REG_INTS1_BO;
 		}
 		break;
 
-	case SourceHandshake::SDYS:
+	case source_handshake_state::SDYS:
 		if (!m_nrfd)
-			update_state(m_sh_state, SourceHandshake::STRS);
+			update_state(m_sh_state, source_handshake_state::STRS);
 		break;
 
-	case SourceHandshake::STRS:
+	case source_handshake_state::STRS:
 		m_nba = false;
 		m_dio_write_func(~m_dout);
 		set_eoi(m_send_eoi);
@@ -475,7 +524,7 @@ void i8291a_device::run_sh_fsm()
 		if (!m_ndac) {
 			m_send_eoi = false;
 			m_ints1 |= REG_INTS1_BO;
-			update_state(m_sh_state, SourceHandshake::SGNS);
+			update_state(m_sh_state, source_handshake_state::SGNS);
 		}
 		break;
 	}
@@ -487,38 +536,38 @@ void i8291a_device::handle_command()
 		switch (m_din) {
 		case IFCMD_DCL:
 			LOG_CMD("DCL\n");
-			update_state(m_dc_state, DeviceClearState::DCAS);
+			update_state(m_dc_state, device_clear_state::DCAS);
 			break;
 		case IFCMD_GTL:
 			LOG_CMD("GTL\n");
-			if (m_l_state == ListenerState::LADS)
-				update_state(m_rl_state, RemoteLocalState::LWLS);
-			if (m_rl_state == RemoteLocalState::REMS &&
-					m_l_state == ListenerState::LADS && m_rtl)
-				update_state(m_rl_state, RemoteLocalState::LOCS);
+			if (m_l_state == listener_state::LADS)
+				update_state(m_rl_state, remote_local_state::LWLS);
+			if (m_rl_state == remote_local_state::REMS &&
+					m_l_state == listener_state::LADS && m_rtl)
+				update_state(m_rl_state, remote_local_state::LOCS);
 			break;
 		case IFCMD_SDC:
 			LOG_CMD("SDC\n");
-			if (m_l_state == ListenerState::LADS)
-				update_state(m_dc_state, DeviceClearState::DCAS);
+			if (m_l_state == listener_state::LADS)
+				update_state(m_dc_state, device_clear_state::DCAS);
 			break;
 		case IFCMD_GET:
 			LOG_CMD("GET\n");
 			break;
 		case IFCMD_LLO:
 			LOG_CMD("LLO\n");
-			if (m_rl_state == RemoteLocalState::LOCS)
-				update_state(m_rl_state, RemoteLocalState::LWLS);
-			if (m_rl_state == RemoteLocalState::REMS)
-				update_state(m_rl_state, RemoteLocalState::RWLS);
+			if (m_rl_state == remote_local_state::LOCS)
+				update_state(m_rl_state, remote_local_state::LWLS);
+			if (m_rl_state == remote_local_state::REMS)
+				update_state(m_rl_state, remote_local_state::RWLS);
 			break;
 		case IFCMD_SPE:
 			LOG_CMD("SPE\n");
-			update_state(m_tsp_state, TalkerSerialPollState::SPMS);
+			update_state(m_tsp_state, talker_serial_poll_state::SPMS);
 			break;
 		case IFCMD_SPD:
 			LOG_CMD("SPD\n");
-			update_state(m_tsp_state, TalkerSerialPollState::SPIS);
+			update_state(m_tsp_state, talker_serial_poll_state::SPIS);
 			break;
 		case 0:
 			break;
@@ -554,17 +603,17 @@ void i8291a_device::handle_command()
 		}
 
 		if (addr_matched) {
-			update_state(m_lp_state, ListenerPrimaryState::LPAS);
-			if (addr_matched && (m_address_mode & 3) == 1 && m_l_state == ListenerState::LIDS)
-				update_state(m_l_state, ListenerState::LADS);
+			update_state(m_lp_state, listener_primary_state::LPAS);
+			if (addr_matched && (m_address_mode & 3) == 1 && m_l_state == listener_state::LIDS)
+				update_state(m_l_state, listener_state::LADS);
 		} else {
-			update_state(m_lp_state, ListenerPrimaryState::LPIS);
-			update_state(m_l_state, ListenerState::LIDS);
+			update_state(m_lp_state, listener_primary_state::LPIS);
+			update_state(m_l_state, listener_state::LIDS);
 			m_address_status &= ~(REG_ADDRESS_STATUS_MJMN);
 		}
 
-		if (addr_matched && (m_address_mode & 3) == 1 && m_rl_state == RemoteLocalState::LWLS)
-			update_state(m_rl_state, RemoteLocalState::RWLS);
+		if (addr_matched && (m_address_mode & 3) == 1 && m_rl_state == remote_local_state::LWLS)
+			update_state(m_rl_state, remote_local_state::RWLS);
 	} else if (m_din >= 0x40 && m_din <= 0x5f) {
 		bool addr_matched = false;
 
@@ -582,22 +631,22 @@ void i8291a_device::handle_command()
 			addr_matched = true;
 		}
 
-		if(addr_matched) {
-			update_state(m_tp_state, TalkerPrimaryState::TPAS);
-			if ((m_address_mode & 3) == 1 && m_t_state == TalkerState::TIDS)
-				update_state(m_t_state, TalkerState::TADS);
+		if (addr_matched) {
+			update_state(m_tp_state, talker_primary_state::TPAS);
+			if ((m_address_mode & 3) == 1 && m_t_state == talker_state::TIDS)
+				update_state(m_t_state, talker_state::TADS);
 		} else {
-			update_state(m_tp_state, TalkerPrimaryState::TPIS);
-			update_state(m_t_state, TalkerState::TIDS);
+			update_state(m_tp_state, talker_primary_state::TPIS);
+			update_state(m_t_state, talker_state::TIDS);
 		}
 
 	} else if (m_din >= 0x60 && m_din <= 0x7f) {
 		LOG_CMD("MSA%d\n", m_din & 0x1f);
-		if ((m_address_mode & 3) == 2 && m_t_state == TalkerState::TIDS)
-			update_state(m_t_state, TalkerState::TADS);
+		if ((m_address_mode & 3) == 2 && m_t_state == talker_state::TIDS)
+			update_state(m_t_state, talker_state::TADS);
 
-		if ((m_address_mode & 3) != 1 && m_rl_state == RemoteLocalState::LWLS)
-			update_state(m_rl_state, RemoteLocalState::RWLS);
+		if ((m_address_mode & 3) != 1 && m_rl_state == remote_local_state::LWLS)
+			update_state(m_rl_state, remote_local_state::RWLS);
 
 		if ((m_address_mode & 3) == 3) {
 			/* In address mode 3, MSA is passed to host for verification */
@@ -610,47 +659,47 @@ void i8291a_device::handle_command()
 
 void i8291a_device::run_ah_fsm()
 {
-	bool f2 = m_atn || m_l_state == ListenerState::LACS || m_l_state == ListenerState::LADS;
+	bool f2 = m_atn || m_l_state == listener_state::LACS || m_l_state == listener_state::LADS;
 
-	if ((m_pon || !f2) && m_ah_state != AcceptorHandshake::AIDS) {
+	if ((m_pon || !f2) && m_ah_state != acceptor_handshake_state::AIDS) {
 		LOG_STATE("reset AH: pon %d f2 %d\n", m_pon, f2);
-		update_state(m_ah_state, AcceptorHandshake::AIDS);
+		update_state(m_ah_state, acceptor_handshake_state::AIDS);
 		set_nrfd(false);
 		set_ndac(false);
 		return;
 	}
 
 	switch (m_ah_state) {
-	case AcceptorHandshake::AIDS:
+	case acceptor_handshake_state::AIDS:
 		if (f2 && !m_pon)
-			update_state(m_ah_state, AcceptorHandshake::ANRS);
+			update_state(m_ah_state, acceptor_handshake_state::ANRS);
 		break;
-	case AcceptorHandshake::ANRS:
+	case acceptor_handshake_state::ANRS:
 		set_nrfd(true);
 		set_ndac(true);
 		m_cpt_flag = false;
 		m_apt_flag = false;
 		//LOG("m_rdy: %d m_cpt_flag: %d m_apt_flag: %d, m_din_flag %d\n", m_rdy, m_cpt_flag, m_apt_flag, m_din_flag);
 		if (m_atn || m_rdy)
-			update_state(m_ah_state, AcceptorHandshake::ACRS);
+			update_state(m_ah_state, acceptor_handshake_state::ACRS);
 		break;
 
-	case AcceptorHandshake::ACRS:
+	case acceptor_handshake_state::ACRS:
 		set_nrfd(false);
 		if (m_dav)
-			update_state(m_ah_state, AcceptorHandshake::ADYS);
+			update_state(m_ah_state, acceptor_handshake_state::ADYS);
 		break;
-	case AcceptorHandshake::ADYS:
+	case acceptor_handshake_state::ADYS:
 		if (!m_dav) {
-			update_state(m_ah_state, AcceptorHandshake::ACRS);
+			update_state(m_ah_state, acceptor_handshake_state::ACRS);
 		} else {
-			update_state(m_ah_state, AcceptorHandshake::ACDS);
+			update_state(m_ah_state, acceptor_handshake_state::ACDS);
 		}
 		break;
-	case AcceptorHandshake::ACDS:
+	case acceptor_handshake_state::ACDS:
 
 		if (!m_rdy) {
-			update_state(m_ah_state, AcceptorHandshake::AWNS);
+			update_state(m_ah_state, acceptor_handshake_state::AWNS);
 			break;
 		}
 		m_din = ~m_dio_read_func();
@@ -661,7 +710,7 @@ void i8291a_device::run_ah_fsm()
 			m_din &= ~0x80; // TODO: parity
 			handle_command();
 			if (!m_cpt_flag && !m_apt_flag)
-				update_state(m_ah_state, AcceptorHandshake::AWNS);
+				update_state(m_ah_state, acceptor_handshake_state::AWNS);
 		} else {
 			/* Received data */
 			m_din_flag = true;
@@ -671,12 +720,12 @@ void i8291a_device::run_ah_fsm()
 			// TODO: END on EOS
 		}
 		break;
-	case AcceptorHandshake::AWNS:
+	case acceptor_handshake_state::AWNS:
 		set_ndac(false);
 		// TODO: T3 delay, rdy holdoff
 
 		if (!m_dav)
-			update_state(m_ah_state, AcceptorHandshake::ANRS);
+			update_state(m_ah_state, acceptor_handshake_state::ANRS);
 		break;
 	}
 }
@@ -684,32 +733,32 @@ void i8291a_device::run_ah_fsm()
 void i8291a_device::run_t_fsm()
 {
 	switch (m_t_state) {
-	case TalkerState::TIDS:
+	case talker_state::TIDS:
 		m_address_status &= ~REG_ADDRESS_STATUS_TA;
 		break;
 
-	case TalkerState::TADS:
+	case talker_state::TADS:
 		m_address_status |= REG_ADDRESS_STATUS_TA;
-		if(!m_atn) {
-			if (m_tsp_state == TalkerSerialPollState::SPMS)
-				update_state(m_t_state, TalkerState::SPAS);
+		if (!m_atn) {
+			if (m_tsp_state == talker_serial_poll_state::SPMS)
+				update_state(m_t_state, talker_state::SPAS);
 			else
-				update_state(m_t_state, TalkerState::TACS);
+				update_state(m_t_state, talker_state::TACS);
 		}
 
-		if (m_tp_state == TalkerPrimaryState::TPIS)
-			update_state(m_t_state, TalkerState::TIDS);
+		if (m_tp_state == talker_primary_state::TPIS)
+			update_state(m_t_state, talker_state::TIDS);
 		break;
 		// TODO: F4 function
-	case TalkerState::TACS:
+	case talker_state::TACS:
 		m_address_status |= REG_ADDRESS_STATUS_TA;
 		if (m_atn)
-			update_state(m_t_state, TalkerState::TADS); // TODO: T2 delay
+			update_state(m_t_state, talker_state::TADS); // TODO: T2 delay
 		break;
 
-	case TalkerState::SPAS:
+	case talker_state::SPAS:
 		if (m_atn)
-			update_state(m_t_state, TalkerState::TADS); // TODO: T2 delay
+			update_state(m_t_state, talker_state::TADS); // TODO: T2 delay
 		break;
 	}
 }
@@ -717,10 +766,10 @@ void i8291a_device::run_t_fsm()
 void i8291a_device::run_tp_fsm()
 {
 	switch (m_tp_state) {
-	case TalkerPrimaryState::TPIS:
+	case talker_primary_state::TPIS:
 		m_address_status &= ~REG_ADDRESS_STATUS_TPAS;
 		break;
-	case TalkerPrimaryState::TPAS:
+	case talker_primary_state::TPAS:
 		m_address_status |= REG_ADDRESS_STATUS_TPAS;
 		break;
 	}
@@ -729,12 +778,12 @@ void i8291a_device::run_tp_fsm()
 void i8291a_device::run_tsp_fsm()
 {
 	if (m_pon || m_ifc)
-		update_state(m_tsp_state, TalkerSerialPollState::SPIS);
+		update_state(m_tsp_state, talker_serial_poll_state::SPIS);
 
-	switch(m_tsp_state) {
-	case TalkerSerialPollState::SPIS:
+	switch (m_tsp_state) {
+	case talker_serial_poll_state::SPIS:
 		break;
-	case TalkerSerialPollState::SPMS:
+	case talker_serial_poll_state::SPMS:
 		break;
 	}
 }
@@ -742,15 +791,15 @@ void i8291a_device::run_tsp_fsm()
 void i8291a_device::run_l_fsm()
 {
 	switch (m_l_state) {
-	case ListenerState::LIDS:
+	case listener_state::LIDS:
 		m_address_status &= ~REG_ADDRESS_STATUS_LA;
 		break;
-	case ListenerState::LADS:
+	case listener_state::LADS:
 		m_address_status |= REG_ADDRESS_STATUS_LA;
-		if (m_lp_state == ListenerPrimaryState::LPIS)
-			update_state(m_l_state, ListenerState::LIDS);
+		if (m_lp_state == listener_primary_state::LPIS)
+			update_state(m_l_state, listener_state::LIDS);
 		break;
-	case ListenerState::LACS:
+	case listener_state::LACS:
 		break;
 	}
 }
@@ -758,11 +807,11 @@ void i8291a_device::run_l_fsm()
 void i8291a_device::run_dc_fsm()
 {
 	switch (m_dc_state) {
-	case DeviceClearState::DCIS:
+	case device_clear_state::DCIS:
 		break;
-	case DeviceClearState::DCAS:
+	case device_clear_state::DCAS:
 		m_ints1 |= REG_INTS1_DEC;
-		update_state(m_dc_state, DeviceClearState::DCIS);
+		update_state(m_dc_state, device_clear_state::DCIS);
 		break;
 	}
 }
@@ -770,12 +819,12 @@ void i8291a_device::run_dc_fsm()
 void i8291a_device::run_dt_fsm()
 {
 	switch (m_dt_state) {
-	case DeviceTriggerState::DTIS:
+	case device_trigger_state::DTIS:
 		break;
-	case DeviceTriggerState::DTAS:
+	case device_trigger_state::DTAS:
 		m_trig_write_func(true);
 		m_trig_write_func(false);
-		update_state(m_dt_state, DeviceTriggerState::DTIS);
+		update_state(m_dt_state, device_trigger_state::DTIS);
 		break;
 	}
 }
@@ -783,33 +832,32 @@ void i8291a_device::run_dt_fsm()
 void i8291a_device::run_pp_fsm()
 {
 	if (m_pon)
-		update_state(m_pp_state, ParallelPollState::PPIS);
+		update_state(m_pp_state, parallel_poll_state::PPIS);
 
 	switch (m_pp_state) {
-	case ParallelPollState::PPIS:
+	case parallel_poll_state::PPIS:
 		if (m_lpe && !m_pon)
-			update_state(m_pp_state, ParallelPollState::PPSS);
+			update_state(m_pp_state, parallel_poll_state::PPSS);
 		break;
 
-	case ParallelPollState::PPSS:
+	case parallel_poll_state::PPSS:
 		if (!m_lpe) {
-			update_state(m_pp_state, ParallelPollState::PPIS);
+			update_state(m_pp_state, parallel_poll_state::PPIS);
 			break;
 		}
 
 		if (m_atn && m_eoi)
-			update_state(m_pp_state, ParallelPollState::PPAS);
+			update_state(m_pp_state, parallel_poll_state::PPAS);
 		break;
 
-	case ParallelPollState::PPAS:
+	case parallel_poll_state::PPAS:
 		if (!m_atn || !m_eoi) {
 			m_dio_write_func(0xff);
-			update_state(m_pp_state, ParallelPollState::PPSS);
+			update_state(m_pp_state, parallel_poll_state::PPSS);
 			break;
 		}
-
 		if (m_ist == m_pp_sense)
-			m_dio_write_func(0x7f); // XXX ~(1 << (7 - m_pp_line)));
+			m_dio_write_func(~(1 << m_pp_line));
 		else
 			m_dio_write_func(0xff);
 		break;
@@ -819,11 +867,11 @@ void i8291a_device::run_pp_fsm()
 void i8291a_device::run_sp_fsm()
 {
 	switch (m_sp_state) {
-	case SerialPollState::APRS:
+	case serial_poll_state::APRS:
 		break;
-	case SerialPollState::NPRS:
+	case serial_poll_state::NPRS:
 		break;
-	case SerialPollState::SRQS:
+	case serial_poll_state::SRQS:
 		break;
 	}
 }
@@ -831,27 +879,27 @@ void i8291a_device::run_sp_fsm()
 void i8291a_device::run_rl_fsm()
 {
 	if (m_pon || !m_ren)
-		update_state(m_rl_state, RemoteLocalState::LOCS);
+		update_state(m_rl_state, remote_local_state::LOCS);
 
 	switch (m_rl_state) {
-	case RemoteLocalState::LOCS:
+	case remote_local_state::LOCS:
 		break;
-	case RemoteLocalState::LWLS:
+	case remote_local_state::LWLS:
 		break;
-	case RemoteLocalState::REMS:
+	case remote_local_state::REMS:
 		break;
-	case RemoteLocalState::RWLS:
+	case remote_local_state::RWLS:
 		break;
 	}
 }
 
 void i8291a_device::run_lp_fsm()
 {
-	switch(m_lp_state) {
-	case ListenerPrimaryState::LPIS:
+	switch (m_lp_state) {
+	case listener_primary_state::LPIS:
 		m_address_status &= ~REG_ADDRESS_STATUS_LPAS;
 		break;
-	case ListenerPrimaryState::LPAS:
+	case listener_primary_state::LPAS:
 		m_address_status |= REG_ADDRESS_STATUS_LPAS;
 		break;
 	}
@@ -881,22 +929,22 @@ void i8291a_device::run_fsm()
 		run_pp_fsm();
 		run_rl_fsm();
 
-		if ((m_t_state_old == TalkerState::TIDS && m_t_state == TalkerState::TADS) ||
-				(m_t_state_old == TalkerState::TADS && m_t_state == TalkerState::TIDS) ||
-				(m_l_state_old == ListenerState::LIDS && m_l_state == ListenerState::LADS) ||
-				(m_l_state_old == ListenerState::LADS && m_l_state == ListenerState::LIDS))
+		if ((m_t_state_old == talker_state::TIDS && m_t_state == talker_state::TADS) ||
+				(m_t_state_old == talker_state::TADS && m_t_state == talker_state::TIDS) ||
+				(m_l_state_old == listener_state::LIDS && m_l_state == listener_state::LADS) ||
+				(m_l_state_old == listener_state::LADS && m_l_state == listener_state::LIDS))
 			m_ints2 |= REG_INTS2_ADSC;
 
-		if ((m_rl_state_old == RemoteLocalState::LOCS && m_rl_state == RemoteLocalState::REMS) ||
-				(m_rl_state_old == RemoteLocalState::REMS && m_rl_state == RemoteLocalState::LOCS) ||
-				(m_rl_state_old == RemoteLocalState::LWLS && m_rl_state == RemoteLocalState::RWLS) ||
-				(m_rl_state_old == RemoteLocalState::RWLS && m_rl_state == RemoteLocalState::LWLS))
+		if ((m_rl_state_old == remote_local_state::LOCS && m_rl_state == remote_local_state::REMS) ||
+				(m_rl_state_old == remote_local_state::REMS && m_rl_state == remote_local_state::LOCS) ||
+				(m_rl_state_old == remote_local_state::LWLS && m_rl_state == remote_local_state::RWLS) ||
+				(m_rl_state_old == remote_local_state::RWLS && m_rl_state == remote_local_state::LWLS))
 			m_ints2 |= REG_INTS2_REMC;
 
-		if ((m_rl_state_old == RemoteLocalState::LOCS && m_rl_state == RemoteLocalState::LWLS) ||
-				(m_rl_state_old == RemoteLocalState::REMS && m_rl_state == RemoteLocalState::RWLS) ||
-				(m_rl_state_old == RemoteLocalState::LWLS && m_rl_state == RemoteLocalState::LOCS) ||
-				(m_rl_state_old == RemoteLocalState::RWLS && m_rl_state == RemoteLocalState::REMS))
+		if ((m_rl_state_old == remote_local_state::LOCS && m_rl_state == remote_local_state::LWLS) ||
+				(m_rl_state_old == remote_local_state::REMS && m_rl_state == remote_local_state::RWLS) ||
+				(m_rl_state_old == remote_local_state::LWLS && m_rl_state == remote_local_state::LOCS) ||
+				(m_rl_state_old == remote_local_state::RWLS && m_rl_state == remote_local_state::REMS))
 			m_ints2 |= REG_INTS2_REMC;
 
 		m_rdy = !m_apt_flag && !m_cpt_flag && !m_din_flag;
@@ -906,163 +954,163 @@ void i8291a_device::run_fsm()
 }
 
 
-const char *i8291a_device::get_state_name(DeviceClearState state)
+const char *i8291a_device::get_state_name(device_clear_state state)
 {
-	switch(state) {
-		case DeviceClearState::DCIS:
+	switch (state) {
+		case device_clear_state::DCIS:
 			return "DICS";
-		case DeviceClearState::DCAS:
+		case device_clear_state::DCAS:
 			return "DCAS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(DeviceTriggerState state)
+const char *i8291a_device::get_state_name(device_trigger_state state)
 {
-	switch(state) {
-	case DeviceTriggerState::DTIS:
+	switch (state) {
+	case device_trigger_state::DTIS:
 		return "DTIS";
-	case DeviceTriggerState::DTAS:
+	case device_trigger_state::DTAS:
 		return "DTAS";
 	}
 	return "Unknown";
 }
 
 
-const char *i8291a_device::get_state_name(ParallelPollState state)
+const char *i8291a_device::get_state_name(parallel_poll_state state)
 {
-	switch(state){
-	case ParallelPollState::PPIS:
+	switch (state){
+	case parallel_poll_state::PPIS:
 		return "PPIS";
-	case ParallelPollState::PPSS:
+	case parallel_poll_state::PPSS:
 		return "PPSS";
-	case ParallelPollState::PPAS:
+	case parallel_poll_state::PPAS:
 		return "PPAS";
 	}
 	return "Unknown";
 }
 
 
-const char *i8291a_device::get_state_name(SerialPollState state)
+const char *i8291a_device::get_state_name(serial_poll_state state)
 {
-	switch(state) {
-	case SerialPollState::APRS:
+	switch (state) {
+	case serial_poll_state::APRS:
 		return "APRS";
-	case SerialPollState::NPRS:
+	case serial_poll_state::NPRS:
 		return "NPRS";
-	case SerialPollState::SRQS:
+	case serial_poll_state::SRQS:
 		return "SRQS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(RemoteLocalState state)
+const char *i8291a_device::get_state_name(remote_local_state state)
 {
-	switch(state) {
-	case RemoteLocalState::LOCS:
+	switch (state) {
+	case remote_local_state::LOCS:
 		return "LOCS";
-	case RemoteLocalState::LWLS:
+	case remote_local_state::LWLS:
 		return "LWLS";
-	case RemoteLocalState::REMS:
+	case remote_local_state::REMS:
 		return "REMS";
-	case RemoteLocalState::RWLS:
+	case remote_local_state::RWLS:
 		return "RWLS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(ListenerPrimaryState state)
+const char *i8291a_device::get_state_name(listener_primary_state state)
 {
-	switch(state) {
-	case ListenerPrimaryState::LPIS:
+	switch (state) {
+	case listener_primary_state::LPIS:
 		return "LPIS";
-	case ListenerPrimaryState::LPAS:
+	case listener_primary_state::LPAS:
 		return "LPAS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(SourceHandshake state)
+const char *i8291a_device::get_state_name(source_handshake_state state)
 {
-	switch(state) {
-	case SourceHandshake::SIDS:
+	switch (state) {
+	case source_handshake_state::SIDS:
 		return "SIDS";
-	case SourceHandshake::SGNS:
+	case source_handshake_state::SGNS:
 		return "SGNS";
-	case SourceHandshake::SDYS:
+	case source_handshake_state::SDYS:
 		return "SDYS";
-	case SourceHandshake::STRS:
+	case source_handshake_state::STRS:
 		return "STRS";
 	}
 	return "Unknown";
 }
 
 
-const char *i8291a_device::get_state_name(AcceptorHandshake state)
+const char *i8291a_device::get_state_name(acceptor_handshake_state state)
 {
-	switch(state) {
-	case AcceptorHandshake::AIDS:
+	switch (state) {
+	case acceptor_handshake_state::AIDS:
 		return "AIDS";
-	case AcceptorHandshake::ANRS:
+	case acceptor_handshake_state::ANRS:
 		return "ANRS";
-	case AcceptorHandshake::ACRS:
+	case acceptor_handshake_state::ACRS:
 		return "ACRS";
-	case AcceptorHandshake::ADYS:
+	case acceptor_handshake_state::ADYS:
 		return "ADYS";
-	case AcceptorHandshake::ACDS:
+	case acceptor_handshake_state::ACDS:
 		return "ACDS";
-	case AcceptorHandshake::AWNS:
+	case acceptor_handshake_state::AWNS:
 		return "AWNS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(TalkerState state)
+const char *i8291a_device::get_state_name(talker_state state)
 {
-	switch(state) {
-	case TalkerState::TIDS:
+	switch (state) {
+	case talker_state::TIDS:
 		return "TIDS";
-	case TalkerState::TADS:
+	case talker_state::TADS:
 		return "TADS";
-	case TalkerState::TACS:
+	case talker_state::TACS:
 		return "TACS";
-	case TalkerState::SPAS:
+	case talker_state::SPAS:
 		return "SPAS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(TalkerPrimaryState state)
+const char *i8291a_device::get_state_name(talker_primary_state state)
 {
-	switch(state) {
-	case TalkerPrimaryState::TPIS:
+	switch (state) {
+	case talker_primary_state::TPIS:
 		return "TPIS";
-	case TalkerPrimaryState::TPAS:
+	case talker_primary_state::TPAS:
 		return "TPAS";
 	}
 	return "Unknown";
 }
 
 
-const char *i8291a_device::get_state_name(ListenerState state)
+const char *i8291a_device::get_state_name(listener_state state)
 {
-	switch(state) {
-	case ListenerState::LIDS:
+	switch (state) {
+	case listener_state::LIDS:
 		return "LIDS";
-	case ListenerState::LADS:
+	case listener_state::LADS:
 		return "LADS";
-	case ListenerState::LACS:
+	case listener_state::LACS:
 		return "LACS";
 	}
 	return "Unknown";
 }
 
-const char *i8291a_device::get_state_name(TalkerSerialPollState state)
+const char *i8291a_device::get_state_name(talker_serial_poll_state state)
 {
-	switch(state) {
-	case TalkerSerialPollState::SPIS:
+	switch (state) {
+	case talker_serial_poll_state::SPIS:
 		return "SPIS";
-	case TalkerSerialPollState::SPMS:
+	case talker_serial_poll_state::SPMS:
 		return "SPMS";
 	}
 	return "Unknown";

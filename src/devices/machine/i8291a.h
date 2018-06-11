@@ -53,57 +53,38 @@ public:
 	i8291a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
-		{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_dreq_write_cb(Object &&cb)
-		{ return m_dreq_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_dreq_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_trig_write_cb(Object &&cb)
-		{ return m_trig_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_trig_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_eoi_write_cb(Object &&cb)
-		{ return m_eoi_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_eoi_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_dav_write_cb(Object &&cb)
-		{ return m_dav_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_dav_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_nrfd_write_cb(Object &&cb)
-		{ return m_nrfd_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_nrfd_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_ndac_write_cb(Object &&cb)
-		{ return m_ndac_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_ndac_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_srq_write_cb(Object &&cb)
-		{ return m_srq_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_srq_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_dio_write_cb(Object &&cb)
-		{ return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> devcb_base& set_dio_read_cb(Object &&cb)
-		{ return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
+	{ return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
 
 	// Signal inputs
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_WRITE_LINE_MEMBER(dack_w);
-
-	// signal output
-	devcb_write_line m_int_write_func;
-	devcb_write_line m_dreq_write_func;
-	devcb_write_line m_trig_write_func;
-	devcb_write_line m_eoi_write_func;
-	devcb_write_line m_dav_write_func;
-	devcb_write_line m_nrfd_write_func;
-	devcb_write_line m_ndac_write_func;
-	devcb_write_line m_srq_write_func;
-
-	devcb_write8 m_dio_write_func;
-	devcb_read8 m_dio_read_func;
-
-	void set_dav(bool state);
-	void set_nrfd(bool state);
-	void set_ndac(bool state);
-	void set_eoi(bool state);
-	void set_srq(bool state);
 
 	// GPIB port
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
@@ -138,6 +119,27 @@ public:
 	void map(address_map &map);
 
 private:
+
+	// signal output
+	devcb_write_line m_int_write_func;
+	devcb_write_line m_dreq_write_func;
+	devcb_write_line m_trig_write_func;
+	devcb_write_line m_eoi_write_func;
+	devcb_write_line m_dav_write_func;
+	devcb_write_line m_nrfd_write_func;
+	devcb_write_line m_ndac_write_func;
+	devcb_write_line m_srq_write_func;
+
+	devcb_write8 m_dio_write_func;
+	devcb_read8 m_dio_read_func;
+
+	void set_dav(bool state);
+	void set_nrfd(bool state);
+	void set_ndac(bool state);
+	void set_eoi(bool state);
+	void set_srq(bool state);
+
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -206,35 +208,35 @@ private:
 	bool m_nba;
 
 	bool m_pp_sense;
-	bool m_pp_line;
+	uint8_t m_pp_line;
 
 	bool m_send_eoi;
 
-	static constexpr int REG_INTS1_BI = (1 << 0);
-	static constexpr int REG_INTS1_BO = (1 << 1);
-	static constexpr int REG_INTS1_ERR = (1 << 2);
-	static constexpr int REG_INTS1_DEC = (1 << 3);
-	static constexpr int REG_INTS1_END = (1 << 4);
-	static constexpr int REG_INTS1_GET = (1 << 5);
-	static constexpr int REG_INTS1_APT = (1 << 6);
-	static constexpr int REG_INTS1_CPT = (1 << 7);
+	static constexpr int REG_INTS1_BI = 1 << 0;
+	static constexpr int REG_INTS1_BO = 1 << 1;
+	static constexpr int REG_INTS1_ERR = 1 << 2;
+	static constexpr int REG_INTS1_DEC = 1 << 3;
+	static constexpr int REG_INTS1_END = 1 << 4;
+	static constexpr int REG_INTS1_GET = 1 << 5;
+	static constexpr int REG_INTS1_APT = 1 << 6;
+	static constexpr int REG_INTS1_CPT = 1 << 7;
 
-	static constexpr int REG_INTS2_ADSC = (1 << 0);
-	static constexpr int REG_INTS2_REMC = (1 << 1);
-	static constexpr int REG_INTS2_LLOC = (1 << 2);
-	static constexpr int REG_INTS2_SPC = (1 << 3);
-	static constexpr int REG_INTS2_REM = (1 << 4);
-	static constexpr int REG_INTS2_LLO = (1 << 5);
-	static constexpr int REG_INTS2_SPAS = (1 << 6);
-	static constexpr int REG_INTS2_INT = (1 << 7);
+	static constexpr int REG_INTS2_ADSC = 1 << 0;
+	static constexpr int REG_INTS2_REMC = 1 << 1;
+	static constexpr int REG_INTS2_LLOC = 1 << 2;
+	static constexpr int REG_INTS2_SPC = 1 << 3;
+	static constexpr int REG_INTS2_REM = 1 << 4;
+	static constexpr int REG_INTS2_LLO = 1 << 5;
+	static constexpr int REG_INTS2_SPAS = 1 << 6;
+	static constexpr int REG_INTS2_INT = 1 << 7;
 
-	static constexpr int REG_IE2_DMAI = (1 << 4);
-	static constexpr int REG_IE2_DMAO = (1 << 5);
+	static constexpr int REG_IE2_DMAI = 1 << 4;
+	static constexpr int REG_IE2_DMAO = 1 << 5;
 
-	static constexpr int REG_ADDRESS01_ARS = (1 << 7);
-	static constexpr int REG_ADDRESS0_INT = (1 << 7);
-	static constexpr int REG_ADDRESS_DT = (1 << 6);
-	static constexpr int REG_ADDRESS_DL = (1 << 5);
+	static constexpr int REG_ADDRESS01_ARS = 1 << 7;
+	static constexpr int REG_ADDRESS0_INT = 1 << 7;
+	static constexpr int REG_ADDRESS_DT = 1 << 6;
+	static constexpr int REG_ADDRESS_DL = 1 << 5;
 
 	static constexpr int REG_ADDRESS_STATUS_MJMN = 1 << 0;
 	static constexpr int REG_ADDRESS_STATUS_TA = 1 << 1;
@@ -294,14 +296,14 @@ private:
 	static constexpr uint8_t IFCMD_UNL        = 0x3f;  // Unlisten
 	static constexpr uint8_t IFCMD_UNT        = 0x5f;  // Untalk
 
-	enum class SourceHandshake {
+	enum class source_handshake_state {
 		SIDS,
 		SGNS,
 		SDYS,
 		STRS
 	};
 
-	enum class AcceptorHandshake {
+	enum class acceptor_handshake_state {
 		AIDS,
 		ANRS,
 		ACRS,
@@ -310,75 +312,75 @@ private:
 		ACDS
 	};
 
-	enum class TalkerState {
+	enum class talker_state {
 		TIDS,
 		TADS,
 		SPAS,
 		TACS
 	};
 
-	enum class TalkerPrimaryState {
+	enum class talker_primary_state {
 		TPIS,
 		TPAS
 	};
 
-	enum class ListenerPrimaryState {
+	enum class listener_primary_state {
 		LPIS,
 		LPAS
 	};
 
-	enum class TalkerSerialPollState {
+	enum class talker_serial_poll_state {
 		SPIS,
 		SPMS
 	};
 
-	enum class SerialPollState {
+	enum class serial_poll_state {
 		NPRS,
 		SRQS,
 		APRS
 	};
 
-	enum class ListenerState {
+	enum class listener_state {
 		LIDS,
 		LADS,
 		LACS
 	};
 
-	enum class RemoteLocalState {
+	enum class remote_local_state {
 		LOCS,
 		REMS,
 		RWLS,
 		LWLS
 	};
 
-	enum class ParallelPollState {
+	enum class parallel_poll_state {
 		PPIS,
 		PPSS,
 		PPAS
 	};
 
-	enum class DeviceClearState {
+	enum class device_clear_state {
 		DCIS,
 		DCAS
 	};
 
-	enum class DeviceTriggerState {
+	enum class device_trigger_state {
 		DTIS,
 		DTAS
 	};
 
-	const char *get_state_name(AcceptorHandshake state);
-	const char *get_state_name(SourceHandshake state);
-	const char *get_state_name(TalkerState state);
-	const char *get_state_name(TalkerPrimaryState state);
-	const char *get_state_name(TalkerSerialPollState state);
-	const char *get_state_name(ListenerState state);
-	const char *get_state_name(ListenerPrimaryState state);
-	const char *get_state_name(DeviceClearState state);
-	const char *get_state_name(DeviceTriggerState state);
-	const char *get_state_name(ParallelPollState state);
-	const char *get_state_name(SerialPollState state);
-	const char *get_state_name(RemoteLocalState state);
+	static const char *get_state_name(acceptor_handshake_state state);
+	static const char *get_state_name(source_handshake_state state);
+	static const char *get_state_name(talker_state state);
+	static const char *get_state_name(talker_primary_state state);
+	static const char *get_state_name(talker_serial_poll_state state);
+	static const char *get_state_name(listener_state state);
+	static const char *get_state_name(listener_primary_state state);
+	static const char *get_state_name(device_clear_state state);
+	static const char *get_state_name(device_trigger_state state);
+	static const char *get_state_name(parallel_poll_state state);
+	static const char *get_state_name(serial_poll_state state);
+	static const char *get_state_name(remote_local_state state);
 
 	template<typename T> void update_state(T &name, T state, int timeout = 0)
 	{
@@ -391,18 +393,18 @@ private:
 			}
 	}
 
-	SourceHandshake m_sh_state;
-	AcceptorHandshake m_ah_state;
-	TalkerState m_t_state;
-	TalkerPrimaryState m_tp_state;
-	TalkerSerialPollState m_tsp_state;
-	ListenerState m_l_state;
-	ListenerPrimaryState m_lp_state;
-	RemoteLocalState m_rl_state;
-	SerialPollState m_sp_state;
-	ParallelPollState m_pp_state;
-	DeviceClearState m_dc_state;
-	DeviceTriggerState m_dt_state;
+	source_handshake_state m_sh_state;
+	acceptor_handshake_state m_ah_state;
+	talker_state m_t_state;
+	talker_primary_state m_tp_state;
+	talker_serial_poll_state m_tsp_state;
+	listener_state m_l_state;
+	listener_primary_state m_lp_state;
+	remote_local_state m_rl_state;
+	serial_poll_state m_sp_state;
+	parallel_poll_state m_pp_state;
+	device_clear_state m_dc_state;
+	device_trigger_state m_dt_state;
 	bool m_state_changed;
 	bool m_ignore_ext_signals;
 	bool m_intr_out;

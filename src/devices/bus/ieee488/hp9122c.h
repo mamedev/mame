@@ -67,13 +67,13 @@ private:
 	 *  3 - GND        GND
 	 */
 
-	constexpr static int REG_CNTL_HEADSEL = (1 << 0);
-	constexpr static int REG_CNTL_CLOCK_SEL = (1 << 2);
-	constexpr static int REG_CNTL_INTSEL1 = (1 << 3);
-	constexpr static int REG_CNTL_DS1 = (1 << 4);
-	constexpr static int REG_CNTL_DS0 = (1 << 5);
-	constexpr static int REG_CNTL_LED = ( 1 << 6);
-	constexpr static int REG_CNTL_INTSEL0 = (1 << 7);
+	constexpr static int REG_CNTL_HEADSEL = 1 << 0;
+	constexpr static int REG_CNTL_CLOCK_SEL = 1 << 2;
+	constexpr static int REG_CNTL_INTSEL1 = 1 << 3;
+	constexpr static int REG_CNTL_DS1 = 1 << 4;
+	constexpr static int REG_CNTL_DS0 = 1 << 5;
+	constexpr static int REG_CNTL_LED =  1 << 6;
+	constexpr static int REG_CNTL_INTSEL0 = 1 << 7;
 
 	/* Status register bits:
 	 * 	0 - Addr0
@@ -86,10 +86,10 @@ private:
 	 *	7 - density indicatior: H - DD, L - HD
 	 */
 
-	constexpr static int REG_STATUS_DUAL = (1 << 3);
-	constexpr static int REG_STATUS_TEST = (1 << 4);
-	constexpr static int REG_STATUS_DISKCHG = (1 << 5);
-	constexpr static int REG_STATUS_LOW_DENSITY = (1 << 7);
+	constexpr static int REG_STATUS_DUAL = 1 << 3;
+	constexpr static int REG_STATUS_TEST = 1 << 4;
+	constexpr static int REG_STATUS_DISKCHG = 1 << 5;
+	constexpr static int REG_STATUS_LOW_DENSITY = 1 << 7;
 
 	DECLARE_WRITE_LINE_MEMBER(i8291a_eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(i8291a_dav_w);
