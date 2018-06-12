@@ -63,7 +63,7 @@ Glitch list!
 
     LeagueMan:
         Raster effects don't work properly (not even cpu time per line?).
-		Reference : https://youtu.be/K8mvKXnvgXc?t=53s
+        Reference : https://youtu.be/K8mvKXnvgXc?t=53s
 
     (0.141 update: at least following two seems fixed from a lot of time ... -AS)
     Perfect Soldiers:
