@@ -149,7 +149,7 @@ private:
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
 
-	/* these contain global status bits */
+	/* these contain global status bits for the 5100 */
 	uint8_t m_PDC;
 	uint8_t m_CTL_pins;
 	uint8_t m_state;
@@ -237,7 +237,7 @@ private:
 	   The internal DAC used to feed the analog pin is only 8 bits, and has the
 	   funny clipping/clamping logic, while the digital pin gives full 10 bit
 	   resolution of the output data.
-	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
+	   TODO: add an MCFG macro to set this other than the FORCE_DIGITAL define
 	 */
 	uint8_t m_digital_select;
 

@@ -198,6 +198,10 @@ Interpolation is inhibited (i.e. interpolation at IP frames will not happen
 
 
 ****Documentation of chip commands:***
+    76543210  (these are in logical 7 thru 0 order with MSB (7) first; TI calls
+              these bits by the opposite order, D0 thru D7, on the datasheet,
+              with D0 being the MSB)
+
     x0x0xbcc: on 5200/5220: NOP (does nothing)
               on 5220C and CD2501ECD: Select frame length by cc, and b selects
               whether every frame is preceded by 2 bits to select the frame
@@ -321,9 +325,10 @@ this), mostly on later pinballs with LPC speech)
 module (6511 based), IBM PS/2 Speech adapter (parallel port connection
 device), PES Speech adapter (serial port connection)
 
-Street electronics had a later 1989-era ECHO appleII card which is TSP50c0x/1x
-MCU based speech and not tms5xxx based (though it is likely emulating the tms5220
-in MCU code). Look for a 16-pin chip at U6 labeled "ECHO-3 SN".
+Street electronics had two later 1988-1990-era ECHO appleII cards which are
+TSP50c0x/1x MCU based speech and not tms52xx based (though it is likely
+emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
+"ECHO-2 SN" or "ECHO-3 SN".
 
 ***********************************************************************************************/
 
@@ -397,6 +402,7 @@ in MCU code). Look for a 16-pin chip at U6 labeled "ECHO-3 SN".
 
 //#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS)
 #include "logmacro.h"
+// TODO: switch the comments to be above the defines instead of below them
 
 #define MAX_SAMPLE_CHUNK    512
 
