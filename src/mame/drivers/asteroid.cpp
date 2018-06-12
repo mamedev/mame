@@ -55,7 +55,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 For revision 3 of Asteroids Deluxe:
 
-U.S Update
+U.S. Update
 New Program with Easier Game Play for Asteroids Deluxe
 
 The read-only memories (ROMs) in this kit contain a new program that changes the Asteroids Deluxe
@@ -66,7 +66,7 @@ The technical manual describes the game play correctly if the game PCB option sw
 to "hard". If you set the switch to "easy", then the following game-play changes happen:
 
 * FOUR large asteroids begin the game. The second wave of asteroids begins with FIVE, and the
-  susbequent waves start with SIX through NINE large asteroids. In addition, the asteriods move
+  subsequent waves start with SIX through NINE large asteroids. In addition, the asteriods move
   much more slowly across the screen. (If the option switch is set to hard, the waves begin with
   SIX to NINE large asteriods.)
 * The large ships ("death stars") when shot will break up into three slowly-moving diamonds. (If
