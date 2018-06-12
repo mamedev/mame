@@ -57,6 +57,7 @@ public:
 	{ }
 
 	void shrike(machine_config &config);
+	void rescraid(machine_config &config);
 	void balsente(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
 	void init_otwalls();
@@ -97,6 +98,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(out5_w);
 	DECLARE_WRITE_LINE_MEMBER(out6_w);
 	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
+	DECLARE_READ8_MEMBER(novram_8bit_r);
+	DECLARE_WRITE8_MEMBER(novram_8bit_w);
 	DECLARE_READ8_MEMBER(m6850_r);
 	DECLARE_WRITE8_MEMBER(m6850_w);
 	DECLARE_READ8_MEMBER(m6850_sound_r);
@@ -151,7 +154,9 @@ private:
 	CEM3394_EXT_INPUT(noise_gen_4);
 	CEM3394_EXT_INPUT(noise_gen_5);
 
+	void cpu1_base_map(address_map &map);
 	void cpu1_map(address_map &map);
+	void cpu1_smudge_map(address_map &map);
 	void cpu2_io_map(address_map &map);
 	void cpu2_map(address_map &map);
 	void shrike68k_map(address_map &map);
