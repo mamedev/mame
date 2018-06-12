@@ -75,7 +75,7 @@ to "hard". If you set the switch to "easy", then the following game-play changes
 
 After installing these five ROMs, we recommend you set your game to easy game play.  To do so, refer
 to the figure that follows. You should note also that the self-test now deisplays and addition 0 or 1
-to represnt your game difficulty selection.
+to represent your game difficulty selection.
 
 
 ROM kit for Asteroids Deluxe Game PCB Assembly A036471-03 and -04  F
