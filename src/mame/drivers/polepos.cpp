@@ -212,7 +212,7 @@ Notes:
 
 Todo:
 
-- the bootlegs without Namco devices (i.e. topracern, polepos2bi) still require
+- the bootlegs without Namco devices (e.g. topracern, polepos2bi) still require
   our 06xx and 51xx emulation to boot, this is incorrect.
 
 ***************************************************************************/
