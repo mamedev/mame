@@ -6,15 +6,15 @@
 
 *************************************************************************/
 
-#include "machine/gen_latch.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
+#include "video/bufsprite.h"
 #include "screen.h"
 
 struct pf_layer_info
 {
 	tilemap_t *     tmap;
-	uint16_t          vram_base;
+	uint16_t        vram_base;
 };
 
 class m107_state : public driver_device
@@ -28,10 +28,10 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_upd71059c(*this, "upd71059c")
-		, m_soundlatch(*this, "soundlatch")
 		, m_spriteram(*this, "spriteram")
 		, m_vram_data(*this, "vram_data")
-		, m_user1_ptr(*this, "user1")
+		, m_sprtable_rom(*this, "sprtable")
+		, m_mainbank(*this, "mainbank")
 	{
 	}
 
@@ -41,11 +41,12 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<buffered_spriteram16_device> m_spriteram;
 
-	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_vram_data;
-	optional_region_ptr<uint8_t> m_user1_ptr;
+	optional_region_ptr<uint8_t> m_sprtable_rom;
+
+	optional_memory_bank m_mainbank;
 
 	// driver init
 	uint8_t m_spritesystem;
@@ -54,7 +55,6 @@ public:
 	uint16_t m_raster_irq_position;
 	pf_layer_info m_pf_layer[4];
 	uint16_t m_control[0x10];
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -84,6 +84,8 @@ public:
 	void firebarr(machine_config &config);
 	void dsoccr94(machine_config &config);
 	void dsoccr94_io_map(address_map &map);
+	void dsoccr94_map(address_map &map);
+	void firebarr_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 	void sound_map(address_map &map);
