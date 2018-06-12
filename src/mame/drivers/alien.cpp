@@ -157,7 +157,7 @@ ROM_START( alien )
 	DISK_IMAGE( "alien", 0, SHA1(0328f12765db41a9ef5c8bfb88d4983345093072) )
 ROM_END
 
-// ROM board only dumped, main board is missing, presumable similar to Alien: The Arcade medal hardware
+// ROM board only dumped, main board is missing
 ROM_START( pingu )
 	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, NO_DUMP )
@@ -167,9 +167,7 @@ ROM_START( pingu )
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
 
 	DISK_REGION( "card" ) //compact flash
-	DISK_IMAGE( "pingu", 0, BAD_DUMP SHA1(bab4f005f779cc2cc804ef1fce29cb17c7d613b9) )
-	// sectors 2-255 is empty (2 sectors of header / file list and 252 sectors of main.abs ELF executable), which makes this dump almost useless.
-	// if not this, high probable this game card can be booted using dkbanana boot ROMs.
+	DISK_IMAGE( "pingu", 0, SHA1(9c74e30906f229eba4bff8262c98e556d3ea1c23) )
 ROM_END
 
 // Host unit board, GPUs and YMZ770B not populated.
