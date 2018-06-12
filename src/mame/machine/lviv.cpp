@@ -20,7 +20,7 @@
 #define LVIV_SNAPSHOT_SIZE  82219
 
 
-void lviv_state::lviv_update_memory()
+void lviv_state::update_memory()
 {
 	uint8_t *ram = m_ram->pointer();
 
@@ -36,22 +36,22 @@ void lviv_state::lviv_update_memory()
 	}
 }
 
-INPUT_CHANGED_MEMBER(lviv_state::lviv_reset)
+INPUT_CHANGED_MEMBER(lviv_state::reset_button)
 {
 	machine().schedule_soft_reset();
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_0_porta_r)
+READ8_MEMBER(lviv_state::ppi_0_porta_r)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_0_portb_r)
+READ8_MEMBER(lviv_state::ppi_0_portb_r)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
+READ8_MEMBER(lviv_state::ppi_0_portc_r)
 {
 	uint8_t data = m_ppi_port_outputs[0][2] & 0x0f;
 	if (m_cassette->input() > 0.038)
@@ -61,32 +61,32 @@ READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_0_porta_w)
+WRITE8_MEMBER(lviv_state::ppi_0_porta_w)
 {
 	m_ppi_port_outputs[0][0] = data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_0_portb_w)
+WRITE8_MEMBER(lviv_state::ppi_0_portb_w)
 {
 	m_ppi_port_outputs[0][1] = data;
-	lviv_update_palette(data&0x7f);
+	update_palette(data&0x7f);
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off */
+WRITE8_MEMBER(lviv_state::ppi_0_portc_w)/* tape in/out, video memory on/off */
 {
 	m_ppi_port_outputs[0][2] = data;
 	if (m_ppi_port_outputs[0][1]&0x80)
 		m_speaker->level_w(data & 0x01);
 	m_cassette->output((data & 0x01) ? -1.0 : 1.0);
-	lviv_update_memory();
+	update_memory();
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_1_porta_r)
+READ8_MEMBER(lviv_state::ppi_1_porta_r)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
+READ8_MEMBER(lviv_state::ppi_1_portb_r)/* keyboard reading */
 {
 	return ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : m_key[0]->read()) &
 		   ((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : m_key[1]->read()) &
@@ -98,7 +98,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
 		   ((m_ppi_port_outputs[1][0] & 0x80) ? 0xff : m_key[7]->read());
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
+READ8_MEMBER(lviv_state::ppi_1_portc_r)/* keyboard reading */
 {
 	return ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : m_key[ 8]->read()) &
 		   ((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : m_key[ 9]->read()) &
@@ -106,24 +106,24 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
 		   ((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : m_key[11]->read());
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_1_porta_w)/* kayboard scaning */
+WRITE8_MEMBER(lviv_state::ppi_1_porta_w)/* kayboard scaning */
 {
 	m_ppi_port_outputs[1][0] = data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_1_portb_w)
+WRITE8_MEMBER(lviv_state::ppi_1_portb_w)
 {
 	m_ppi_port_outputs[1][1] = data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_1_portc_w)/* kayboard scaning */
+WRITE8_MEMBER(lviv_state::ppi_1_portc_w)/* kayboard scaning */
 {
 	m_ppi_port_outputs[1][2] = data;
 }
 
 
 /* I/O */
-READ8_MEMBER(lviv_state::lviv_io_r)
+READ8_MEMBER(lviv_state::io_r)
 {
 	if (m_startup_mem_map)
 	{
@@ -147,7 +147,7 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 	}
 }
 
-WRITE8_MEMBER(lviv_state::lviv_io_w)
+WRITE8_MEMBER(lviv_state::io_w)
 {
 	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)
@@ -223,13 +223,11 @@ Lviv snapshot files (SAV)
 1411D - 1412A:  ??? (something additional)
 *******************************************************************************/
 
-void lviv_state::lviv_setup_snapshot(uint8_t * data)
+void lviv_state::setup_snapshot(uint8_t * data)
 {
-	unsigned char lo,hi;
-
 	/* Set registers */
-	lo = data[0x14112] & 0x0ff;
-	hi = data[0x14111] & 0x0ff;
+	uint8_t lo = data[0x14112] & 0x0ff;
+	uint8_t hi = data[0x14111] & 0x0ff;
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
@@ -254,9 +252,9 @@ void lviv_state::lviv_setup_snapshot(uint8_t * data)
 	/* Ports */
 	m_ppi_port_outputs[0][0] = data[0x14011+0xc0];
 	m_ppi_port_outputs[0][1] = data[0x14011+0xc1];
-	lviv_update_palette(m_ppi_port_outputs[0][1]&0x7f);
+	update_palette(m_ppi_port_outputs[0][1]&0x7f);
 	m_ppi_port_outputs[0][2] = data[0x14011+0xc2];
-	lviv_update_memory();
+	update_memory();
 }
 
 void lviv_state::dump_registers()
@@ -269,7 +267,7 @@ void lviv_state::dump_registers()
 	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_HL));
 }
 
-image_verify_result lviv_state::lviv_verify_snapshot(uint8_t * data, uint32_t size)
+image_verify_result lviv_state::verify_snapshot(uint8_t * data, uint32_t size)
 {
 	const char* tag = "LVOV/DUMP/2.0/";
 
@@ -289,18 +287,18 @@ image_verify_result lviv_state::lviv_verify_snapshot(uint8_t * data, uint32_t si
 	return image_verify_result::PASS;
 }
 
-SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
+SNAPSHOT_LOAD_MEMBER(lviv_state, lviv)
 {
-	std::vector<uint8_t> lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
+	std::vector<uint8_t> snapshot_data(LVIV_SNAPSHOT_SIZE);
 
-	image.fread( &lviv_snapshot_data[0], LVIV_SNAPSHOT_SIZE);
+	image.fread(&snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 
-	if (lviv_verify_snapshot(&lviv_snapshot_data[0], snapshot_size) != image_verify_result::PASS)
+	if (verify_snapshot(&snapshot_data[0], snapshot_size) != image_verify_result::PASS)
 	{
 		return image_init_result::FAIL;
 	}
 
-	lviv_setup_snapshot (&lviv_snapshot_data[0]);
+	setup_snapshot(&snapshot_data[0]);
 
 	dump_registers();
 
