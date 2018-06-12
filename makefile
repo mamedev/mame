@@ -166,6 +166,12 @@ endif
 ifneq ($(filter powerpc,$(UNAME_P)),)
 PLATFORM := powerpc
 endif
+ifneq ($(filter riscv64%,$(UNAME_M)),)
+PLATFORM := riscv64
+endif
+ifneq ($(filter riscv64%,$(UNAME_P)),)
+PLATFORM := riscv64
+endif
 ifneq ($(filter mips64%,$(UNAME_M)),)
 ifeq ($(shell getconf LONG_BIT),64)
 PLATFORM := mips64

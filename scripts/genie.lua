@@ -1061,6 +1061,12 @@ if (_OPTIONS["PLATFORM"]=="arm64") then
 	}
 end
 
+if (_OPTIONS["PLATFORM"]=="riscv64") then
+	defines {
+		"PTR64=1",
+	}
+end
+
 if (_OPTIONS["PLATFORM"]=="mips64") then
 	defines {
 		"PTR64=1",
