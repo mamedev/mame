@@ -231,7 +231,6 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/cem3394.h"
 #include "speaker.h"
@@ -246,7 +245,7 @@ DIP locations verified for:
  *
  *************************************/
 
-void balsente_state::cpu1_map(address_map &map)
+void balsente_state::cpu1_base_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
@@ -267,9 +266,21 @@ void balsente_state::cpu1_map(address_map &map)
 	map(0x9903, 0x9903).portr("IN1").nopw();
 	map(0x9a00, 0x9a03).r(FUNC(balsente_state::random_num_r));
 	map(0x9a04, 0x9a05).rw(FUNC(balsente_state::m6850_r), FUNC(balsente_state::m6850_w));
-	map(0x9b00, 0x9cff).ram().share("nvram");   /* system+cart NOVRAM */
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).bankr("bank2");
+}
+
+void balsente_state::cpu1_map(address_map &map)
+{
+	cpu1_base_map(map);
+	map(0x9b00, 0x9bff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0x9c00, 0x9cff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
+}
+
+void balsente_state::cpu1_smudge_map(address_map &map)
+{
+	cpu1_base_map(map);
+	map(0x9b00, 0x9bff).rw(FUNC(balsente_state::novram_8bit_r), FUNC(balsente_state::novram_8bit_w));
 }
 
 
@@ -1305,7 +1316,8 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_X2212_ADD_AUTOSAVE("nov0") // system NOVRAM
+	MCFG_X2212_ADD_AUTOSAVE("nov1") // cart NOVRAM
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1390,6 +1402,14 @@ MACHINE_CONFIG_START(balsente_state::shrike)
 	MCFG_DEVICE_PROGRAM_MAP(shrike68k_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(balsente_state::rescraid)
+	balsente(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_smudge_map)
 MACHINE_CONFIG_END
 
 
@@ -2453,9 +2473,9 @@ GAME( 1986, spiker3,   spiker,   balsente, spiker,   balsente_state, init_spiker
 GAME( 1986, stompin,   0,        balsente, stompin,  balsente_state, init_stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
-GAME( 1987, rescraid,  0,        balsente, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraid,  0,        rescraid, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown */
 GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rescraida, rescraid, balsente, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,   ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )

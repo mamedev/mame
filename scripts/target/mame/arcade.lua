@@ -354,6 +354,7 @@ VIDEOS["PPU2C0X"] = true
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["BUSMOUSE"] = true
 MACHINES["NCR53C7XX"] = true
 MACHINES["LSI53C810"] = true
 MACHINES["6522VIA"] = true

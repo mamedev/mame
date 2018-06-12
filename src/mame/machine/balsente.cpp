@@ -312,7 +312,19 @@ WRITE_LINE_MEMBER(balsente_state::out6_w)
 
 WRITE_LINE_MEMBER(balsente_state::nvrecall_w)
 {
-	logerror("nvrecall_w=%d\n", state);
+	m_novram[0]->recall(!state);
+	m_novram[1]->recall(!state);
+}
+
+READ8_MEMBER(balsente_state::novram_8bit_r)
+{
+	return (m_novram[0]->read(space, offset) & 0x0f) | (m_novram[1]->read(space, offset) << 4);
+}
+
+WRITE8_MEMBER(balsente_state::novram_8bit_w)
+{
+	m_novram[0]->write(space, offset, data & 0x0f);
+	m_novram[1]->write(space, offset, data >> 4);
 }
 
 

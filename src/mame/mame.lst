@@ -70,6 +70,7 @@ flagrall                        // ?
 3do                             // 3DO consoles
 3do_pal                         //
 3dobios                         //
+md23do                          //
 orbatak                         //
 
 @source:3x3puzzl.cpp
@@ -32109,6 +32110,7 @@ pokemini                        // Nintendo Pokemon Mini
 poker72                         //
 
 @source:polepos.cpp
+grally                          // bootleg
 polepos                         // (c) 1982
 polepos2                        // (c) 1983
 polepos2a                       // 136014   (c) 1983 + Atari license
