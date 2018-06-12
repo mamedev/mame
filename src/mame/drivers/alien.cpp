@@ -160,8 +160,8 @@ ROM_END
 // ROM board only dumped, main board is missing
 ROM_START( pingu )
 	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, NO_DUMP )
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, NO_DUMP )
+	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
+	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
 	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
