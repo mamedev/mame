@@ -108,9 +108,9 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x00000000, 0x001FFFFF).bankrw(m_bank1).share(m_dram);                       /* DRAM */
-	map(0x00200000, 0x003FFFFF).ram().share(m_vram);                                    /* VRAM */
-	map(0x03000000, 0x030FFFFF).bankr(m_bank2);                                    /* BIOS */
+	map(0x00000000, 0x001FFFFF).bankrw(m_bank1).share(m_dram);                         /* DRAM */
+	map(0x00200000, 0x003FFFFF).ram().share(m_vram);                                   /* VRAM */
+	map(0x03000000, 0x030FFFFF).rom().region("bios", 0);                               /* BIOS */
 	map(0x03100000, 0x0313FFFF).ram();                                                 /* Brooktree? */
 	map(0x03140000, 0x0315FFFF).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
 	map(0x03180000, 0x031BFFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
@@ -134,12 +134,12 @@ INPUT_PORTS_END
 
 void _3do_state::machine_start()
 {
-	m_bank2->set_base(memregion("user1")->base());
 	m_nvram->set_base(&m_nvmem, sizeof(m_nvmem));
 
 	/* configure overlay */
+	// TODO: can overlay at 0-0x1FFFFF even be written to, or writes go to dram in any case?
 	m_bank1->configure_entry(0, m_dram);
-	m_bank1->configure_entry(1, memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("overlay")->base());
 
 	m_slow2_init();
 	m_madam_init();
@@ -191,7 +191,7 @@ MACHINE_CONFIG_END
 
 #if 0
 #define NTSC_BIOS \
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) \
+	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
@@ -204,7 +204,7 @@ MACHINE_CONFIG_END
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(4) )
 #else
 #define NTSC_BIOS \
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) \
+	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
@@ -217,33 +217,48 @@ MACHINE_CONFIG_END
 
 ROM_START(3do)
 	NTSC_BIOS
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
 ROM_END
 
 ROM_START(3dobios)
 	NTSC_BIOS
+	
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
 ROM_END
 
 ROM_START(3do_pal)
-	ROM_REGION32_BE( 0x200000, "user1", 0 )
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
 	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" )
 	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) )
+	
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
 ROM_END
 
 ROM_START(orbatak)
 	NTSC_BIOS
 
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+	
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
 ROM_END
 
 ROM_START(md23do)
-	ROM_REGION32_BE( 0x200000, "user1", 0 )
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
 	ROM_LOAD( "soat_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) ) // TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF
 
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+	
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "md23do", 0, NO_DUMP )
 ROM_END

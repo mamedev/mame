@@ -24,8 +24,7 @@ public:
 		m_vram(*this, "vram"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2") { }
+		m_bank1(*this, "bank1") { }
 
 	void _3do(machine_config &config);
 	void _3do_pal(machine_config &config);
@@ -166,7 +165,6 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
 
 	SLOW2 m_slow2;
 	MADAM m_madam;
