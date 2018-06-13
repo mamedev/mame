@@ -1384,6 +1384,7 @@ void tms5220_device::process_command(unsigned char cmd)
 		LOGMASKED(LOG_COMMAND_VERBOSE, "Speak External command received\n");
 
 		// SPKEXT going active asserts /SPKEE for 2 clocks, which clears the FIFO and its counters
+		std::fill(std::begin(m_fifo), std::end(m_fifo), 0);
 		m_fifo_head = m_fifo_tail = m_fifo_count = m_fifo_bits_taken = 0;
 		// SPEN is enabled when the FIFO passes half full (falling edge of BL signal)
 		m_DDIS = true; // speak using FIFO
@@ -1641,7 +1642,7 @@ void tms5220_device::device_reset()
 {
 	m_digital_select = FORCE_DIGITAL; // assume analog output
 	/* initialize the FIFO */
-	/*memset(m_fifo, 0, sizeof(m_fifo));*/
+	std::fill(std::begin(m_fifo), std::end(m_fifo), 0);
 	m_fifo_head = m_fifo_tail = m_fifo_count = m_fifo_bits_taken = 0;
 
 	/* initialize the chip state */
@@ -1656,14 +1657,14 @@ void tms5220_device::device_reset()
 	/* initialize the energy/pitch/k states */
 #ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
-	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
+	std::fill(std::begin(m_old_frame_k_idx), std::end(m_old_frame_k_idx), 0);
 	m_old_zpar = false;
 #endif
 	m_new_frame_energy_idx = m_current_energy =  m_previous_energy = 0;
 	m_new_frame_pitch_idx = m_current_pitch = 0;
 	m_zpar = m_uv_zpar = false;
-	memset(m_new_frame_k_idx, 0, sizeof(m_new_frame_k_idx));
-	memset(m_current_k, 0, sizeof(m_current_k));
+	std::fill(std::begin(m_new_frame_k_idx), std::end(m_new_frame_k_idx), 0);
+	std::fill(std::begin(m_current_k), std::end(m_current_k), 0);
 
 	/* initialize the sample generators */
 	m_inhibit = true;
@@ -1672,8 +1673,8 @@ void tms5220_device::device_reset()
 	m_OLDE = m_OLDP = true;
 	m_IP = reload_table[m_c_variant_rate&0x3];
 	m_RNG = 0x1FFF;
-	memset(m_u, 0, sizeof(m_u));
-	memset(m_x, 0, sizeof(m_x));
+	std::fill(std::begin(m_u), std::end(m_u), 0);
+	std::fill(std::begin(m_x), std::end(m_x), 0);
 	m_schedule_dummy_read = false;
 
 	if (m_speechrom)
