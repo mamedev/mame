@@ -784,6 +784,8 @@ int tms5220_device::extract_bits(int count)
 		// extract from VSM (speech ROM)
 		if (m_speechrom)
 			val = m_speechrom->read(count);
+		else
+			val = (1<<count)-1; // assume the input floats high if nothing is connected, so a spurious speak vsm command will eventually return a 0xF (STOP) frame which will halt speech
 #else
 		while (count--)
 		{
