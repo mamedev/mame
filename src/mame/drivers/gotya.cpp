@@ -75,12 +75,12 @@ void gotya_state::gotya_map(address_map &map)
 	map(0x6000, 0x6000).portr("P1");
 	map(0x6001, 0x6001).portr("P2");
 	map(0x6002, 0x6002).portr("DSW");
-	map(0x6004, 0x6004).w(this, FUNC(gotya_state::gotya_video_control_w));
-	map(0x6005, 0x6005).w(this, FUNC(gotya_state::gotya_soundlatch_w));
+	map(0x6004, 0x6004).w(FUNC(gotya_state::gotya_video_control_w));
+	map(0x6005, 0x6005).w(FUNC(gotya_state::gotya_soundlatch_w));
 	map(0x6006, 0x6006).writeonly().share("scroll");
 	map(0x6007, 0x6007).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(gotya_state::gotya_videoram_w)).share("videoram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gotya_state::gotya_colorram_w)).share("colorram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(gotya_state::gotya_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gotya_state::gotya_colorram_w)).share("colorram");
 	map(0xd000, 0xd3df).ram().share("videoram2");
 	map(0xd3e0, 0xd3ff).ram().share("spriteram");
 }
@@ -155,7 +155,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( gotya )
+static GFXDECODE_START( gfx_gotya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)

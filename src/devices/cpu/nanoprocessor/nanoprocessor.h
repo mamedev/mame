@@ -82,7 +82,7 @@ public:
 	// 3 cycles is for int. acknowledge + 1 instruction
 	virtual uint32_t execute_max_cycles() const override { return 3; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

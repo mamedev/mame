@@ -587,21 +587,21 @@ void cyclemb_state::cyclemb_map(address_map &map)
 void cyclemb_state::cyclemb_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc09e, 0xc09f).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
-	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
 void cyclemb_state::skydest_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc080, 0xc081).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
-	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
@@ -641,7 +641,7 @@ void cyclemb_state::cyclemb_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x40, 0x41).rw(this, FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
+	map(0x40, 0x41).rw(FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
 }
 
 
@@ -958,7 +958,7 @@ static const gfx_layout spritelayout_32x32 =
 	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
-static GFXDECODE_START( cyclemb )
+static GFXDECODE_START( gfx_cyclemb )
 	GFXDECODE_ENTRY( "tilemap_data", 0, charlayout,     0, 0x40 )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_16x16,    0x00, 0x40 )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclemb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclemb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 

@@ -190,11 +190,11 @@ void patapata_state::main_map(address_map &map)
 	map(0x100002, 0x100003).portr("IN1");
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
-	map(0x100015, 0x100015).w(this, FUNC(patapata_state::flipscreen_w));
+	map(0x100015, 0x100015).w(FUNC(patapata_state::flipscreen_w));
 	map(0x110000, 0x1103ff).ram().share("videoregs");
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x13ffff).ram().w(this, FUNC(patapata_state::fg_videoram_w)).share("fg_videoram");
-	map(0x140000, 0x14ffff).ram().w(this, FUNC(patapata_state::bg_videoram_w)).share("bg_videoram");
+	map(0x130000, 0x13ffff).ram().w(FUNC(patapata_state::fg_videoram_w)).share("fg_videoram");
+	map(0x140000, 0x14ffff).ram().w(FUNC(patapata_state::bg_videoram_w)).share("bg_videoram");
 	map(0x150001, 0x150001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x150011, 0x150011).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x150020, 0x15002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
@@ -273,7 +273,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( patapata )
+static GFXDECODE_START( gfx_patapata )
 	GFXDECODE_ENTRY( "tilesa", 0, tilelayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "tilesb", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", patapata)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_patapata)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

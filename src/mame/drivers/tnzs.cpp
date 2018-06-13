@@ -730,7 +730,7 @@ void tnzs_base_state::main_map(address_map &map)
 	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
 	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
 	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf600, 0xf600).nopr().w(this, FUNC(tnzs_base_state::ramrom_bankswitch_w));
+	map(0xf600, 0xf600).nopr().w(FUNC(tnzs_base_state::ramrom_bankswitch_w));
 	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -752,7 +752,7 @@ void tnzsb_state::tnzsb_main_map(address_map &map)
 	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
 	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
 	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf600, 0xf600).w(this, FUNC(tnzsb_state::ramrom_bankswitch_w));
+	map(0xf600, 0xf600).w(FUNC(tnzsb_state::ramrom_bankswitch_w));
 	/* kabukiz still writes here but it's not used (it's paletteram in type1 map) */
 	map(0xf800, 0xfbff).nopw();
 }
@@ -761,7 +761,7 @@ void tnzs_base_state::base_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("subbank");
-	map(0xa000, 0xa000).w(this, FUNC(tnzs_base_state::bankswitch1_w));
+	map(0xa000, 0xa000).w(FUNC(tnzs_base_state::bankswitch1_w));
 	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().share("share1");
@@ -770,9 +770,9 @@ void tnzs_base_state::base_sub_map(address_map &map)
 void tnzs_mcu_state::tnzs_sub_map(address_map &map)
 {
 	base_sub_map(map);
-	map(0xc000, 0xc001).rw(this, FUNC(tnzs_mcu_state::mcu_r), FUNC(tnzs_mcu_state::mcu_w));   /* not present in insectx */
-	map(0xa000, 0xa000).w(this, FUNC(tnzs_mcu_state::bankswitch1_w));
-	map(0xf000, 0xf003).r(this, FUNC(tnzs_mcu_state::analog_r)); /* paddles in arkanoid2/plumppop. The ports are */
+	map(0xc000, 0xc001).rw(FUNC(tnzs_mcu_state::mcu_r), FUNC(tnzs_mcu_state::mcu_w));   /* not present in insectx */
+	map(0xa000, 0xa000).w(FUNC(tnzs_mcu_state::bankswitch1_w));
+	map(0xf000, 0xf003).r(FUNC(tnzs_mcu_state::analog_r)); /* paddles in arkanoid2/plumppop. The ports are */
 											   /* read but not used by the other games, and are not read at */
 											   /* all by insectx. */
 }
@@ -780,7 +780,7 @@ void tnzs_mcu_state::tnzs_sub_map(address_map &map)
 void arknoid2_state::arknoid2_sub_map(address_map &map)
 {
 	tnzs_sub_map(map);
-	map(0xc000, 0xc001).rw(this, FUNC(arknoid2_state::mcu_r), FUNC(arknoid2_state::mcu_w));
+	map(0xc000, 0xc001).rw(FUNC(arknoid2_state::mcu_r), FUNC(arknoid2_state::mcu_w));
 }
 
 void kageki_state::kageki_sub_map(address_map &map)
@@ -805,10 +805,10 @@ void tnzsb_state::tnzsb_base_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("subbank");
-	map(0xa000, 0xa000).w(this, FUNC(tnzsb_state::bankswitch1_w));
+	map(0xa000, 0xa000).w(FUNC(tnzsb_state::bankswitch1_w));
 	map(0xb002, 0xb002).portr("DSWA");
 	map(0xb003, 0xb003).portr("DSWB");
-	map(0xb004, 0xb004).w(this, FUNC(tnzsb_state::sound_command_w));
+	map(0xb004, 0xb004).w(FUNC(tnzsb_state::sound_command_w));
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
@@ -858,7 +858,7 @@ void jpopnics_state::jpopnics_main_map(address_map &map)
 	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
 	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
 	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf600, 0xf600).nopr().w(this, FUNC(jpopnics_state::ramrom_bankswitch_w));
+	map(0xf600, 0xf600).nopr().w(FUNC(jpopnics_state::ramrom_bankswitch_w));
 	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -867,7 +867,7 @@ void jpopnics_state::jpopnics_sub_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("subbank");
 
-	map(0xa000, 0xa000).w(this, FUNC(jpopnics_state::subbankswitch_w));
+	map(0xa000, 0xa000).w(FUNC(jpopnics_state::subbankswitch_w));
 	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xc000, 0xc000).portr("IN1");
 	map(0xc001, 0xc001).portr("IN2");
@@ -1525,11 +1525,11 @@ static const gfx_layout insectx_charlayout =
 	64*8
 };
 
-static GFXDECODE_START( tnzs )
+static GFXDECODE_START( gfx_tnzs )
 	GFXDECODE_ENTRY( "gfx1", 0, tnzs_charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( insectx )
+static GFXDECODE_START( gfx_insectx )
 	GFXDECODE_ENTRY( "gfx1", 0, insectx_charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -1560,7 +1560,7 @@ MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnzs_base_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnzs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1634,7 +1634,7 @@ MACHINE_CONFIG_START(insectx_state::insectx)
 	MCFG_DEVICE_PROGRAM_MAP(insectx_sub_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", insectx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_insectx)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
@@ -1707,7 +1707,7 @@ MACHINE_CONFIG_START(kabukiz_state::kabukiz)
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, kabukiz_state, sound_bank_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

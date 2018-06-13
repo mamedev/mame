@@ -119,18 +119,18 @@ void fcombat_state::main_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram().share("videoram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
-	map(0xe000, 0xe000).r(this, FUNC(fcombat_state::fcombat_port01_r));
+	map(0xe000, 0xe000).r(FUNC(fcombat_state::fcombat_port01_r));
 	map(0xe100, 0xe100).portr("DSW0");
 	map(0xe200, 0xe200).portr("DSW1");
-	map(0xe300, 0xe300).r(this, FUNC(fcombat_state::e300_r));
-	map(0xe400, 0xe400).r(this, FUNC(fcombat_state::fcombat_protection_r)); // protection?
-	map(0xe800, 0xe800).w(this, FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
-	map(0xe900, 0xe900).w(this, FUNC(fcombat_state::e900_w));
-	map(0xea00, 0xea00).w(this, FUNC(fcombat_state::ea00_w));
-	map(0xeb00, 0xeb00).w(this, FUNC(fcombat_state::eb00_w));
-	map(0xec00, 0xec00).w(this, FUNC(fcombat_state::ec00_w));
-	map(0xed00, 0xed00).w(this, FUNC(fcombat_state::ed00_w));
-	map(0xee00, 0xee00).w(this, FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
+	map(0xe300, 0xe300).r(FUNC(fcombat_state::e300_r));
+	map(0xe400, 0xe400).r(FUNC(fcombat_state::fcombat_protection_r)); // protection?
+	map(0xe800, 0xe800).w(FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
+	map(0xe900, 0xe900).w(FUNC(fcombat_state::e900_w));
+	map(0xea00, 0xea00).w(FUNC(fcombat_state::ea00_w));
+	map(0xeb00, 0xeb00).w(FUNC(fcombat_state::eb00_w));
+	map(0xec00, 0xec00).w(FUNC(fcombat_state::ec00_w));
+	map(0xed00, 0xed00).w(FUNC(fcombat_state::ed00_w));
+	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
 	map(0xef00, 0xef00).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -250,7 +250,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( fcombat )
+static GFXDECODE_START( gfx_fcombat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     256, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     512, 64 )
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(fcombat_state::fcombat)
 	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fcombat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fcombat)
 	MCFG_PALETTE_ADD("palette", 256*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
@@ -347,9 +347,9 @@ void fcombat_state::init_fcombat()
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-					       ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-					       ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-					       ((oldaddr     ) & 0x0001);        /* keep h2 */
+						   ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+						   ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+						   ((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -366,10 +366,10 @@ void fcombat_state::init_fcombat()
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					       ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					       ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					       ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					       ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 
 		dst[newaddr] = src[oldaddr];
 	}
@@ -387,10 +387,10 @@ void fcombat_state::init_fcombat()
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					       ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					       ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					       ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					       ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 

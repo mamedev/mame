@@ -114,13 +114,13 @@ void canyon_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
-	map(0x0400, 0x0401).w(this, FUNC(canyon_state::canyon_motor_w));
-	map(0x0500, 0x0500).w(this, FUNC(canyon_state::canyon_explode_w));
+	map(0x0400, 0x0401).w(FUNC(canyon_state::canyon_motor_w));
+	map(0x0500, 0x0500).w(FUNC(canyon_state::canyon_explode_w));
 	map(0x0501, 0x0501).w(m_watchdog, FUNC(watchdog_timer_device::reset_w)); /* watchdog, disabled in service mode */
-	map(0x0600, 0x0603).select(0x0180).w(this, FUNC(canyon_state::output_latch_w));
-	map(0x0800, 0x0bff).ram().w(this, FUNC(canyon_state::canyon_videoram_w)).share("videoram");
-	map(0x1000, 0x17ff).r(this, FUNC(canyon_state::canyon_switches_r)).nopw();  /* sloppy code writes here */
-	map(0x1800, 0x1fff).r(this, FUNC(canyon_state::canyon_options_r));
+	map(0x0600, 0x0603).select(0x0180).w(FUNC(canyon_state::output_latch_w));
+	map(0x0800, 0x0bff).ram().w(FUNC(canyon_state::canyon_videoram_w)).share("videoram");
+	map(0x1000, 0x17ff).r(FUNC(canyon_state::canyon_switches_r)).nopw();  /* sloppy code writes here */
+	map(0x1800, 0x1fff).r(FUNC(canyon_state::canyon_options_r));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -225,7 +225,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( canyon )
+static GFXDECODE_START( gfx_canyon )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 2 )
 GFXDECODE_END
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", canyon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_canyon)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
 

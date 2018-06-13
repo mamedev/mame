@@ -261,9 +261,9 @@ void pce_state::pce_mem(address_map &map)
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FE800, 0x1FEBFF).rw(C6280_TAG, FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
-	map(0x1FF800, 0x1FFBFF).rw(this, FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
+	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
 }
 
 void pce_state::pce_io(address_map &map)
@@ -286,9 +286,9 @@ void pce_state::sgx_mem(address_map &map)
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FE800, 0x1FEBFF).rw(C6280_TAG, FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
-	map(0x1FF800, 0x1FFBFF).rw(this, FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
+	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
 }
 
 
@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))

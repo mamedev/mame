@@ -198,15 +198,15 @@ void snowbros_state::snowbros_map(address_map &map)
 	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x300001, 0x300001).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::snowbros_flipscreen_w));
+	map(0x400000, 0x400000).w(FUNC(snowbros_state::snowbros_flipscreen_w));
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
 	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
-	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 void snowbros_state::sound_map(address_map &map)
@@ -257,15 +257,15 @@ void snowbros_state::wintbob_map(address_map &map)
 	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x300001, 0x300001).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::bootleg_flipscreen_w));
+	map(0x400000, 0x400000).w(FUNC(snowbros_state::bootleg_flipscreen_w));
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
 	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x701fff).ram().share("spriteram16b");
-	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 /* Honey Dolls */
@@ -276,9 +276,9 @@ void snowbros_state::honeydol_map(address_map &map)
 	map(0x100000, 0x10ffff).ram().share("hyperpac_ram");
 	map(0x200000, 0x200001).nopw();    /* ? */
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x400000, 0x400001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x500000, 0x500001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0x600000, 0x600001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x400000, 0x400001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x500000, 0x500001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0x600000, 0x600001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 	map(0x800000, 0x800001).nopw();    /* ? */
 	map(0x900000, 0x900001).portr("DSW1");
 	map(0x900002, 0x900003).portr("DSW2");
@@ -311,16 +311,16 @@ void snowbros_state::twinadv_map(address_map &map)
 	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x300001, 0x300001).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::bootleg_flipscreen_w));
+	map(0x400000, 0x400000).w(FUNC(snowbros_state::bootleg_flipscreen_w));
 
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
 	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x701fff).ram().share("spriteram16b");
-	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
@@ -337,7 +337,7 @@ void snowbros_state::twinadv_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x02).w("soundlatch2", FUNC(generic_latch_8_device::write)); // back to 68k?
-	map(0x04, 0x04).w(this, FUNC(snowbros_state::twinadv_oki_bank_w)); // oki bank?
+	map(0x04, 0x04).w(FUNC(snowbros_state::twinadv_oki_bank_w)); // oki bank?
 	map(0x06, 0x06).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -361,9 +361,9 @@ void snowbros_state::hyperpac_map(address_map &map)
 
 	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
-	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 void snowbros_state::hyperpac_sound_map(address_map &map)
@@ -487,17 +487,17 @@ void snowbros_state::snowbros3_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x300000, 0x300001).r(this, FUNC(snowbros_state::sb3_sound_r)); // ?
-	map(0x300000, 0x300001).w(this, FUNC(snowbros_state::sb3_sound_w));  // ?
-	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::bootleg_flipscreen_w));
+	map(0x300000, 0x300001).r(FUNC(snowbros_state::sb3_sound_r)); // ?
+	map(0x300000, 0x300001).w(FUNC(snowbros_state::sb3_sound_w));  // ?
+	map(0x400000, 0x400000).w(FUNC(snowbros_state::bootleg_flipscreen_w));
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
 	map(0x600000, 0x6003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x7021ff).ram().share("spriteram16b");
-	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 /* Final Tetris */
@@ -515,9 +515,9 @@ void snowbros_state::finalttr_map(address_map &map)
 
 	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
-	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 
@@ -546,9 +546,9 @@ void snowbros_state::yutnori_map(address_map &map)
 
 	map(0x700000, 0x70ffff).ram();
 
-	map(0x800000, 0x800001).nopr().w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).nopr().w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).nopr().w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).nopr().w(FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).nopr().w(FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).nopr().w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
 static INPUT_PORTS_START( snowbros )
@@ -1623,7 +1623,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( snowbros )
+static GFXDECODE_START( gfx_snowbros )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
 GFXDECODE_END
 
@@ -1640,13 +1640,13 @@ static const gfx_layout honeydol_tilelayout8bpp =
 	32*32
 };
 
-static GFXDECODE_START( honeydol )
+static GFXDECODE_START( gfx_honeydol )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 ) // how does it use 0-15
 	GFXDECODE_ENTRY( "gfx2", 0, honeydol_tilelayout8bpp,  0, 4 )
 
 GFXDECODE_END
 
-static GFXDECODE_START( twinadv )
+static GFXDECODE_START( gfx_twinadv )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 )
 GFXDECODE_END
 
@@ -1663,7 +1663,7 @@ static const gfx_layout tilelayout_wb =
 	16*64
 };
 
-static GFXDECODE_START( wb )
+static GFXDECODE_START( gfx_wb )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_wb,  0, 16 )
 GFXDECODE_END
 
@@ -1697,12 +1697,12 @@ static const gfx_layout sb3_tilebglayout =
 };
 
 
-static GFXDECODE_START( sb3 )
+static GFXDECODE_START( gfx_sb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sb3_tilebglayout,  0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( hyperpac )
+static GFXDECODE_START( gfx_hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
@@ -1746,7 +1746,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snowbros)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1778,7 +1778,7 @@ MACHINE_CONFIG_START(snowbros_state::wintbob)
 	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
@@ -1798,7 +1798,7 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	MCFG_DEVICE_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hyperpac)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(NOOP)
@@ -1854,7 +1854,7 @@ MACHINE_CONFIG_START(snowbros_state::honeydol)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", honeydol)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_honeydol)
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1895,7 +1895,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twinadv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twinadv)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1957,7 +1957,7 @@ MACHINE_CONFIG_START(snowbros_state::_4in1)
 	semicom(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_snowbros)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
@@ -1977,7 +1977,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sb3)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2009,7 +2009,7 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hyperpac)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

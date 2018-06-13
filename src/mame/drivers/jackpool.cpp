@@ -147,7 +147,7 @@ void jackpool_state::jackpool_mem(address_map &map)
 	map(0x348000, 0x34ffff).ram(); //<- vram banks 2 & 3?
 
 	map(0x360000, 0x3603ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x38002f).r(this, FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
+	map(0x380000, 0x38002f).r(FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
 	map(0x380030, 0x38003f).w("latch1", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x380040, 0x38004f).w("latch2", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x380050, 0x38005f).w("latch3", FUNC(ls259_device::write_d0)).umask16(0x00ff);
@@ -214,7 +214,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jackpool )
+static GFXDECODE_START( gfx_jackpool )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 0x20  ) /* sprites */
 GFXDECODE_END
 
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackpool)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 

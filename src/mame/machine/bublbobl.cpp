@@ -115,7 +115,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 {
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(bublbobl_state::tokiob_mcu_r)

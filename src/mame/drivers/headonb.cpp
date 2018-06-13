@@ -101,7 +101,7 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 void headonb_state::headonb_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().mirror(0x4000);
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(headonb_state::video_ram_w)).share("video_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(headonb_state::video_ram_w)).share("video_ram");
 	map(0xff00, 0xffff).ram();
 }
 
@@ -158,7 +158,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( headonb )
+static GFXDECODE_START( gfx_headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -179,7 +179,7 @@ MACHINE_CONFIG_START(headonb_state::headonb)
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_headonb)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

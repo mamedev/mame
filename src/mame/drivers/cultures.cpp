@@ -196,7 +196,7 @@ void cultures_state::oki_map(address_map &map)
 
 void cultures_state::vrambank_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
 	map(0x4000, 0x6fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -220,9 +220,9 @@ void cultures_state::cultures_io_map(address_map &map)
 	map(0x50, 0x53).ram().share("bg1_regs_y");
 	map(0x60, 0x63).ram().share("bg2_regs_x");
 	map(0x70, 0x73).ram().share("bg2_regs_y");
-	map(0x80, 0x80).w(this, FUNC(cultures_state::cpu_bankswitch_w));
-	map(0x90, 0x90).w(this, FUNC(cultures_state::misc_w));
-	map(0xa0, 0xa0).w(this, FUNC(cultures_state::bg_bank_w));
+	map(0x80, 0x80).w(FUNC(cultures_state::cpu_bankswitch_w));
+	map(0x90, 0x90).w(FUNC(cultures_state::misc_w));
+	map(0xa0, 0xa0).w(FUNC(cultures_state::bg_bank_w));
 	map(0xc0, 0xc0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd0, 0xd0).portr("SW1_A");
 	map(0xd1, 0xd1).portr("SW1_B");
@@ -369,7 +369,7 @@ static const gfx_layout gfxlayout =
 	8*64,
 };
 
-static GFXDECODE_START( culture )
+static GFXDECODE_START( gfx_cultures )
 	GFXDECODE_ENTRY("bg0", 0, gfxlayout, 0x0000, 16 )
 	GFXDECODE_ENTRY("bg1", 0, gfxlayout, 0x1000, 8 )
 	GFXDECODE_ENTRY("bg2", 0, gfxlayout, 0x1000, 8 )
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", culture)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cultures)
 	MCFG_PALETTE_ADD("palette", 0x3000/2)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 

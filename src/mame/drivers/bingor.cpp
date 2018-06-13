@@ -685,7 +685,7 @@ static const gfx_layout bingor_layout =
 	8*32
 };
 
-static GFXDECODE_START( bingor )
+static GFXDECODE_START( gfx_bingor )
 	GFXDECODE_ENTRY( "gfx", 0, bingor_layout,   0x0, 2  )
 GFXDECODE_END
 
@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(bingor_state::bingor)
 
 	MCFG_DEVICE_ADD("pic", PIC16C57, 12000000) //?? Mhz
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bingor)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -739,8 +739,8 @@ void bingor_state::vip2000_io(address_map &map)
 {
 	map(0x0000, 0x0001).nopr(); // watchdog
 	map(0x0080, 0x009f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x0100, 0x0100).rw(this, FUNC(bingor_state::fromslave_r), FUNC(bingor_state::toslave_w));
-	map(0x0280, 0x0281).w(this, FUNC(bingor_state::vip2000_outputs_w));
+	map(0x0100, 0x0100).rw(FUNC(bingor_state::fromslave_r), FUNC(bingor_state::toslave_w));
+	map(0x0280, 0x0281).w(FUNC(bingor_state::vip2000_outputs_w));
 }
 
 WRITE8_MEMBER(bingor_state::toslave_w)
@@ -775,7 +775,7 @@ void bingor_state::slave_map(address_map &map)
 
 void bingor_state::slave_io(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(bingor_state::toslave_r), FUNC(bingor_state::fromslave_w));
+	map(0x0000, 0x0000).rw(FUNC(bingor_state::toslave_r), FUNC(bingor_state::fromslave_w));
 	map(0xc000, 0xcfff).ram();
 }
 

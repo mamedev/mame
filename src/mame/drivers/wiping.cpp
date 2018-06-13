@@ -88,7 +88,7 @@ void wiping_state::main_map(address_map &map)
 	map(0x9000, 0x93ff).ram().share("share1");
 	map(0x9800, 0x9bff).ram().share("share2");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa800, 0xa807).r(this, FUNC(wiping_state::ports_r));
+	map(0xa800, 0xa807).r(FUNC(wiping_state::ports_r));
 	map(0xb000, 0xb7ff).ram();
 	map(0xb800, 0xb800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
@@ -266,7 +266,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( wiping )
+static GFXDECODE_START( gfx_wiping )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wiping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiping)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)

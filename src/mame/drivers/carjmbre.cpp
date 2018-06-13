@@ -244,11 +244,11 @@ WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 void carjmbre_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8803, 0x8803).w(this, FUNC(carjmbre_state::nmi_enable_w));
-	map(0x8805, 0x8805).w(this, FUNC(carjmbre_state::bgcolor_w));
-	map(0x8807, 0x8807).w(this, FUNC(carjmbre_state::flipscreen_w));
+	map(0x8803, 0x8803).w(FUNC(carjmbre_state::nmi_enable_w));
+	map(0x8805, 0x8805).w(FUNC(carjmbre_state::bgcolor_w));
+	map(0x8807, 0x8807).w(FUNC(carjmbre_state::flipscreen_w));
 	map(0x8000, 0x87ff).ram(); // 6116
-	map(0x9000, 0x97ff).ram().w(this, FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
+	map(0x9000, 0x97ff).ram().w(FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
 	map(0x9800, 0x98ff).ram().share("spriteram"); // 5101*2
 	map(0xa000, 0xa000).portr("IN1");
 	map(0xa800, 0xa800).portr("IN2");
@@ -349,7 +349,7 @@ static const gfx_layout carjmbre_spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( carjmbre )
+static GFXDECODE_START( gfx_carjmbre )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, carjmbre_spritelayout, 0, 16 )
 GFXDECODE_END
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 	MCFG_SCREEN_UPDATE_DRIVER(carjmbre_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carjmbre)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carjmbre)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
 

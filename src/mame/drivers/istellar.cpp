@@ -154,7 +154,7 @@ void istellar_state::z80_2_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0x1800, 0x1fff).ram();
-	map(0xc000, 0xc000).r(this, FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
+	map(0xc000, 0xc000).r(FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
 }
 
 
@@ -180,7 +180,7 @@ void istellar_state::z80_1_io(address_map &map)
 void istellar_state::z80_2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
+	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
 	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
 /*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/
@@ -254,7 +254,7 @@ static const gfx_layout istellar_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( istellar )
+static GFXDECODE_START( gfx_istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	// Daphne says "TODO: get the real interstellar resistor values"
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istellar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

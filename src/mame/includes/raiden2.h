@@ -11,12 +11,6 @@ class raiden2_state : public driver_device
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		/*
-		, m_back_data(*this, "back_data")
-		, m_fore_data(*this, "fore_data")
-		, m_mid_data(*this, "mid_data")
-		, m_text_data(*this, "text_data")
-		*/
 		, m_spriteram(*this, "spriteram")
 		, m_maincpu(*this, "maincpu")
 		, m_seibu_sound(*this, "seibu_sound")
@@ -51,6 +45,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_fore_data;
 	std::unique_ptr<uint16_t[]> m_mid_data;
 	std::unique_ptr<uint16_t[]> m_text_data; // private buffers, allocated in init
+	std::unique_ptr<uint16_t[]> m_palette_data;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -162,4 +157,4 @@ protected:
 	virtual void machine_start() override;
 };
 
-GFXDECODE_EXTERN( raiden2 );
+GFXDECODE_EXTERN( gfx_raiden2 );

@@ -1115,7 +1115,7 @@ void saturn_state::stv_vdp1_set_drawpixel( void )
 		drawpixel = &saturn_state::drawpixel_generic;
 		return;
 	}
-	
+
 	// polygon / polyline / line with replace case
 	if (sprite_type & 4 && ((stv2_current_sprite.CMDPMOD & 0x7) == 0))
 	{

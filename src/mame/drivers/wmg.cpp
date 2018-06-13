@@ -128,7 +128,7 @@ void wmg_state::wmg_cpu1(address_map &map)
 	map(0x9000, 0xbfff).ram();
 	map(0xc000, 0xcfff).bankr("bank7");
 	map(0xd000, 0xffff).bankr("bank5");
-	map(0xd000, 0xd000).w(this, FUNC(wmg_state::wmg_d000_w));
+	map(0xd000, 0xd000).w(FUNC(wmg_state::wmg_d000_w));
 }
 
 void wmg_state::wmg_cpu2(address_map &map)
@@ -421,7 +421,6 @@ MACHINE_RESET_MEMBER( wmg_state, wmg )
 	m_wmg_port_select=0;
 	m_wmg_vram_bank=0;
 	wmg_c400_w( space1, 0, 0);
-	MACHINE_RESET_CALL_MEMBER(williams_common);
 	m_maincpu->reset();
 }
 
@@ -503,8 +502,11 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_MACHINE_RESET_OVERRIDE(wmg_state, wmg)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -536,7 +538,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END

@@ -132,19 +132,19 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 void sns_rom_sgb_device::supergb_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(this, FUNC(sns_rom_sgb_device::gb_cart_r), FUNC(sns_rom_sgb_device::gb_bank_w));
+	map(0x0000, 0x7fff).rw(FUNC(sns_rom_sgb_device::gb_cart_r), FUNC(sns_rom_sgb_device::gb_bank_w));
 	map(0x8000, 0x9fff).rw("sgb_ppu", FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));  /* 8k VRAM */
-	map(0xa000, 0xbfff).rw(this, FUNC(sns_rom_sgb_device::gb_ram_r), FUNC(sns_rom_sgb_device::gb_ram_w));   /* 8k switched RAM bank (cartridge) */
+	map(0xa000, 0xbfff).rw(FUNC(sns_rom_sgb_device::gb_ram_r), FUNC(sns_rom_sgb_device::gb_ram_w));   /* 8k switched RAM bank (cartridge) */
 	map(0xc000, 0xdfff).ram();                              /* 8k low RAM */
-	map(0xe000, 0xfdff).rw(this, FUNC(sns_rom_sgb_device::gb_echo_r), FUNC(sns_rom_sgb_device::gb_echo_w));
+	map(0xe000, 0xfdff).rw(FUNC(sns_rom_sgb_device::gb_echo_r), FUNC(sns_rom_sgb_device::gb_echo_w));
 	map(0xfe00, 0xfeff).rw("sgb_ppu", FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));    /* OAM RAM */
-	map(0xff00, 0xff0f).rw(this, FUNC(sns_rom_sgb_device::gb_io_r), FUNC(sns_rom_sgb_device::gb_io_w));      /* I/O */
+	map(0xff00, 0xff0f).rw(FUNC(sns_rom_sgb_device::gb_io_r), FUNC(sns_rom_sgb_device::gb_io_w));      /* I/O */
 	map(0xff10, 0xff26).rw("sgb_apu", FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));      /* sound registers */
 	map(0xff27, 0xff2f).noprw();                     /* unused */
 	map(0xff30, 0xff3f).rw("sgb_apu", FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));        /* Wave RAM */
 	map(0xff40, 0xff7f).rw("sgb_ppu", FUNC(sgb_ppu_device::video_r), FUNC(sgb_ppu_device::video_w)); /* also disable bios?? */        /* Video controller & BIOS flip-flop */
 	map(0xff80, 0xfffe).ram();                     /* High RAM */
-	map(0xffff, 0xffff).rw(this, FUNC(sns_rom_sgb_device::gb_ie_r), FUNC(sns_rom_sgb_device::gb_ie_w));        /* Interrupt enable register */
+	map(0xffff, 0xffff).rw(FUNC(sns_rom_sgb_device::gb_ie_r), FUNC(sns_rom_sgb_device::gb_ie_w));        /* Interrupt enable register */
 }
 
 
@@ -167,7 +167,7 @@ MACHINE_CONFIG_START(sns_rom_sgb1_device::device_add_mconfig)
 	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
 	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, 4295454)
 
@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(sns_rom_sgb2_device::device_add_mconfig)
 	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
 	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
 

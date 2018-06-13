@@ -100,7 +100,13 @@ class didact_state : public driver_device
 		, m_lines{ 0, 0, 0, 0 }
 		, m_led(0)
 		, m_rs232(*this, "rs232")
+		, m_leds(*this, "led%u", 0U)
 	{ }
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_ioport_array<5> m_io_lines;
 	uint8_t m_lines[4];
@@ -108,7 +114,7 @@ class didact_state : public driver_device
 	uint8_t m_shift;
 	uint8_t m_led;
 	optional_device<rs232_port_device> m_rs232;
-	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
+	output_finder<2> m_leds;
 };
 
 
@@ -246,7 +252,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
 	LOG("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
-	output().set_led_value(m_led, !state);
+	m_leds[m_led] = state ? 0 :1;
 
 	// Serial Out - needs debug/verification
 	m_rs232->write_txd(state);
@@ -258,6 +264,7 @@ void md6802_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
 
+	didact_state::machine_start();
 	m_7segs.resolve();
 
 	save_item(NAME(m_reset));
@@ -415,7 +422,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
-		output().set_led_value(m_led, m_shift);
+		m_leds[m_led] = m_shift ? 1 : 0;
 		LOG("SHIFT is released\n");
 	}
 
@@ -452,6 +459,7 @@ void mp68a_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
 
+	didact_state::machine_start();
 	m_7segs.resolve();
 
 	/* register for state saving */
@@ -550,7 +558,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 	{
 		LOG("RESET is pressed, resetting the CPU\n");
 		m_shift = 0;
-		output().set_led_value(m_led, m_shift); // For mp68a only
+		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
 		if (m_reset == 0)
 		{
 			machine_reset();
@@ -562,7 +570,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 		// Poll the artwork SHIFT/* key
 		LOG("%s", !m_shift ? "SHIFT is set\n" : "");
 		m_shift = 1;
-		output().set_led_value(m_led, m_shift); // For mp68a only
+		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
 	}
 	else
 	{

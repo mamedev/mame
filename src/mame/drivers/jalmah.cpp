@@ -1023,20 +1023,20 @@ void jalmah_state::jalmah(address_map &map)
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("DSW");
 	//       0x080004, 0x080005  MCU read,different for each game
-	map(0x080010, 0x080011).w(this, FUNC(jalmah_state::jalmah_flip_screen_w));
+	map(0x080010, 0x080011).w(FUNC(jalmah_state::jalmah_flip_screen_w));
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/map(0x080016, 0x080017).ram().w(this, FUNC(jalmah_state::jalmah_tilebank_w));
-	map(0x080018, 0x080019).w(this, FUNC(jalmah_state::jalmah_okibank_w));
-	map(0x08001a, 0x08001b).w(this, FUNC(jalmah_state::jalmah_okirom_w));
-/**/map(0x080020, 0x08003f).ram().w(this, FUNC(jalmah_state::jalmah_scroll_w));
+/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::jalmah_tilebank_w));
+	map(0x080018, 0x080019).w(FUNC(jalmah_state::jalmah_okibank_w));
+	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::jalmah_okirom_w));
+/**/map(0x080020, 0x08003f).ram().w(FUNC(jalmah_state::jalmah_scroll_w));
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//       0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x090000, 0x093fff).ram().w(this, FUNC(jalmah_state::sc0_vram_w)).share("sc0_vram");
-	map(0x094000, 0x097fff).ram().w(this, FUNC(jalmah_state::sc1_vram_w)).share("sc1_vram");
-	map(0x098000, 0x09bfff).ram().w(this, FUNC(jalmah_state::sc2_vram_w)).share("sc2_vram");
-	map(0x09c000, 0x09ffff).ram().w(this, FUNC(jalmah_state::sc3_vram_w)).share("sc3_vram");
+	map(0x090000, 0x093fff).ram().w(FUNC(jalmah_state::sc0_vram_w)).share("sc0_vram");
+	map(0x094000, 0x097fff).ram().w(FUNC(jalmah_state::sc1_vram_w)).share("sc1_vram");
+	map(0x098000, 0x09bfff).ram().w(FUNC(jalmah_state::sc2_vram_w)).share("sc2_vram");
+	map(0x09c000, 0x09ffff).ram().w(FUNC(jalmah_state::sc3_vram_w)).share("sc3_vram");
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
 	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
@@ -1048,25 +1048,25 @@ void jalmah_state::urashima(address_map &map)
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("DSW");
 	//       0x080004, 0x080005  MCU read,different for each game
-	map(0x080010, 0x080011).w(this, FUNC(jalmah_state::jalmah_flip_screen_w));
+	map(0x080010, 0x080011).w(FUNC(jalmah_state::jalmah_flip_screen_w));
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/map(0x080016, 0x080017).ram().w(this, FUNC(jalmah_state::urashima_dma_w));
-	map(0x080018, 0x080019).w(this, FUNC(jalmah_state::jalmah_okibank_w));
-	map(0x08001a, 0x08001b).w(this, FUNC(jalmah_state::jalmah_okirom_w));
-/**/map(0x08001c, 0x08001d).ram().w(this, FUNC(jalmah_state::urashima_bank_w));
+/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::urashima_dma_w));
+	map(0x080018, 0x080019).w(FUNC(jalmah_state::jalmah_okibank_w));
+	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::jalmah_okirom_w));
+/**/map(0x08001c, 0x08001d).ram().w(FUNC(jalmah_state::urashima_bank_w));
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//       0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x090000, 0x093fff).ram().w(this, FUNC(jalmah_state::urashima_sc0_vram_w)).share("sc0_vram");
-	map(0x094000, 0x097fff).ram().w(this, FUNC(jalmah_state::urashima_sc0_vram_w));
-	map(0x098000, 0x09bfff).ram().w(this, FUNC(jalmah_state::urashima_sc0_vram_w));
+	map(0x090000, 0x093fff).ram().w(FUNC(jalmah_state::urashima_sc0_vram_w)).share("sc0_vram");
+	map(0x094000, 0x097fff).ram().w(FUNC(jalmah_state::urashima_sc0_vram_w));
+	map(0x098000, 0x09bfff).ram().w(FUNC(jalmah_state::urashima_sc0_vram_w));
 //  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
 //  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
 	/*$9c000-$9cfff Video Registers*/
-/**/map(0x09c000, 0x09dfff).w(this, FUNC(jalmah_state::urashima_vregs_w));
+/**/map(0x09c000, 0x09dfff).w(FUNC(jalmah_state::urashima_vregs_w));
 /**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE(urashima_sc2vregs_w)
-	map(0x09e000, 0x0a1fff).ram().w(this, FUNC(jalmah_state::urashima_sc3_vram_w)).share("sc3_vram");
+	map(0x09e000, 0x0a1fff).ram().w(FUNC(jalmah_state::urashima_sc3_vram_w)).share("sc3_vram");
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
 	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
@@ -1388,7 +1388,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( jalmah )
+static GFXDECODE_START( gfx_jalmah )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x300, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1396,7 +1396,7 @@ static GFXDECODE_START( jalmah )
 GFXDECODE_END
 
 /*different color offsets*/
-static GFXDECODE_START( urashima )
+static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1431,7 +1431,7 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	//M50747 MCU
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jalmah)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1457,7 +1457,7 @@ MACHINE_CONFIG_START(jalmah_state::urashima)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(urashima)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
 
 	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
 	MCFG_SCREEN_MODIFY("screen")

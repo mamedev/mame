@@ -259,7 +259,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( carrera )
+static GFXDECODE_START( gfx_carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carrera)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 

@@ -395,7 +395,7 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 
 	// IEEE-488
-	m_ieee488->dio_w(data);
+	m_ieee488->write_dio(data);
 }
 
 DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
@@ -807,11 +807,11 @@ ROM_START( victor9k )
 	ROM_REGION( 0x2000, I8088_TAG, 0 )
 	ROM_DEFAULT_BIOS( "univ" )
 	ROM_SYSTEM_BIOS( 0, "old", "Older" )
-	ROMX_LOAD( "102320.7j", 0x0000, 0x1000, CRC(3d615fd7) SHA1(b22f7e5d66404185395d8effbf57efded0079a92), ROM_BIOS(1) )
-	ROMX_LOAD( "102322.8j", 0x1000, 0x1000, CRC(9209df0e) SHA1(3ee8e0c15186bbd5768b550ecc1fa3b6b1dbb928), ROM_BIOS(1) )
+	ROMX_LOAD( "102320.7j", 0x0000, 0x1000, CRC(3d615fd7) SHA1(b22f7e5d66404185395d8effbf57efded0079a92), ROM_BIOS(0) )
+	ROMX_LOAD( "102322.8j", 0x1000, 0x1000, CRC(9209df0e) SHA1(3ee8e0c15186bbd5768b550ecc1fa3b6b1dbb928), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "univ", "Universal" )
-	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(2) )
-	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(2) )
+	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(1) )
+	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(1) )
 ROM_END
 
 

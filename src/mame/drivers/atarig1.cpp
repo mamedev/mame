@@ -185,16 +185,16 @@ void atarig1_state::main_map(address_map &map)
 	map(0xf90000, 0xf90000).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0xf98000, 0xf98001).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0xfa0001, 0xfa0001).w(m_rle, FUNC(atari_rle_objects_device::control_write));
-	map(0xfb0000, 0xfb0001).w(this, FUNC(atarig1_state::video_int_ack_w));
+	map(0xfb0000, 0xfb0001).w(FUNC(atarig1_state::video_int_ack_w));
 	map(0xfc0000, 0xfc0001).portr("IN0");
-	map(0xfc8000, 0xfc8007).rw(this, FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
+	map(0xfc8000, 0xfc8007).rw(FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	map(0xfe8000, 0xfe89ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
-	map(0xff2000, 0xff2001).w(this, FUNC(atarig1_state::mo_command_w)).share("mo_command");
+	map(0xff2000, 0xff2001).w(FUNC(atarig1_state::mo_command_w)).share("mo_command");
 	map(0xff4000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 }
@@ -347,7 +347,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarig1 )
+static GFXDECODE_START( gfx_atarig1 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x300, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x300, 8 )
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)
 	MCFG_PALETTE_ADD("palette", 1280)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

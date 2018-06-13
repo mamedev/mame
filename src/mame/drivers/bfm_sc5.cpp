@@ -89,7 +89,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 
 #if 1
 	// dev1
-	map(0x01010000, 0x010101ff).rw(this, FUNC(bfm_sc5_state::sc5_mux1_r), FUNC(bfm_sc5_state::sc5_mux1_w)); // guess
+	map(0x01010000, 0x010101ff).rw(FUNC(bfm_sc5_state::sc5_mux1_r), FUNC(bfm_sc5_state::sc5_mux1_w)); // guess
 #endif
 
 #if 0
@@ -119,7 +119,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 
 #if 1
 	// dev2
-	map(0x01020000, 0x010201ff).w(this, FUNC(bfm_sc5_state::sc5_mux2_w)); // guess
+	map(0x01020000, 0x010201ff).w(FUNC(bfm_sc5_state::sc5_mux2_w)); // guess
 #endif
 
 #if 0
@@ -135,7 +135,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 	map(0x010202b0, 0x010202b3).nopw();
 	map(0x010202c0, 0x010202c3).nopw();
 #endif
-	map(0x010202F0, 0x010202F3).rw(this, FUNC(bfm_sc5_state::sc5_10202F0_r), FUNC(bfm_sc5_state::sc5_10202F0_w));
+	map(0x010202F0, 0x010202F3).rw(FUNC(bfm_sc5_state::sc5_10202F0_r), FUNC(bfm_sc5_state::sc5_10202F0_w));
 #if 1
 	map(0x01020330, 0x01020333).nopw();
 
@@ -145,7 +145,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 
 	map(0x01020390, 0x01020393).nopw();
 #endif
-	map(0x02000000, 0x0200001f).w(this, FUNC(bfm_sc5_state::sc5_duart_w));
+	map(0x02000000, 0x0200001f).w(FUNC(bfm_sc5_state::sc5_duart_w));
 
 	// ram
 	map(0x40000000, 0x4000ffff).ram();

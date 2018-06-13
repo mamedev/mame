@@ -149,9 +149,9 @@ void jupiter3_state::jupiter3_mem(address_map &map)
 void jupiter3_state::jupiter3_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa1, 0xa4).r(this, FUNC(jupiter3_state::ff_r));
-	map(0xb0, 0xb0).r(this, FUNC(jupiter3_state::status_r));
-	map(0xb2, 0xb2).r(this, FUNC(jupiter3_state::key_r));
+	map(0xa1, 0xa4).r(FUNC(jupiter3_state::ff_r));
+	map(0xb0, 0xb0).r(FUNC(jupiter3_state::status_r));
+	map(0xb2, 0xb2).r(FUNC(jupiter3_state::key_r));
 }
 
 READ8_MEMBER( jupiter3_state::ff_r )
@@ -431,6 +431,6 @@ void jupiter3_state::init_jupiter3()
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY      FULLNAME       FLAGS
-COMP( 1976, jupiter2, 0,      0,      jupiter2, jupiter, jupiter2_state, empty_init, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, jupiter3, 0,      0,      jupiter3, jupiter, jupiter3_state, empty_init, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT           COMPANY      FULLNAME       FLAGS
+COMP( 1976, jupiter2, 0,      0,      jupiter2, jupiter, jupiter2_state, init_jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,      jupiter3, jupiter, jupiter3_state, init_jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -273,8 +273,8 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 void olibochu_state::olibochu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(olibochu_state::olibochu_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(olibochu_state::olibochu_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(olibochu_state::olibochu_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(olibochu_state::olibochu_colorram_w)).share("colorram");
 	map(0x9000, 0x903f).ram(); //???
 	map(0x9800, 0x983f).ram(); //???
 	map(0xa000, 0xa000).portr("IN0");
@@ -283,8 +283,8 @@ void olibochu_state::olibochu_map(address_map &map)
 	map(0xa003, 0xa003).portr("DSW0");
 	map(0xa004, 0xa004).portr("DSW1");
 	map(0xa005, 0xa005).portr("DSW2");
-	map(0xa800, 0xa801).w(this, FUNC(olibochu_state::sound_command_w));
-	map(0xa802, 0xa802).w(this, FUNC(olibochu_state::olibochu_flipscreen_w));    /* bit 6 = enable sound? */
+	map(0xa800, 0xa801).w(FUNC(olibochu_state::sound_command_w));
+	map(0xa802, 0xa802).w(FUNC(olibochu_state::olibochu_flipscreen_w));    /* bit 6 = enable sound? */
 	map(0xf000, 0xffff).ram();
 	map(0xf400, 0xf41f).ram().share("spriteram");
 	map(0xf440, 0xf47f).ram().share("spriteram2");
@@ -433,7 +433,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( olibochu )
+static GFXDECODE_START( gfx_olibochu )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 64 )
 GFXDECODE_END
@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", olibochu)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_olibochu)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
 

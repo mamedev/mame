@@ -101,8 +101,8 @@ void plan80_state::plan80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).r(this, FUNC(plan80_state::plan80_04_r));
-	map(0x09, 0x09).w(this, FUNC(plan80_state::plan80_09_w));
+	map(0x04, 0x04).r(FUNC(plan80_state::plan80_04_r));
+	map(0x09, 0x09).w(FUNC(plan80_state::plan80_09_w));
 }
 
 /* Input ports */
@@ -224,7 +224,7 @@ static const gfx_layout plan80_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( plan80 )
+static GFXDECODE_START( gfx_plan80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, plan80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(plan80_state::plan80)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plan80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plan80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 

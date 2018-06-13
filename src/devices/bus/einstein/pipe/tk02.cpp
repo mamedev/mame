@@ -26,7 +26,7 @@ void tk02_device::map(address_map &map)
 //  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
 	map(0x08, 0x08).mirror(0xff00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).mirror(0xff00).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x0c, 0x0c).mirror(0xff00).r(this, FUNC(tk02_device::status_r));
+	map(0x0c, 0x0c).mirror(0xff00).r(FUNC(tk02_device::status_r));
 }
 
 //-------------------------------------------------
@@ -87,7 +87,7 @@ static const gfx_layout tk02_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( tk02 )
+static GFXDECODE_START( gfx_tk02 )
 	GFXDECODE_ENTRY("gfx", 0x0000, tk02_charlayout, 0, 1)
 	GFXDECODE_ENTRY("gfx", 0x1000, tk02_charlayout, 0, 1)
 GFXDECODE_END
@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk02)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk02)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "mono", XTAL(8'000'000) / 4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

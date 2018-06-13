@@ -18,7 +18,7 @@ Atari Triple Hunt Driver
 
 void triplhnt_state::init_triplhnt()
 {
-	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
+	subdevice<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
 
 
@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
 
 WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -114,6 +114,12 @@ READ8_MEMBER(triplhnt_state::da_latch_r)
 }
 
 
+void triplhnt_state::machine_start()
+{
+	m_lamp.resolve();
+}
+
+
 void triplhnt_state::triplhnt_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -127,10 +133,10 @@ void triplhnt_state::triplhnt_map(address_map &map)
 	map(0x0c08, 0x0c08).portr("0C08");
 	map(0x0c09, 0x0c09).portr("0C09");
 	map(0x0c0a, 0x0c0a).portr("0C0A");
-	map(0x0c0b, 0x0c0b).r(this, FUNC(triplhnt_state::input_port_4_r));
-	map(0x0c10, 0x0c1f).r(this, FUNC(triplhnt_state::da_latch_r));
-	map(0x0c20, 0x0c2f).r(this, FUNC(triplhnt_state::cmos_r)).share("nvram");
-	map(0x0c30, 0x0c3f).r(this, FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
+	map(0x0c0b, 0x0c0b).r(FUNC(triplhnt_state::input_port_4_r));
+	map(0x0c10, 0x0c1f).r(FUNC(triplhnt_state::da_latch_r));
+	map(0x0c20, 0x0c2f).r(FUNC(triplhnt_state::cmos_r)).share("nvram");
+	map(0x0c30, 0x0c3f).r(FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
 	map(0x0c40, 0x0c40).portr("0C40");
 	map(0x0c48, 0x0c48).portr("0C48");
 	map(0x7000, 0x7fff).rom(); /* program */
@@ -270,7 +276,7 @@ static const gfx_layout triplhnt_tile_layout =
 };
 
 
-static GFXDECODE_START( triplhnt )
+static GFXDECODE_START( gfx_triplhnt )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_small_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_large_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, triplhnt_tile_layout, 4, 2 )
@@ -321,7 +327,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 

@@ -77,7 +77,7 @@ void actfancr_state::actfan_map(address_map &map)
 	map(0x070010, 0x07001f).w(m_tilegen2, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
 	map(0x072000, 0x0727ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
 	map(0x100000, 0x1007ff).ram().share("spriteram");
-	map(0x110000, 0x110001).w(this, FUNC(actfancr_state::actfancr_buffer_spriteram_w));
+	map(0x110000, 0x110001).w(FUNC(actfancr_state::actfancr_buffer_spriteram_w));
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x130000, 0x130000).portr("P1");
 	map(0x130001, 0x130001).portr("P2");
@@ -100,12 +100,12 @@ void actfancr_state::triothep_map(address_map &map)
 	map(0x064000, 0x0647ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
 	map(0x066400, 0x0667ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
 	map(0x100000, 0x100000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x110000, 0x110001).w(this, FUNC(actfancr_state::actfancr_buffer_spriteram_w));
+	map(0x110000, 0x110001).w(FUNC(actfancr_state::actfancr_buffer_spriteram_w));
 	map(0x120000, 0x1207ff).ram().share("spriteram");
 	map(0x130000, 0x1305ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x140000, 0x140001).nopr(); /* Value doesn't matter */
 	map(0x1f0000, 0x1f3fff).ram().share("main_ram"); /* Main ram */
-	map(0x1ff000, 0x1ff001).rw(this, FUNC(actfancr_state::triothep_control_r), FUNC(actfancr_state::triothep_control_select_w));
+	map(0x1ff000, 0x1ff001).rw(FUNC(actfancr_state::triothep_control_r), FUNC(actfancr_state::triothep_control_select_w));
 	map(0x1ff400, 0x1ff403).w(m_maincpu, FUNC(h6280_device::irq_status_w));
 }
 
@@ -260,13 +260,13 @@ static const gfx_layout sprites =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( actfan )
+static GFXDECODE_START( gfx_actfan )
 	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprites,   512, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, tiles,     256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( triothep )
+static GFXDECODE_START( gfx_triothep )
 	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprites,   256, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, tiles,     512, 16 )
@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actfan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triothep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

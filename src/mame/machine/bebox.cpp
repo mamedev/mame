@@ -598,17 +598,17 @@ WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
  *
  *************************************/
 
-READ8_MEMBER(bebox_state::bebox_flash_r )
+READ8_MEMBER(bebox_state::bebox_flash_r)
 {
 	offset = (offset & ~7) | (7 - (offset & 7));
-	return m_flash->read(offset);
+	return m_flash->read(space, offset);
 }
 
 
-WRITE8_MEMBER(bebox_state::bebox_flash_w )
+WRITE8_MEMBER(bebox_state::bebox_flash_w)
 {
 	offset = (offset & ~7) | (7 - (offset & 7));
-	m_flash->write(offset, data);
+	m_flash->write(space, offset, data);
 }
 
 /*************************************

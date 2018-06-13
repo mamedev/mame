@@ -14,6 +14,9 @@ Chips: P8251, D8253C, MK3880N-4 (Z80). 3x 6-sw dips. Unmarked crystal.
 
 A blue jumper marked 4M and 2M (between U11 and U12) selects the CPU clock.
 
+The RS232 port uses a 26-pin header (J1) rather than the conventional DB25
+connector. The second 26-pin header (J2) is for the parallel port.
+
 Feature list from QT ad:
 - 1K RAM (which can be located at any 1K boundary) plus one each
   Parallel and Serial I/O ports on board
@@ -219,13 +222,13 @@ void qtsbc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0000, 0xffff).rw(this, FUNC(qtsbc_state::memory_r), FUNC(qtsbc_state::memory_w));
+	map(0x0000, 0xffff).rw(FUNC(qtsbc_state::memory_r), FUNC(qtsbc_state::memory_w));
 }
 
 void qtsbc_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(qtsbc_state::io_r), FUNC(qtsbc_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(qtsbc_state::io_r), FUNC(qtsbc_state::io_w));
 }
 
 /* Input ports */

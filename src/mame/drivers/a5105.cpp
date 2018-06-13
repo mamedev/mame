@@ -56,7 +56,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -358,21 +358,21 @@ void a5105_state::a5105_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x40, 0x41).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x48, 0x4f).w(this, FUNC(a5105_state::a5105_upd765_w));
+	map(0x48, 0x4f).w(FUNC(a5105_state::a5105_upd765_w));
 
 	map(0x80, 0x83).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x90, 0x93).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x98, 0x99).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 
-	map(0x9c, 0x9c).w(this, FUNC(a5105_state::pcg_val_w));
+	map(0x9c, 0x9c).w(FUNC(a5105_state::pcg_val_w));
 //  AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
-	map(0x9e, 0x9e).w(this, FUNC(a5105_state::pcg_addr_w));
+	map(0x9e, 0x9e).w(FUNC(a5105_state::pcg_addr_w));
 
 //  AM_RANGE(0xa0, 0xa1) ay8910?
-	map(0xa8, 0xa8).rw(this, FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
-	map(0xa9, 0xa9).r(this, FUNC(a5105_state::key_r));
-	map(0xaa, 0xaa).rw(this, FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));
-	map(0xab, 0xab).w(this, FUNC(a5105_state::a5105_ab_w)); //misc output, see above
+	map(0xa8, 0xa8).rw(FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
+	map(0xa9, 0xa9).r(FUNC(a5105_state::key_r));
+	map(0xaa, 0xaa).rw(FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));
+	map(0xab, 0xab).w(FUNC(a5105_state::a5105_ab_w)); //misc output, see above
 }
 
 /* Input ports */
@@ -518,7 +518,7 @@ static const gfx_layout a5105_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( a5105 )
+static GFXDECODE_START( gfx_a5105 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, a5105_chars_8x8, 0, 8 )
 GFXDECODE_END
 
@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", a5105)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a5105)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(a5105_state, a5105)
 

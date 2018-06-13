@@ -30,8 +30,8 @@ void asst128_mb_device::map(address_map &map)
 	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0080, 0x008f).w(this, FUNC(asst128_mb_device::pc_page_w));
-	map(0x00a0, 0x00a1).w(this, FUNC(asst128_mb_device::nmi_enable_w));
+	map(0x0080, 0x008f).w(FUNC(asst128_mb_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(FUNC(asst128_mb_device::nmi_enable_w));
 }
 
 DEFINE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device, "asst128_mb", "ASST128_MOTHERBOARD")
@@ -82,7 +82,7 @@ void asst128_state::asst128_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(asst128_mb_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x03f2, 0x03f3).w(this, FUNC(asst128_state::asst128_fdc_dor_w));
+	map(0x03f2, 0x03f3).w(FUNC(asst128_state::asst128_fdc_dor_w));
 	map(0x03f4, 0x03f5).m("fdc:upd765", FUNC(upd765a_device::map));
 }
 

@@ -147,7 +147,9 @@ public:
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
 		m_scratchpad(*this, TI99_PADRAM_TAG),
-		m_amsram(*this, TI99_AMSRAM_TAG)
+		m_amsram(*this, TI99_AMSRAM_TAG),
+		m_keyboard(*this, "COL%u", 0U),
+		m_alpha(*this, "ALPHA")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
@@ -198,6 +200,9 @@ private:
 	required_device<bus::ti99::joyport::joyport_device>   m_joyport;
 	required_device<ram_device> m_scratchpad;
 	required_device<ram_device> m_amsram;
+
+	required_ioport_array<6> m_keyboard;
+	required_ioport m_alpha;
 
 	int decode_address(int address);
 	DECLARE_READ16_MEMBER( debugger_read );
@@ -286,15 +291,15 @@ enum
 
 void ti99_4p_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(this, FUNC(ti99_4p_state::setoffset));
+	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(FUNC(ti99_4p_state::setoffset));
 }
 
 void ti99_4p_state::cru_map(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(ti99_4p_state::cruread));
+	map(0x0000, 0x01ff).r(FUNC(ti99_4p_state::cruread));
 	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x0fff).w(this, FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x0fff).w(FUNC(ti99_4p_state::cruwrite));
 	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
 }
 
@@ -725,7 +730,6 @@ READ8_MEMBER( ti99_4p_state::cruread )
 /***************************************************************************
     Keyboard/tape control
 ****************************************************************************/
-static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
 
 READ8_MEMBER( ti99_4p_state::read_by_9901 )
 {
@@ -747,11 +751,11 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		if (m_check_alphalock)
 		{
-			answer &= ~(ioport("ALPHA")->read());
+			answer &= ~(m_alpha->read());
 		}
 		answer = (answer << 3) | m_9901_int;
 		break;
@@ -764,7 +768,7 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 
 		// |1|1|1|1|0|K|K|K|
 		if (m_keyboard_column >= m_firstjoy) answer = 0x07;
-		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
+		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
 		answer |= 0xf0;
 		break;
 

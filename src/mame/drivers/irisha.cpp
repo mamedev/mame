@@ -79,7 +79,7 @@ void irisha_state::irisha_mem(address_map &map)
 
 void irisha_state::irisha_io(address_map &map)
 {
-	map(0x04, 0x05).r(this, FUNC(irisha_state::irisha_keyboard_r));
+	map(0x04, 0x05).r(FUNC(irisha_state::irisha_keyboard_r));
 	map(0x06, 0x06).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x07, 0x07).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x08, 0x0B).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -239,7 +239,7 @@ static const gfx_layout irisha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( irisha )
+static GFXDECODE_START( gfx_irisha )
 	GFXDECODE_ENTRY( "maincpu", 0x3800, irisha_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_irisha)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

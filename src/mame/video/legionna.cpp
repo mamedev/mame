@@ -98,10 +98,10 @@ WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
 
 WRITE16_MEMBER(legionna_state::videowrite_cb_w)
 {
-	//  AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(background_w) AM_SHARE("back_data")
-	//  AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(foreground_w) AM_SHARE("fore_data")
-	//  AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(midground_w) AM_SHARE("mid_data")
-	//  AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(text_w) AM_SHARE("textram")
+	//  map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	//  map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	//  map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	//  map(0x102800, 0x1037ff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 
 	if (offset < 0x800 / 2)
 	{
@@ -195,7 +195,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
 	tile &= 0xfff;
 
 	tile |= 0x1000;
-	color += 0x10;
+	color |= 0x10;
 
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
@@ -234,10 +234,13 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 void legionna_state::common_video_allocate_ptr()
 {
 	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	m_mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	m_textram =  make_unique_clear<uint16_t[]>(0x1000/2);
+	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_mid_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_textram = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_scrollram16 = std::make_unique<uint16_t[]>(0x60/2);
+	m_paletteram = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_palette->basemem().set(m_paletteram.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_BIG, 2);
+
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -246,6 +249,7 @@ void legionna_state::common_video_allocate_ptr()
 	save_pointer(NAME(m_mid_data.get()), 0x800/2);
 	save_pointer(NAME(m_textram.get()), 0x1000/2);
 	save_pointer(NAME(m_scrollram16.get()), 0x60/2);
+	save_pointer(NAME(m_paletteram.get()), 0x1000/2);
 
 	save_item(NAME(m_back_gfx_bank));
 	save_item(NAME(m_mid_gfx_bank));
@@ -441,7 +445,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			if(machine().input().code_pressed_once(KEYCODE_A))
 				pri_test++;
 
-			if(machine().input().code_pressed_once(KEYCODE_A))
+			if(machine().input().code_pressed_once(KEYCODE_S))
 				pri_test--;
 
 			pri_test&=3;

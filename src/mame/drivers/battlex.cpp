@@ -118,10 +118,10 @@ CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
 void battlex_state::battlex_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(battlex_state::battlex_videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(battlex_state::battlex_videoram_w)).share("videoram");
 	map(0x9000, 0x91ff).ram().share("spriteram");
 	map(0xa000, 0xa3ff).ram();
-	map(0xe000, 0xe03f).ram().w(this, FUNC(battlex_state::battlex_palette_w));
+	map(0xe000, 0xe03f).ram().w(FUNC(battlex_state::battlex_palette_w));
 }
 
 
@@ -132,13 +132,13 @@ void battlex_state::io_map(address_map &map)
 	map(0x01, 0x01).portr("SYSTEM");
 	map(0x02, 0x02).portr("INPUTS");
 	map(0x03, 0x03).portr("DSW2");
-	map(0x10, 0x10).w(this, FUNC(battlex_state::battlex_flipscreen_w));
+	map(0x10, 0x10).w(FUNC(battlex_state::battlex_flipscreen_w));
 
 	/* verify all of these */
 	map(0x22, 0x23).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0x30, 0x30).w(this, FUNC(battlex_state::battlex_scroll_starfield_w));
-	map(0x32, 0x32).w(this, FUNC(battlex_state::battlex_scroll_x_lsb_w));
-	map(0x33, 0x33).w(this, FUNC(battlex_state::battlex_scroll_x_msb_w));
+	map(0x30, 0x30).w(FUNC(battlex_state::battlex_scroll_starfield_w));
+	map(0x32, 0x32).w(FUNC(battlex_state::battlex_scroll_x_lsb_w));
+	map(0x33, 0x33).w(FUNC(battlex_state::battlex_scroll_x_msb_w));
 }
 
 void battlex_state::dodgeman_io_map(address_map &map)
@@ -262,7 +262,7 @@ static const gfx_layout battlex_spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( battlex )
+static GFXDECODE_START( gfx_battlex )
 	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   64, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 0, 8 )
 GFXDECODE_END
@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_SCREEN_UPDATE_DRIVER(battlex_state, screen_update_battlex)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlex)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlex)
 	MCFG_PALETTE_ADD("palette", 64 + 128)
 
 	/* sound hardware */

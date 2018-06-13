@@ -1465,13 +1465,13 @@ void _39in1_state::_39in1_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00400000, 0x005fffff).rom().region("data", 0);
-	map(0x04000000, 0x047fffff).rw(this, FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
-	map(0x40000000, 0x400002ff).rw(this, FUNC(_39in1_state::pxa255_dma_r), FUNC(_39in1_state::pxa255_dma_w));
-	map(0x40400000, 0x40400083).rw(this, FUNC(_39in1_state::pxa255_i2s_r), FUNC(_39in1_state::pxa255_i2s_w));
-	map(0x40a00000, 0x40a0001f).rw(this, FUNC(_39in1_state::pxa255_ostimer_r), FUNC(_39in1_state::pxa255_ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(this, FUNC(_39in1_state::pxa255_intc_r), FUNC(_39in1_state::pxa255_intc_w));
-	map(0x40e00000, 0x40e0006b).rw(this, FUNC(_39in1_state::pxa255_gpio_r), FUNC(_39in1_state::pxa255_gpio_w));
-	map(0x44000000, 0x4400021f).rw(this, FUNC(_39in1_state::pxa255_lcd_r), FUNC(_39in1_state::pxa255_lcd_w));
+	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
+	map(0x40000000, 0x400002ff).rw(FUNC(_39in1_state::pxa255_dma_r), FUNC(_39in1_state::pxa255_dma_w));
+	map(0x40400000, 0x40400083).rw(FUNC(_39in1_state::pxa255_i2s_r), FUNC(_39in1_state::pxa255_i2s_w));
+	map(0x40a00000, 0x40a0001f).rw(FUNC(_39in1_state::pxa255_ostimer_r), FUNC(_39in1_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(FUNC(_39in1_state::pxa255_intc_r), FUNC(_39in1_state::pxa255_intc_w));
+	map(0x40e00000, 0x40e0006b).rw(FUNC(_39in1_state::pxa255_gpio_r), FUNC(_39in1_state::pxa255_gpio_w));
+	map(0x44000000, 0x4400021f).rw(FUNC(_39in1_state::pxa255_lcd_r), FUNC(_39in1_state::pxa255_lcd_w));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
@@ -1598,7 +1598,7 @@ MACHINE_CONFIG_START(_39in1_state::_39in1)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

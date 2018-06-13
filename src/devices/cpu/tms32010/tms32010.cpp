@@ -836,7 +836,7 @@ void tms32010_device::device_start()
 	save_item(NAME(m_addr_mask));
 
 	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

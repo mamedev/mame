@@ -254,3 +254,19 @@ public:
 	void vandyke_map(address_map &map);
 	void vandykeb_map(address_map &map);
 };
+
+class nmk16_tomagic_state : public nmk16_state
+{
+public:
+	nmk16_tomagic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nmk16_state(mconfig, type, tag)
+	{}
+
+	void tomagic(machine_config &config);
+	void init_tomagic();
+
+private:
+	void tomagic_map(address_map &map);
+	void tomagic_sound_map(address_map &map);
+	void tomagic_sound_io_map(address_map &map);
+};

@@ -43,14 +43,14 @@
 void kyugo_state::kyugo_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(kyugo_state::bgvideoram_w)).share("bgvideoram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(kyugo_state::bgattribram_w)).share("bgattribram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(kyugo_state::fgvideoram_w)).share("fgvideoram");
-	map(0x9800, 0x9fff).ram().r(this, FUNC(kyugo_state::spriteram_2_r)).share("spriteram_2");
+	map(0x8000, 0x87ff).ram().w(FUNC(kyugo_state::bgvideoram_w)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(kyugo_state::bgattribram_w)).share("bgattribram");
+	map(0x9000, 0x97ff).ram().w(FUNC(kyugo_state::fgvideoram_w)).share("fgvideoram");
+	map(0x9800, 0x9fff).ram().r(FUNC(kyugo_state::spriteram_2_r)).share("spriteram_2");
 	map(0xa000, 0xa7ff).ram().share("spriteram_1");
-	map(0xa800, 0xa800).w(this, FUNC(kyugo_state::scroll_x_lo_w));
-	map(0xb000, 0xb000).w(this, FUNC(kyugo_state::gfxctrl_w));
-	map(0xb800, 0xb800).w(this, FUNC(kyugo_state::scroll_y_w));
+	map(0xa800, 0xa800).w(FUNC(kyugo_state::scroll_x_lo_w));
+	map(0xb000, 0xb000).w(FUNC(kyugo_state::gfxctrl_w));
+	map(0xb800, 0xb800).w(FUNC(kyugo_state::scroll_y_w));
 	map(0xf000, 0xf7ff).ram().share("shared_ram");
 }
 
@@ -165,7 +165,7 @@ void kyugo_state::repulse_sub_portmap(address_map &map)
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xc0, 0xc1).w(this, FUNC(kyugo_state::coin_counter_w));
+	map(0xc0, 0xc1).w(FUNC(kyugo_state::coin_counter_w));
 }
 
 
@@ -175,7 +175,7 @@ void kyugo_state::flashgala_sub_portmap(address_map &map)
 	map(0x40, 0x41).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x42, 0x42).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x80, 0x81).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xc0, 0xc1).w(this, FUNC(kyugo_state::coin_counter_w));
+	map(0xc0, 0xc1).w(FUNC(kyugo_state::coin_counter_w));
 }
 
 
@@ -185,7 +185,7 @@ void kyugo_state::srdmissn_sub_portmap(address_map &map)
 	map(0x80, 0x81).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x82, 0x82).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x84, 0x85).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x90, 0x91).w(this, FUNC(kyugo_state::coin_counter_w));
+	map(0x90, 0x91).w(FUNC(kyugo_state::coin_counter_w));
 }
 
 
@@ -481,7 +481,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( kyugo )
+static GFXDECODE_START( gfx_kyugo )
 	GFXDECODE_ENTRY( "gfx1", 0, fg_tilelayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, bg_tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 32 )
@@ -515,7 +515,7 @@ void kyugo_state::machine_reset()
 INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kyugo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyugo)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */

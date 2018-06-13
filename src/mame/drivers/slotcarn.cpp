@@ -197,7 +197,7 @@ void slotcarn_state::slotcarn_map(address_map &map)
 
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(slotcarn_state::palette_r), FUNC(slotcarn_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(slotcarn_state::palette_r), FUNC(slotcarn_state::palette_w));
 }
 
 // spielbud - is the ay mirrored, or are there now 2?
@@ -521,7 +521,7 @@ static const gfx_layout slotcarntiles8x8x1_layout =
 *          Graphics Decode          *
 ************************************/
 
-static GFXDECODE_START( slotcarn )
+static GFXDECODE_START( gfx_slotcarn )
 	GFXDECODE_ENTRY( "gfx1", 0, slotcarntiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 8, slotcarntiles8x8x3_layout, 0, 16 ) // flipped
 	GFXDECODE_ENTRY( "gfx2", 0, slotcarntiles8x8x1_layout, 0, 4 )
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, slotcarn_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotcarn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */

@@ -287,15 +287,13 @@ uint32_t zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	m_k001604->draw_back_layer(bitmap, cliprect);
-
 	m_k001005->draw(bitmap, cliprect);
-
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -340,7 +338,7 @@ uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &b
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -481,14 +479,14 @@ void zr107_state::zr107_map(address_map &map)
 	map(0x00000000, 0x000fffff).ram().share("workram"); /* Work RAM */
 	map(0x74000000, 0x74003fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));
 	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::long_r), FUNC(k056832_device::long_w));
-	map(0x74060000, 0x7406003f).rw(this, FUNC(zr107_state::ccu_r), FUNC(zr107_state::ccu_w));
-	map(0x74080000, 0x74081fff).ram().w(this, FUNC(zr107_state::paletteram32_w)).share("paletteram");
+	map(0x74060000, 0x7406003f).rw(FUNC(zr107_state::ccu_r), FUNC(zr107_state::ccu_w));
+	map(0x74080000, 0x74081fff).ram().w(FUNC(zr107_state::paletteram32_w)).share("paletteram");
 	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_long_r));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));        /* 21N 21K 23N 23K */
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(this, FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
+	map(0x7e000000, 0x7e003fff).rw(FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));               /* LANC registers */
 	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));      /* LANC Buffer RAM (27E) */
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
@@ -508,7 +506,7 @@ void zr107_state::jetwave_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram();       /* Work RAM */
 	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(this, FUNC(zr107_state::jetwave_palette_w)).share("paletteram");
+	map(0x74010000, 0x7401ffff).ram().w(FUNC(zr107_state::jetwave_palette_w)).share("paletteram");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));      /* 21N 21K 23N 23K */
@@ -516,7 +514,7 @@ void zr107_state::jetwave_map(address_map &map)
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(this, FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
+	map(0x7e000000, 0x7e003fff).rw(FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));             /* LANC registers */
 	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));    /* LANC Buffer RAM (27E) */
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
@@ -547,7 +545,7 @@ void zr107_state::sound_memmap(address_map &map)
 	map(0x200000, 0x2004ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
 	map(0x200000, 0x2004ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
 	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
-	map(0x500000, 0x500001).w(this, FUNC(zr107_state::sound_ctrl_w));
+	map(0x500000, 0x500001).w(FUNC(zr107_state::sound_ctrl_w));
 	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
 }
 
@@ -572,7 +570,7 @@ WRITE32_MEMBER(zr107_state::dsp_dataram_w)
 void zr107_state::sharc_map(address_map &map)
 {
 	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x500000, 0x5fffff).rw(this, FUNC(zr107_state::dsp_dataram_r), FUNC(zr107_state::dsp_dataram_w));
+	map(0x500000, 0x5fffff).rw(FUNC(zr107_state::dsp_dataram_r), FUNC(zr107_state::dsp_dataram_w));
 	map(0x600000, 0x6fffff).rw(m_k001005, FUNC(k001005_device::read), FUNC(k001005_device::write));
 	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 }
@@ -788,7 +786,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
@@ -808,11 +806,10 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(zr107_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx2", K056832_BPP_8, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0)
-	MCFG_K001005_TEXEL_CHIP("k001006_1")
+	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
 
 	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
 	MCFG_K001006_GFX_REGION("gfx1")
@@ -860,7 +857,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
@@ -885,8 +882,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0)
-	MCFG_K001005_TEXEL_CHIP("k001006_1")
+	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
 
 	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
 	MCFG_K001006_GFX_REGION("gfx1")

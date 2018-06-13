@@ -282,7 +282,7 @@ void rx78_state::rx78_mem(address_map &map)
 	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
 	map(0x6000, 0xafff).ram(); //ext RAM
 	map(0xb000, 0xebff).ram();
-	map(0xec00, 0xffff).rw(this, FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
+	map(0xec00, 0xffff).rw(FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
 }
 
 void rx78_state::rx78_io(address_map &map)
@@ -291,14 +291,14 @@ void rx78_state::rx78_io(address_map &map)
 	map.global_mask(0xff);
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-	map(0xf0, 0xf0).rw(this, FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
-	map(0xf1, 0xf1).w(this, FUNC(rx78_state::vram_read_bank_w));
-	map(0xf2, 0xf2).w(this, FUNC(rx78_state::vram_write_bank_w));
-	map(0xf4, 0xf4).rw(this, FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
-	map(0xf5, 0xfb).w(this, FUNC(rx78_state::vdp_reg_w)); //vdp
-	map(0xfc, 0xfc).w(this, FUNC(rx78_state::vdp_bg_reg_w)); //vdp
-	map(0xfe, 0xfe).w(this, FUNC(rx78_state::vdp_pri_mask_w));
-	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
+	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
+	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
+	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
+	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
+	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
+	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
+	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
 }
 
 /* Input ports */
@@ -465,7 +465,7 @@ static const gfx_layout rx78_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( rx78 )
+static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

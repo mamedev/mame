@@ -478,18 +478,18 @@ void hazl1500_state::hazl1500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-	map(0x3000, 0x377f).rw(this, FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
+	map(0x3000, 0x377f).rw(FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
 	map(0x3780, 0x37ff).ram();
 }
 
 void hazl1500_state::hazl1500_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).rw(this, FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
-	map(0xbf, 0xbf).rw(this, FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
-	map(0xdf, 0xdf).r(this, FUNC(hazl1500_state::kbd_encoder_r));
-	map(0xef, 0xef).rw(this, FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
-	map(0xf7, 0xf7).r(this, FUNC(hazl1500_state::kbd_status_latch_r));
+	map(0x7f, 0x7f).rw(FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
+	map(0xbf, 0xbf).rw(FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
+	map(0xdf, 0xdf).r(FUNC(hazl1500_state::kbd_encoder_r));
+	map(0xef, 0xef).rw(FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
+	map(0xf7, 0xf7).r(FUNC(hazl1500_state::kbd_status_latch_r));
 }
 
 	/*
@@ -686,7 +686,7 @@ static const gfx_layout hazl1500_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( hazl1500 )
+static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
 	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay51013_device, write_tcp))

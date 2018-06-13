@@ -65,15 +65,15 @@ void quizpani_state::quizpani_map(address_map &map)
 	map(0x10000a, 0x10000b).portr("DSW2");
 	map(0x100014, 0x100015).nopw(); /* screen flipping? */
 	map(0x100016, 0x100017).nopw(); /* IRQ enable? */
-	map(0x100018, 0x100019).w(this, FUNC(quizpani_state::tilesbank_w));
+	map(0x100018, 0x100019).w(FUNC(quizpani_state::tilesbank_w));
 	map(0x104001, 0x104001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x104020, 0x104027).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x108000, 0x1083ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108400, 0x1085ff).nopw();
 	map(0x10c000, 0x10c007).ram().share("scrollreg");
 	map(0x10c008, 0x10c403).nopw();
-	map(0x110000, 0x113fff).ram().w(this, FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
-	map(0x11c000, 0x11ffff).ram().w(this, FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
+	map(0x110000, 0x113fff).ram().w(FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
+	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
 	map(0x180000, 0x18ffff).ram();
 	map(0x200000, 0x33ffff).rom();
 }
@@ -188,7 +188,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( quizpani )
+static GFXDECODE_START( gfx_quizpani )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x100, 16 ) /* Background */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x000, 16 ) /* Text */
 GFXDECODE_END
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpani)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpani)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

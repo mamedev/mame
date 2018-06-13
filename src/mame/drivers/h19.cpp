@@ -173,10 +173,10 @@ void h19_state::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x80, 0x80).mirror(0x1f).r(this, FUNC(h19_state::kbd_key_r));
-	map(0xA0, 0xA0).mirror(0x1f).r(this, FUNC(h19_state::kbd_flags_r));
-	map(0xC0, 0xC0).mirror(0x1f).w(this, FUNC(h19_state::h19_keyclick_w));
-	map(0xE0, 0xE0).mirror(0x1f).w(this, FUNC(h19_state::h19_bell_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(h19_state::kbd_key_r));
+	map(0xA0, 0xA0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
+	map(0xC0, 0xC0).mirror(0x1f).w(FUNC(h19_state::h19_keyclick_w));
+	map(0xE0, 0xE0).mirror(0x1f).w(FUNC(h19_state::h19_bell_w));
 }
 
 /* Input ports */
@@ -513,7 +513,7 @@ static const gfx_layout h19_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( h19 )
+static GFXDECODE_START( gfx_h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)

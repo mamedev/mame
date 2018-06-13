@@ -591,7 +591,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy(space, 0);
+		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r(space, 0);
 }
 
 
@@ -656,7 +656,7 @@ void segas18_state::sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xa0).mirror(0x1f).w(this, FUNC(segas18_state::soundbank_w));
+	map(0xa0, 0xa0).mirror(0x1f).w(FUNC(segas18_state::soundbank_w));
 	map(0xc0, 0xc0).mirror(0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::pread), FUNC(sega_315_5195_mapper_device::pwrite));
 }
 
@@ -1282,7 +1282,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( segas18 )
+static GFXDECODE_START( gfx_segas18 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 GFXDECODE_END
 
@@ -1356,12 +1356,11 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas18)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas18)
 	MCFG_PALETTE_ADD("palette", 2048*3+2048 + 64*3)
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

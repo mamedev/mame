@@ -260,10 +260,10 @@ void tnx1_state::maincpu_program_map(address_map &map)
 	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
 	map(0x8c00, 0x8e7f).ram().share("dmasource");
 	map(0x8e80, 0x8fff).ram();
-	map(0xa000, 0xa3ff).w(this, FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
-	map(0xa400, 0xa7ff).w(this, FUNC(tnx1_state::popeye_colorram_w)).share("colorram");
-	map(0xc000, 0xcfff).w(this, FUNC(tnx1_state::background_w));
-	map(0xe000, 0xe001).rw(this, FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
+	map(0xa000, 0xa3ff).w(FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
+	map(0xa400, 0xa7ff).w(FUNC(tnx1_state::popeye_colorram_w)).share("colorram");
+	map(0xc000, 0xcfff).w(FUNC(tnx1_state::background_w));
+	map(0xe000, 0xe001).rw(FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
 }
 
 void tpp2_state::maincpu_program_map(address_map &map)
@@ -271,7 +271,7 @@ void tpp2_state::maincpu_program_map(address_map &map)
 	tpp1_state::maincpu_program_map(map);
 	map(0x8000, 0x87ff).unmaprw(); // 7f (unpopulated)
 	map(0x8800, 0x8bff).ram(); // 7h
-	map(0xc000, 0xdfff).w(this, FUNC(tpp2_state::background_w));
+	map(0xc000, 0xdfff).w(FUNC(tpp2_state::background_w));
 }
 
 void tpp2_noalu_state::maincpu_program_map(address_map &map)
@@ -346,7 +346,7 @@ protected:
 	{
 		T::maincpu_program_map(map);
 		map(0x0000, 0x7fff).rom().region("brazehs", 0);
-		map(0x9000, 0x9000).rw(this, FUNC(brazehs::eeprom_r), FUNC(brazehs::eeprom_w));
+		map(0x9000, 0x9000).rw(FUNC(brazehs::eeprom_r), FUNC(brazehs::eeprom_w));
 	}
 };
 
@@ -569,7 +569,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( popeye )
+static GFXDECODE_START( gfx_popeye )
 	GFXDECODE_SCALE( "gfx1", 0, charlayout,   16, 16, 2, 2 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 8 ) /* sprites */
 GFXDECODE_END
@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnx1_state, screen_vblank))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
 	MCFG_PALETTE_INIT_OWNER(tnx1_state, palette_init)
 

@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 WRITE_LINE_MEMBER(tsamurai_state::vblank_irq)
 {
 	if (state && m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
@@ -150,25 +150,25 @@ void tsamurai_state::main_map(address_map &map)
 	map(0xc000, 0xcfff).ram();
 
 	/* protection? - there are writes as well...*/
-	map(0xd803, 0xd803).r(this, FUNC(tsamurai_state::tsamurai_unknown_d803_r));
-	map(0xd806, 0xd806).r(this, FUNC(tsamurai_state::unknown_d806_r));
-	map(0xd900, 0xd900).r(this, FUNC(tsamurai_state::unknown_d900_r));
-	map(0xd938, 0xd938).r(this, FUNC(tsamurai_state::unknown_d938_r));
+	map(0xd803, 0xd803).r(FUNC(tsamurai_state::tsamurai_unknown_d803_r));
+	map(0xd806, 0xd806).r(FUNC(tsamurai_state::unknown_d806_r));
+	map(0xd900, 0xd900).r(FUNC(tsamurai_state::unknown_d900_r));
+	map(0xd938, 0xd938).r(FUNC(tsamurai_state::unknown_d938_r));
 
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
-	map(0xe400, 0xe43f).ram().w(this, FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe400, 0xe43f).ram().w(FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
 	map(0xe440, 0xe7ff).ram();
-	map(0xe800, 0xefff).ram().w(this, FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
 	map(0xf000, 0xf3ff).ram().share("spriteram");
 
 	map(0xf400, 0xf400).nopw();
-	map(0xf401, 0xf401).w(this, FUNC(tsamurai_state::sound_command1_w));
-	map(0xf402, 0xf402).w(this, FUNC(tsamurai_state::sound_command2_w));
+	map(0xf401, 0xf401).w(FUNC(tsamurai_state::sound_command1_w));
+	map(0xf402, 0xf402).w(FUNC(tsamurai_state::sound_command2_w));
 
 	map(0xf800, 0xf800).portr("P1");
-	map(0xf801, 0xf801).portr("P2").w(this, FUNC(tsamurai_state::bgcolor_w));
-	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(tsamurai_state::scrolly_w));
-	map(0xf803, 0xf803).w(this, FUNC(tsamurai_state::scrollx_w));
+	map(0xf801, 0xf801).portr("P2").w(FUNC(tsamurai_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(tsamurai_state::scrolly_w));
+	map(0xf803, 0xf803).w(FUNC(tsamurai_state::scrollx_w));
 	map(0xf804, 0xf804).portr("DSW1");
 	map(0xf805, 0xf805).portr("DSW2");
 
@@ -181,26 +181,26 @@ void tsamurai_state::m660_map(address_map &map)
 	map(0xc000, 0xcfff).ram();
 
 	/* protection? - there are writes as well...*/
-	map(0xd803, 0xd803).r(this, FUNC(tsamurai_state::m660_unknown_d803_r));
-	map(0xd806, 0xd806).r(this, FUNC(tsamurai_state::unknown_d806_r));
-	map(0xd900, 0xd900).r(this, FUNC(tsamurai_state::unknown_d900_r));
-	map(0xd938, 0xd938).r(this, FUNC(tsamurai_state::unknown_d938_r));
+	map(0xd803, 0xd803).r(FUNC(tsamurai_state::m660_unknown_d803_r));
+	map(0xd806, 0xd806).r(FUNC(tsamurai_state::unknown_d806_r));
+	map(0xd900, 0xd900).r(FUNC(tsamurai_state::unknown_d900_r));
+	map(0xd938, 0xd938).r(FUNC(tsamurai_state::unknown_d938_r));
 
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
-	map(0xe400, 0xe43f).ram().w(this, FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe400, 0xe43f).ram().w(FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
 	map(0xe440, 0xe7ff).ram();
-	map(0xe800, 0xefff).ram().w(this, FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
 	map(0xf000, 0xf3ff).ram().share("spriteram");
 
 	map(0xf400, 0xf400).nopw();/* This is always written with F401, F402 & F403 data */
-	map(0xf401, 0xf401).w(this, FUNC(tsamurai_state::m660_sound_command3_w));
-	map(0xf402, 0xf402).w(this, FUNC(tsamurai_state::sound_command2_w));
-	map(0xf403, 0xf403).w(this, FUNC(tsamurai_state::sound_command1_w));
+	map(0xf401, 0xf401).w(FUNC(tsamurai_state::m660_sound_command3_w));
+	map(0xf402, 0xf402).w(FUNC(tsamurai_state::sound_command2_w));
+	map(0xf403, 0xf403).w(FUNC(tsamurai_state::sound_command1_w));
 
 	map(0xf800, 0xf800).portr("P1");
-	map(0xf801, 0xf801).portr("P2").w(this, FUNC(tsamurai_state::bgcolor_w));
-	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(tsamurai_state::scrolly_w));
-	map(0xf803, 0xf803).w(this, FUNC(tsamurai_state::scrollx_w));
+	map(0xf801, 0xf801).portr("P2").w(FUNC(tsamurai_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(tsamurai_state::scrolly_w));
+	map(0xf803, 0xf803).w(FUNC(tsamurai_state::scrollx_w));
 	map(0xf804, 0xf804).portr("DSW1");
 	map(0xf805, 0xf805).portr("DSW2");
 
@@ -246,9 +246,9 @@ READ8_MEMBER(tsamurai_state::m660_sound_command3_r)
 void tsamurai_state::sound1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x6000, 0x6000).r(this, FUNC(tsamurai_state::sound_command1_r));
+	map(0x6000, 0x6000).r(FUNC(tsamurai_state::sound_command1_r));
 	map(0x6001, 0x6001).nopw(); /* ? - probably clear IRQ */
-	map(0x6002, 0x6002).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x6002, 0x6002).w("dac1", FUNC(dac_byte_interface::data_w));
 	map(0x7f00, 0x7fff).ram();
 }
 
@@ -257,9 +257,9 @@ void tsamurai_state::sound1_map(address_map &map)
 void tsamurai_state::sound2_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x6000, 0x6000).r(this, FUNC(tsamurai_state::sound_command2_r));
+	map(0x6000, 0x6000).r(FUNC(tsamurai_state::sound_command2_r));
 	map(0x6001, 0x6001).nopw(); /* ? - probably clear IRQ */
-	map(0x6002, 0x6002).w("dac2", FUNC(dac_byte_interface::write));
+	map(0x6002, 0x6002).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0x7f00, 0x7fff).ram();
 }
 
@@ -268,9 +268,9 @@ void tsamurai_state::sound2_map(address_map &map)
 void tsamurai_state::sound1_m660_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0xc000, 0xc000).r(this, FUNC(tsamurai_state::sound_command1_r));
+	map(0xc000, 0xc000).r(FUNC(tsamurai_state::sound_command1_r));
 	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
-	map(0xc002, 0xc002).w("dac1", FUNC(dac_byte_interface::write));
+	map(0xc002, 0xc002).w("dac1", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0x87ff).ram();
 }
 
@@ -279,9 +279,9 @@ void tsamurai_state::sound1_m660_map(address_map &map)
 void tsamurai_state::sound2_m660_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0xc000, 0xc000).r(this, FUNC(tsamurai_state::sound_command2_r));
+	map(0xc000, 0xc000).r(FUNC(tsamurai_state::sound_command2_r));
 	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
-	map(0xc002, 0xc002).w("dac2", FUNC(dac_byte_interface::write));
+	map(0xc002, 0xc002).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0x87ff).ram();
 }
 
@@ -290,7 +290,7 @@ void tsamurai_state::sound2_m660_map(address_map &map)
 void tsamurai_state::sound3_m660_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc000).r(this, FUNC(tsamurai_state::m660_sound_command3_r));
+	map(0xc000, 0xc000).r(FUNC(tsamurai_state::m660_sound_command3_r));
 	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
 	map(0x8000, 0x87ff).ram();
 	map(0xfffc, 0xffff).ram(); /* CPU writes here - music data */
@@ -311,7 +311,8 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
 
 INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
 {
-	if (m_vsgongf_sound_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_vsgongf_sound_nmi_enabled)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* what are these, protection of some kind? */
@@ -341,22 +342,22 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tsamurai_state::vsgongf_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa003, 0xa003).readonly();
-	map(0xa006, 0xa006).r(this, FUNC(tsamurai_state::vsgongf_a006_r)); /* protection */
-	map(0xa100, 0xa100).r(this, FUNC(tsamurai_state::vsgongf_a100_r)); /* protection */
+	map(0xa006, 0xa006).r(FUNC(tsamurai_state::vsgongf_a006_r)); /* protection */
+	map(0xa100, 0xa100).r(FUNC(tsamurai_state::vsgongf_a100_r)); /* protection */
 	map(0xc000, 0xc7ff).ram();                  /* work ram */
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
 	map(0xe400, 0xe43f).ram().share("spriteram");
 	map(0xe440, 0xe47b).ram();
-	map(0xe800, 0xe800).w(this, FUNC(tsamurai_state::vsgongf_sound_command_w));
+	map(0xe800, 0xe800).w(FUNC(tsamurai_state::vsgongf_sound_command_w));
 	map(0xec00, 0xec06).writeonly();
-	map(0xf000, 0xf000).w(this, FUNC(tsamurai_state::vsgongf_color_w));
+	map(0xf000, 0xf000).w(FUNC(tsamurai_state::vsgongf_color_w));
 	map(0xf400, 0xf400).writeonly(); /* vreg? always 0 */
 	map(0xf800, 0xf800).portr("P1");
 	map(0xf801, 0xf801).portr("P2");
@@ -373,8 +374,8 @@ void tsamurai_state::sound_vsgongf_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).ram(); /* work RAM */
-	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(tsamurai_state::vsgongf_sound_nmi_enable_w)); /* NMI enable */
-	map(0xa000, 0xa000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(tsamurai_state::vsgongf_sound_nmi_enable_w)); /* NMI enable */
+	map(0xa000, 0xa000).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 /*******************************************************************************/
@@ -707,7 +708,7 @@ static const gfx_layout tile_layout =
 	8*8
 };
 
-static GFXDECODE_START( tsamurai )
+static GFXDECODE_START( gfx_tsamurai )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 0, 32 )
@@ -748,7 +749,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
@@ -796,7 +797,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
@@ -852,7 +853,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audio3", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 

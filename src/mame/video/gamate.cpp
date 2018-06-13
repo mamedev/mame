@@ -33,13 +33,13 @@ DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Vide
 
 void gamate_video_device::regs_map(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(gamate_video_device::lcdcon_w));
-	map(0x02, 0x02).w(this, FUNC(gamate_video_device::xscroll_w));
-	map(0x03, 0x03).w(this, FUNC(gamate_video_device::yscroll_w));
-	map(0x04, 0x04).w(this, FUNC(gamate_video_device::xpos_w));
-	map(0x05, 0x05).w(this, FUNC(gamate_video_device::ypos_w));
-	map(0x06, 0x06).r(this, FUNC(gamate_video_device::vram_r));
-	map(0x07, 0x07).w(this, FUNC(gamate_video_device::vram_w));
+	map(0x01, 0x01).w(FUNC(gamate_video_device::lcdcon_w));
+	map(0x02, 0x02).w(FUNC(gamate_video_device::xscroll_w));
+	map(0x03, 0x03).w(FUNC(gamate_video_device::yscroll_w));
+	map(0x04, 0x04).w(FUNC(gamate_video_device::xpos_w));
+	map(0x05, 0x05).w(FUNC(gamate_video_device::ypos_w));
+	map(0x06, 0x06).r(FUNC(gamate_video_device::vram_r));
+	map(0x07, 0x07).w(FUNC(gamate_video_device::vram_w));
 }
 
 void gamate_video_device::vram_map(address_map &map)

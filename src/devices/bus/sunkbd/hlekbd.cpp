@@ -753,6 +753,7 @@ hle_device_base::hle_device_base(
 	, m_dips(*this, "DIP")
 	, m_click_timer(nullptr)
 	, m_beeper(*this, "beeper")
+	, m_leds(*this, "led%u", 0U)
 	, m_make_count(0U)
 	, m_rx_state(RX_IDLE)
 	, m_keyclick(0U)
@@ -802,6 +803,7 @@ MACHINE_CONFIG_END
 
 void hle_device_base::device_start()
 {
+	m_leds.resolve();
 	m_click_timer = timer_alloc(CLICK_TIMER_ID);
 
 	save_item(NAME(m_make_count));
@@ -836,11 +838,11 @@ void hle_device_base::device_reset()
 	output_rxd(1);
 
 	// start with keyboard LEDs off
-	machine().output().set_led_value(LED_NUM, 0);
-	machine().output().set_led_value(LED_COMPOSE, 0);
-	machine().output().set_led_value(LED_SCROLL, 0);
-	machine().output().set_led_value(LED_CAPS, 0);
-	machine().output().set_led_value(LED_KANA, 0);
+	m_leds[LED_NUM] = 0;
+	m_leds[LED_COMPOSE] = 0;
+	m_leds[LED_SCROLL] = 0;
+	m_leds[LED_CAPS] = 0;
+	m_leds[LED_KANA] = 0;
 
 	// no beep
 	m_click_timer->reset();
@@ -972,11 +974,11 @@ void hle_device_base::received_byte(uint8_t byte)
 	switch (m_rx_state)
 	{
 	case RX_LED:
-		machine().output().set_led_value(LED_NUM, BIT(byte, 0));
-		machine().output().set_led_value(LED_COMPOSE, BIT(byte, 1));
-		machine().output().set_led_value(LED_SCROLL, BIT(byte, 2));
-		machine().output().set_led_value(LED_CAPS, BIT(byte, 3));
-		machine().output().set_led_value(LED_KANA, BIT(byte, 4));
+		m_leds[LED_NUM] = BIT(byte, 0);
+		m_leds[LED_COMPOSE] = BIT(byte, 1);
+		m_leds[LED_SCROLL] = BIT(byte, 2);
+		m_leds[LED_CAPS] = BIT(byte, 3);
+		m_leds[LED_KANA] = BIT(byte, 4);
 		m_rx_state = RX_IDLE;
 		break;
 

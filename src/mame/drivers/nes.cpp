@@ -30,9 +30,9 @@ void nes_state::nes_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().mirror(0x1800);                   /* RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
-	map(0x4014, 0x4014).w(this, FUNC(nes_state::nes_vh_sprite_dma_w));              /* stupid address space hole */
-	map(0x4016, 0x4016).rw(this, FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(nes_state::nes_in1_r));                         /* IN1 - input port 2 */
+	map(0x4014, 0x4014).w(FUNC(nes_state::nes_vh_sprite_dma_w));              /* stupid address space hole */
+	map(0x4016, 0x4016).rw(FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(nes_state::nes_in1_r));                         /* IN1 - input port 2 */
 	// 0x4100-0x5fff -> LOW HANDLER defined on a pcb base
 	// 0x6000-0x7fff -> MID HANDLER defined on a pcb base
 	// 0x8000-0xffff -> HIGH HANDLER defined on a pcb base
@@ -79,7 +79,7 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_NES_CONTROL_PORT_ADD("ctrl2", nes_control_port2_devices, "joypad")
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, nullptr)
+	MCFG_DEVICE_ADD("nes_slot", NES_CART_SLOT, NTSC_APU_CLOCK, nes_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
 	MCFG_SOFTWARE_LIST_ADD("ade_list", "nes_ade")         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")      // Sunsoft Nantettate! Baseball mini-carts
@@ -98,6 +98,9 @@ MACHINE_CONFIG_START(nes_state::nespal)
 	MCFG_PPU2C07_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	MCFG_DEVICE_MODIFY("nes_slot")
+	MCFG_DEVICE_CLOCK(PAL_APU_CLOCK)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -131,6 +134,9 @@ MACHINE_CONFIG_START(nes_state::nespalc)
 	MCFG_PPUPALC_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	MCFG_DEVICE_MODIFY("nes_slot")
+	MCFG_DEVICE_CLOCK(PALC_APU_CLOCK)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -61,6 +61,9 @@ public:
 		, m_p_vram(*this, "vram")
 	{ }
 
+	void unior(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
@@ -75,9 +78,9 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	void unior(machine_config &config);
 	void unior_io(address_map &map);
 	void unior_mem(address_map &map);
+
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;
@@ -94,7 +97,7 @@ void unior_state::unior_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xf7ff).ram();
-	map(0xf800, 0xffff).rom().w(this, FUNC(unior_state::vram_w)); // main video
+	map(0xf800, 0xffff).rom().w(FUNC(unior_state::vram_w)); // main video
 }
 
 void unior_state::unior_io(address_map &map)
@@ -104,7 +107,7 @@ void unior_state::unior_io(address_map &map)
 	map(0x30, 0x38).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)); // dma data
 	map(0x3c, 0x3f).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // cassette player control
 	map(0x4c, 0x4f).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x50, 0x50).w(this, FUNC(unior_state::scroll_w));
+	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
 	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xec, 0xec).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -245,7 +248,7 @@ static const gfx_layout unior_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( unior )
+static GFXDECODE_START( gfx_unior )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -265,9 +268,6 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
-
-	if(linecount == 8)
-		gfx = 0;
 
 	if (vsp)
 		gfx = 0;
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 

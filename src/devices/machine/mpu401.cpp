@@ -59,8 +59,8 @@
 
 void mpu401_device::mpu401_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(mpu401_device::regs_mode2_r), FUNC(mpu401_device::regs_mode2_w));
-	map(0x0020, 0x0021).rw(this, FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
+	map(0x0000, 0x001f).rw(FUNC(mpu401_device::regs_mode2_r), FUNC(mpu401_device::regs_mode2_w));
+	map(0x0020, 0x0021).rw(FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
 	map(0x0080, 0x00ff).ram(); // on-chip RAM
 	map(0x0800, 0x0fff).ram(); // external RAM
 	map(0xf000, 0xffff).rom().region(ROM_TAG, 0);
@@ -68,8 +68,8 @@ void mpu401_device::mpu401_map(address_map &map)
 
 void mpu401_device::mpu401_io_map(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(mpu401_device::port1_r), FUNC(mpu401_device::port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(mpu401_device::port2_r), FUNC(mpu401_device::port2_w));
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(mpu401_device::port1_r), FUNC(mpu401_device::port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(mpu401_device::port2_r), FUNC(mpu401_device::port2_w));
 }
 
 ROM_START( mpu401 )

@@ -18,7 +18,7 @@ To Do:
 
 Blomby Car is said to be a bootleg of Gaelco's World Rally and uses many
 of the same fonts
-(Update: it actually is a bootleg of World Rally by looking how much 
+(Update: it actually is a bootleg of World Rally by looking how much
 similar the two HWs are, down to the dipswitches!)
 
 Waterball
@@ -107,8 +107,8 @@ void blmbycar_state::common_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0xfec000, 0xfeffff).ram();
 	map(0x100000, 0x103fff).writeonly();                                               // ???
-	map(0x104000, 0x105fff).ram().w(this, FUNC(blmbycar_state::vram_1_w)).share("vram_1"); // Layer 1
-	map(0x106000, 0x107fff).ram().w(this, FUNC(blmbycar_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x104000, 0x105fff).ram().w(FUNC(blmbycar_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0x106000, 0x107fff).ram().w(FUNC(blmbycar_state::vram_0_w)).share("vram_0"); // Layer 0
 	map(0x108000, 0x10bfff).writeonly();                                               // ???
 	map(0x10c000, 0x10c003).writeonly().share("scroll_1");              // Scroll 1
 	map(0x10c004, 0x10c007).writeonly().share("scroll_0");              // Scroll 0
@@ -118,7 +118,7 @@ void blmbycar_state::common_map(address_map &map)
 	map(0x444000, 0x445fff).writeonly().share("spriteram");// Sprites (size?)
 	map(0x700000, 0x700001).portr("DSW");
 	map(0x700002, 0x700003).portr("P1_P2");
-	map(0x70000c, 0x70000d).w(this, FUNC(blmbycar_state::okibank_w));                               // Sound
+	map(0x70000c, 0x70000d).w(FUNC(blmbycar_state::okibank_w));                               // Sound
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 }
 
@@ -126,12 +126,12 @@ void blmbycar_state::blmbycar_map(address_map &map)
 {
 	common_map(map);
 
-	map(0x700004, 0x700005).r(this, FUNC(blmbycar_state::blmbycar_opt_wheel_r));                              // Wheel (optical)
+	map(0x700004, 0x700005).r(FUNC(blmbycar_state::blmbycar_opt_wheel_r));                              // Wheel (optical)
 	map(0x700006, 0x700007).portr("UNK");
-	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
+	map(0x700008, 0x700009).r(FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
 	map(0x70000a, 0x70000b).nopw();                                                // ? Wheel
-	map(0x70006a, 0x70006b).nopr().w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
-	map(0x70007a, 0x70007b).nopr().w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
+	map(0x70006a, 0x70006b).nopr().w(FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
+	map(0x70007a, 0x70007b).nopr().w(FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
 }
 
 READ16_MEMBER(blmbycar_state::waterball_unk_r)
@@ -145,7 +145,7 @@ void blmbycar_state::watrball_map(address_map &map)
 	common_map(map);
 
 	map(0x700006, 0x700007).nopr();                                                 // read
-	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::waterball_unk_r));                                   // 0x0008 must toggle
+	map(0x700008, 0x700009).r(FUNC(blmbycar_state::waterball_unk_r));                                   // 0x0008 must toggle
 	map(0x70000a, 0x70000b).writeonly();                                               // ?? busy
 }
 
@@ -213,10 +213,10 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1_P2") /* $700002.w */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear Shift") PORT_TOGGLE PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( blmbycar )
 
 	PORT_START("OPT_WHEEL") /* $700004.w */
 	PORT_BIT ( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_REVERSE PORT_CONDITION("DSW", 0x18, EQUALS, 0x08) PORT_NAME("P1 Opt Wheel")
-	
+
 	PORT_START("POT_WHEEL")
 	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_REVERSE PORT_CONDITION("DSW", 0x18, EQUALS, 0x10) PORT_NAME("P1 Pot Wheel")
 
@@ -325,7 +325,7 @@ static const gfx_layout layout_16x16x4 =
 };
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
-static GFXDECODE_START( blmbycar )
+static GFXDECODE_START( gfx_blmbycar )
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
 GFXDECODE_END
 
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)

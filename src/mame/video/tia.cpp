@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "tia.h"
-#include "sound/tiaintf.h"
 #include "screen.h"
 
 static const int nusiz[8][3] =
@@ -359,6 +358,7 @@ tia_video_device::tia_video_device(const machine_config &mconfig, device_type ty
 	, m_databus_contents_cb(*this)
 	, m_vsync_cb(*this)
 	, m_maincpu(*this, "^maincpu")
+	, m_tia(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -2015,7 +2015,7 @@ WRITE8_MEMBER( tia_video_device::write )
 	case 0x18: /* AUDF1 */
 	case 0x19: /* AUDV0 */
 	case 0x1A: /* AUDV1 */
-		machine().device<tia_device>("tia")->tia_sound_w(space, offset, data);
+		m_tia->tia_sound_w(space, offset, data);
 		break;
 
 	case 0x1B:

@@ -33,8 +33,8 @@ void mikro80_state::mikro80_mem(address_map &map)
 void mikro80_state::mikro80_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x07).rw(this, FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
+	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x07).rw(FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
 }
 
 void mikro80_state::kristall_io(address_map &map)
@@ -46,11 +46,11 @@ void mikro80_state::kristall_io(address_map &map)
 void mikro80_state::radio99_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x04).w(this, FUNC(mikro80_state::radio99_sound_w));
-	map(0x05, 0x05).rw(this, FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
-	map(0x06, 0x06).r(this, FUNC(mikro80_state::mikro80_8255_portb_r));
-	map(0x07, 0x07).w(this, FUNC(mikro80_state::mikro80_8255_porta_w));
+	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x04).w(FUNC(mikro80_state::radio99_sound_w));
+	map(0x05, 0x05).rw(FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
+	map(0x06, 0x06).r(FUNC(mikro80_state::mikro80_8255_portb_r));
+	map(0x07, 0x07).w(FUNC(mikro80_state::mikro80_8255_porta_w));
 }
 
 /* Input ports */
@@ -160,7 +160,7 @@ static const gfx_layout mikro80_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mikro80 )
+static GFXDECODE_START( gfx_mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SCREEN_UPDATE_DRIVER(mikro80_state, screen_update_mikro80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikro80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikro80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	SPEAKER(config, "speaker").front_center();

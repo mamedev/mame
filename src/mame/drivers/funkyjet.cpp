@@ -134,7 +134,7 @@ void funkyjet_state::funkyjet_map(address_map &map)
 	map(0x120000, 0x1207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x143fff).ram();
 	map(0x160000, 0x1607ff).ram().share("spriteram");
-	map(0x180000, 0x183fff).rw(this, FUNC(funkyjet_state::funkyjet_protection_region_0_146_r), FUNC(funkyjet_state::funkyjet_protection_region_0_146_w)).share("prot16ram"); /* Protection device */ // unlikely to be cs0 region
+	map(0x180000, 0x183fff).rw(FUNC(funkyjet_state::funkyjet_protection_region_0_146_r), FUNC(funkyjet_state::funkyjet_protection_region_0_146_w)).share("prot16ram"); /* Protection device */ // unlikely to be cs0 region
 	map(0x184000, 0x184001).nopw();
 	map(0x188000, 0x188001).nopw();
 	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
@@ -295,7 +295,7 @@ static const gfx_layout tile_layout =
 	64*8
 };
 
-static GFXDECODE_START( funkyjet )
+static GFXDECODE_START( gfx_funkyjet )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 256, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0, 16 )  /* Sprites 16x16 */
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkyjet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkyjet)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

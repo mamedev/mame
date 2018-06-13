@@ -210,12 +210,12 @@ void thepit_state::thepit_main_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().w(this, FUNC(thepit_state::colorram_w)).share("colorram");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(thepit_state::videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(thepit_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(thepit_state::videoram_w)).share("videoram");
 	map(0x9800, 0x983f).mirror(0x0700).ram().share("attributesram");
 	map(0x9840, 0x985f).ram().share("spriteram");
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
+	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -226,12 +226,12 @@ void thepit_state::desertdan_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().w(this, FUNC(thepit_state::colorram_w)).share("colorram");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(thepit_state::videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(thepit_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(thepit_state::videoram_w)).share("videoram");
 	map(0x9800, 0x983f).mirror(0x0700).ram().share("attributesram");
 	map(0x9840, 0x985f).ram().share("spriteram");
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
+	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -242,13 +242,13 @@ void thepit_state::intrepid_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8c00, 0x8fff).r(this, FUNC(thepit_state::intrepid_colorram_mirror_r)).w(this, FUNC(thepit_state::colorram_w)); /* mirror for intrepi2 */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(thepit_state::videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(thepit_state::colorram_w)).share("colorram");
+	map(0x8c00, 0x8fff).r(FUNC(thepit_state::intrepid_colorram_mirror_r)).w(FUNC(thepit_state::colorram_w)); /* mirror for intrepi2 */
+	map(0x9000, 0x93ff).ram().w(FUNC(thepit_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(thepit_state::colorram_w)).share("colorram");
 	map(0x9800, 0x983f).mirror(0x0700).ram().share("attributesram");
 	map(0x9840, 0x985f).ram().share("spriteram");
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(thepit_state::input_port_0_r));
+	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r));
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -692,19 +692,19 @@ static const gfx_layout suprmous_spritelayout =
 };
 
 
-static GFXDECODE_START( thepit )
+static GFXDECODE_START( gfx_thepit )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( intrepid )
+static GFXDECODE_START( gfx_intrepid )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( suprmous )
+static GFXDECODE_START( gfx_suprmous )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, suprmous_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, suprmous_spritelayout, 0, 4 )
 GFXDECODE_END
@@ -738,7 +738,7 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thepit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
 	MCFG_PALETTE_ADD("palette", 32+8)
 	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
 
@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(thepit_state::desertdn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::intrepid)
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(thepit_state::intrepid)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, thepit_state, intrepid_graphics_bank_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
 MACHINE_CONFIG_END
 
 
@@ -803,7 +803,7 @@ MACHINE_CONFIG_START(thepit_state::suprmous)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", suprmous)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
 MACHINE_CONFIG_END
 
 

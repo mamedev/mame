@@ -126,13 +126,13 @@ void ambush_state::main_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc000, 0xc07f).ram();
-	map(0xc080, 0xc09f).ram().w(this, FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
+	map(0xc080, 0xc09f).ram().w(FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
 	map(0xc0a0, 0xc0ff).ram();
 	map(0xc100, 0xc1ff).ram().share("attribute_ram");  // 1 line corresponds to 4 in the video ram
 	map(0xc200, 0xc3ff).ram().share("sprite_ram");
 	map(0xc400, 0xc7ff).ram().share("video_ram");
 	map(0xc800, 0xc800).portr("sw1");
-	map(0xcc00, 0xcc07).w(this, FUNC(ambush_state::output_latches_w));
+	map(0xcc00, 0xcc07).w(FUNC(ambush_state::output_latches_w));
 }
 
 void ambush_state::main_portmap(address_map &map)
@@ -557,7 +557,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( ambush )
+static GFXDECODE_START( gfx_ambush )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx1", 0, spritelayout,     0, 64)
 GFXDECODE_END
@@ -576,12 +576,12 @@ static const gfx_layout spritelayout_mariobl =
 	32*8
 };
 
-static GFXDECODE_START( mariobl )
+static GFXDECODE_START( gfx_mariobl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar,     0, 32)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout_mariobl, 0, 32)
 GFXDECODE_END
 
-static GFXDECODE_START( dkong3abl )
+static GFXDECODE_START( gfx_dkong3abl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,     0, 32)
 GFXDECODE_END
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ambush)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ambush)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mariobl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobl)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
@@ -763,7 +763,7 @@ MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, dkong3)

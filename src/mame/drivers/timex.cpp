@@ -527,11 +527,11 @@ void spectrum_state::ts2068_update_memory()
 
 void spectrum_state::ts2068_io(address_map &map)
 {
-	map(0xf4, 0xf4).rw(this, FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
+	map(0xf4, 0xf4).rw(FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
 	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
 	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
-	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
 }
 
 void spectrum_state::ts2068_mem(address_map &map)
@@ -573,8 +573,8 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 
 void spectrum_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
+	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
 }
 
 void spectrum_state::tc2048_mem(address_map &map)
@@ -682,7 +682,7 @@ static const gfx_layout ts2068_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ts2068 )
+static GFXDECODE_START( gfx_ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ts2068)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 

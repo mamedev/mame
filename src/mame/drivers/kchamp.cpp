@@ -108,8 +108,8 @@ void kchamp_state::kchampvs_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
 	map(0xd900, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
@@ -143,7 +143,7 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x04).w(m_adpcm_select, FUNC(ls157_device::ab_w));
-	map(0x05, 0x05).w(this, FUNC(kchamp_state::sound_control_w));
+	map(0x05, 0x05).w(FUNC(kchamp_state::sound_control_w));
 }
 
 
@@ -152,7 +152,8 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 ********************/
 READ8_MEMBER(kchamp_state::sound_reset_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
@@ -172,8 +173,8 @@ void kchamp_state::kchamp_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
 	map(0xea00, 0xeaff).ram().share("spriteram");
 	map(0xeb00, 0xffff).ram();
 }
@@ -186,7 +187,7 @@ void kchamp_state::kchamp_io_map(address_map &map)
 	map(0x90, 0x90).portr("P1");
 	map(0x98, 0x98).portr("P2");
 	map(0xa0, 0xa0).portr("SYSTEM");
-	map(0xa8, 0xa8).r(this, FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa8, 0xa8).r(FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void kchamp_state::kchamp_sound_map(address_map &map)
@@ -200,8 +201,8 @@ void kchamp_state::kchamp_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::write));
-	map(0x05, 0x05).w(this, FUNC(kchamp_state::kc_sound_control_w));
+	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x05, 0x05).w(FUNC(kchamp_state::kc_sound_control_w));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -346,7 +347,7 @@ static const gfx_layout spritelayout =
 	16*8    /* ofset to next tile */
 };
 
-static GFXDECODE_START( kchamp )
+static GFXDECODE_START( gfx_kchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   32*4, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout, 0, 16 )
@@ -433,7 +434,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
@@ -493,7 +494,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 

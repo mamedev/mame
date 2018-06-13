@@ -136,7 +136,7 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
 	namcos2_kickstart = nullptr;
 	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 }
 
 MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)

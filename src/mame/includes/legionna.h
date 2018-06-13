@@ -40,6 +40,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_mid_data;
 	std::unique_ptr<uint16_t[]> m_textram;
 	std::unique_ptr<uint16_t[]> m_scrollram16;
+	std::unique_ptr<uint16_t[]> m_paletteram;
 	uint16_t m_layer_disable;
 	std::unique_ptr<uint16_t[]> m_layer_config;
 	int m_sprite_xoffs;

@@ -126,8 +126,8 @@ void hexion_state::hexion_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
-	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
+	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
 	map(0xe800, 0xe8ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
@@ -138,9 +138,9 @@ void hexion_state::hexion_map(address_map &map)
 	map(0xf403, 0xf403).portr("P2");
 	map(0xf440, 0xf440).portr("DSW3");
 	map(0xf441, 0xf441).portr("SYSTEM");
-	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
-	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
-	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
+	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
 	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -149,8 +149,8 @@ void hexion_state::hexionb_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
-	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
+	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
 	map(0xe800, 0xe87f).noprw(); // all the code to use the k051649 is still present
 	map(0xe880, 0xe889).noprw(); // but the bootleg has an additional M6295 @ 0xf5c0 instead
@@ -165,9 +165,9 @@ void hexion_state::hexionb_map(address_map &map)
 	map(0xf403, 0xf403).portr("P2");
 	map(0xf440, 0xf440).portr("DSW3");
 	map(0xf441, 0xf441).portr("SYSTEM");
-	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
-	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
-	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
+	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
 	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf5c0, 0xf5c0).w("oki2", FUNC(okim6295_device::write));
 }
@@ -228,7 +228,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( hexion )
+static GFXDECODE_START( gfx_hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexion)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */

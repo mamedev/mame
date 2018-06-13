@@ -433,12 +433,12 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x063fff).ram().share("ram");
 	map(0x080000, 0x080fff).ram().share("spriteram");
-	map(0x0a0000, 0x0a07ff).ram().w(this, FUNC(karnov_state::karnov_videoram_w)).share("videoram");
-	map(0x0a0800, 0x0a0fff).w(this, FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
+	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::karnov_videoram_w)).share("videoram");
+	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
 	map(0x0a1000, 0x0a17ff).writeonly().share("pf_data");
-	map(0x0a1800, 0x0a1fff).w(this, FUNC(karnov_state::karnov_playfield_swap_w));
-	map(0x0c0000, 0x0c0007).r(this, FUNC(karnov_state::karnov_control_r));
-	map(0x0c0000, 0x0c000f).w(this, FUNC(karnov_state::karnov_control_w));
+	map(0x0a1800, 0x0a1fff).w(FUNC(karnov_state::karnov_playfield_swap_w));
+	map(0x0c0000, 0x0c0007).r(FUNC(karnov_state::karnov_control_r));
+	map(0x0c0000, 0x0c000f).w(FUNC(karnov_state::karnov_control_w));
 }
 
 
@@ -728,7 +728,7 @@ static const gfx_layout tiles =
 	16*16
 };
 
-static GFXDECODE_START( karnov )
+static GFXDECODE_START( gfx_karnov )
 	GFXDECODE_ENTRY( "gfx1", 0, chars,     0,  4 )  /* colors 0-31 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   512, 16 )  /* colors 512-767 */
 	GFXDECODE_ENTRY( "gfx3", 0, sprites, 256, 16 )  /* colors 256-511 */
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)

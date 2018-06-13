@@ -85,7 +85,7 @@ void crimfght_state::crimfght_map(address_map &map)
 {
 	map(0x0000, 0x03ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
 	map(0x0400, 0x1fff).ram();
-	map(0x2000, 0x5fff).rw(this, FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   /* video RAM + sprite RAM */
+	map(0x2000, 0x5fff).rw(FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   /* video RAM + sprite RAM */
 	map(0x3f80, 0x3f80).portr("SYSTEM");
 	map(0x3f81, 0x3f81).portr("P1");
 	map(0x3f82, 0x3f82).portr("P2");
@@ -94,8 +94,8 @@ void crimfght_state::crimfght_map(address_map &map)
 	map(0x3f85, 0x3f85).portr("P3");
 	map(0x3f86, 0x3f86).portr("P4");
 	map(0x3f87, 0x3f87).portr("DSW1");
-	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(crimfght_state::crimfght_coin_w)); // 051550
-	map(0x3f8c, 0x3f8c).mirror(0x03).w(this, FUNC(crimfght_state::sound_w));
+	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(crimfght_state::crimfght_coin_w)); // 051550
+	map(0x3f8c, 0x3f8c).mirror(0x03).w(FUNC(crimfght_state::sound_w));
 	map(0x6000, 0x7fff).bankr("rombank");                        /* banked ROM */
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
 }

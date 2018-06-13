@@ -110,18 +110,18 @@ INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 
 void brkthru_state::brkthru_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().w(this, FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
+	map(0x0000, 0x03ff).ram().w(FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
 	map(0x0400, 0x0bff).ram();
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
 	map(0x1100, 0x17ff).ram();
 	map(0x1800, 0x1800).portr("P1");
 	map(0x1801, 0x1801).portr("P2");
 	map(0x1802, 0x1802).portr("DSW1");
 	map(0x1803, 0x1803).portr("DSW2/COIN");
-	map(0x1800, 0x1801).w(this, FUNC(brkthru_state::brkthru_1800_w));   /* bg scroll and color, ROM bank selection, flip screen */
+	map(0x1800, 0x1801).w(FUNC(brkthru_state::brkthru_1800_w));   /* bg scroll and color, ROM bank selection, flip screen */
 	map(0x1802, 0x1802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1803, 0x1803).w(this, FUNC(brkthru_state::brkthru_1803_w));   /* NMI enable, + ? */
+	map(0x1803, 0x1803).w(FUNC(brkthru_state::brkthru_1803_w));   /* NMI enable, + ? */
 	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x4000, 0xffff).rom();
 }
@@ -129,18 +129,18 @@ void brkthru_state::brkthru_map(address_map &map)
 /* same as brktrhu, but xor 0x1000 below 8k */
 void brkthru_state::darwin_map(address_map &map)
 {
-	map(0x1000, 0x13ff).ram().w(this, FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
+	map(0x1000, 0x13ff).ram().w(FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
 	map(0x1400, 0x1bff).ram();
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
 	map(0x0000, 0x00ff).ram().share("spriteram");
 	map(0x0100, 0x01ff).nopw(); /*tidyup, nothing really here?*/
 	map(0x0800, 0x0800).portr("P1");
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("DSW1");
 	map(0x0803, 0x0803).portr("DSW2/COIN");
-	map(0x0800, 0x0801).w(this, FUNC(brkthru_state::brkthru_1800_w));     /* bg scroll and color, ROM bank selection, flip screen */
+	map(0x0800, 0x0801).w(FUNC(brkthru_state::brkthru_1800_w));     /* bg scroll and color, ROM bank selection, flip screen */
 	map(0x0802, 0x0802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0803, 0x0803).w(this, FUNC(brkthru_state::darwin_0803_w));     /* NMI enable, + ? */
+	map(0x0803, 0x0803).w(FUNC(brkthru_state::darwin_0803_w));     /* NMI enable, + ? */
 	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x4000, 0xffff).rom();
 }
@@ -330,7 +330,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( brkthru )
+static GFXDECODE_START( gfx_brkthru )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x00,  1 )  /* use colors 0x00-0x07 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout1,  0x80, 16 )  /* use colors 0x80-0xff */
 	GFXDECODE_ENTRY( "gfx2", 0x01000, tilelayout2,  0x80, 16 )
@@ -370,7 +370,7 @@ void brkthru_state::machine_reset()
 WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 {
 	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(brkthru_state::brkthru)
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)

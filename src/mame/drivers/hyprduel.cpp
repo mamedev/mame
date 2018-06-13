@@ -261,9 +261,9 @@ void hyprduel_state::hyprduel_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a2, 0x4788a3).rw(this, FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
+	map(0x4788a2, 0x4788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
 	map(0x4788a4, 0x4788a5).ram().share("irq_enable");      /* IRQ Enable */
-	map(0x800000, 0x800001).w(this, FUNC(hyprduel_state::subcpu_control_w));
+	map(0x800000, 0x800001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0xc00000, 0xc07fff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
 	map(0xe00002, 0xe00003).portr("DSW");
@@ -291,9 +291,9 @@ void hyprduel_state::hyprduel_map2(address_map &map)
 void hyprduel_state::magerror_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x400000, 0x400001).w(this, FUNC(hyprduel_state::subcpu_control_w));
+	map(0x400000, 0x400001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
+	map(0x8788a2, 0x8788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
 	map(0x8788a4, 0x8788a5).ram().share("irq_enable");      /* IRQ Enable */
 	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
@@ -440,7 +440,7 @@ static const gfx_layout layout_16x16x4 =
 /* 16x16x8 tiles for later games */
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 32*8 )
 
-static GFXDECODE_START( i4220 )
+static GFXDECODE_START( gfx_i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE(":vdp:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp:palette", i4220)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, ":vdp:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hyprduel_state::hyprduel)

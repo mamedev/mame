@@ -236,7 +236,7 @@ uint32_t warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 void warpspeed_state::warpspeed_map(address_map &map)
 {
 	map(0x0000, 0x0dff).rom();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(warpspeed_state::vidram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(warpspeed_state::vidram_w)).share("videoram");
 	map(0x1c00, 0x1cff).ram().share("workram");
 }
 
@@ -247,7 +247,7 @@ void warpspeed_state::warpspeed_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("DSW");
 	map(0x03, 0x03).portr("IN2");
-	map(0x00, 0x27).w(this, FUNC(warpspeed_state::hardware_w));
+	map(0x00, 0x27).w(FUNC(warpspeed_state::hardware_w));
 }
 
 static INPUT_PORTS_START( warpspeed )
@@ -302,7 +302,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( warpspeed )
+static GFXDECODE_START( gfx_warpspeed )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1  )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 1  )
 GFXDECODE_END
@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warpspeed)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warpspeed)
 	MCFG_PALETTE_ADD("palette", 2+8)
 	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_END

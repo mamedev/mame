@@ -162,7 +162,7 @@ void murogem_state::murogem_map(address_map &map)
 	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x5000, 0x5000).portr("IN0");
 	map(0x5800, 0x5800).portr("IN1");
-	map(0x7000, 0x7000).w(this, FUNC(murogem_state::outport_w));    /* output port */
+	map(0x7000, 0x7000).w(FUNC(murogem_state::outport_w));    /* output port */
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0xf000, 0xffff).rom();
 }
@@ -214,7 +214,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( murogem )
+static GFXDECODE_START( gfx_murogem )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogem)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_murogem)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 

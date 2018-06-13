@@ -20,11 +20,11 @@ void decobsmt_device::decobsmt_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0xffff).rom().region(":soundcpu", 0x2000);
-	map(0x2000, 0x2001).w(this, FUNC(decobsmt_device::bsmt_reset_w));
-	map(0x2002, 0x2003).r(this, FUNC(decobsmt_device::bsmt_comms_r));
-	map(0x2006, 0x2007).r(this, FUNC(decobsmt_device::bsmt_status_r));
-	map(0x6000, 0x6000).w(this, FUNC(decobsmt_device::bsmt0_w));
-	map(0xa000, 0xa0ff).w(this, FUNC(decobsmt_device::bsmt1_w));
+	map(0x2000, 0x2001).w(FUNC(decobsmt_device::bsmt_reset_w));
+	map(0x2002, 0x2003).r(FUNC(decobsmt_device::bsmt_comms_r));
+	map(0x2006, 0x2007).r(FUNC(decobsmt_device::bsmt_status_r));
+	map(0x6000, 0x6000).w(FUNC(decobsmt_device::bsmt0_w));
+	map(0xa000, 0xa0ff).w(FUNC(decobsmt_device::bsmt1_w));
 }
 
 void decobsmt_device::bsmt_map(address_map &map)
@@ -55,7 +55,7 @@ MACHINE_CONFIG_START(decobsmt_device::device_add_mconfig)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_BSMT2000_ADD(BSMT_TAG, XTAL(24'000'000))
+	MCFG_DEVICE_ADD(BSMT_TAG, BSMT2000, XTAL(24'000'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, bsmt_map)
 	MCFG_BSMT2000_READY_CALLBACK(decobsmt_device, bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)

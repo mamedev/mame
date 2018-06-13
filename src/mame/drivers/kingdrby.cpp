@@ -432,8 +432,8 @@ void kingdrby_state::master_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x33ff).ram().mirror(0xc00).share("share1");
-	map(0x4000, 0x43ff).ram().w(this, FUNC(kingdrby_state::sc0_vram_w)).share("vram");
-	map(0x5000, 0x53ff).ram().w(this, FUNC(kingdrby_state::sc0_attr_w)).share("attr");
+	map(0x4000, 0x43ff).ram().w(FUNC(kingdrby_state::sc0_vram_w)).share("vram");
+	map(0x5000, 0x53ff).ram().w(FUNC(kingdrby_state::sc0_attr_w)).share("attr");
 }
 
 void kingdrby_state::master_io_map(address_map &map)
@@ -453,7 +453,7 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x7801, 0x780f).w(this, FUNC(kingdrby_state::led_array_w));
+	map(0x7801, 0x780f).w(FUNC(kingdrby_state::led_array_w));
 	map(0x7a00, 0x7a00).ram(); //buffer for the key matrix
 	map(0x7c00, 0x7c00).portr("DSW");
 }
@@ -478,7 +478,7 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x7801, 0x7801).portr("KEY1");
 	map(0x7802, 0x7802).portr("KEY2");
 	map(0x7803, 0x7803).portr("KEY3");
-	map(0x7800, 0x7803).w(this, FUNC(kingdrby_state::kingdrbb_lamps_w));
+	map(0x7800, 0x7803).w(FUNC(kingdrby_state::kingdrbb_lamps_w));
 	map(0x7a00, 0x7a00).portr("SYSTEM");
 	map(0x7c00, 0x7c00).portr("DSW");
 }
@@ -883,12 +883,12 @@ static const gfx_layout cowrace_layout16x16x2 =
 	16*16
 };
 
-static GFXDECODE_START( kingdrby )
+static GFXDECODE_START( gfx_kingdrby )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0x000, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( cowrace )
+static GFXDECODE_START( gfx_cowrace )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, cowrace_layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0x000, 0x80 )
 GFXDECODE_END
@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, kingdrby_state, input_mux_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, outport2_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingdrby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1044,7 +1044,7 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
 	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cowrace)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified

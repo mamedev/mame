@@ -530,13 +530,13 @@ void m10_state::m10_main(address_map &map)
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
 	map(0x1000, 0x2fff).rom().share("rom");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x53ff).ram().w(this, FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
-	map(0xa400, 0xa400).w(this, FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
-	map(0xa500, 0xa500).w(this, FUNC(m10_state::m10_a500_w));   /* ??? */
-	map(0xa700, 0xa700).r(this, FUNC(m10_state::m10_a700_r));
+	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   /* ??? */
+	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
 	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -545,13 +545,13 @@ void m10_state::m11_main(address_map &map)
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
 	map(0x1000, 0x2fff).rom().share("rom");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
 	map(0x5000, 0x53ff).ram().share("chargen"); /* background ????? */
-	map(0xa100, 0xa100).w(this, FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
+	map(0xa100, 0xa100).w(FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
-	map(0xa400, 0xa400).w(this, FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
-	map(0xa700, 0xa700).r(this, FUNC(m10_state::m11_a700_r));
+	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa700, 0xa700).r(FUNC(m10_state::m11_a700_r));
 	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -560,13 +560,13 @@ void m10_state::m15_main(address_map &map)
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
 	map(0x1000, 0x33ff).rom().share("rom");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x57ff).ram().w(this, FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x57ff).ram().w(FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
 	map(0xa000, 0xa000).portr("P2");
-	map(0xa100, 0xa100).w(this, FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
+	map(0xa100, 0xa100).w(FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("P1");
-	map(0xa400, 0xa400).w(this, FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
+	map(0xa400, 0xa400).w(FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
 	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -780,7 +780,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( m10 )
+static GFXDECODE_START( gfx_m10 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -829,7 +829,7 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m10)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(m10_state::m15)
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m15)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)

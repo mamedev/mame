@@ -378,13 +378,13 @@ void elwro800_state::elwro800_mem(address_map &map)
 
 void elwro800_state::elwro800_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(elwro800_state::elwro800jr_io_r), FUNC(elwro800_state::elwro800jr_io_w));
+	map(0x0000, 0xffff).rw(FUNC(elwro800_state::elwro800jr_io_r), FUNC(elwro800_state::elwro800jr_io_w));
 }
 
 void elwro800_state::elwro800_m1(address_map &map)
 {
 	map(0x0000, 0x1fff).m(m_bank1, FUNC(address_map_bank_device::amap8));
-	map(0x0066, 0x0066).r(this, FUNC(elwro800_state::nmi_r));
+	map(0x0066, 0x0066).r(FUNC(elwro800_state::nmi_r));
 	map(0x2000, 0x3fff).m(m_bank2, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xffff).bankrw("rambank3");
 }
@@ -561,7 +561,7 @@ static const gfx_layout elwro800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( elwro800 )
+static GFXDECODE_START( gfx_elwro800 )
 	GFXDECODE_ENTRY( "maincpu", 0x3c00, elwro800_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", elwro800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 
@@ -597,8 +597,8 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("JOY"))
-	MCFG_I8255_IN_PORTB_CB(READ8("cent_data_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, elwro800_state, i8255_port_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, elwro800_state, i8255_port_c_w))
 

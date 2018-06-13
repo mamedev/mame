@@ -291,13 +291,13 @@ void statriv2_state::statriv2_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x48ff).ram().share("nvram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
 }
 
 void statriv2_state::statriv2_io_map(address_map &map)
 {
 	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x28, 0x2b).r(this, FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
+	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
 	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xb1, 0xb1).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
@@ -570,7 +570,7 @@ static const gfx_layout horizontal_tiles_layout =
 	16*8
 };
 
-static GFXDECODE_START( horizontal )
+static GFXDECODE_START( gfx_horizontal )
 	GFXDECODE_ENTRY( "tiles", 0, horizontal_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -586,7 +586,7 @@ static const gfx_layout vertical_tiles_layout =
 	8*8
 };
 
-static GFXDECODE_START( vertical )
+static GFXDECODE_START( gfx_vertical )
 	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -625,7 +625,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2v)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(statriv2_state::funcsino)

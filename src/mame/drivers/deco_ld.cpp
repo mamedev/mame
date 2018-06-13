@@ -276,10 +276,10 @@ void deco_ld_state::rblaster_map(address_map &map)
 	map(0x1001, 0x1001).portr("DSW1");
 	map(0x1002, 0x1002).portr("DSW2");
 	map(0x1003, 0x1003).portr("IN1");
-	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(this, FUNC(deco_ld_state::decold_sound_cmd_w));
-	map(0x1005, 0x1005).r(this, FUNC(deco_ld_state::sound_status_r));
+	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
+	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
 	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	map(0x1006, 0x1006).r(this, FUNC(deco_ld_state::acia_status_hack_r));
+	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x27ff).ram();
@@ -303,7 +303,7 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
-	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -451,7 +451,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( rblaster )
+static GFXDECODE_START( gfx_rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rblaster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 

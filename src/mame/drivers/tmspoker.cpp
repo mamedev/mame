@@ -332,7 +332,7 @@ void tmspoker_state::tmspoker_map(address_map &map)
 	map(0x0000, 0x0fff).bankr("bank1");
 	map(0x2800, 0x2800).nopr().w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x3000, 0x33ff).ram().w(this, FUNC(tmspoker_state::tmspoker_videoram_w)).share("videoram");
+	map(0x3000, 0x33ff).ram().w(FUNC(tmspoker_state::tmspoker_videoram_w)).share("videoram");
 	map(0x3800, 0x3fff).ram(); //NVRAM?
 	map(0x2000, 0x20ff).ram(); //color RAM?
 }
@@ -346,7 +346,7 @@ READ8_MEMBER(tmspoker_state::unk_r)
 
 void tmspoker_state::tmspoker_cru_map(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(tmspoker_state::unk_r));
+	map(0x0000, 0x07ff).r(FUNC(tmspoker_state::unk_r));
 }
 
 /* I/O byte R/W
@@ -546,7 +546,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( tmspoker )
+static GFXDECODE_START( gfx_tmspoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmspoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmspoker)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)

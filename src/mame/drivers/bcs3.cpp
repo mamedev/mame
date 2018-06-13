@@ -50,7 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
 #include "screen.h"
@@ -137,9 +137,9 @@ void bcs3_state::bcs3_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
-	map(0x1000, 0x13ff).mirror(0x2000).r(this, FUNC(bcs3_state::keyboard_r));
+	map(0x1000, 0x13ff).mirror(0x2000).r(FUNC(bcs3_state::keyboard_r));
 	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
-	map(0x1800, 0x1bff).mirror(0x2000).r(this, FUNC(bcs3_state::video_r));
+	map(0x1800, 0x1bff).mirror(0x2000).r(FUNC(bcs3_state::video_r));
 	map(0x1c00, 0x1fff).mirror(0x2000).ram().share("videoram");
 }
 
@@ -147,9 +147,9 @@ void bcs3_state::bcs3a_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
-	map(0x1000, 0x13ff).mirror(0x2000).r(this, FUNC(bcs3_state::keyboard_r));
+	map(0x1000, 0x13ff).mirror(0x2000).r(FUNC(bcs3_state::keyboard_r));
 	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
-	map(0x1800, 0x1bff).mirror(0x2000).r(this, FUNC(bcs3_state::zx_r));
+	map(0x1800, 0x1bff).mirror(0x2000).r(FUNC(bcs3_state::zx_r));
 	map(0x3c00, 0x7fff).ram().share("videoram");
 	map(0xf000, 0xf3ff).rom().region("roms", 0x1000);
 }
@@ -326,7 +326,7 @@ static const gfx_layout bcs3_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( bcs3 )
+static GFXDECODE_START( gfx_bcs3 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bcs3_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -399,7 +399,7 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(5'000'000) / 2)
@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3a)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(7'000'000) / 2)

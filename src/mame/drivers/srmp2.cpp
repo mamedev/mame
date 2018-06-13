@@ -400,15 +400,15 @@ void srmp2_state::srmp2_map(address_map &map)
 	map(0x180000, 0x1805ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     /* Sprites Y */
 	map(0x180600, 0x180607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0x1c0000, 0x1c0001).nopw();                        /* ??? */
-	map(0x800000, 0x800001).w(this, FUNC(srmp2_state::srmp2_flags_w));            /* ADPCM bank, Color bank, etc. */
+	map(0x800000, 0x800001).w(FUNC(srmp2_state::srmp2_flags_w));            /* ADPCM bank, Color bank, etc. */
 	map(0x900000, 0x900001).portr("SYSTEM");             /* Coinage */
 	map(0x900000, 0x900001).nopw();                        /* ??? */
-	map(0xa00001, 0xa00001).rw(this, FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
-	map(0xa00003, 0xa00003).rw(this, FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
-	map(0xb00001, 0xb00001).w(this, FUNC(srmp2_state::adpcm_code_w));   /* ADPCM number */
-	map(0xb00003, 0xb00003).r(this, FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
-	map(0xc00001, 0xc00001).w(this, FUNC(srmp2_state::srmp2_irq2_ack_w));         /* irq ack lv 2 */
-	map(0xd00001, 0xd00001).w(this, FUNC(srmp2_state::srmp2_irq4_ack_w));         /* irq ack lv 4 */
+	map(0xa00001, 0xa00001).rw(FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
+	map(0xa00003, 0xa00003).rw(FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xb00001, 0xb00001).w(FUNC(srmp2_state::adpcm_code_w));   /* ADPCM number */
+	map(0xb00003, 0xb00003).r(FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
+	map(0xc00001, 0xc00001).w(FUNC(srmp2_state::srmp2_irq2_ack_w));         /* irq ack lv 2 */
+	map(0xd00001, 0xd00001).w(FUNC(srmp2_state::srmp2_irq4_ack_w));         /* irq ack lv 4 */
 	map(0xe00000, 0xe00001).nopw();                        /* watchdog */
 	map(0xf00001, 0xf00001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xf00000, 0xf00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
@@ -430,19 +430,19 @@ void srmp2_state::mjyuugi_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x100001).portr("SYSTEM");             /* Coinage */
-	map(0x100000, 0x100001).w(this, FUNC(srmp2_state::mjyuugi_flags_w));          /* Coin Counter */
+	map(0x100000, 0x100001).w(FUNC(srmp2_state::mjyuugi_flags_w));          /* Coin Counter */
 	map(0x100010, 0x100011).nopr();                         /* ??? */
-	map(0x100010, 0x100011).w(this, FUNC(srmp2_state::mjyuugi_adpcm_bank_w));     /* ADPCM bank, GFX bank */
-	map(0x200001, 0x200001).r(this, FUNC(srmp2_state::mjyuugi_irq2_ack_r)); /* irq ack lv 2? */
-	map(0x300001, 0x300001).r(this, FUNC(srmp2_state::mjyuugi_irq4_ack_r)); /* irq ack lv 4? */
+	map(0x100010, 0x100011).w(FUNC(srmp2_state::mjyuugi_adpcm_bank_w));     /* ADPCM bank, GFX bank */
+	map(0x200001, 0x200001).r(FUNC(srmp2_state::mjyuugi_irq2_ack_r)); /* irq ack lv 2? */
+	map(0x300001, 0x300001).r(FUNC(srmp2_state::mjyuugi_irq4_ack_r)); /* irq ack lv 4? */
 	map(0x500000, 0x500001).portr("DSW3-1");             /* DSW 3-1 */
 	map(0x500010, 0x500011).portr("DSW3-2");             /* DSW 3-2 */
 	map(0x700000, 0x7003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x800001).nopr();             /* ??? */
-	map(0x900001, 0x900001).rw(this, FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
-	map(0x900003, 0x900003).rw(this, FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
-	map(0xa00001, 0xa00001).w(this, FUNC(srmp2_state::adpcm_code_w));           /* ADPCM number */
-	map(0xb00003, 0xb00003).r(this, FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
+	map(0x900001, 0x900001).rw(FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
+	map(0x900003, 0x900003).rw(FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xa00001, 0xa00001).w(FUNC(srmp2_state::adpcm_code_w));           /* ADPCM number */
+	map(0xb00003, 0xb00003).r(FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
 	map(0xb00001, 0xb00001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xb00000, 0xb00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0xc00000, 0xc00001).nopw();                    /* ??? */
@@ -489,13 +489,13 @@ void srmp2_state::srmp3_map(address_map &map)
 void srmp2_state::srmp3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x20, 0x20).w(this, FUNC(srmp2_state::srmp3_irq_ack_w));                              /* interrupt acknowledge */
-	map(0x40, 0x40).portr("SYSTEM").w(this, FUNC(srmp2_state::srmp3_flags_w));         /* coin, service | GFX bank, counter, lockout */
-	map(0x60, 0x60).w(this, FUNC(srmp2_state::srmp3_rombank_w));                              /* ROM bank select */
-	map(0xa0, 0xa0).w(this, FUNC(srmp2_state::adpcm_code_w));                   /* ADPCM number */
-	map(0xa1, 0xa1).r(this, FUNC(srmp2_state::vox_status_r));                                  /* ADPCM voice status */
-	map(0xc0, 0xc0).rw(this, FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w));                 /* key matrix | I/O */
-	map(0xc1, 0xc1).rw(this, FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0x20, 0x20).w(FUNC(srmp2_state::srmp3_irq_ack_w));                              /* interrupt acknowledge */
+	map(0x40, 0x40).portr("SYSTEM").w(FUNC(srmp2_state::srmp3_flags_w));         /* coin, service | GFX bank, counter, lockout */
+	map(0x60, 0x60).w(FUNC(srmp2_state::srmp3_rombank_w));                              /* ROM bank select */
+	map(0xa0, 0xa0).w(FUNC(srmp2_state::adpcm_code_w));                   /* ADPCM number */
+	map(0xa1, 0xa1).r(FUNC(srmp2_state::vox_status_r));                                  /* ADPCM voice status */
+	map(0xc0, 0xc0).rw(FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w));                 /* key matrix | I/O */
+	map(0xc1, 0xc1).rw(FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
 	map(0xe0, 0xe1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe2, 0xe2).r("aysnd", FUNC(ay8910_device::data_r));
 }
@@ -528,7 +528,7 @@ void srmp2_state::rmgoldyh_io_map(address_map &map)
 	map.global_mask(0xff);
 	srmp3_io_map(map);
 	map(0x00, 0x00).nopw(); /* watchdog */
-	map(0x60, 0x60).w(this, FUNC(srmp2_state::rmgoldyh_rombank_w));                       /* ROM bank select */
+	map(0x60, 0x60).w(FUNC(srmp2_state::rmgoldyh_rombank_w));                       /* ROM bank select */
 	map(0x80, 0x80).portr("DSW4");
 	map(0x81, 0x81).portr("DSW3");
 }
@@ -1132,11 +1132,11 @@ static const gfx_layout charlayout =
 	16*16*2
 };
 
-static GFXDECODE_START( srmp2 )
+static GFXDECODE_START( gfx_srmp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( srmp3 )
+static GFXDECODE_START( gfx_srmp3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -1164,7 +1164,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp2)
 	MCFG_PALETTE_ADD("palette", 1024)   /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1211,7 +1211,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1266,7 +1266,7 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_mjyuugi)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
 	MCFG_PALETTE_ADD("palette", 512)            /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

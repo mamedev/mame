@@ -63,7 +63,7 @@ void banctec_state::banctec_mcu_mem(address_map &map)
 	map(0x0000, 0x00ff).ram(); /* Probably wrong. Must be verified on pcb! */
 	map(0x2000, 0x2000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2003, 0x2003).w(this, FUNC(banctec_state::videoram_w));
+	map(0x2003, 0x2003).w(FUNC(banctec_state::videoram_w));
 	map(0x8000, 0x80ff).ram().share("videoram"); /* Probably wrong. Must be verified on pcb! */
 	map(0xe000, 0xffff).rom().region("mcu", 0x0000);
 }
@@ -131,7 +131,7 @@ const gfx_layout banctec_gfx_layout =
 	8                 /* size of one char */
 };
 
-static GFXDECODE_START( banctec )
+static GFXDECODE_START( gfx_banctec )
 	GFXDECODE_ENTRY( "chargen", 0x00000, banctec_gfx_layout, 0, 1 )
 GFXDECODE_END
 
@@ -154,7 +154,7 @@ MACHINE_CONFIG_START(banctec_state::banctec)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", banctec)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_banctec)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(2'000'000)) /* (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

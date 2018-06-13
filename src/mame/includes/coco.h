@@ -119,7 +119,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus & "space"
-	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
+	DECLARE_READ8_MEMBER( floating_bus_r )   { return floating_bus_read(); }
 	uint8_t floating_space_read(offs_t offset);
 	void floating_space_write(offs_t offset, uint8_t data);
 

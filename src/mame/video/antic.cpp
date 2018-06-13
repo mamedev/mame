@@ -1972,7 +1972,7 @@ TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
 	{
 		LOG(("           @cycle #%3d issue DLI\n", cycle()));
 		m_r.nmist |= DLI_NMI;
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 	{
@@ -2378,7 +2378,7 @@ void antic_device::generic_interrupt(int button_count)
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			m_r.nmist |= VBL_NMI;
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 

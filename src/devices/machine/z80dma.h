@@ -34,7 +34,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 //**************************************************************************
@@ -87,8 +87,8 @@ public:
 
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_READ8_MEMBER( read ) { return read(); }
-	DECLARE_WRITE8_MEMBER( write ) { write(data); }
+	DECLARE_READ8_MEMBER( bus_r ) { return read(); }
+	DECLARE_WRITE8_MEMBER( bus_w ) { write(data); }
 
 	DECLARE_WRITE_LINE_MEMBER(rdy_w);
 	DECLARE_WRITE_LINE_MEMBER(wait_w);

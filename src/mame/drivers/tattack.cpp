@@ -272,11 +272,11 @@ void tattack_state::tattack_map(address_map &map)
 	map(0x6000, 0x6000).portr("DSW2");
 	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
 	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
-	map(0xc000, 0xc000).portr("INPUTS").w(this, FUNC(tattack_state::sound_w)); // sound
-	map(0xc001, 0xc001).w(this, FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
-	map(0xc005, 0xc005).w(this, FUNC(tattack_state::paddle_w));
-	map(0xc006, 0xc007).w(this, FUNC(tattack_state::ball_w));
+	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
+	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
 	map(0xe000, 0xe3ff).ram().share("ram");
 }
 
@@ -367,7 +367,7 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( tattack )
+static GFXDECODE_START( gfx_tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(tattack_state::tattack)
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tattack)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 

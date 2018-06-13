@@ -167,20 +167,20 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(dfruit_state::dfruit_rom_r));
+	map(0x6000, 0x7fff).r(FUNC(dfruit_state::dfruit_rom_r));
 
 	map(0x8000, 0x9fff).ram();
 
-	map(0xc000, 0xcfff).rw(this, FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
-	map(0xd000, 0xdfff).rw(this, FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
-	map(0xe000, 0xefff).rw(this, FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
-	map(0xf000, 0xfdff).rw(this, FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
+	map(0xc000, 0xcfff).rw(FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
+	map(0xd000, 0xdfff).rw(FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
+	map(0xe000, 0xefff).rw(FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
+	map(0xf000, 0xfdff).rw(FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
 
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(this, FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
-	map(0xff03, 0xff03).rw(this, FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
-	map(0xff04, 0xff07).rw(this, FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
-	map(0xff08, 0xff08).rw(this, FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
+	map(0xff00, 0xff02).rw(FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
+	map(0xff03, 0xff03).rw(FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
+	map(0xff08, 0xff08).rw(FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
 }
 
 
@@ -342,7 +342,7 @@ static const gfx_layout char_layout =
 };
 #endif
 
-static GFXDECODE_START( dfruit )
+static GFXDECODE_START( gfx_dfruit )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
 	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfruit )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)

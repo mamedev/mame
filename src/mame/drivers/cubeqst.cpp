@@ -434,14 +434,14 @@ void cubeqst_state::m68k_program_map(address_map &map)
 {
 	map.global_mask(0x03ffff);
 	map(0x000000, 0x01ffff).rom();
-	map(0x020000, 0x027fff).rw(this, FUNC(cubeqst_state::read_rotram), FUNC(cubeqst_state::write_rotram));
-	map(0x028000, 0x028fff).rw(this, FUNC(cubeqst_state::read_sndram), FUNC(cubeqst_state::write_sndram));
-	map(0x038000, 0x038001).rw(this, FUNC(cubeqst_state::io_r), FUNC(cubeqst_state::io_w));
-	map(0x038002, 0x038003).rw(this, FUNC(cubeqst_state::chop_r), FUNC(cubeqst_state::ldaud_w));
-	map(0x038008, 0x038009).rw(this, FUNC(cubeqst_state::line_r), FUNC(cubeqst_state::reset_w));
-	map(0x03800e, 0x03800f).rw(this, FUNC(cubeqst_state::laserdisc_r), FUNC(cubeqst_state::laserdisc_w));
-	map(0x03c800, 0x03c9ff).ram().w(this, FUNC(cubeqst_state::palette_w)).share("paletteram");
-	map(0x03cc00, 0x03cc01).w(this, FUNC(cubeqst_state::control_w));
+	map(0x020000, 0x027fff).rw(FUNC(cubeqst_state::read_rotram), FUNC(cubeqst_state::write_rotram));
+	map(0x028000, 0x028fff).rw(FUNC(cubeqst_state::read_sndram), FUNC(cubeqst_state::write_sndram));
+	map(0x038000, 0x038001).rw(FUNC(cubeqst_state::io_r), FUNC(cubeqst_state::io_w));
+	map(0x038002, 0x038003).rw(FUNC(cubeqst_state::chop_r), FUNC(cubeqst_state::ldaud_w));
+	map(0x038008, 0x038009).rw(FUNC(cubeqst_state::line_r), FUNC(cubeqst_state::reset_w));
+	map(0x03800e, 0x03800f).rw(FUNC(cubeqst_state::laserdisc_r), FUNC(cubeqst_state::laserdisc_w));
+	map(0x03c800, 0x03c9ff).ram().w(FUNC(cubeqst_state::palette_w)).share("paletteram");
+	map(0x03cc00, 0x03cc01).w(FUNC(cubeqst_state::control_w));
 	map(0x03e000, 0x03efff).ram().share("nvram");
 	map(0x03f000, 0x03ffff).ram();
 }

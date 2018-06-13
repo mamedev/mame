@@ -1,21 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
-#include "video/poly.h"
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
-#include "machine/eepromser.h"
-#include "machine/i8251.h"
 #include "cpu/i960/i960.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/bankdev.h"
-#include "machine/gen_fifo.h"
-#include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
+#include "machine/bankdev.h"
+#include "machine/eepromser.h"
+#include "machine/gen_fifo.h"
+#include "machine/i8251.h"
 #include "machine/m2comm.h"
 #include "machine/timer.h"
+#include "sound/scsp.h"
+#include "video/segaic24.h"
+#include "video/poly.h"
 #include "screen.h"
 
 class model2_renderer;
@@ -43,9 +44,11 @@ public:
 		m_copro_fifo_out(*this, "copro_fifo_out"),
 		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom"),
+		m_tiles(*this, "tile"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
+		m_timers(*this, "timer%u", 0U),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_copro_data(*this, "copro_data"),
@@ -99,9 +102,11 @@ protected:
 	required_device<generic_fifo_u32_device> m_copro_fifo_out;
 	optional_device<cpu_device> m_drivecpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<segas24_tile_device> m_tiles;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;
+	required_device_array<timer_device, 4> m_timers;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 	optional_memory_region m_copro_data;
@@ -113,7 +118,6 @@ protected:
 	uint32_t m_timervals[4];
 	uint32_t m_timerorig[4];
 	int m_timerrun[4];
-	timer_device *m_timers[4];
 	int m_ctrlmode;
 	uint16_t m_cmd_data;
 	uint8_t m_driveio_comm_data;

@@ -25,7 +25,7 @@ void decocpu_type1_device::decocpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(decocpu_type1_device::solenoid2_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type1_device::solenoid2_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -38,7 +38,7 @@ void decocpu_type2_device::decocpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(decocpu_type2_device::solenoid2_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type2_device::solenoid2_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -87,7 +87,7 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )

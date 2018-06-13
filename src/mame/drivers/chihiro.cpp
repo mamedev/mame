@@ -1709,7 +1709,7 @@ void chihiro_state::chihiro_map(address_map &map)
 void chihiro_state::chihiro_map_io(address_map &map)
 {
 	xbox_base_map_io(map);
-	map(0x4000, 0x40ff).rw(this, FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
+	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
 static INPUT_PORTS_START(chihiro)
@@ -1879,10 +1879,10 @@ MACHINE_CONFIG_START(chihiro_state::chihirogd)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CHIHIRO_BIOS \
 	ROM_REGION( 0x80000, "bios", 0) \

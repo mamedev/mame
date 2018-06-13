@@ -67,8 +67,8 @@ WRITE_LINE_MEMBER(pooyan_state::coin_counter_2_w)
 void pooyan_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pooyan_state::colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pooyan_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pooyan_state::colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pooyan_state::videoram_w)).share("videoram");
 	map(0x8800, 0x8fff).ram();
 	map(0x9000, 0x90ff).mirror(0x0b00).ram().share("spriteram");
 	map(0x9400, 0x94ff).mirror(0x0b00).ram().share("spriteram2");
@@ -174,7 +174,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pooyan )
+static GFXDECODE_START( gfx_pooyan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pooyan_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pooyan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pooyan)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pooyan_state, pooyan)

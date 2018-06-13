@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 /***************************************************************************
     CLASS DEFINITIONS

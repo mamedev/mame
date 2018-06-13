@@ -116,8 +116,8 @@ void shuuz_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x101000, 0x101fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x102000, 0x102001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x103000, 0x103003).r(this, FUNC(shuuz_state::leta_r));
-	map(0x105000, 0x105001).rw(this, FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
+	map(0x103000, 0x103003).r(FUNC(shuuz_state::leta_r));
+	map(0x105000, 0x105001).rw(FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
 	map(0x105002, 0x105003).portr("BUTTONS");
 	map(0x106001, 0x106001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x107000, 0x107007).noprw();
@@ -219,7 +219,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( shuuz )
+static GFXDECODE_START( gfx_shuuz )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

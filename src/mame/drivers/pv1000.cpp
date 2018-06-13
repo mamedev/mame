@@ -183,14 +183,14 @@ void pv1000_state::pv1000(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
-	map(0xbc00, 0xbfff).ram().w(this, FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
+	map(0xbc00, 0xbfff).ram().w(FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
 }
 
 
 void pv1000_state::pv1000_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf8, 0xff).rw(this, FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
+	map(0xf8, 0xff).rw(FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
 }
 
 
@@ -431,7 +431,7 @@ static const gfx_layout pv1000_3bpp_gfx =
 };
 
 
-static GFXDECODE_START( pv1000 )
+static GFXDECODE_START( gfx_pv1000 )
 	GFXDECODE_ENTRY( "gfxrom", 8, pv1000_3bpp_gfx, 0, 8 )
 	GFXDECODE_ENTRY( "gfxram", 8, pv1000_3bpp_gfx, 0, 8 )
 GFXDECODE_END
@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(pv1000_state::pv1000)
 
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pv1000 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pv1000 )
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "pv1000_sound", PV1000, 17897725 )

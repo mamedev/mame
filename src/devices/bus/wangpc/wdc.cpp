@@ -79,12 +79,12 @@ void wangpc_wdc_device::wangpc_wdc_mem(address_map &map)
 void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).r(this, FUNC(wangpc_wdc_device::port_r));
-	map(0x03, 0x03).w(this, FUNC(wangpc_wdc_device::status_w));
-	map(0x10, 0x10).rw(this, FUNC(wangpc_wdc_device::ctc_ch0_r), FUNC(wangpc_wdc_device::ctc_ch0_w));
-	map(0x14, 0x14).rw(this, FUNC(wangpc_wdc_device::ctc_ch1_r), FUNC(wangpc_wdc_device::ctc_ch1_w));
-	map(0x18, 0x18).rw(this, FUNC(wangpc_wdc_device::ctc_ch2_r), FUNC(wangpc_wdc_device::ctc_ch2_w));
-	map(0x1c, 0x1c).rw(this, FUNC(wangpc_wdc_device::ctc_ch3_r), FUNC(wangpc_wdc_device::ctc_ch3_w));
+	map(0x01, 0x01).r(FUNC(wangpc_wdc_device::port_r));
+	map(0x03, 0x03).w(FUNC(wangpc_wdc_device::status_w));
+	map(0x10, 0x10).rw(FUNC(wangpc_wdc_device::ctc_ch0_r), FUNC(wangpc_wdc_device::ctc_ch0_w));
+	map(0x14, 0x14).rw(FUNC(wangpc_wdc_device::ctc_ch1_r), FUNC(wangpc_wdc_device::ctc_ch1_w));
+	map(0x18, 0x18).rw(FUNC(wangpc_wdc_device::ctc_ch2_r), FUNC(wangpc_wdc_device::ctc_ch2_w));
+	map(0x1c, 0x1c).rw(FUNC(wangpc_wdc_device::ctc_ch3_r), FUNC(wangpc_wdc_device::ctc_ch3_w));
 }
 
 

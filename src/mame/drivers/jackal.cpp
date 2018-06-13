@@ -165,19 +165,19 @@ WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
 void jackal_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0003).ram().share("videoctrl");   // scroll + other things
-	map(0x0004, 0x0004).w(this, FUNC(jackal_state::jackal_flipscreen_w));
+	map(0x0004, 0x0004).w(FUNC(jackal_state::jackal_flipscreen_w));
 	map(0x0010, 0x0010).portr("DSW1");
 	map(0x0011, 0x0011).portr("IN1");
 	map(0x0012, 0x0012).portr("IN2");
 	map(0x0013, 0x0013).portr("IN0");
-	map(0x0014, 0x0015).r(this, FUNC(jackal_state::jackalr_rotary_r));
+	map(0x0014, 0x0015).r(FUNC(jackal_state::jackalr_rotary_r));
 	map(0x0018, 0x0018).portr("DSW2");
 	map(0x0019, 0x0019).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x001c, 0x001c).w(this, FUNC(jackal_state::jackal_rambank_w));
-	map(0x0020, 0x005f).rw(this, FUNC(jackal_state::jackal_zram_r), FUNC(jackal_state::jackal_zram_w));             // MAIN   Z RAM,SUB    Z RAM
+	map(0x001c, 0x001c).w(FUNC(jackal_state::jackal_rambank_w));
+	map(0x0020, 0x005f).rw(FUNC(jackal_state::jackal_zram_r), FUNC(jackal_state::jackal_zram_w));             // MAIN   Z RAM,SUB    Z RAM
 	map(0x0060, 0x1fff).ram().share("share1");                          // M COMMON RAM,S COMMON RAM
-	map(0x2000, 0x2fff).rw(this, FUNC(jackal_state::jackal_voram_r), FUNC(jackal_state::jackal_voram_w));           // MAIN V O RAM,SUB  V O RAM
-	map(0x3000, 0x3fff).rw(this, FUNC(jackal_state::jackal_spriteram_r), FUNC(jackal_state::jackal_spriteram_w));   // MAIN V O RAM,SUB  V O RAM
+	map(0x2000, 0x2fff).rw(FUNC(jackal_state::jackal_voram_r), FUNC(jackal_state::jackal_voram_w));           // MAIN V O RAM,SUB  V O RAM
+	map(0x3000, 0x3fff).rw(FUNC(jackal_state::jackal_spriteram_r), FUNC(jackal_state::jackal_spriteram_w));   // MAIN V O RAM,SUB  V O RAM
 	map(0x4000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rom();
 }
@@ -302,7 +302,7 @@ static const gfx_layout spritelayout8 =
 	32*8
 };
 
-static GFXDECODE_START( jackal )
+static GFXDECODE_START( gfx_jackal )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER(jackal_state::vblank_irq)
 	if (state && m_irq_enable)
 	{
 		m_mastercpu->set_input_line(0, HOLD_LINE);
-		m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jackal_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackal)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

@@ -24,50 +24,34 @@ class vip_state : public driver_device
 {
 public:
 	vip_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vdc(*this, CDP1861_TAG),
-			m_cassette(*this, "cassette"),
-			m_beeper(*this, DISCRETE_TAG),
-			m_byteio(*this, VIP_BYTEIO_PORT_TAG),
-			m_exp(*this, VIP_EXPANSION_SLOT_TAG),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, CDP1802_TAG),
-			m_chip8(*this, "chip8"),
-			m_chip8x(*this, "chip8x"),
-			m_run(*this, "RUN"),
-			m_keypad(*this, "KEYPAD"),
-			m_io_beeper(*this, "BEEPER"),
-			m_8000(1),
-			m_vdc_int(CLEAR_LINE),
-			m_vdc_dma_out(CLEAR_LINE),
-			m_vdc_ef1(CLEAR_LINE),
-			m_exp_int(CLEAR_LINE),
-			m_exp_dma_out(CLEAR_LINE),
-			m_exp_dma_in(CLEAR_LINE),
-			m_byteio_ef3(CLEAR_LINE),
-			m_byteio_ef4(CLEAR_LINE),
-			m_exp_ef1(CLEAR_LINE),
-			m_exp_ef3(CLEAR_LINE),
-			m_exp_ef4(CLEAR_LINE)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_vdc(*this, CDP1861_TAG)
+		, m_cassette(*this, "cassette")
+		, m_beeper(*this, DISCRETE_TAG)
+		, m_byteio(*this, VIP_BYTEIO_PORT_TAG)
+		, m_exp(*this, VIP_EXPANSION_SLOT_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, CDP1802_TAG)
+		, m_chip8(*this, "chip8")
+		, m_chip8x(*this, "chip8x")
+		, m_run(*this, "RUN")
+		, m_keypad(*this, "KEYPAD")
+		, m_io_beeper(*this, "BEEPER")
+		, m_8000(1)
+		, m_vdc_int(CLEAR_LINE)
+		, m_vdc_dma_out(CLEAR_LINE)
+		, m_vdc_ef1(CLEAR_LINE)
+		, m_exp_int(CLEAR_LINE)
+		, m_exp_dma_out(CLEAR_LINE)
+		, m_exp_dma_in(CLEAR_LINE)
+		, m_byteio_ef3(CLEAR_LINE)
+		, m_byteio_ef4(CLEAR_LINE)
+		, m_exp_ef1(CLEAR_LINE)
+		, m_exp_ef3(CLEAR_LINE)
+		, m_exp_ef4(CLEAR_LINE)
+		, m_leds(*this, "led%u", 0U)
 	{ }
-
-	required_device<cosmac_device> m_maincpu;
-	required_device<cdp1861_device> m_vdc;
-	required_device<cassette_image_device> m_cassette;
-	required_device<discrete_sound_device> m_beeper;
-	required_device<vip_byteio_port_device> m_byteio;
-	required_device<vip_expansion_slot_device> m_exp;
-	required_device<ram_device> m_ram;
-	required_memory_region m_rom;
-	required_memory_region m_chip8;
-	required_memory_region m_chip8x;
-	required_ioport m_run;
-	required_ioport m_keypad;
-	required_ioport m_io_beeper;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -102,6 +86,29 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( vip );
+	void vp111(machine_config &config);
+	void vip(machine_config &config);
+	void vip_io(address_map &map);
+	void vip_mem(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1861_device> m_vdc;
+	required_device<cassette_image_device> m_cassette;
+	required_device<discrete_sound_device> m_beeper;
+	required_device<vip_byteio_port_device> m_byteio;
+	required_device<vip_expansion_slot_device> m_exp;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_chip8;
+	required_memory_region m_chip8x;
+	required_ioport m_run;
+	required_ioport m_keypad;
+	required_ioport m_io_beeper;
+
 	// memory state
 	int m_8000;
 
@@ -123,10 +130,7 @@ public:
 
 	// expansion state
 	uint8_t m_byteio_data;
-	void vp111(machine_config &config);
-	void vip(machine_config &config);
-	void vip_io(address_map &map);
-	void vip_mem(address_map &map);
+	output_finder<3> m_leds;
 };
 
 #endif

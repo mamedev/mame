@@ -73,11 +73,11 @@ void battlnts_state::battlnts_map(address_map &map)
 	map(0x2e02, 0x2e02).portr("P1");
 	map(0x2e03, 0x2e03).portr("DSW3");               /* coinsw, testsw, startsw */
 	map(0x2e04, 0x2e04).portr("DSW2");
-	map(0x2e08, 0x2e08).w(this, FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
-	map(0x2e0c, 0x2e0c).w(this, FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
+	map(0x2e08, 0x2e08).w(FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
+	map(0x2e0c, 0x2e0c).w(FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
 	map(0x2e10, 0x2e10).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2e14, 0x2e14).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound code # */
-	map(0x2e18, 0x2e18).w(this, FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x2e18, 0x2e18).w(FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
 	map(0x4000, 0x7fff).bankr("rombank");              /* banked ROM */
 	map(0x8000, 0xffff).rom();                             /* ROM 777e02.bin */
 }
@@ -205,7 +205,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( battlnts )
+static GFXDECODE_START( gfx_battlnts )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 ) /* colors  0-15 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 4*16, 1 ) /* colors 64-79 */
 GFXDECODE_END
@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlnts)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlnts)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

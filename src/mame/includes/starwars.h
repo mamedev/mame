@@ -8,7 +8,9 @@
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/x2212.h"
 #include "sound/pokey.h"
+#include "sound/tms5220.h"
 #include "includes/slapstic.h"
 
 
@@ -24,6 +26,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pokey(*this, "pokey%u", 1U),
+		m_tms(*this, "tms"),
+		m_novram(*this, "x2212"),
 		m_slapstic_device(*this, "slapstic")
 		{ }
 
@@ -34,6 +38,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<pokey_device, 4> m_pokey;
+	required_device<tms5220_device> m_tms;
+	required_device<x2212_device> m_novram;
 	optional_device<atari_slapstic_device> m_slapstic_device;
 
 	uint8_t *m_slapstic_source;

@@ -411,7 +411,7 @@ static const gfx_layout ksm_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ksm )
+static GFXDECODE_START( gfx_ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)

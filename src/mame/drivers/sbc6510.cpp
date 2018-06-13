@@ -98,7 +98,7 @@ void sbc6510_state::sbc6510_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0001).ram();
-	map(0x0002, 0x0002).rw(this, FUNC(sbc6510_state::a2_r), FUNC(sbc6510_state::a2_w));
+	map(0x0002, 0x0002).rw(FUNC(sbc6510_state::a2_r), FUNC(sbc6510_state::a2_w));
 	map(0x0003, 0xdfff).ram();
 	map(0xe000, 0xe00f).mirror(0x1f0).rw("cia6526", FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0xe800, 0xe800).mirror(0x1ff).w("ay8910", FUNC(ay8910_device::address_w));
@@ -268,7 +268,7 @@ static const gfx_layout charset_8x16 =
 };
 
 
-static GFXDECODE_START( sbc6510 )
+static GFXDECODE_START( gfx_sbc6510 )
 	GFXDECODE_ENTRY( "videocpu", 0x1500, charset_8x16, 0, 128 )
 GFXDECODE_END
 
@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(sbc6510_state::sbc6510)
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette") // for F4 displayer only
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbc6510)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbc6510)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

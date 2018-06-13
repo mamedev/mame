@@ -122,8 +122,8 @@ void ladybug_state::ladybug_map(address_map &map)
 	map(0x9002, 0x9002).portr("DSW0");
 	map(0x9003, 0x9003).portr("DSW1");
 	map(0xa000, 0xa007).w("videolatch", FUNC(ls259_device::write_d0));
-	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::write));
-	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::write));
+	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::command_w));
+	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::command_w));
 	map(0xd000, 0xd7ff).rw(m_video, FUNC(ladybug_video_device::bg_r), FUNC(ladybug_video_device::bg_w));
 	map(0xe000, 0xe000).portr("IN2");
 }
@@ -140,7 +140,7 @@ void sraider_state::sraider_cpu1_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
 	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w));
-	map(0x8005, 0x8005).r(this, FUNC(sraider_state::sraider_8005_r));  // protection check?
+	map(0x8005, 0x8005).r(FUNC(sraider_state::sraider_8005_r));  // protection check?
 	map(0x8006, 0x8006).writeonly().share("sound_low");
 	map(0x8007, 0x8007).writeonly().share("sound_high");
 	map(0x9000, 0x9000).portr("IN0");
@@ -159,18 +159,18 @@ void sraider_state::sraider_cpu2_map(address_map &map)
 	map(0xa000, 0xa000).readonly().share("sound_high");
 	map(0xc000, 0xc000).nopr(); //some kind of sync
 	map(0xe000, 0xe0ff).writeonly().share("grid_data");
-	map(0xe800, 0xe800).w(this, FUNC(sraider_state::sraider_io_w));
+	map(0xe800, 0xe800).w(FUNC(sraider_state::sraider_io_w));
 }
 
 void sraider_state::sraider_cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::write));
-	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::write));
-	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::write));
-	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::write));
-	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::write));
-	map(0x28, 0x3f).w(this, FUNC(sraider_state::sraider_misc_w));  // lots unknown
+	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::command_w));
+	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::command_w));
+	map(0x28, 0x3f).w(FUNC(sraider_state::sraider_misc_w));  // lots unknown
 }
 
 
@@ -685,13 +685,13 @@ static const gfx_layout gridlayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( ladybug )
+static GFXDECODE_START( gfx_ladybug )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sraider )
+static GFXDECODE_START( gfx_sraider )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout2,             0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,          4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,         4*8, 16 )
@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladybug)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladybug)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
@@ -786,7 +786,7 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sraider_state, screen_vblank_sraider))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sraider)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sraider)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32+1)
 	MCFG_PALETTE_INIT_OWNER(sraider_state,sraider)

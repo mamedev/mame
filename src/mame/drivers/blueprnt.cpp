@@ -86,7 +86,7 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
@@ -105,21 +105,21 @@ void blueprnt_state::blueprnt_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // service mode checks for 8 chips = 64K
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
 	map(0xa000, 0xa0ff).ram().share("scrollram");
 	map(0xb000, 0xb0ff).ram().share("spriteram");
-	map(0xc000, 0xc000).portr("P1").w(this, FUNC(blueprnt_state::blueprnt_coin_counter_w));
+	map(0xc000, 0xc000).portr("P1").w(FUNC(blueprnt_state::blueprnt_coin_counter_w));
 	map(0xc001, 0xc001).portr("P2");
-	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
-	map(0xd000, 0xd000).w(this, FUNC(blueprnt_state::blueprnt_sound_command_w));
-	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(blueprnt_state::blueprnt_flipscreen_w));
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
+	map(0xc003, 0xc003).r(FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
+	map(0xd000, 0xd000).w(FUNC(blueprnt_state::blueprnt_sound_command_w));
+	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(blueprnt_state::blueprnt_flipscreen_w));
+	map(0xf000, 0xf3ff).ram().w(FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
 }
 
 void blueprnt_state::grasspin_map(address_map &map)
 {
 	blueprnt_map(map);
-	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::grasspin_sh_dipsw_r));
+	map(0xc003, 0xc003).r(FUNC(blueprnt_state::grasspin_sh_dipsw_r));
 }
 
 
@@ -322,7 +322,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( blueprnt )
+static GFXDECODE_START( gfx_blueprnt )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,     0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     128*4,   1 )
 GFXDECODE_END
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blueprnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blueprnt)
 	MCFG_PALETTE_ADD("palette", 128*4+8)
 	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
 

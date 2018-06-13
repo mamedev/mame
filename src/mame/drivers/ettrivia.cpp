@@ -159,18 +159,18 @@ void ettrivia_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x9000, 0x9000).w(this, FUNC(ettrivia_state::ettrivia_control_w));
+	map(0x9000, 0x9000).w(FUNC(ettrivia_state::ettrivia_control_w));
 	map(0x9800, 0x9800).nopw();
 	map(0xa000, 0xa000).nopw();
-	map(0xb000, 0xb000).r(this, FUNC(ettrivia_state::b000_r)).w(this, FUNC(ettrivia_state::b000_w));
-	map(0xb800, 0xb800).w(this, FUNC(ettrivia_state::b800_w));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
+	map(0xb000, 0xb000).r(FUNC(ettrivia_state::b000_r)).w(FUNC(ettrivia_state::b000_w));
+	map(0xb800, 0xb800).w(FUNC(ettrivia_state::b800_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
 }
 
 void ettrivia_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(ettrivia_state::ettrivia_question_r));
+	map(0x0000, 0xffff).r(FUNC(ettrivia_state::ettrivia_question_r));
 }
 
 static INPUT_PORTS_START( ettrivia )
@@ -209,7 +209,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( ettrivia )
+static GFXDECODE_START( gfx_ettrivia )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -289,7 +289,7 @@ uint32_t ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_in
 INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 {
 	if( ioport("COIN")->read() & 0x01 )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ettrivia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ettrivia)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 

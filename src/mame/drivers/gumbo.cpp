@@ -60,8 +60,8 @@ void gumbo_state::gumbo_map(address_map &map)
 	map(0x1c0100, 0x1c0101).portr("P1_P2");
 	map(0x1c0200, 0x1c0201).portr("DSW");
 	map(0x1c0301, 0x1c0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1e0000, 0x1e0fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
-	map(0x1f0000, 0x1f3fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x1e0000, 0x1e0fff).ram().w(FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1f0000, 0x1f3fff).ram().w(FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
 }
 
 /* Miss Puzzle has a different memory map */
@@ -70,12 +70,12 @@ void gumbo_state::mspuzzle_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram(); // main ram
-	map(0x190000, 0x197fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x190000, 0x197fff).ram().w(FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
 	map(0x1a0000, 0x1a03ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x1b0100, 0x1b0101).portr("P1_P2");
 	map(0x1b0200, 0x1b0201).portr("DSW");
 	map(0x1b0301, 0x1b0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1c0000, 0x1c1fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1c0000, 0x1c1fff).ram().w(FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
 }
 
 void gumbo_state::dblpoint_map(address_map &map)
@@ -86,8 +86,8 @@ void gumbo_state::dblpoint_map(address_map &map)
 	map(0x1c0100, 0x1c0101).portr("P1_P2");
 	map(0x1c0200, 0x1c0201).portr("DSW");
 	map(0x1c0301, 0x1c0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1e0000, 0x1e3fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
-	map(0x1f0000, 0x1f0fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1e0000, 0x1e3fff).ram().w(FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x1f0000, 0x1f0fff).ram().w(FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
 }
 
 static INPUT_PORTS_START( gumbo )
@@ -230,7 +230,7 @@ static const gfx_layout gumbo2_layout =
 	4*16
 };
 
-static GFXDECODE_START( gumbo )
+static GFXDECODE_START( gfx_gumbo )
 	GFXDECODE_ENTRY( "gfx1", 0, gumbo_layout,   0x0, 2  ) /* bg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, gumbo2_layout,  0x0, 2  ) /* fg tiles */
 GFXDECODE_END
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_DEVICE_PROGRAM_MAP(gumbo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gumbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gumbo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

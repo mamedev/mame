@@ -84,11 +84,11 @@ void klax_state::klax_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x260000, 0x260001).portr("P1").w(this, FUNC(klax_state::klax_latch_w));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::klax_latch_w));
 	map(0x260002, 0x260003).portr("P2");
 	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360000, 0x360001).w(this, FUNC(klax_state::interrupt_ack_w));
+	map(0x360000, 0x360001).w(FUNC(klax_state::interrupt_ack_w));
 	map(0x3e0000, 0x3e07ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
@@ -102,11 +102,11 @@ void klax_state::klax2bl_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x260000, 0x260001).portr("P1").w(this, FUNC(klax_state::klax_latch_w));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::klax_latch_w));
 	map(0x260002, 0x260003).portr("P2");
 //  AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // no OKI here
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360000, 0x360001).w(this, FUNC(klax_state::interrupt_ack_w));
+	map(0x360000, 0x360001).w(FUNC(klax_state::interrupt_ack_w));
 	map(0x3e0000, 0x3e07ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
@@ -165,7 +165,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( klax )
+static GFXDECODE_START( gfx_klax )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -181,7 +181,7 @@ static const gfx_layout bootleg_layout =
 	8*8
 };
 
-static GFXDECODE_START( klax2bl )
+static GFXDECODE_START( gfx_klax2bl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", klax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_klax)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(klax_state::klax2bl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", klax2bl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_klax2bl)
 
 	// guess, probably something like this
 	MCFG_DEVICE_ADD("msm", MSM5205, 375000)    /* ? */

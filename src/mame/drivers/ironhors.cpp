@@ -37,7 +37,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
 	else if (((scanline+16) % 64) == 0)
 	{
 		if (*m_interrupt_enable & 1)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -62,24 +62,24 @@ WRITE8_MEMBER(ironhors_state::filter_w)
 void ironhors_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0002).ram();
-	map(0x0003, 0x0003).ram().w(this, FUNC(ironhors_state::charbank_w));
+	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
 	map(0x0004, 0x0004).ram().share("int_enable");
 	map(0x0005, 0x001f).ram();
 	map(0x0020, 0x003f).ram().share("scroll");
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00df).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900).portr("DSW3").w(this, FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2").w(this, FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
+	map(0x0900, 0x0900).portr("DSW3").w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2").w(FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
 	map(0x0b01, 0x0b01).portr("P2");
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 	map(0x1800, 0x1800).nopw(); // ???
 	map(0x1a00, 0x1a01).nopw(); // ???
 	map(0x1c00, 0x1dff).nopw(); // ???
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x3000, 0x30ff).ram().share("spriteram2");
 	map(0x3100, 0x37ff).ram();
@@ -112,22 +112,22 @@ void ironhors_state::farwest_master_map(address_map &map)
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00ff).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(this, FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
-	map(0x0b01, 0x0b01).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 
 
 
-	map(0x1800, 0x1800).w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x1800, 0x1800).w(FUNC(ironhors_state::sh_irqtrigger_w));
 	map(0x1a00, 0x1a00).ram().share("int_enable");
-	map(0x1a01, 0x1a01).ram().w(this, FUNC(ironhors_state::charbank_w));
-	map(0x1a02, 0x1a02).w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x1a01, 0x1a01).ram().w(FUNC(ironhors_state::charbank_w));
+	map(0x1a02, 0x1a02).w(FUNC(ironhors_state::palettebank_w));
 //  map(0x1c00, 0x1fff).ram();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x1c00, 0x1dff).ram().share("spriteram2");
 	map(0x3000, 0x38ff).ram();
@@ -244,7 +244,7 @@ static const gfx_layout ironhors_spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( ironhors )
+static GFXDECODE_START( gfx_ironhors )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,   16*8*16, 16*8 )  /* to handle 8x8 sprites */
@@ -286,7 +286,7 @@ static const gfx_layout farwest_spritelayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( farwest )
+static GFXDECODE_START( gfx_farwest )
 	GFXDECODE_ENTRY( "gfx1", 0, farwest_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ironhors)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ironhors)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
@@ -435,7 +435,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 	else if ((scanline % 2) == 0)
 	{
 		if (*m_interrupt_enable & 1)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", farwest)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)

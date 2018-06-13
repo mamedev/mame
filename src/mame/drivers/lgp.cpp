@@ -166,7 +166,7 @@ void lgp_state::main_program_map(address_map &map)
 	map(0xe400, 0xe7ff).ram().share("tile_ctrl_ram");
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
-	map(0xef80, 0xef80).rw(this, FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
+	map(0xef80, 0xef80).rw(FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
 	map(0xefb8, 0xefb8).nopr(); // watchdog
 	map(0xefc0, 0xefc0).portr("DSWA");    /* Not tested */
 	map(0xefc8, 0xefc8).portr("DSWB");
@@ -346,7 +346,7 @@ static const gfx_layout lgp_gfx_layout_16x32 =
 	32*128
 };
 
-static GFXDECODE_START( lgp )
+static GFXDECODE_START( gfx_lgp )
 	GFXDECODE_ENTRY("gfx1", 0, lgp_gfx_layout, 0x0, 0x100)
 	GFXDECODE_ENTRY("gfx4", 0, lgp_gfx_layout_16x32, 0x0, 0x100)
 GFXDECODE_END
@@ -354,7 +354,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
 {
 	// NMI
-	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	//device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	// IRQ
 	device.execute().set_input_line(0, HOLD_LINE);
@@ -430,7 +430,7 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(lgp_state,lgp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lgp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lgp)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

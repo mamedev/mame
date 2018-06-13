@@ -136,7 +136,7 @@ void jr100_state::jr100_mem(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	map(0xc000, 0xc0ff).ram().share("pcg");
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(this, FUNC(jr100_state::jr100_via_w));
+	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(FUNC(jr100_state::jr100_via_w));
 	map(0xe000, 0xffff).rom();
 }
 
@@ -262,7 +262,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jr100 )
+static GFXDECODE_START( gfx_jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(jr100_state::jr100)
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr100)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(14'318'181) / 16)

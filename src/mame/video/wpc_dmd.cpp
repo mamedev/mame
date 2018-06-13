@@ -9,14 +9,14 @@ DEFINE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device, "wpc_dmd", "Williams Pinball Control
 
 void wpc_dmd_device::registers(address_map &map)
 {
-	map(0, 0).w(this, FUNC(wpc_dmd_device::bank2_w));
-	map(1, 1).w(this, FUNC(wpc_dmd_device::bank0_w));
-	map(2, 2).w(this, FUNC(wpc_dmd_device::bank6_w));
-	map(3, 3).w(this, FUNC(wpc_dmd_device::bank4_w));
-	map(4, 4).w(this, FUNC(wpc_dmd_device::banka_w));
-	map(5, 5).w(this, FUNC(wpc_dmd_device::firq_scanline_w));
-	map(6, 6).w(this, FUNC(wpc_dmd_device::bank8_w));
-	map(7, 7).w(this, FUNC(wpc_dmd_device::visible_page_w));
+	map(0, 0).w(FUNC(wpc_dmd_device::bank2_w));
+	map(1, 1).w(FUNC(wpc_dmd_device::bank0_w));
+	map(2, 2).w(FUNC(wpc_dmd_device::bank6_w));
+	map(3, 3).w(FUNC(wpc_dmd_device::bank4_w));
+	map(4, 4).w(FUNC(wpc_dmd_device::banka_w));
+	map(5, 5).w(FUNC(wpc_dmd_device::firq_scanline_w));
+	map(6, 6).w(FUNC(wpc_dmd_device::bank8_w));
+	map(7, 7).w(FUNC(wpc_dmd_device::visible_page_w));
 }
 
 

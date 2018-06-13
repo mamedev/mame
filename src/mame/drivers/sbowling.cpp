@@ -250,7 +250,7 @@ READ8_MEMBER(sbowling_state::controls_r)
 void sbowling_state::main_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x8000, 0xbfff).ram().w(this, FUNC(sbowling_state::videoram_w)).share("videoram");
+	map(0x8000, 0xbfff).ram().w(FUNC(sbowling_state::videoram_w)).share("videoram");
 	map(0xf800, 0xf801).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xf801, 0xf801).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xfc00, 0xffff).ram();
@@ -260,11 +260,11 @@ void sbowling_state::main_map(address_map &map)
 void sbowling_state::port_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x01, 0x01).rw(this, FUNC(sbowling_state::controls_r), FUNC(sbowling_state::pix_data_w));
-	map(0x02, 0x02).rw(this, FUNC(sbowling_state::pix_data_r), FUNC(sbowling_state::pix_shift_w));
+	map(0x01, 0x01).rw(FUNC(sbowling_state::controls_r), FUNC(sbowling_state::pix_data_w));
+	map(0x02, 0x02).rw(FUNC(sbowling_state::pix_data_r), FUNC(sbowling_state::pix_shift_w));
 	map(0x03, 0x03).portr("IN1").nopw();
-	map(0x04, 0x04).portr("DSW0").w(this, FUNC(sbowling_state::system_w));
-	map(0x05, 0x05).portr("DSW1").w(this, FUNC(sbowling_state::graph_control_w));
+	map(0x04, 0x04).portr("DSW0").w(FUNC(sbowling_state::system_w));
+	map(0x05, 0x05).portr("DSW1").w(FUNC(sbowling_state::graph_control_w));
 }
 
 
@@ -363,7 +363,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( sbowling )
+static GFXDECODE_START( gfx_sbowling )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x18, 1 )
 GFXDECODE_END
 
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbowling)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbowling)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)

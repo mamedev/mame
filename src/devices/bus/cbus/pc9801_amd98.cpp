@@ -124,26 +124,6 @@ void pc9801_amd98_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_amd98_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
-{
-	int buswidth = m_bus->io_space().data_width();
-	switch(buswidth)
-	{
-		case 8:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			break;
-		default:
-			fatalerror("PC-9801-AMD98: Bus width %d not supported\n", buswidth);
-	}
-}
-
-
 void pc9801_amd98_device::device_start()
 {
 }
@@ -155,9 +135,9 @@ void pc9801_amd98_device::device_start()
 
 void pc9801_amd98_device::device_reset()
 {
-	install_device(0x00d8, 0x00df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
+	m_bus->install_io(0x00d8, 0x00df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
 	// Thexder access with following
-	install_device(0x38d8, 0x38df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
+	m_bus->install_io(0x38d8, 0x38df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
 }
 
 

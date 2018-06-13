@@ -247,7 +247,7 @@ void by35_state::by35_map(address_map &map)
 	map(0x0000, 0x007f).ram();
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0200, 0x02ff).ram().rw(this, FUNC(by35_state::nibble_nvram_r), FUNC(by35_state::nibble_nvram_w)).share("nvram");
+	map(0x0200, 0x02ff).ram().rw(FUNC(by35_state::nibble_nvram_r), FUNC(by35_state::nibble_nvram_w)).share("nvram");
 	map(0x1000, 0x7fff).rom(); // AM_REGION("roms", 0 )
 }
 
@@ -2490,7 +2490,7 @@ GAME( 1986, darkshad,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "N
 GAME( 1986, skflight,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, cobrap,     0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, futrquen,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, toppin,     0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, bullseye,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)

@@ -74,9 +74,9 @@ void ipds_state::ipds_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xb0, 0xb0).r(this, FUNC(ipds_state::ipds_b0_r));
-	map(0xb1, 0xb1).rw(this, FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
-	map(0xc0, 0xc0).r(this, FUNC(ipds_state::ipds_c0_r));
+	map(0xb0, 0xb0).r(FUNC(ipds_state::ipds_b0_r));
+	map(0xb1, 0xb1).rw(FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
+	map(0xc0, 0xc0).r(FUNC(ipds_state::ipds_c0_r));
 }
 
 /* Input ports */
@@ -121,7 +121,7 @@ static const gfx_layout ipds_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( ipds )
+static GFXDECODE_START( gfx_ipds )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ipds_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(ipds_state::ipds)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(19'660'800) / 4)

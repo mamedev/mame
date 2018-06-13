@@ -420,7 +420,7 @@ void tandy1000_state::machine_start()
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
 			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this), 0xffff);
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
 READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
@@ -559,11 +559,11 @@ void tandy1000_state::tandy1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
-	map(0x00a0, 0x00a0).w(this, FUNC(tandy1000_state::nmi_vram_bank_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::write));
+	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
+	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::command_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0378, 0x037f).rw(this, FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
 }
 
@@ -585,28 +585,28 @@ void tandy1000_state::tandy1000_16_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
-	map(0x0065, 0x0065).w(this, FUNC(tandy1000_state::devctrl_w));
-	map(0x00a0, 0x00a0).r(this, FUNC(tandy1000_state::unk_r));
-	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::write));
+	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
+	map(0x0065, 0x0065).w(FUNC(tandy1000_state::devctrl_w));
+	map(0x00a0, 0x00a0).r(FUNC(tandy1000_state::unk_r));
+	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::command_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0378, 0x037f).rw(this, FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
-	map(0xffe8, 0xffe8).w(this, FUNC(tandy1000_state::vram_bank_w));
+	map(0xffe8, 0xffe8).w(FUNC(tandy1000_state::vram_bank_w));
 }
 
 void tandy1000_state::tandy1000_bank_io(address_map &map)
 {
 	map.unmap_value_high();
 	tandy1000_16_io(map);
-	map(0xffea, 0xffeb).rw(this, FUNC(tandy1000_state::tandy1000_bank_r), FUNC(tandy1000_state::tandy1000_bank_w));
+	map(0xffea, 0xffeb).rw(FUNC(tandy1000_state::tandy1000_bank_r), FUNC(tandy1000_state::tandy1000_bank_w));
 }
 
 void tandy1000_state::tandy1000tx_io(address_map &map)
 {
 	map.unmap_value_high();
 	tandy1000_16_io(map);
-	map(0x00a0, 0x00a0).w(this, FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
 }
 
 void tandy1000_state::tandy1000_286_map(address_map &map)
@@ -642,7 +642,7 @@ void tandy1000_state::cfg_fdc_525(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static GFXDECODE_START( t1000 )
+static GFXDECODE_START( gfx_t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -651,9 +651,9 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	downcast<t1000_mb_device &>(*device).set_cputag("maincpu");
 
 	/* video hardware */
-	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
+	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
@@ -780,9 +780,9 @@ ROM_START( t1000 )
 	// Schematics displays 2 32KB ROMs at U9 and U10
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "v010000", "v010000" )
-	ROMX_LOAD("v010000.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("v010000.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v010100", "v010100" )
-	ROMX_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(2))
+	ROMX_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(1))
 
 	// Part of video array at u76?
 	ROM_REGION(0x08000,"gfx1", 0)
@@ -826,13 +826,13 @@ ROM_START( t1000sl )
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0x00000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_SYSTEM_BIOS( 0, "v010400", "v010400" )
-	ROMX_LOAD("v010400.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD("v010400.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v010401", "v010401" )
-	ROMX_LOAD("v010401.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD("v010401.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v010402", "v010402" )
-	ROMX_LOAD("v010402.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD("v010402.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "v020001", "v020001" )
-	ROMX_LOAD("v020001.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(4) )
+	ROMX_LOAD("v020001.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(3) )
 
 	ROM_REGION(0x08000,"gfx1", 0)
 	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))

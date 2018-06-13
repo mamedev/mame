@@ -86,7 +86,7 @@ void summit_state::mainmap(address_map &map)
 
 	map(0x3800, 0x3800).portr("IN0");
 //  AM_RANGE(0x3880, 0x3880) AM_WRITE(out_w)
-	map(0x3900, 0x3900).portr("IN1").w(this, FUNC(summit_state::out_w)); // lamps
+	map(0x3900, 0x3900).portr("IN1").w(FUNC(summit_state::out_w)); // lamps
 //  AM_RANGE(0x3980, 0x3980) AM_WRITE(out_w)
 	map(0x3a00, 0x3a00).portr("IN2"); //AM_WRITE(out_w)
 	map(0x3b00, 0x3b00).portr("IN3");
@@ -299,7 +299,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( summit )
+static GFXDECODE_START( gfx_summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(summit_state::summit)
 	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", summit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_summit)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(summit_state, summit)

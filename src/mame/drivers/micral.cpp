@@ -154,10 +154,10 @@ void micral_state::mem_map(address_map &map)
 	map(0xf800, 0xfeff).rom();
 	map(0xff00, 0xffef).ram();
 	map(0xfff6, 0xfff7); // AM_WRITENOP // unknown ports
-	map(0xfff8, 0xfff9).rw(this, FUNC(micral_state::video_r), FUNC(micral_state::video_w));
-	map(0xfffa, 0xfffa).r(this, FUNC(micral_state::keyin_r));
-	map(0xfffb, 0xfffb).r(this, FUNC(micral_state::unk_r));
-	map(0xfffc, 0xfffc).r(this, FUNC(micral_state::status_r));
+	map(0xfff8, 0xfff9).rw(FUNC(micral_state::video_r), FUNC(micral_state::video_w));
+	map(0xfffa, 0xfffa).r(FUNC(micral_state::keyin_r));
+	map(0xfffb, 0xfffb).r(FUNC(micral_state::unk_r));
+	map(0xfffc, 0xfffc).r(FUNC(micral_state::status_r));
 	map(0xfffd, 0xffff); // more unknown ports
 }
 
@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
 	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown

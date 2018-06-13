@@ -103,8 +103,8 @@ void by6803_state::by6803_map(address_map &map)
 
 void by6803_state::by6803_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
 }
 
 static INPUT_PORTS_START( by6803 )
@@ -164,7 +164,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( by6803_state::activity_test )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by6803_state::self_test )

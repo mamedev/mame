@@ -56,11 +56,11 @@ void zerozone_state::main_map(address_map &map)
 	map(0x080002, 0x080003).portr("INPUTS");
 	map(0x080008, 0x080009).portr("DSWB");
 	map(0x08000a, 0x08000b).portr("DSWA");
-	map(0x084000, 0x084001).w(this, FUNC(zerozone_state::sound_w));
+	map(0x084000, 0x084001).w(FUNC(zerozone_state::sound_w));
 	map(0x088000, 0x0881ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x098000, 0x098001).ram();     /* Watchdog? */
-	map(0x09ce00, 0x09ffff).ram().w(this, FUNC(zerozone_state::tilemap_w)).share("videoram");
-	map(0x0b4000, 0x0b4001).w(this, FUNC(zerozone_state::tilebank_w));
+	map(0x09ce00, 0x09ffff).ram().w(FUNC(zerozone_state::tilemap_w)).share("videoram");
+	map(0x0b4000, 0x0b4001).w(FUNC(zerozone_state::tilebank_w));
 	map(0x0c0000, 0x0cffff).ram();
 	map(0x0f8000, 0x0f87ff).ram();     /* Never read from */
 }
@@ -155,7 +155,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( zerozone )
+static GFXDECODE_START( gfx_zerozone )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )         /* sprites & playfield */
 GFXDECODE_END
 
@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(zerozone_state::zerozone)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zerozone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerozone)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)

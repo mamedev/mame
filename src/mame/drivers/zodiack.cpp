@@ -151,20 +151,20 @@ void zodiack_state::main_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5800, 0x5fff).ram();
-	map(0x6081, 0x6081).portr("DSW0").w(this, FUNC(zodiack_state::control_w));
+	map(0x6081, 0x6081).portr("DSW0").w(FUNC(zodiack_state::control_w));
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN0");
 	map(0x6084, 0x6084).portr("IN1");
-	map(0x6090, 0x6090).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(zodiack_state::master_soundlatch_w));
+	map(0x6090, 0x6090).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(zodiack_state::master_soundlatch_w));
 	map(0x7000, 0x7000).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));  /* NOP??? */
-	map(0x7100, 0x7100).w(this, FUNC(zodiack_state::nmi_mask_w));
-	map(0x7200, 0x7200).w(this, FUNC(zodiack_state::flipscreen_w));
-	map(0x9000, 0x903f).ram().w(this, FUNC(zodiack_state::attributes_w)).share("attributeram");
+	map(0x7100, 0x7100).w(FUNC(zodiack_state::nmi_mask_w));
+	map(0x7200, 0x7200).w(FUNC(zodiack_state::flipscreen_w));
+	map(0x9000, 0x903f).ram().w(FUNC(zodiack_state::attributes_w)).share("attributeram");
 	map(0x9040, 0x905f).ram().share("spriteram");
 	map(0x9060, 0x907f).ram().share("bulletsram");
 	map(0x9080, 0x93ff).ram();
-	map(0xa000, 0xa3ff).ram().w(this, FUNC(zodiack_state::videoram_w)).share("videoram");
-	map(0xb000, 0xb3ff).ram().w(this, FUNC(zodiack_state::videoram2_w)).share("videoram_2");
+	map(0xa000, 0xa3ff).ram().w(FUNC(zodiack_state::videoram_w)).share("videoram");
+	map(0xb000, 0xb3ff).ram().w(FUNC(zodiack_state::videoram2_w)).share("videoram_2");
 	map(0xc000, 0xcfff).rom();
 }
 
@@ -172,7 +172,7 @@ void zodiack_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x4000).w(this, FUNC(zodiack_state::sound_nmi_enable_w));
+	map(0x4000, 0x4000).w(FUNC(zodiack_state::sound_nmi_enable_w));
 	map(0x6000, 0x6000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 }
 
@@ -545,7 +545,7 @@ static const gfx_layout bulletlayout =
 	0   /* no use */
 };
 
-static GFXDECODE_START( zodiack )
+static GFXDECODE_START( gfx_zodiack )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   8*4    , 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0      , 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, bulletlayout, 8*4+8*2, 1 )
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(zodiack_state::zodiack)
 	MCFG_SCREEN_UPDATE_DRIVER(zodiack_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zodiack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zodiack)
 	MCFG_PALETTE_ADD("palette", 4*8+2*8+2*1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(48+1)
 	MCFG_PALETTE_INIT_OWNER(zodiack_state,zodiack)

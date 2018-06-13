@@ -293,7 +293,7 @@ WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
 WRITE8_MEMBER(mirax_state::sound_cmd_w)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -330,7 +330,7 @@ void mirax_state::mirax_main_map(address_map &map)
 	map(0xf300, 0xf300).nopr(); //watchdog? value is always read then discarded
 	map(0xf400, 0xf400).portr("DSW2");
 	map(0xf500, 0xf507).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xf800, 0xf800).w(this, FUNC(mirax_state::sound_cmd_w));
+	map(0xf800, 0xf800).w(FUNC(mirax_state::sound_cmd_w));
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 }
 
@@ -342,13 +342,13 @@ void mirax_state::mirax_sound_map(address_map &map)
 
 	map(0xe000, 0xe000).nopw();
 	map(0xe001, 0xe001).nopw();
-	map(0xe003, 0xe003).w(this, FUNC(mirax_state::ay1_sel)); //1st ay ?
+	map(0xe003, 0xe003).w(FUNC(mirax_state::ay1_sel)); //1st ay ?
 
 	map(0xe400, 0xe400).nopw();
 	map(0xe401, 0xe401).nopw();
-	map(0xe403, 0xe403).w(this, FUNC(mirax_state::ay2_sel)); //2nd ay ?
+	map(0xe403, 0xe403).w(FUNC(mirax_state::ay2_sel)); //2nd ay ?
 
-	map(0xf900, 0xf9ff).w(this, FUNC(mirax_state::audio_w));
+	map(0xf900, 0xf9ff).w(FUNC(mirax_state::audio_w));
 }
 
 
@@ -466,7 +466,7 @@ static const gfx_layout layout8 =
 	8*8
 };
 
-static GFXDECODE_START( mirax )
+static GFXDECODE_START( gfx_mirax )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 8 )
 GFXDECODE_END
@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirax)
 
 	SPEAKER(config, "mono").front_center();
 

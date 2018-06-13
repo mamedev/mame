@@ -53,7 +53,7 @@ void cedar_magnet_sprite_device::cedar_magnet_sprite_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).m("sp_sub_ram", FUNC(address_map_bank_device::amap8));
 
-	map(0x00400, 0x007ff).r(this, FUNC(cedar_magnet_sprite_device::exzisus_hack_r));
+	map(0x00400, 0x007ff).r(FUNC(cedar_magnet_sprite_device::exzisus_hack_r));
 }
 
 void cedar_magnet_sprite_device::cedar_magnet_sprite_io(address_map &map)
@@ -64,14 +64,14 @@ void cedar_magnet_sprite_device::cedar_magnet_sprite_io(address_map &map)
 	map(0xc4, 0xc7).rw("z80pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xc8, 0xcb).rw("z80pio2", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 
-	map(0x80, 0x80).w(this, FUNC(cedar_magnet_sprite_device::sprite_port80_w));
-	map(0x84, 0x84).w(this, FUNC(cedar_magnet_sprite_device::sprite_port84_w));
+	map(0x80, 0x80).w(FUNC(cedar_magnet_sprite_device::sprite_port80_w));
+	map(0x84, 0x84).w(FUNC(cedar_magnet_sprite_device::sprite_port84_w));
 
-	map(0x88, 0x88).w(this, FUNC(cedar_magnet_sprite_device::sprite_port88_w)); // increasing values // upper address?
+	map(0x88, 0x88).w(FUNC(cedar_magnet_sprite_device::sprite_port88_w)); // increasing values // upper address?
 
-	map(0x8c, 0x8c).w(this, FUNC(cedar_magnet_sprite_device::sprite_port8c_w)); // written after 88 (possible data upload?)
+	map(0x8c, 0x8c).w(FUNC(cedar_magnet_sprite_device::sprite_port8c_w)); // written after 88 (possible data upload?)
 
-	map(0x9c, 0x9c).w(this, FUNC(cedar_magnet_sprite_device::sprite_port9c_w)); // ?
+	map(0x9c, 0x9c).w(FUNC(cedar_magnet_sprite_device::sprite_port9c_w)); // ?
 
 }
 

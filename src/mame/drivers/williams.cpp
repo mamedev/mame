@@ -525,7 +525,7 @@ void williams_state::defender_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xdfff).w(this, FUNC(williams_state::defender_bank_select_w));
+	map(0xd000, 0xdfff).w(FUNC(williams_state::defender_bank_select_w));
 	map(0xd000, 0xffff).rom();
 }
 
@@ -533,10 +533,10 @@ void williams_state::defender_map(address_map &map)
 void williams_state::defender_bankc000_map(address_map &map)
 {
 	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share("paletteram");
-	map(0x03ff, 0x03ff).w(this, FUNC(williams_state::williams_watchdog_reset_w));
-	map(0x0010, 0x001f).mirror(0x03e0).w(this, FUNC(williams_state::defender_video_control_w));
-	map(0x0400, 0x04ff).mirror(0x0300).ram().w(this, FUNC(williams_state::williams_cmos_w)).share("nvram");
-	map(0x0800, 0x0bff).r(this, FUNC(williams_state::williams_video_counter_r));
+	map(0x03ff, 0x03ff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(williams_state::defender_video_control_w));
+	map(0x0400, 0x04ff).mirror(0x0300).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0x0800, 0x0bff).r(FUNC(williams_state::williams_video_counter_r));
 	map(0x0c00, 0x0c03).mirror(0x03e0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0c04, 0x0c07).mirror(0x03e0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x9fff).rom().region("maincpu", 0x10000);
@@ -558,11 +558,11 @@ void williams_state::williams_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc9ff).w(this, FUNC(williams_state::williams_vram_select_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(this, FUNC(williams_state::williams_blitter_w));
-	map(0xcb00, 0xcbff).r(this, FUNC(williams_state::williams_video_counter_r));
-	map(0xcbff, 0xcbff).w(this, FUNC(williams_state::williams_watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0xc900, 0xc9ff).w(FUNC(williams_state::williams_vram_select_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
@@ -581,11 +581,11 @@ void williams_state::sinistar_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc9ff).w(this, FUNC(williams_state::sinistar_vram_select_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(this, FUNC(williams_state::williams_blitter_w));
-	map(0xcb00, 0xcbff).r(this, FUNC(williams_state::williams_video_counter_r));
-	map(0xcbff, 0xcbff).w(this, FUNC(williams_state::williams_watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0xc900, 0xc9ff).w(FUNC(williams_state::sinistar_vram_select_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
 }
@@ -609,14 +609,14 @@ void blaster_state::blaster_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc93f).w(this, FUNC(blaster_state::blaster_vram_select_w));
-	map(0xc940, 0xc97f).w(this, FUNC(blaster_state::blaster_remap_select_w));
-	map(0xc980, 0xc9bf).w(this, FUNC(blaster_state::blaster_bank_select_w));
-	map(0xc9c0, 0xc9ff).w(this, FUNC(blaster_state::blaster_video_control_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(this, FUNC(blaster_state::williams_blitter_w));
-	map(0xcb00, 0xcbff).r(this, FUNC(blaster_state::williams_video_counter_r));
-	map(0xcbff, 0xcbff).w(this, FUNC(blaster_state::williams_watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(blaster_state::williams_cmos_w)).share("nvram");
+	map(0xc900, 0xc93f).w(FUNC(blaster_state::blaster_vram_select_w));
+	map(0xc940, 0xc97f).w(FUNC(blaster_state::blaster_remap_select_w));
+	map(0xc980, 0xc9bf).w(FUNC(blaster_state::blaster_bank_select_w));
+	map(0xc9c0, 0xc9ff).w(FUNC(blaster_state::blaster_video_control_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(blaster_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(blaster_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(blaster_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(blaster_state::williams_cmos_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
@@ -633,27 +633,27 @@ void williams2_state::williams2_common_map(address_map &map)
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0x0000, 0x7fff).bankr("bank1");
 	map(0x8000, 0x87ff).m(m_bank8000, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(williams2_state::williams2_tileram_w)).share("williams2_tile");
-	map(0xc800, 0xc87f).w(this, FUNC(williams2_state::williams2_bank_select_w));
-	map(0xc880, 0xc887).mirror(0x0078).w(this, FUNC(williams2_state::williams_blitter_w));
-	map(0xc900, 0xc97f).w(this, FUNC(williams2_state::williams2_watchdog_reset_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(williams2_state::williams2_tileram_w)).share("williams2_tile");
+	map(0xc800, 0xc87f).w(FUNC(williams2_state::williams2_bank_select_w));
+	map(0xc880, 0xc887).mirror(0x0078).w(FUNC(williams2_state::williams_blitter_w));
+	map(0xc900, 0xc97f).w(FUNC(williams2_state::williams2_watchdog_reset_w));
 	map(0xc980, 0xc983).mirror(0x0070).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc984, 0xc987).mirror(0x0070).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc98c, 0xc98f).mirror(0x0070).w(this, FUNC(williams2_state::williams2_7segment_w));
-	map(0xcb00, 0xcb1f).w(this, FUNC(williams2_state::williams2_fg_select_w));
-	map(0xcb20, 0xcb3f).w(this, FUNC(williams2_state::williams2_bg_select_w));
-	map(0xcb40, 0xcb5f).w(this, FUNC(williams2_state::williams2_xscroll_low_w));
-	map(0xcb60, 0xcb7f).w(this, FUNC(williams2_state::williams2_xscroll_high_w));
-	map(0xcb80, 0xcb9f).w(this, FUNC(williams2_state::defender_video_control_w));
-	map(0xcba0, 0xcbbf).w(this, FUNC(williams2_state::williams2_blit_window_enable_w));
-	map(0xcbe0, 0xcbef).r(this, FUNC(williams2_state::williams_video_counter_r));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(williams2_state::williams_cmos_w)).share("nvram");
+	map(0xc98c, 0xc98f).mirror(0x0070).w(FUNC(williams2_state::williams2_7segment_w));
+	map(0xcb00, 0xcb1f).w(FUNC(williams2_state::williams2_fg_select_w));
+	map(0xcb20, 0xcb3f).w(FUNC(williams2_state::williams2_bg_select_w));
+	map(0xcb40, 0xcb5f).w(FUNC(williams2_state::williams2_xscroll_low_w));
+	map(0xcb60, 0xcb7f).w(FUNC(williams2_state::williams2_xscroll_high_w));
+	map(0xcb80, 0xcb9f).w(FUNC(williams2_state::defender_video_control_w));
+	map(0xcba0, 0xcbbf).w(FUNC(williams2_state::williams2_blit_window_enable_w));
+	map(0xcbe0, 0xcbef).r(FUNC(williams2_state::williams_video_counter_r));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams2_state::williams_cmos_w)).share("nvram");
 }
 
 void williams2_state::williams2_bank8000_map(address_map &map)
 {
 	map(0x0000, 0x07ff).bankrw("vram8000");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(williams2_state::williams2_paletteram_w)).share("paletteram");
+	map(0x0800, 0x0fff).ram().w(FUNC(williams2_state::williams2_paletteram_w)).share("paletteram");
 }
 
 
@@ -1450,7 +1450,7 @@ static const gfx_layout williams2_layout =
 };
 
 
-static GFXDECODE_START( williams2 )
+static GFXDECODE_START( gfx_williams2 )
 	GFXDECODE_ENTRY( "gfx1", 0, williams2_layout, 0, 8 )
 GFXDECODE_END
 
@@ -1472,11 +1472,13 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1506,7 +1508,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
@@ -1571,7 +1573,7 @@ MACHINE_CONFIG_START(williams_state::williams_muxed)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(williams_state::spdball)
+MACHINE_CONFIG_START(spdball_state::spdball)
 	williams(config);
 
 	/* basic machine hardware */
@@ -1649,7 +1651,6 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
-	MCFG_MACHINE_RESET_OVERRIDE(blaster_state,blaster)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(blaster_state,blaster)
@@ -1695,10 +1696,10 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, blaster_state, blaster_snd_cmd_w))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("ldac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("ldac", dac_byte_interface, data_w))
 
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("rdac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("rdac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, blaster_state,williams_snd_irq_b))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, blaster_state,williams_snd_irq_b))
 
@@ -1737,14 +1738,17 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 254
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", williams2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_williams2)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
@@ -1773,7 +1777,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE("pia_1", pia6821_device, cb1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
@@ -2130,6 +2134,27 @@ ROM_START( attackf )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) ) // not dumped from this PCB, believed to match
 ROM_END
 
+ROM_START( galwars2 ) // 2 board stack: CPU and ROM boards
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "9d-1-2532.bin",  0x0d000, 0x1000, CRC(ebc93622) SHA1(bd1c098e91b24409925d01aa25de013451dba8e6) )
+	ROM_LOAD( "9c-2-2532.bin",  0x0e000, 0x1000, CRC(2a4f4f44) SHA1(8c0519fcb631e05e967cf0953ab2749183655594) )
+	ROM_LOAD( "8d-3-2532.bin",  0x0f000, 0x1000, CRC(a4112f91) SHA1(aad7ae81da7c20c7f4c1ef41697c8900a0c81f8e) )
+	ROM_LOAD( "4c-10-2716.bin", 0x10000, 0x0800, CRC(7a1e5998) SHA1(c133f43427540b39a383db7f46298942420d138a) )
+	ROM_LOAD( "5d-7-2716.bin",  0x10800, 0x0800, CRC(a9bdacdc) SHA1(aa6f31a127c5e744c1267705fffa659c03c38329) )
+	ROM_LOAD( "4d-9-2716.bin",  0x11000, 0x0800, CRC(906dca8f) SHA1(ae77945f1628f5c60040dcc3fa650ace3bbe8720) )
+	ROM_LOAD( "6c-6-2716.bin",  0x11800, 0x0800, CRC(6d748030) SHA1(060ddf95eeb1318695a25c8c082a670fcdf117e7) )
+	ROM_LOAD( "5c-8-2716.bin",  0x12000, 0x0800, CRC(52d5438b) SHA1(087268ca30a42c00dbeceb4df901ddf80ae50125) )
+	ROM_LOAD( "6d-5-2716.bin",  0x12800, 0x0800, CRC(4a270340) SHA1(317fcc3156a099dbe48a0658757a9d6c4c54b23a) )
+	ROM_LOAD( "7c-4-2716.bin",  0x16000, 0x0800, CRC(e13f457c) SHA1(c706babc0005dfeb3c1b880047da6ec04bce407d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "3f-11-2716.bin", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+
+	ROM_REGION( 0x1000, "user1", 0 ) // these are on the main CPU board. What are they used for?
+	ROM_LOAD( "1l-13-8516.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00, identical to rom11.bin in maydayb
+	ROM_LOAD( "1a-12-8516.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00, identical to rom12.bin in maydayb
+ROM_END
+
 ROM_START( mayday )
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "ic03-3.bin",  0x0d000, 0x1000, CRC(a1ff6e62) SHA1(c3c60ce94c6bdc4b07e45f386eff9a4aa4816953) )
@@ -2171,7 +2196,7 @@ ROM_START( maydayb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic28-8.bin",  0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
-	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms?
+	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms? rom11.bin and rom12.bin were also found on galwars2 PCB
 	ROM_LOAD( "rom11.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom12.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom6a.bin",   0x1000, 0x0800, CRC(8e4e981f) SHA1(685c1fca9373f4129c7c6b86f18900a1bd324019) )
@@ -3214,14 +3239,12 @@ void blaster_state::init_blaster()
 }
 
 
-void williams_state::init_spdball()
+void spdball_state::driver_init()
 {
-	pia6821_device *pia_3 = machine().device<pia6821_device>("pia_3");
-
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 
 	/* add a third PIA */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), (pia6821_device*)m_pia_3), write8_delegate(FUNC(pia6821_device::write), (pia6821_device*)m_pia_3));
 
 	/* install extra input handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xc800, 0xc800, "AN0");
@@ -3308,6 +3331,7 @@ GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, init
 GAME( 1981, defence,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, attackf,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Famare SA)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Sonic)", "Galaxy Wars II (Defender bootleg)", MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega Sa, only displays Sonic on title screen
 
 GAME( 1980, mayday,     0,        defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
@@ -3351,7 +3375,7 @@ GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,  init
 GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // mono sound
 
-GAME( 1985, spdball,    0,        spdball,        spdball,  williams_state, init_spdball,  ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,  driver_init,   ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, alienar,    0,        williams_muxed, alienar,  williams_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, alienaru,   alienar,  williams_muxed, alienar,  williams_state, init_alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )

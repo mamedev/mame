@@ -107,15 +107,15 @@ void lcmate2_state::lcmate2_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write));
-	map(0x1000, 0x1000).w(this, FUNC(lcmate2_state::speaker_w));
-	map(0x1fff, 0x1fff).w(this, FUNC(lcmate2_state::bankswitch_w));
+	map(0x1000, 0x1000).w(FUNC(lcmate2_state::speaker_w));
+	map(0x1fff, 0x1fff).w(FUNC(lcmate2_state::bankswitch_w));
 
 	map(0x3000, 0x3000).w(m_lcdc, FUNC(hd44780_device::control_write));
 	map(0x3001, 0x3001).w(m_lcdc, FUNC(hd44780_device::data_write));
 	map(0x3002, 0x3002).r(m_lcdc, FUNC(hd44780_device::control_read));
 	map(0x3003, 0x3003).r(m_lcdc, FUNC(hd44780_device::data_read));
 
-	map(0x5000, 0x50ff).r(this, FUNC(lcmate2_state::key_r));
+	map(0x5000, 0x50ff).r(FUNC(lcmate2_state::key_r));
 }
 
 /* Input ports */
@@ -223,7 +223,7 @@ static const gfx_layout lcmate2_charlayout =
 	8*8 /* 8 bytes */
 };
 
-static GFXDECODE_START( lcmate2 )
+static GFXDECODE_START( gfx_lcmate2 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lcmate2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)

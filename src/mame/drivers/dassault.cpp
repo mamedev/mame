@@ -280,15 +280,15 @@ void dassault_state::dassault_map(address_map &map)
 
 	map(0x100000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0x140004, 0x140005).w(this, FUNC(dassault_state::main_irq_ack_w));
+	map(0x140004, 0x140005).w(FUNC(dassault_state::main_irq_ack_w));
 	map(0x140006, 0x140007).nopw(); /* ? */
 
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	map(0x1c0000, 0x1c000f).r(this, FUNC(dassault_state::dassault_control_r));
-	map(0x1c000a, 0x1c000b).w(this, FUNC(dassault_state::priority_w));
+	map(0x1c0000, 0x1c000f).r(FUNC(dassault_state::dassault_control_r));
+	map(0x1c000a, 0x1c000b).w(FUNC(dassault_state::priority_w));
 	map(0x1c000c, 0x1c000d).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
-	map(0x1c000e, 0x1c000f).w(this, FUNC(dassault_state::dassault_control_w));
+	map(0x1c000e, 0x1c000f).w(FUNC(dassault_state::dassault_control_w));
 
 	map(0x200000, 0x201fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x202000, 0x203fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
@@ -310,9 +310,9 @@ void dassault_state::dassault_sub_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 	map(0x100000, 0x100001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write));
-	map(0x100002, 0x100003).w(this, FUNC(dassault_state::sub_irq_ack_w));
+	map(0x100002, 0x100003).w(FUNC(dassault_state::sub_irq_ack_w));
 	map(0x100004, 0x100007).nopw(); /* ? */
-	map(0x100004, 0x100005).r(this, FUNC(dassault_state::dassault_sub_control_r));
+	map(0x100004, 0x100005).r(FUNC(dassault_state::dassault_sub_control_r));
 
 	map(0x3f8000, 0x3fbfff).ram(); /* Sub cpu ram */
 	map(0x3fc000, 0x3fcfff).ram().share("spriteram1"); /* Sprite ram */
@@ -495,7 +495,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( dassault )
+static GFXDECODE_START( gfx_dassault )
 	/* "gfx1" is copied to "gfx2" at runtime */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )    /* Tiles 16x16 */
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 

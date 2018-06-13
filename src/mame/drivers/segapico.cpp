@@ -344,7 +344,7 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 void pico_base_state::pico_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x800000, 0x80001f).rw(this, FUNC(pico_base_state::pico_68k_io_read), FUNC(pico_base_state::pico_68k_io_write));
+	map(0x800000, 0x80001f).rw(FUNC(pico_base_state::pico_68k_io_read), FUNC(pico_base_state::pico_68k_io_write));
 	map(0xc00000, 0xc0001f).rw("gen_vdp", FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
 }
@@ -574,7 +574,7 @@ void copera_state::copera_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 
-	map(0x800000, 0x80001f).rw(this, FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
+	map(0x800000, 0x80001f).rw(FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
 
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 

@@ -48,9 +48,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	uint8_t read(int offset);
-	void write(int offset, uint8_t data);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

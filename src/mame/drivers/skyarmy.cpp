@@ -214,8 +214,8 @@ void skyarmy_state::skyarmy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().w(this, FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
+	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
 	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
 	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
 	map(0xa000, 0xa000).portr("DSW");
@@ -315,7 +315,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( skyarmy )
+static GFXDECODE_START( gfx_skyarmy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyarmy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyarmy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 

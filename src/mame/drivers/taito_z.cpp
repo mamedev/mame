@@ -1277,7 +1277,6 @@ DIP switches are not verified
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "sound/flt_vol.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1306,8 +1305,8 @@ WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	output().set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
-	output().set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
+	m_lamps[0] = BIT(m_cpua_ctrl, 5);
+	m_lamps[1] = BIT(m_cpua_ctrl, 6);
 }
 
 WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
@@ -1655,8 +1654,7 @@ READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 /**** sound pan control ****/
 WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
 {
-	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
-	dynamic_cast<filter_volume_device*>(machine().device(fltname[offset & 3]))->flt_volume_set_volume(data / 255.0f);
+	m_filter[offset & 3]->flt_volume_set_volume(data / 255.0f);
 }
 
 
@@ -1670,7 +1668,7 @@ void taitoz_state::contcirc_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
 	map(0x084000, 0x087fff).ram().share("share1");
-	map(0x090000, 0x090001).w(this, FUNC(taitoz_state::contcirc_out_w));    /* road palette bank, sub CPU reset, 3d glasses control */
+	map(0x090000, 0x090001).w(FUNC(taitoz_state::contcirc_out_w));    /* road palette bank, sub CPU reset, 3d glasses control */
 	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
@@ -1683,9 +1681,9 @@ void taitoz_state::contcirc_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
 	map(0x084000, 0x087fff).ram().share("share1");
-	map(0x100001, 0x100001).r(this, FUNC(taitoz_state::contcirc_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
+	map(0x100001, 0x100001).r(FUNC(taitoz_state::contcirc_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x100003, 0x100003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
-	map(0x200000, 0x200003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 }
 
 
@@ -1695,15 +1693,15 @@ void taitoz_state::chasehq_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 	map(0x108000, 0x10bfff).ram().share("share1");
 	map(0x10c000, 0x10ffff).ram();
-	map(0x400001, 0x400001).r(this, FUNC(taitoz_state::chasehq_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
+	map(0x400001, 0x400001).r(FUNC(taitoz_state::chasehq_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x400003, 0x400003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
-	map(0x800000, 0x800001).w(this, FUNC(taitoz_state::chasehq_cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x800000, 0x800001).w(FUNC(taitoz_state::chasehq_cpua_ctrl_w));
+	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
-	map(0xe00000, 0xe003ff).rw(this, FUNC(taitoz_state::chasehq_motor_r), FUNC(taitoz_state::chasehq_motor_w)); /* motor cpu */
+	map(0xe00000, 0xe003ff).rw(FUNC(taitoz_state::chasehq_motor_r), FUNC(taitoz_state::chasehq_motor_w)); /* motor cpu */
 }
 
 void taitoz_state::chq_cpub_map(address_map &map)
@@ -1720,7 +1718,7 @@ void taitoz_state::enforce_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200001).w(this, FUNC(taitoz_state::cpua_ctrl_w));  // works without?
+	map(0x200000, 0x200001).w(FUNC(taitoz_state::cpua_ctrl_w));  // works without?
 	map(0x300000, 0x3006ff).ram().share("spriteram");
 	map(0x400000, 0x401fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));    /* "root ram" ??? */
 	map(0x500000, 0x500007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
@@ -1733,7 +1731,7 @@ void taitoz_state::enforce_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 	map(0x300000, 0x300003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 }
 
@@ -1744,7 +1742,7 @@ void taitoz_state::bshark_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x600000, 0x600001).w(this, FUNC(taitoz_state::cpua_ctrl_w));
+	map(0x600000, 0x600001).w(FUNC(taitoz_state::cpua_ctrl_w));
 	map(0x800000, 0x80000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
@@ -1758,7 +1756,7 @@ void taitoz_state::bsharkjjs_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x600000, 0x600001).w(this, FUNC(taitoz_state::cpua_ctrl_w));
+	map(0x600000, 0x600001).w(FUNC(taitoz_state::cpua_ctrl_w));
 //  map(0x800000, 0x80000f) // No analog stick, this is the Joystick version
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
@@ -1771,8 +1769,8 @@ void taitoz_state::bshark_cpub_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x108000, 0x10bfff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
-	map(0x400000, 0x400007).w(this, FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
-//  map(0x40000a, 0x40000b).r(this, FUNC(taitoz_state::taitoz_unknown_r));  // ???
+	map(0x400000, 0x400007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+//  map(0x40000a, 0x40000b).r(FUNC(taitoz_state::taitoz_unknown_r));  // ???
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).noprw(); // interrupt controller?
 	map(0x60000e, 0x60000f).noprw();
@@ -1787,14 +1785,14 @@ void taitoz_state::sci_map(address_map &map)
 	map(0x108000, 0x10bfff).ram().share("share1");
 	map(0x10c000, 0x10ffff).ram();
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x200010, 0x20001f).r(this, FUNC(taitoz_state::sci_steer_input_r));
-//  map(0x400000, 0x400001).w(this, FUNC(taitoz_state::cpua_ctrl_w));  // ?? doesn't seem to fit what's written
-	map(0x420000, 0x420003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200010, 0x20001f).r(FUNC(taitoz_state::sci_steer_input_r));
+//  map(0x400000, 0x400001).w(FUNC(taitoz_state::cpua_ctrl_w));  // ?? doesn't seem to fit what's written
+	map(0x420000, 0x420003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
 	map(0xc00000, 0xc03fff).ram().share("spriteram");
-	map(0xc08000, 0xc08001).rw(this, FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w));
+	map(0xc08000, 0xc08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w));
 }
 
 void taitoz_state::sci_cpub_map(address_map &map)
@@ -1812,13 +1810,13 @@ void taitoz_state::nightstr_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x800000, 0x800001).w(this, FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x800000, 0x800001).w(FUNC(taitoz_state::cpua_ctrl_w));
+	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
-	map(0xe00000, 0xe00011).w(this, FUNC(taitoz_state::nightstr_motor_w));    /* Motor outputs */
+	map(0xe00000, 0xe00011).w(FUNC(taitoz_state::nightstr_motor_w));    /* Motor outputs */
 	map(0xe40000, 0xe4000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
 
@@ -1836,7 +1834,7 @@ void taitoz_state::aquajack_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200001).w(this, FUNC(taitoz_state::cpua_ctrl_w));  // not needed, but it's probably like the others
+	map(0x200000, 0x200001).w(FUNC(taitoz_state::cpua_ctrl_w));  // not needed, but it's probably like the others
 	map(0x300000, 0x300007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0x800000, 0x801fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));
 	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
@@ -1850,10 +1848,10 @@ void taitoz_state::aquajack_cpub_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
-	map(0x800800, 0x80083f).r(this, FUNC(taitoz_state::aquajack_unknown_r)); // Read regularly after write to 800800...
-//  map(0x800800, 0x800801).w(this, FUNC(taitoz_state::taitoz_unknown_w));
-//  map(0x900000, 0x900007).rw(this, FUNC(taitoz_state::taitoz_unknown_r), FUNC(taitoz_state::taitoz_unknown_w));
+	map(0x300000, 0x300003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x800800, 0x80083f).r(FUNC(taitoz_state::aquajack_unknown_r)); // Read regularly after write to 800800...
+//  map(0x800800, 0x800801).w(FUNC(taitoz_state::taitoz_unknown_w));
+//  map(0x900000, 0x900007).rw(FUNC(taitoz_state::taitoz_unknown_r), FUNC(taitoz_state::taitoz_unknown_w));
 }
 
 
@@ -1877,8 +1875,8 @@ void taitoz_state::spacegun_cpub_map(address_map &map)
 	map(0xc00000, 0xc00007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0xc0000c, 0xc0000d).noprw(); // interrupt controller?
 	map(0xc0000e, 0xc0000f).noprw();
-	map(0xc20000, 0xc20007).w(this, FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
-	map(0xe00000, 0xe00001).w(this, FUNC(taitoz_state::spacegun_gun_output_w));    /* gun outputs */
+	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0xe00000, 0xe00001).w(FUNC(taitoz_state::spacegun_gun_output_w));    /* gun outputs */
 	map(0xf00000, 0xf0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
 
@@ -1889,15 +1887,15 @@ void taitoz_state::dblaxle_map(address_map &map)
 	map(0x200000, 0x203fff).ram();
 	map(0x210000, 0x21ffff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
-	map(0x400010, 0x40001f).r(this, FUNC(taitoz_state::dblaxle_steer_input_r));
-	map(0x600000, 0x600001).w(this, FUNC(taitoz_state::dblaxle_cpua_ctrl_w));  /* could this be causing int6 ? */
-	map(0x620000, 0x620003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x400010, 0x40001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
+	map(0x600000, 0x600001).w(FUNC(taitoz_state::dblaxle_cpua_ctrl_w));  /* could this be causing int6 ? */
+	map(0x620000, 0x620003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemap mirror */
 	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
 	map(0xa30000, 0xa3002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
 	map(0xc00000, 0xc03fff).ram().share("spriteram"); /* mostly unused ? */
-	map(0xc08000, 0xc08001).rw(this, FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* set in int6, seems to stay zero */
+	map(0xc08000, 0xc08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* set in int6, seems to stay zero */
 }
 
 void taitoz_state::dblaxle_cpub_map(address_map &map)
@@ -1916,14 +1914,14 @@ void taitoz_state::racingb_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x110000, 0x11ffff).ram().share("share1");
 	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
-	map(0x300010, 0x30001f).r(this, FUNC(taitoz_state::dblaxle_steer_input_r));
-	map(0x500002, 0x500003).w(this, FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x520000, 0x520003).rw(this, FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x300010, 0x30001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
+	map(0x500002, 0x500003).w(FUNC(taitoz_state::cpua_ctrl_w));
+	map(0x520000, 0x520003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
 	map(0x700000, 0x701fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
 	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
 	map(0xb00000, 0xb03fff).ram().share("spriteram"); /* mostly unused ? */
-	map(0xb08000, 0xb08001).rw(this, FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* alternates 0/0x100 */
+	map(0xb08000, 0xb08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* alternates 0/0x100 */
 }
 
 void taitoz_state::racingb_cpub_map(address_map &map)
@@ -1946,11 +1944,11 @@ void taitoz_state::z80_sound_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).w(this, FUNC(taitoz_state::taitoz_pancontrol)); /* pan */
+	map(0xe400, 0xe403).w(FUNC(taitoz_state::taitoz_pancontrol)); /* pan */
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(taitoz_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(taitoz_state::sound_bankswitch_w));
 }
 
 
@@ -3092,7 +3090,7 @@ static const gfx_layout dblaxle_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( taitoz )
+static GFXDECODE_START( gfx_taitoz )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 GFXDECODE_END
@@ -3100,13 +3098,13 @@ GFXDECODE_END
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
    slot, so 2nd batch of obj must be placed third */
 
-static GFXDECODE_START( chasehq )
+static GFXDECODE_START( gfx_chasehq )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )   /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx4", 0x0, tile16x16_layout,  0, 256 )   /* sprite parts */
 GFXDECODE_END
 
-static GFXDECODE_START( dblaxle )
+static GFXDECODE_START( gfx_dblaxle )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, dblaxle_charlayout,  0, 256 ) /* sprites & playfield */
 GFXDECODE_END
@@ -3166,6 +3164,12 @@ MACHINE_START_MEMBER(taitoz_state,taitoz)
 	MACHINE_START_CALL_MEMBER(bshark);
 }
 
+MACHINE_START_MEMBER(taitoz_state,chasehq)
+{
+	m_lamps.resolve();
+	MACHINE_START_CALL_MEMBER(taitoz);
+}
+
 MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 {
 	m_cpua_ctrl = 0xff;
@@ -3209,7 +3213,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3223,8 +3227,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
@@ -3264,7 +3267,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_DEVICE_PROGRAM_MAP(chq_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,chasehq)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
@@ -3284,7 +3287,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chasehq)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3298,8 +3301,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
@@ -3361,7 +3363,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3375,8 +3377,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3442,7 +3443,7 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_bshark)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3523,7 +3524,7 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_sci)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3604,7 +3605,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chasehq)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3618,8 +3619,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
@@ -3681,7 +3681,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_aquajack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3695,8 +3695,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3736,8 +3735,8 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(spacegun_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(spacegun_default_eeprom, 128)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // clock unknown
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("sub", 5))
@@ -3764,7 +3763,7 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_spacegun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3775,8 +3774,7 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3835,7 +3833,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_dblaxle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblaxle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3909,7 +3907,7 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_racingb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblaxle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)

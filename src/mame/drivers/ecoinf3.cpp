@@ -447,7 +447,7 @@ void ecoinf3_state::pyramid_portmap(address_map &map)
 	map(0x58, 0x5b).rw("ppi8255_g", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5c, 0x5f).rw("ppi8255_h", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// frequently accesses DB after 5B, mirror? bug?
-	map(0xDB, 0xDB).w("sn1", FUNC(sn76489_device::write));  // no idea what the sound chip is, this sounds terrible
+	map(0xDB, 0xDB).w("sn1", FUNC(sn76489_device::command_w));  // no idea what the sound chip is, this sounds terrible
 
 
 }
@@ -740,13 +740,13 @@ MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_c))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_c))
 
-	MCFG_ECOIN_200STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<0>))
-	MCFG_ECOIN_200STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<1>))
-	MCFG_ECOIN_200STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<2>))
-	MCFG_ECOIN_200STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 

@@ -225,7 +225,7 @@ static const uint8_t tx0_palette[] =
 
 static const uint8_t total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
 
-static GFXDECODE_START( tx0 )
+static GFXDECODE_START( gfx_tx0 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )
 GFXDECODE_END
 
@@ -1577,7 +1577,7 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_DEVICE_ADD("typewriter", TX0_PRINTER, 0)
 	MCFG_DEVICE_ADD("magtape", TX0_MAGTAPE, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tx0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tx0)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(tx0_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)

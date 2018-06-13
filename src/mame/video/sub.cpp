@@ -40,7 +40,7 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 TILE_GET_INFO_MEMBER(sub_state::get_tile_info)
 {
 	int code = m_vram[tile_index] | ((m_attr[tile_index]&0xe0)<<3);
-	int	color = (m_attr[tile_index]&0x1f)+0x40;
+	int color = (m_attr[tile_index]&0x1f)+0x40;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -107,10 +107,10 @@ void sub_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		if(dx)
 			x = 0xe0 - x;
-		
+
 
 		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
-	}	
+	}
 }
 
 

@@ -208,9 +208,9 @@ void ppmast93_state::ppmast93_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().nopw();
 	map(0x8000, 0xbfff).bankr("cpubank");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(ppmast93_state::bgram_w)).share("bgram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(ppmast93_state::bgram_w)).share("bgram");
 	map(0xd800, 0xdfff).nopw();
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(ppmast93_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(ppmast93_state::fgram_w)).share("fgram");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -219,7 +219,7 @@ void ppmast93_state::ppmast93_cpu1_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).portr("P2");
-	map(0x04, 0x04).portr("SYSTEM").w(this, FUNC(ppmast93_state::port4_w));
+	map(0x04, 0x04).portr("SYSTEM").w(FUNC(ppmast93_state::port4_w));
 	map(0x06, 0x06).portr("DSW1");
 	map(0x08, 0x08).portr("DSW2");
 }
@@ -235,7 +235,7 @@ void ppmast93_state::ppmast93_cpu2_io(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("sub", 0x20000);
 	map(0x0000, 0x0001).mirror(0xff00).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( ppmast93 )
@@ -332,7 +332,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( ppmast93 )
+static GFXDECODE_START( gfx_ppmast93 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppmast93)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppmast93)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 

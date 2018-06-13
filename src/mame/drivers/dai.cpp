@@ -77,11 +77,11 @@ void dai_state::dai_mem(address_map &map)
 	map(0x0000, 0xbfff).bankrw("bank1");
 	map(0xc000, 0xdfff).rom();
 	map(0xe000, 0xefff).bankr("bank2");
-	map(0xf000, 0xf7ff).w(this, FUNC(dai_state::dai_stack_interrupt_circuit_w));
+	map(0xf000, 0xf7ff).w(FUNC(dai_state::dai_stack_interrupt_circuit_w));
 	map(0xf800, 0xf8ff).ram();
-	map(0xfb00, 0xfbff).rw(this, FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
-	map(0xfc00, 0xfcff).rw(this, FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	map(0xfd00, 0xfdff).rw(this, FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
+	map(0xfb00, 0xfbff).rw(FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
+	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	map(0xfd00, 0xfdff).rw(FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
 	map(0xfe00, 0xfeff).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xff00, 0xff0f).mirror(0xf0).m(m_tms5501, FUNC(tms5501_device::io_map));
 }
@@ -182,7 +182,7 @@ static const gfx_layout dai_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dai )
+static GFXDECODE_START( gfx_dai )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dai_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dai)
 	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
 

@@ -278,26 +278,26 @@ void hitpoker_state::hitpoker_map(address_map &map)
 
 	map(0x0000, 0x00ff).ram(); // stack ram
 	map(0x1000, 0x103f).ram(); // internal I/O
-	map(0x8000, 0xb5ff).rw(this, FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
+	map(0x8000, 0xb5ff).rw(FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
 	map(0xb600, 0xbdff).ram();
 	map(0xbe0a, 0xbe0a).portr("IN0");
-	map(0xbe0c, 0xbe0c).r(this, FUNC(hitpoker_state::irq_clear_r));
-	map(0xbe0d, 0xbe0d).r(this, FUNC(hitpoker_state::rtc_r));
+	map(0xbe0c, 0xbe0c).r(FUNC(hitpoker_state::irq_clear_r));
+	map(0xbe0d, 0xbe0d).r(FUNC(hitpoker_state::rtc_r));
 	map(0xbe0e, 0xbe0e).portr("IN1");
-	map(0xbe50, 0xbe51).w(this, FUNC(hitpoker_state::eeprom_offset_w));
-	map(0xbe53, 0xbe53).rw(this, FUNC(hitpoker_state::eeprom_r), FUNC(hitpoker_state::eeprom_w));
+	map(0xbe50, 0xbe51).w(FUNC(hitpoker_state::eeprom_offset_w));
+	map(0xbe53, 0xbe53).rw(FUNC(hitpoker_state::eeprom_r), FUNC(hitpoker_state::eeprom_w));
 	map(0xbe80, 0xbe80).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xbe81, 0xbe81).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xbe90, 0xbe91).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xbea0, 0xbea0).portr("VBLANK"); //probably other bits as well
 //  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
-	map(0xc000, 0xdfff).rw(this, FUNC(hitpoker_state::hitpoker_cram_r), FUNC(hitpoker_state::hitpoker_cram_w));
-	map(0xe000, 0xefff).rw(this, FUNC(hitpoker_state::hitpoker_paletteram_r), FUNC(hitpoker_state::hitpoker_paletteram_w));
+	map(0xc000, 0xdfff).rw(FUNC(hitpoker_state::hitpoker_cram_r), FUNC(hitpoker_state::hitpoker_cram_w));
+	map(0xe000, 0xefff).rw(FUNC(hitpoker_state::hitpoker_paletteram_r), FUNC(hitpoker_state::hitpoker_paletteram_w));
 }
 
 void hitpoker_state::hitpoker_io(address_map &map)
 {
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(hitpoker_state::hitpoker_pic_r), FUNC(hitpoker_state::hitpoker_pic_w)).share("sys_regs");
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(hitpoker_state::hitpoker_pic_r), FUNC(hitpoker_state::hitpoker_pic_w)).share("sys_regs");
 }
 
 static INPUT_PORTS_START( hitpoker )
@@ -453,7 +453,7 @@ static const gfx_layout hitpoker_layout_8bpp =
 	8*32
 };
 
-static GFXDECODE_START( hitpoker )
+static GFXDECODE_START( gfx_hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_4bpp,   0, 0x100  )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hitpoker_state, hitpoker_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	SPEAKER(config, "mono").front_center();
@@ -496,7 +496,7 @@ void hitpoker_state::init_hitpoker()
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// init nvram
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;

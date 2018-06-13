@@ -132,7 +132,7 @@ void cd2650_state::cd2650_io(address_map &map)
 
 void cd2650_state::cd2650_data(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
 }
 
 /* Input ports */
@@ -206,7 +206,7 @@ static const gfx_layout cd2650_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( cd2650 )
+static GFXDECODE_START( gfx_cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cd2650)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cd2650)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
