@@ -447,6 +447,25 @@ static const uint8_t reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for
 
 void tms5220_device::register_for_save_states()
 {
+	// for sanity purposes these variables should be in the same order as in tms5220.h!
+
+	// 5110 specific stuff
+	save_item(NAME(m_PDC));
+	save_item(NAME(m_CTL_pins));
+	save_item(NAME(m_state));
+
+	// new VSM stuff
+	save_item(NAME(m_address));
+	save_item(NAME(m_next_is_address));
+	save_item(NAME(m_schedule_dummy_read));
+	save_item(NAME(m_addr_bit));
+	save_item(NAME(m_CTL_buffer));
+
+	// old VSM stuff
+	save_item(NAME(m_read_byte_register));
+	save_item(NAME(m_RDB_flag));
+
+	// FIFO
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_head));
 	save_item(NAME(m_fifo_tail));
@@ -464,6 +483,7 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_irq_pin));
 	save_item(NAME(m_ready_pin));
 
+	// current and previous frames
 	save_item(NAME(m_OLDE));
 	save_item(NAME(m_OLDP));
 
@@ -500,27 +520,16 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_RNG));
 	save_item(NAME(m_excitation_data));
 
-	save_item(NAME(m_schedule_dummy_read));
-	save_item(NAME(m_data_register));
-	save_item(NAME(m_RDB_flag));
 	save_item(NAME(m_digital_select));
 
 	save_item(NAME(m_io_ready));
 
+	// "proper" rs+ws emulation
 	save_item(NAME(m_true_timing));
 
 	save_item(NAME(m_rs_ws));
 	save_item(NAME(m_read_latch));
 	save_item(NAME(m_write_latch));
-
-	// 5110 specific stuff
-	save_item(NAME(m_PDC));
-	save_item(NAME(m_CTL_pins));
-	save_item(NAME(m_state));
-	save_item(NAME(m_address));
-	save_item(NAME(m_next_is_address));
-	save_item(NAME(m_addr_bit));
-	save_item(NAME(m_CTL_buffer));
 }
 
 
