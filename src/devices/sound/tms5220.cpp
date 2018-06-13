@@ -1920,9 +1920,6 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 
 void tms5220_device::write_data(uint8_t data)
 {
-	// prevent debugger from changing the internal state
-	if (machine().side_effects_disabled()) return;
-
 	LOGMASKED(LOG_RS_WS, "tms5220_data_w: data %02x\n", data);
 
 	if (!m_true_timing)
@@ -1980,8 +1977,9 @@ uint8_t tms5220_device::read_status()
 
 READ_LINE_MEMBER( tms5220_device::readyq_r )
 {
-	/* bring up to date first */
-	m_stream->update();
+	// prevent debugger from changing the internal state
+	if (!machine().side_effects_disabled())
+		m_stream->update(); /* bring up to date first */
 	return !ready_read();
 }
 
@@ -1995,8 +1993,9 @@ READ_LINE_MEMBER( tms5220_device::readyq_r )
 
 READ_LINE_MEMBER( tms5220_device::intq_r )
 {
-	/* bring up to date first */
-	m_stream->update();
+	// prevent debugger from changing the internal state
+	if (!machine().side_effects_disabled())
+		m_stream->update(); /* bring up to date first */
 	return !int_read();
 }
 
