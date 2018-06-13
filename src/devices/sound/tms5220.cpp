@@ -903,7 +903,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				parse_frame();
 
 				/* if the new frame is a stop frame, unset both TALK and SPEN (via TCON). TALKD remains active while the energy is ramping to 0. */
-				if (NEW_FRAME_STOP_FLAG())
+				if (new_frame_stop_flag())
 				{
 					m_TALK = m_SPEN = 0;
 					update_fifo_status_and_ints(); // probably not necessary...
@@ -1679,7 +1679,7 @@ void tms5220_device::device_reset()
 		// MZ: Do the dummy read immediately. The previous line will cause a
 		// shift in the address pointer in the VSM. When the next command is a
 		// load_address, no dummy read will occur, hence the address will be
-		// falsely shifted.
+		// incorrectly shifted.
 		m_speechrom->read(1);
 		m_schedule_dummy_read = false;
 	}
