@@ -29,7 +29,7 @@ Quirks:
 DEFINE_DEVICE_TYPE(SCC2698B, scc2698b_device, "scc2698b", "SCC2698B Octal UART")
 DEFINE_DEVICE_TYPE(SCC2698B_CHANNEL, scc2698b_channel, "scc2698b_channel", "UART channel")
 
-#define TRACE_ENABLE 1
+#define TRACE_ENABLE 0
 
 
 #define TRACE_REGISTER_WRITE(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), "<<", (reg_name)); }
@@ -323,17 +323,16 @@ void scc2698b_channel::recompute_pin_output(bool force)
 
 		if (new_mpp1 != mpp1_value || force)
 		{
-			logerror("Channel %d MPP1 => %d\n", channel_port, new_mpp1);
+			if (TRACE_ENABLE) logerror("Channel %d MPP1 => %d\n", channel_port, new_mpp1);
 			parent->write_line_mpp1(channel_port, new_mpp1);
 			mpp1_value = new_mpp1;
 		}
 		if (new_mpp2 != mpp2_value || force)
 		{
-			logerror("Channel %d MPP2 => %d\n", channel_port, new_mpp1);
+			if(TRACE_ENABLE) logerror("Channel %d MPP2 => %d\n", channel_port, new_mpp1);
 			parent->write_line_mpp2(channel_port, new_mpp2);
 			mpp2_value = new_mpp2;
 		}
-		logerror("Channel %d Debug MPP1 => %d, MPP2 => %d\n", channel_port, new_mpp1, new_mpp2);
 	}
 }
 

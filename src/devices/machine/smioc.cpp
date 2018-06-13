@@ -71,6 +71,13 @@
 
 #define I188_TAG     "smioc_i188" // U23
 
+#define ENABLE_LOG_REGISTER_ACCESS 0
+#define ENABLE_LOG_COMMAND 1
+
+
+#define LOG_REGISTER_ACCESS if(ENABLE_LOG_REGISTER_ACCESS) logerror
+#define LOG_COMMAND if(ENABLE_LOG_COMMAND) logerror
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -125,7 +132,8 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */
-	MCFG_DEVICE_ADD(I188_TAG, I80188, XTAL(20'000'000) / 2) // Clock division unknown
+	MCFG_DEVICE_ADD(I188_TAG, I80188, XTAL(20'000'000)) // Clock division unknown
+	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 	MCFG_DEVICE_PROGRAM_MAP(smioc_mem)
 
 	/* DMA */
@@ -238,6 +246,16 @@ void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 
 void smioc_device::SendCommand(u16 command)
 {
+	LOG_COMMAND("SMIOC Command %04x (Address %04x, Length %04x)\n", command, m_dmaSendAddress, m_dmaSendLength);
+
+	// Assume that command 0 is a hard reset command handled by the logic in the board rather than the cpu.
+	// It's difficult to be sure that this is what actually should happen, but given the context and how it's used, this seems likely.
+	if (command == 0)
+	{
+		m_smioccpu->reset();
+		return;
+	}
+
 	m_commandValue = command;
 	m_requestFlags_11D |= 1;
 	m_deviceBusy = 1;
@@ -259,7 +277,7 @@ void smioc_device::ClearStatus2()
 
 void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_name)
 {
-	if (reg != newValue)
+	//if (reg != newValue)
 	{
 		logerror("Update %s %04X -> %04X\n", register_name, reg, newValue);
 		reg = newValue;
@@ -271,12 +289,27 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 	u8 data = 0;
 	switch (offset)
 	{
+	case 0xB83: // Unclear
+		LOG_COMMAND("SMIOC Read B83 (Unknown)\n");
+		break;
+
+	case 0xB87: // Unclear
+		LOG_COMMAND("SMIOC Read B87 (Unknown)\n");
+		break;
+
+
 	case 0xCC2: // Command from 68k?
 		data = m_commandValue & 0xFF;
 		break;
 	case 0xCC3:
 		data = m_commandValue >> 8;
+		LOG_COMMAND("SMIOC Read CC3 (Command)\n");
 		break;
+
+	case 0xCC7:
+		LOG_COMMAND("SMIOC Read CC7 (Unknown)\n");
+		break;
+
 
 	case 0xCD8: // DMA source address (for writing characters) - Port 0
 		data = m_dmaSendAddress & 0xFF;
@@ -305,26 +338,34 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 	{
 		
 	case 0xC84:
-		update_and_log(m_status2, (m_status2 & 0xFF00) | data, "Status2[40C84]");
+		//update_and_log(m_wordcount, (m_wordcount & 0xFF00) | data, "Wordcount[40C84]");
 		return;
 	case 0xC85:
-		update_and_log(m_status2, (m_status2 & 0xFF) | (data<<8), "Status2[40C85]");
+		//update_and_log(m_wordcount, (m_wordcount & 0xFF) | (data<<8), "Wordcount[40C85]");
 		return;
 
-	/*
 	case 0xC88:
-		update_and_log(m_status, (m_status & 0xFF00) | data, "Status[40C88]");
+		//update_and_log(m_wordcount2, (m_wordcount2 & 0xFF00) | data, "Wordcount2[40C88]");
 		return;
 	case 0xC89:
-		update_and_log(m_status, (m_status & 0xFF) | (data<<8), "Status[40C89]");
+		//update_and_log(m_wordcount2, (m_wordcount2 & 0xFF) | (data<<8), "Wordcount2[40C89]");
 		return;
-	*/
+
 	case 0xCC4:
-		update_and_log(m_status, (m_status & 0xFF) | (data<<8), "Status[40CC4]");
-		break; // return;
+		update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC4]");
+		return;
 	case 0xCC5:
-		update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC5]");
-		break; // return;
+		update_and_log(m_status, (m_status & 0xFF) | (data << 8), "Status[40CC5]");
+		m_status |= 0x40;
+		return;
+
+	case 0xCC8:
+		update_and_log(m_status2, (m_status2 & 0xFF) | (data << 8), "Status2[40CC8]");
+		return;
+	case 0xCC9:
+		update_and_log(m_status2, (m_status2 & 0xFF00) | data, "Status2[40CC9]");
+		m_status2 |= 0x40;
+		return;
 
 	}
 
@@ -346,7 +387,7 @@ READ8_MEMBER(smioc_device::dma68k_r)
 	// Another (and maybe more likely) possibility is that the hardware is doing a slow fetch of the value, and the N+1 read returns data from the Nth read's address
 
 	data = m_m68k_r_cb(offset-1);
-	logerror("dma68k[%04X] => %02X\n", offset, data);
+	LOG_REGISTER_ACCESS("dma68k[%04X] => %02X\n", offset, data);
 	return data;
 }
 
@@ -357,7 +398,7 @@ WRITE8_MEMBER(smioc_device::dma68k_w)
 
 	m_m68k_w_cb(offset, data);
 
-	logerror("dma68k[%04X] <= %02X\n", offset, data);
+	LOG_REGISTER_ACCESS("dma68k[%04X] <= %02X\n", offset, data);
 }
 
 READ8_MEMBER(smioc_device::boardlogic_mmio_r)
@@ -386,7 +427,7 @@ READ8_MEMBER(smioc_device::boardlogic_mmio_r)
 			break;
 
 	}
-	logerror("logic[%04X] => %02X\n", offset, data);
+	LOG_REGISTER_ACCESS("logic[%04X] => %02X\n", offset, data);
 	return data;
 }
 
@@ -415,7 +456,7 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 		break;
 
 	}
-	logerror("logic[%04X] <= %02X\n", offset, data);
+	LOG_REGISTER_ACCESS("logic[%04X] <= %02X\n", offset, data);
 }
 
 
@@ -424,12 +465,12 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 READ8_MEMBER(smioc_device::dma8237_2_dmaread)
 {
 	int data = m_smioccpu->space(AS_PROGRAM).read_byte(offset);
-	logerror("dma2read [0x%x] => 0x%x\n", offset, data);
+	LOG_REGISTER_ACCESS("dma2read [0x%x] => 0x%x\n", offset, data);
 	m_scc2698b->write_reg(0x03, data);
 	return data;
 }
 WRITE8_MEMBER(smioc_device::dma8237_2_dmawrite)
 {
-	logerror("dma2write 0x%x\n", data);
+	LOG_REGISTER_ACCESS("dma2write 0x%x\n", data);
 }
 

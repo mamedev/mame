@@ -51,6 +51,8 @@ public:
 
 	u16 m_status;
 	u16 m_status2;
+	u16 m_wordcount;
+	u16 m_wordcount2;
 
 	u8 m_deviceBusy;
 

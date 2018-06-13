@@ -74,6 +74,9 @@
 
 #define ENABLE_TRACE_SMIOC 0
 
+#define ENABLE_TRACE_ALL_DEVICES 1
+
+
 #if ENABLE_TRACE_SMIOC
 #define TRACE_SMIOC_READ(address, data, reg, text) UnifiedTrace((address),(data)," Read", "SMIOC", (reg), (text))
 #define TRACE_SMIOC_WRITE(address, data, reg, text) UnifiedTrace((address),(data),"Write", "SMIOC", (reg), (text))
@@ -81,6 +84,9 @@
 #define TRACE_SMIOC_READ(address, data, reg, text) do {} while (0)
 #define TRACE_SMIOC_WRITE(address, data, reg, text) do {} while (0)
 #endif
+
+
+
 
 class r9751_state : public driver_device
 {
@@ -158,7 +164,142 @@ private:
 	void UnifiedTrace(u32 address, u32 data, const char* operation="Read", const char* Device="SMIOC", const char* RegisterName=nullptr, const char* extraText=nullptr);
 
 	virtual void machine_reset() override;
+	void trace_device(int address, int data, const char* direction);
+
+	uint32_t m_device_trace_enable[2];
+	int m_trace_last_address[64];
+	int m_trace_last_data[64];
+	int m_trace_repeat_count[64];
+	char const * m_trace_last_direction[64];
+	char const * m_generic_command_names[256];
+	void device_trace_init();
+	void device_trace_enable_all();
+	void device_trace_disable(int device);
+
 };
+
+#if ENABLE_TRACE_ALL_DEVICES
+static const char * DeviceNames[] = {
+	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,"??", // 0x00-0x07
+	"??","HDD",nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x08-0x0F
+	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x10-0x17
+	nullptr,nullptr,nullptr,nullptr,"SMIOCb","SMIOCb?","SMIOCb?","SMIOCb?", // 0x18-0x1F - Unclear how wide the range is for the second SMIOC range.
+	nullptr,nullptr,nullptr,nullptr,"SMIOCa","SMIOCa?","SMIOCa","SMIOCa", // 0x20-0x27 - 0x25 SMIOC we have not observed being used yet.
+	"??",nullptr,nullptr,nullptr,"FDC",nullptr,nullptr,nullptr, // 0x28-0x2F
+	"??",nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x30-0x37
+	"SMIOCc?",nullptr,"SMIOCd?",nullptr,nullptr,nullptr,nullptr,"??" // 0x38-0x3F
+};
+struct GenericCommandRecord {
+	int AddressPattern;
+	const char * Name;
+};
+
+static const GenericCommandRecord GenericCommands[] = {
+	{ 0x200, "Clear Status" },
+	{ 0x800, "Status" },
+	{ 0x1000, "Word Count" },
+	{ 0x3000, "Command Result" },
+	{ 0x4000, "Command/etc" },  // Also a write length.
+	{ 0x8000, "various" },  // Read address, 
+	{ 0xC000, "various" },  // Write address, Read length
+};
+
+void r9751_state::device_trace_init()
+{
+	for (int i = 0; i < 64; i++)
+	{
+		m_trace_last_address[i] = -1;
+		m_trace_last_data[i] = -1;
+		m_trace_repeat_count[i] = 0;
+		m_trace_last_direction[i] = nullptr;
+	}
+	for (int i = 0; i < 256; i++)
+	{
+		m_generic_command_names[i] = "?";
+	}
+
+	for (int i = 0; i < sizeof(GenericCommands) / sizeof(GenericCommands[0]); i++)
+	{
+		int index = (GenericCommands[i].AddressPattern & 0xFF00) >> 8;
+		m_generic_command_names[index] = GenericCommands[i].Name;
+	}
+}
+void r9751_state::trace_device(int address, int data, const char* direction)
+{
+	int dev = (address & 0xFF) / 4;
+	char const * devName = "?";
+	char const * regName = "?";
+
+	if (!(m_device_trace_enable[(dev >> 5)] & (1 << (dev & 31))))
+	{
+		// Device is not enabled for tracing.
+		return;
+	}
+	
+	if ((address == m_trace_last_address[dev]) && (data == m_trace_last_data[dev]) && (direction == m_trace_last_direction[dev]))
+	{
+		m_trace_repeat_count[dev]++;
+		return;
+	}
+	// Compute Device and Register name
+	if (DeviceNames[dev] != nullptr)
+	{
+		devName = DeviceNames[dev];
+	}
+
+	if (m_trace_repeat_count[dev] > 0)
+	{
+		regName = m_generic_command_names[(m_trace_last_address[dev] & 0xFF00) >> 8];
+		logerror("Previous access on Device 0x%x (%s) to [%08x] (%s) repeated %d times\n", dev, devName, m_trace_last_address[dev], regName, m_trace_repeat_count[dev]);
+	}
+	m_trace_repeat_count[dev] = 0;
+	m_trace_last_address[dev] = address;
+	m_trace_last_data[dev] = data;
+	m_trace_last_direction[dev] = direction;
+
+	regName = m_generic_command_names[(address & 0xFF00) >> 8];
+
+
+
+	u32 stacktrace[4];
+	u32 basepointer[2];
+	u32 reg_a6 = ptr_m68000->state_int(M68K_A6);
+
+	for (int i = 0; i<4; i++)
+		stacktrace[i] = 0;
+	for (int i = 0; i<2; i++)
+		basepointer[i] = 0;
+
+	stacktrace[0] = m_maincpu->pc();
+	if (reg_a6 + 4 < 0xFFFFFF) stacktrace[1] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6 + 4);
+	if (reg_a6 < 0xFFFFFF && reg_a6 != 0) basepointer[0] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6);
+	if (basepointer[0] + 4 < 0xFFFFFF && basepointer[0] != 0) stacktrace[2] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[0] + 4);
+	if (basepointer[0] < 0xFFFFFF && basepointer[0] != 0) basepointer[1] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[0]);
+	if (basepointer[1] + 4 < 0xFFFFFF && basepointer[1] != 0) stacktrace[3] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[1] + 4);
+
+
+	logerror("Device 0x%x (%s) Register [%08X] (%s) %s %08X (%08X, %08X, %08X, %08X)\n", dev, devName, address, regName, direction, data, stacktrace[0], stacktrace[1], stacktrace[2], stacktrace[3]);
+
+}
+
+#else
+void r9751_state::trace_device(int address, int data, const char* direction) {}
+#endif
+
+void r9751_state::device_trace_enable_all()
+{
+	for (int i = 0; i < sizeof(m_device_trace_enable) / sizeof(m_device_trace_enable[0]); i++)
+	{
+		m_device_trace_enable[i] = 0xFFFFFFFF;
+	}
+}
+void r9751_state::device_trace_disable(int device)
+{
+	device = device & 0x3F;
+	m_device_trace_enable[device >> 5] &= ~(1 << (device & 0x1F));
+}
+
+
 
 void r9751_state::kbd_put(u8 data)
 {
@@ -271,6 +412,11 @@ void r9751_state::init_r9751()
 
 	m_maincpu->interface<m68000_base_device>(ptr_m68000);
 
+	device_trace_init();
+	device_trace_enable_all();
+	device_trace_disable(0x07);
+	device_trace_disable(0x09);
+
 	/* Save states */
 	save_item(NAME(reg_ff050004));
 	save_item(NAME(reg_fff80040));
@@ -305,16 +451,20 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 		if(((offset << 2) & 0xFF) == TRACE_DEVICE * 4)
 			logerror("(!) Device Read: 0x%02X - PC: %08X Register: %08X\n", TRACE_DEVICE, m_maincpu->pc(), offset << 2 | 0x5FF00000);
 
+
 	switch(offset << 2)
 	{
 		/* PDC HDD region (0x24, device 9) */
 		case 0x0824: /* HDD Command result code */
-			return 0x10;
+			data = 0x10;
+			break;
+
 		case 0x3024: /* HDD SCSI command completed successfully */
 			data = 0x1;
 			if(TRACE_HDC) logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, m_maincpu->pc(), offset << 2 | 0x5FF00000);
-			return data;
-		/* SMIOC region (0x98, device 26) */
+			break;
+
+		/* SMIOC region (0x98, device 0x26) */
 		case 0x0898: /* Serial status or DMA status */
 			if(serial_status == 0)
 			{
@@ -338,40 +488,55 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			{
 				data = serial_status;
 			}
-			if(TRACE_SMIOC) logerror("serial_status_queue = %04X \n", data | 0x8);
+			//if(TRACE_SMIOC) logerror("serial_status_queue = %04X \n", data | 0x8);
 			//TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, data | 0x8, "Serial Status 1",  nullptr);
 			//TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, m_smioc->m_status, "(Real)Serial Status 1", nullptr);
 
-			return m_smioc->m_status;
-		case 0x0870: /* Serial status or DMA status 2 */
-			if(TRACE_SMIOC) logerror("m_serial_status2 = %04X \n", m_serial_status2);
+			data = m_smioc->m_status;
+			break;
+
+		case 0x0870: /* Serial status or DMA status 2 (0x70, device 0x24) */
+			//if(TRACE_SMIOC) logerror("m_serial_status2 = %04X \n", m_serial_status2);
 			//TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, m_serial_status2, "Serial Status 2", nullptr);
-			return m_serial_status2;
-		/* SMIOC region (0x9C, device 27) */
+			data = m_smioc->m_status2;
+			break;
+		/* SMIOC region (0x9C, device 0x27) */
 
 		case 0x1098: /* Serial word count register */
-			return m_serial_wordcount;
+			data = m_serial_wordcount;
+			break;
 
 		case 0x2898: /* SMIOC DMA Busy register - nonzero = busy */
-			return m_smioc->m_deviceBusy;
+			data = m_smioc->m_deviceBusy;
+			break;
 
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x08B0: /* FDD Command result code */
-			return 0x10;
+			data = 0x10;
+			break;
+
 		case 0x10B0: /* Clear 5FF030B0 ?? */
 			if(TRACE_FDC) logerror("--- FDD 0x5FF010B0 READ (0)\n");
-			return 0;
+			data = 0;
+			break;
+
 		case 0x1890: /* SMIOC ??? (Bit 7 needs to be set) */
-			return 0x80;
+			data = 0x80;
+			break;
+
 		case 0x30B0: /* FDD command completion status */
 			data = (m_pdc->reg_p5 << 8) + m_pdc->reg_p4;
 			if(TRACE_FDC && data != 0) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, m_maincpu->pc(), offset << 2 | 0x5FF00000);
-			return data;
+			break;
+
 		default:
 			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Unknown read address: %08X PC: %08X\n", offset << 2 | 0x5FF00000, m_maincpu->pc());
 			if(((offset << 2) & 0xFF) == 0x26 * 4 || ((offset << 2) & 0xFF) == 0x27 * 4) TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, 0, "Unknown", nullptr);
-			return 0;
+			data = 0;
+			break;
 	}
+	trace_device(offset << 2 | 0x5FF00000, data, ">>");
+	return data;
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
@@ -383,6 +548,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 	if(TRACE_DEVICE)
 		if(((offset << 2) & 0xFF) == TRACE_DEVICE * 4)
 			logerror("(!) Device Write: 0x%02X - PC: %08X Register: %08X Data: %08X\n", TRACE_DEVICE, m_maincpu->pc(), offset << 2 | 0x5FF00000, data);
+
+	trace_device(offset << 2 | 0x5FF00000, data, "<<");
 
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
@@ -696,7 +863,7 @@ void r9751_state::r9751_mem(address_map &map)
 	map(0xFF010000, 0xFF01FFFF).rw(FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
 	map(0xFF050000, 0xFF06FFFF).rw(FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
 	map(0xFFF80000, 0xFFF8FFFF).rw(FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
-	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
+	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown areaMCFG_QUANTUM_TIME
 }
 
 /******************************************************************************
@@ -713,7 +880,7 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(r9751_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
