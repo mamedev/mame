@@ -622,7 +622,7 @@ uint8_t tms5220_device::new_int_read()
 
 void tms5220_device::data_write(int data)
 {
-	int old_buffer_low = m_buffer_low;
+	bool old_buffer_low = m_buffer_low;
 	LOGMASKED(LOG_DUMP_INPUT_DATA, "%c", data);
 
 	if (m_DDIS) // If we're in speak external mode
@@ -637,21 +637,21 @@ void tms5220_device::data_write(int data)
 			update_fifo_status_and_ints();
 
 			// if we just unset buffer low with that last write, and SPEN *was* zero (see circuit 251, sheet 12)
-			if ((m_SPEN == 0) && ((old_buffer_low == 1) && (m_buffer_low == 0))) // MUST HAVE EDGE DETECT
+			if ((!m_SPEN) && (old_buffer_low && (!m_buffer_low))) // MUST HAVE EDGE DETECT
 			{
 				LOGMASKED(LOG_FIFO, "data_write triggered SPEN to go active!\n");
 				// ...then we now have enough bytes to start talking; set zpar and clear out the new frame parameters (it will become old frame just before the first call to parse_frame() )
-				m_zpar = 1;
-				m_uv_zpar = 1; // zero k4-k10 as well
-				m_OLDE = 1; // 'silence/zpar' frames are zero energy
-				m_OLDP = 1; // 'silence/zpar' frames are zero pitch
+				m_zpar = true;
+				m_uv_zpar = true; // zero k4-k10 as well
+				m_OLDE = true; // 'silence/zpar' frames are zero energy
+				m_OLDP = true; // 'silence/zpar' frames are zero pitch
 #ifdef TMS5220_PERFECT_INTERPOLATION_HACK
-				m_old_zpar = 1; // zero all the old parameters
-				m_old_uv_zpar = 1; // zero old k4-k10 as well
+				m_old_zpar = true; // zero all the old parameters
+				m_old_uv_zpar = true; // zero old k4-k10 as well
 #endif
-				m_SPEN = 1;
+				m_SPEN = true;
 #ifdef FAST_START_HACK
-				m_TALK = 1;
+				m_TALK = true;
 #endif
 				m_new_frame_energy_idx = 0;
 				m_new_frame_pitch_idx = 0;
@@ -714,12 +714,12 @@ void tms5220_device::update_fifo_status_and_ints()
 		// generate an interrupt if necessary; if /BL was inactive and is now active, set int.
 		if (!m_buffer_low)
 		{
-			m_buffer_low = 1;
+			m_buffer_low = true;
 			set_interrupt_state(1);
 		}
 	}
 	else
-		m_buffer_low = 0;
+		m_buffer_low = false;
 
 	/* BE is set if neither byte 15 nor 14 of the fifo are in use; this
 	translates to having fifo_count equal to exactly 0
@@ -729,22 +729,22 @@ void tms5220_device::update_fifo_status_and_ints()
 		// generate an interrupt if necessary; if /BE was inactive and is now active, set int.
 		if (!m_buffer_empty)
 		{
-			m_buffer_empty = 1;
+			m_buffer_empty = true;
 			set_interrupt_state(1);
 		}
 		if (m_DDIS)
-			m_TALK = m_SPEN = 0; // /BE being active clears the TALK status via TCON, which in turn clears SPEN, but ONLY if m_DDIS is set! See patent page 16, gate 232b
+			m_TALK = m_SPEN = false; // /BE being active clears the TALK status via TCON, which in turn clears SPEN, but ONLY if m_DDIS is set! See patent page 16, gate 232b
 	}
 	else
-		m_buffer_empty = 0;
+		m_buffer_empty = false;
 
 	// generate an interrupt if /TS was active, and is now inactive.
 	// also, in this case, regardless if DDIS was set, unset it.
-	if ((m_previous_talk_status == 1) && (talk_status() == 0))
+	if (m_previous_talk_status && !talk_status())
 	{
 		LOGMASKED(LOG_GENERAL, "Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
 		set_interrupt_state(1);
-		m_DDIS = 0;
+		m_DDIS = false;
 	}
 	m_previous_talk_status = talk_status();
 
@@ -819,7 +819,7 @@ int tms5220_device::status_read()
 	if (m_RDB_flag)
 	{   /* if last command was read, return data register */
 		m_RDB_flag = false;
-		return(m_data_register);
+		return(m_read_byte_register);
 	}
 	else
 	{   /* read status */
@@ -837,7 +837,7 @@ int tms5220_device::status_read()
 
 ***********************************************************************************************/
 
-int tms5220_device::ready_read()
+bool tms5220_device::ready_read()
 {
 	LOGMASKED(LOG_PIN_READS, "ready_read: ready pin read, io_ready is %d, fifo count is %d, DDIS(speak external) is %d\n", m_io_ready, m_fifo_count, m_DDIS);
 
@@ -851,7 +851,7 @@ int tms5220_device::ready_read()
 
 ***********************************************************************************************/
 
-int tms5220_device::int_read()
+bool tms5220_device::int_read()
 {
 	LOGMASKED(LOG_PIN_READS, "int_read: irq pin read, state is %d\n", m_irq_pin);
 
@@ -905,7 +905,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				/* if the new frame is a stop frame, unset both TALK and SPEN (via TCON). TALKD remains active while the energy is ramping to 0. */
 				if (new_frame_stop_flag())
 				{
-					m_TALK = m_SPEN = 0;
+					m_TALK = m_SPEN = false;
 					update_fifo_status_and_ints(); // probably not necessary...
 				}
 
@@ -916,19 +916,19 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				 * Old frame was unvoiced, new is voiced
 				 * Old frame was unvoiced, new frame is silence/zero energy (non-existent on tms51xx rev D and F (present and working on tms52xx, present but buggy on tms51xx rev A and B))
 				 */
-				if ( ((old_frame_unvoiced_flag() == 0) && new_frame_unvoiced_flag())
-					|| ((old_frame_unvoiced_flag() == 1) && !new_frame_unvoiced_flag())
-					|| ((old_frame_silence_flag() == 1) && !new_frame_silence_flag())
-					//|| ((m_inhibit == 1) && (old_frame_unvoiced_flag() == 1) && new_frame_silence_flag()) ) //TMS51xx INTERP BUG1
-					|| ((old_frame_unvoiced_flag() == 1) && new_frame_silence_flag()) )
-					m_inhibit = 1;
+				if ( (!old_frame_unvoiced_flag() && new_frame_unvoiced_flag())
+					|| (old_frame_unvoiced_flag() && !new_frame_unvoiced_flag())
+					|| (old_frame_silence_flag() && !new_frame_silence_flag())
+					//|| (m_inhibit && old_frame_unvoiced_flag() && new_frame_silence_flag()) ) //TMS51xx INTERP BUG1
+					|| (old_frame_unvoiced_flag() && new_frame_silence_flag()) )
+					m_inhibit = true;
 				else // normal frame, normal interpolation
-					m_inhibit = 0;
+					m_inhibit = false;
 
 				/* Debug info for current parsed frame */
 				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", old_frame_silence_flag(), new_frame_silence_flag(), old_frame_unvoiced_flag(), new_frame_unvoiced_flag());
 				LOGMASKED(LOG_GENERATION, "Processing new frame: ");
-				if (m_inhibit == 0)
+				if (!m_inhibit)
 					LOGMASKED(LOG_GENERATION, "Normal Frame\n");
 				else
 					LOGMASKED(LOG_GENERATION, "Interpolation Inhibited\n");
@@ -950,7 +950,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 			}
 			else // Not a new frame, just interpolate the existing frame.
 			{
-				int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
+				bool inhibit_state = (m_inhibit && (m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
 #ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 				int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 				//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
@@ -971,7 +971,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				}
 				else // we're done, play this frame for 1/8 frame.
 				{
-					if (m_subcycle == 2) m_pitch_zero = 0; // this reset happens around the second subcycle during IP=0
+					if (m_subcycle == 2) m_pitch_zero = false; // this reset happens around the second subcycle during IP=0
 					m_current_energy = (m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar));
 					m_current_pitch = (m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar));
 					for (i = 0; i < m_coeff->num_k; i++)
@@ -1003,7 +1003,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 			}
 
 			// calculate the output
-			if (old_frame_unvoiced_flag() == 1)
+			if (old_frame_unvoiced_flag())
 			{
 				// generate unvoiced samples here
 				if (m_RNG & 1)
@@ -1011,7 +1011,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				else
 					m_excitation_data = 0x40;
 			}
-			else /* (old_frame_unvoiced_flag() == 0) */
+			else /* (!old_frame_unvoiced_flag()) */
 			{
 				// generate voiced samples here
 				/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
@@ -1085,13 +1085,13 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				 * According to testing the pitch zeroing lasts approximately 2 samples.
 				 * We set the zeroing latch here, and unset it on PC=1 in the generator.
 				 */
-				if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_zero = 1;
+				if ((m_IP == 7) && m_inhibit) m_pitch_zero = true;
 				if (m_IP == 7) // RESETL4
 				{
 					// Latch OLDE and OLDP
-					//if (old_frame_silence_flag()) m_uv_zpar = 0; // TMS51xx INTERP BUG2
-					m_OLDE = new_frame_silence_flag() ? 1 : 0; // old_frame_silence_flag()
-					m_OLDP = new_frame_unvoiced_flag()? 1 : 0; // old_frame_unvoiced_flag()
+					//if (old_frame_silence_flag()) m_uv_zpar = false; // TMS51xx INTERP BUG2
+					m_OLDE = new_frame_silence_flag(); // old_frame_silence_flag()
+					m_OLDP = new_frame_unvoiced_flag(); // old_frame_unvoiced_flag()
 					/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
 
 					LOGMASKED(LOG_GENERATION, "RESETL4, about to update status: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
@@ -1100,14 +1100,14 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 
 					m_TALKD = m_TALK; // TALKD is latched from TALK
 					update_fifo_status_and_ints(); // to trigger an interrupt if talk_status has changed
-					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
+					if ((!m_TALK) && m_SPEN) m_TALK = true; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 
 					LOGMASKED(LOG_GENERATION, "RESETL4, status updated: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 				}
 				m_subcycle = m_subc_reload;
 				m_PC = 0;
 				m_IP++;
-				m_IP&=0x7;
+				m_IP &= 0x7;
 			}
 			else if (m_subcycle == 3)
 			{
@@ -1115,7 +1115,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				m_PC++;
 			}
 			m_pitch_count++;
-			if ((m_pitch_count >= m_current_pitch)||(m_pitch_zero == 1)) m_pitch_count = 0;
+			if ((m_pitch_count >= m_current_pitch) || m_pitch_zero) m_pitch_count = 0;
 			m_pitch_count &= 0x1FF;
 		}
 		else // m_TALKD == 0
@@ -1127,7 +1127,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				{
 					m_TALKD = m_TALK; // TALKD is latched from TALK
 					update_fifo_status_and_ints(); // probably not necessary
-					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
+					if ((!m_TALK) && m_SPEN) m_TALK = true; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 				}
 				m_subcycle = m_subc_reload;
 				m_PC = 0;
@@ -1292,9 +1292,9 @@ void tms5220_device::process_command(unsigned char cmd)
 	switch (cmd & 0x70)
 	{
 	case 0x10 : /* read byte */
-		if (talk_status() == 0) /* TALKST must be clear for RDBY */
+		LOGMASKED(LOG_COMMAND_VERBOSE, "Read Byte command received\n");
+		if (!talk_status()) /* TALKST must be clear for RDBY */
 		{
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Read Byte command received\n");
 			if (m_schedule_dummy_read)
 			{
 				m_schedule_dummy_read = false;
@@ -1302,7 +1302,7 @@ void tms5220_device::process_command(unsigned char cmd)
 					m_speechrom->read(1);
 			}
 			if (m_speechrom)
-				m_data_register = m_speechrom->read(8);    /* read one byte from speech ROM... */
+				m_read_byte_register = m_speechrom->read(8);    /* read one byte from speech ROM... */
 			m_RDB_flag = true;
 		}
 		else
@@ -1312,7 +1312,7 @@ void tms5220_device::process_command(unsigned char cmd)
 	case 0x00: case 0x20: /* set rate (tms5220c and cd2501ecd only), otherwise NOP */
 		if (TMS5220_HAS_RATE_CONTROL)
 		{
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Set Rate command received\n");
+			LOGMASKED(LOG_COMMAND_VERBOSE, "Set Rate (or NOP) command received\n");
 			m_c_variant_rate = cmd&0x0F;
 		}
 		else
@@ -1320,22 +1320,19 @@ void tms5220_device::process_command(unsigned char cmd)
 		break;
 
 	case 0x30 : /* read and branch */
-		if (talk_status() == 0) /* TALKST must be clear for RB */
+		if (!talk_status()) /* TALKST must be clear for RB */
 		{
 			LOGMASKED(LOG_COMMAND_VERBOSE, "Read and Branch command received\n");
 			m_RDB_flag = false;
 			if (m_speechrom)
 				m_speechrom->read_and_branch();
 		}
-		else
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Read and Branch command received during TALK state, ignoring!\n");
 		break;
 
 	case 0x40 : /* load address */
-		if (talk_status() == 0) /* TALKST must be clear for LA */
+		LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received\n");
+		if (!talk_status()) /* TALKST must be clear for LA */
 		{
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received\n");
-
 			/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
 			   This code does not care about this. */
 			if (m_speechrom)
@@ -1358,14 +1355,14 @@ void tms5220_device::process_command(unsigned char cmd)
 #ifdef FAST_START_HACK
 		m_TALK = 1;
 #endif
-		m_DDIS = 0;
-		m_zpar = 1; // zero all the parameters
-		m_uv_zpar = 1; // zero k4-k10 as well
-		m_OLDE = 1; // 'silence/zpar' frames are zero energy
-		m_OLDP = 1; // 'silence/zpar' frames are zero pitch
+		m_DDIS = false; // speak using VSM
+		m_zpar = true; // zero all the parameters
+		m_uv_zpar = true; // zero k4-k10 as well
+		m_OLDE = true; // 'silence/zpar' frames are zero energy
+		m_OLDP = true; // 'silence/zpar' frames are zero pitch
 #ifdef TMS5220_PERFECT_INTERPOLATION_HACK
-		m_old_zpar = 1; // zero all the old parameters
-		m_old_uv_zpar = 1; // zero old k4-k10 as well
+		m_old_zpar = true; // zero all the old parameters
+		m_old_uv_zpar = true; // zero old k4-k10 as well
 #endif
 		// following is semi-hack but matches idle state observed on chip
 		m_new_frame_energy_idx = 0;
@@ -1381,17 +1378,17 @@ void tms5220_device::process_command(unsigned char cmd)
 	case 0x60 : /* speak external */
 		LOGMASKED(LOG_COMMAND_VERBOSE, "Speak External command received\n");
 
-		// SPKEXT going active activates SPKEE which clears the fifo
+		// SPKEXT going active asserts /SPKEE for 2 clocks, which clears the FIFO and its counters
 		m_fifo_head = m_fifo_tail = m_fifo_count = m_fifo_bits_taken = 0;
-		// SPEN is enabled when the fifo passes half full (falling edge of BL signal)
-		m_DDIS = 1;
-		m_zpar = 1; // zero all the parameters
-		m_uv_zpar = 1; // zero k4-k10 as well
-		m_OLDE = 1; // 'silence/zpar' frames are zero energy
-		m_OLDP = 1; // 'silence/zpar' frames are zero pitch
+		// SPEN is enabled when the FIFO passes half full (falling edge of BL signal)
+		m_DDIS = true; // speak using FIFO
+		m_zpar = true; // zero all the parameters
+		m_uv_zpar = true; // zero k4-k10 as well
+		m_OLDE = true; // 'silence/zpar' frames are zero energy
+		m_OLDP = true; // 'silence/zpar' frames are zero pitch
 #ifdef TMS5220_PERFECT_INTERPOLATION_HACK
-		m_old_zpar = 1; // zero all the old parameters
-		m_old_uv_zpar = 1; // zero old k4-k10 as well
+		m_old_zpar = true; // zero all the old parameters
+		m_old_uv_zpar = true; // zero old k4-k10 as well
 #endif
 		// following is semi-hack but matches idle state observed on chip
 		m_new_frame_energy_idx = 0;
@@ -1476,7 +1473,7 @@ void tms5220_device::parse_frame()
 	printbits(m_new_frame_pitch_idx, m_coeff->pitch_bits);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
-	m_uv_zpar = new_frame_unvoiced_flag() ? 1 : 0;
+	m_uv_zpar = new_frame_unvoiced_flag();
 	update_fifo_status_and_ints();
 	if (m_DDIS && m_buffer_empty) goto ranout;
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
@@ -1547,13 +1544,14 @@ void tms5220_device::set_interrupt_state(int state)
 
 void tms5220_device::update_ready_state()
 {
-	int state = ready_read();
-
-	LOGMASKED(LOG_PIN_READS, "ready pin set to state %d\n", state);
-
-	if (!m_readyq_handler.isnull() && state != m_ready_pin)
-		m_readyq_handler(!state);
-	m_ready_pin = state;
+	bool state = m_io_ready;
+	if (m_ready_pin != state)
+	{
+		LOGMASKED(LOG_PIN_READS, "ready pin set to state %d\n", state);
+		if (!m_readyq_handler.isnull())
+			m_readyq_handler(!state);
+		m_ready_pin = state;
+	}
 }
 
 
@@ -1623,8 +1621,8 @@ void tms5220_device::device_start()
 	m_timer_io_ready = timer_alloc(0);
 
 	/* not during reset which is called from within a write! */
-	m_io_ready = 1;
-	m_true_timing = 0;
+	m_io_ready = true;
+	m_true_timing = false;
 	m_rs_ws = 0x03; // rs and ws are assumed to be inactive on device startup
 
 	register_for_save_states();
@@ -1643,10 +1641,10 @@ void tms5220_device::device_reset()
 
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if m_buffer_empty or m_buffer_low are 0 */
-	m_SPEN = m_DDIS = m_TALK = m_TALKD = m_previous_talk_status = m_irq_pin = m_ready_pin = 0;
+	m_SPEN = m_DDIS = m_TALK = m_TALKD = m_previous_talk_status = m_irq_pin = m_ready_pin = false;
 	set_interrupt_state(0);
 	update_ready_state();
-	m_buffer_empty = m_buffer_low = 1;
+	m_buffer_empty = m_buffer_low = true;
 
 	m_RDB_flag = false;
 
@@ -1654,24 +1652,24 @@ void tms5220_device::device_reset()
 #ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
 	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
-	m_old_zpar = 0;
+	m_old_zpar = false;
 #endif
 	m_new_frame_energy_idx = m_current_energy =  m_previous_energy = 0;
 	m_new_frame_pitch_idx = m_current_pitch = 0;
-	m_zpar = m_uv_zpar = 0;
+	m_zpar = m_uv_zpar = false;
 	memset(m_new_frame_k_idx, 0, sizeof(m_new_frame_k_idx));
 	memset(m_current_k, 0, sizeof(m_current_k));
 
 	/* initialize the sample generators */
-	m_inhibit = 1;
+	m_inhibit = true;
 	m_subcycle = m_c_variant_rate = m_pitch_count = m_PC = 0;
 	m_subc_reload = FORCE_SUBC_RELOAD;
-	m_OLDE = m_OLDP = 1;
+	m_OLDE = m_OLDP = true;
 	m_IP = reload_table[m_c_variant_rate&0x3];
 	m_RNG = 0x1FFF;
 	memset(m_u, 0, sizeof(m_u));
 	memset(m_x, 0, sizeof(m_x));
-	m_schedule_dummy_read = 0;
+	m_schedule_dummy_read = false;
 
 	if (m_speechrom)
 	{
@@ -1744,7 +1742,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
  */
 WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 {
-	m_true_timing = 1;
+	m_true_timing = true;
 	state &= 0x01;
 	LOGMASKED(LOG_RS_WS, "/RS written with data: %d\n", state);
 
@@ -1776,7 +1774,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 			/* high to low - schedule ready cycle */
 			LOGMASKED(LOG_RS_WS, "Scheduling ready cycle for /RS...\n");
 			/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
-			m_io_ready = 0;
+			m_io_ready = false;
 			update_ready_state();
 			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
 			m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
@@ -1789,7 +1787,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
  */
 WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 {
-	m_true_timing = 1;
+	m_true_timing = true;
 	state &= 0x01;
 	LOGMASKED(LOG_RS_WS, "/WS written with data: %d\n", state);
 
@@ -1822,7 +1820,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 			LOGMASKED(LOG_RS_WS, "Scheduling ready cycle for /WS...\n");
 
 			/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
-			m_io_ready = 0;
+			m_io_ready = false;
 			update_ready_state();
 			/* Now comes the complicated part: how long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
 			Speak external mode: ~16 cycles
@@ -1848,7 +1846,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 {
 	uint8_t falling_edges;
-	m_true_timing = 1;
+	m_true_timing = true;
 	LOGMASKED(LOG_RS_WS, "/RS and /WS written with %d and %d respectively\n", (data&2)>>1, data&1);
 
 	uint8_t new_val = data & 0x03;
@@ -1877,7 +1875,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				LOGMASKED(LOG_RS_WS, "Scheduling ready cycle for /WS...\n");
 
 				/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
-				m_io_ready = 0;
+				m_io_ready = false;
 				update_ready_state();
 
 				/* Now comes the complicated part: how long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
@@ -1901,7 +1899,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				LOGMASKED(LOG_RS_WS, "Scheduling ready cycle for /RS...\n");
 
 				/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
-				m_io_ready = 0;
+				m_io_ready = false;
 				update_ready_state();
 
 				/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
