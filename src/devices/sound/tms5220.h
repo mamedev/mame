@@ -90,8 +90,6 @@ public:
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );
 
-	attotime time_to_ready();
-
 protected:
 	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
@@ -120,7 +118,6 @@ private:
 	int extract_bits(int count);
 	int status_read();
 	int ready_read();
-	int cycles_to_ready();
 	int int_read();
 	void process(int16_t *buffer, unsigned int size);
 	int16_t clip_analog(int16_t cliptemp) const;

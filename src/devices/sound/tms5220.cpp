@@ -841,49 +841,6 @@ int tms5220_device::ready_read()
 
 /**********************************************************************************************
 
-     tms5220_cycles_to_ready -- returns the number of cycles until ready is asserted
-     NOTE: this function is deprecated and is known to be VERY inaccurate.
-     Use at your own peril!
-
-***********************************************************************************************/
-
-int tms5220_device::cycles_to_ready()
-{
-	int answer;
-
-
-	if (ready_read())
-		answer = 0;
-	else
-	{
-		int val;
-		int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
-		int current_sample = ((m_PC*(3-m_subc_reload))+((m_subc_reload?38:25)*m_IP));
-		answer = samples_per_frame-current_sample+8;
-
-		// total number of bits available in current byte is (8 - m_fifo_bits_taken)
-		// if more than 4 are available, we need to check the energy
-		if (m_fifo_bits_taken < 4)
-		{
-			// read energy
-			val = (m_fifo[m_fifo_head] >> m_fifo_bits_taken) & 0xf;
-			if (val == 0)
-				/* 0 -> silence frame: we will only read 4 bits, and we will
-				 * therefore need to read another frame before the FIFO is not
-				 * full any more */
-				answer += m_subc_reload?200:304;
-			/* 15 -> stop frame, we will only read 4 bits, but the FIFO will
-			 * we cleared; otherwise, we need to parse the repeat flag (1 bit)
-			 * and the pitch (6 bits), so everything will be OK. */
-		}
-	}
-
-	return answer;
-}
-
-
-/**********************************************************************************************
-
      tms5220_int_read -- returns the interrupt state of the TMS5220
 
 ***********************************************************************************************/
@@ -2020,21 +1977,6 @@ READ_LINE_MEMBER( tms5220_device::readyq_r )
 	/* bring up to date first */
 	m_stream->update();
 	return !ready_read();
-}
-
-
-
-/**********************************************************************************************
-
-     tms5220_time_to_ready -- return the time until the ready line is asserted
-
-***********************************************************************************************/
-
-attotime tms5220_device::time_to_ready()
-{
-	/* bring up to date first */
-	m_stream->update();
-	return clocks_to_attotime(cycles_to_ready() * 80);
 }
 
 
