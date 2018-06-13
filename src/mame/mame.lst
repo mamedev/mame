@@ -70,8 +70,10 @@ flagrall                        // ?
 3do                             // 3DO consoles
 3do_pal                         //
 3dobios                         //
+alg3do							//
 md23do                          //
 orbatak                         //
+sht3do							//
 
 @source:3x3puzzl.cpp
 3x3puzzl                        // (c) 199? Ace

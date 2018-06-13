@@ -212,21 +212,17 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) )
+	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
+	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
+	ROM_COPY( "bios", 0, 0, 0x200000 )
 #endif
 
 ROM_START(3do)
 	NTSC_BIOS
-
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 ROM_END
 
 ROM_START(3dobios)
 	NTSC_BIOS
-	
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 ROM_END
 
 ROM_START(3do_pal)
@@ -244,24 +240,38 @@ ROM_END
 
 ROM_START(orbatak)
 	NTSC_BIOS
-
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 	
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
 ROM_END
 
-ROM_START(md23do)
-	ROM_REGION32_BE( 0x200000, "bios", 0 )
-	ROM_LOAD( "soat_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) ) // TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF
+#define ALG_BIOS \
+	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
+	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
+	ROM_LOAD( "soat_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) )  \
+	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
+	ROM_COPY( "bios", 0, 0, 0x200000 ) \
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+ROM_START(alg3do)
+	ALG_BIOS
+ROM_END
+
+
+ROM_START(md23do)
+	ALG_BIOS
 	
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "md23do", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "mad dog ii", 0, SHA1(0117c1fd279f42e942648ca55fa75dd45da37a4f) )
 ROM_END
+
+ROM_START(sht3do)
+	ALG_BIOS
+	
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "shootout at old tucson", 0, SHA1(bd42213c6b460b5b6153a8b2b41d0a114171e86e) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -270,11 +280,21 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE       INIT        COMPANY            FULLNAME      FLAGS */
-CONS( 1991, 3do,     0,      0,      _3do,       3do,    _3do_state, empty_init, "The 3DO Company", "3DO (NTSC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1991, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init, "The 3DO Company", "3DO (PAL)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// console section
+CONS( 1993, 3do,     0,      0,      _3do,       3do,    _3do_state, empty_init, "The 3DO Company", "3DO (NTSC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1993, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init, "The 3DO Company", "3DO (PAL)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 /*    YEAR  NAME     PARENT   MACHINE  INPUT  STATE       INIT        MONITOR   COMPANY                 FULLNAME               FLAGS */
-GAME( 1991, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+// Misc 3do Arcade games
+GAME( 1993, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+
 GAME( 199?, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "<unknown>",            "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, md23do,  0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Beavis and Butthead (prototype)
+
+
+// American Laser Games uses its own BIOS (with additional protection according to serial output?)
+GAME( 1993, alg3do, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+
+GAME( 199?, md23do,  alg3do, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, sht3do,  alg3do, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
