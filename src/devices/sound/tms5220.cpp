@@ -810,11 +810,12 @@ void tms5220_device::perform_dummy_read()
 
 /**********************************************************************************************
 
-     tms5220_status_read -- read status or data from the TMS5220
+     tms5220_status_read -- read status or data from the TMS5220; if the bool is 1, clear interrupt
+     state.
 
 ***********************************************************************************************/
 
-int tms5220_device::status_read()
+uint8_t tms5220_device::status_read(bool clear_int)
 {
 	if (m_RDB_flag)
 	{   /* if last command was read, return data register */
@@ -824,7 +825,8 @@ int tms5220_device::status_read()
 	else
 	{   /* read status */
 		/* clear the interrupt pin on status read */
-		set_interrupt_state(0);
+		if (clear_int)
+			set_interrupt_state(0);
 		LOGMASKED(LOG_PIN_READS, "Status read: TS=%d BL=%d BE=%d\n", talk_status(), m_buffer_low, m_buffer_empty);
 		return (talk_status() << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);// | (m_write_latch & 0x1f); // low 5 bits are open bus, so use the m_write_latch value.
 	}
@@ -1720,8 +1722,8 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				/* Read */
 				/* bring up to date first */
 				m_stream->update();
-				m_read_latch = status_read();
-				LOGMASKED(LOG_IO_READY, "Serviced read, returning %02x\n", m_read_latch);
+				m_read_latch = status_read(true);
+				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced read, returning %02x\n", m_read_latch);
 				break;
 			case 0x03:
 				/* High Impedance */
@@ -1947,13 +1949,15 @@ void tms5220_device::write_data(uint8_t data)
 uint8_t tms5220_device::read_status()
 {
 	// prevent debugger from changing the internal state
-	if (machine().side_effects_disabled()) return 0;
+	if (!machine().side_effects_disabled())
+		m_stream->update(); /* bring up to date first */
 
 	if (!m_true_timing)
 	{
-		/* bring up to date first */
-		m_stream->update();
-		return status_read();
+		// prevent debugger from changing the internal state
+		if (machine().side_effects_disabled())
+			return status_read(false);
+		return status_read(true);
 	}
 	else
 	{

@@ -116,7 +116,7 @@ private:
 	void data_write(int data);
 	void update_fifo_status_and_ints();
 	int extract_bits(int count);
-	int status_read();
+	uint8_t status_read(bool clear_int);
 	bool ready_read();
 	bool int_read();
 	void process(int16_t *buffer, unsigned int size);
