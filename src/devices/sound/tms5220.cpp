@@ -825,8 +825,8 @@ int tms5220_device::status_read()
 	{   /* read status */
 		/* clear the interrupt pin on status read */
 		set_interrupt_state(0);
-		LOGMASKED(LOG_PIN_READS, "Status read: TS=%d BL=%d BE=%d\n", TALK_STATUS(), m_buffer_low, m_buffer_empty);
-		return (TALK_STATUS() << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);
+		LOGMASKED(LOG_PIN_READS, "Status read: TS=%d BL=%d BE=%d\n", talk_status(), m_buffer_low, m_buffer_empty);
+		return (talk_status() << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);// | (m_write_latch & 0x1f); // low 5 bits are open bus, so use the m_write_latch value.
 	}
 }
 
@@ -867,7 +867,7 @@ bool tms5220_device::int_read()
 
 void tms5220_device::process(int16_t *buffer, unsigned int size)
 {
-	int buf_count=0;
+	int buf_count = 0;
 	int i, bitout;
 	int32_t this_sample;
 
@@ -1752,14 +1752,14 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 		m_rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, ? for cd2501ecd
+			if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, probably also correct for cd2501ecd
 				reset();
 			else
 				/* illegal */
 				LOGMASKED(LOG_RS_WS, "tms5220_rsq_w: illegal\n");
 			return;
 		}
-		else if ( new_val == 3)
+		else if (new_val == 3)
 		{
 			/* high impedance */
 			m_read_latch = 0xff;
@@ -1776,8 +1776,9 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 			/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = false;
 			update_ready_state();
-			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
-			m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
+			/* How long does /READY stay inactive, when /RS is pulled low? It might be always ~16 clocks (25 usec at 800khz as shown on the datasheet)
+			 but the patent schematic implies it might be as short as 4 clock cycles. */
+			m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
 		}
 	}
 }
@@ -1961,7 +1962,7 @@ uint8_t tms5220_device::read_status()
 			return m_read_latch;
 		else
 			LOGMASKED(LOG_RS_WS, "tms5220_status_r: data read outside rs!\n");
-		return 0xff;
+		return 0xff; // m_write_latch; // TODO: return open bus?
 	}
 }
 
