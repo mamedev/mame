@@ -83,6 +83,7 @@ public:
 	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	void init_cischeat();
 	void init_bigrun();
 	void init_f1gpstar();
