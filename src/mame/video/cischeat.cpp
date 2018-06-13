@@ -840,41 +840,29 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 uint32_t cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	int active_layers1, flag;
 
-#ifdef MAME_DEBUG
-	/* FAKE Videoreg */
-	active_layers1 = m_active_layers;
-	if (active_layers1 == 0)   active_layers1 = 0x3f;
-#else
-	active_layers1 = 0x3f;
-#endif
-
-#ifdef MAME_DEBUG
-	CISCHEAT_LAYERSCTRL
-#endif
-
-	bitmap.fill(0, cliprect);
-
+	bitmap.fill(0x1000, cliprect);
+	
 	for (i = 7; i >= 4; i--)
-	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,false);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+	{
+		/* bitmap, cliprect, road, min_priority, max_priority, transparency */
+		cischeat_draw_road(bitmap,cliprect,0,i,i,(i != 7));
+		cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+		bigrun_draw_sprites(bitmap,cliprect,i+1,i);
 	}
 
-	flag = 0;
-	cischeat_tmap_DRAW(0)
-	cischeat_tmap_DRAW(1)
+	m_tmap[0]->draw(screen, bitmap, cliprect, 0, 0 );
+	m_tmap[1]->draw(screen, bitmap, cliprect, 0, 0 );
 
 	for (i = 3; i >= 0; i--)
-	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,true);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+	{
+		/* bitmap, cliprect, road, min_priority, max_priority, transparency */
+		cischeat_draw_road(bitmap,cliprect,0,i,i,true);
+		cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+		bigrun_draw_sprites(bitmap,cliprect,i+1,i);
 	}
 
-	if (active_layers1 & 0x08) bigrun_draw_sprites(bitmap,cliprect,15,0);
-
-	cischeat_tmap_DRAW(2)
+	m_tmap[2]->draw(screen, bitmap, cliprect, 0, 0 );
 
 	return 0;
 }
