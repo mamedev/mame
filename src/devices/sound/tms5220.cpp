@@ -842,8 +842,11 @@ uint8_t tms5220_device::status_read(bool clear_int)
 bool tms5220_device::ready_read()
 {
 	LOGMASKED(LOG_PIN_READS, "ready_read: ready pin read, io_ready is %d, fifo count is %d, DDIS(speak external) is %d\n", m_io_ready, m_fifo_count, m_DDIS);
-
-	return ((m_fifo_count < FIFO_SIZE)||(!m_DDIS)) && m_io_ready;
+	// if m_true_timing is NOT set (we're in 'hacky instant write mode'), the m_timer_io_ready doesn't run and will never de-assert m_io_ready if the fifo is full, so we need to explicitly check for fifo full here and return the proper value.
+	if (!m_true_timing)
+		return ((m_fifo_count < FIFO_SIZE)||(!m_DDIS)) && m_io_ready; // SEVERE CAVEAT: this makes the assumption that the ready_read was after wsq was 'virtually asserted', so if the fifo has no room in it ready will always return inactive, even if no write happened (i.e., after a read command when the fifo was exactly filled but no write attempted to overfill it) which is inaccurate to hardware and may cause issues! you have been warned!
+	else
+		return m_io_ready;
 }
 
 
@@ -1705,30 +1708,42 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch(id)
 	{
-	case 0:
-		if (param)
+	case 0: // m_timer_io_ready
+		/* bring up to date first */
+		m_stream->update();
+		LOGMASKED(LOG_IO_READY, "m_timer_io_ready timer fired, param = %02x, m_rs_ws = %02x\n", param, m_rs_ws);
+		if (param) // low->high ready state
 		{
 			switch (m_rs_ws)
 			{
 			case 0x02:
 				/* Write */
-				/* bring up to date first */
-				LOGMASKED(LOG_IO_READY, "Serviced write: %02x\n", m_write_latch);
-				//LOGMASKED(LOG_IO_READY, "Processed write data: %02X\n", m_write_latch);
-				m_stream->update();
-				data_write(m_write_latch);
-				break;
+				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Attempting to service write...\n");
+				if ((m_fifo_count >= FIFO_SIZE) && m_DDIS) // if fifo is full and we're in speak external mode
+				{
+					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: in SPKEXT and FIFO was full! cannot service write now, delaying 16 cycles...\n");
+					m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
+					break;
+				}
+				else
+				{
+					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02x\n", m_write_latch);
+					data_write(m_write_latch);
+					m_io_ready = param;
+					break;
+				}
 			case 0x01:
 				/* Read */
-				/* bring up to date first */
-				m_stream->update();
 				m_read_latch = status_read(true);
 				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced read, returning %02x\n", m_read_latch);
+				m_io_ready = param;
 				break;
 			case 0x03:
 				/* High Impedance */
+				m_io_ready = param;
 			case 0x00:
 				/* illegal */
+				m_io_ready = param;
 				break;
 			}
 		}
@@ -1921,20 +1936,17 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 
 void tms5220_device::write_data(uint8_t data)
 {
-	LOGMASKED(LOG_RS_WS, "tms5220_data_w: data %02x\n", data);
-
-	if (!m_true_timing)
-	{
-		/* bring up to date first */
-		m_stream->update();
-		data_write(data);
-	}
+	LOGMASKED(LOG_RS_WS, "tms5220_write_data: data %02x\n", data);
+	/* bring up to date first */
+	m_stream->update();
+	m_write_latch = data;
+	if (!m_true_timing) // if we're in the default hacky mode where we don't bother with rsq_w and wsq_w...
+		data_write(m_write_latch); // ...force the write through instantly.
 	else
 	{
 		/* actually in a write ? */
 		if (!(m_rs_ws == 0x02))
 			LOGMASKED(LOG_RS_WS, "tms5220_data_w: data written outside ws, status: %02x!\n", m_rs_ws);
-		m_write_latch = data;
 	}
 }
 
