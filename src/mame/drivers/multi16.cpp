@@ -10,6 +10,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

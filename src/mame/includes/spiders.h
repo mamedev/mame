@@ -9,6 +9,7 @@
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 class spiders_state : public driver_device
 {

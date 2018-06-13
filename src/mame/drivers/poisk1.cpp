@@ -35,6 +35,7 @@
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

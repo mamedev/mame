@@ -24,6 +24,7 @@
 #include "formats/rk_cas.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 
 class special_state : public driver_device

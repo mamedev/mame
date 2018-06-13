@@ -37,6 +37,7 @@
 #include "machine/kb3600.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

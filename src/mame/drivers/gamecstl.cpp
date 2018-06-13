@@ -70,6 +70,7 @@
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -12,6 +12,7 @@
 #include "video/k053936.h"
 #include "machine/k054321.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 
 class rungun_state : public driver_device

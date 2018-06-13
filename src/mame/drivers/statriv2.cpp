@@ -76,6 +76,7 @@ quaquiz2 - no inputs, needs NVRAM
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

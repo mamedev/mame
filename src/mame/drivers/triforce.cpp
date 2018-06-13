@@ -443,6 +443,7 @@ Notes:
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/naomigd.h"
+#include "emupal.h"
 #include "screen.h"
 
 

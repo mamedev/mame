@@ -18,6 +18,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

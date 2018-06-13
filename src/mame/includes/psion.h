@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "video/hd44780.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 
 // ======================> psion_state

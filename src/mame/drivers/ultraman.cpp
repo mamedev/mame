@@ -19,6 +19,7 @@
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

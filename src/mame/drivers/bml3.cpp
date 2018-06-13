@@ -25,6 +25,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #include "bus/bml3/bml3bus.h"
 #include "bus/bml3/bml3mp1802.h"

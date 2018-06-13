@@ -26,6 +26,7 @@ and an unpopulated position for a YM2413 or UM3567
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

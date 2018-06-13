@@ -22,6 +22,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

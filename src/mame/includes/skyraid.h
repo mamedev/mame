@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 class skyraid_state : public driver_device
 {

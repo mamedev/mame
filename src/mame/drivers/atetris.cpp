@@ -56,6 +56,7 @@
 #include "sound/pokey.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

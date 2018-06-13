@@ -6,6 +6,7 @@
     Irem M58 hardware
 
 ****************************************************************************/
+#include "emupal.h"
 #include "screen.h"
 
 class m58_state : public driver_device

@@ -51,6 +51,7 @@ E I1     Vectored interrupt error
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

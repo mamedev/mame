@@ -9,6 +9,7 @@
 #define MAME_INCLUDES_SUBS_H
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define SUBS_SONAR1_EN          NODE_01

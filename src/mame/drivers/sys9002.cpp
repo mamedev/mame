@@ -21,6 +21,7 @@ If write to the 6845 is enabled, MAME freezes after 1 or 2 seconds.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"

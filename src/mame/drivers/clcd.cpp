@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

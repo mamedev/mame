@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

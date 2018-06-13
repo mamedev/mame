@@ -64,6 +64,7 @@ ToDo: verify QS1000 hook-up
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -43,6 +43,7 @@
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"

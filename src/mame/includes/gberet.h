@@ -8,6 +8,7 @@
 
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 
 class gberet_state : public driver_device
 {

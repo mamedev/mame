@@ -39,6 +39,7 @@
 #include "bus/a2bus/corvfdc01.h"
 #include "bus/a2bus/corvfdc02.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

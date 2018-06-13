@@ -45,6 +45,7 @@ icq3250a-d
 #include "includes/comquest.h"
 
 #include "cpu/m6805/m6805.h"
+#include "emupal.h"
 #include "screen.h"
 
 

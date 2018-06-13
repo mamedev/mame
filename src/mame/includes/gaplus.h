@@ -3,6 +3,7 @@
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "machine/namcoio.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAX_STARS           250
@@ -22,7 +23,7 @@ public:
 		TIMER_NAMCOIO1_RUN
 	};
 
-    gaplus_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *namco56xx_tag, const char *namco58xx_tag)
+	gaplus_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *namco56xx_tag, const char *namco58xx_tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
@@ -90,7 +91,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-    required_memory_region m_proms_region;
+	required_memory_region m_proms_region;
 
 	required_shared_ptr<uint8_t> m_customio_3;
 	required_shared_ptr<uint8_t> m_videoram;

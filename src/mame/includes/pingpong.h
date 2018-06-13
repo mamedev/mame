@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Parchanski
 
 #include "machine/timer.h"
+#include "emupal.h"
 
 class pingpong_state : public driver_device
 {

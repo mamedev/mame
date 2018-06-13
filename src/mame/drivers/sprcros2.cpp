@@ -56,6 +56,7 @@ SC-61.5A
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

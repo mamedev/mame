@@ -16,6 +16,7 @@
 #include "machine/segag80.h"
 #include "sound/samples.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 
 

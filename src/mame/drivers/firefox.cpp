@@ -41,6 +41,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

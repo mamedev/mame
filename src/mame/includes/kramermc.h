@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_KRAMERMC_H
 
 #include "machine/z80pio.h"
+#include "emupal.h"
 
 class kramermc_state : public driver_device
 {

@@ -62,6 +62,7 @@
 #include "machine/upd765.h"
 #include "sound/upd1771.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

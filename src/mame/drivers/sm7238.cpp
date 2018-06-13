@@ -27,6 +27,7 @@
 #include "machine/pic8259.h"
 #include "machine/km035.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 

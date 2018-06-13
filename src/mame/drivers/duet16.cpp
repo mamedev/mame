@@ -15,6 +15,7 @@
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"

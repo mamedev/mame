@@ -6,6 +6,7 @@
 #include "machine/gen_latch.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 
 class legionna_state : public driver_device, protected seibu_sound_common
 {

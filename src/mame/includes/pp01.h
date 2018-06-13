@@ -19,6 +19,7 @@
 #include "sound/spkrdev.h"
 //#include "sound/wave.h"
 //#include "imagedev/cassette.h"
+#include "emupal.h"
 
 class pp01_state : public driver_device
 {

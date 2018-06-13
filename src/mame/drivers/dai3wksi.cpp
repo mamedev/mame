@@ -43,6 +43,7 @@ Driver Notes:
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

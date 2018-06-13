@@ -179,6 +179,7 @@ Notes:
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

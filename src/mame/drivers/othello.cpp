@@ -48,6 +48,7 @@ Limit for help/undo (matta):
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

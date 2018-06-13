@@ -95,7 +95,6 @@ class address_map; // Forward declaration
 
 // video-related
 #include "drawgfx.h"
-#include "emupal.h"
 #include "tilemap.h"
 #include "video.h"
 

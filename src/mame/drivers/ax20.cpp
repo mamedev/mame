@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "bus/isa/fdc.h"
 #include "cpu/i86/i86.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ax20_state : public driver_device

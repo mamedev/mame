@@ -17,6 +17,7 @@
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #define SCREEN_TAG          "screen"
 #define Z80_TAG             "ic35"

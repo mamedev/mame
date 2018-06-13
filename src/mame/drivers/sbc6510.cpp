@@ -56,6 +56,7 @@ ToDo:
 #include "machine/mos6526.h"
 #include "machine/terminal.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

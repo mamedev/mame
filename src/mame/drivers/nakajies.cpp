@@ -276,6 +276,7 @@ disabled). Perhaps power on/off related??
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

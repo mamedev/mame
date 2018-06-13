@@ -27,6 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

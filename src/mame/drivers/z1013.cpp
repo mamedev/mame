@@ -55,6 +55,7 @@ Due to no input checking, misuse of commands can crash the system.
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -77,6 +77,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

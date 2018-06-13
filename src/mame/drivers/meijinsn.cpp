@@ -67,6 +67,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( d110 )

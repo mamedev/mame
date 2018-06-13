@@ -445,6 +445,7 @@
 #include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

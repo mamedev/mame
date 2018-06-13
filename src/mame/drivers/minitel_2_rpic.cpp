@@ -52,6 +52,7 @@
 #include "machine/timer.h"
 #include "video/ef9345.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

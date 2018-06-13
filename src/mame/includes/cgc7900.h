@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define M68000_TAG      "uh8"

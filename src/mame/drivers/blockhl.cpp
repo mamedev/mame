@@ -29,6 +29,7 @@
 #include "video/k052109.h"
 #include "video/k051960.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 

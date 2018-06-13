@@ -37,6 +37,7 @@
 #include "machine/timer.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

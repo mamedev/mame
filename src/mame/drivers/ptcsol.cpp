@@ -121,6 +121,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

@@ -22,6 +22,7 @@
 #include "video/crt9007.h"
 #include "video/crt9021.h"
 #include "video/crt9212.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define I80186_TAG      "u76"

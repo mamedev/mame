@@ -319,6 +319,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "video/vsystem_gga.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

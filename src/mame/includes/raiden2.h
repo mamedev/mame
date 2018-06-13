@@ -3,6 +3,7 @@
 #include "audio/seibu.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 
 class raiden2_state : public driver_device
 {

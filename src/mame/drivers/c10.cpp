@@ -18,6 +18,7 @@ constantly looking at.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 

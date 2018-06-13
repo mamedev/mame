@@ -96,6 +96,7 @@ Notes:
 #include "machine/tmp68301.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

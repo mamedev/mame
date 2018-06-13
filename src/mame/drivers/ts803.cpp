@@ -55,6 +55,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

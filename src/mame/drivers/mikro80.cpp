@@ -15,6 +15,7 @@
 #include "includes/mikro80.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

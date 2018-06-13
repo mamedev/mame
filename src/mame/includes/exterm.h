@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 
 class exterm_state : public driver_device
 {

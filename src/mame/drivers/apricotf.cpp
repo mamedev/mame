@@ -35,6 +35,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "emupal.h"
 #include "screen.h"
 
 

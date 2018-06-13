@@ -13,6 +13,7 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

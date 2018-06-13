@@ -22,6 +22,7 @@
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

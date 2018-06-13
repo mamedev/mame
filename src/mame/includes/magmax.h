@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 class magmax_state : public driver_device
 {

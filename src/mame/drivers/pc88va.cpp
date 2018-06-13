@@ -36,6 +36,7 @@
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

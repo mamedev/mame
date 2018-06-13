@@ -14,6 +14,7 @@
 #include "audio/svis_snd.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 
 struct svision_t
 {

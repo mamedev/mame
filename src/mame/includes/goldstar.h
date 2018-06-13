@@ -3,6 +3,7 @@
 
 #include "machine/ds2401.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 
 
 class goldstar_state : public driver_device

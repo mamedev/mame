@@ -31,6 +31,7 @@
 
 #include "formats/x1_tap.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

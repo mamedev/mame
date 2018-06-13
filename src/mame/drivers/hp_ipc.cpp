@@ -376,6 +376,7 @@ Software to look for
 
 #include "rendlay.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

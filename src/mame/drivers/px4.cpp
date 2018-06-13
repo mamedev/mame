@@ -24,6 +24,7 @@
 #include "sound/spkrdev.h"
 
 #include "diserial.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

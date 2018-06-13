@@ -16,6 +16,7 @@
 #include "machine/6821pia.h"
 #include "machine/bankdev.h"
 #include "audio/williams.h"
+#include "emupal.h"
 #include "screen.h"
 
 class williams_state : public driver_device

@@ -124,6 +124,7 @@ Notes:
 #include "sound/okim9810.h"
 #include "sound/ymz280b.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

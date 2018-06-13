@@ -7,6 +7,7 @@
 #include "machine/taito68705interface.h"
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 class flstory_state : public driver_device
 {

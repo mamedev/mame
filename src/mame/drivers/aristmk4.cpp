@@ -328,6 +328,7 @@
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

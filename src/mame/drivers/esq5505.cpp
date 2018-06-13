@@ -140,7 +140,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
-
+#include "emupal.h"
 #include "speaker.h"
 
 #include <cstdio>

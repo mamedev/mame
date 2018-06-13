@@ -65,6 +65,7 @@ this requires the -joystick_contradictory switch on the commandline.
 #include "sound/ay8910.h"
 #include "machine/i2cmem.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

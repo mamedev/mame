@@ -68,6 +68,7 @@ Notes:
 #include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 
 

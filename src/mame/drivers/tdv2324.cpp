@@ -103,6 +103,7 @@
 #include "emu.h"
 #include "includes/tdv2324.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

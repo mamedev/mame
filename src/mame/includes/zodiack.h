@@ -3,6 +3,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class zodiack_state : public driver_device
 {

@@ -27,6 +27,7 @@
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

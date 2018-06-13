@@ -37,6 +37,7 @@ SOUND : YM2151 uPD7759C
 #include "machine/i8251.h"
 #include "sound/ym2151.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

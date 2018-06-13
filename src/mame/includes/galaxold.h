@@ -17,6 +17,7 @@
 
 #include "machine/7474.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* star circuit */

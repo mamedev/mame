@@ -3,6 +3,7 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "machine/deco146.h"
+#include "emupal.h"
 
 class sshangha_state : public driver_device
 {

@@ -16,6 +16,7 @@
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 #include "bus/electron/exp.h"
 

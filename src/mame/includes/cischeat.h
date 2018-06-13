@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/ms1_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cischeat_state : public driver_device
