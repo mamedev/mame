@@ -1658,7 +1658,7 @@ void trackfld_state::init_atlantol()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *rom = memregion("maincpu")->base();
 
-	machine().device<konami1_device>("maincpu")->set_encryption_boundary(0x6000);
+	((konami1_device*)m_maincpu.target())->set_encryption_boundary(0x6000);
 
 	space.install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
 	space.nop_write(0x1000, 0x1000);

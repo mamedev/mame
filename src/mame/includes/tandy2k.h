@@ -11,6 +11,7 @@
 #include "imagedev/harddriv.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
+#include "machine/pckeybrd.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
@@ -66,6 +67,7 @@ public:
 		m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		m_hires_ram(*this, "hires_ram"),
 		m_char_ram(*this, "char_ram"),
+		m_pc_keyboard(*this, "pc_keyboard"),
 		m_dma_mux(0),
 		m_kbdclk(0),
 		m_kbddat(0),
@@ -124,6 +126,7 @@ public:
 	required_device<tandy2k_keyboard_device> m_kb;
 	required_shared_ptr<uint16_t> m_hires_ram;
 	optional_shared_ptr<uint8_t> m_char_ram;
+	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
 
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;

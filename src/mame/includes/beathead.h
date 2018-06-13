@@ -21,6 +21,7 @@ public:
 	beathead_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_jsa(*this, "jsa"),
+		m_scan_timer(*this, "scan_timer"),
 		m_videoram(*this, "videoram"),
 		m_vram_bulk_latch(*this, "vram_bulk_latch"),
 		m_palette_select(*this, "palette_select"),
@@ -58,6 +59,7 @@ protected:
 
 private:
 	required_device<atari_jsa_iii_device> m_jsa;
+	required_device<timer_device> m_scan_timer;
 
 	required_shared_ptr<uint32_t> m_videoram;
 
