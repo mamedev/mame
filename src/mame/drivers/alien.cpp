@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /**********************************************************************************
 
-    Capcom Medal hardware (c) 2005 Capcom
+    Capcom Medal / Medalusion / Medalusion 2 hardware (c) 2005 Capcom
 
     skeleton driver
 
@@ -34,8 +34,29 @@
     - S29JL064H 64Mbit FlashROM (TSOP-48)
     - Compact Flash connector
 
-   Known undumped games:
-    - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
+    Games list: http://web.archive.org/web/20090227151212/http://www.capcom.co.jp:80/arcade/medalgame.html
+
+    6-8 player coin pusher machines:
+ *   - Alien: The Arcade Medal Edition (c) 2005
+     - Alien Danger (c) 2007
+     - Chibi Maruko-chan Aim Fuji Nippon Ichi! (c) 2008
+ *   - Donkey Kong Banana Kingdom (c) 2006
+     - Super Mario Fushigi No Korokoro Party 2 (c) 2005
+
+    Single player medal machines:
+    Medalusion:
+     - Chibi Maruko-chan's "Sugoroku Playfully Everyone" Volume (c) 2003
+     - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
+     - Rockman Exe The Medal Operation (c) 2005
+     - Super Mario Fushigi No JanJanLand (c) 2005
+
+    Medalusion 2:
+     - Doko Demo Issho Toro's Fishing (c) 2006
+ *   - Pingu's Ice Block (c) 2005
+     - Shooter Village (c) 2005
+     - Won! Tertainment Happy Channel (c) 2008
+
+ * - dumped
 
 ***********************************************************************************/
 
