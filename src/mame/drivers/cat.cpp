@@ -292,7 +292,7 @@ public:
 	DECLARE_VIDEO_START(cat);
 	void init_cat();
 
-	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
@@ -946,29 +946,29 @@ VIDEO_START_MEMBER(cat_state,cat)
 {
 }
 
-uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t code;
-	int y, x, b;
+	const rgb_t on_color = m_video_invert ? rgb_t::black() : rgb_t::white();
+	const rgb_t off_color = m_video_invert ? rgb_t::white() : rgb_t::black();
 
 	int addr = 0;
 	if (m_video_enable == 1)
 	{
-		for (y = 0; y < 344; y++)
+		for (int y = 0; y < 344; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 42; x++)
+			for (int x = 0; x < 42; x++)
 			{
-				code = m_p_cat_videoram[addr++];
-				for (b = 15; b >= 0; b--)
+				uint16_t code = m_p_cat_videoram[addr++];
+				for (int b = 15; b >= 0; b--)
 				{
-					bitmap.pix16(y, horpos++) = ((code >> b) & 0x01) ^ m_video_invert;
+					bitmap.pix32(y, horpos++) = BIT(code, b) ? on_color : off_color;
 				}
 			}
 		}
 	} else {
 		const rectangle black_area(0, 672 - 1, 0, 344 - 1);
-		bitmap.fill(0, black_area);
+		bitmap.fill(rgb_t::black(), black_area);
 	}
 	return 0;
 }
@@ -1071,9 +1071,6 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_SCREEN_SIZE(672, 344)
 	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
