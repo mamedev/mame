@@ -131,12 +131,12 @@ private:
 	void set_interrupt_state(int state);
 	void update_ready_state();
 
-	uint8_t TALK_STATUS() const { return m_SPEN | m_TALKD; }
-	uint8_t &OLD_FRAME_SILENCE_FLAG() { return m_OLDE; } // 1 if E=0, 0 otherwise.
-	uint8_t &OLD_FRAME_UNVOICED_FLAG() { return m_OLDP; } // 1 if P=0 (unvoiced), 0 if voiced
-	bool NEW_FRAME_STOP_FLAG() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
-	bool NEW_FRAME_SILENCE_FLAG() const { return m_new_frame_energy_idx == 0; } // ditto as above
-	bool NEW_FRAME_UNVOICED_FLAG() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+	uint8_t talk_status() const { return m_SPEN || m_TALKD; }
+	uint8_t &old_frame_silence_flag() { return m_OLDE; } // 1 if E=0, 0 otherwise.
+	uint8_t &old_frame_unvoiced_flag() { return m_OLDP; } // 1 if P=0 (unvoiced), 0 if voiced
+	bool new_frame_stop_flag() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
+	bool new_frame_silence_flag() const { return m_new_frame_energy_idx == 0; } // ditto as above
+	bool new_frame_unvoiced_flag() const { return m_new_frame_pitch_idx == 0; } // ditto as above
 
 	// debugging helper
 	void printbits(long data, int num);
@@ -175,8 +175,8 @@ private:
 	uint8_t m_fifo_bits_taken;
 
 
-	/* these contain global status bits */
-	uint8_t m_previous_TALK_STATUS;      /* this is the OLD value of TALK_STATUS (i.e. previous value of m_SPEN|m_TALKD), needed for generating interrupts on a falling TALK_STATUS edge */
+	/* these contain global status bits (booleans) */
+	uint8_t m_previous_talk_status;      /* this is the OLD value of talk_status (i.e. previous value of m_SPEN|m_TALKD), needed for generating interrupts on a falling talk_status edge */
 	uint8_t m_SPEN;             /* set on speak(or speak external and BL falling edge) command, cleared on stop command, reset command, or buffer out */
 	uint8_t m_DDIS;             /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
 	uint8_t m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */

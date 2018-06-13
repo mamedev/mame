@@ -453,7 +453,8 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_fifo_count));
 	save_item(NAME(m_fifo_bits_taken));
 
-	save_item(NAME(m_previous_TALK_STATUS));
+	// global status bits (booleans)
+	save_item(NAME(m_previous_talk_status));
 	save_item(NAME(m_SPEN));
 	save_item(NAME(m_DDIS));
 	save_item(NAME(m_TALK));
@@ -726,13 +727,13 @@ void tms5220_device::update_fifo_status_and_ints()
 
 	// generate an interrupt if /TS was active, and is now inactive.
 	// also, in this case, regardless if DDIS was set, unset it.
-	if ((m_previous_TALK_STATUS == 1) && (TALK_STATUS() == 0))
+	if ((m_previous_talk_status == 1) && (talk_status() == 0))
 	{
 		LOGMASKED(LOG_GENERAL, "Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
 		set_interrupt_state(1);
 		m_DDIS = 0;
 	}
-	m_previous_TALK_STATUS = TALK_STATUS();
+	m_previous_talk_status = talk_status();
 
 }
 
@@ -943,17 +944,17 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				 * Old frame was unvoiced, new is voiced
 				 * Old frame was unvoiced, new frame is silence/zero energy (non-existent on tms51xx rev D and F (present and working on tms52xx, present but buggy on tms51xx rev A and B))
 				 */
-				if ( ((OLD_FRAME_UNVOICED_FLAG() == 0) && NEW_FRAME_UNVOICED_FLAG())
-					|| ((OLD_FRAME_UNVOICED_FLAG() == 1) && !NEW_FRAME_UNVOICED_FLAG())
-					|| ((OLD_FRAME_SILENCE_FLAG() == 1) && !NEW_FRAME_SILENCE_FLAG())
-					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG() == 1) && NEW_FRAME_SILENCE_FLAG()) ) //TMS51xx INTERP BUG1
-					|| ((OLD_FRAME_UNVOICED_FLAG() == 1) && NEW_FRAME_SILENCE_FLAG()) )
+				if ( ((old_frame_unvoiced_flag() == 0) && new_frame_unvoiced_flag())
+					|| ((old_frame_unvoiced_flag() == 1) && !new_frame_unvoiced_flag())
+					|| ((old_frame_silence_flag() == 1) && !new_frame_silence_flag())
+					//|| ((m_inhibit == 1) && (old_frame_unvoiced_flag() == 1) && new_frame_silence_flag()) ) //TMS51xx INTERP BUG1
+					|| ((old_frame_unvoiced_flag() == 1) && new_frame_silence_flag()) )
 					m_inhibit = 1;
 				else // normal frame, normal interpolation
 					m_inhibit = 0;
 
 				/* Debug info for current parsed frame */
-				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG(), NEW_FRAME_SILENCE_FLAG(), OLD_FRAME_UNVOICED_FLAG(), NEW_FRAME_UNVOICED_FLAG());
+				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", old_frame_silence_flag(), new_frame_silence_flag(), old_frame_unvoiced_flag(), new_frame_unvoiced_flag());
 				LOGMASKED(LOG_GENERATION, "Processing new frame: ");
 				if (m_inhibit == 0)
 					LOGMASKED(LOG_GENERATION, "Normal Frame\n");
@@ -1030,7 +1031,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 			}
 
 			// calculate the output
-			if (OLD_FRAME_UNVOICED_FLAG() == 1)
+			if (old_frame_unvoiced_flag() == 1)
 			{
 				// generate unvoiced samples here
 				if (m_RNG & 1)
@@ -1038,7 +1039,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				else
 					m_excitation_data = 0x40;
 			}
-			else /* (OLD_FRAME_UNVOICED_FLAG() == 0) */
+			else /* (old_frame_unvoiced_flag() == 0) */
 			{
 				// generate voiced samples here
 				/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
@@ -1116,9 +1117,9 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				if (m_IP == 7) // RESETL4
 				{
 					// Latch OLDE and OLDP
-					//if (OLD_FRAME_SILENCE_FLAG()) m_uv_zpar = 0; // TMS51xx INTERP BUG2
-					OLD_FRAME_SILENCE_FLAG() = NEW_FRAME_SILENCE_FLAG() ? 1 : 0; // m_OLDE
-					OLD_FRAME_UNVOICED_FLAG() = NEW_FRAME_UNVOICED_FLAG() ? 1 : 0; // m_OLDP
+					//if (old_frame_silence_flag()) m_uv_zpar = 0; // TMS51xx INTERP BUG2
+					m_OLDE = new_frame_silence_flag() ? 1 : 0; // old_frame_silence_flag()
+					m_OLDP = new_frame_unvoiced_flag()? 1 : 0; // old_frame_unvoiced_flag()
 					/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
 
 					LOGMASKED(LOG_GENERATION, "RESETL4, about to update status: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
@@ -1126,7 +1127,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 						LOGMASKED(LOG_GENERATION, "tms5220_process: processing frame: TALKD = 0 caused by stop frame or buffer empty, halting speech.\n");
 
 					m_TALKD = m_TALK; // TALKD is latched from TALK
-					update_fifo_status_and_ints(); // to trigger an interrupt if TALK_STATUS has changed
+					update_fifo_status_and_ints(); // to trigger an interrupt if talk_status has changed
 					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 
 					LOGMASKED(LOG_GENERATION, "RESETL4, status updated: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
@@ -1319,7 +1320,7 @@ void tms5220_device::process_command(unsigned char cmd)
 	switch (cmd & 0x70)
 	{
 	case 0x10 : /* read byte */
-		if (TALK_STATUS() == 0) /* TALKST must be clear for RDBY */
+		if (talk_status() == 0) /* TALKST must be clear for RDBY */
 		{
 			LOGMASKED(LOG_COMMAND_VERBOSE, "Read Byte command received\n");
 			if (m_schedule_dummy_read)
@@ -1347,7 +1348,7 @@ void tms5220_device::process_command(unsigned char cmd)
 		break;
 
 	case 0x30 : /* read and branch */
-		if (TALK_STATUS() == 0) /* TALKST must be clear for RB */
+		if (talk_status() == 0) /* TALKST must be clear for RB */
 		{
 			LOGMASKED(LOG_COMMAND_VERBOSE, "Read and Branch command received\n");
 			m_RDB_flag = false;
@@ -1359,7 +1360,7 @@ void tms5220_device::process_command(unsigned char cmd)
 		break;
 
 	case 0x40 : /* load address */
-		if (TALK_STATUS() == 0) /* TALKST must be clear for LA */
+		if (talk_status() == 0) /* TALKST must be clear for LA */
 		{
 			LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received\n");
 
@@ -1503,7 +1504,7 @@ void tms5220_device::parse_frame()
 	printbits(m_new_frame_pitch_idx, m_coeff->pitch_bits);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
-	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG() ? 1 : 0;
+	m_uv_zpar = new_frame_unvoiced_flag() ? 1 : 0;
 	update_fifo_status_and_ints();
 	if (m_DDIS && m_buffer_empty) goto ranout;
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
@@ -1670,7 +1671,7 @@ void tms5220_device::device_reset()
 
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if m_buffer_empty or m_buffer_low are 0 */
-	m_SPEN = m_DDIS = m_TALK = m_TALKD = m_previous_TALK_STATUS = m_irq_pin = m_ready_pin = 0;
+	m_SPEN = m_DDIS = m_TALK = m_TALKD = m_previous_talk_status = m_irq_pin = m_ready_pin = 0;
 	set_interrupt_state(0);
 	update_ready_state();
 	m_buffer_empty = m_buffer_low = 1;
