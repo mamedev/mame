@@ -713,8 +713,10 @@ void tms5220_device::update_fifo_status_and_ints()
 	{
 		// generate an interrupt if necessary; if /BL was inactive and is now active, set int.
 		if (!m_buffer_low)
+		{
+			m_buffer_low = 1;
 			set_interrupt_state(1);
-		m_buffer_low = 1;
+		}
 	}
 	else
 		m_buffer_low = 0;
@@ -726,8 +728,10 @@ void tms5220_device::update_fifo_status_and_ints()
 	{
 		// generate an interrupt if necessary; if /BE was inactive and is now active, set int.
 		if (!m_buffer_empty)
+		{
+			m_buffer_empty = 1;
 			set_interrupt_state(1);
-		m_buffer_empty = 1;
+		}
 		if (m_DDIS)
 			m_TALK = m_SPEN = 0; // /BE being active clears the TALK status via TCON, which in turn clears SPEN, but ONLY if m_DDIS is set! See patent page 16, gate 232b
 	}
