@@ -1924,12 +1924,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 
 
 
-#define STD_FM_CLOCK    3000000
-#define STD_OKI_CLOCK     (1584000)
-
-
-
-
 MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
