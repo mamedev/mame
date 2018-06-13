@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 
-/* TODO: some variables are per-game specifics */
+#ifndef MAME_INCLUDES_CISCHEAT_H
+#define MAME_INCLUDES_CISCHEAT_H
+
+// TODO: better inheritance, eventually split individual driver files
 
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
@@ -119,7 +122,6 @@ public:
 	void f1gpstar(machine_config &config);
 	void captflag(machine_config &config);
 	void bigrun(machine_config &config);
-	void wildplt(machine_config &config);
 	void armchmp2_map(address_map &map);
 	void bigrun_map(address_map &map);
 	void bigrun_map2(address_map &map);
@@ -140,7 +142,6 @@ public:
 	void f1gpstr2_map(address_map &map);
 	void f1gpstr2_sound_map(address_map &map);
 	void scudhamm_map(address_map &map);
-	void wildplt_map(address_map &map);
 
 protected:
 	virtual void machine_start() override { m_leds.resolve(); }
@@ -196,3 +197,24 @@ protected:
 	uint16_t m_captflag_leds;
 	output_finder<5> m_leds;
 };
+
+class wildplt_state : public cischeat_state
+{
+public:
+	wildplt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cischeat_state(mconfig, type, tag)
+	{}
+
+	uint16_t *m_buffer_spriteram;
+	void wildplt_map(address_map &map);
+	void wildplt(machine_config &config);
+	DECLARE_WRITE16_MEMBER(sprite_dma_w);
+
+protected:
+	virtual void video_start() override;
+	
+private:
+	uint16_t m_sprite_dma_reg;
+};
+
+#endif
