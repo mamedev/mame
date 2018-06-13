@@ -8,11 +8,11 @@
 #include "debugger.h"
 #include "i86inline.h"
 
-#define LOG_PORTS           1
+#define LOG_PORTS           0
 #define LOG_INTERRUPTS      0
 #define LOG_INTERRUPTS_EXT  0
 #define LOG_TIMER           0
-#define LOG_DMA             1
+#define LOG_DMA             0
 
 /* external int priority masks */
 
