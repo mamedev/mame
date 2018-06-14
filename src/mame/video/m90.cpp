@@ -319,21 +319,21 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 		/* Setup scrolling */
 		if (layer->control & 0x20)
 		{
-			m_pf_layer[laynum].tmap->set_scroll_rows(512);
-			m_pf_layer[laynum].wide_tmap->set_scroll_rows(512);
+			layer->tmap->set_scroll_rows(512);
+			layer->wide_tmap->set_scroll_rows(512);
 
 			for (int i = 0; i < 512; i++)
 			{
-				m_pf_layer[laynum].tmap->set_scrollx(i, m_video_data[rowscroll_offs[laynum] + i] + rowscroll_bias[laynum]);
-				m_pf_layer[laynum].wide_tmap->set_scrollx(i, m_video_data[rowscroll_offs[laynum] + i] + rowscroll_bias[laynum] + 256);
+				layer->tmap->set_scrollx(i, m_video_data[rowscroll_offs[laynum] + i] + rowscroll_bias[laynum]);
+				layer->wide_tmap->set_scrollx(i, m_video_data[rowscroll_offs[laynum] + i] + rowscroll_bias[laynum] + 256);
 			}
 		}
 		else
 		{
-			m_pf_layer[laynum].tmap->set_scroll_rows(1);
-			m_pf_layer[laynum].wide_tmap->set_scroll_rows(1);
-			m_pf_layer[laynum].tmap->set_scrollx(0, m_video_control_data[1 | (laynum<<1)] + rowscroll_bias[laynum]);
-			m_pf_layer[laynum].wide_tmap->set_scrollx(0, m_video_control_data[1 | (laynum<<1)] + rowscroll_bias[laynum] + 256);
+			layer->tmap->set_scroll_rows(1);
+			layer->wide_tmap->set_scroll_rows(1);
+			layer->tmap->set_scrollx(0, m_video_control_data[1 | (laynum<<1)] + rowscroll_bias[laynum]);
+			layer->wide_tmap->set_scrollx(0, m_video_control_data[1 | (laynum<<1)] + rowscroll_bias[laynum] + 256);
 		}
 	}
 
