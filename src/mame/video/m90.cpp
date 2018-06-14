@@ -83,6 +83,7 @@ void m90_state::common_tilemap_init()
 
 		// fix for bootlegs
 		layer->vram_base = laynum << 14;
+		layer->control   = 0;
 
 		save_item(NAME(layer->vram_base), laynum);
 		save_item(NAME(layer->control), laynum);
@@ -283,6 +284,7 @@ WRITE16_MEMBER(m90_state::video_control_w)
 				if ((old ^ m_video_control_data[5]) & 2)
 					m_pf_layer[0].wide_tmap->mark_all_dirty();
 			}
+			m_pf_layer[0].control = m_video_control_data[5];
 			break;
 		case 6:
 			if ((old ^ m_video_control_data[6]) & 3)
@@ -292,14 +294,13 @@ WRITE16_MEMBER(m90_state::video_control_w)
 				if ((old ^ m_video_control_data[6]) & 2)
 					m_pf_layer[1].wide_tmap->mark_all_dirty();
 			}
+			m_pf_layer[1].control = m_video_control_data[6];
 			break;
 	}
 }
 
 uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const layer_ctrl[2] = { m_video_control_data[5], m_video_control_data[6] };
-
 	bool const video_enable = !(m_video_control_data[7] & 0x04);
 	bool const pf_enable[2] = { !(m_video_control_data[5] & 0x10), !(m_video_control_data[6] & 0x10) };
 	int const clip_miny = std::min(cliprect.min_y, 511);
@@ -312,26 +313,27 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 
 	constexpr int rowscroll_offs[2] = { 0xf000 >> 1, 0xf400 >> 1 };
 	constexpr int rowscroll_bias[2] = { 2, -2 };
-	for (int layer = 0; layer < 2; layer++)
+	for (int laynum = 0; laynum < 2; laynum++)
 	{
+		M90_pf_layer_info *layer = &m_pf_layer[laynum];
 		/* Setup scrolling */
-		if (layer_ctrl[layer] & 0x20)
+		if (layer->control & 0x20)
 		{
-			m_pf_layer[layer].tmap->set_scroll_rows(512);
-			m_pf_layer[layer].wide_tmap->set_scroll_rows(512);
+			m_pf_layer[laynum].tmap->set_scroll_rows(512);
+			m_pf_layer[laynum].wide_tmap->set_scroll_rows(512);
 
 			for (int i = 0; i < 512; i++)
 			{
-				m_pf_layer[layer].tmap->set_scrollx(i, m_video_data[rowscroll_offs[layer] + i] + rowscroll_bias[layer]);
-				m_pf_layer[layer].wide_tmap->set_scrollx(i, m_video_data[rowscroll_offs[layer] + i] + rowscroll_bias[layer] + 256);
+				m_pf_layer[laynum].tmap->set_scrollx(i, m_video_data[rowscroll_offs[laynum] + i] + rowscroll_bias[laynum]);
+				m_pf_layer[laynum].wide_tmap->set_scrollx(i, m_video_data[rowscroll_offs[laynum] + i] + rowscroll_bias[laynum] + 256);
 			}
 		}
 		else
 		{
-			m_pf_layer[layer].tmap->set_scroll_rows(1);
-			m_pf_layer[layer].wide_tmap->set_scroll_rows(1);
-			m_pf_layer[layer].tmap->set_scrollx(0, m_video_control_data[1 | (layer<<1)] + rowscroll_bias[layer]);
-			m_pf_layer[layer].wide_tmap->set_scrollx(0, m_video_control_data[1 | (layer<<1)] + rowscroll_bias[layer] + 256);
+			m_pf_layer[laynum].tmap->set_scroll_rows(1);
+			m_pf_layer[laynum].wide_tmap->set_scroll_rows(1);
+			m_pf_layer[laynum].tmap->set_scrollx(0, m_video_control_data[1 | (laynum<<1)] + rowscroll_bias[laynum]);
+			m_pf_layer[laynum].wide_tmap->set_scrollx(0, m_video_control_data[1 | (laynum<<1)] + rowscroll_bias[laynum] + 256);
 		}
 	}
 
@@ -346,7 +348,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 	if (pf_enable[1])
 	{
 		// use the playfield 2 y-offset table for each scanline
-		if (layer_ctrl[1] & 0x40)
+		if (m_pf_layer[1].control & 0x40)
 		{
 			rectangle clip;
 			clip.min_x = cliprect.min_x;
@@ -356,7 +358,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 			{
 				clip.min_y = clip.max_y = line;
 
-				if (layer_ctrl[1] & 0x4)
+				if (m_pf_layer[1].control & 0x4)
 				{
 					m_pf_layer[1].wide_tmap->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
 					m_pf_layer[1].wide_tmap->draw(screen, bitmap, clip, 0,0);
@@ -372,7 +374,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 		}
 		else
 		{
-			if (layer_ctrl[1] & 0x4)
+			if (m_pf_layer[1].control & 0x4)
 			{
 				m_pf_layer[1].wide_tmap->set_scrolly(0, m_video_control_data[2] );
 				m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
@@ -394,7 +396,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 	if (pf_enable[0])
 	{
 		// use the playfield 1 y-offset table for each scanline
-		if (layer_ctrl[0] & 0x40)
+		if (m_pf_layer[0].control & 0x40)
 		{
 			rectangle clip;
 			clip.min_x = cliprect.min_x;
@@ -404,7 +406,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 			{
 				clip.min_y = clip.max_y = line;
 
-				if (layer_ctrl[0] & 0x4)
+				if (m_pf_layer[0].control & 0x4)
 				{
 					m_pf_layer[0].wide_tmap->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
 					m_pf_layer[0].wide_tmap->draw(screen, bitmap, clip, 0,0);
@@ -420,7 +422,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 		}
 		else
 		{
-			if (layer_ctrl[0] & 0x4)
+			if (m_pf_layer[0].control & 0x4)
 			{
 				m_pf_layer[0].wide_tmap->set_scrolly(0, m_video_control_data[0] );
 				m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 0,0);

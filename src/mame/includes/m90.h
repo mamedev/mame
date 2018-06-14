@@ -8,6 +8,7 @@ struct M90_pf_layer_info
 	tilemap_t *     tmap;
 	tilemap_t *     wide_tmap;
 	uint16_t        vram_base;
+	uint16_t        control;
 };
 
 class m90_state : public driver_device
