@@ -7,6 +7,7 @@
 #include "sound/k005289.h"
 #include "sound/vlm5030.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

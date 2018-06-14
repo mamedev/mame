@@ -4,6 +4,7 @@
 #include "cpu/m6805/m68705.h"
 
 #include "sound/2203intf.h"
+#include "emupal.h"
 
 
 class mexico86_state : public driver_device

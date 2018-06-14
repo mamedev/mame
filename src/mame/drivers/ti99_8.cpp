@@ -222,7 +222,8 @@ public:
 		m_ioport(*this, TI99_IOPORT_TAG),
 		m_mainboard(*this, TI998_MAINBOARD_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
-		m_cassette(*this, "cassette")
+		m_cassette(*this, "cassette"),
+		m_keyboard(*this, "COL%u", 0U)
 	{
 	}
 
@@ -286,6 +287,8 @@ private:
 	required_device<bus::ti99::internal::mainboard8_device>  m_mainboard;
 	required_device<bus::ti99::joyport::joyport_device> m_joyport;
 	required_device<cassette_image_device> m_cassette;
+
+	required_ioport_array<14> m_keyboard;
 };
 
 /*
@@ -306,10 +309,10 @@ void ti99_8_state::memmap(address_map &map)
 
 void ti99_8_state::crumap(address_map &map)
 {
-	map(0x0000, 0x02ff).r(this, FUNC(ti99_8_state::cruread));
+	map(0x0000, 0x02ff).r(FUNC(ti99_8_state::cruread));
 	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x17ff).w(this, FUNC(ti99_8_state::cruwrite));
+	map(0x0000, 0x17ff).w(FUNC(ti99_8_state::cruwrite));
 	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
 }
 
@@ -448,11 +451,6 @@ WRITE8_MEMBER( ti99_8_state::cruwrite )
     keyboard column selection.)
 ***************************************************************************/
 
-static const char *const column[] = {
-	"COL0", "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7",
-	"COL8", "COL9", "COL10", "COL11", "COL12", "COL13"
-};
-
 READ8_MEMBER( ti99_8_state::read_by_9901 )
 {
 	int answer=0;
@@ -477,7 +475,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		answer = (answer << 6);
 		if (m_int1 == CLEAR_LINE) answer |= 0x02;
@@ -502,7 +500,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		answer = (answer >> 2) & 0x07;
 		break;

@@ -118,7 +118,7 @@ READ8_MEMBER( midway_cheap_squeak_deluxe_device::stat_r )
 
 WRITE8_MEMBER( midway_cheap_squeak_deluxe_device::sr_w )
 {
-	m_pia->portb_w(data & 0x0f);
+	m_pia->write_portb(data & 0x0f);
 }
 
 //-------------------------------------------------

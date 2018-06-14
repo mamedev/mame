@@ -41,6 +41,7 @@ PCB:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -220,13 +221,13 @@ void albazg_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa7fc, 0xa7fc).w(this, FUNC(albazg_state::prot_lock_w));
+	map(0xa7fc, 0xa7fc).w(FUNC(albazg_state::prot_lock_w));
 	map(0xa7ff, 0xa7ff).portw("EEPROMOUT");
-	map(0xaf80, 0xafff).rw(this, FUNC(albazg_state::custom_ram_r), FUNC(albazg_state::custom_ram_w)).share("cus_ram");
+	map(0xaf80, 0xafff).rw(FUNC(albazg_state::custom_ram_r), FUNC(albazg_state::custom_ram_w)).share("cus_ram");
 	map(0xb000, 0xb07f).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xb080, 0xb0ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(albazg_state::yumefuda_vram_w)).share("videoram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(albazg_state::yumefuda_cram_w)).share("colorram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(albazg_state::yumefuda_vram_w)).share("videoram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(albazg_state::yumefuda_cram_w)).share("colorram");
 	map(0xe000, 0xffff).ram();
 }
 
@@ -367,7 +368,7 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_DEVICE_IO_MAP(port_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown

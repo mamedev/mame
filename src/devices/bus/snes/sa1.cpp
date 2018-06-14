@@ -1137,9 +1137,9 @@ WRITE8_MEMBER( sns_sa1_device::sa1_lo_w )
 
 void sns_sa1_device::sa1_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(sns_sa1_device::sa1_lo_r), FUNC(sns_sa1_device::sa1_lo_w));
+	map(0x000000, 0x7dffff).rw(FUNC(sns_sa1_device::sa1_lo_r), FUNC(sns_sa1_device::sa1_lo_w));
 	map(0x7e0000, 0x7fffff).noprw();
-	map(0x800000, 0xffffff).rw(this, FUNC(sns_sa1_device::sa1_hi_r), FUNC(sns_sa1_device::sa1_hi_w));
+	map(0x800000, 0xffffff).rw(FUNC(sns_sa1_device::sa1_hi_r), FUNC(sns_sa1_device::sa1_hi_w));
 }
 
 

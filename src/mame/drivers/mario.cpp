@@ -146,13 +146,13 @@ void mario_state::mario_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
 	map(0x7000, 0x73ff).ram().share("spriteram"); /* physical sprite ram */
-	map(0x7400, 0x77ff).ram().w(this, FUNC(mario_state::mario_videoram_w)).share("videoram");
-	map(0x7c00, 0x7c00).portr("IN0").w(this, FUNC(mario_state::mario_sh1_w)); /* Mario run sample */
-	map(0x7c80, 0x7c80).portr("IN1").w(this, FUNC(mario_state::mario_sh2_w)); /* Luigi run sample */
-	map(0x7d00, 0x7d00).w(this, FUNC(mario_state::mario_scroll_w));
-	map(0x7e00, 0x7e00).w(this, FUNC(mario_state::mario_sh_tuneselect_w));
+	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
+	map(0x7c00, 0x7c00).portr("IN0").w(FUNC(mario_state::mario_sh1_w)); /* Mario run sample */
+	map(0x7c80, 0x7c80).portr("IN1").w(FUNC(mario_state::mario_sh2_w)); /* Luigi run sample */
+	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
+	map(0x7e00, 0x7e00).w(FUNC(mario_state::mario_sh_tuneselect_w));
 	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x7f00, 0x7f07).w(this, FUNC(mario_state::mario_sh3_w)); /* Sound port */
+	map(0x7f00, 0x7f07).w(FUNC(mario_state::mario_sh3_w)); /* Sound port */
 	map(0x7f80, 0x7f80).portr("DSW");    /* DSW */
 	map(0xf000, 0xffff).rom();
 }
@@ -162,13 +162,13 @@ void mario_state::masao_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
 	map(0x7000, 0x73ff).ram().share("spriteram"); /* physical sprite ram */
-	map(0x7400, 0x77ff).ram().w(this, FUNC(mario_state::mario_videoram_w)).share("videoram");
+	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
 	map(0x7c00, 0x7c00).portr("IN0");
 	map(0x7c80, 0x7c80).portr("IN1");
-	map(0x7d00, 0x7d00).w(this, FUNC(mario_state::mario_scroll_w));
+	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
 	map(0x7e00, 0x7e00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x7f00, 0x7f00).w(this, FUNC(mario_state::masao_sh_irqtrigger_w));
+	map(0x7f00, 0x7f00).w(FUNC(mario_state::masao_sh_irqtrigger_w));
 	map(0x7f80, 0x7f80).portr("DSW");    /* DSW */
 	map(0xf000, 0xffff).rom();
 }
@@ -176,7 +176,7 @@ void mario_state::masao_map(address_map &map)
 void mario_state::mario_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));  /* dma controller */
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));  /* dma controller */
 }
 
 

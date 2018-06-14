@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "pc_t1t.h"
 
-#include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "screen.h"
 
@@ -65,6 +64,7 @@ pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const 
 
 pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
+	m_pic8259(*this, ":pic8259"),
 	m_jxkanji(nullptr)
 {
 }
@@ -1034,5 +1034,5 @@ WRITE_LINE_MEMBER( pcvideo_pcjr_device::pcjr_vsync_changed )
 	{
 		m_pc_framecnt++;
 	}
-	machine().device<pic8259_device>("pic8259")->ir5_w(state);
+	m_pic8259->ir5_w(state);
 }

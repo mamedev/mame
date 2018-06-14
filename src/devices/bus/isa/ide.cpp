@@ -26,12 +26,12 @@ WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
 
 void isa16_ide_device::map(address_map &map)
 {
-	map(0x0, 0x7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x0, 0x7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 }
 
 void isa16_ide_device::alt_map(address_map &map)
 {
-	map(0x6, 0x6).rw(this, FUNC(isa16_ide_device::ide16_alt_r), FUNC(isa16_ide_device::ide16_alt_w));
+	map(0x6, 0x6).rw(FUNC(isa16_ide_device::ide16_alt_r), FUNC(isa16_ide_device::ide16_alt_w));
 }
 
 WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)

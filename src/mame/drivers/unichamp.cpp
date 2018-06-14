@@ -44,6 +44,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -109,8 +110,8 @@ PALETTE_INIT_MEMBER(unichamp_state, unichamp)
 void unichamp_state::unichamp_mem(address_map &map)
 {
 	map.global_mask(0x1FFF); //B13/B14/B15 are grounded!
-	map(0x0000, 0x00FF).rw(this, FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
-	map(0x0100, 0x07FF).rw(this, FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
+	map(0x0000, 0x00FF).rw(FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
+	map(0x0100, 0x07FF).rw(FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
 	map(0x0800, 0x0FFF).rom().region("maincpu", 0);   // Carts and EXE ROM, 10-bits wide
 }
 

@@ -1023,17 +1023,17 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
     -x-- ----   Hopper Motor (inverted).
     x--- ----   HOLD4 lamp.
 */
-	output().set_lamp_value(0, 1-((data >> 1) & 1));  /* Hold1 (inverted) */
-	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* Hold3 (inverted, see pinouts) */
+	m_lamps[0] = BIT(~data, 1);  /* Hold1 (inverted) */
+	m_lamps[2] = BIT(~data, 1);  /* Hold3 (inverted, see pinouts) */
 
-	output().set_lamp_value(1, 1-((data >> 3) & 1));  /* Hold2 / Low (inverted) */
-	output().set_lamp_value(3, (data >> 7) & 1);      /* Hold4 / High */
-	output().set_lamp_value(5, 1-((data >> 5) & 1));  /* Cancel / Collect (inverted) */
+	m_lamps[1] = BIT(~data, 3);  /* Hold2 / Low (inverted) */
+	m_lamps[3] = BIT(data, 7);      /* Hold4 / High */
+	m_lamps[5] = BIT(~data, 5);  /* Cancel / Collect (inverted) */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Credit In counter */
 	machine().bookkeeping().coin_counter_w(7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
 
-	output().set_lamp_value(7, 1-((data >> 6) & 1));      /* Hopper Motor (inverted) */
+	m_lamps[7] = BIT(~data, 6);      /* Hopper Motor (inverted) */
 
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
@@ -1047,8 +1047,8 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
     ---- -x--   Unknown (inverted).
     xxxx x---   Unknown.
 */
-	output().set_lamp_value(4, (data >> 0) & 1);      /* Hold5 / Bet */
-	output().set_lamp_value(6, (data >> 1) & 1);      /* Start / Deal / Draw */
+	m_lamps[4] = BIT(data, 0);      /* Hold5 / Bet */
+	m_lamps[6] = BIT(data, 1);      /* Start / Deal / Draw */
 
 //  popmessage("Lamps B: %02X", data);
 }
@@ -1075,8 +1075,8 @@ void funworld_state::funworld_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x4000, 0x4000).nopr();
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xffff).rom();
@@ -1111,11 +1111,11 @@ void funworld_state::funquiz_map(address_map &map)
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	map(0x1800, 0x1800).w(this, FUNC(funworld_state::question_bank_w));
+	map(0x1800, 0x1800).w(FUNC(funworld_state::question_bank_w));
 
-	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
-	map(0x4000, 0x7fff).r(this, FUNC(funworld_state::questions_r));
+	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x7fff).r(FUNC(funworld_state::questions_r));
 
 	map(0xc000, 0xffff).rom();
 }
@@ -1132,8 +1132,8 @@ void funworld_state::magicrd2_map(address_map &map)
 	map(0x2c00, 0x2cff).ram(); /* range for protection */
 	map(0x3600, 0x36ff).ram(); /* some games use $3603-05 range for protection */
 	map(0x3c00, 0x3cff).ram(); /* range for protection */
-	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x4fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x6000, 0xffff).rom();
 }
 
@@ -1149,8 +1149,8 @@ void funworld_state::cuoreuno_map(address_map &map)
 	map(0x2000, 0x2000).nopr(); /* some unknown reads */
 	map(0x3e00, 0x3fff).ram(); /* some games use $3e03-05 range for protection */
 	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
-	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1176,10 +1176,10 @@ void funworld_state::chinatow_map(address_map &map)
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2000, 0x2000).nopr(); /* some unknown reads */
-	map(0x32f0, 0x32ff).r(this, FUNC(funworld_state::chinatow_r_32f0));
+	map(0x32f0, 0x32ff).r(FUNC(funworld_state::chinatow_r_32f0));
 	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
-	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1192,8 +1192,8 @@ void funworld_state::lunapark_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram").mirror(0x2000);
-	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram").mirror(0x2000);
+	map(0x4000, 0x4fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram").mirror(0x2000);
+	map(0x5000, 0x5fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram").mirror(0x2000);
 	map(0x8000, 0xffff).bankr("bank1");
 }
 
@@ -1210,8 +1210,8 @@ void funworld_state::saloon_map(address_map &map)
 	map(0x1800, 0x1800).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x1800, 0x1801).w("ay8910", FUNC(ay8910_device::address_data_w));
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
-	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1237,8 +1237,8 @@ void funworld_state::witchryl_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x4fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x6000, 0x6000).portr("DSW2");
 	map(0x8000, 0xffff).rom();
 }
@@ -1248,12 +1248,12 @@ void funworld_state::intergames_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));           // WRONG. just a placeholder...
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));  // WRONG. just a placeholder...
-	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
 	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3001, 0x3001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x3400, 0x3403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // the bookkeeping mode requests a byte from $3400 to advance pages...
 	map(0x3800, 0x3803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // WRONG. just a placeholder...
-	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1266,8 +1266,8 @@ void funworld_state::fw_a7_11_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x4000, 0x4000).nopr();
 	map(0x8000, 0xbfff).ram();
 	map(0xc000, 0xffff).rom();
@@ -3046,13 +3046,14 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-MACHINE_START_MEMBER(funworld_state, lunapark)
+void lunapark_state::machine_start()
 {
+	funworld_state::machine_start();
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-MACHINE_RESET_MEMBER(funworld_state, lunapark)
+void lunapark_state::machine_reset()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -3189,12 +3190,10 @@ MACHINE_CONFIG_START(funworld_state::witchryl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(funworld_state::lunapark)
+MACHINE_CONFIG_START(lunapark_state::lunapark)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
-	MCFG_MACHINE_START_OVERRIDE(funworld_state, lunapark)
-	MCFG_MACHINE_RESET_OVERRIDE(funworld_state, lunapark)
 MACHINE_CONFIG_END
 
 
@@ -7109,8 +7108,8 @@ GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  funworld_state, empty_ini
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  funworld_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  funworld_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  lunapark_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  lunapark_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
 GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 3)",                               0,                       layout_jollycrd ) // regular video RAM 6000/7000.
 GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 

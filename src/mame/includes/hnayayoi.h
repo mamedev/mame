@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "sound/msm5205.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 class hnayayoi_state : public driver_device
 {

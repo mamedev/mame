@@ -16,6 +16,7 @@
 #include "sound/wave.h"
 #include "formats/rk_cas.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -31,10 +32,10 @@ void bk_state::bk0010_mem(address_map &map)
 	map(0xa000, 0xbfff).rom();  // ROM
 	map(0xc000, 0xdfff).rom();  // ROM
 	map(0xe000, 0xfeff).rom();  // ROM
-	map(0xffb0, 0xffb1).rw(this, FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
-	map(0xffb2, 0xffb3).r(this, FUNC(bk_state::bk_key_code_r));
-	map(0xffb4, 0xffb5).rw(this, FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
-	map(0xffce, 0xffcf).rw(this, FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
+	map(0xffb0, 0xffb1).rw(FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
+	map(0xffb2, 0xffb3).r(FUNC(bk_state::bk_key_code_r));
+	map(0xffb4, 0xffb5).rw(FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
+	map(0xffce, 0xffcf).rw(FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
 }
 
 void bk_state::bk0010fd_mem(address_map &map)
@@ -45,12 +46,12 @@ void bk_state::bk0010fd_mem(address_map &map)
 	map(0x8000, 0x9fff).rom();  // ROM
 	map(0xa000, 0xdfff).ram();  // RAM
 	map(0xe000, 0xfdff).rom();  // ROM
-	map(0xfe58, 0xfe59).rw(this, FUNC(bk_state::bk_floppy_cmd_r), FUNC(bk_state::bk_floppy_cmd_w));
-	map(0xfe5a, 0xfe5b).rw(this, FUNC(bk_state::bk_floppy_data_r), FUNC(bk_state::bk_floppy_data_w));
-	map(0xffb0, 0xffb1).rw(this, FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
-	map(0xffb2, 0xffb3).r(this, FUNC(bk_state::bk_key_code_r));
-	map(0xffb4, 0xffb5).rw(this, FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
-	map(0xffce, 0xffcf).rw(this, FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
+	map(0xfe58, 0xfe59).rw(FUNC(bk_state::bk_floppy_cmd_r), FUNC(bk_state::bk_floppy_cmd_w));
+	map(0xfe5a, 0xfe5b).rw(FUNC(bk_state::bk_floppy_data_r), FUNC(bk_state::bk_floppy_data_w));
+	map(0xffb0, 0xffb1).rw(FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
+	map(0xffb2, 0xffb3).r(FUNC(bk_state::bk_key_code_r));
+	map(0xffb4, 0xffb5).rw(FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
+	map(0xffce, 0xffcf).rw(FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
 }
 
 /* Input ports */

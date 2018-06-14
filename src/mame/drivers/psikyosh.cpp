@@ -497,8 +497,8 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x03004000, 0x0300ffff).ram().share("bgram"); // video banks 7-0x1f (backgrounds and other effects)
 	map(0x03040000, 0x03044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
 	map(0x03050000, 0x030501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(this, FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0305ffe0, 0x0305ffff).ram().w(this, FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); //  video registers
+	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); //  video registers
 	map(0x03060000, 0x0307ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx) (Mirrored?)
@@ -506,7 +506,7 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // inputs/eeprom
 	map(0x05800000, 0x05800003).portr("INPUTS");
-	map(0x05800004, 0x05800007).rw(this, FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
+	map(0x05800004, 0x05800007).rw(FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
 // ram
 	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
 }
@@ -518,7 +518,7 @@ void psikyosh_state::ps5_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
 // inputs/eeprom
 	map(0x03000000, 0x03000003).portr("INPUTS");
-	map(0x03000004, 0x03000007).rw(this, FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
+	map(0x03000004, 0x03000007).rw(FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
 // sound chip
 	map(0x03100000, 0x03100007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // video chip
@@ -526,8 +526,8 @@ void psikyosh_state::ps5_map(address_map &map)
 	map(0x04004000, 0x0400ffff).ram().share("bgram"); // video banks 7-0x1f (backgrounds and other effects)
 	map(0x04040000, 0x04044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x04050000, 0x040501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0405ffdc, 0x0405ffdf).nopr().w(this, FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0405ffe0, 0x0405ffff).ram().w(this, FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); // video registers
+	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); // video registers
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x100000); // data ROM
@@ -786,8 +786,8 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32) /* If using alpha */

@@ -39,6 +39,7 @@ This is not a bug (real machine behaves the same).
 #include "emu.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 
 #define DEBUG_CHAR
 
@@ -370,27 +371,27 @@ void srmp5_state::srmp5_mem(address_map &map)
 	map(0x01800000, 0x01800003).ram(); //?1
 	map(0x01800004, 0x01800007).portr("DSW1");
 	map(0x01800008, 0x0180000b).portr("DSW2");
-	map(0x0180000c, 0x0180000f).w(this, FUNC(srmp5_state::bank_w));
-	map(0x01800010, 0x01800013).r(this, FUNC(srmp5_state::srmp5_inputs_r)); //multiplexed controls (selected by writes to 1c)
+	map(0x0180000c, 0x0180000f).w(FUNC(srmp5_state::bank_w));
+	map(0x01800010, 0x01800013).r(FUNC(srmp5_state::srmp5_inputs_r)); //multiplexed controls (selected by writes to 1c)
 	map(0x01800014, 0x01800017).portr("TEST");
-	map(0x0180001c, 0x0180001f).w(this, FUNC(srmp5_state::input_select_w));//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
+	map(0x0180001c, 0x0180001f).w(FUNC(srmp5_state::input_select_w));//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
 	map(0x01800200, 0x01800203).ram();  //sound related ? only few writes after boot
-	map(0x01802000, 0x01802003).w(this, FUNC(srmp5_state::cmd1_w));
-	map(0x01802004, 0x01802007).w(this, FUNC(srmp5_state::cmd2_w));
-	map(0x01802008, 0x0180200b).r(this, FUNC(srmp5_state::cmd_stat32_r));
-	map(0x01a00000, 0x01bfffff).r(this, FUNC(srmp5_state::chrrom_r));
+	map(0x01802000, 0x01802003).w(FUNC(srmp5_state::cmd1_w));
+	map(0x01802004, 0x01802007).w(FUNC(srmp5_state::cmd2_w));
+	map(0x01802008, 0x0180200b).r(FUNC(srmp5_state::cmd_stat32_r));
+	map(0x01a00000, 0x01bfffff).r(FUNC(srmp5_state::chrrom_r));
 	map(0x01c00000, 0x01c00003).nopr(); // debug? 'Toru'
 
-	map(0x0a000000, 0x0a0fffff).rw(this, FUNC(srmp5_state::spr_r), FUNC(srmp5_state::spr_w));
+	map(0x0a000000, 0x0a0fffff).rw(FUNC(srmp5_state::spr_r), FUNC(srmp5_state::spr_w));
 	map(0x0a100000, 0x0a17ffff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	//0?N???A?????????i??????????
-	map(0x0a180000, 0x0a18011f).rw(this, FUNC(srmp5_state::srmp5_vidregs_r), FUNC(srmp5_state::srmp5_vidregs_w));
+	map(0x0a180000, 0x0a18011f).rw(FUNC(srmp5_state::srmp5_vidregs_r), FUNC(srmp5_state::srmp5_vidregs_w));
 	map(0x0a180000, 0x0a180003).nopr(); // write 0x00000400
-	map(0x0a200000, 0x0a3fffff).rw(this, FUNC(srmp5_state::tileram_r), FUNC(srmp5_state::tileram_w));
+	map(0x0a200000, 0x0a3fffff).rw(FUNC(srmp5_state::tileram_r), FUNC(srmp5_state::tileram_w));
 	map(0x0fc00000, 0x0fdfffff).mirror(0x10000000).rom().region("maincpu", 0);
 
 	map(0x1eff0000, 0x1eff001f).writeonly();
-	map(0x1eff003c, 0x1eff003f).r(this, FUNC(srmp5_state::irq_ack_clear));
+	map(0x1eff003c, 0x1eff003f).r(FUNC(srmp5_state::irq_ack_clear));
 }
 
 void srmp5_state::st0016_mem(address_map &map)
@@ -429,11 +430,11 @@ void srmp5_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	map(0xc0, 0xc0).r(this, FUNC(srmp5_state::cmd1_r));
-	map(0xc1, 0xc1).r(this, FUNC(srmp5_state::cmd2_r));
-	map(0xc2, 0xc2).r(this, FUNC(srmp5_state::cmd_stat8_r));
-	map(0xe1, 0xe1).w(this, FUNC(srmp5_state::st0016_rom_bank_w));
-	map(0xe7, 0xe7).w(this, FUNC(srmp5_state::st0016_rom_bank_w));
+	map(0xc0, 0xc0).r(FUNC(srmp5_state::cmd1_r));
+	map(0xc1, 0xc1).r(FUNC(srmp5_state::cmd2_r));
+	map(0xc2, 0xc2).r(FUNC(srmp5_state::cmd_stat8_r));
+	map(0xe1, 0xe1).w(FUNC(srmp5_state::st0016_rom_bank_w));
+	map(0xe7, 0xe7).w(FUNC(srmp5_state::st0016_rom_bank_w));
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 }
 

@@ -149,7 +149,7 @@ DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
 void via6522_device::map(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x00, 0x0f).rw(FUNC(via6522_device::read), FUNC(via6522_device::write));
 }
 
 //-------------------------------------------------

@@ -10,8 +10,9 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
-
+#include "audio/tx1.h"
 
 #define TX1_PIXEL_CLOCK     (XTAL(18'000'000) / 3)
 #define TX1_HBSTART         256
@@ -109,28 +110,26 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "main_cpu"),
 			m_mathcpu(*this, "math_cpu"),
-			m_audiocpu(*this, "audio_cpu"),
 			m_math_ram(*this, "math_ram"),
 			m_vram(*this, "vram"),
 			m_objram(*this, "objram"),
 			m_rcram(*this, "rcram"),
-			m_z80_ram(*this, "z80_ram"),
 			m_char_tiles(*this, "char_tiles"),
 			m_obj_tiles(*this, "obj_tiles"),
 			m_road_rom(*this, "road"),
 			m_obj_map(*this, "obj_map"),
 			m_obj_luts(*this, "obj_luts"),
 			m_proms(*this, "proms"),
-			m_screen(*this, "screen") { }
+			m_screen(*this, "screen"),
+			m_sound(*this, "soundbrd")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mathcpu;
-	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint16_t> m_math_ram;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_objram;
 	required_shared_ptr<uint16_t> m_rcram;
-	required_shared_ptr<uint8_t> m_z80_ram;
 
 	required_region_ptr<uint8_t> m_char_tiles;
 	required_region_ptr<uint8_t> m_obj_tiles;
@@ -140,13 +139,9 @@ public:
 	required_region_ptr<uint8_t> m_proms;
 
 	required_device<screen_device> m_screen;
+	required_device<tx1_sound_device> m_sound;
 
 	emu_timer *m_interrupt_timer;
-
-	uint8_t m_ppi_latch_a;
-	uint8_t m_ppi_latch_b;
-	uint32_t m_ts;
-
 
 	math_t m_math;
 	sn74s516_t m_sn74s516;
@@ -179,22 +174,9 @@ public:
 	DECLARE_WRITE16_MEMBER(buggyboy_gas_w);
 	DECLARE_WRITE16_MEMBER(buggyboy_sky_w);
 	DECLARE_WRITE16_MEMBER(buggyboy_scolst_w);
-	DECLARE_WRITE16_MEMBER(z80_busreq_w);
 	DECLARE_WRITE16_MEMBER(resume_math_w);
 	DECLARE_WRITE16_MEMBER(halt_math_w);
-	DECLARE_WRITE8_MEMBER(z80_intreq_w);
-	DECLARE_READ16_MEMBER(z80_shared_r);
-	DECLARE_WRITE16_MEMBER(z80_shared_w);
 	DECLARE_READ16_MEMBER(dipswitches_r);
-	DECLARE_WRITE8_MEMBER(ts_w);
-	DECLARE_READ8_MEMBER(ts_r);
-	DECLARE_WRITE8_MEMBER(tx1_ppi_latch_w);
-	DECLARE_READ8_MEMBER(bb_analog_r);
-	DECLARE_READ8_MEMBER(bbjr_analog_r);
-	DECLARE_WRITE8_MEMBER(tx1_coin_cnt_w);
-	DECLARE_WRITE8_MEMBER(bb_coin_cnt_w);
-	DECLARE_READ8_MEMBER(tx1_ppi_porta_r);
-	DECLARE_READ8_MEMBER(tx1_ppi_portb_r);
 	DECLARE_MACHINE_RESET(tx1);
 	DECLARE_VIDEO_START(tx1);
 	DECLARE_PALETTE_INIT(tx1);
@@ -231,21 +213,16 @@ public:
 	uint32_t screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx1);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_buggyboy);
-	INTERRUPT_GEN_MEMBER(z80_irq);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void tx1(machine_config &config);
+	void tx1j(machine_config &config);
 	void buggyboy(machine_config &config);
 	void buggybjr(machine_config &config);
 	void buggybjr_main(address_map &map);
-	void buggybjr_sound_prg(address_map &map);
 	void buggyboy_main(address_map &map);
 	void buggyboy_math(address_map &map);
-	void buggyboy_sound_io(address_map &map);
-	void buggyboy_sound_prg(address_map &map);
 	void tx1_main(address_map &map);
 	void tx1_math(address_map &map);
-	void tx1_sound_io(address_map &map);
-	void tx1_sound_prg(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TX1_H

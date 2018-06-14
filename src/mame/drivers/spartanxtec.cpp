@@ -25,6 +25,7 @@ probably an original bug?
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -194,14 +195,14 @@ void spartanxtec_state::spartanxtec_map(address_map &map)
 	map(0x8102, 0x8102).portr("SYSTEM");
 	map(0x8103, 0x8103).portr("P1");
 
-	map(0x8200, 0x8200).w(this, FUNC(spartanxtec_state::irq_ack));
+	map(0x8200, 0x8200).w(FUNC(spartanxtec_state::irq_ack));
 
-	map(0xA801, 0xA801).w(this, FUNC(spartanxtec_state::a801_w));
+	map(0xA801, 0xA801).w(FUNC(spartanxtec_state::a801_w));
 
 	map(0xa900, 0xa903).ram().share("scroll_lo");
 	map(0xa980, 0xa983).ram().share("scroll_hi");
 
-	map(0xd000, 0xdfff).ram().w(this, FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
 
 	map(0xe000, 0xefff).ram();
 
@@ -227,7 +228,7 @@ void spartanxtec_state::spartanxtec_sound_map(address_map &map)
 void spartanxtec_state::spartanxtec_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0000).w(this, FUNC(spartanxtec_state::sound_irq_ack));
+	map(0x0000, 0x0000).w(FUNC(spartanxtec_state::sound_irq_ack));
 
 	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
 	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));

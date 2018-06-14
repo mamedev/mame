@@ -154,11 +154,11 @@ void bloodbro_state::common_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x08afff).ram();
 	map(0x08b000, 0x08bfff).ram().share("spriteram");
-	map(0x08c000, 0x08c3ff).ram().w(this, FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x08c000, 0x08c3ff).ram().w(FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
 	map(0x08c400, 0x08cfff).ram();
-	map(0x08d000, 0x08d3ff).ram().w(this, FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x08d000, 0x08d3ff).ram().w(FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
 	map(0x08d400, 0x08d7ff).ram();
-	map(0x08d800, 0x08dfff).ram().w(this, FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x08d800, 0x08dfff).ram().w(FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
 	map(0x08e000, 0x08e7ff).ram();
 	map(0x08e800, 0x08f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08f800, 0x08ffff).ram();
@@ -199,14 +199,14 @@ void bloodbro_state::weststry_map(address_map &map)
 	map(0x0c1000, 0x0c1001).portr("DSW");
 	map(0x0c1002, 0x0c1003).portr("IN0");
 	map(0x0c1004, 0x0c1005).portr("IN1");
-	map(0x0c1000, 0x0c1003).w(this, FUNC(bloodbro_state::weststry_soundlatch_w)).umask16(0xff00);
-	map(0x0c1004, 0x0c100b).w(this, FUNC(bloodbro_state::weststry_layer_scroll_w));
+	map(0x0c1000, 0x0c1003).w(FUNC(bloodbro_state::weststry_soundlatch_w)).umask16(0xff00);
+	map(0x0c1004, 0x0c100b).w(FUNC(bloodbro_state::weststry_layer_scroll_w));
 	map(0x0e0002, 0x0e0003).nopr(); // remnant of old code
 	map(0x122800, 0x122bff).ram(); // cleared at startup
-	map(0x122c00, 0x122fff).ram().w(this, FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
-	map(0x123000, 0x1233ff).ram().w(this, FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x122c00, 0x122fff).ram().w(FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x123000, 0x1233ff).ram().w(FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
 	map(0x123400, 0x1237ff).ram(); // cleared at startup
-	map(0x123800, 0x123fff).ram().w(this, FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x123800, 0x123fff).ram().w(FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
 	map(0x124000, 0x124005).ram();
 	map(0x124006, 0x1247fd).ram().share("spriteram");
 	map(0x128000, 0x1287ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -241,7 +241,7 @@ void bloodbro_state::weststry_soundnmi_update()
 void bloodbro_state::weststry_sound_map(address_map &map)
 {
 	seibu_sound_map(map);
-	map(0x4002, 0x4002).w(this, FUNC(bloodbro_state::weststry_soundnmi_ack_w));
+	map(0x4002, 0x4002).w(FUNC(bloodbro_state::weststry_soundnmi_ack_w));
 }
 
 /* Input Ports */

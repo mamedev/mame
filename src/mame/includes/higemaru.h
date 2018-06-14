@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/timer.h"
+#include "emupal.h"
 
 class higemaru_state : public driver_device
 {

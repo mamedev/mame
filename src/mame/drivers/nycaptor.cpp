@@ -285,46 +285,46 @@ void nycaptor_state::nycaptor_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xd001, 0xd001).w(this, FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(this, FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::nycaptor_generic_control_w));   /* bit 3 - memory bank at 0x8000-0xbfff */
+	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::nycaptor_generic_control_w));   /* bit 3 - memory bank at 0x8000-0xbfff */
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd401, 0xd401).nopr();
-	map(0xd403, 0xd403).w(this, FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::nycaptor_mcu_status_r1));
-	map(0xd806, 0xd806).r(this, FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::nycaptor_mcu_status_r2));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::nycaptor_mcu_status_r1));
+	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::nycaptor_mcu_status_r2));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
 	map(0xdce1, 0xdce1).nopw();
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void nycaptor_state::nycaptor_slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
 
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(this, FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(this, FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(this, FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).r(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r)).nopw();/* ? gfx control ? */
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
+	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::nycaptor_gfxctrl_r)).nopw();/* ? gfx control ? */
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
@@ -339,9 +339,9 @@ void nycaptor_state::sound_map(address_map &map)
 	map(0xcb00, 0xcb00).nopw();
 	map(0xcc00, 0xcc00).nopw();
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0xd200, 0xd200).nopr().w(this, FUNC(nycaptor_state::nmi_enable_w));
-	map(0xd400, 0xd400).w(this, FUNC(nycaptor_state::nmi_disable_w));
-	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::write)); //otherwise no girl's scream in cycle shooting, see MT03975
+	map(0xd200, 0xd200).nopr().w(FUNC(nycaptor_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(FUNC(nycaptor_state::nmi_disable_w));
+	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::data_w)); //otherwise no girl's scream in cycle shooting, see MT03975
 	map(0xe000, 0xefff).noprw();
 }
 
@@ -383,44 +383,44 @@ void nycaptor_state::cyclshtg_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).rw(this, FUNC(nycaptor_state::cyclshtg_mcu_r), FUNC(nycaptor_state::cyclshtg_mcu_w));
-	map(0xd001, 0xd001).w(this, FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(this, FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).rw(FUNC(nycaptor_state::cyclshtg_mcu_r), FUNC(nycaptor_state::cyclshtg_mcu_w));
+	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd403, 0xd403).w(this, FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xd806, 0xd806).r(this, FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
 	map(0xdce1, 0xdce1).nopw();
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void nycaptor_state::cyclshtg_slave_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(this, FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(this, FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(this, FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).r(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r));
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
+	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::nycaptor_gfxctrl_r));
 	map(0xdf03, 0xdf03).nopw();
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
@@ -434,46 +434,46 @@ void nycaptor_state::bronx_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).r(this, FUNC(nycaptor_state::cyclshtg_mcu_r)).nopw();
-	map(0xd001, 0xd001).w(this, FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(this, FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).r(FUNC(nycaptor_state::cyclshtg_mcu_r)).nopw();
+	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd401, 0xd401).r(this, FUNC(nycaptor_state::unk_r));
-	map(0xd403, 0xd403).w(this, FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0xd401, 0xd401).r(FUNC(nycaptor_state::unk_r));
+	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xd806, 0xd806).r(this, FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void nycaptor_state::bronx_slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r1));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r1));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(this, FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(this, FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(this, FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 

@@ -35,6 +35,7 @@
 #include "machine/rp5c15.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -107,15 +108,15 @@ void lcmate2_state::lcmate2_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write));
-	map(0x1000, 0x1000).w(this, FUNC(lcmate2_state::speaker_w));
-	map(0x1fff, 0x1fff).w(this, FUNC(lcmate2_state::bankswitch_w));
+	map(0x1000, 0x1000).w(FUNC(lcmate2_state::speaker_w));
+	map(0x1fff, 0x1fff).w(FUNC(lcmate2_state::bankswitch_w));
 
 	map(0x3000, 0x3000).w(m_lcdc, FUNC(hd44780_device::control_write));
 	map(0x3001, 0x3001).w(m_lcdc, FUNC(hd44780_device::data_write));
 	map(0x3002, 0x3002).r(m_lcdc, FUNC(hd44780_device::control_read));
 	map(0x3003, 0x3003).r(m_lcdc, FUNC(hd44780_device::data_read));
 
-	map(0x5000, 0x50ff).r(this, FUNC(lcmate2_state::key_r));
+	map(0x5000, 0x50ff).r(FUNC(lcmate2_state::key_r));
 }
 
 /* Input ports */

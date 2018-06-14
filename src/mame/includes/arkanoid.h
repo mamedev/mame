@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {

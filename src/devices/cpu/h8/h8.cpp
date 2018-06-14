@@ -177,6 +177,11 @@ uint32_t h8_device::execute_input_lines() const
 	return 0;
 }
 
+bool h8_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == INPUT_LINE_NMI;
+}
+
 void h8_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + icount) {

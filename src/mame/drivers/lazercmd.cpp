@@ -415,8 +415,8 @@ void lazercmd_state::lazercmd_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::lazercmd_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::lazercmd_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
@@ -426,8 +426,8 @@ void lazercmd_state::medlanes_map(address_map &map)
 	map(0x1000, 0x17ff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::medlanes_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::medlanes_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
@@ -436,15 +436,15 @@ void lazercmd_state::bbonk_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::bbonk_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::bbonk_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
 void lazercmd_state::lazercmd_portmap(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(lazercmd_state::lazercmd_ctrl_port_r), FUNC(lazercmd_state::lazercmd_ctrl_port_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(lazercmd_state::lazercmd_data_port_r), FUNC(lazercmd_state::lazercmd_data_port_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(lazercmd_state::lazercmd_ctrl_port_r), FUNC(lazercmd_state::lazercmd_ctrl_port_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(lazercmd_state::lazercmd_data_port_r), FUNC(lazercmd_state::lazercmd_data_port_w));
 }
 
 

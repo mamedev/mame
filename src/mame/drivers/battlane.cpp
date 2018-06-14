@@ -53,8 +53,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	/*
 	if (~m_cpu_control & 0x08)
 	{
-	    m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	    m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	    m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	    m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	*/
 
@@ -88,8 +88,8 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -103,15 +103,15 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 void battlane_state::battlane_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
-	map(0x1000, 0x17ff).ram().w(this, FUNC(battlane_state::battlane_tileram_w)).share("tileram");
-	map(0x1800, 0x18ff).ram().w(this, FUNC(battlane_state::battlane_spriteram_w)).share("spriteram");
-	map(0x1c00, 0x1c00).portr("P1").w(this, FUNC(battlane_state::battlane_video_ctrl_w));
-	map(0x1c01, 0x1c01).portr("P2").w(this, FUNC(battlane_state::battlane_scrollx_w));
-	map(0x1c02, 0x1c02).portr("DSW1").w(this, FUNC(battlane_state::battlane_scrolly_w));
-	map(0x1c03, 0x1c03).portr("DSW2").w(this, FUNC(battlane_state::battlane_cpu_command_w));
+	map(0x1000, 0x17ff).ram().w(FUNC(battlane_state::battlane_tileram_w)).share("tileram");
+	map(0x1800, 0x18ff).ram().w(FUNC(battlane_state::battlane_spriteram_w)).share("spriteram");
+	map(0x1c00, 0x1c00).portr("P1").w(FUNC(battlane_state::battlane_video_ctrl_w));
+	map(0x1c01, 0x1c01).portr("P2").w(FUNC(battlane_state::battlane_scrollx_w));
+	map(0x1c02, 0x1c02).portr("DSW1").w(FUNC(battlane_state::battlane_scrolly_w));
+	map(0x1c03, 0x1c03).portr("DSW2").w(FUNC(battlane_state::battlane_cpu_command_w));
 	map(0x1c04, 0x1c05).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-	map(0x1e00, 0x1e3f).w(this, FUNC(battlane_state::battlane_palette_w));
-	map(0x2000, 0x3fff).ram().w(this, FUNC(battlane_state::battlane_bitmap_w)).share("share4");
+	map(0x1e00, 0x1e3f).w(FUNC(battlane_state::battlane_palette_w));
+	map(0x2000, 0x3fff).ram().w(FUNC(battlane_state::battlane_bitmap_w)).share("share4");
 	map(0x4000, 0xffff).rom();
 }
 

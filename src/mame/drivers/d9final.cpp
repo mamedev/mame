@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -133,10 +134,10 @@ void d9final_state::d9final_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xc800, 0xcbff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xcc00, 0xcfff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(d9final_state::sc0_lovram)).share("lo_vram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(d9final_state::sc0_hivram)).share("hi_vram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(d9final_state::sc0_cram)).share("cram");
-	map(0xf000, 0xf007).r(this, FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
+	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
@@ -150,7 +151,7 @@ void d9final_state::d9final_io(address_map &map)
 	map(0x40, 0x41).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x60, 0x60).portr("DSWD");
 	map(0x80, 0x80).portr("IN0");
-	map(0xa0, 0xa0).portr("IN1").w(this, FUNC(d9final_state::bank_w));
+	map(0xa0, 0xa0).portr("IN1").w(FUNC(d9final_state::bank_w));
 	map(0xe0, 0xe0).portr("IN2");
 }
 

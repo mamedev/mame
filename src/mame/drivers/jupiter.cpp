@@ -33,6 +33,7 @@ ToDo: (both)
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MCM6571AP_TAG   "vid125_6c"
@@ -149,9 +150,9 @@ void jupiter3_state::jupiter3_mem(address_map &map)
 void jupiter3_state::jupiter3_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa1, 0xa4).r(this, FUNC(jupiter3_state::ff_r));
-	map(0xb0, 0xb0).r(this, FUNC(jupiter3_state::status_r));
-	map(0xb2, 0xb2).r(this, FUNC(jupiter3_state::key_r));
+	map(0xa1, 0xa4).r(FUNC(jupiter3_state::ff_r));
+	map(0xb0, 0xb0).r(FUNC(jupiter3_state::status_r));
+	map(0xb2, 0xb2).r(FUNC(jupiter3_state::key_r));
 }
 
 READ8_MEMBER( jupiter3_state::ff_r )

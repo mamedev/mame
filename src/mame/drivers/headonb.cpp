@@ -30,6 +30,7 @@ Other outs:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -101,7 +102,7 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 void headonb_state::headonb_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().mirror(0x4000);
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(headonb_state::video_ram_w)).share("video_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(headonb_state::video_ram_w)).share("video_ram");
 	map(0xff00, 0xffff).ram();
 }
 

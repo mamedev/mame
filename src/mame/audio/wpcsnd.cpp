@@ -34,21 +34,21 @@ wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, dev
 void wpcsnd_device::wpcsnd_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).mirror(0x03ff).w(this, FUNC(wpcsnd_device::rombank_w));
+	map(0x2000, 0x2000).mirror(0x03ff).w(FUNC(wpcsnd_device::rombank_w));
 	map(0x2400, 0x2401).mirror(0x03fe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2c00, 0x2fff).w(this, FUNC(wpcsnd_device::bg_speech_digit_w));
-	map(0x3000, 0x33ff).r(this, FUNC(wpcsnd_device::latch_r));
-	map(0x3400, 0x37ff).w(this, FUNC(wpcsnd_device::bg_speech_clock_w));
-	map(0x3800, 0x3bff).w(this, FUNC(wpcsnd_device::volume_w));
-	map(0x3c00, 0x3fff).w(this, FUNC(wpcsnd_device::latch_w));
+	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2c00, 0x2fff).w(FUNC(wpcsnd_device::bg_speech_digit_w));
+	map(0x3000, 0x33ff).r(FUNC(wpcsnd_device::latch_r));
+	map(0x3400, 0x37ff).w(FUNC(wpcsnd_device::bg_speech_clock_w));
+	map(0x3800, 0x3bff).w(FUNC(wpcsnd_device::volume_w));
+	map(0x3c00, 0x3fff).w(FUNC(wpcsnd_device::latch_w));
 	map(0x4000, 0xbfff).bankr("rombank");
 	map(0xc000, 0xffff).bankr("fixed");
 }
 
 void wpcsnd_device::ctrl_w(uint8_t data)
 {
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void wpcsnd_device::data_w(uint8_t data)
@@ -102,7 +102,7 @@ void wpcsnd_device::device_reset()
 	m_fixedbank->set_entry(0);
 
 	// reset the CPU again, so that the CPU is starting with the right vectors (otherwise sound may die on reset)
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	m_reply_available = false;
 }

@@ -491,7 +491,7 @@ int z80sio_device::z80daisy_irq_ack()
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
 		// FIXME: use an optional_device or something
-		int const ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		int const ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
 		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_cputag, ret);
 		return ret;
 	}
@@ -560,7 +560,7 @@ int i8274_new_device::z80daisy_irq_ack()
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
 		// FIXME: use an optional_device or something
-		int const ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		int const ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
 		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_cputag, ret);
 		return ret;
 	}

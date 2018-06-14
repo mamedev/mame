@@ -26,10 +26,10 @@ DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree Bt459 256 Color RAMD
 
 void bt459_device::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w));
-	map(0x01, 0x01).rw(this, FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w));
-	map(0x02, 0x02).rw(this, FUNC(bt459_device::register_r), FUNC(bt459_device::register_w));
-	map(0x03, 0x03).rw(this, FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w));
+	map(0x00, 0x00).rw(FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w));
+	map(0x01, 0x01).rw(FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w));
+	map(0x02, 0x02).rw(FUNC(bt459_device::register_r), FUNC(bt459_device::register_w));
+	map(0x03, 0x03).rw(FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w));
 }
 
 bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -623,21 +623,21 @@ void taitojc_state::taitojc_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().mirror(0x200000);
 	map(0x00400000, 0x01bfffff).rom().region("gfx1", 0);
 	map(0x04000000, 0x040f7fff).ram().share("vram");
-	map(0x040f8000, 0x040fbfff).rw(this, FUNC(taitojc_state::taitojc_tile_r), FUNC(taitojc_state::taitojc_tile_w));
-	map(0x040fc000, 0x040fefff).rw(this, FUNC(taitojc_state::taitojc_char_r), FUNC(taitojc_state::taitojc_char_w));
+	map(0x040f8000, 0x040fbfff).rw(FUNC(taitojc_state::taitojc_tile_r), FUNC(taitojc_state::taitojc_tile_w));
+	map(0x040fc000, 0x040fefff).rw(FUNC(taitojc_state::taitojc_char_r), FUNC(taitojc_state::taitojc_char_w));
 	map(0x040ff000, 0x040fffff).ram().share("objlist");
-	map(0x05800000, 0x0580003f).r(this, FUNC(taitojc_state::jc_pcbid_r));
-	map(0x05900000, 0x05900007).rw(this, FUNC(taitojc_state::mcu_comm_r), FUNC(taitojc_state::mcu_comm_w));
-	map(0x06400000, 0x0641ffff).rw(this, FUNC(taitojc_state::taitojc_palette_r), FUNC(taitojc_state::taitojc_palette_w)).share("palette_ram");
+	map(0x05800000, 0x0580003f).r(FUNC(taitojc_state::jc_pcbid_r));
+	map(0x05900000, 0x05900007).rw(FUNC(taitojc_state::mcu_comm_r), FUNC(taitojc_state::mcu_comm_w));
+	map(0x06400000, 0x0641ffff).rw(FUNC(taitojc_state::taitojc_palette_r), FUNC(taitojc_state::taitojc_palette_w)).share("palette_ram");
 	map(0x06600000, 0x0660001f).rw(m_tc0640fio, FUNC(tc0640fio_device::read), FUNC(tc0640fio_device::write)).umask32(0xff000000);
 	map(0x0660004c, 0x0660004f).portw("EEPROMOUT");
-	map(0x06800001, 0x06800001).w(this, FUNC(taitojc_state::jc_irq_unk_w));
+	map(0x06800001, 0x06800001).w(FUNC(taitojc_state::jc_irq_unk_w));
 	map(0x06a00000, 0x06a01fff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask32(0xff000000);
-	map(0x06c00000, 0x06c0001f).rw(this, FUNC(taitojc_state::jc_lan_r), FUNC(taitojc_state::jc_lan_w)).umask32(0x00ff0000);
+	map(0x06c00000, 0x06c0001f).rw(FUNC(taitojc_state::jc_lan_r), FUNC(taitojc_state::jc_lan_w)).umask32(0x00ff0000);
 	map(0x08000000, 0x080fffff).ram().share("main_ram");
-	map(0x10000000, 0x10001fff).rw(this, FUNC(taitojc_state::dsp_shared_r), FUNC(taitojc_state::dsp_shared_w)).umask32(0xffff0000);
-	map(0x10001ff8, 0x10001ff9).r(this, FUNC(taitojc_state::dsp_to_main_7fe_r));
-	map(0x10001ffc, 0x10001ffd).w(this, FUNC(taitojc_state::main_to_dsp_7ff_w));
+	map(0x10000000, 0x10001fff).rw(FUNC(taitojc_state::dsp_shared_r), FUNC(taitojc_state::dsp_shared_w)).umask32(0xffff0000);
+	map(0x10001ff8, 0x10001ff9).r(FUNC(taitojc_state::dsp_to_main_7fe_r));
+	map(0x10001ffc, 0x10001ffd).w(FUNC(taitojc_state::main_to_dsp_7ff_w));
 }
 
 
@@ -672,8 +672,8 @@ WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 void taitojc_state::dendego_map(address_map &map)
 {
 	taitojc_map(map);
-	map(0x06e00001, 0x06e00001).w(this, FUNC(taitojc_state::dendego_speedmeter_w));
-	map(0x06e00005, 0x06e00005).w(this, FUNC(taitojc_state::dendego_brakemeter_w));
+	map(0x06e00001, 0x06e00001).w(FUNC(taitojc_state::dendego_speedmeter_w));
+	map(0x06e00005, 0x06e00005).w(FUNC(taitojc_state::dendego_brakemeter_w));
 	map(0x06e0000d, 0x06e0000d).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -754,10 +754,10 @@ void taitojc_state::hc11_pgm_map(address_map &map)
 void taitojc_state::hc11_io_map(address_map &map)
 {
 	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).nopr(); // ?
-	map(MC68HC11_IO_PORTG, MC68HC11_IO_PORTG).rw(this, FUNC(taitojc_state::hc11_comm_r), FUNC(taitojc_state::hc11_comm_w));
-	map(MC68HC11_IO_PORTH, MC68HC11_IO_PORTH).rw(this, FUNC(taitojc_state::hc11_output_r), FUNC(taitojc_state::hc11_output_w));
-	map(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA).rw(this, FUNC(taitojc_state::hc11_data_r), FUNC(taitojc_state::hc11_data_w));
-	map(MC68HC11_IO_AD0, MC68HC11_IO_AD7).r(this, FUNC(taitojc_state::hc11_analog_r));
+	map(MC68HC11_IO_PORTG, MC68HC11_IO_PORTG).rw(FUNC(taitojc_state::hc11_comm_r), FUNC(taitojc_state::hc11_comm_w));
+	map(MC68HC11_IO_PORTH, MC68HC11_IO_PORTH).rw(FUNC(taitojc_state::hc11_output_r), FUNC(taitojc_state::hc11_output_w));
+	map(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA).rw(FUNC(taitojc_state::hc11_data_r), FUNC(taitojc_state::hc11_data_w));
+	map(MC68HC11_IO_AD0, MC68HC11_IO_AD7).r(FUNC(taitojc_state::hc11_analog_r));
 }
 
 
@@ -862,16 +862,16 @@ void taitojc_state::tms_data_map(address_map &map)
 	map(0x6b20, 0x6b20).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
 	map(0x6b22, 0x6b22).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x6b23, 0x6b23).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
-	map(0x6c00, 0x6c01).rw(this, FUNC(taitojc_state::dsp_rom_r), FUNC(taitojc_state::dsp_rom_w));
-	map(0x7000, 0x7002).w(this, FUNC(taitojc_state::dsp_math_projection_w));
-	map(0x7010, 0x7012).w(this, FUNC(taitojc_state::dsp_math_intersection_w));
-	map(0x7013, 0x7015).w(this, FUNC(taitojc_state::dsp_math_viewport_w));
-	map(0x701b, 0x701b).r(this, FUNC(taitojc_state::dsp_math_intersection_r));
-	map(0x701d, 0x701d).r(this, FUNC(taitojc_state::dsp_math_projection_y_r));
-	map(0x701f, 0x701f).r(this, FUNC(taitojc_state::dsp_math_projection_x_r));
-	map(0x7022, 0x7022).r(this, FUNC(taitojc_state::dsp_math_unk_r));
+	map(0x6c00, 0x6c01).rw(FUNC(taitojc_state::dsp_rom_r), FUNC(taitojc_state::dsp_rom_w));
+	map(0x7000, 0x7002).w(FUNC(taitojc_state::dsp_math_projection_w));
+	map(0x7010, 0x7012).w(FUNC(taitojc_state::dsp_math_intersection_w));
+	map(0x7013, 0x7015).w(FUNC(taitojc_state::dsp_math_viewport_w));
+	map(0x701b, 0x701b).r(FUNC(taitojc_state::dsp_math_intersection_r));
+	map(0x701d, 0x701d).r(FUNC(taitojc_state::dsp_math_projection_y_r));
+	map(0x701f, 0x701f).r(FUNC(taitojc_state::dsp_math_projection_x_r));
+	map(0x7022, 0x7022).r(FUNC(taitojc_state::dsp_math_unk_r));
 	map(0x7800, 0x7fff).ram().share("dsp_shared");
-	map(0x7ffe, 0x7ffe).w(this, FUNC(taitojc_state::dsp_to_main_7fe_w));
+	map(0x7ffe, 0x7ffe).w(FUNC(taitojc_state::dsp_to_main_7fe_w));
 	map(0x8000, 0xffff).ram();
 }
 
@@ -1095,7 +1095,7 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
 	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))

@@ -32,6 +32,7 @@ there is no code to emulate tho as it is all inside the MCU.
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

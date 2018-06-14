@@ -513,25 +513,25 @@ void wecleman_state::wecleman_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom(); // ROM (03c000-03ffff used as RAM sometimes!)
 	map(0x040000, 0x043fff).ram(); // RAM
-	map(0x040494, 0x040495).w(this, FUNC(wecleman_state::wecleman_videostatus_w)).share("videostatus");   // cloud blending control (HACK)
-	map(0x060000, 0x060005).w(this, FUNC(wecleman_state::wecleman_protection_w)).share("protection_ram");
-	map(0x060006, 0x060007).r(this, FUNC(wecleman_state::wecleman_protection_r)); // MCU read
-	map(0x080000, 0x080011).ram().w(this, FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
-	map(0x100000, 0x103fff).ram().w(this, FUNC(wecleman_state::wecleman_pageram_w)).share("pageram");   // Background Layers
-	map(0x108000, 0x108fff).ram().w(this, FUNC(wecleman_state::wecleman_txtram_w)).share("txtram"); // Text Layer
-	map(0x110000, 0x110fff).ram().w(this, FUNC(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x040494, 0x040495).w(FUNC(wecleman_state::wecleman_videostatus_w)).share("videostatus");   // cloud blending control (HACK)
+	map(0x060000, 0x060005).w(FUNC(wecleman_state::wecleman_protection_w)).share("protection_ram");
+	map(0x060006, 0x060007).r(FUNC(wecleman_state::wecleman_protection_r)); // MCU read
+	map(0x080000, 0x080011).ram().w(FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x100000, 0x103fff).ram().w(FUNC(wecleman_state::wecleman_pageram_w)).share("pageram");   // Background Layers
+	map(0x108000, 0x108fff).ram().w(FUNC(wecleman_state::wecleman_txtram_w)).share("txtram"); // Text Layer
+	map(0x110000, 0x110fff).ram().w(FUNC(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)).share("paletteram");
 	map(0x124000, 0x127fff).ram().share("share1");  // Shared with main CPU
 	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
-	map(0x140002, 0x140003).w(this, FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel / ..
-	map(0x140004, 0x140005).w(this, FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140002, 0x140003).w(FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel / ..
+	map(0x140004, 0x140005).w(FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
 	map(0x140006, 0x140007).nopw();    // Watchdog reset
 	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
 	map(0x140012, 0x140013).portr("IN1");    // ??
 	map(0x140014, 0x140015).portr("DSWA");   // DSW 2
 	map(0x140016, 0x140017).portr("DSWB");   // DSW 1
 	map(0x140020, 0x140021).writeonly();   // Paired with writes to $140003
-	map(0x140020, 0x140021).r(this, FUNC(wecleman_state::selected_ip_r)); // Accelerator or Wheel or ..
+	map(0x140020, 0x140021).r(FUNC(wecleman_state::selected_ip_r)); // Accelerator or Wheel or ..
 	map(0x140030, 0x140031).nopw();    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
 }
 
@@ -547,23 +547,23 @@ void wecleman_state::hotchase_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x041fff).ram();                                 // RAM
 	map(0x060000, 0x063fff).ram();                                 // RAM
-	map(0x080000, 0x080011).ram().w(this, FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x080000, 0x080011).ram().w(FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
 	map(0x100000, 0x100fff).rw("k051316_1", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Background
 	map(0x101000, 0x10101f).w("k051316_1", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Background Ctrl
 	map(0x102000, 0x102fff).rw("k051316_2", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Foreground
 	map(0x103000, 0x10301f).w("k051316_2", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Foreground Ctrl
-	map(0x110000, 0x111fff).ram().w(this, FUNC(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x110000, 0x111fff).ram().w(FUNC(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)).share("paletteram");
 	map(0x120000, 0x123fff).ram().share("share1");                  // Shared with sub CPU
 	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
-	map(0x140002, 0x140003).w(this, FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel /
-	map(0x140004, 0x140005).w(this, FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140002, 0x140003).w(FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel /
+	map(0x140004, 0x140005).w(FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
 	map(0x140006, 0x140007).nopr(); // Watchdog reset
 	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
 	map(0x140012, 0x140013).portr("IN1");    // ?? bit 4 from sound cpu
 	map(0x140014, 0x140015).portr("DSW2");   // DSW 2
 	map(0x140016, 0x140017).portr("DSW1");   // DSW 1
-	map(0x140020, 0x140021).r(this, FUNC(wecleman_state::selected_ip_r)).nopw(); // Paired with writes to $140003
+	map(0x140020, 0x140021).r(FUNC(wecleman_state::selected_ip_r)).nopw(); // Paired with writes to $140003
 	map(0x140022, 0x140023).nopr(); // read and written at $601c0, unknown purpose
 	map(0x140030, 0x140031).nopw();    // signal to cabinet vibration motors?
 }
@@ -642,13 +642,13 @@ void wecleman_state::wecleman_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram();
 	map(0x8500, 0x8500).nopw();            // increased with speed (global volume)?
-	map(0x9000, 0x9000).r(this, FUNC(wecleman_state::multiply_r));    // 007452: Protection
-	map(0x9000, 0x9001).w(this, FUNC(wecleman_state::multiply_w));   // 007452: Protection
+	map(0x9000, 0x9000).r(FUNC(wecleman_state::multiply_r));    // 007452: Protection
+	map(0x9000, 0x9001).w(FUNC(wecleman_state::multiply_w));   // 007452: Protection
 	map(0x9006, 0x9006).nopw();            // 007452: ?
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU
 	map(0xb000, 0xb00d).rw("k007232_1", FUNC(k007232_device::read), FUNC(k007232_device::write)); // K007232 (Reading offset 5/b triggers the sample)
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xf000, 0xf000).w(this, FUNC(wecleman_state::wecleman_K00723216_bank_w));    // Samples banking
+	map(0xf000, 0xf000).w(FUNC(wecleman_state::wecleman_K00723216_bank_w));    // Samples banking
 }
 
 
@@ -725,13 +725,13 @@ WRITE8_MEMBER(wecleman_state::hotchase_k007232_w)
 void wecleman_state::hotchase_sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x100d).rw(this, FUNC(wecleman_state::hotchase_k007232_r<0>), FUNC(wecleman_state::hotchase_k007232_w<0>));   // 3 x K007232
-	map(0x2000, 0x200d).rw(this, FUNC(wecleman_state::hotchase_k007232_r<1>), FUNC(wecleman_state::hotchase_k007232_w<1>));
-	map(0x3000, 0x300d).rw(this, FUNC(wecleman_state::hotchase_k007232_r<2>), FUNC(wecleman_state::hotchase_k007232_w<2>));
-	map(0x4000, 0x4007).w(this, FUNC(wecleman_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
+	map(0x1000, 0x100d).rw(FUNC(wecleman_state::hotchase_k007232_r<0>), FUNC(wecleman_state::hotchase_k007232_w<0>));   // 3 x K007232
+	map(0x2000, 0x200d).rw(FUNC(wecleman_state::hotchase_k007232_r<1>), FUNC(wecleman_state::hotchase_k007232_w<1>));
+	map(0x3000, 0x300d).rw(FUNC(wecleman_state::hotchase_k007232_r<2>), FUNC(wecleman_state::hotchase_k007232_w<2>));
+	map(0x4000, 0x4007).w(FUNC(wecleman_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
 	map(0x5000, 0x5000).nopw();   // 0 at start of IRQ service, 1 at end (irq mask?)
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU (Read on IRQ)
-	map(0x7000, 0x7000).w(this, FUNC(wecleman_state::hotchase_sound_hs_w));    // ACK signal to main CPU
+	map(0x7000, 0x7000).w(FUNC(wecleman_state::hotchase_sound_hs_w));    // ACK signal to main CPU
 	map(0x8000, 0xffff).rom();
 }
 

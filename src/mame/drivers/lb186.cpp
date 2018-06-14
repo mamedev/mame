@@ -104,8 +104,8 @@ void lb186_state::lb186_io(address_map &map)
 	map(0x1000, 0x101f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0x1100, 0x1107).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0x1180, 0x1180).rw(this, FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
-	map(0x1200, 0x1200).w(this, FUNC(lb186_state::drive_sel_w));
+	map(0x1180, 0x1180).rw(FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
+	map(0x1200, 0x1200).w(FUNC(lb186_state::drive_sel_w));
 }
 
 static void lb186_floppies(device_slot_interface &device)
@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_DEVICE_PROGRAM_MAP(lb186_map)
 	MCFG_DEVICE_IO_MAP(lb186_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_WD1772_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int2_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)

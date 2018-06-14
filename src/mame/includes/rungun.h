@@ -12,6 +12,7 @@
 #include "video/k053936.h"
 #include "machine/k054321.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 
 class rungun_state : public driver_device
@@ -83,19 +84,19 @@ private:
 	bool        m_single_screen_mode;
 	uint8_t       m_video_mux_bank;
 
-	DECLARE_READ16_MEMBER(rng_sysregs_r);
-	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
+	DECLARE_READ16_MEMBER(sysregs_r);
+	DECLARE_WRITE16_MEMBER(sysregs_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_status_msb_r);
 	DECLARE_WRITE8_MEMBER(sound_status_w);
 	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
-	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
-	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
-	DECLARE_READ16_MEMBER(rng_psac2_videoram_r);
-	DECLARE_WRITE16_MEMBER(rng_psac2_videoram_w);
-	DECLARE_READ8_MEMBER(rng_53936_rom_r);
+	DECLARE_READ16_MEMBER(ttl_ram_r);
+	DECLARE_WRITE16_MEMBER(ttl_ram_w);
+	DECLARE_READ16_MEMBER(psac2_videoram_r);
+	DECLARE_WRITE16_MEMBER(psac2_videoram_w);
+	DECLARE_READ8_MEMBER(k53936_rom_r);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
@@ -115,7 +116,7 @@ private:
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 
-	void rungun_k054539_map(address_map &map);
+	void k054539_map(address_map &map);
 	void rungun_map(address_map &map);
 	void rungun_sound_map(address_map &map);
 };

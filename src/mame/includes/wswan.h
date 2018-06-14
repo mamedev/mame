@@ -21,6 +21,7 @@
 #include "video/wswan.h"
 #include "bus/wswan/slot.h"
 #include "bus/wswan/rom.h"
+#include "emupal.h"
 
 
 class wswan_state : public driver_device

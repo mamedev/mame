@@ -48,36 +48,36 @@ DEFINE_DEVICE_TYPE(BT458, bt458_device, "bt458", "Brooktree Bt458 256 Color RAMD
 
 void bt45x_device_base::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(bt45x_device_base::address_r), FUNC(bt45x_device_base::address_w));
-	map(0x01, 0x01).rw(this, FUNC(bt45x_device_base::palette_r), FUNC(bt45x_device_base::palette_w));
-	map(0x02, 0x02).rw(this, FUNC(bt45x_device_base::register_r), FUNC(bt45x_device_base::register_w));
-	map(0x03, 0x03).rw(this, FUNC(bt45x_device_base::overlay_r), FUNC(bt45x_device_base::overlay_w));
+	map(0x00, 0x00).rw(FUNC(bt45x_device_base::address_r), FUNC(bt45x_device_base::address_w));
+	map(0x01, 0x01).rw(FUNC(bt45x_device_base::palette_r), FUNC(bt45x_device_base::palette_w));
+	map(0x02, 0x02).rw(FUNC(bt45x_device_base::register_r), FUNC(bt45x_device_base::register_w));
+	map(0x03, 0x03).rw(FUNC(bt45x_device_base::overlay_r), FUNC(bt45x_device_base::overlay_w));
 }
 
 void bt453_device::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(bt453_device::address_r), FUNC(bt453_device::address_w));
-	map(0x01, 0x01).rw(this, FUNC(bt453_device::palette_r), FUNC(bt453_device::palette_w));
-	map(0x02, 0x02).rw(this, FUNC(bt453_device::address_r), FUNC(bt453_device::address_w));
-	map(0x03, 0x03).rw(this, FUNC(bt453_device::overlay_r), FUNC(bt453_device::overlay_w));
+	map(0x00, 0x00).rw(FUNC(bt453_device::address_r), FUNC(bt453_device::address_w));
+	map(0x01, 0x01).rw(FUNC(bt453_device::palette_r), FUNC(bt453_device::palette_w));
+	map(0x02, 0x02).rw(FUNC(bt453_device::address_r), FUNC(bt453_device::address_w));
+	map(0x03, 0x03).rw(FUNC(bt453_device::overlay_r), FUNC(bt453_device::overlay_w));
 }
 
 void bt454_device::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(bt454_device::address_r), FUNC(bt454_device::address_w));
-	map(0x01, 0x01).rw(this, FUNC(bt454_device::palette_r), FUNC(bt454_device::palette_w));
+	map(0x00, 0x00).rw(FUNC(bt454_device::address_r), FUNC(bt454_device::address_w));
+	map(0x01, 0x01).rw(FUNC(bt454_device::palette_r), FUNC(bt454_device::palette_w));
 	// FIXME: not clear what happens here
-	//map(0x02, 0x02).rw(this, FUNC(bt454_device::address_r), FUNC(bt454_device::address_w));
-	map(0x03, 0x03).rw(this, FUNC(bt454_device::overlay_r), FUNC(bt454_device::overlay_w));
+	//map(0x02, 0x02).rw(FUNC(bt454_device::address_r), FUNC(bt454_device::address_w));
+	map(0x03, 0x03).rw(FUNC(bt454_device::overlay_r), FUNC(bt454_device::overlay_w));
 }
 
 void bt455_device::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(bt455_device::address_r), FUNC(bt455_device::address_w));
-	map(0x01, 0x01).rw(this, FUNC(bt455_device::palette_r), FUNC(bt455_device::palette_w));
+	map(0x00, 0x00).rw(FUNC(bt455_device::address_r), FUNC(bt455_device::address_w));
+	map(0x01, 0x01).rw(FUNC(bt455_device::palette_r), FUNC(bt455_device::palette_w));
 	// FIXME: not clear what happens here
-	//map(0x02, 0x02).rw(this, FUNC(bt455_device::address_r), FUNC(bt455_device::address_w));
-	map(0x03, 0x03).rw(this, FUNC(bt455_device::overlay_r), FUNC(bt455_device::overlay_w));
+	//map(0x02, 0x02).rw(FUNC(bt455_device::address_r), FUNC(bt455_device::address_w));
+	map(0x03, 0x03).rw(FUNC(bt455_device::overlay_r), FUNC(bt455_device::overlay_w));
 }
 
 bt45x_device_base::bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors)

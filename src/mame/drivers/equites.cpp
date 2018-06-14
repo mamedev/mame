@@ -645,20 +645,20 @@ void equites_state::equites_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom(); // ROM area is written several times (dev system?)
 	map(0x040000, 0x040fff).ram();
-	map(0x080000, 0x080fff).rw(this, FUNC(equites_state::equites_fg_videoram_r), FUNC(equites_state::equites_fg_videoram_w)).umask16(0x00ff);
-	map(0x0c0000, 0x0c01ff).ram().w(this, FUNC(equites_state::equites_bg_videoram_w)).share("bg_videoram");
+	map(0x080000, 0x080fff).rw(FUNC(equites_state::equites_fg_videoram_r), FUNC(equites_state::equites_fg_videoram_w)).umask16(0x00ff);
+	map(0x0c0000, 0x0c01ff).ram().w(FUNC(equites_state::equites_bg_videoram_w)).share("bg_videoram");
 	map(0x0c0200, 0x0c0fff).ram();
 	map(0x100000, 0x1001ff).ram().share("spriteram");
-	map(0x100000, 0x100001).r(this, FUNC(equites_state::equites_spriteram_kludge_r));
-	map(0x140000, 0x1407ff).rw(this, FUNC(equites_state::mcu_ram_r), FUNC(equites_state::mcu_ram_w)).umask16(0x00ff);
+	map(0x100000, 0x100001).r(FUNC(equites_state::equites_spriteram_kludge_r));
+	map(0x140000, 0x1407ff).rw(FUNC(equites_state::mcu_ram_r), FUNC(equites_state::mcu_ram_w)).umask16(0x00ff);
 	map(0x180000, 0x180001).portr("IN1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w",
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
 												 });
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1c0000, 0x1c0001).portr("IN0").w(this, FUNC(equites_state::equites_scrollreg_w));
-	map(0x380000, 0x380000).w(this, FUNC(equites_state::equites_bgcolor_w));
+	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::equites_scrollreg_w));
+	map(0x380000, 0x380000).w(FUNC(equites_state::equites_bgcolor_w));
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
 
@@ -666,7 +666,7 @@ void gekisou_state::gekisou_map(address_map &map)
 {
 	equites_map(map);
 	map(0x040000, 0x040fff).ram().share("nvram"); // mainram is battery-backed
-	map(0x580000, 0x580001).select(0x020000).w(this, FUNC(gekisou_state::gekisou_unknown_bit_w));
+	map(0x580000, 0x580001).select(0x020000).w(FUNC(gekisou_state::gekisou_unknown_bit_w));
 }
 
 
@@ -677,17 +677,17 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x040000, 0x040fff).ram();
 	map(0x080000, 0x080001).portr("IN0");
 	map(0x0c0000, 0x0c0001).portr("IN1");
-	map(0x0c0000, 0x0c0000).select(0x020000).w(this, FUNC(splndrbt_state::equites_bgcolor_w));
+	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::equites_bgcolor_w));
 	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w",
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
 												 });
-	map(0x100000, 0x100001).w(this, FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
+	map(0x100000, 0x100001).w(FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1c0000, 0x1c0001).w(this, FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
-	map(0x180000, 0x1807ff).rw(this, FUNC(splndrbt_state::mcu_ram_r), FUNC(splndrbt_state::mcu_ram_w)).umask16(0x00ff);
-	map(0x200000, 0x200fff).mirror(0x001000).rw(this, FUNC(splndrbt_state::equites_fg_videoram_r), FUNC(splndrbt_state::equites_fg_videoram_w)).umask16(0x00ff);
-	map(0x400000, 0x4007ff).ram().w(this, FUNC(splndrbt_state::equites_bg_videoram_w)).share("bg_videoram");
+	map(0x1c0000, 0x1c0001).w(FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
+	map(0x180000, 0x1807ff).rw(FUNC(splndrbt_state::mcu_ram_r), FUNC(splndrbt_state::mcu_ram_w)).umask16(0x00ff);
+	map(0x200000, 0x200fff).mirror(0x001000).rw(FUNC(splndrbt_state::equites_fg_videoram_r), FUNC(splndrbt_state::equites_fg_videoram_w)).umask16(0x00ff);
+	map(0x400000, 0x4007ff).ram().w(FUNC(splndrbt_state::equites_bg_videoram_w)).share("bg_videoram");
 	map(0x400800, 0x400fff).ram();
 	map(0x600000, 0x6000ff).ram().share("spriteram");   // sprite RAM 0,1
 	map(0x600100, 0x6001ff).ram().share("spriteram_2"); // sprite RAM 2 (8-bit)
@@ -701,10 +701,10 @@ void equites_state::sound_map(address_map &map)
 	map(0xc080, 0xc08d).w(m_msm, FUNC(msm5232_device::write));
 	map(0xc0a0, 0xc0a1).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0xc0b0, 0xc0b0).nopw(); // n.c.
-	map(0xc0c0, 0xc0c0).w(this, FUNC(equites_state::equites_cymbal_ctrl_w));
-	map(0xc0d0, 0xc0d0).w(this, FUNC(equites_state::equites_dac_latch_w));  // followed by 1 (and usually 0) on 8155 port B
-	map(0xc0e0, 0xc0e0).w(this, FUNC(equites_state::equites_dac_latch_w));  // followed by 2 (and usually 0) on 8155 port B
-	map(0xc0f8, 0xc0ff).w(this, FUNC(equites_state::equites_c0f8_w));
+	map(0xc0c0, 0xc0c0).w(FUNC(equites_state::equites_cymbal_ctrl_w));
+	map(0xc0d0, 0xc0d0).w(FUNC(equites_state::equites_dac_latch_w));  // followed by 1 (and usually 0) on 8155 port B
+	map(0xc0e0, 0xc0e0).w(FUNC(equites_state::equites_dac_latch_w));  // followed by 2 (and usually 0) on 8155 port B
+	map(0xc0f8, 0xc0ff).w(FUNC(equites_state::equites_c0f8_w));
 	map(0xe000, 0xe0ff).rw("audio8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 }
 

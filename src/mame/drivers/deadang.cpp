@@ -75,7 +75,7 @@ void deadang_state::main_map(address_map &map)
 	map(0x05000, 0x05fff).writeonly();
 	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x06010, 0x07fff).writeonly();
-	map(0x08000, 0x087ff).w(this, FUNC(deadang_state::text_w)).share("videoram");
+	map(0x08000, 0x087ff).w(FUNC(deadang_state::text_w)).share("videoram");
 	map(0x08800, 0x0bfff).writeonly();
 	map(0x0a000, 0x0a001).portr("P1_P2");
 	map(0x0a002, 0x0a003).portr("DSW");
@@ -92,23 +92,23 @@ void popnrun_state::popnrun_main_map(address_map &map)
 	map(0x00000, 0x03bff).ram();
 	map(0x03c00, 0x03dff).ram().share("spriteram");
 	map(0x03e00, 0x03fff).ram();
-	map(0x08000, 0x08fff).ram().w(this, FUNC(popnrun_state::popnrun_text_w)).share("videoram");
+	map(0x08000, 0x08fff).ram().w(FUNC(popnrun_state::popnrun_text_w)).share("videoram");
 	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
 }
 
 void deadang_state::sub_map(address_map &map)
 {
 	map(0x00000, 0x037ff).ram();
-	map(0x03800, 0x03fff).ram().w(this, FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x03800, 0x03fff).ram().w(FUNC(deadang_state::foreground_w)).share("video_data");
 	map(0x04000, 0x04fff).ram().share("share1");
-	map(0x08000, 0x08001).w(this, FUNC(deadang_state::bank_w));
+	map(0x08000, 0x08001).w(FUNC(deadang_state::bank_w));
 	map(0x0c000, 0x0c001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xe0000, 0xfffff).rom();
 }
 
 void popnrun_state::popnrun_sub_map(address_map &map)
 {
-	map(0x00000, 0x003ff).ram().w(this, FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x00000, 0x003ff).ram().w(FUNC(deadang_state::foreground_w)).share("video_data");
 	map(0x00400, 0x03fff).ram();
 	map(0x04000, 0x04fff).ram().share("share1");
 	map(0xe0000, 0xfffff).rom();
@@ -443,19 +443,19 @@ MACHINE_CONFIG_END
 /* ROMs */
 ROM_START( popnrun )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD16_BYTE( "popnrun-27512-1-6e.bin", 0xe0001, 0x010000, CRC(cf800494) SHA1(eaed51212c91ebb16e326f8133b60a0ecf0055e5) )
-    ROM_LOAD16_BYTE( "popnrun-27512-2-6h.bin", 0xe0000, 0x010000, CRC(bad47dc4) SHA1(279236cfe5102b4724f9fb4405f514dba011ae3d) )
+	ROM_LOAD16_BYTE( "popnrun-27512-1-6e.bin", 0xe0001, 0x010000, CRC(cf800494) SHA1(eaed51212c91ebb16e326f8133b60a0ecf0055e5) )
+	ROM_LOAD16_BYTE( "popnrun-27512-2-6h.bin", 0xe0000, 0x010000, CRC(bad47dc4) SHA1(279236cfe5102b4724f9fb4405f514dba011ae3d) )
 
 	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "popnrun-27256-3-17e.bin", 0xf0001, 0x008000, CRC(93f811aa) SHA1(75998375081d3cc5faa7533d39dd2d29a4ef3e7d) )
-    ROM_LOAD16_BYTE( "popnrun-27256-4-17h.bin", 0xf0000, 0x008000, CRC(8fe0c064) SHA1(2a854238b8335a85cbe75c901480b51d479273a0) )
+	ROM_LOAD16_BYTE( "popnrun-27256-4-17h.bin", 0xf0000, 0x008000, CRC(8fe0c064) SHA1(2a854238b8335a85cbe75c901480b51d479273a0) )
 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "popnrun-2764-5-22c.bin", 0x000000, 0x002000, CRC(768a2ec7) SHA1(abc02ec6c6a495e612e8708377d9e7ca98981de4) )
-    ROM_LOAD( "popnrun-27512-6-20c.bin", 0x010000, 0x010000, CRC(47d168ce) SHA1(36c16a400408834fcf0561c3f097e84a287560bd) )
+	ROM_LOAD( "popnrun-2764-5-22c.bin", 0x000000, 0x002000, CRC(768a2ec7) SHA1(abc02ec6c6a495e612e8708377d9e7ca98981de4) )
+	ROM_LOAD( "popnrun-27512-6-20c.bin", 0x010000, 0x010000, CRC(47d168ce) SHA1(36c16a400408834fcf0561c3f097e84a287560bd) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
-    ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
+	ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
 
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
@@ -482,24 +482,24 @@ ROM_START( popnrun )
 	ROM_REGION( 0x10000, "adpcm2", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0100, "prom", ROMREGION_ERASE00 )
-    ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
+	ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
 ROM_END
 
 ROM_START( popnruna )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD16_BYTE( "1.e5.27512",   0xe0001, 0x010000, CRC(fe45b6c4) SHA1(efa0d4ce6c5963f25ca1195cd2d5745e730b3b95) )
-    ROM_LOAD16_BYTE( "2.h5.27512",   0xe0000, 0x010000, CRC(1e325398) SHA1(ca481c1447de4bffdea695deb9bb46c269272c68) )
+	ROM_LOAD16_BYTE( "1.e5.27512",   0xe0001, 0x010000, CRC(fe45b6c4) SHA1(efa0d4ce6c5963f25ca1195cd2d5745e730b3b95) )
+	ROM_LOAD16_BYTE( "2.h5.27512",   0xe0000, 0x010000, CRC(1e325398) SHA1(ca481c1447de4bffdea695deb9bb46c269272c68) )
 
 	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "popnrun-27256-3-17e.bin", 0xf0001, 0x008000, CRC(93f811aa) SHA1(75998375081d3cc5faa7533d39dd2d29a4ef3e7d) )
-    ROM_LOAD16_BYTE( "popnrun-27256-4-17h.bin", 0xf0000, 0x008000, CRC(8fe0c064) SHA1(2a854238b8335a85cbe75c901480b51d479273a0) )
+	ROM_LOAD16_BYTE( "popnrun-27256-4-17h.bin", 0xf0000, 0x008000, CRC(8fe0c064) SHA1(2a854238b8335a85cbe75c901480b51d479273a0) )
 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "popnrun-2764-5-22c.bin", 0x000000, 0x002000, CRC(768a2ec7) SHA1(abc02ec6c6a495e612e8708377d9e7ca98981de4) )
-    ROM_LOAD( "popnrun-27512-6-20c.bin", 0x010000, 0x010000, CRC(47d168ce) SHA1(36c16a400408834fcf0561c3f097e84a287560bd) )
+	ROM_LOAD( "popnrun-2764-5-22c.bin", 0x000000, 0x002000, CRC(768a2ec7) SHA1(abc02ec6c6a495e612e8708377d9e7ca98981de4) )
+	ROM_LOAD( "popnrun-27512-6-20c.bin", 0x010000, 0x010000, CRC(47d168ce) SHA1(36c16a400408834fcf0561c3f097e84a287560bd) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
-    ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
+	ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
 
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
@@ -522,7 +522,7 @@ ROM_START( popnruna )
 	ROM_LOAD( "gfx7.bin",  0x0000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x0100, "prom", ROMREGION_ERASE00 )
-    ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
+	ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
 ROM_END
 
 ROM_START( deadang )
@@ -723,8 +723,8 @@ void deadang_state::init_deadang()
 
 void popnrun_state::init_popnrun()
 {
-//	m_adpcm1->decrypt();
-//	m_adpcm2->decrypt();
+//  m_adpcm1->decrypt();
+//  m_adpcm2->decrypt();
 }
 
 void deadang_state::init_ghunter()

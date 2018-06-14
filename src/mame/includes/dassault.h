@@ -13,6 +13,7 @@
 #include "video/decocomn.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "emupal.h"
 
 class dassault_state : public driver_device
 {

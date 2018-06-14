@@ -20,6 +20,7 @@
 #include "machine/gen_latch.h"
 #include "machine/seicopbl.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -163,18 +164,18 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		switch (cur_pri)
 		{
 			// gumdam swamp monster l2
-			case 0: pri_mask = -256; break; 
+			case 0: pri_mask = -256; break;
 			// (players and football goal, should go above sidelines but behind portraits when there's a goal)
 			case 1: pri_mask = 0xfff0; break;
 			// masking effect for gundam l2 monster
-			case 2: pri_mask = -4; break; 
+			case 2: pri_mask = -4; break;
 			// cupsoc (radar dots)
-			case 3: pri_mask = 0x0000; break; 
+			case 3: pri_mask = 0x0000; break;
 			// gundam level 2/3 player
 			case 4: pri_mask = -32; break;
 			//case 5: pri_mask = 0; break;
 			// insert coin in gundam
-			case 6: pri_mask = 0; break; 
+			case 6: pri_mask = 0; break;
 			//case 7: pri_mask = 0; break;
 
 			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
@@ -292,16 +293,16 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
 	}
 
-	if (!(m_layer_disable&0x0001)) 
+	if (!(m_layer_disable&0x0001))
 		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 1);
-	
-	if (!(m_layer_disable&0x0002)) 
+
+	if (!(m_layer_disable&0x0002))
 		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 2);
-	
-	if (!(m_layer_disable&0x0004)) 
+
+	if (!(m_layer_disable&0x0004))
 		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 4);
-	
-	if (!(m_layer_disable&0x0008)) 
+
+	if (!(m_layer_disable&0x0008))
 		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 8);
 
 	if (!(m_layer_disable&0x0010))
@@ -343,7 +344,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	map(0x000000, 0x0fffff).rom();
 	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
-	map(0x10065c, 0x10065d).w(this, FUNC(seicupbl_state::layer_disable_w));
+	map(0x10065c, 0x10065d).w(FUNC(seicupbl_state::layer_disable_w));
 	map(0x100660, 0x10066f).ram().share("vregs");
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
@@ -351,10 +352,10 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
 	map(0x100741, 0x100741).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100800, 0x100fff).ram().w(this, FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
-	map(0x101800, 0x101fff).ram().w(this, FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
-	map(0x102000, 0x102fff).ram().w(this, FUNC(seicupbl_state::vram_sc3_w)).share("textram");
+	map(0x100800, 0x100fff).ram().w(FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram().w(FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
+	map(0x101800, 0x101fff).ram().w(FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
+	map(0x102000, 0x102fff).ram().w(FUNC(seicupbl_state::vram_sc3_w)).share("textram");
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x106fff).ram();
 	map(0x107000, 0x1077ff).ram().share("spriteram");
@@ -372,7 +373,7 @@ void seicupbl_state::cupsocbl_sound_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(seicupbl_state::okim_rombank_w));
+	map(0x9000, 0x9000).w(FUNC(seicupbl_state::okim_rombank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

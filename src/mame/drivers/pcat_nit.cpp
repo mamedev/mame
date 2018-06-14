@@ -158,7 +158,7 @@ void pcat_nit_state::pcat_map(address_map &map)
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
 	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
-	map(0x000d7000, 0x000d7000).w(this, FUNC(pcat_nit_state::pcat_nit_rombank_w));
+	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
 	map(0x000d8000, 0x000dffff).bankr("rombank");
 	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
@@ -170,7 +170,7 @@ void pcat_nit_state::bonanza_map(address_map &map)
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
 	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
-	map(0x000d7000, 0x000d7000).w(this, FUNC(pcat_nit_state::pcat_nit_rombank_w));
+	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
 	map(0x000d8000, 0x000dffff).bankr("rombank");
 	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
@@ -194,7 +194,7 @@ READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 void pcat_nit_state::pcat_nit_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0278, 0x027f).r(this, FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
+	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
@@ -205,7 +205,7 @@ void pcat_nit_state::pcat_nit_io(address_map &map)
 void pcat_nit_state::bonanza_io_map(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0278, 0x027f).r(this, FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
+	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
 	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
@@ -425,7 +425,7 @@ ROM_END
 void pcat_nit_state::init_pcat_nit()
 {
 	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
-	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
 
 GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -494,31 +494,31 @@ void ecoinfr_state::memmap(address_map &map)
 void ecoinfr_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
-	map(0x01, 0x01).w(this, FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
-	map(0x02, 0x02).w(this, FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
-	map(0x03, 0x03).w(this, FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
-	map(0x04, 0x04).w(this, FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
-	map(0x05, 0x05).w(this, FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
-	map(0x06, 0x06).w(this, FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
-	map(0x07, 0x07).w(this, FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
-	map(0x08, 0x08).w(this, FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
-	map(0x09, 0x09).w(this, FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
-	map(0x0a, 0x0a).w(this, FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
-	map(0x0b, 0x0b).w(this, FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
-	map(0x0c, 0x0c).w(this, FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
-	map(0x0d, 0x0d).w(this, FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
+	map(0x00, 0x00).w(FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
+	map(0x01, 0x01).w(FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
+	map(0x02, 0x02).w(FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
+	map(0x03, 0x03).w(FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
+	map(0x04, 0x04).w(FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
+	map(0x05, 0x05).w(FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
+	map(0x06, 0x06).w(FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
+	map(0x07, 0x07).w(FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
+	map(0x08, 0x08).w(FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
+	map(0x09, 0x09).w(FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
+	map(0x0a, 0x0a).w(FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
+	map(0x0b, 0x0b).w(FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
+	map(0x0c, 0x0c).w(FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
+	map(0x0d, 0x0d).w(FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
 //  AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
-	map(0x0f, 0x0f).w(this, FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
-	map(0x10, 0x10).w(this, FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
-	map(0x11, 0x11).w(this, FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
-	map(0x12, 0x12).w(this, FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
-	map(0x13, 0x13).w(this, FUNC(ecoinfr_state::ec_port13_out_w));
-	map(0x14, 0x14).w(this, FUNC(ecoinfr_state::ec_port14_out_w));
-	map(0x15, 0x15).w(this, FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
-	map(0x16, 0x16).w(this, FUNC(ecoinfr_state::ec_port16_out_w));
-	map(0x17, 0x17).w(this, FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
-	map(0x18, 0x18).w(this, FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
+	map(0x0f, 0x0f).w(FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
+	map(0x10, 0x10).w(FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
+	map(0x11, 0x11).w(FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
+	map(0x12, 0x12).w(FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
+	map(0x13, 0x13).w(FUNC(ecoinfr_state::ec_port13_out_w));
+	map(0x14, 0x14).w(FUNC(ecoinfr_state::ec_port14_out_w));
+	map(0x15, 0x15).w(FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
+	map(0x16, 0x16).w(FUNC(ecoinfr_state::ec_port16_out_w));
+	map(0x17, 0x17).w(FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
+	map(0x18, 0x18).w(FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
 }
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
@@ -790,13 +790,13 @@ MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
-	MCFG_ECOIN_200STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel0_optic_cb))
-	MCFG_ECOIN_200STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel1_optic_cb))
-	MCFG_ECOIN_200STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel2_optic_cb))
-	MCFG_ECOIN_200STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 

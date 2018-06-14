@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/decmxc06.h"
+#include "emupal.h"
 
 
 class thedeep_state : public driver_device

@@ -35,6 +35,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,19 +43,14 @@
 class thedealr_state : public driver_device
 {
 public:
-	thedealr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thedealr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 0U)
 	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<seta001_device> m_seta001;
-	required_device<palette_device> m_palette;
 
 	// IOX
 	DECLARE_READ8_MEMBER(iox_r);
@@ -68,8 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 
 	// machine
-	DECLARE_MACHINE_START(thedealr);
-	DECLARE_MACHINE_RESET(thedealr);
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
@@ -79,6 +73,18 @@ public:
 	void thedealr(machine_config &config);
 	void thedealr(address_map &map);
 	void thedealr_sub(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<seta001_device> m_seta001;
+	required_device<palette_device> m_palette;
+	output_finder<8> m_leds;
 };
 
 /***************************************************************************
@@ -135,7 +141,7 @@ void thedealr_state::iox_reset()
 	m_iox_coins     =   0x00;
 }
 
-MACHINE_RESET_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_reset()
 {
 	iox_reset();
 }
@@ -160,14 +166,14 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x20:  // leds
 				m_iox_leds = data;
-				output().set_led_value(0, data & 0x01);  // bet
-				output().set_led_value(1, data & 0x02);  // deal
-				output().set_led_value(2, data & 0x04);
-				output().set_led_value(3, data & 0x08);
-				output().set_led_value(4, data & 0x10);  // hold 1-5?
-				output().set_led_value(5, data & 0x20);
-				output().set_led_value(6, data & 0x40);
-				output().set_led_value(7, data & 0x80);
+				m_leds[0] = BIT(data, 0);  // bet
+				m_leds[1] = BIT(data, 1);  // deal
+				m_leds[2] = BIT(data, 2);
+				m_leds[3] = BIT(data, 3);
+				m_leds[4] = BIT(data, 4);  // hold 1-5?
+				m_leds[5] = BIT(data, 5);
+				m_leds[6] = BIT(data, 6);
+				m_leds[7] = BIT(data, 7);
 				break;
 
 			case 0x40:  // coin counters
@@ -279,16 +285,16 @@ void thedealr_state::thedealr(address_map &map)
 
 	map(0x2000, 0x2000).ram(); // w ff at boot (after clearing commram)
 
-	map(0x2400, 0x2400).r(this, FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
-	map(0x2400, 0x2400).w(this, FUNC(thedealr_state::unk_w));    // w = ?
+	map(0x2400, 0x2400).r(FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
+	map(0x2400, 0x2400).w(FUNC(thedealr_state::unk_w));    // w = ?
 
 	map(0x2800, 0x2800).portr("COINS").nopw();  // rw
 
 	map(0x2801, 0x2801).portr("DSW4");
 	map(0x2c00, 0x2c00).portr("DSW3");
 
-	map(0x3400, 0x3400).rw(this, FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
-	map(0x3401, 0x3401).r(this, FUNC(thedealr_state::iox_status_r));
+	map(0x3400, 0x3400).rw(FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
+	map(0x3401, 0x3401).r(FUNC(thedealr_state::iox_status_r));
 
 	map(0x3000, 0x3000).ram(); // rw, comm in test mode
 	map(0x3001, 0x3001).ram(); // rw, ""
@@ -506,8 +512,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));
 	save_item(NAME(m_iox_cmd));
@@ -545,9 +553,6 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-
-	MCFG_MACHINE_RESET_OVERRIDE(thedealr_state,thedealr)
-	MCFG_MACHINE_START_OVERRIDE(thedealr_state,thedealr)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

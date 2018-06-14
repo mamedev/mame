@@ -134,9 +134,9 @@ void zac1b11142_audio_device::zac1b11142_audio_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x007f).ram(); // 6802 internal RAM
 	map(0x0090, 0x0093).mirror(0x8f6c).rw("pia_1i", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::write));
-	map(0x1400, 0x1400).mirror(0xc3ff).w(this, FUNC(zac1b11142_audio_device::melody_command_w));
-	map(0x1800, 0x1800).mirror(0xc3ff).r(this, FUNC(zac1b11142_audio_device::host_command_r));
+	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x1400, 0x1400).mirror(0xc3ff).w(FUNC(zac1b11142_audio_device::melody_command_w));
+	map(0x1800, 0x1800).mirror(0xc3ff).r(FUNC(zac1b11142_audio_device::host_command_r));
 	map(0x2000, 0x2fff).mirror(0x8000).rom(); // ROM 8 with A12 low
 	map(0x3000, 0x3fff).mirror(0x8000).rom(); // ROM 7 with A12 low
 	map(0x6000, 0x6fff).mirror(0x8000).rom(); // ROM 8 with A12 high

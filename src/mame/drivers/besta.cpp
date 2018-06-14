@@ -110,7 +110,7 @@ void besta_state::besta_mem(address_map &map)
 	map(0xff000000, 0xff00ffff).rom().region("user1", 0);   // actual mapping is up to 0xff03ffff
 	map(0xff040000, 0xff07ffff).ram();                         // onboard SRAM
 //  AM_RANGE(0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_t, reg_r, reg_w, 0xffffffff)
-	map(0xff800000, 0xff80001f).rw(this, FUNC(besta_state::mpcc_reg_r), FUNC(besta_state::mpcc_reg_w)); // console
+	map(0xff800000, 0xff80001f).rw(FUNC(besta_state::mpcc_reg_r), FUNC(besta_state::mpcc_reg_w)); // console
 	map(0xff800200, 0xff800237).rw(m_pit2, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 //  AM_RANGE(0xff800400, 0xff800xxx) // ??? -- shows up in cp31dssp log
 //  AM_RANGE(0xff800800, 0xff800xxx) // 68153 BIM
@@ -155,11 +155,11 @@ ROM_START( besta88 )
 	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 
 	ROM_SYSTEM_BIOS(0, "cp31dbg", "CP31 Debug")
-	ROMX_LOAD( "cp31dbgboot.27c512",  0x0000, 0x10000, CRC(9bf057de) SHA1(b13cb16042e4c6ca63ae26058a78259c0849d0b6), ROM_BIOS(1))
+	ROMX_LOAD( "cp31dbgboot.27c512",  0x0000, 0x10000, CRC(9bf057de) SHA1(b13cb16042e4c6ca63ae26058a78259c0849d0b6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "cp31dssp", "CP31 DSSP")
-	ROMX_LOAD( "cp31dsspboot.27c512", 0x0000, 0x10000, CRC(607a0a55) SHA1(c257a88672ab39d2f3fad681d22e062182b0236d), ROM_BIOS(2))
+	ROMX_LOAD( "cp31dsspboot.27c512", 0x0000, 0x10000, CRC(607a0a55) SHA1(c257a88672ab39d2f3fad681d22e062182b0236d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "cp31os9", "CP31 OS9")
-	ROMX_LOAD( "cp31os9.27c512",      0x0000, 0x10000, CRC(607a0a55) SHA1(c257a88672ab39d2f3fad681d22e062182b0236d), ROM_BIOS(3))
+	ROMX_LOAD( "cp31os9.27c512",      0x0000, 0x10000, CRC(607a0a55) SHA1(c257a88672ab39d2f3fad681d22e062182b0236d), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

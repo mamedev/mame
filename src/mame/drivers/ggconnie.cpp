@@ -79,7 +79,7 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1f7100, 0x1f7100).portr("SWB");
 	map(0x1f7200, 0x1f7200).portr("SWC");
 	map(0x1f7700, 0x1f7700).portr("IN1");
-	map(0x1f7800, 0x1f7800).w(this, FUNC(ggconnie_state::output_w));
+	map(0x1f7800, 0x1f7800).w(FUNC(ggconnie_state::output_w));
 	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
 	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
 	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
@@ -87,9 +87,9 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1fe800, 0x1febff).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1fec00, 0x1fefff).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
 	map(0x1f7300, 0x1f7300).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1f7400, 0x1f74ff).w(this, FUNC(ggconnie_state::oki_bank_w));
+	map(0x1f7400, 0x1f74ff).w(FUNC(ggconnie_state::oki_bank_w));
 	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x1ff000, 0x1ff000).portr("IN0").w(this, FUNC(ggconnie_state::lamp_w));
+	map(0x1ff000, 0x1ff000).portr("IN0").w(FUNC(ggconnie_state::lamp_w));
 	map(0x1ff400, 0x1ff7ff).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 

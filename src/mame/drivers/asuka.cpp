@@ -275,7 +275,7 @@ WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 
 	if (m_adpcm_ff)
 	{
-		m_adpcm_select->ba_w(m_sound_data[m_adpcm_pos]);
+		m_adpcm_select->write_ba(m_sound_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 	}
 }
@@ -328,7 +328,7 @@ void asuka_state::bonzeadv_map(address_map &map)
 	map(0x10c000, 0x10ffff).ram();
 	map(0x200000, 0x200007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
 	map(0x390000, 0x390001).portr("DSWA");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(asuka_state::asuka_spritectrl_w));
 	map(0x3b0000, 0x3b0001).portr("DSWB");
 	map(0x3c0000, 0x3c0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x3d0000, 0x3d0001).nopr();
@@ -347,7 +347,7 @@ void asuka_state::asuka_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x1076f0, 0x1076f1).nopr(); /* Mofflott init does dummy reads here */
 	map(0x200000, 0x20000f).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
-	map(0x3a0000, 0x3a0003).w(this, FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x3a0000, 0x3a0003).w(FUNC(asuka_state::asuka_spritectrl_w));
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0003, 0x3e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -361,12 +361,12 @@ void asuka_state::asuka_map(address_map &map)
 void asuka_state::cadash_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080003).w(this, FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x080000, 0x080003).w(FUNC(asuka_state::asuka_spritectrl_w));
 	map(0x0c0000, 0x0c0001).nopr();
 	map(0x0c0001, 0x0c0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x0c0003, 0x0c0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0x100000, 0x107fff).ram();
-	map(0x800000, 0x800fff).rw(this, FUNC(asuka_state::cadash_share_r), FUNC(asuka_state::cadash_share_w));    /* network ram */
+	map(0x800000, 0x800fff).rw(FUNC(asuka_state::cadash_share_r), FUNC(asuka_state::cadash_share_w));    /* network ram */
 	map(0x900000, 0x90000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0xa00000, 0xa0000f).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_4bpg_word_w));
 	map(0xb00000, 0xb03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
@@ -381,7 +381,7 @@ void asuka_state::eto_map(address_map &map)
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x30000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x400000, 0x40000f).r(m_tc0220ioc, FUNC(tc0220ioc_device::read)).umask16(0x00ff);   /* service mode mirror */
-	map(0x4a0000, 0x4a0003).w(this, FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x4a0000, 0x4a0003).w(FUNC(asuka_state::asuka_spritectrl_w));
 	map(0x4e0000, 0x4e0001).nopr();
 	map(0x4e0001, 0x4e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x4e0003, 0x4e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -406,7 +406,7 @@ void asuka_state::bonzeadv_z80_map(address_map &map)
 	map(0xe600, 0xe600).nopw();
 	map(0xee00, 0xee00).nopw();
 	map(0xf000, 0xf000).nopw();
-	map(0xf200, 0xf200).w(this, FUNC(asuka_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(asuka_state::sound_bankswitch_w));
 }
 
 void asuka_state::z80_map(address_map &map)
@@ -418,9 +418,9 @@ void asuka_state::z80_map(address_map &map)
 //  map(0x9002, 0x9100).nopr();
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb000).w(this, FUNC(asuka_state::asuka_msm5205_address_w));
-	map(0xc000, 0xc000).w(this, FUNC(asuka_state::asuka_msm5205_start_w));
-	map(0xd000, 0xd000).w(this, FUNC(asuka_state::asuka_msm5205_stop_w));
+	map(0xb000, 0xb000).w(FUNC(asuka_state::asuka_msm5205_address_w));
+	map(0xc000, 0xc000).w(FUNC(asuka_state::asuka_msm5205_start_w));
+	map(0xd000, 0xd000).w(FUNC(asuka_state::asuka_msm5205_stop_w));
 }
 
 /* no MSM5205 */
@@ -884,8 +884,7 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -947,8 +946,7 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1023,8 +1021,7 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1086,8 +1083,7 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1157,8 +1153,7 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

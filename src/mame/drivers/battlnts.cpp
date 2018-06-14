@@ -73,11 +73,11 @@ void battlnts_state::battlnts_map(address_map &map)
 	map(0x2e02, 0x2e02).portr("P1");
 	map(0x2e03, 0x2e03).portr("DSW3");               /* coinsw, testsw, startsw */
 	map(0x2e04, 0x2e04).portr("DSW2");
-	map(0x2e08, 0x2e08).w(this, FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
-	map(0x2e0c, 0x2e0c).w(this, FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
+	map(0x2e08, 0x2e08).w(FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
+	map(0x2e0c, 0x2e0c).w(FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
 	map(0x2e10, 0x2e10).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2e14, 0x2e14).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound code # */
-	map(0x2e18, 0x2e18).w(this, FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x2e18, 0x2e18).w(FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
 	map(0x4000, 0x7fff).bankr("rombank");              /* banked ROM */
 	map(0x8000, 0xffff).rom();                             /* ROM 777e02.bin */
 }

@@ -90,6 +90,7 @@
 #include "cpu/tms32051/tms32051.h"
 #include "video/tc0780fpa.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
@@ -529,9 +530,9 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 void taitopjc_state::ppc603e_mem(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram(); // Work RAM
-	map(0x40000000, 0x4000000f).rw(this, FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
-	map(0x80000000, 0x80003fff).rw(this, FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
-	map(0xc0000000, 0xc0003fff).rw(this, FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
+	map(0x40000000, 0x4000000f).rw(FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
+	map(0x80000000, 0x80003fff).rw(FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
+	map(0xc0000000, 0xc0003fff).rw(FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
 	map(0xfe800000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffe00000, 0xffffffff).rom().region("user1", 0);
 }
@@ -629,10 +630,10 @@ WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
 void taitopjc_state::tlcs900h_mem(address_map &map)
 {
 	map(0x010000, 0x02ffff).ram();     // Work RAM
-	map(0x040000, 0x0400ff).rw(this, FUNC(taitopjc_state::tlcs_sound_r), FUNC(taitopjc_state::tlcs_sound_w));
+	map(0x040000, 0x0400ff).rw(FUNC(taitopjc_state::tlcs_sound_r), FUNC(taitopjc_state::tlcs_sound_w));
 	map(0x044000, 0x045fff).ram().share("nvram");
-	map(0x060000, 0x061fff).rw(this, FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
-	map(0x06c000, 0x06c00f).w(this, FUNC(taitopjc_state::tlcs_unk_w));
+	map(0x060000, 0x061fff).rw(FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
+	map(0x06c000, 0x06c00f).w(FUNC(taitopjc_state::tlcs_unk_w));
 	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
 }
 
@@ -689,17 +690,17 @@ void taitopjc_state::tms_data_map(address_map &map)
 {
 	map(0x4000, 0x6fff).rom().region("user2", 0x8000);
 	map(0x7000, 0xefff).ram();
-	map(0xf000, 0xffff).rw(this, FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
+	map(0xf000, 0xffff).rw(FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
 }
 
 void taitopjc_state::tms_io_map(address_map &map)
 {
-	map(0x0053, 0x0053).w(this, FUNC(taitopjc_state::dsp_roml_w));
-	map(0x0057, 0x0057).w(this, FUNC(taitopjc_state::dsp_romh_w));
+	map(0x0053, 0x0053).w(FUNC(taitopjc_state::dsp_roml_w));
+	map(0x0057, 0x0057).w(FUNC(taitopjc_state::dsp_romh_w));
 	map(0x0058, 0x0058).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
 	map(0x005a, 0x005a).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x005b, 0x005b).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
-	map(0x005f, 0x005f).r(this, FUNC(taitopjc_state::dsp_rom_r));
+	map(0x005f, 0x005f).r(FUNC(taitopjc_state::dsp_rom_r));
 }
 
 

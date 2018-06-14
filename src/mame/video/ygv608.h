@@ -314,12 +314,6 @@ DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_YGV608_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, YGV608, 0)
-
-#define MCFG_YGV608_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
-
 #define MCFG_YGV608_VBLANK_HANDLER( _intcallb ) \
 	devcb = &downcast<ygv608_device &>(*device).set_vblank_callback(DEVCB_##_intcallb);
 

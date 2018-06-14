@@ -414,24 +414,24 @@ READ8_MEMBER(mcr_dpoker_state::ip0_r)
 WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
 {
 	// cpanel button lamps (white)
-	output().set_lamp_value(0, data >> 0 & 1); // hold 1
-	output().set_lamp_value(1, data >> 4 & 1); // hold 2
-	output().set_lamp_value(2, data >> 5 & 1); // hold 3
-	output().set_lamp_value(3, data >> 6 & 1); // hold 4
-	output().set_lamp_value(4, data >> 7 & 1); // hold 5
-	output().set_lamp_value(5, data >> 1 & 1); // deal
-	output().set_lamp_value(6, data >> 2 & 1); // cancel
-	output().set_lamp_value(7, data >> 3 & 1); // stand
+	m_lamps[0] = BIT(data, 0); // hold 1
+	m_lamps[1] = BIT(data, 4); // hold 2
+	m_lamps[2] = BIT(data, 5); // hold 3
+	m_lamps[3] = BIT(data, 6); // hold 4
+	m_lamps[4] = BIT(data, 7); // hold 5
+	m_lamps[5] = BIT(data, 1); // deal
+	m_lamps[6] = BIT(data, 2); // cancel
+	m_lamps[7] = BIT(data, 3); // stand
 }
 
 WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
 {
 	// d5: button lamp: service or change
-	output().set_lamp_value(8, data >> 5 & 1);
+	m_lamps[8] = BIT(data, 5);
 
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
-		output().set_lamp_value(9 + i, data >> i & 1);
+		m_lamps[9 + i] = BIT(data, i);
 
 	// d6, d7: unused?
 }
@@ -699,7 +699,7 @@ void mcr_state::cpu_90009_map(address_map &map)
 	map(0xf000, 0xf1ff).mirror(0x0200).ram().share("spriteram");
 	map(0xf400, 0xf41f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf81f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
+	map(0xfc00, 0xffff).ram().w(FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -728,7 +728,7 @@ void mcr_state::cpu_90010_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("nvram");
 	map(0xe000, 0xe1ff).mirror(0x1600).ram().share("spriteram");
-	map(0xe800, 0xefff).mirror(0x1000).ram().w(this, FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).mirror(0x1000).ram().w(FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -757,8 +757,8 @@ void mcr_state::cpu_91490_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).mirror(0x0200).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
-	map(0xf800, 0xf87f).mirror(0x0780).w(this, FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
+	map(0xf800, 0xf87f).mirror(0x0780).w(FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -797,8 +797,8 @@ void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
 	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x10, 0x13).mirror(0xe0).w(this, FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
-	map(0x1c, 0x1f).mirror(0xe0).rw(this, FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
+	map(0x10, 0x13).mirror(0xe0).w(FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
+	map(0x1c, 0x1f).mirror(0xe0).rw(FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
 }
 
 
@@ -2446,6 +2446,34 @@ ROM_START( tapper )
 	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "tapper_video_fg_1_a7_12-7-83.a7",   0x00000, 0x4000, CRC(32509011) SHA1(a38667573d235efe2dc515e52af05825fe4e0f30) ) /* labeled TAPPER VIDEO FG1 A7 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_0_a8_12-7-83.a8",   0x04000, 0x4000, CRC(8412c808) SHA1(2077f79177fda26f9c674b2ab525ec3833802059) ) /* labeled TAPPER VIDEO FG0 A8 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_3_a5_12-7-83.a5",   0x08000, 0x4000, CRC(818fffd4) SHA1(930142dd73fb30c4d3ec09a1e37517c6c6774024) ) /* labeled TAPPER VIDEO FG3 A5 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_2_a6_12-7-83.a6",   0x0c000, 0x4000, CRC(67e37690) SHA1(d553b8517c1d03a2be0b065f4da2fa99d9e6fb30) ) /* labeled TAPPER VIDEO FG2 A6 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_5_a3_12-7-83.a3",   0x10000, 0x4000, CRC(800f7c8a) SHA1(8aead89e1adaee5f0b679661c4bfba36e0d639e8) ) /* labeled TAPPER VIDEO FG5 A3 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_4_a4_12-7-83.a4",   0x14000, 0x4000, CRC(32674ee6) SHA1(402c166d50b4a693959b3f0706a7931a5daef6ce) ) /* labeled TAPPER VIDEO FG4 A4 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_7_a1_12-7-83.a1",   0x18000, 0x4000, CRC(070b4c81) SHA1(95879a455ecfe2e3de7fe2a75078f9e6934960f5) ) /* labeled TAPPER VIDEO FG7 A1 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_6_a2_12-7-83.a2",   0x1c000, 0x4000, CRC(a37aef36) SHA1(a24696f16d467d9eea4f25aef5f4c5ff55bf51ff) ) /* labeled TAPPER VIDEO FG6 A2 12/7/83 */
+ROM_END
+
+ROM_START( tapperg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c_1-27-84.1c",   0x00000, 0x4000, CRC(bb060bb0) SHA1(ff5a729e36faea3758c8c7b345a42dd8bb465f44) ) /* labeled TAPPER C.P.U. PG 0 1C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c_1-27-84.2c",   0x04000, 0x4000, CRC(fd9acc22) SHA1(b9f0396e2eba5772deec4725c41fa9de49658e72) ) /* labeled TAPPER C.P.U. PG 1 2C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c_1-27-84.3c",   0x08000, 0x4000, CRC(b3755d41) SHA1(434d3c27b9f1e43def081d79b9f56dbce93a9207) ) /* labeled TAPPER C.P.U. PG 2 3C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c_1-27-84.4c",   0x0c000, 0x2000, CRC(77273096) SHA1(5e4e2dc1703b39f588ba374f6a610f273d710532) ) /* labeled TAPPER C.P.U. PG 3 4C 1/27/84 */
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_1_a8_12-7-83.a8",   0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) ) /* labeled TAPPER SOUND SND 1 A8 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_2_a9_12-7-83.a9",   0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) ) /* labeled TAPPER SOUND SND 2 A9 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_3_a10_12-7-83.a10", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) ) /* labeled TAPPER SOUND SND 3 A10 12/7/83 */
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "tapper_c.p.u._bg_1_6f_12-7-83.6f",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) ) /* labeled TAPPER C.P.U. BG 1 6F 12/7/83 */
+	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "fg1_a7.128",   0x00000, 0x4000, CRC(bac70b69) SHA1(7fd26cc8ff2faab86d04fcee2b5ec49ecf6b8143) ) /* Are these correct or hacked? Customers from ALL other sets match the 12/7/83 */
 	ROM_LOAD( "fg0_a8.128",   0x04000, 0x4000, CRC(c300925d) SHA1(45df1ac033512be942460d678a7c1ba9dcef1937) ) /* graphics set including the Root Beer and Suntory sets. */
 	ROM_LOAD( "fg3_a5.128",   0x08000, 0x4000, CRC(ecff6c23) SHA1(0b28e7e59eba983bc1929758f8dcaf315b7134a1) ) /* The 1/27/84 program set has been verified to come with 12/7/83 graphics in at least one machine */
@@ -2977,6 +3005,7 @@ GAME(  1983, journey,   0,        mcr_91475,     journey,   mcr_state,         i
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
 GAME(  1983, tapper,    0,        mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
+GAME(  1983, tapperg,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84 - Alternate graphics)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
 GAME(  1983, tappera,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
 GAME(  1983, tapperb,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, Date Unknown)", MACHINE_SUPPORTS_SAVE ) /* First release at 12/7/83? or in between the other two? */
 GAME(  1983, sutapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )

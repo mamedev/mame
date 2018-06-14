@@ -133,7 +133,7 @@ void groundfx_state::groundfx_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).ram().share("ram"); /* main CPUA ram */
 	map(0x300000, 0x303fff).ram().share("spriteram"); /* sprite ram */
-	map(0x400000, 0x400003).w(this, FUNC(groundfx_state::motor_control_w));  /* gun vibration */
+	map(0x400000, 0x400003).w(FUNC(groundfx_state::motor_control_w));  /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
@@ -144,7 +144,7 @@ void groundfx_state::groundfx_map(address_map &map)
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb003ff).ram();                     // ?? single bytes, blending ??
 	map(0xc00000, 0xc00007).nopr(); /* Network? */
-	map(0xd00000, 0xd00003).w(this, FUNC(groundfx_state::rotate_control_w)); /* perhaps port based rotate control? */
+	map(0xd00000, 0xd00003).w(FUNC(groundfx_state::rotate_control_w)); /* perhaps port based rotate control? */
 	/* f00000 is seat control? */
 }
 
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_DEVICE_PROGRAM_MAP(groundfx_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))

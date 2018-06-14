@@ -117,6 +117,11 @@
  *
  *************************************/
 
+void eolith_state::machine_start()
+{
+	m_led.resolve();
+}
+
 READ32_MEMBER(eolith_state::eolith_custom_r)
 {
 	/*
@@ -136,7 +141,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
-	output().set_led_value(0, data & 1);
+	m_led = BIT(data, 0);
 
 	m_eepromoutport->write(data, 0xff);
 
@@ -221,9 +226,9 @@ void eolith_state::eolith_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram(); // fort2b wants ram here
 	map(0x40000000, 0x401fffff).ram();
-	map(0x90000000, 0x9003ffff).rw(this, FUNC(eolith_state::eolith_vram_r), FUNC(eolith_state::eolith_vram_w));
-	map(0xfc000000, 0xfc000003).r(this, FUNC(eolith_state::eolith_custom_r));
-	map(0xfc400000, 0xfc400003).w(this, FUNC(eolith_state::systemcontrol_w));
+	map(0x90000000, 0x9003ffff).rw(FUNC(eolith_state::eolith_vram_r), FUNC(eolith_state::eolith_vram_w));
+	map(0xfc000000, 0xfc000003).r(FUNC(eolith_state::eolith_custom_r));
+	map(0xfc400000, 0xfc400003).w(FUNC(eolith_state::systemcontrol_w));
 	map(0xfc800000, 0xfc800003).w("soundlatch", FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
 	map(0xfca00000, 0xfca00003).portr("DSW1");
 	map(0xfcc00000, 0xfcc0005b).nopw(); // crt registers ?
@@ -236,8 +241,8 @@ void eolith_state::hidctch3_map(address_map &map)
 	eolith_map(map);
 	map(0xfc200000, 0xfc200003).nopw(); // this generates pens vibration
 	// It is not clear why the first reads are needed too
-	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<0>));
-	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<1>));
+	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(FUNC(eolith_state::hidctch3_pen_r<0>));
+	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(FUNC(eolith_state::hidctch3_pen_r<1>));
 }
 
 
@@ -547,7 +552,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))
 

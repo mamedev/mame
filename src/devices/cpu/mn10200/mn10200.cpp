@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "Panasonic MN102
 // internal memory maps
 void mn10200_device::mn1020012a_internal_map(address_map &map)
 {
-	map(0x00fc00, 0x00ffff).rw(this, FUNC(mn10200_device::io_control_r), FUNC(mn10200_device::io_control_w));
+	map(0x00fc00, 0x00ffff).rw(FUNC(mn10200_device::io_control_r), FUNC(mn10200_device::io_control_w));
 }
 
 

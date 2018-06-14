@@ -49,16 +49,16 @@ ROM_START( plus3 )
 	ROM_DEFAULT_BIOS("adfs100")
 	// ADFS
 	ROM_SYSTEM_BIOS(0, "adfs100", "Acorn ADFS 1.00")
-	ROMX_LOAD("adfs.rom", 0x0000, 0x4000, CRC(3289bdc6) SHA1(e7c7a1094d50a3579751df2007269067c8ff6812), ROM_BIOS(1))
+	ROMX_LOAD("adfs.rom", 0x0000, 0x4000, CRC(3289bdc6) SHA1(e7c7a1094d50a3579751df2007269067c8ff6812), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "adfs113", "PRES ADFS 1.13")
-	ROMX_LOAD("pres_adfs_113.rom", 0x0000, 0x4000, CRC(f06ca04a) SHA1(3c8221d63457c552aa2c9a502db632ce1dea66b4), ROM_BIOS(2))
+	ROMX_LOAD("pres_adfs_113.rom", 0x0000, 0x4000, CRC(f06ca04a) SHA1(3c8221d63457c552aa2c9a502db632ce1dea66b4), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "adfs115", "PRES ADFS 1.15")
-	ROMX_LOAD("pres_adfs_115.rom", 0x0000, 0x4000, CRC(8f81edc3) SHA1(32007425058a7b0f8bd5c17b3c22552aa3a03eca), ROM_BIOS(3))
+	ROMX_LOAD("pres_adfs_115.rom", 0x0000, 0x4000, CRC(8f81edc3) SHA1(32007425058a7b0f8bd5c17b3c22552aa3a03eca), ROM_BIOS(2))
 	// DFS
 	ROM_SYSTEM_BIOS(3, "dfs200", "Advanced 1770 DFS 2.00")
-	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(4))
+	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "dfs210", "Advanced 1770 DFS 2.10")
-	ROMX_LOAD("acp_dfs1770_210.rom", 0x0000, 0x4000, CRC(b0661992) SHA1(c62f1290f689788dad6a2df30ace083eb827cffe), ROM_BIOS(5))
+	ROMX_LOAD("acp_dfs1770_210.rom", 0x0000, 0x4000, CRC(b0661992) SHA1(c62f1290f689788dad6a2df30ace083eb827cffe), ROM_BIOS(4))
 ROM_END
 
 //-------------------------------------------------
@@ -67,7 +67,7 @@ ROM_END
 
 MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", WD1770, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)

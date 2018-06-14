@@ -53,6 +53,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -231,11 +232,11 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 void chanbara_state::chanbara_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(this, FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
+	map(0x0800, 0x0bff).ram().w(FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x19ff).ram().w(this, FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
-	map(0x1a00, 0x1bff).ram().w(this, FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
+	map(0x1800, 0x19ff).ram().w(FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
+	map(0x1a00, 0x1bff).ram().w(FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
 	map(0x2000, 0x2000).portr("DSW1");
 	map(0x2001, 0x2001).portr("SYSTEM");
 	map(0x2002, 0x2002).portr("P2");

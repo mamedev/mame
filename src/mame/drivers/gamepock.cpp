@@ -8,6 +8,7 @@
 #include "bus/generic/carts.h"
 #include "cpu/upd7810/upd7810.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"

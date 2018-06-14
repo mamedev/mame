@@ -341,9 +341,9 @@ void tec1_state::tec1_map(address_map &map)
 void tec1_state::tec1_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
-	map(0x01, 0x01).w(this, FUNC(tec1_state::tec1_digit_w));
-	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tec1_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
 }
 
 
@@ -358,10 +358,10 @@ void tec1_state::tecjmon_map(address_map &map)
 void tec1_state::tecjmon_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
-	map(0x01, 0x01).w(this, FUNC(tec1_state::tecjmon_digit_w));
-	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
-	map(0x03, 0x03).r(this, FUNC(tec1_state::latch_r));
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tecjmon_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
+	map(0x03, 0x03).r(FUNC(tec1_state::latch_r));
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
 	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
 }
@@ -458,11 +458,11 @@ MACHINE_CONFIG_END
 ROM_START(tec1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "mon1", "MON1")
-	ROMX_LOAD("mon1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
+	ROMX_LOAD("mon1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon1b", "MON1B")
-	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
+	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "mon2", "MON2")
-	ROMX_LOAD("mon2.rom",   0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(3))
+	ROMX_LOAD("mon2.rom",   0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(2))
 ROM_END
 
 ROM_START(tecjmon)

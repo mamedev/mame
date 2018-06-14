@@ -53,8 +53,8 @@ void m20_8086_device::i86_prog(address_map &map)
 
 void m20_8086_device::i86_io(address_map &map)
 {
-	map(0x4000, 0x4fff).rw(this, FUNC(m20_8086_device::z8000_io_r), FUNC(m20_8086_device::z8000_io_w));
-	map(0x7ffa, 0x7ffd).w(this, FUNC(m20_8086_device::handshake_w));
+	map(0x4000, 0x4fff).rw(FUNC(m20_8086_device::z8000_io_r), FUNC(m20_8086_device::z8000_io_w));
+	map(0x7ffa, 0x7ffd).w(FUNC(m20_8086_device::handshake_w));
 }
 
 MACHINE_CONFIG_START(m20_8086_device::device_add_mconfig)
@@ -104,13 +104,13 @@ WRITE16_MEMBER(m20_8086_device::handshake_w)
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_8086_halt = true;
 	}
 	else
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_8086->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_8086->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_8086_halt = false;
 	}

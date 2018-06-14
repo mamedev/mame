@@ -15,6 +15,7 @@
 #include "sound/upd7759.h"
 #include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "emupal.h"
 
 
 #define HOST_MONITOR_DISPLAY        0

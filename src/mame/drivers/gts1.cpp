@@ -142,7 +142,7 @@ void gts1_state::gts1_data(address_map &map)
 
 void gts1_state::gts1_io(address_map &map)
 {
-	map(0x0000, 0x00ff).r(this, FUNC(gts1_state::gts1_io_r)).w(this, FUNC(gts1_state::gts1_io_w));         // catch undecoded I/O accesss
+	map(0x0000, 0x00ff).r(FUNC(gts1_state::gts1_io_r)).w(FUNC(gts1_state::gts1_io_w));         // catch undecoded I/O accesss
 
 	map(0x0020, 0x002f).rw("u4", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w)); // (U4) solenoid
 	map(0x0030, 0x003f).rw("u3", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w)); // (U3) solenoid + dips

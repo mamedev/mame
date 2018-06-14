@@ -208,14 +208,14 @@ void vball_state::main_map(address_map &map)
 	map(0x1004, 0x1004).portr("DSW2");
 	map(0x1005, 0x1005).portr("P3");
 	map(0x1006, 0x1006).portr("P4");
-	map(0x1008, 0x1008).w(this, FUNC(vball_state::scrollx_hi_w));
-	map(0x1009, 0x1009).w(this, FUNC(vball_state::bankswitch_w));
-	map(0x100a, 0x100b).w(this, FUNC(vball_state::irq_ack_w));  /* is there a scanline counter here? */
-	map(0x100c, 0x100c).w(this, FUNC(vball_state::scrollx_lo_w));
+	map(0x1008, 0x1008).w(FUNC(vball_state::scrollx_hi_w));
+	map(0x1009, 0x1009).w(FUNC(vball_state::bankswitch_w));
+	map(0x100a, 0x100b).w(FUNC(vball_state::irq_ack_w));  /* is there a scanline counter here? */
+	map(0x100c, 0x100c).w(FUNC(vball_state::scrollx_lo_w));
 	map(0x100d, 0x100d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100e, 0x100e).writeonly().share("scrolly_lo");
-	map(0x2000, 0x2fff).w(this, FUNC(vball_state::videoram_w)).share("videoram");
-	map(0x3000, 0x3fff).w(this, FUNC(vball_state::attrib_w)).share("attribram");
+	map(0x2000, 0x2fff).w(FUNC(vball_state::videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).w(FUNC(vball_state::attrib_w)).share("attribram");
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }

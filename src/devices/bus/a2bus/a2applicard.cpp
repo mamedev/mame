@@ -31,12 +31,12 @@ DEFINE_DEVICE_TYPE(A2BUS_APPLICARD, a2bus_applicard_device, "a2aplcrd", "PCPI Ap
 
 void a2bus_applicard_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(a2bus_applicard_device::dma_r), FUNC(a2bus_applicard_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(a2bus_applicard_device::dma_r), FUNC(a2bus_applicard_device::dma_w));
 }
 
 void a2bus_applicard_device::z80_io(address_map &map)
 {
-	map(0x00, 0x60).mirror(0xff00).rw(this, FUNC(a2bus_applicard_device::z80_io_r), FUNC(a2bus_applicard_device::z80_io_w));
+	map(0x00, 0x60).mirror(0xff00).rw(FUNC(a2bus_applicard_device::z80_io_r), FUNC(a2bus_applicard_device::z80_io_w));
 }
 
 ROM_START( a2applicard )
@@ -144,7 +144,7 @@ uint8_t a2bus_applicard_device::read_c0nx(uint8_t offset)
 			fatalerror("Applicard: Z80 IRQ not supported yet\n");
 
 		case 7: // NMI on Z80 (direct)
-			m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 	}

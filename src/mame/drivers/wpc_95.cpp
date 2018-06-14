@@ -132,8 +132,8 @@ void wpc_95_state::wpc_95_map(address_map &map)
 
 	map(0x3fb8, 0x3fbf).m("dmd", FUNC(wpc_dmd_device::registers));
 
-	map(0x3fdc, 0x3fdc).rw(this, FUNC(wpc_95_state::dcs_data_r), FUNC(wpc_95_state::dcs_data_w));
-	map(0x3fdd, 0x3fdd).rw(this, FUNC(wpc_95_state::dcs_ctrl_r), FUNC(wpc_95_state::dcs_reset_w));
+	map(0x3fdc, 0x3fdc).rw(FUNC(wpc_95_state::dcs_data_r), FUNC(wpc_95_state::dcs_data_w));
+	map(0x3fdd, 0x3fdd).rw(FUNC(wpc_95_state::dcs_ctrl_r), FUNC(wpc_95_state::dcs_reset_w));
 
 	map(0x3fe0, 0x3fe3).w(out, FUNC(wpc_out_device::out_w));
 	map(0x3fe4, 0x3fe4).nopr().w(lamp, FUNC(wpc_lamp_device::row_w));
@@ -148,13 +148,13 @@ void wpc_95_state::wpc_95_map(address_map &map)
 	map(0x3fef, 0x3fef).portr("FLIPPERS");
 
 	map(0x3ff2, 0x3ff2).w(out, FUNC(wpc_out_device::led_w));
-	map(0x3ff3, 0x3ff3).nopr().w(this, FUNC(wpc_95_state::irq_ack_w));
+	map(0x3ff3, 0x3ff3).nopr().w(FUNC(wpc_95_state::irq_ack_w));
 	map(0x3ff4, 0x3ff7).m("shift", FUNC(wpc_shift_device::registers));
-	map(0x3ff8, 0x3ff8).r(this, FUNC(wpc_95_state::firq_src_r)).nopw(); // ack?
-	map(0x3ffa, 0x3ffb).r(this, FUNC(wpc_95_state::rtc_r));
-	map(0x3ffc, 0x3ffc).w(this, FUNC(wpc_95_state::bank_w));
+	map(0x3ff8, 0x3ff8).r(FUNC(wpc_95_state::firq_src_r)).nopw(); // ack?
+	map(0x3ffa, 0x3ffb).r(FUNC(wpc_95_state::rtc_r));
+	map(0x3ffc, 0x3ffc).w(FUNC(wpc_95_state::bank_w));
 	map(0x3ffd, 0x3ffe).noprw(); // memory protection stuff?
-	map(0x3fff, 0x3fff).rw(this, FUNC(wpc_95_state::zc_r), FUNC(wpc_95_state::watchdog_w));
+	map(0x3fff, 0x3fff).rw(FUNC(wpc_95_state::zc_r), FUNC(wpc_95_state::watchdog_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0xf8000);
 }
@@ -2254,11 +2254,12 @@ MACHINE_CONFIG_START(wpc_95_state::wpc_95)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_95_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_95_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
-	MCFG_WPC_PIC_ADD("pic")
-	MCFG_WPC_LAMP_ADD("lamp")
-	MCFG_WPC_OUT_ADD("out", 3)
-	MCFG_WPC_SHIFT_ADD("shift")
-	MCFG_WPC_DMD_ADD("dmd", WRITELINE(*this, wpc_95_state, scanline_irq))
+	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)
+	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
+	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
+	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
+	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
+	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_95_state, scanline_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)

@@ -29,6 +29,7 @@
 #include "video/k052109.h"
 #include "video/k051960.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -81,9 +82,9 @@ private:
 
 void blockhl_state::main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(blockhl_state::k052109_051960_r), FUNC(blockhl_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(FUNC(blockhl_state::k052109_051960_r), FUNC(blockhl_state::k052109_051960_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1f88, 0x1f88).w(this, FUNC(blockhl_state::sound_irq_w));
+	map(0x1f88, 0x1f88).w(FUNC(blockhl_state::sound_irq_w));
 	map(0x1f8c, 0x1f8c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1f94, 0x1f94).portr("DSW3");
 	map(0x1f95, 0x1f95).portr("P1");

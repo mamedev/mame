@@ -93,6 +93,7 @@ private:
 
 	emu_timer                       *m_click_timer;
 	required_device<beep_device>    m_beeper;
+	output_finder<5>                m_leds;
 
 	uint8_t   m_make_count;
 	uint8_t   m_rx_state;

@@ -50,4 +50,18 @@
 		</part>
 	</software>
 
+	<software name="videorom">
+		<description>VideoROM: Videodisc Player Control Software</description>
+		<year>1988</year>
+		<publisher>The Soft Option</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="VideoROM_3.1.rom" size="16384" crc="e2089d1c" sha1="32c3aed1e8dc44997a7b567da012b85687062193" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="BootROM_1.4.rom" size="16384" crc="59639755" sha1="173f619e0c794c5f2bbf1ad0beba92bce1d9716a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

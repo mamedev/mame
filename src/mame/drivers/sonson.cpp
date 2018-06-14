@@ -81,10 +81,10 @@ WRITE_LINE_MEMBER(sonson_state::coin2_counter_w)
 void sonson_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).ram().w(this, FUNC(sonson_state::sonson_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(sonson_state::sonson_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(sonson_state::sonson_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(sonson_state::sonson_colorram_w)).share("colorram");
 	map(0x2020, 0x207f).ram().share("spriteram");
-	map(0x3000, 0x3000).w(this, FUNC(sonson_state::sonson_scrollx_w));
+	map(0x3000, 0x3000).w(FUNC(sonson_state::sonson_scrollx_w));
 	map(0x3002, 0x3002).portr("P1");
 	map(0x3003, 0x3003).portr("P2");
 	map(0x3004, 0x3004).portr("SYSTEM");

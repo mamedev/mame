@@ -367,7 +367,7 @@ READ8_MEMBER(namcos1_state::dsw_r)
 	// ------1-  ls257 dsw selector 3y
 	// -------0  ls257 dsw selector 4y
 
-	m_dsw_sel->ba_w(m_io_dipsw->read());
+	m_dsw_sel->write_ba(m_io_dipsw->read());
 	m_dsw_sel->select_w(BIT(offset, 1));
 
 	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(space, 0), 0, 1, 2, 3);
@@ -405,11 +405,11 @@ void namcos1_state::sub_map(address_map &map)
 
 void namcos1_state::virtual_map(address_map &map)
 {
-	map(0x2c0000, 0x2c1fff).w(this, FUNC(namcos1_state::_3dcs_w));
+	map(0x2c0000, 0x2c1fff).w(FUNC(namcos1_state::_3dcs_w));
 	map(0x2e0000, 0x2e7fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
-	map(0x2f0000, 0x2f7fff).ram().w(this, FUNC(namcos1_state::videoram_w)).share("videoram");
-	map(0x2f8000, 0x2f9fff).rw(this, FUNC(namcos1_state::no_key_r), FUNC(namcos1_state::no_key_w));
-	map(0x2fc000, 0x2fcfff).ram().w(this, FUNC(namcos1_state::spriteram_w)).share("spriteram");
+	map(0x2f0000, 0x2f7fff).ram().w(FUNC(namcos1_state::videoram_w)).share("videoram");
+	map(0x2f8000, 0x2f9fff).rw(FUNC(namcos1_state::no_key_r), FUNC(namcos1_state::no_key_w));
+	map(0x2fc000, 0x2fcfff).ram().w(FUNC(namcos1_state::spriteram_w)).share("spriteram");
 	map(0x2fd000, 0x2fd01f).ram().share("pfcontrol").mirror(0xfe0);
 	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x2ff000, 0x2ff7ff).ram().share("triram").mirror(0x800);
@@ -425,9 +425,9 @@ void namcos1_state::sound_map(address_map &map)
 	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0x400); /* PSG ( Shared ) */
 	map(0x7000, 0x77ff).ram().share("triram");
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
-	map(0xc000, 0xc001).w(this, FUNC(namcos1_state::sound_bankswitch_w)); /* ROM bank selector */
+	map(0xc000, 0xc001).w(FUNC(namcos1_state::sound_bankswitch_w)); /* ROM bank selector */
 	map(0xd001, 0xd001).w(m_c117, FUNC(namco_c117_device::sound_watchdog_w));
-	map(0xe000, 0xe000).w(this, FUNC(namcos1_state::audiocpu_irq_ack_w));
+	map(0xe000, 0xe000).w(FUNC(namcos1_state::audiocpu_irq_ack_w));
 	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
 
@@ -436,23 +436,23 @@ void namcos1_state::mcu_map(address_map &map)
 {
 	map(0x0000, 0x001f).rw(m_mcu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
 	map(0x0080, 0x00ff).ram(); /* built in RAM */
-	map(0x1000, 0x1003).r(this, FUNC(namcos1_state::dsw_r));
+	map(0x1000, 0x1003).r(FUNC(namcos1_state::dsw_r));
 	map(0x1400, 0x1400).portr("CONTROL0");
 	map(0x1401, 0x1401).portr("CONTROL1");
 	map(0x4000, 0xbfff).bankr("mcubank"); /* banked external ROM */
 	map(0xc000, 0xc7ff).ram().share("triram");
 	map(0xc800, 0xcfff).ram().share("nvram"); /* EEPROM */
-	map(0xd000, 0xd000).w(m_dac0, FUNC(dac_byte_interface::write));
-	map(0xd400, 0xd400).w(m_dac1, FUNC(dac_byte_interface::write));
-	map(0xd800, 0xd800).w(this, FUNC(namcos1_state::mcu_bankswitch_w)); /* ROM bank selector */
-	map(0xf000, 0xf000).w(this, FUNC(namcos1_state::mcu_irq_ack_w));
+	map(0xd000, 0xd000).w(m_dac0, FUNC(dac_byte_interface::data_w));
+	map(0xd400, 0xd400).w(m_dac1, FUNC(dac_byte_interface::data_w));
+	map(0xd800, 0xd800).w(FUNC(namcos1_state::mcu_bankswitch_w)); /* ROM bank selector */
+	map(0xf000, 0xf000).w(FUNC(namcos1_state::mcu_irq_ack_w));
 	map(0xf000, 0xffff).rom().region("mcu", 0); /* internal ROM */
 }
 
 void namcos1_state::mcu_port_map(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).portr("COIN").w(this, FUNC(namcos1_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).nopr().w(this, FUNC(namcos1_state::dac_gain_w));
+	map(M6801_PORT1, M6801_PORT1).portr("COIN").w(FUNC(namcos1_state::coin_w));
+	map(M6801_PORT2, M6801_PORT2).nopr().w(FUNC(namcos1_state::dac_gain_w));
 }
 
 

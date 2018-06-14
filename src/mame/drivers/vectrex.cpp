@@ -28,7 +28,7 @@ void vectrex_state::vectrex_map(address_map &map)
 {
 	map(0x0000, 0x7fff).noprw(); // cart area, handled at machine_start
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(this, FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -147,15 +147,15 @@ MACHINE_CONFIG_END
 ROM_START(vectrex)
 	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "bios0", "exec rom")
-	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
+	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "bios1", "exec rom intl 284001-1")
-	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
+	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(1) )
 
 //  The following fastboots are listed here for reference and documentation
 //  ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
-//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(3) )
+//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
 //  ROM_SYSTEM_BIOS(3, "bios3", "intl-fastboot hack")
-//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(4) )
+//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(3) )
 
 ROM_END
 
@@ -199,9 +199,9 @@ void raaspec_state::raaspec_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xa000).w(this, FUNC(raaspec_state::raaspec_led_w));
+	map(0xa000, 0xa000).w(FUNC(raaspec_state::raaspec_led_w));
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(this, FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
 	map(0xe000, 0xffff).rom();
 }
 

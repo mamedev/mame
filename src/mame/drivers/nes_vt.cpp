@@ -1162,17 +1162,17 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x2000, 0x3fff).mask(0x001F).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).r(this, FUNC(nes_vt_state::psg1_4014_r)).w(this, FUNC(nes_vt_state::nes_vh_sprite_dma_w));
-	map(0x4015, 0x4015).rw(this, FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(this, FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(nes_vt_state::nes_in1_r)).w(this, FUNC(nes_vt_state::psg1_4017_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::nes_vh_sprite_dma_w));
+	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
 
-	map(0x4034, 0x4034).w(this, FUNC(nes_vt_state::vt03_4034_w));
+	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
 
-	map(0x4100, 0x410b).r(this, FUNC(nes_vt_state::vt03_410x_r)).w(this, FUNC(nes_vt_state::vt03_410x_w));
+	map(0x4100, 0x410b).r(FUNC(nes_vt_state::vt03_410x_r)).w(FUNC(nes_vt_state::vt03_410x_w));
 
 	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).w(this, FUNC(nes_vt_state::vt03_8000_w));
+	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
 	map(0x6000, 0x7fff).ram();
 }
 
@@ -1187,40 +1187,40 @@ void nes_vt_state::nes_vt_xx_map(address_map &map)
 void nes_vt_state::nes_vt_hum_map(address_map &map)
 {
 	nes_vt_map(map);
-	map(0x4100, 0x410b).w(this, FUNC(nes_vt_state::vt03_410x_hum_w));
-	map(0x8000, 0xffff).w(this, FUNC(nes_vt_state::vt03_8000_hum_w));
+	map(0x4100, 0x410b).w(FUNC(nes_vt_state::vt03_410x_hum_w));
+	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_hum_w));
 }
 
 void nes_vt_state::nes_vt_pjoy_map(address_map &map)
 {
 	nes_vt_map(map);
-	map(0x4100, 0x410b).w(this, FUNC(nes_vt_state::vt03_410x_pjoy_w));
-	map(0x8000, 0xffff).w(this, FUNC(nes_vt_state::vt03_8000_pjoy_w));
+	map(0x4100, 0x410b).w(FUNC(nes_vt_state::vt03_410x_pjoy_w));
+	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_pjoy_w));
 }
 
 void nes_vt_state::nes_vt_sp69_map(address_map &map)
 {
 	nes_vt_map(map);
-	map(0x4100, 0x410b).w(this, FUNC(nes_vt_state::vt03_410x_sp69_w));
-	map(0x8000, 0xffff).w(this, FUNC(nes_vt_state::vt03_8000_sp69_w));
+	map(0x4100, 0x410b).w(FUNC(nes_vt_state::vt03_410x_sp69_w));
+	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_sp69_w));
 }
 
 
 void nes_vt_state::nes_vt_cy_map(address_map &map)
 {
 	nes_vt_xx_map(map);
-	map(0x41b0, 0x41bf).r(this, FUNC(nes_vt_state::vt03_41bx_r)).w(this, FUNC(nes_vt_state::vt03_41bx_w));
-	map(0x48a0, 0x48af).r(this, FUNC(nes_vt_state::vt03_48ax_r)).w(this, FUNC(nes_vt_state::vt03_48ax_w));
-	map(0x4130, 0x4136).r(this, FUNC(nes_vt_state::vt03_413x_r)).w(this, FUNC(nes_vt_state::vt03_413x_w));
-	map(0x414F, 0x414F).r(this, FUNC(nes_vt_state::vt03_414f_r));
-	map(0x415C, 0x415C).r(this, FUNC(nes_vt_state::vt03_415c_r));
+	map(0x41b0, 0x41bf).r(FUNC(nes_vt_state::vt03_41bx_r)).w(FUNC(nes_vt_state::vt03_41bx_w));
+	map(0x48a0, 0x48af).r(FUNC(nes_vt_state::vt03_48ax_r)).w(FUNC(nes_vt_state::vt03_48ax_w));
+	map(0x4130, 0x4136).r(FUNC(nes_vt_state::vt03_413x_r)).w(FUNC(nes_vt_state::vt03_413x_w));
+	map(0x414F, 0x414F).r(FUNC(nes_vt_state::vt03_414f_r));
+	map(0x415C, 0x415C).r(FUNC(nes_vt_state::vt03_415c_r));
 
 }
 
 void nes_vt_state::nes_vt_bt_map(address_map &map)
 {
 	nes_vt_xx_map(map);
-	map(0x412c, 0x412c).w(this, FUNC(nes_vt_state::vt03_412c_w));
+	map(0x412c, 0x412c).w(FUNC(nes_vt_state::vt03_412c_w));
 }
 
 
@@ -1230,20 +1230,20 @@ void nes_vt_state::nes_vt_hh_map(address_map &map)
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4015, 0x4015).rw(this, FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(this, FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(nes_vt_state::nes_in1_r)).w(this, FUNC(nes_vt_state::psg1_4017_w));
+	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
 
-	map(0x4100, 0x410b).r(this, FUNC(nes_vt_state::vt03_410x_r)).w(this, FUNC(nes_vt_state::vt03_410x_w));
+	map(0x4100, 0x410b).r(FUNC(nes_vt_state::vt03_410x_r)).w(FUNC(nes_vt_state::vt03_410x_w));
 
 	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).w(this, FUNC(nes_vt_state::vt03_8000_w));
+	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
 
-	map(0x4034, 0x4034).w(this, FUNC(nes_vt_state::vt03_4034_w));
-	map(0x4014, 0x4014).r(this, FUNC(nes_vt_state::psg1_4014_r)).w(this, FUNC(nes_vt_state::vt_hh_sprite_dma_w));
+	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_hh_sprite_dma_w));
 
-	map(0x414A, 0x414A).r(this, FUNC(nes_vt_state::vthh_414a_r));
-	map(0x411d, 0x411d).w(this, FUNC(nes_vt_state::vtfp_411d_w));
+	map(0x414A, 0x414A).r(FUNC(nes_vt_state::vthh_414a_r));
+	map(0x411d, 0x411d).w(FUNC(nes_vt_state::vtfp_411d_w));
 
 	map(0x6000, 0x7fff).ram();
 }
@@ -1254,31 +1254,31 @@ void nes_vt_state::nes_vt_dg_map(address_map &map)
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4015, 0x4015).rw(this, FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(this, FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(nes_vt_state::nes_in1_r)).w(this, FUNC(nes_vt_state::psg1_4017_w));
+	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
 
-	map(0x4100, 0x410b).r(this, FUNC(nes_vt_state::vt03_410x_r)).w(this, FUNC(nes_vt_state::vt03_410x_w));
+	map(0x4100, 0x410b).r(FUNC(nes_vt_state::vt03_410x_r)).w(FUNC(nes_vt_state::vt03_410x_w));
 
-	map(0x411c, 0x411c).w(this, FUNC(nes_vt_state::vt03_411c_w));
+	map(0x411c, 0x411c).w(FUNC(nes_vt_state::vt03_411c_w));
 
 	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).w(this, FUNC(nes_vt_state::vt03_8000_w));
+	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
 
-	map(0x4034, 0x4034).w(this, FUNC(nes_vt_state::vt03_4034_w));
-	map(0x4014, 0x4014).r(this, FUNC(nes_vt_state::psg1_4014_r)).w(this, FUNC(nes_vt_state::nes_vh_sprite_dma_w));
+	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::nes_vh_sprite_dma_w));
 	map(0x6000, 0x7fff).ram();
 }
 
 void nes_vt_state::nes_vt_fp_map(address_map &map)
 {
 	nes_vt_hh_map(map);
-	map(0x411e, 0x411e).w(this, FUNC(nes_vt_state::vtfp_411e_w));
-	map(0x4a00, 0x4a00).w(this, FUNC(nes_vt_state::vtfp_4a00_w));
-	map(0x412c, 0x412c).w(this, FUNC(nes_vt_state::vtfp_412c_w));
-	map(0x412d, 0x412d).r(this, FUNC(nes_vt_state::vtfp_412d_r));
-	map(0x4242, 0x4242).w(this, FUNC(nes_vt_state::vtfp_4242_w));
-	map(0x4119, 0x4119).r(this, FUNC(nes_vt_state::vtfp_4119_r));
+	map(0x411e, 0x411e).w(FUNC(nes_vt_state::vtfp_411e_w));
+	map(0x4a00, 0x4a00).w(FUNC(nes_vt_state::vtfp_4a00_w));
+	map(0x412c, 0x412c).w(FUNC(nes_vt_state::vtfp_412c_w));
+	map(0x412d, 0x412d).r(FUNC(nes_vt_state::vtfp_412d_r));
+	map(0x4242, 0x4242).w(FUNC(nes_vt_state::vtfp_4242_w));
+	map(0x4119, 0x4119).r(FUNC(nes_vt_state::vtfp_4119_r));
 
 }
 
@@ -1287,8 +1287,8 @@ void nes_vt_state::nes_vt_fa_map(address_map &map)
 
 	nes_vt_dg_map(map);
 
-	map(0x412c, 0x412c).r(this, FUNC(nes_vt_state::vtfa_412c_r)).w(this, FUNC(nes_vt_state::vtfa_412c_w));
-	map(0x4242, 0x4242).w(this, FUNC(nes_vt_state::vtfp_4242_w));
+	map(0x412c, 0x412c).r(FUNC(nes_vt_state::vtfa_412c_r)).w(FUNC(nes_vt_state::vtfa_412c_w));
+	map(0x4242, 0x4242).w(FUNC(nes_vt_state::vtfp_4242_w));
 
 }
 

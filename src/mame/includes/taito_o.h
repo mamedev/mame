@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/tc0080vco.h"
+#include "emupal.h"
 
 class taitoo_state : public driver_device
 {

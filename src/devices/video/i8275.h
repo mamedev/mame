@@ -103,6 +103,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void vrtc_start();
+	void vrtc_end();
+	void dma_start();
+
 	void recompute_parameters();
 
 	enum
@@ -198,7 +202,7 @@ protected:
 	int m_buffer_idx;
 	int m_fifo_idx;
 	int m_dma_idx;
-	bool m_fifo_next;
+	uint8_t m_dma_last_char;
 	int m_buffer_dma;
 
 	int m_lpen;
@@ -213,7 +217,6 @@ protected:
 	int m_irq_scanline;
 	int m_vrtc_scanline;
 	int m_vrtc_drq_scanline;
-	bool m_du;
 	bool m_dma_stop;
 	bool m_end_of_screen;
 	bool m_preset;

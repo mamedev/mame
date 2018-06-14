@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(C64_IDE64, c64_ide64_cartridge_device, "c64_ide64", "C64 IDE6
 
 MACHINE_CONFIG_START(c64_ide64_cartridge_device::device_add_mconfig)
 	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
-	MCFG_DS1302_ADD(DS1302_TAG, XTAL(32'768))
+	MCFG_DEVICE_ADD(DS1302_TAG, DS1302, 32.768_kHz_XTAL)
 
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
@@ -224,7 +224,7 @@ uint8_t c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
 
-		data = m_flash_rom->read(addr);
+		data = m_flash_rom->read(space, addr);
 	}
 	else if (!ram_oe)
 	{
@@ -258,7 +258,7 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, u
 	if ((offset >= 0x8000 && offset < 0xc000) && !m_wp)
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
-		m_flash_rom->write(addr, data);
+		m_flash_rom->write(space, addr, data);
 	}
 
 	if (!io1)

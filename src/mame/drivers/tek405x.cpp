@@ -179,7 +179,7 @@ void tek4051_state::tek4051_mem(address_map &map)
 	map(0x8798, 0x879b).rw(MC6820_TAPE_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87a8, 0x87ab).rw(MC6820_KB_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87b0, 0x87b3).rw(m_gpib_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x87c0, 0x87c0).mirror(0x03).w(this, FUNC(tek4051_state::lbs_w));
+	map(0x87c0, 0x87c0).mirror(0x03).w(FUNC(tek4051_state::lbs_w));
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
 //  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
@@ -622,9 +622,9 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	*/
 
 	// lamps
-	output().set_led_value(1, !BIT(data, 5));
-	output().set_led_value(2, !BIT(data, 6));
-	output().set_led_value(3, !BIT(data, 7));
+	m_lamps[0] = BIT(~data, 5);
+	m_lamps[1] = BIT(~data, 6);
+	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
 	m_gpib->eoi_w(!BIT(data, 4));
@@ -741,7 +741,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 
 	if (m_talk)
 	{
-		m_gpib->dio_w(data);
+		m_gpib->write_dio(data);
 	}
 }
 
@@ -824,7 +824,7 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 
 	if (!m_talk)
 	{
-		m_gpib->dio_w(0xff);
+		m_gpib->write_dio(0xff);
 		m_gpib->nrfd_w(1);
 		m_gpib->ndac_w(1);
 	}
@@ -958,6 +958,8 @@ WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 
 void tek4051_state::machine_start()
 {
+	m_lamps.resolve();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM

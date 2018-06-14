@@ -2265,6 +2265,17 @@ uint32_t h6280_device::execute_input_lines() const
 
 
 //-------------------------------------------------
+//  execute_input_edge_triggered - return true if
+//  the input line has an asynchronous edge trigger
+//-------------------------------------------------
+
+bool h6280_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == H6280_NMI_STATE;
+}
+
+
+//-------------------------------------------------
 //  execute_set_input - act on a changed input/
 //  interrupt line
 //-------------------------------------------------

@@ -5,6 +5,7 @@
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class gaelco2_state : public driver_device
 {

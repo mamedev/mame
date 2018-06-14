@@ -97,85 +97,85 @@ void nbmj8991_state::init_tokimbsj()
 void nbmj8991_state::pstadium_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf00f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
+	map(0xf000, 0xf00f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf200, 0xf3ff).ram().w(FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
 	map(0xf800, 0xffff).ram().share("nvram");   // finalbny
 }
 
 void nbmj8991_state::triplew1_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
-	map(0xf200, 0xf20f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf000, 0xf1ff).ram().w(FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
+	map(0xf200, 0xf20f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
 	map(0xf800, 0xffff).ram().share("nvram");   // mjgottub
 }
 
 void nbmj8991_state::triplew2_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
-	map(0xf400, 0xf40f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf000, 0xf1ff).ram().w(FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
+	map(0xf400, 0xf40f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
 	map(0xf800, 0xffff).ram();
 }
 
 void nbmj8991_state::mjlstory_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
-	map(0xf700, 0xf70f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf200, 0xf3ff).ram().w(FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
+	map(0xf700, 0xf70f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
 	map(0xf800, 0xffff).ram();
 }
 
 void nbmj8991_state::galkoku_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf00f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(nbmj8991_state::palette_type1_w)).share("paletteram");
+	map(0xf000, 0xf00f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf400, 0xf5ff).ram().w(FUNC(nbmj8991_state::palette_type1_w)).share("paletteram");
 	map(0xf800, 0xffff).ram().share("nvram");   // hyouban
 }
 
 void nbmj8991_state::galkaika_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf00f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(nbmj8991_state::palette_type2_w)).share("paletteram");
+	map(0xf000, 0xf00f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf400, 0xf5ff).ram().w(FUNC(nbmj8991_state::palette_type2_w)).share("paletteram");
 	map(0xf800, 0xffff).ram().share("nvram");   // tokimbsj
 }
 
 void nbmj8991_state::tokyogal_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(nbmj8991_state::palette_type2_w)).share("paletteram");
-	map(0xf400, 0xf40f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf000, 0xf1ff).ram().w(FUNC(nbmj8991_state::palette_type2_w)).share("paletteram");
+	map(0xf400, 0xf40f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
 	map(0xf800, 0xffff).ram();
 }
 
 void nbmj8991_state::av2mj1bb_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
-	map(0xf500, 0xf50f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf000, 0xf1ff).ram().w(FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
+	map(0xf500, 0xf50f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
 	map(0xf800, 0xffff).ram();
 }
 
 void nbmj8991_state::av2mj2rg_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf00f).rw(this, FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
+	map(0xf000, 0xf00f).rw(FUNC(nbmj8991_state::clut_r), FUNC(nbmj8991_state::clut_w));
+	map(0xf200, 0xf3ff).ram().w(FUNC(nbmj8991_state::palette_type3_w)).share("paletteram");
 	map(0xf800, 0xffff).ram();
 }
 
 void nbmj8991_state::galkoku_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r)).w(this, FUNC(nbmj8991_state::blitter_w));
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r)).w(FUNC(nbmj8991_state::blitter_w));
 	map(0x80, 0x81).w("fmsnd", FUNC(ym3812_device::write));
 	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
 	map(0xc0, 0xc0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r), FUNC(nb1413m3_device::nmi_clock_w));
-	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::write));
+	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	map(0xf0, 0xf0).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r), FUNC(nb1413m3_device::outcoin_w));
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
@@ -184,14 +184,14 @@ void nbmj8991_state::galkoku_io_map(address_map &map)
 void nbmj8991_state::hyouban_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r)).w(this, FUNC(nbmj8991_state::blitter_w));
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r)).w(FUNC(nbmj8991_state::blitter_w));
 	map(0x81, 0x81).r("fmsnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("fmsnd", FUNC(ay8910_device::data_address_w));
 	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
 	map(0xc0, 0xc0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r), FUNC(nb1413m3_device::nmi_clock_w));
-	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::write));
+	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	map(0xf0, 0xf0).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r), FUNC(nb1413m3_device::outcoin_w));
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
@@ -200,7 +200,7 @@ void nbmj8991_state::hyouban_io_map(address_map &map)
 void nbmj8991_state::pstadium_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).w(this, FUNC(nbmj8991_state::blitter_w));
+	map(0x00, 0x7f).w(FUNC(nbmj8991_state::blitter_w));
 	map(0x80, 0x80).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
@@ -214,7 +214,7 @@ void nbmj8991_state::pstadium_io_map(address_map &map)
 void nbmj8991_state::av2mj1bb_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).w(this, FUNC(nbmj8991_state::blitter_w));
+	map(0x00, 0x7f).w(FUNC(nbmj8991_state::blitter_w));
 	map(0x80, 0x80).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
@@ -237,9 +237,9 @@ void nbmj8991_state::nbmj8991_sound_map(address_map &map)
 void nbmj8991_state::nbmj8991_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac1", FUNC(dac_byte_interface::write));
-	map(0x02, 0x02).w("dac2", FUNC(dac_byte_interface::write));
-	map(0x04, 0x04).w(this, FUNC(nbmj8991_state::soundbank_w));
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac1", FUNC(dac_byte_interface::data_w));
+	map(0x02, 0x02).w("dac2", FUNC(dac_byte_interface::data_w));
+	map(0x04, 0x04).w(FUNC(nbmj8991_state::soundbank_w));
 	map(0x06, 0x06).nopw();
 	map(0x80, 0x81).w("fmsnd", FUNC(ym3812_device::write));
 }

@@ -34,6 +34,7 @@ Issues:
 #include "sound/beep.h"
 #include "video/i8275.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -112,9 +113,9 @@ void rc702_state::rc702_io(address_map &map)
 	map(0x08, 0x0b).rw("sio1", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w)); // boot sequence doesn't program this
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x14, 0x17).portr("DSW").w(this, FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).w(this, FUNC(rc702_state::port18_w)); // memory banking
-	map(0x1c, 0x1f).w(this, FUNC(rc702_state::port1c_w)); // sound
+	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
+	map(0x18, 0x1b).w(FUNC(rc702_state::port18_w)); // memory banking
+	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
 
@@ -403,11 +404,11 @@ MACHINE_CONFIG_END
 ROM_START( rc702 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
 		ROM_SYSTEM_BIOS(0, "rc700", "RC700")
-		ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(1))
+		ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(0))
 		ROM_SYSTEM_BIOS(1, "rc702", "RC702")
-		ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(2))
+		ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(1))
 		ROM_SYSTEM_BIOS(2, "rc703", "RC703")
-		ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(3))
+		ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(2))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 		ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char

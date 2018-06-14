@@ -39,6 +39,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,8 +50,8 @@ void crospang_state::crospang_base_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom().nopw(); // writes to rom quite often
 
-	map(0x120000, 0x1207ff).ram().w(this, FUNC(crospang_state::crospang_fg_videoram_w)).share("fg_videoram");
-	map(0x122000, 0x1227ff).ram().w(this, FUNC(crospang_state::crospang_bg_videoram_w)).share("bg_videoram");
+	map(0x120000, 0x1207ff).ram().w(FUNC(crospang_state::crospang_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x1227ff).ram().w(FUNC(crospang_state::crospang_bg_videoram_w)).share("bg_videoram");
 	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x210000, 0x2107ff).ram().share("spriteram");
 	map(0x270001, 0x270001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -65,10 +66,10 @@ void crospang_state::crospang_map(address_map &map)
 	crospang_base_map(map);
 
 	map(0x100000, 0x100001).nopw();
-	map(0x100002, 0x100003).w(this, FUNC(crospang_state::crospang_fg_scrolly_w));
-	map(0x100004, 0x100005).w(this, FUNC(crospang_state::crospang_bg_scrollx_w));
-	map(0x100006, 0x100007).w(this, FUNC(crospang_state::crospang_bg_scrolly_w));
-	map(0x100008, 0x100009).w(this, FUNC(crospang_state::crospang_fg_scrollx_w));
+	map(0x100002, 0x100003).w(FUNC(crospang_state::crospang_fg_scrolly_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::crospang_bg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::crospang_bg_scrolly_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::crospang_fg_scrollx_w));
 	map(0x10000e, 0x10000f).nopw();
 
 	map(0x320000, 0x32ffff).ram();
@@ -78,11 +79,11 @@ void crospang_state::bestri_map(address_map &map)
 {
 	crospang_base_map(map);
 
-	map(0x100004, 0x100005).w(this, FUNC(crospang_state::bestri_fg_scrollx_w));
-	map(0x100006, 0x100007).w(this, FUNC(crospang_state::bestri_fg_scrolly_w));
-	map(0x10000a, 0x10000b).w(this, FUNC(crospang_state::bestri_bg_scrolly_w));
-	map(0x10000c, 0x10000d).w(this, FUNC(crospang_state::bestri_bg_scrollx_w));
-	map(0x10000e, 0x10000f).w(this, FUNC(crospang_state::bestri_tilebank_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::bestri_fg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bestri_fg_scrolly_w));
+	map(0x10000a, 0x10000b).w(FUNC(crospang_state::bestri_bg_scrolly_w));
+	map(0x10000c, 0x10000d).w(FUNC(crospang_state::bestri_bg_scrollx_w));
+	map(0x10000e, 0x10000f).w(FUNC(crospang_state::bestri_tilebank_w));
 
 	map(0x3a0000, 0x3affff).ram();
 }
@@ -92,11 +93,11 @@ void crospang_state::bestria_map(address_map &map)
 	crospang_base_map(map);
 
 	map(0x100000, 0x100001).nopw(); // ??
-	map(0x100006, 0x100007).w(this, FUNC(crospang_state::bestri_fg_scrollx_w));
-	map(0x100008, 0x100009).w(this, FUNC(crospang_state::bestri_fg_scrolly_w));
-	map(0x10000a, 0x10000b).w(this, FUNC(crospang_state::bestri_bg_scrollx_w));
-	map(0x10000c, 0x10000d).w(this, FUNC(crospang_state::bestri_bg_scrolly_w));
-	map(0x10000e, 0x10000f).w(this, FUNC(crospang_state::bestri_tilebank_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bestri_fg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::bestri_fg_scrolly_w));
+	map(0x10000a, 0x10000b).w(FUNC(crospang_state::bestri_bg_scrollx_w));
+	map(0x10000c, 0x10000d).w(FUNC(crospang_state::bestri_bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(FUNC(crospang_state::bestri_tilebank_w));
 
 	map(0x340000, 0x34ffff).ram();
 }

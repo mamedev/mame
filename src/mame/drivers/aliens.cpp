@@ -17,6 +17,7 @@ Preliminary driver by:
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -90,14 +91,14 @@ void aliens_state::aliens_map(address_map &map)
 	map(0x0000, 0x03ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
 	map(0x0400, 0x1fff).ram();
 	map(0x2000, 0x3fff).bankr("rombank");                                /* banked ROM */
-	map(0x4000, 0x7fff).rw(this, FUNC(aliens_state::k052109_051960_r), FUNC(aliens_state::k052109_051960_w));
+	map(0x4000, 0x7fff).rw(FUNC(aliens_state::k052109_051960_r), FUNC(aliens_state::k052109_051960_w));
 	map(0x5f80, 0x5f80).portr("DSW3");
 	map(0x5f81, 0x5f81).portr("P1");
 	map(0x5f82, 0x5f82).portr("P2");
 	map(0x5f83, 0x5f83).portr("DSW2");
 	map(0x5f84, 0x5f84).portr("DSW1");
-	map(0x5f88, 0x5f88).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(aliens_state::aliens_coin_counter_w));      /* coin counters */
-	map(0x5f8c, 0x5f8c).w(this, FUNC(aliens_state::aliens_sh_irqtrigger_w));                       /* cause interrupt on audio CPU */
+	map(0x5f88, 0x5f88).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(aliens_state::aliens_coin_counter_w));      /* coin counters */
+	map(0x5f8c, 0x5f8c).w(FUNC(aliens_state::aliens_sh_irqtrigger_w));                       /* cause interrupt on audio CPU */
 	map(0x8000, 0xffff).rom().region("maincpu", 0x28000);                   /* ROM e24_j02.bin */
 }
 

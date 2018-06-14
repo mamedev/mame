@@ -20,12 +20,6 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_DS2404_ADD(_tag, _ref_year, _ref_month, _ref_day) \
-	MCFG_DEVICE_ADD(_tag, DS2404, XTAL(32'768)) \
-	MCFG_DS2404_REF_YEAR(_ref_year) \
-	MCFG_DS2404_REF_MONTH(_ref_month) \
-	MCFG_DS2404_REF_DAY(_ref_day)
-
 #define MCFG_DS2404_REF_YEAR(_ref_year) \
 	downcast<ds2404_device &>(*device).set_ref_year(_ref_year);
 

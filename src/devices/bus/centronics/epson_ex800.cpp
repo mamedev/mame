@@ -202,11 +202,11 @@ void epson_ex800_device::ex800_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0xbfff).ram(); /* external RAM */
-	map(0xc000, 0xc7ff).mirror(0x1800).rw(this, FUNC(epson_ex800_device::devsel_r), FUNC(epson_ex800_device::devsel_w));
-	map(0xe000, 0xe7ff).rw(this, FUNC(epson_ex800_device::gate5a_r), FUNC(epson_ex800_device::gate5a_w));
-	map(0xe800, 0xefff).rw(this, FUNC(epson_ex800_device::iosel_r), FUNC(epson_ex800_device::iosel_w));
-	map(0xf000, 0xf001).mirror(0x07fc).r(this, FUNC(epson_ex800_device::gate7a_r));
-	map(0xf002, 0xf003).mirror(0x07fc).w(this, FUNC(epson_ex800_device::gate7a_w));
+	map(0xc000, 0xc7ff).mirror(0x1800).rw(FUNC(epson_ex800_device::devsel_r), FUNC(epson_ex800_device::devsel_w));
+	map(0xe000, 0xe7ff).rw(FUNC(epson_ex800_device::gate5a_r), FUNC(epson_ex800_device::gate5a_w));
+	map(0xe800, 0xefff).rw(FUNC(epson_ex800_device::iosel_r), FUNC(epson_ex800_device::iosel_w));
+	map(0xf000, 0xf001).mirror(0x07fc).r(FUNC(epson_ex800_device::gate7a_r));
+	map(0xf002, 0xf003).mirror(0x07fc).w(FUNC(epson_ex800_device::gate7a_w));
 	map(0xf800, 0xfeff).noprw(); /* not connected */
 }
 

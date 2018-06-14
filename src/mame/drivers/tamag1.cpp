@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/e0c6200/e0c6s46.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

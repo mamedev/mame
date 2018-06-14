@@ -30,6 +30,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -202,14 +203,14 @@ void limenko_state::limenko_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("mainram");
 	map(0x40000000, 0x403fffff).rom().region("maindata", 0);
-	map(0x80000000, 0x80007fff).ram().w(this, FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
-	map(0x80008000, 0x8000ffff).ram().w(this, FUNC(limenko_state::md_videoram_w)).share("md_videoram");
-	map(0x80010000, 0x80017fff).ram().w(this, FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
+	map(0x80000000, 0x80007fff).ram().w(FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
+	map(0x80008000, 0x8000ffff).ram().w(FUNC(limenko_state::md_videoram_w)).share("md_videoram");
+	map(0x80010000, 0x80017fff).ram().w(FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
 	map(0x80018000, 0x80019fff).ram().share("spriteram");
 	map(0x8001c000, 0x8001dfff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x8001e000, 0x8001ebff).ram(); // ? not used
 	map(0x8001ffec, 0x8001ffff).ram().share("videoreg");
-	map(0x8003e000, 0x8003e003).w(this, FUNC(limenko_state::spriteram_buffer_w));
+	map(0x8003e000, 0x8003e003).w(FUNC(limenko_state::spriteram_buffer_w));
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -218,7 +219,7 @@ void limenko_state::limenko_io_map(address_map &map)
 	map(0x0000, 0x0003).portr("IN0");
 	map(0x0800, 0x0803).portr("IN1");
 	map(0x1000, 0x1003).portr("IN2");
-	map(0x4000, 0x4003).w(this, FUNC(limenko_state::limenko_coincounter_w));
+	map(0x4000, 0x4003).w(FUNC(limenko_state::limenko_coincounter_w));
 	map(0x4800, 0x4803).portw("EEPROMOUT");
 	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
 }
@@ -230,14 +231,14 @@ void limenko_state::spotty_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("mainram");
 	map(0x40002000, 0x400024d3).ram(); //?
-	map(0x80000000, 0x80007fff).ram().w(this, FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
-	map(0x80008000, 0x8000ffff).ram().w(this, FUNC(limenko_state::md_videoram_w)).share("md_videoram");
-	map(0x80010000, 0x80017fff).ram().w(this, FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
+	map(0x80000000, 0x80007fff).ram().w(FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
+	map(0x80008000, 0x8000ffff).ram().w(FUNC(limenko_state::md_videoram_w)).share("md_videoram");
+	map(0x80010000, 0x80017fff).ram().w(FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
 	map(0x80018000, 0x80019fff).ram().share("spriteram");
 	map(0x8001c000, 0x8001dfff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x8001e000, 0x8001ebff).ram(); // ? not used
 	map(0x8001ffec, 0x8001ffff).ram().share("videoreg");
-	map(0x8003e000, 0x8003e003).w(this, FUNC(limenko_state::spriteram_buffer_w));
+	map(0x8003e000, 0x8003e003).w(FUNC(limenko_state::spriteram_buffer_w));
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -708,7 +709,7 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_DEVICE_IO_MAP(limenko_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -753,7 +754,7 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

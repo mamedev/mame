@@ -21,6 +21,7 @@ Notes:
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tim100_state : public driver_device
@@ -32,7 +33,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
-		{ }
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
@@ -221,12 +222,12 @@ ROM_START( tim100 )
 	// The first and 2nd halves of these roms are identical, confirmed ok
 	ROM_REGION( 0x2000, "chargen", ROMREGION_INVERT )
 	ROM_SYSTEM_BIOS( 0, "212", "v 2.1.2" )
-	ROMX_LOAD( "tim 100kg v.2.1.2.u12", 0x0000, 0x0800, CRC(faf5743c) SHA1(310b662e9535878210f8aaab3e2b846fade60642),ROM_BIOS(1))
+	ROMX_LOAD( "tim 100kg v.2.1.2.u12", 0x0000, 0x0800, CRC(faf5743c) SHA1(310b662e9535878210f8aaab3e2b846fade60642), ROM_BIOS(0))
 	ROM_CONTINUE (0x1000, 0x0800)
 	ROM_CONTINUE (0x0800, 0x0800)
 	ROM_CONTINUE (0x1800, 0x0800)
 	ROM_SYSTEM_BIOS( 1, "220", "v 2.2.0" )
-	ROMX_LOAD( "tim 100kg v.2.2.0.u12", 0x0000, 0x0800, CRC(358dbbd3) SHA1(14b7d6ee41b19bedf2f070f5b28b03aaff2cac4f),ROM_BIOS(2))
+	ROMX_LOAD( "tim 100kg v.2.2.0.u12", 0x0000, 0x0800, CRC(358dbbd3) SHA1(14b7d6ee41b19bedf2f070f5b28b03aaff2cac4f), ROM_BIOS(1))
 	ROM_CONTINUE (0x1000, 0x0800)
 	ROM_CONTINUE (0x0800, 0x0800)
 	ROM_CONTINUE (0x1800, 0x0800)

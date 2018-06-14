@@ -82,16 +82,16 @@ void micropin_state::micropin_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x01ff).ram().share("nvram"); // 4x 6561 RAM
-	map(0x4000, 0x4005).w(this, FUNC(micropin_state::sw_w));
+	map(0x4000, 0x4005).w(FUNC(micropin_state::sw_w));
 	map(0x4000, 0x4000).portr("X1");
 	map(0x4001, 0x4001).portr("X2");
 	map(0x4002, 0x4002).portr("X3");
 	map(0x4003, 0x4003).portr("X4");
 	map(0x4004, 0x4004).portr("X5");
 	map(0x5000, 0x5003).rw("pia50", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x5100, 0x5103).rw(this, FUNC(micropin_state::pia51_r), FUNC(micropin_state::pia51_w));
-	map(0x5200, 0x5200).w(this, FUNC(micropin_state::sol_w));
-	map(0x5202, 0x5202).w(this, FUNC(micropin_state::lamp_w));
+	map(0x5100, 0x5103).rw(FUNC(micropin_state::pia51_r), FUNC(micropin_state::pia51_w));
+	map(0x5200, 0x5200).w(FUNC(micropin_state::sol_w));
+	map(0x5202, 0x5202).w(FUNC(micropin_state::lamp_w));
 	map(0x5203, 0x5203).nopw();
 	map(0x6400, 0x7fff).rom().region("v1cpu", 0);
 }
@@ -105,8 +105,8 @@ void micropin_state::pentacup2_map(address_map &map)
 void micropin_state::pentacup2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0e).w(this, FUNC(micropin_state::sw_w));
-	map(0x0f, 0x0f).w(this, FUNC(micropin_state::lamp_w));
+	map(0x00, 0x0e).w(FUNC(micropin_state::sw_w));
+	map(0x0f, 0x0f).w(FUNC(micropin_state::lamp_w));
 	map(0x00, 0x00).portr("X0");
 	map(0x01, 0x01).portr("X1");
 	map(0x02, 0x02).portr("X2");

@@ -25,6 +25,7 @@
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -679,19 +680,19 @@ void rastersp_state::cpu_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share("dram");
 	map(0x01000000, 0x010bffff).noprw(); // External ROM
 	map(0x010c0000, 0x010cffff).rom().region("bios", 0);
-	map(0x02200000, 0x022fffff).rw(this, FUNC(rastersp_state::nvram_r), FUNC(rastersp_state::nvram_w)).umask32(0x000000ff);
+	map(0x02200000, 0x022fffff).rw(FUNC(rastersp_state::nvram_r), FUNC(rastersp_state::nvram_w)).umask32(0x000000ff);
 	map(0x02200800, 0x02200803).nopw(); // ?
 	map(0x02208000, 0x02208fff).rw("scsibus:7:ncr53c700", FUNC(ncr53c7xx_device::read), FUNC(ncr53c7xx_device::write));
-	map(0x0220e000, 0x0220e003).w(this, FUNC(rastersp_state::dpylist_w));
+	map(0x0220e000, 0x0220e003).w(FUNC(rastersp_state::dpylist_w));
 	map(0xfff00000, 0xffffffff).bankrw("bank3");
 }
 
 void rastersp_state::io_map(address_map &map)
 {
-	map(0x0020, 0x0023).w(this, FUNC(rastersp_state::cyrix_cache_w));
-	map(0x1000, 0x1003).portr("P1").w(this, FUNC(rastersp_state::port1_w));
-	map(0x1004, 0x1007).portr("P2").w(this, FUNC(rastersp_state::port2_w));
-	map(0x1008, 0x100b).portr("COMMON").w(this, FUNC(rastersp_state::port3_w));
+	map(0x0020, 0x0023).w(FUNC(rastersp_state::cyrix_cache_w));
+	map(0x1000, 0x1003).portr("P1").w(FUNC(rastersp_state::port1_w));
+	map(0x1004, 0x1007).portr("P2").w(FUNC(rastersp_state::port2_w));
+	map(0x1008, 0x100b).portr("COMMON").w(FUNC(rastersp_state::port3_w));
 	map(0x100c, 0x100f).portr("DSW2");
 	map(0x1010, 0x1013).portr("DSW1");
 	map(0x1014, 0x1017).portr("EXTRA");
@@ -704,11 +705,11 @@ void rastersp_state::dsp_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).bankrw("bank1");
 	map(0x400000, 0x40ffff).rom().region("dspboot", 0);
-	map(0x808000, 0x80807f).rw(this, FUNC(rastersp_state::tms32031_control_r), FUNC(rastersp_state::tms32031_control_w));
-	map(0x880402, 0x880402).w(this, FUNC(rastersp_state::dsp_unk_w));
-	map(0x883c00, 0x883c00).w(this, FUNC(rastersp_state::dsp_486_int_w));
+	map(0x808000, 0x80807f).rw(FUNC(rastersp_state::tms32031_control_r), FUNC(rastersp_state::tms32031_control_w));
+	map(0x880402, 0x880402).w(FUNC(rastersp_state::dsp_unk_w));
+	map(0x883c00, 0x883c00).w(FUNC(rastersp_state::dsp_486_int_w));
 	map(0xc00000, 0xc03fff).bankrw("bank2");
-	map(0xc80000, 0xc80000).w(this, FUNC(rastersp_state::dsp_ctrl_w));
+	map(0xc80000, 0xc80000).w(FUNC(rastersp_state::dsp_ctrl_w));
 	map(0xfc0000, 0xffffff).bankrw("bank3");
 }
 
@@ -874,7 +875,9 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
 	MCFG_TIMER_DRIVER_ADD("tms_tx_timer", rastersp_state, tms_tx_timer)
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_NSCSI_BUS_ADD("scsibus")

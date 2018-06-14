@@ -78,7 +78,7 @@ void pipbug_state::pipbug_mem(address_map &map)
 void pipbug_state::pipbug_data(address_map &map)
 {
 //  ADDRESS_MAP_UNMAP_HIGH
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(pipbug_state::pipbug_ctrl_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(pipbug_state::pipbug_ctrl_w));
 }
 
 /* Input ports */

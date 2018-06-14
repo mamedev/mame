@@ -492,12 +492,12 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			{
 			case 1:
 				ret |= 0x0c;
-				if(m_flop0->get_device()->exists())
+				if(m_flop[0]->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 2:
 				ret |= 0x0c;
-				if(m_flop1->get_device()->exists())
+				if(m_flop[1]->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 3:
@@ -510,9 +510,9 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 		case 0x0e: // DRVCHG
 			logerror("FDC: read from offset 0x0e\n");
 			if(m_towns_selected_drive == 1)
-				return m_flop0->get_device()->dskchg_r();
+				return m_flop[0]->get_device()->dskchg_r();
 			if(m_towns_selected_drive == 2)
-				return m_flop1->get_device()->dskchg_r();
+				return m_flop[1]->get_device()->dskchg_r();
 			return 0x00;
 		default:
 			logerror("FDC: read from invalid or unimplemented register %02x\n",offset);
@@ -522,7 +522,7 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 
 WRITE8_MEMBER(towns_state::towns_floppy_w)
 {
-	floppy_image_device* sel[4] = { m_flop0->get_device(), m_flop1->get_device(), nullptr, nullptr };
+	floppy_image_device* sel[4] = { m_flop[0]->get_device(), m_flop[1]->get_device(), nullptr, nullptr };
 
 	switch(offset)
 	{
@@ -1147,7 +1147,7 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 READ8_MEMBER( towns_state::towns_cmos_low_r )
 {
 	if(m_towns_mainmem_enable != 0)
-		return m_messram->pointer()[offset + 0xd8000];
+		return m_ram->pointer()[offset + 0xd8000];
 
 	if(m_nvram)
 		return m_nvram[offset];
@@ -1158,7 +1158,7 @@ READ8_MEMBER( towns_state::towns_cmos_low_r )
 WRITE8_MEMBER( towns_state::towns_cmos_low_w )
 {
 	if(m_towns_mainmem_enable != 0)
-		m_messram->pointer()[offset+0xd8000] = data;
+		m_ram->pointer()[offset+0xd8000] = data;
 	else
 		if(m_nvram)
 			m_nvram[offset] = data;
@@ -1188,42 +1188,42 @@ void towns_state::towns_update_video_banks(address_space& space)
 
 	if(m_towns_mainmem_enable != 0)  // first MB is RAM
 	{
-//      membank(1)->set_base(m_messram->pointer()+0xc0000);
-//      membank(2)->set_base(m_messram->pointer()+0xc8000);
-//      membank(3)->set_base(m_messram->pointer()+0xc9000);
-//      membank(4)->set_base(m_messram->pointer()+0xca000);
-//      membank(5)->set_base(m_messram->pointer()+0xca000);
-//      membank(10)->set_base(m_messram->pointer()+0xca800);
-		m_bank_cb000_r->set_base(m_messram->pointer()+0xcb000);
-		m_bank_cb000_w->set_base(m_messram->pointer()+0xcb000);
+//      membank(1)->set_base(m_ram->pointer()+0xc0000);
+//      membank(2)->set_base(m_ram->pointer()+0xc8000);
+//      membank(3)->set_base(m_ram->pointer()+0xc9000);
+//      membank(4)->set_base(m_ram->pointer()+0xca000);
+//      membank(5)->set_base(m_ram->pointer()+0xca000);
+//      membank(10)->set_base(m_ram->pointer()+0xca800);
+		m_bank_cb000_r->set_base(m_ram->pointer()+0xcb000);
+		m_bank_cb000_w->set_base(m_ram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			m_bank_f8000_r->set_base(m_messram->pointer()+0xf8000);
+			m_bank_f8000_r->set_base(m_ram->pointer()+0xf8000);
 		else
 			m_bank_f8000_r->set_base(ROM+0x238000);
-		m_bank_f8000_w->set_base(m_messram->pointer()+0xf8000);
+		m_bank_f8000_w->set_base(m_ram->pointer()+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
 	{
 //      membank(1)->set_base(towns_gfxvram+(towns_vram_rplane*0x8000));
 //      membank(2)->set_base(towns_txtvram);
-//      membank(3)->set_base(m_messram->pointer()+0xc9000);
+//      membank(3)->set_base(m_ram->pointer()+0xc9000);
 //      if(towns_ankcg_enable != 0)
 //          membank(4)->set_base(ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
 //          membank(4)->set_base(towns_txtvram+0x2000);
 //      membank(5)->set_base(towns_txtvram+0x2000);
-//      membank(10)->set_base(m_messram->pointer()+0xca800);
+//      membank(10)->set_base(m_ram->pointer()+0xca800);
 		if(m_towns_ankcg_enable != 0)
 			m_bank_cb000_r->set_base(ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			m_bank_cb000_r->set_base(m_messram->pointer()+0xcb000);
-		m_bank_cb000_w->set_base(m_messram->pointer()+0xcb000);
+			m_bank_cb000_r->set_base(m_ram->pointer()+0xcb000);
+		m_bank_cb000_w->set_base(m_ram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			m_bank_f8000_r->set_base(m_messram->pointer()+0xf8000);
+			m_bank_f8000_r->set_base(m_ram->pointer()+0xf8000);
 		else
 			m_bank_f8000_r->set_base(ROM+0x238000);
-		m_bank_f8000_w->set_base(m_messram->pointer()+0xf8000);
+		m_bank_f8000_w->set_base(m_ram->pointer()+0xf8000);
 		return;
 	}
 }
@@ -2182,26 +2182,26 @@ void towns_state::towns_mem(address_map &map)
 	// memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
 	// may not be (and probably is not) correct
 	map(0x00000000, 0x000bffff).ram();
-	map(0x000c0000, 0x000c7fff).rw(this, FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
-	map(0x000c8000, 0x000cafff).rw(this, FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
+	map(0x000c0000, 0x000c7fff).rw(FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
+	map(0x000c8000, 0x000cafff).rw(FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
 	map(0x000cb000, 0x000cbfff).bankr("bank_cb000_r").bankw("bank_cb000_w");
 	map(0x000cc000, 0x000cff7f).ram();
-	map(0x000cff80, 0x000cffff).rw(this, FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
+	map(0x000cff80, 0x000cffff).rw(FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
 	map(0x000d0000, 0x000d7fff).ram();
-	map(0x000d8000, 0x000d9fff).rw(this, FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram"); // CMOS? RAM
+	map(0x000d8000, 0x000d9fff).rw(FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram"); // CMOS? RAM
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
 //  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
-	map(0x80000000, 0x8007ffff).rw(this, FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x80000); // VRAM
-	map(0x80100000, 0x8017ffff).rw(this, FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
-	map(0x81000000, 0x8101ffff).rw(this, FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
+	map(0x80000000, 0x8007ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x80000); // VRAM
+	map(0x80100000, 0x8017ffff).rw(FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
+	map(0x81000000, 0x8101ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
 	map(0xc0000000, 0xc0ffffff).rw(m_icmemcard, FUNC(fmt_icmem_device::static_mem_read), FUNC(fmt_icmem_device::static_mem_write));
 	map(0xc1000000, 0xc1ffffff).rw(m_icmemcard, FUNC(fmt_icmem_device::mem_read), FUNC(fmt_icmem_device::mem_write));
 	map(0xc2000000, 0xc207ffff).rom().region("user", 0x000000);  // OS ROM
 	map(0xc2080000, 0xc20fffff).rom().region("user", 0x100000);  // DIC ROM
 	map(0xc2100000, 0xc213ffff).rom().region("user", 0x180000);  // FONT ROM
-	map(0xc2140000, 0xc2141fff).rw(this, FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)); // CMOS (mirror?)
+	map(0xc2140000, 0xc2141fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)); // CMOS (mirror?)
 	map(0xc2180000, 0xc21fffff).rom().region("user", 0x080000);  // F20 ROM
 	map(0xc2200000, 0xc2200fff).rw("pcm", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));  // WAVE RAM
 	map(0xfffc0000, 0xffffffff).rom().region("user", 0x200000);  // SYSTEM ROM
@@ -2210,22 +2210,22 @@ void towns_state::towns_mem(address_map &map)
 void towns_state::marty_mem(address_map &map)
 {
 	map(0x00000000, 0x000bffff).ram();
-	map(0x000c0000, 0x000c7fff).rw(this, FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
-	map(0x000c8000, 0x000cafff).rw(this, FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
+	map(0x000c0000, 0x000c7fff).rw(FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
+	map(0x000c8000, 0x000cafff).rw(FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
 	map(0x000cb000, 0x000cbfff).bankr("bank_cb000_r").bankw("bank_cb000_w");
 	map(0x000cc000, 0x000cff7f).ram();
-	map(0x000cff80, 0x000cffff).rw(this, FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
+	map(0x000cff80, 0x000cffff).rw(FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
 	map(0x000d0000, 0x000d7fff).ram();
-	map(0x000d8000, 0x000d9fff).rw(this, FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram16"); // CMOS? RAM
+	map(0x000d8000, 0x000d9fff).rw(FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram16"); // CMOS? RAM
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
 //  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
 	map(0x00600000, 0x0067ffff).rom().region("user", 0x000000);  // OS
 	map(0x00680000, 0x0087ffff).rom().region("user", 0x280000);  // EX ROM
-	map(0x00a00000, 0x00a7ffff).rw(this, FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
+	map(0x00a00000, 0x00a7ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
 	map(0x00b00000, 0x00b7ffff).rom().region("user", 0x180000);  // FONT
-	map(0x00c00000, 0x00c1ffff).rw(this, FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
+	map(0x00c00000, 0x00c1ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
 	map(0x00d00000, 0x00dfffff).rw(m_icmemcard, FUNC(fmt_icmem_device::mem_read), FUNC(fmt_icmem_device::mem_write));
 	map(0x00e80000, 0x00efffff).rom().region("user", 0x100000);  // DIC ROM
 	map(0x00f00000, 0x00f7ffff).rom().region("user", 0x180000);  // FONT
@@ -2236,20 +2236,20 @@ void towns_state::marty_mem(address_map &map)
 void towns_state::ux_mem(address_map &map)
 {
 	map(0x00000000, 0x000bffff).ram();
-	map(0x000c0000, 0x000c7fff).rw(this, FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
-	map(0x000c8000, 0x000cafff).rw(this, FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
+	map(0x000c0000, 0x000c7fff).rw(FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
+	map(0x000c8000, 0x000cafff).rw(FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
 	map(0x000cb000, 0x000cbfff).bankr("bank_cb000_r").bankw("bank_cb000_w");
 	map(0x000cc000, 0x000cff7f).ram();
-	map(0x000cff80, 0x000cffff).rw(this, FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
+	map(0x000cff80, 0x000cffff).rw(FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
 	map(0x000d0000, 0x000d7fff).ram();
-	map(0x000d8000, 0x000d9fff).rw(this, FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram16"); // CMOS? RAM
+	map(0x000d8000, 0x000d9fff).rw(FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram16"); // CMOS? RAM
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
 //  AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
-	map(0x00a00000, 0x00a7ffff).rw(this, FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
+	map(0x00a00000, 0x00a7ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
 	map(0x00b00000, 0x00b7ffff).rom().region("user", 0x180000);  // FONT
-	map(0x00c00000, 0x00c1ffff).rw(this, FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
+	map(0x00c00000, 0x00c1ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
 	map(0x00d00000, 0x00dfffff).rw(m_icmemcard, FUNC(fmt_icmem_device::mem_read), FUNC(fmt_icmem_device::mem_write));
 	map(0x00e00000, 0x00e7ffff).rom().region("user", 0x000000);  // OS
 	map(0x00e80000, 0x00efffff).rom().region("user", 0x100000);  // DIC ROM
@@ -2265,57 +2265,57 @@ void towns_state::towns_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0003).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask32(0x00ff00ff);
 	map(0x0010, 0x0013).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask32(0x00ff00ff);
-	map(0x0020, 0x0033).rw(this, FUNC(towns_state::towns_system_r), FUNC(towns_state::towns_system_w));
+	map(0x0020, 0x0033).rw(FUNC(towns_state::towns_system_r), FUNC(towns_state::towns_system_w));
 	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x00ff00ff);
 	map(0x0050, 0x0057).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x00ff00ff);
-	map(0x0060, 0x0060).rw(this, FUNC(towns_state::towns_port60_r), FUNC(towns_state::towns_port60_w));
-	map(0x0068, 0x006b).rw(this, FUNC(towns_state::towns_intervaltimer2_r), FUNC(towns_state::towns_intervaltimer2_w));
-	map(0x006c, 0x006c).rw(this, FUNC(towns_state::towns_sys6c_r), FUNC(towns_state::towns_sys6c_w));
+	map(0x0060, 0x0060).rw(FUNC(towns_state::towns_port60_r), FUNC(towns_state::towns_port60_w));
+	map(0x0068, 0x006b).rw(FUNC(towns_state::towns_intervaltimer2_r), FUNC(towns_state::towns_intervaltimer2_w));
+	map(0x006c, 0x006c).rw(FUNC(towns_state::towns_sys6c_r), FUNC(towns_state::towns_sys6c_w));
 	// 0x0070/0x0080 - CMOS RTC
-	map(0x0070, 0x0070).rw(this, FUNC(towns_state::towns_rtc_r), FUNC(towns_state::towns_rtc_w));
-	map(0x0080, 0x0080).w(this, FUNC(towns_state::towns_rtc_select_w));
+	map(0x0070, 0x0070).rw(FUNC(towns_state::towns_rtc_r), FUNC(towns_state::towns_rtc_w));
+	map(0x0080, 0x0080).w(FUNC(towns_state::towns_rtc_select_w));
 	// DMA controllers (uPD71071)
-	map(0x00a0, 0x00af).rw(this, FUNC(towns_state::towns_dma_r<0>), FUNC(towns_state::towns_dma_w<0>));
-	map(0x00b0, 0x00bf).rw(this, FUNC(towns_state::towns_dma_r<1>), FUNC(towns_state::towns_dma_w<1>));
+	map(0x00a0, 0x00af).rw(FUNC(towns_state::towns_dma_r<0>), FUNC(towns_state::towns_dma_w<0>));
+	map(0x00b0, 0x00bf).rw(FUNC(towns_state::towns_dma_r<1>), FUNC(towns_state::towns_dma_w<1>));
 	// Floppy controller
-	map(0x0200, 0x020f).rw(this, FUNC(towns_state::towns_floppy_r), FUNC(towns_state::towns_floppy_w));
+	map(0x0200, 0x020f).rw(FUNC(towns_state::towns_floppy_r), FUNC(towns_state::towns_floppy_w));
 	// CRTC / Video
-	map(0x0400, 0x0400).r(this, FUNC(towns_state::towns_video_unknown_r));  // R/O (0x400)
-	map(0x0404, 0x0404).rw(this, FUNC(towns_state::towns_video_404_r), FUNC(towns_state::towns_video_404_w));  // R/W (0x404)
-	map(0x0440, 0x045f).rw(this, FUNC(towns_state::towns_video_440_r), FUNC(towns_state::towns_video_440_w));
+	map(0x0400, 0x0400).r(FUNC(towns_state::towns_video_unknown_r));  // R/O (0x400)
+	map(0x0404, 0x0404).rw(FUNC(towns_state::towns_video_404_r), FUNC(towns_state::towns_video_404_w));  // R/W (0x404)
+	map(0x0440, 0x045f).rw(FUNC(towns_state::towns_video_440_r), FUNC(towns_state::towns_video_440_w));
 	// System port
-	map(0x0480, 0x0480).rw(this, FUNC(towns_state::towns_sys480_r), FUNC(towns_state::towns_sys480_w));  // R/W (0x480)
+	map(0x0480, 0x0480).rw(FUNC(towns_state::towns_sys480_r), FUNC(towns_state::towns_sys480_w));  // R/W (0x480)
 	// IC Memory Card
 	map(0x048a, 0x048a).r(m_icmemcard, FUNC(fmt_icmem_device::status_r));
 	map(0x0490, 0x0491).rw(m_icmemcard, FUNC(fmt_icmem_device::bank_r), FUNC(fmt_icmem_device::bank_w));
 	// CD-ROM
-	map(0x04c0, 0x04cf).rw(this, FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask32(0x00ff00ff);
+	map(0x04c0, 0x04cf).rw(FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask32(0x00ff00ff);
 	// Joystick / Mouse ports
-	map(0x04d0, 0x04d3).r(this, FUNC(towns_state::towns_padport_r)).umask32(0x00ff00ff);
-	map(0x04d6, 0x04d6).w(this, FUNC(towns_state::towns_pad_mask_w));
+	map(0x04d0, 0x04d3).r(FUNC(towns_state::towns_padport_r)).umask32(0x00ff00ff);
+	map(0x04d6, 0x04d6).w(FUNC(towns_state::towns_pad_mask_w));
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	map(0x04d8, 0x04df).rw("fm", FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask32(0x00ff00ff);
-	map(0x04e0, 0x04e3).rw(this, FUNC(towns_state::towns_volume_r), FUNC(towns_state::towns_volume_w));  // R/W  -- volume ports
-	map(0x04e4, 0x04e7).r(this, FUNC(towns_state::unksnd_r));
-	map(0x04e8, 0x04ef).rw(this, FUNC(towns_state::towns_sound_ctrl_r), FUNC(towns_state::towns_sound_ctrl_w));
+	map(0x04e0, 0x04e3).rw(FUNC(towns_state::towns_volume_r), FUNC(towns_state::towns_volume_w));  // R/W  -- volume ports
+	map(0x04e4, 0x04e7).r(FUNC(towns_state::unksnd_r));
+	map(0x04e8, 0x04ef).rw(FUNC(towns_state::towns_sound_ctrl_r), FUNC(towns_state::towns_sound_ctrl_w));
 	map(0x04f0, 0x04fb).w("pcm", FUNC(rf5c68_device::rf5c68_w));
 	// CRTC / Video
-	map(0x05c8, 0x05cb).rw(this, FUNC(towns_state::towns_video_5c8_r), FUNC(towns_state::towns_video_5c8_w));
+	map(0x05c8, 0x05cb).rw(FUNC(towns_state::towns_video_5c8_r), FUNC(towns_state::towns_video_5c8_w));
 	// System ports
-	map(0x05e8, 0x05ef).rw(this, FUNC(towns_state::towns_sys5e8_r), FUNC(towns_state::towns_sys5e8_w)).umask32(0x00ff00ff);
+	map(0x05e8, 0x05ef).rw(FUNC(towns_state::towns_sys5e8_r), FUNC(towns_state::towns_sys5e8_w)).umask32(0x00ff00ff);
 	// Keyboard (8042 MCU)
-	map(0x0600, 0x0607).rw(this, FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask32(0x00ff00ff);
+	map(0x0600, 0x0607).rw(FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask32(0x00ff00ff);
 	// RS-232C interface
-	map(0x0a00, 0x0a0b).rw(this, FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask32(0x00ff00ff);
+	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask32(0x00ff00ff);
 	// SCSI controller
 	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
 	// CMOS
-	map(0x3000, 0x4fff).rw(this, FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
+	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
 	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
 	// CRTC / Video (again)
-	map(0xfd90, 0xfda3).rw(this, FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
-	map(0xff80, 0xffff).rw(this, FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
+	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
+	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
 }
 
 void towns_state::towns16_io(address_map &map)
@@ -2324,57 +2324,57 @@ void towns_state::towns16_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0003).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x0010, 0x0013).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x0020, 0x0033).rw(this, FUNC(towns_state::towns_system_r), FUNC(towns_state::towns_system_w));
+	map(0x0020, 0x0033).rw(FUNC(towns_state::towns_system_r), FUNC(towns_state::towns_system_w));
 	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0060, 0x0060).rw(this, FUNC(towns_state::towns_port60_r), FUNC(towns_state::towns_port60_w));
-	map(0x0068, 0x006b).rw(this, FUNC(towns_state::towns_intervaltimer2_r), FUNC(towns_state::towns_intervaltimer2_w));
-	map(0x006c, 0x006c).rw(this, FUNC(towns_state::towns_sys6c_r), FUNC(towns_state::towns_sys6c_w));
+	map(0x0060, 0x0060).rw(FUNC(towns_state::towns_port60_r), FUNC(towns_state::towns_port60_w));
+	map(0x0068, 0x006b).rw(FUNC(towns_state::towns_intervaltimer2_r), FUNC(towns_state::towns_intervaltimer2_w));
+	map(0x006c, 0x006c).rw(FUNC(towns_state::towns_sys6c_r), FUNC(towns_state::towns_sys6c_w));
 	// 0x0070/0x0080 - CMOS RTC
-	map(0x0070, 0x0070).rw(this, FUNC(towns_state::towns_rtc_r), FUNC(towns_state::towns_rtc_w));
-	map(0x0080, 0x0080).w(this, FUNC(towns_state::towns_rtc_select_w));
+	map(0x0070, 0x0070).rw(FUNC(towns_state::towns_rtc_r), FUNC(towns_state::towns_rtc_w));
+	map(0x0080, 0x0080).w(FUNC(towns_state::towns_rtc_select_w));
 	// DMA controllers (uPD71071)
-	map(0x00a0, 0x00af).rw(this, FUNC(towns_state::towns_dma_r<0>), FUNC(towns_state::towns_dma_w<0>));
-	map(0x00b0, 0x00bf).rw(this, FUNC(towns_state::towns_dma_r<1>), FUNC(towns_state::towns_dma_w<1>));
+	map(0x00a0, 0x00af).rw(FUNC(towns_state::towns_dma_r<0>), FUNC(towns_state::towns_dma_w<0>));
+	map(0x00b0, 0x00bf).rw(FUNC(towns_state::towns_dma_r<1>), FUNC(towns_state::towns_dma_w<1>));
 	// Floppy controller
-	map(0x0200, 0x020f).rw(this, FUNC(towns_state::towns_floppy_r), FUNC(towns_state::towns_floppy_w));
+	map(0x0200, 0x020f).rw(FUNC(towns_state::towns_floppy_r), FUNC(towns_state::towns_floppy_w));
 	// CRTC / Video
-	map(0x0400, 0x0400).r(this, FUNC(towns_state::towns_video_unknown_r));  // R/O (0x400)
-	map(0x0404, 0x0407).rw(this, FUNC(towns_state::towns_video_404_r), FUNC(towns_state::towns_video_404_w));  // R/W (0x404)
-	map(0x0440, 0x045f).rw(this, FUNC(towns_state::towns_video_440_r), FUNC(towns_state::towns_video_440_w));
+	map(0x0400, 0x0400).r(FUNC(towns_state::towns_video_unknown_r));  // R/O (0x400)
+	map(0x0404, 0x0407).rw(FUNC(towns_state::towns_video_404_r), FUNC(towns_state::towns_video_404_w));  // R/W (0x404)
+	map(0x0440, 0x045f).rw(FUNC(towns_state::towns_video_440_r), FUNC(towns_state::towns_video_440_w));
 	// System port
-	map(0x0480, 0x0480).rw(this, FUNC(towns_state::towns_sys480_r), FUNC(towns_state::towns_sys480_w));  // R/W (0x480)
+	map(0x0480, 0x0480).rw(FUNC(towns_state::towns_sys480_r), FUNC(towns_state::towns_sys480_w));  // R/W (0x480)
 	// IC Memory Card
 	map(0x048a, 0x048a).r(m_icmemcard, FUNC(fmt_icmem_device::status_r));
 	map(0x0490, 0x0491).rw(m_icmemcard, FUNC(fmt_icmem_device::bank_r), FUNC(fmt_icmem_device::bank_w));
 	// CD-ROM
-	map(0x04c0, 0x04cf).rw(this, FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask16(0x00ff);
+	map(0x04c0, 0x04cf).rw(FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask16(0x00ff);
 	// Joystick / Mouse ports
-	map(0x04d0, 0x04d3).r(this, FUNC(towns_state::towns_padport_r)).umask16(0x00ff);
-	map(0x04d6, 0x04d6).w(this, FUNC(towns_state::towns_pad_mask_w));
+	map(0x04d0, 0x04d3).r(FUNC(towns_state::towns_padport_r)).umask16(0x00ff);
+	map(0x04d6, 0x04d6).w(FUNC(towns_state::towns_pad_mask_w));
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	map(0x04d8, 0x04df).rw("fm", FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
-	map(0x04e0, 0x04e3).rw(this, FUNC(towns_state::towns_volume_r), FUNC(towns_state::towns_volume_w));  // R/W  -- volume ports
-	map(0x04e4, 0x04e7).r(this, FUNC(towns_state::unksnd_r));
-	map(0x04e8, 0x04ef).rw(this, FUNC(towns_state::towns_sound_ctrl_r), FUNC(towns_state::towns_sound_ctrl_w));
+	map(0x04e0, 0x04e3).rw(FUNC(towns_state::towns_volume_r), FUNC(towns_state::towns_volume_w));  // R/W  -- volume ports
+	map(0x04e4, 0x04e7).r(FUNC(towns_state::unksnd_r));
+	map(0x04e8, 0x04ef).rw(FUNC(towns_state::towns_sound_ctrl_r), FUNC(towns_state::towns_sound_ctrl_w));
 	map(0x04f0, 0x04fb).w("pcm", FUNC(rf5c68_device::rf5c68_w));
 	// CRTC / Video
-	map(0x05c8, 0x05cb).rw(this, FUNC(towns_state::towns_video_5c8_r), FUNC(towns_state::towns_video_5c8_w));
+	map(0x05c8, 0x05cb).rw(FUNC(towns_state::towns_video_5c8_r), FUNC(towns_state::towns_video_5c8_w));
 	// System ports
-	map(0x05e8, 0x05ef).rw(this, FUNC(towns_state::towns_sys5e8_r), FUNC(towns_state::towns_sys5e8_w)).umask16(0x00ff);
+	map(0x05e8, 0x05ef).rw(FUNC(towns_state::towns_sys5e8_r), FUNC(towns_state::towns_sys5e8_w)).umask16(0x00ff);
 	// Keyboard (8042 MCU)
-	map(0x0600, 0x0607).rw(this, FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask16(0x00ff);
+	map(0x0600, 0x0607).rw(FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask16(0x00ff);
 	// RS-232C interface
-	map(0x0a00, 0x0a0b).rw(this, FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask16(0x00ff);
+	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask16(0x00ff);
 	// SCSI controller
 	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
 	// CMOS
-	map(0x3000, 0x4fff).rw(this, FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask16(0x00ff);
+	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask16(0x00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
 	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
 	// CRTC / Video (again)
-	map(0xfd90, 0xfda3).rw(this, FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
-	map(0xff80, 0xffff).rw(this, FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
+	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
+	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
 }
 
 void towns_state::pcm_mem(address_map &map)
@@ -2658,7 +2658,7 @@ void towns_state::driver_start()
 	memset(&m_towns_cd,0,sizeof(struct towns_cdrom_controller));
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
-	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
+	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)m_dma_1.target());
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
@@ -2675,17 +2675,13 @@ void marty_state::driver_start()
 
 void towns_state::machine_start()
 {
-	m_flop0->get_device()->set_rpm(360);
-	m_flop1->get_device()->set_rpm(360);
+	m_flop[0]->get_device()->set_rpm(360);
+	m_flop[1]->get_device()->set_rpm(360);
 }
 
 void towns_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_messram = m_ram;
-	m_cdrom = machine().device<cdrom_image_device>("cdrom");
-	m_cdda = machine().device<cdda_device>("cdda");
-	m_scsi = machine().device<fmscsi_device>("fmscsi");
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;
@@ -2798,9 +2794,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_DEVICE_ADD("cdda",CDDA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND,0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "lspeaker", 0.50).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(307200)
@@ -2825,7 +2819,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
-	MCFG_MB8877_ADD("fdc",XTAL(8'000'000)/4)  // clock unknown
+	MCFG_DEVICE_ADD("fdc", MB8877, 8'000'000 / 4)  // clock unknown
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)

@@ -54,9 +54,9 @@ void bigstrkb_state::bigstrkb_map(address_map &map)
 
 	map(0x0D0000, 0x0dffff).ram();  // 0xd2000 - 0xd3fff?   0xd8000?
 
-	map(0x0e0000, 0x0e3fff).ram().w(this, FUNC(bigstrkb_state::videoram2_w)).share("videoram2");
-	map(0x0e8000, 0x0ebfff).ram().w(this, FUNC(bigstrkb_state::videoram3_w)).share("videoram3");
-	map(0x0ec000, 0x0effff).ram().w(this, FUNC(bigstrkb_state::videoram_w)).share("videoram");
+	map(0x0e0000, 0x0e3fff).ram().w(FUNC(bigstrkb_state::videoram2_w)).share("videoram2");
+	map(0x0e8000, 0x0ebfff).ram().w(FUNC(bigstrkb_state::videoram3_w)).share("videoram3");
+	map(0x0ec000, 0x0effff).ram().w(FUNC(bigstrkb_state::videoram_w)).share("videoram");
 
 	map(0x0f0000, 0x0f7fff).ram();
 	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");

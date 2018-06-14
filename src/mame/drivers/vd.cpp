@@ -76,17 +76,17 @@ void vd_state::vd_io(address_map &map)
 	map(0x03, 0x03).portr("X3");
 	map(0x04, 0x04).portr("X4");
 	map(0x05, 0x05).portr("X5");
-	map(0x20, 0x27).w(this, FUNC(vd_state::lamp_w));
-	map(0x28, 0x28).w(this, FUNC(vd_state::sol_w));
-	map(0x40, 0x44).w(this, FUNC(vd_state::disp_w));
+	map(0x20, 0x27).w(FUNC(vd_state::lamp_w));
+	map(0x28, 0x28).w(FUNC(vd_state::sol_w));
+	map(0x40, 0x44).w(FUNC(vd_state::disp_w));
 	map(0x60, 0x60).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x61, 0x61).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x62, 0x62).w("ay1", FUNC(ay8910_device::data_w));
 	map(0x80, 0x80).w("ay2", FUNC(ay8910_device::address_w));
 	map(0x81, 0x81).r("ay2", FUNC(ay8910_device::data_r)); // probably never read
 	map(0x82, 0x82).w("ay2", FUNC(ay8910_device::data_w));
-	map(0xa0, 0xa0).r(this, FUNC(vd_state::ack_r));
-	map(0xc0, 0xc0).w(this, FUNC(vd_state::col_w));
+	map(0xa0, 0xa0).r(FUNC(vd_state::ack_r));
+	map(0xc0, 0xc0).w(FUNC(vd_state::col_w));
 }
 
 static INPUT_PORTS_START( break86 )

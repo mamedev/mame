@@ -29,6 +29,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,7 +87,7 @@ void lola8a_state::lola8a_io(address_map &map)
 	map.unmap_value_high();
 	map(0x80, 0x80).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0x84, 0x84).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x88, 0x88).r(this, FUNC(lola8a_state::keyboard_r));
+	map(0x88, 0x88).r(FUNC(lola8a_state::keyboard_r));
 
 	map(0x90, 0x90).rw(HD46505SP_TAG, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x92, 0x92).rw(HD46505SP_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));

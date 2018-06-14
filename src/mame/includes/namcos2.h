@@ -15,6 +15,7 @@
 #include "video/namco_c116.h"
 
 #include "cpu/m6502/m3745x.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* CPU reference numbers */

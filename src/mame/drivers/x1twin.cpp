@@ -42,9 +42,9 @@ public:
 };
 
 
-#define X1_MAIN_CLOCK XTAL(16'000'000)
-#define VDP_CLOCK  XTAL(42'954'545)
-#define MCU_CLOCK  XTAL(6'000'000)
+#define X1_MAIN_CLOCK 16_MHz_XTAL
+#define VDP_CLOCK  42.954545_MHz_XTAL
+#define MCU_CLOCK  6_MHz_XTAL
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -55,7 +55,7 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 void x1twin_state::x1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
 }
 
 void x1twin_state::x1_io(address_map &map)
@@ -69,17 +69,17 @@ void x1twin_state::pce_mem(address_map &map)
 {
 	map(0x000000, 0x09FFFF).rom();
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw(this, FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
-	map(0x1FE400, 0x1FE7FF).rw(this, FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
+	map(0x1FE000, 0x1FE3FF).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+	map(0x1FE400, 0x1FE7FF).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
 	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1FEC00, 0x1FEFFF).rw(this, FUNC(x1twin_state::h6280_timer_r), FUNC(x1twin_state::h6280_timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(x1twin_state::pce_joystick_r), FUNC(x1twin_state::pce_joystick_w));
+	map(0x1FEC00, 0x1FEFFF).rw(FUNC(x1twin_state::h6280_timer_r), FUNC(x1twin_state::h6280_timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(x1twin_state::pce_joystick_r), FUNC(x1twin_state::pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw("maincpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
 void x1twin_state::pce_io(address_map &map)
 {
-	map(0x00, 0x03).rw(this, FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+	map(0x00, 0x03).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
 }
 #endif
 
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 

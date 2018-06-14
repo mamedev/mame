@@ -4,6 +4,7 @@
 #include "video/decospr.h"
 #include "machine/deco146.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class lemmings_state : public driver_device
 {

@@ -19,6 +19,7 @@ It appears that unused bits in port 03 are to operate the discrete sound channel
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -152,10 +153,10 @@ void dorachan_state::dorachan_map(address_map &map)
 	map(0x0000, 0x17ff).rom();
 	map(0x1800, 0x1fff).ram();
 	map(0x2000, 0x23ff).rom();
-	map(0x2400, 0x2400).mirror(0x03ff).r(this, FUNC(dorachan_state::protection_r));
+	map(0x2400, 0x2400).mirror(0x03ff).r(FUNC(dorachan_state::protection_r));
 	map(0x2800, 0x2800).mirror(0x03ff).portr("IN0");
 	map(0x2c00, 0x2c00).mirror(0x03ff).portr("IN1");
-	map(0x3800, 0x3800).mirror(0x03ff).r(this, FUNC(dorachan_state::v128_r));
+	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(dorachan_state::v128_r));
 	map(0x4000, 0x5fff).ram().share("videoram");
 	map(0x6000, 0x77ff).rom();
 }
@@ -164,8 +165,8 @@ void dorachan_state::dorachan_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).nopw();
-	map(0x02, 0x02).w(this, FUNC(dorachan_state::protection_w));
-	map(0x03, 0x03).w(this, FUNC(dorachan_state::control_w));
+	map(0x02, 0x02).w(FUNC(dorachan_state::protection_w));
+	map(0x03, 0x03).w(FUNC(dorachan_state::control_w));
 }
 
 

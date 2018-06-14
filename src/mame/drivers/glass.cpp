@@ -106,28 +106,28 @@ WRITE_LINE_MEMBER(glass_state::coin2_counter_w)
 
 void glass_state::mcu_hostmem_map(address_map &map)
 {
-	map(0x0000, 0xffff).mask(0x3fff).rw(this, FUNC(glass_state::shareram_r), FUNC(glass_state::shareram_w)); // shared RAM with the main CPU
+	map(0x0000, 0xffff).mask(0x3fff).rw(FUNC(glass_state::shareram_r), FUNC(glass_state::shareram_w)); // shared RAM with the main CPU
 }
 
 
 void glass_state::glass_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                   // ROM
-	map(0x100000, 0x101fff).ram().w(this, FUNC(glass_state::vram_w)).share("videoram");                                // Video RAM
-	map(0x102000, 0x102fff).ram();                                                                   // Extra Video RAM
-	map(0x108000, 0x108007).writeonly().share("vregs");                                           // Video Registers
-	map(0x108008, 0x108009).w(this, FUNC(glass_state::clr_int_w));                                                      // CLR INT Video
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x440000, 0x440fff).ram().share("spriteram");                                             // Sprite RAM
+	map(0x000000, 0x0fffff).rom();                                                                  // ROM
+	map(0x100000, 0x101fff).ram().w(FUNC(glass_state::vram_w)).share("videoram");                   // Video RAM
+	map(0x102000, 0x102fff).ram();                                                                  // Extra Video RAM
+	map(0x108000, 0x108007).writeonly().share("vregs");                                             // Video Registers
+	map(0x108008, 0x108009).w(FUNC(glass_state::clr_int_w));                                        // CLR INT Video
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");     // Palette
+	map(0x440000, 0x440fff).ram().share("spriteram");                                               // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x700008, 0x700009).w(this, FUNC(glass_state::blitter_w));                                                      // serial blitter
-	map(0x70000a, 0x70000b).select(0x000070).w(this, FUNC(glass_state::coin_w));                                     // Coin Counters/Lockout
-	map(0x70000c, 0x70000d).w(this, FUNC(glass_state::OKIM6295_bankswitch_w));                                          // OKI6295 bankswitch
-	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));            // OKI6295 status register
-	map(0xfec000, 0xfeffff).ram().share("shareram");                                              // Work RAM (partially shared with DS5002FP)
+	map(0x700008, 0x700009).w(FUNC(glass_state::blitter_w));                                        // serial blitter
+	map(0x70000a, 0x70000b).select(0x000070).w(FUNC(glass_state::coin_w));                          // Coin Counters/Lockout
+	map(0x70000c, 0x70000d).w(FUNC(glass_state::OKIM6295_bankswitch_w));                            // OKI6295 bankswitch
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // OKI6295 status register
+	map(0xfec000, 0xfeffff).ram().share("shareram");                                                // Work RAM (partially shared with DS5002FP)
 }
 
 

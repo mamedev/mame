@@ -18,6 +18,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 /* SM8521 register addresses */
 enum

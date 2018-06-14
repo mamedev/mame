@@ -7,6 +7,7 @@
 
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
+#include "emupal.h"
 
 class playch10_state : public driver_device
 {
@@ -14,6 +15,7 @@ public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_cartcpu(*this, "cart")
 		, m_ppu(*this, "ppu")
 		, m_rp5h01(*this, "rp5h01")
 		, m_ram_8w(*this, "ram_8w")
@@ -117,6 +119,7 @@ private:
 	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cartcpu;
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 

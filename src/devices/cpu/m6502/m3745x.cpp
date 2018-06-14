@@ -499,9 +499,9 @@ WRITE8_MEMBER(m3745x_device::adc_w)
 void m37450_device::m37450_map(address_map &map)
 {
 	map(0x0000, 0x00bf).ram();
-	map(0x00d6, 0x00dd).rw(this, FUNC(m37450_device::ports_r), FUNC(m37450_device::ports_w));
-	map(0x00e2, 0x00e3).rw(this, FUNC(m37450_device::adc_r), FUNC(m37450_device::adc_w));
-	map(0x00fc, 0x00ff).rw(this, FUNC(m37450_device::intregs_r), FUNC(m37450_device::intregs_w));
+	map(0x00d6, 0x00dd).rw(FUNC(m37450_device::ports_r), FUNC(m37450_device::ports_w));
+	map(0x00e2, 0x00e3).rw(FUNC(m37450_device::adc_r), FUNC(m37450_device::adc_w));
+	map(0x00fc, 0x00ff).rw(FUNC(m37450_device::intregs_r), FUNC(m37450_device::intregs_w));
 	map(0x0100, 0x01ff).ram();
 }
 

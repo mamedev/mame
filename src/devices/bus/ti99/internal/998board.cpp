@@ -470,8 +470,8 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 	// Check video for writing
 	if (m_pending_write && m_vaquerro->vdpwt_out()==ASSERT_LINE)
 	{
-		if (m_A14_set) m_video->register_write(*m_space, 0, m_latched_data);
-		else m_video->vram_write(*m_space, 0, m_latched_data);
+		if (m_A14_set) m_video->register_write(m_latched_data);
+		else m_video->vram_write(m_latched_data);
 		m_pending_write = false;
 		LOGMASKED(LOG_MEM, "Write %04x (video) <- %02x\n", m_logical_address, m_latched_data);
 		cycle_end();
@@ -665,7 +665,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// VDP access
 		if (m_vaquerro->vdprd_out()==ASSERT_LINE)
 		{
-			value = m_A14_set? m_video->register_read(space, 0) : m_video->vram_read(space, 0);
+			value = m_A14_set? m_video->register_read() : m_video->vram_read();
 			what = "video";
 			goto readdone;
 		}
@@ -855,7 +855,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	if (m_vaquerro->sccs_out()==ASSERT_LINE)
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (sound) <- %02x\n", m_logical_address, data);
-		m_sound->write(space, 0, data);         // Sound chip will lower READY after this access
+		m_sound->write(data);         // Sound chip will lower READY after this access
 		m_pending_write = false;
 	}
 	else

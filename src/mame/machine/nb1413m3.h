@@ -189,6 +189,7 @@ private:
 	int m_gfxrombank;
 	int m_outcoin_enable;
 	emu_timer *m_timer_cb;
+	output_finder<> m_led;
 	TIMER_CALLBACK_MEMBER( timer_callback );
 };
 

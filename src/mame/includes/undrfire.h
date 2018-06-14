@@ -4,6 +4,7 @@
 #include "machine/eepromser.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
+#include "emupal.h"
 
 struct uf_tempsprite
 {

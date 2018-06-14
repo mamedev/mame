@@ -35,7 +35,7 @@ void namco_c139_device::data_map(address_map &map)
 
 void namco_c139_device::regs_map(address_map &map)
 {
-	map(0x00, 0x01).r(this, FUNC(namco_c139_device::status_r)); // WRITE clears flags
+	map(0x00, 0x01).r(FUNC(namco_c139_device::status_r)); // WRITE clears flags
 	map(0x02, 0x03).noprw(); // settings?
 //  AM_RANGE(0x0a, 0x0b) // WRITE tx_w
 //  AM_RANGE(0x0c, 0x0d) // READ rx_r

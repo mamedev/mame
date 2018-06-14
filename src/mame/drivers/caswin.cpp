@@ -71,6 +71,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,7 +84,8 @@ public:
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void vvillage(machine_config &config);
@@ -110,6 +112,7 @@ private:
 	tilemap_t *m_sc0_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<5> m_lamps;
 };
 
 
@@ -127,6 +130,7 @@ TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 
 void caswin_state::video_start()
 {
+	m_lamps.resolve();
 	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
@@ -190,20 +194,18 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	---- --x- lamp button 2
 	---- ---x lamp button 1
 	*/
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
-	output().set_led_value(2, data & 0x04);
-	output().set_led_value(3, data & 0x08);
-	output().set_led_value(4, data & 0x10);
+
+	for (unsigned i = 0; i < 5; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
 void caswin_state::vvillage_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).r(this, FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
+	map(0xa000, 0xa000).r(FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
-	map(0xf800, 0xfbff).ram().w(this, FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
+	map(0xf000, 0xf3ff).ram().w(FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
+	map(0xf800, 0xfbff).ram().w(FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
 }
 
 void caswin_state::vvillage_io(address_map &map)
@@ -213,10 +215,10 @@ void caswin_state::vvillage_io(address_map &map)
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
-	map(0x10, 0x10).w(this, FUNC(caswin_state::vvillage_scroll_w));
-	map(0x11, 0x11).w(this, FUNC(caswin_state::vvillage_vregs_w));
-	map(0x12, 0x12).w(this, FUNC(caswin_state::vvillage_lamps_w));
-	map(0x13, 0x13).w(this, FUNC(caswin_state::vvillage_output_w));
+	map(0x10, 0x10).w(FUNC(caswin_state::vvillage_scroll_w));
+	map(0x11, 0x11).w(FUNC(caswin_state::vvillage_vregs_w));
+	map(0x12, 0x12).w(FUNC(caswin_state::vvillage_lamps_w));
+	map(0x13, 0x13).w(FUNC(caswin_state::vvillage_output_w));
 }
 
 

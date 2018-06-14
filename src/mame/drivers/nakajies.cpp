@@ -276,6 +276,7 @@ disabled). Perhaps power on/off related??
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -400,14 +401,14 @@ WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
 
 void nakajies_state::nakajies_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).bankr("bank0").w(this, FUNC(nakajies_state::bank0_w));
-	map(0x20000, 0x3ffff).bankr("bank1").w(this, FUNC(nakajies_state::bank1_w));
-	map(0x40000, 0x5ffff).bankr("bank2").w(this, FUNC(nakajies_state::bank2_w));
-	map(0x60000, 0x7ffff).bankr("bank3").w(this, FUNC(nakajies_state::bank3_w));
-	map(0x80000, 0x9ffff).bankr("bank4").w(this, FUNC(nakajies_state::bank4_w));
-	map(0xa0000, 0xbffff).bankr("bank5").w(this, FUNC(nakajies_state::bank5_w));
-	map(0xc0000, 0xdffff).bankr("bank6").w(this, FUNC(nakajies_state::bank6_w));
-	map(0xe0000, 0xfffff).bankr("bank7").w(this, FUNC(nakajies_state::bank7_w));
+	map(0x00000, 0x1ffff).bankr("bank0").w(FUNC(nakajies_state::bank0_w));
+	map(0x20000, 0x3ffff).bankr("bank1").w(FUNC(nakajies_state::bank1_w));
+	map(0x40000, 0x5ffff).bankr("bank2").w(FUNC(nakajies_state::bank2_w));
+	map(0x60000, 0x7ffff).bankr("bank3").w(FUNC(nakajies_state::bank3_w));
+	map(0x80000, 0x9ffff).bankr("bank4").w(FUNC(nakajies_state::bank4_w));
+	map(0xa0000, 0xbffff).bankr("bank5").w(FUNC(nakajies_state::bank5_w));
+	map(0xc0000, 0xdffff).bankr("bank6").w(FUNC(nakajies_state::bank6_w));
+	map(0xe0000, 0xfffff).bankr("bank7").w(FUNC(nakajies_state::bank7_w));
 }
 
 
@@ -504,12 +505,12 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 
 void nakajies_state::nakajies_io_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(nakajies_state::lcd_memory_start_w));
-	map(0x0010, 0x0017).w(this, FUNC(nakajies_state::banking_w));
-	map(0x0060, 0x0060).rw(this, FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
-	map(0x0090, 0x0090).rw(this, FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
-	map(0x00a0, 0x00a0).r(this, FUNC(nakajies_state::unk_a0_r));
-	map(0x00b0, 0x00b0).r(this, FUNC(nakajies_state::keyboard_r));
+	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
+	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
+	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
+	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::unk_a0_r));
+	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
 	map(0x00d0, 0x00df).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 }
 
@@ -796,10 +797,10 @@ ROM_START(wales210)
 	ROM_REGION( 0x80000, "bios", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "wales210", "Walther ES-210" )
-	ROMX_LOAD("wales210.ic303", 0x00000, 0x80000, CRC(a8e8d991) SHA1(9a133b37b2fbf689ae1c7ab5c7f4e97cd33fd596), ROM_BIOS(1))        /* 27c4001 */
+	ROMX_LOAD("wales210.ic303", 0x00000, 0x80000, CRC(a8e8d991) SHA1(9a133b37b2fbf689ae1c7ab5c7f4e97cd33fd596), ROM_BIOS(0))        /* 27c4001 */
 
 	ROM_SYSTEM_BIOS( 1, "drwrtr325", "NTS DreamWriter 325" )
-	ROMX_LOAD("dr3_1_02uk.ic303", 0x00000, 0x80000, CRC(027db9fe) SHA1(eb52a30510f2e2924c6dae9bc4348cd3572f4997), ROM_BIOS(2))
+	ROMX_LOAD("dr3_1_02uk.ic303", 0x00000, 0x80000, CRC(027db9fe) SHA1(eb52a30510f2e2924c6dae9bc4348cd3572f4997), ROM_BIOS(1))
 ROM_END
 
 

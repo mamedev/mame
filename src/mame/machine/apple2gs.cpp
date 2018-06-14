@@ -1981,7 +1981,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	/* setup globals */
 	m_is_rom3 = true;
 
-	machine().device<nvram_device>("nvram")->set_base(m_clock_bram, sizeof(m_clock_bram));
+	subdevice<nvram_device>("nvram")->set_base(m_clock_bram, sizeof(m_clock_bram));
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	uint8_t* ram = m_ram->pointer();

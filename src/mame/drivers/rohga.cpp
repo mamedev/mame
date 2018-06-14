@@ -166,16 +166,16 @@ void rohga_state::rohga_map(address_map &map)
 	map(0x200000, 0x20000f).w("tilegen1", FUNC(deco16ic_device::pf_control_w));
 	map(0x240000, 0x24000f).w("tilegen2", FUNC(deco16ic_device::pf_control_w));
 
-	map(0x280000, 0x283fff).rw(this, FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0x280000, 0x283fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
 
 	map(0x2c0000, 0x2c0001).portr("DSW3");
 
-	map(0x300000, 0x300001).w(this, FUNC(rohga_state::rohga_buffer_spriteram16_w)); /* write 1 for sprite dma */
+	map(0x300000, 0x300001).w(FUNC(rohga_state::rohga_buffer_spriteram16_w)); /* write 1 for sprite dma */
 	map(0x310000, 0x310009).nopw(); /* Palette control? */
 	map(0x31000a, 0x31000b).w(m_decocomn, FUNC(decocomn_device::palette_dma_w)); /* Write 1111 for dma?  (Or any value?) */
 	map(0x320000, 0x320001).nopw(); /* ? */
 	map(0x322000, 0x322001).w(m_decocomn, FUNC(decocomn_device::priority_w));
-	map(0x321100, 0x321101).r(this, FUNC(rohga_state::rohga_irq_ack_r)); /* Irq ack?  Value not used */
+	map(0x321100, 0x321101).r(FUNC(rohga_state::rohga_irq_ack_r)); /* Irq ack?  Value not used */
 
 	map(0x3c0000, 0x3c1fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x3c2000, 0x3c2fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
@@ -211,7 +211,7 @@ void rohga_state::wizdfire_map(address_map &map)
 
 	map(0x320000, 0x320001).w(m_decocomn, FUNC(decocomn_device::priority_w)); /* Priority */
 	map(0x320002, 0x320003).nopw(); /* ? */
-	map(0x320004, 0x320005).w(this, FUNC(rohga_state::wizdfire_irq_ack_w)); /* VBL IRQ ack */
+	map(0x320004, 0x320005).w(FUNC(rohga_state::wizdfire_irq_ack_w)); /* VBL IRQ ack */
 
 	map(0x340000, 0x3407ff).ram().share("spriteram1");
 	map(0x350000, 0x350001).w("spriteram1", FUNC(buffered_spriteram16_device::write)); /* Triggers DMA for spriteram */
@@ -222,7 +222,7 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x390008, 0x390009).w(m_decocomn, FUNC(decocomn_device::palette_dma_w));
 
 	map(0xfdc000, 0xffffff).ram();
-	map(0xfe4000, 0xfe7fff).rw(this, FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0xfe4000, 0xfe7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
 }
 
 
@@ -245,7 +245,7 @@ void rohga_state::nitrobal_map(address_map &map)
 
 	map(0x320000, 0x320001).portr("DSW3").w(m_decocomn, FUNC(decocomn_device::priority_w)); /* Priority */
 	map(0x320002, 0x320003).nopw(); /* ? */
-	map(0x320004, 0x320005).w(this, FUNC(rohga_state::wizdfire_irq_ack_w)); /* VBL IRQ ack */
+	map(0x320004, 0x320005).w(FUNC(rohga_state::wizdfire_irq_ack_w)); /* VBL IRQ ack */
 
 	map(0x340000, 0x3407ff).ram().share("spriteram1");
 	map(0x350000, 0x350001).w("spriteram1", FUNC(buffered_spriteram16_device::write)); /* Triggers DMA for spriteram */
@@ -256,7 +256,7 @@ void rohga_state::nitrobal_map(address_map &map)
 	map(0x390008, 0x390009).w(m_decocomn, FUNC(decocomn_device::palette_dma_w));
 
 	map(0xfec000, 0xff3fff).ram();
-	map(0xff4000, 0xff7fff).rw(this, FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0xff4000, 0xff7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
 
 	map(0xff8000, 0xffffff).ram();
 }
@@ -267,16 +267,16 @@ void rohga_state::hotb_base_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20000f).w("tilegen1", FUNC(deco16ic_device::pf_control_w));
 	map(0x240000, 0x24000f).w("tilegen2", FUNC(deco16ic_device::pf_control_w));
-	map(0x280000, 0x283fff).rw(this, FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0x280000, 0x283fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
 
 	map(0x2c0000, 0x2c0001).portr("DSW3");
-	map(0x300000, 0x300001).portr("DSW3").w(this, FUNC(rohga_state::rohga_buffer_spriteram16_w)); /* write 1 for sprite dma */
+	map(0x300000, 0x300001).portr("DSW3").w(FUNC(rohga_state::rohga_buffer_spriteram16_w)); /* write 1 for sprite dma */
 	map(0x310002, 0x310003).portr("SYSTEM");
 	map(0x310000, 0x310009).nopw(); /* Palette control? */
 	map(0x31000a, 0x31000b).w(m_decocomn, FUNC(decocomn_device::palette_dma_w)); /* Write 1111 for dma?  (Or any value?) */
 	map(0x320000, 0x320001).nopw(); /* bit 4: cleared on irq routine start, set on end */
 	map(0x322000, 0x322001).w(m_decocomn, FUNC(decocomn_device::priority_w));
-	map(0x321100, 0x321101).w(this, FUNC(rohga_state::wizdfire_irq_ack_w));  /* Irq ack?  Value not used */
+	map(0x321100, 0x321101).w(FUNC(rohga_state::wizdfire_irq_ack_w));  /* Irq ack?  Value not used */
 
 	map(0x3c0000, 0x3c1fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x3c2000, 0x3c2fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));

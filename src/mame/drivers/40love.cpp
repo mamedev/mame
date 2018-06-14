@@ -306,33 +306,10 @@ READ8_MEMBER(fortyl_state::pix2_r)
 
 /***************************************************************************/
 
-void fortyl_state::init_undoukai()
+void fortyl_state::driver_init()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
-
-	m_pix_color[0] = 0x000;
-	m_pix_color[1] = 0x1e3;
-	m_pix_color[2] = 0x16c;
-	m_pix_color[3] = 0x1ec;
-}
-
-void fortyl_state::init_40love()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
-
-	#if 0
-		/* character ROM hack
-		    to show a white line on the opponent side */
-
-		uint8_t *ROM = memregion("gfx2")->base();
-		int adr = 0x10 * 0x022b;
-		ROM[adr + 0x000a] = 0x00;
-		ROM[adr + 0x000b] = 0x00;
-		ROM[adr + 0x400a] = 0x00;
-		ROM[adr + 0x400b] = 0x00;
-	#endif
 
 	m_pix_color[0] = 0x000;
 	m_pix_color[1] = 0x1e3;
@@ -354,27 +331,27 @@ void fortyl_state::_40love_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram(); /* M5517P on main board */
 	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x8801, 0x8801).rw(this, FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_mcu_w));      //pixel layer related
-	map(0x8802, 0x8802).w(this, FUNC(fortyl_state::bank_select_w));
-	map(0x8803, 0x8803).rw(this, FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
+	map(0x8801, 0x8801).rw(FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_mcu_w));      //pixel layer related
+	map(0x8802, 0x8802).w(FUNC(fortyl_state::bank_select_w));
+	map(0x8803, 0x8803).rw(FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
 	map(0x8804, 0x8804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x8804, 0x8804).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x8805, 0x8805).r(this, FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/ //????
+	map(0x8805, 0x8805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/ //????
 	map(0x8807, 0x8807).nopr(); /* unknown */
 	map(0x8808, 0x8808).portr("DSW3");
 	map(0x8809, 0x8809).portr("P1");
 	map(0x880a, 0x880a).portr("SYSTEM");
 	map(0x880b, 0x880b).portr("P2");
-	map(0x880c, 0x880c).portr("DSW1").w(this, FUNC(fortyl_state::fortyl_pixram_sel_w)); /* pixram bank select */
+	map(0x880c, 0x880c).portr("DSW1").w(FUNC(fortyl_state::fortyl_pixram_sel_w)); /* pixram bank select */
 	map(0x880d, 0x880d).portr("DSW2").nopw(); /* unknown */
-	map(0x9000, 0x97ff).rw(this, FUNC(fortyl_state::fortyl_bg_videoram_r), FUNC(fortyl_state::fortyl_bg_videoram_w)).share("videoram");      /* #1 M5517P on video board */
+	map(0x9000, 0x97ff).rw(FUNC(fortyl_state::fortyl_bg_videoram_r), FUNC(fortyl_state::fortyl_bg_videoram_w)).share("videoram");      /* #1 M5517P on video board */
 	map(0x9800, 0x983f).ram().share("video_ctrl");          /* video control area */
 	map(0x9840, 0x987f).ram().share("spriteram");   /* sprites part 1 */
-	map(0x9880, 0x98bf).rw(this, FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
+	map(0x9880, 0x98bf).rw(FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
 	map(0x98c0, 0x98ff).ram().share("spriteram2");/* sprites part 2 */
 	map(0xa000, 0xbfff).bankr("bank1");
 	//AM_RANGE(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
-	map(0xc000, 0xffff).rw(this, FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w)); /* banked pixel layer */
+	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w)); /* banked pixel layer */
 }
 
 void fortyl_state::undoukai_map(address_map &map)
@@ -383,25 +360,25 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xa7ff).ram().share("mcu_ram"); /* M5517P on main board */
 	map(0xa800, 0xa800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xa801, 0xa801).rw(this, FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_w));        //pixel layer related
-	map(0xa802, 0xa802).w(this, FUNC(fortyl_state::bank_select_w));
-	map(0xa803, 0xa803).rw(this, FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
+	map(0xa801, 0xa801).rw(FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_w));        //pixel layer related
+	map(0xa802, 0xa802).w(FUNC(fortyl_state::bank_select_w));
+	map(0xa803, 0xa803).rw(FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
 	map(0xa804, 0xa804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xa804, 0xa804).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xa805, 0xa805).r(this, FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
+	map(0xa805, 0xa805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
 	map(0xa807, 0xa807).nopr().nopw(); /* unknown */
 	map(0xa808, 0xa808).portr("DSW3");
 	map(0xa809, 0xa809).portr("P1");
 	map(0xa80a, 0xa80a).portr("SYSTEM");
 	map(0xa80b, 0xa80b).portr("P2");
-	map(0xa80c, 0xa80c).portr("DSW1").w(this, FUNC(fortyl_state::fortyl_pixram_sel_w)); /* pixram bank select */
+	map(0xa80c, 0xa80c).portr("DSW1").w(FUNC(fortyl_state::fortyl_pixram_sel_w)); /* pixram bank select */
 	map(0xa80d, 0xa80d).portr("DSW2").nopw(); /* unknown */
-	map(0xb000, 0xb7ff).rw(this, FUNC(fortyl_state::fortyl_bg_videoram_r), FUNC(fortyl_state::fortyl_bg_videoram_w)).share("videoram");      /* #1 M5517P on video board */
+	map(0xb000, 0xb7ff).rw(FUNC(fortyl_state::fortyl_bg_videoram_r), FUNC(fortyl_state::fortyl_bg_videoram_w)).share("videoram");      /* #1 M5517P on video board */
 	map(0xb800, 0xb83f).ram().share("video_ctrl");          /* video control area */
 	map(0xb840, 0xb87f).ram().share("spriteram");   /* sprites part 1 */
-	map(0xb880, 0xb8bf).rw(this, FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
+	map(0xb880, 0xb8bf).rw(FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
 	map(0xb8e0, 0xb8ff).ram().share("spriteram2"); /* sprites part 2 */
-	map(0xc000, 0xffff).rw(this, FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w));
+	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w));
 }
 
 WRITE8_MEMBER(fortyl_state::sound_control_0_w)
@@ -452,14 +429,14 @@ void fortyl_state::sound_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xc801).w(m_ay, FUNC(ay8910_device::address_data_w));
 	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
-	map(0xcc00, 0xcc00).w(this, FUNC(fortyl_state::sound_control_0_w));
-	map(0xce00, 0xce00).w(this, FUNC(fortyl_state::sound_control_1_w));
+	map(0xcc00, 0xcc00).w(FUNC(fortyl_state::sound_control_0_w));
+	map(0xce00, 0xce00).w(FUNC(fortyl_state::sound_control_1_w));
 	map(0xd800, 0xd800).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xd800, 0xd800).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 	map(0xda00, 0xda00).nopr(); // unknown read
 	map(0xda00, 0xda00).w("soundnmi", FUNC(input_merger_device::in_set<1>)); // enable NMI
 	map(0xdc00, 0xdc00).w("soundnmi", FUNC(input_merger_device::in_clear<1>)); // disable NMI
-	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::write));       /* signed 8-bit DAC - unknown read */
+	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::data_w));       /* signed 8-bit DAC - unknown read */
 	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
 }
 
@@ -664,7 +641,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-MACHINE_START_MEMBER(fortyl_state,40love)
+void fortyl_state::machine_start()
 {
 	/* video */
 	save_item(NAME(m_pix1));
@@ -680,10 +657,8 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 }
 
 
-MACHINE_RESET_MEMBER(fortyl_state,common)
+void fortyl_state::machine_reset()
 {
-	//MACHINE_RESET_CALL_MEMBER(ta7630);
-
 	/* video */
 	m_pix1 = 0;
 	m_pix2[0] = 0;
@@ -695,11 +670,6 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_snd_ctrl1 = 0;
 	m_snd_ctrl2 = 0;
 	m_snd_ctrl3 = 0;
-}
-
-MACHINE_RESET_MEMBER(fortyl_state,40love)
-{
-	MACHINE_RESET_CALL_MEMBER(common);
 }
 
 MACHINE_CONFIG_START(fortyl_state::_40love)
@@ -724,8 +694,6 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6) /* OK */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* high interleave to ensure proper synchronization of CPUs */
-	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
-	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -790,8 +758,6 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
-	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)  /* init machine */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -986,7 +952,7 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, init_40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, init_40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
-GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, init_undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, init_undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
+GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

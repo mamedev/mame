@@ -50,9 +50,69 @@ For kit 08-0303008 (from rev 02) swap the following:
 
 There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in any known Atari docs found to date.
 
+
+****************************************************************************
+
+For revision 3 of Asteroids Deluxe:
+
+U.S. Update
+New Program with Easier Game Play for Asteroids Deluxe
+
+The read-only memories (ROMs) in this kit contain a new program that changes the Asteroids Deluxe
+game play. To attract new players, the game play is now operator-adjustable to be either easy for
+approximately the first 30,000 points or hard through-out the game.
+
+The technical manual describes the game play correctly if the game PCB option switch at R5 is set
+to "hard". If you set the switch to "easy", then the following game-play changes happen:
+
+* FOUR large asteroids begin the game. The second wave of asteroids begins with FIVE, and the
+  subsequent waves start with SIX through NINE large asteroids. In addition, the asteriods move
+  much more slowly across the screen. (If the option switch is set to hard, the waves begin with
+  SIX to NINE large asteriods.)
+* The large ships ("death stars") when shot will break up into three slowly-moving diamonds. (If
+  the option switch is set to hard, diamonds would immediatly begin chasing the player's
+  spaceship at high speed.)
+
+After installing these five ROMs, we recommend you set your game to easy game play.  To do so, refer
+to the figure that follows. You should note also that the self-test now deisplays and addition 0 or 1
+to represent your game difficulty selection.
+
+
+ROM kit for Asteroids Deluxe Game PCB Assembly A036471-03 and -04  F
+
+Part Number   PCB Location
+--------------------------------
+036430-02      D1
+036431-02      E/F1
+036432-02      H1
+036433-03      J1
+036800-02      R2
+
+***********************
+
+Self-Test screen shows:
+
+ 0000     (left to right: Coin Bonus Adder, Left Mech Mutiplier, Right Mech Multiplier & Game Price)
+
+ 01000    (left to right: Game Language, Ships at Game Start, Minimum Plays, Difficulty, Bonus Ship)
+
+ ^^       (Graphic display of the number of ships per game [up to 7])
+
+ 10000    (Point score at which a bonus ship is granted, blank is no bonus ship)
+
+
+NOTE: Previous program versions, for the second line would only show 4 digits.  The 6th switch has
+      a currently unknown effect in the game. However, on the Minimum Number of Plays display (on the
+      Self-Test screen) changes the values shown from 0 for a 1-Play Minimum to show a 2 and from
+      1 for a 2-Play Minimum to show a 3. Known documentation for ealier game versions state the 6th
+      switch is "Unused"
+
+****************************************************************************
+
     Asteroids-deluxe state-prom added by HIGHWAYMAN.
     The prom pcb location is:C8 and is 256x4
     (i need to update the dump, this one is read in 8bit-mode)
+
 ****************************************************************************
 
     Asteroids Memory Map (preliminary)
@@ -237,16 +297,16 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(this, FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3600, 0x3600).w(this, FUNC(asteroid_state::asteroid_explode_w));
-	map(0x3a00, 0x3a00).w(this, FUNC(asteroid_state::asteroid_thump_w));
+	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
+	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::asteroid_thump_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::asteroid_noise_reset_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x5000, 0x57ff).rom();                     /* vector rom */
 	map(0x6800, 0x7fff).rom();
@@ -259,18 +319,18 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(this, FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2c40, 0x2c7f).r("earom", FUNC(atari_vg_earom_device::read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
 	map(0x3200, 0x323f).w("earom", FUNC(atari_vg_earom_device::write)).nopr();
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3600, 0x3600).w(this, FUNC(asteroid_state::asteroid_explode_w));
+	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
 	map(0x3a00, 0x3a00).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::asteroid_noise_reset_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x57ff).rom();                     /* vector rom */
 	map(0x6000, 0x7fff).rom();
@@ -282,14 +342,14 @@ void asteroid_state::llander_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).ram().mirror(0x1f00);
 	map(0x2000, 0x2000).portr("IN0");
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c00).portr("THRUST");
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(asteroid_state::llander_sounds_w));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::llander_snd_reset_w));
+	map(0x3c00, 0x3c00).w(FUNC(asteroid_state::llander_sounds_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::llander_snd_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x5fff).rom();                     /* vector rom */
 	map(0x5800, 0x5800).nopw(); // INC access?
@@ -486,9 +546,9 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPNAME( 0x10, 0x00, "Minimum Plays" )         PORT_DIPLOCATION("R5:5")
 	PORT_DIPSETTING (   0x00, "1" )
 	PORT_DIPSETTING (   0x10, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" */
-	PORT_DIPSETTING (   0x00, DEF_STR( Hard ) )
-	PORT_DIPSETTING (   0x20, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" for pre Revision 03 versions */
+	PORT_DIPSETTING (   0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("R5:7,8")
 	PORT_DIPSETTING (   0x00, "10000" )
 	PORT_DIPSETTING (   0x40, "12000" )

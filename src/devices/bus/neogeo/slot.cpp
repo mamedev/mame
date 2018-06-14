@@ -158,6 +158,7 @@ static const neogeo_slot slot_list[] =
 	{ NEOGEO_GAROU, "sma_garou" },
 	{ NEOGEO_GAROUH, "sma_garouh" },
 	{ NEOGEO_MSLUG3, "sma_mslug3" },
+	{ NEOGEO_MSLUG3A, "sma_mslug3a" },
 	{ NEOGEO_KOF2K, "sma_kof2k" },
 	{ NEOGEO_MSLUG4, "pcm2_mslug4" },
 	{ NEOGEO_MSLUG4P, "pcm2_ms4p" },

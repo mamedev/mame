@@ -122,7 +122,7 @@ uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(machine().input().code_pressed(KEYCODE_W)) {
 		if(!nmi) {
-			maincpu->set_input_line(M65C02_NMI_LINE, PULSE_LINE);
+			maincpu->pulse_input_line(M65C02_NMI_LINE, attotime::zero);
 			nmi = true;
 		}
 	} else
@@ -333,12 +333,12 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 void stratos_state::stratos_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).w(this, FUNC(stratos_state::p2000_w));
-	map(0x2200, 0x2200).rw(this, FUNC(stratos_state::p2200_r), FUNC(stratos_state::p2200_w));
-	map(0x2400, 0x2400).w(this, FUNC(stratos_state::p2400_w));
-	map(0x2600, 0x2600).rw(this, FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
+	map(0x2000, 0x2000).w(FUNC(stratos_state::p2000_w));
+	map(0x2200, 0x2200).rw(FUNC(stratos_state::p2200_r), FUNC(stratos_state::p2200_w));
+	map(0x2400, 0x2400).w(FUNC(stratos_state::p2400_w));
+	map(0x2600, 0x2600).rw(FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
 	map(0x2800, 0x37ff).bankrw("nvram_bank");
-	map(0x3800, 0x3800).rw(this, FUNC(stratos_state::lcd_r), FUNC(stratos_state::lcd_w));
+	map(0x3800, 0x3800).rw(FUNC(stratos_state::lcd_r), FUNC(stratos_state::lcd_w));
 	map(0x4000, 0x7fff).bankr("bank_4000");
 	map(0x8000, 0xffff).bankr("bank_8000");
 }

@@ -22,6 +22,7 @@
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -136,7 +137,7 @@ void jr100_state::jr100_mem(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	map(0xc000, 0xc0ff).ram().share("pcg");
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(this, FUNC(jr100_state::jr100_via_w));
+	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(FUNC(jr100_state::jr100_via_w));
 	map(0xe000, 0xffff).rom();
 }
 

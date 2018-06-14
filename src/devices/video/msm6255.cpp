@@ -56,8 +56,8 @@ DEFINE_DEVICE_TYPE(MSM6255, msm6255_device, "msm6255", "Oki MSM6255 LCD Controll
 // I/O map
 void msm6255_device::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(msm6255_device::dr_r), FUNC(msm6255_device::dr_w));
-	map(0x01, 0x01).rw(this, FUNC(msm6255_device::ir_r), FUNC(msm6255_device::ir_w));
+	map(0x00, 0x00).rw(FUNC(msm6255_device::dr_r), FUNC(msm6255_device::dr_w));
+	map(0x01, 0x01).rw(FUNC(msm6255_device::ir_r), FUNC(msm6255_device::ir_w));
 }
 
 // default address map
