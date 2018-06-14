@@ -301,7 +301,7 @@ WRITE16_MEMBER(m90_state::video_control_w)
 uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool const video_enable = !(m_video_control_data[7] & 0x04);
-	bool const pf_enable[2] = { !(m_video_control_data[5] & 0x10), !(m_video_control_data[6] & 0x10) };
+	bool const pf_enable[2] = { !(m_pf_layer[0].control & 0x10), !(m_pf_layer[1].control & 0x10) };
 	int const clip_miny = std::min(cliprect.min_y, 511);
 	int const clip_maxy = std::min(cliprect.max_y, 511);
 
