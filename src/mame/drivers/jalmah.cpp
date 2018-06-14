@@ -139,57 +139,20 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	tilemap_t *m_sc0_tilemap_0;
-	tilemap_t *m_sc0_tilemap_1;
-	tilemap_t *m_sc0_tilemap_2;
-	tilemap_t *m_sc0_tilemap_3;
-	tilemap_t *m_sc1_tilemap_0;
-	tilemap_t *m_sc1_tilemap_1;
-	tilemap_t *m_sc1_tilemap_2;
-	tilemap_t *m_sc1_tilemap_3;
-	tilemap_t *m_sc2_tilemap_0;
-	tilemap_t *m_sc2_tilemap_1;
-	tilemap_t *m_sc2_tilemap_2;
-	tilemap_t *m_sc2_tilemap_3;
-	tilemap_t *m_sc3_tilemap_0;
-	tilemap_t *m_sc3_tilemap_2;
-	tilemap_t *m_sc3_tilemap_3;
-	required_shared_ptr<uint16_t> m_sc0_vram;
-	optional_shared_ptr<uint16_t> m_sc1_vram;
-	optional_shared_ptr<uint16_t> m_sc2_vram;
-	required_shared_ptr<uint16_t> m_sc3_vram;
-	std::unique_ptr<uint16_t[]>m_jm_scrollram;
-	std::unique_ptr<uint16_t[]> m_jm_vregs;
-	uint16_t m_sc0bank;
-	uint16_t m_pri;
-	uint8_t m_sc0_prin;
-	uint8_t m_sc1_prin;
-	uint8_t m_sc2_prin;
-	uint8_t m_sc3_prin;
-	required_shared_ptr<uint16_t> m_jm_shared_ram;
-	required_shared_ptr<uint16_t> m_jm_mcu_code;
-	uint8_t m_mcu_prg;
-	int m_respcount;
-	uint8_t m_test_mode;
-	uint16_t m_dma_old;
-	uint16_t m_prg_prot;
-	uint8_t m_oki_rom;
-	uint8_t m_oki_bank;
-	uint8_t m_oki_za;
 	DECLARE_WRITE16_MEMBER(sc0_vram_w);
 	DECLARE_WRITE16_MEMBER(sc3_vram_w);
 	DECLARE_WRITE16_MEMBER(sc1_vram_w);
 	DECLARE_WRITE16_MEMBER(sc2_vram_w);
-	DECLARE_WRITE16_MEMBER(jalmah_tilebank_w);
-	DECLARE_WRITE16_MEMBER(jalmah_scroll_w);
+	DECLARE_WRITE16_MEMBER(tilebank_w);
+	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_WRITE16_MEMBER(urashima_bank_w);
 	DECLARE_WRITE16_MEMBER(urashima_sc0_vram_w);
 	DECLARE_WRITE16_MEMBER(urashima_sc3_vram_w);
 	DECLARE_WRITE16_MEMBER(urashima_vregs_w);
 	DECLARE_WRITE16_MEMBER(urashima_dma_w);
-	DECLARE_WRITE16_MEMBER(jalmah_okirom_w);
-	DECLARE_WRITE16_MEMBER(jalmah_okibank_w);
-	DECLARE_WRITE16_MEMBER(jalmah_flip_screen_w);
+	DECLARE_WRITE16_MEMBER(okirom_w);
+	DECLARE_WRITE16_MEMBER(okibank_w);
+	DECLARE_WRITE16_MEMBER(flip_screen_w);
 	DECLARE_READ16_MEMBER(urashima_mcu_r);
 	DECLARE_WRITE16_MEMBER(urashima_mcu_w);
 	DECLARE_READ16_MEMBER(daireika_mcu_r);
@@ -214,13 +177,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(urashima);
 	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
-	void jalmah_priority_system();
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
+	void priority_system();
 	void draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sc2_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -230,13 +191,58 @@ public:
 	void mjzoomin_mcu_run();
 	void urashima_mcu_run();
 	void second_mcu_run();
+	void urashima(machine_config &config);
+	void jalmah(machine_config &config);
+	void jalmah_map(address_map &map);
+	void urashima_map(address_map &map);
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	
+private:
+	tilemap_t *m_sc0_tilemap_0;
+	tilemap_t *m_sc0_tilemap_1;
+	tilemap_t *m_sc0_tilemap_2;
+	tilemap_t *m_sc0_tilemap_3;
+	tilemap_t *m_sc1_tilemap_0;
+	tilemap_t *m_sc1_tilemap_1;
+	tilemap_t *m_sc1_tilemap_2;
+	tilemap_t *m_sc1_tilemap_3;
+	tilemap_t *m_sc2_tilemap_0;
+	tilemap_t *m_sc2_tilemap_1;
+	tilemap_t *m_sc2_tilemap_2;
+	tilemap_t *m_sc2_tilemap_3;
+	tilemap_t *m_sc3_tilemap_0;
+	tilemap_t *m_sc3_tilemap_2;
+	tilemap_t *m_sc3_tilemap_3;
+
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	optional_shared_ptr<uint16_t> m_sc1_vram;
+	optional_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
+	std::unique_ptr<uint16_t[]>m_jm_scrollram;
+	std::unique_ptr<uint16_t[]> m_jm_vregs;
+	required_shared_ptr<uint16_t> m_jm_shared_ram;
+	required_shared_ptr<uint16_t> m_jm_mcu_code;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void urashima(machine_config &config);
-	void jalmah(machine_config &config);
-	void jalmah(address_map &map);
-	void urashima(address_map &map);
+
+	uint16_t m_sc0bank;
+	uint16_t m_pri;
+	uint8_t m_sc0_prin;
+	uint8_t m_sc1_prin;
+	uint8_t m_sc2_prin;
+	uint8_t m_sc3_prin;
+
+	uint8_t m_mcu_prg;
+	int m_respcount;
+	uint8_t m_test_mode;
+	uint16_t m_dma_old;
+	uint16_t m_prg_prot;
+	uint8_t m_oki_rom;
+	uint8_t m_oki_bank;
+	uint8_t m_oki_za;
 };
 
 
@@ -392,7 +398,7 @@ etc.)
 In the end the final results always are one bit assigned to each priority (i.e. most
 priority = 8, then 4, 2 and finally 1).
 ***************************************************************************************/
-void jalmah_state::jalmah_priority_system()
+void jalmah_state::priority_system()
 {
 	uint8_t *pri_rom = memregion("user1")->base();
 	uint8_t i;
@@ -464,7 +470,7 @@ uint32_t jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 
 {
 	uint16_t *jm_scrollram = m_jm_scrollram.get();
 	uint8_t cur_prin;
-	jalmah_priority_system();
+	priority_system();
 
 	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
 	m_sc0_tilemap_1->set_scrollx(0, jm_scrollram[0] & 0x7ff);
@@ -585,7 +591,7 @@ WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 	m_sc2_tilemap_3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
+WRITE16_MEMBER(jalmah_state::tilebank_w)
 {
 	/*
 	 xxxx ---- fg bank (used by suchiesp)
@@ -607,7 +613,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 	}
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
+WRITE16_MEMBER(jalmah_state::scroll_w)
 {
 	uint16_t *jm_scrollram = m_jm_scrollram.get();
 	uint16_t *jm_vregs = m_jm_vregs.get();
@@ -951,7 +957,7 @@ void jalmah_state::second_mcu_run()
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::jalmah_mcu_sim)
+TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::mcu_sim)
 {
 	switch(m_mcu_prg)
 	{
@@ -979,7 +985,7 @@ Basic driver start
 ******************************************************************************************/
 
 
-WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
+WRITE16_MEMBER(jalmah_state::okirom_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -996,7 +1002,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
+WRITE16_MEMBER(jalmah_state::okibank_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -1010,7 +1016,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
+WRITE16_MEMBER(jalmah_state::flip_screen_w)
 {
 	/*---- ----x flip screen*/
 	flip_screen_set(data & 1);
@@ -1018,19 +1024,19 @@ WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 //  popmessage("%04x",data);
 }
 
-void jalmah_state::jalmah(address_map &map)
+void jalmah_state::jalmah_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("DSW");
 	//       0x080004, 0x080005  MCU read,different for each game
-	map(0x080010, 0x080011).w(FUNC(jalmah_state::jalmah_flip_screen_w));
+	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::jalmah_tilebank_w));
-	map(0x080018, 0x080019).w(FUNC(jalmah_state::jalmah_okibank_w));
-	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::jalmah_okirom_w));
-/**/map(0x080020, 0x08003f).ram().w(FUNC(jalmah_state::jalmah_scroll_w));
+/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::tilebank_w));
+	map(0x080018, 0x080019).w(FUNC(jalmah_state::okibank_w));
+	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::okirom_w));
+/**/map(0x080020, 0x08003f).ram().w(FUNC(jalmah_state::scroll_w));
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//       0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
@@ -1043,18 +1049,18 @@ void jalmah_state::jalmah(address_map &map)
 	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 }
 
-void jalmah_state::urashima(address_map &map)
+void jalmah_state::urashima_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("DSW");
 	//       0x080004, 0x080005  MCU read,different for each game
-	map(0x080010, 0x080011).w(FUNC(jalmah_state::jalmah_flip_screen_w));
+	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
 /**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::urashima_dma_w));
-	map(0x080018, 0x080019).w(FUNC(jalmah_state::jalmah_okibank_w));
-	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::jalmah_okirom_w));
+	map(0x080018, 0x080019).w(FUNC(jalmah_state::okibank_w));
+	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::okirom_w));
 /**/map(0x08001c, 0x08001d).ram().w(FUNC(jalmah_state::urashima_bank_w));
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//       0x084000, 0x084001  ?
@@ -1427,7 +1433,7 @@ void jalmah_state::machine_reset()
 
 MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
-	MCFG_DEVICE_PROGRAM_MAP(jalmah)
+	MCFG_DEVICE_PROGRAM_MAP(jalmah_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
 
 	//M50747 MCU
@@ -1445,7 +1451,7 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, jalmah_mcu_sim, attotime::from_hz(10000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, mcu_sim, attotime::from_hz(10000))
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
@@ -1456,7 +1462,7 @@ MACHINE_CONFIG_START(jalmah_state::urashima)
 	jalmah(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(urashima)
+	MCFG_DEVICE_PROGRAM_MAP(urashima_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
 
