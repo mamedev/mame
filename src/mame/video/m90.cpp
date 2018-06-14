@@ -36,7 +36,25 @@
 
 TILE_GET_INFO_MEMBER(m90_state::get_tile_info)
 {
-	uint16_t *vram = (uint16_t*)tilemap.user_data();
+	M90_pf_layer_info *layer = (M90_pf_layer_info *)tilemap.user_data();
+
+	uint16_t *vram = &m_video_data[layer->vram_base];
+	int tile,color;
+
+	tile=vram[tile_index<<1];
+	color=vram[(tile_index<<1)|1];
+	SET_TILE_INFO_MEMBER(0,
+			tile,
+			color&0xf,
+			TILE_FLIPYX((color & 0xc0) >> 6));
+			tileinfo.category = (color & 0x30) ? 1 : 0;
+}
+
+TILE_GET_INFO_MEMBER(m90_state::get_tile_info_wide)
+{
+	M90_pf_layer_info *layer = (M90_pf_layer_info *)tilemap.user_data();
+
+	uint16_t *vram = &m_video_data[layer->vram_base & ~0x2000];
 	int tile,color;
 
 	tile=vram[tile_index<<1];
@@ -50,50 +68,56 @@ TILE_GET_INFO_MEMBER(m90_state::get_tile_info)
 
 void m90_state::common_tilemap_init()
 {
-	m_pf_layer[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64,64);
-	m_pf_layer[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_pf_layer[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64,64);
-	m_pf_layer[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	
+	for (int laynum = 0; laynum < 2; laynum++)
+	{
+		M90_pf_layer_info *layer = &m_pf_layer[laynum];
 
-	// fix for bootlegs
-	m_pf_layer[0][0]->set_user_data(&m_video_data[0x0000]);
-	m_pf_layer[0][1]->set_user_data(&m_video_data[0x0000]);
-	m_pf_layer[1][0]->set_user_data(&m_video_data[0x4000]);
-	m_pf_layer[1][1]->set_user_data(&m_video_data[0x4000]);
+		// allocate two tilemaps per layer, one normal, one wide
+		layer->tmap      = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),     TILEMAP_SCAN_ROWS,8,8, 64,64);
+		layer->wide_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info_wide),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+
+		// set the user data for each one to point to the layer
+		layer->tmap->set_user_data(&m_pf_layer[laynum]);
+		layer->wide_tmap->set_user_data(&m_pf_layer[laynum]);
+
+		// fix for bootlegs
+		layer->vram_base = laynum << 14;
+
+		save_item(NAME(layer->vram_base), laynum);
+		save_item(NAME(layer->control), laynum);
+	}
 }
 
 void m90_state::video_start()
 {
 	common_tilemap_init();
 
-	m_pf_layer[0][0]->set_transparent_pen(0);
-	m_pf_layer[0][1]->set_transparent_pen(0);
-
-	m_last_pf[0] = 0;
-	m_last_pf[1] = 2;
+	m_pf_layer[0].tmap->set_transparent_pen(0);
+	m_pf_layer[0].wide_tmap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(m90_state,bomblord)
 {
 	common_tilemap_init();
 
-	m_pf_layer[1][0]->set_transparent_pen(0);
-	m_pf_layer[1][1]->set_transparent_pen(0);
-	m_pf_layer[0][0]->set_transparent_pen(0);
-	m_pf_layer[0][1]->set_transparent_pen(0);
+	m_pf_layer[1].tmap->set_transparent_pen(0);
+	m_pf_layer[1].wide_tmap->set_transparent_pen(0);
+	m_pf_layer[0].tmap->set_transparent_pen(0);
+	m_pf_layer[0].wide_tmap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(m90_state,dynablsb)
 {
 	common_tilemap_init();
 
-	m_pf_layer[1][0]->set_transparent_pen(0);
-	m_pf_layer[1][1]->set_transparent_pen(0);
+	m_pf_layer[1].tmap->set_transparent_pen(0);
+	m_pf_layer[1].wide_tmap->set_transparent_pen(0);
 }
 
 void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint16_t *spriteram = m_video_data + 0xee00/2;
+	const uint16_t *spriteram = m_video_data + 0xee00/2;
 	int offs;
 
 	for (offs = 0x1f2/2; offs >= 0; offs -= 3)
@@ -223,15 +247,12 @@ WRITE16_MEMBER(m90_state::m90_video_w)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 
-	int page[2] = { m_video_control_data[5] & 0x3, m_video_control_data[6] & 0x3 };
-	for (int i = 0; i < 2; i++)
+	for (int layer = 0; layer < 2; layer++)
 	{
-		if ((offset >> 13) == page[i])
-			m_pf_layer[i][0]->mark_tile_dirty((offset & 0x1fff) >> 1);
-
-		page[i] >>= 1;
-		if ((offset >> 14) == page[i])
-			m_pf_layer[i][1]->mark_tile_dirty((offset & 0x3fff) >> 1);
+		if ((offset & 0x6000) == m_pf_layer[layer].vram_base)
+			m_pf_layer[layer].tmap->mark_tile_dirty((offset & 0x1fff) >> 1);
+		if ((offset & 0x4000) == (m_pf_layer[layer].vram_base & ~0x2000))
+			m_pf_layer[layer].wide_tmap->mark_tile_dirty((offset & 0x3fff) >> 1);
 	}
 }
 
@@ -239,11 +260,40 @@ WRITE16_MEMBER(m90_state::bootleg_video_w)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 
-	int layer = offset >> 14;
+	int const layer = offset >> 14;
 	if (!(offset & 0x2000))
-		m_pf_layer[layer][0]->mark_tile_dirty((offset & 0x1fff) >> 1);
+		m_pf_layer[layer].tmap->mark_tile_dirty((offset & 0x1fff) >> 1);
 
-	m_pf_layer[layer][1]->mark_tile_dirty((offset & 0x3fff) >> 1);
+	m_pf_layer[layer].wide_tmap->mark_tile_dirty((offset & 0x3fff) >> 1);
+}
+
+WRITE16_MEMBER(m90_state::video_control_w)
+{
+	uint16_t const old = m_video_control_data[offset];
+	COMBINE_DATA(&m_video_control_data[offset]);
+
+	switch (offset)
+	{
+		/* Dirty tilemaps if VRAM base changes */
+		case 5:
+			if ((old ^ m_video_control_data[5]) & 3)
+			{
+				m_pf_layer[0].vram_base = (m_video_control_data[5] & 3) << 13;
+				m_pf_layer[0].tmap->mark_all_dirty();
+				if ((old ^ m_video_control_data[5]) & 2)
+					m_pf_layer[0].wide_tmap->mark_all_dirty();
+			}
+			break;
+		case 6:
+			if ((old ^ m_video_control_data[6]) & 3)
+			{
+				m_pf_layer[1].vram_base = (m_video_control_data[6] & 3) << 13;
+				m_pf_layer[1].tmap->mark_all_dirty();
+				if ((old ^ m_video_control_data[6]) & 2)
+					m_pf_layer[1].wide_tmap->mark_all_dirty();
+			}
+			break;
+	}
 }
 
 uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -255,44 +305,33 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 	int const clip_miny = std::min(cliprect.min_y, 511);
 	int const clip_maxy = std::min(cliprect.max_y, 511);
 
-// m_pf_layer[0][0]->enable(pf_enable[0]);
-// m_pf_layer[1][0]->enable(pf_enable[1]);
-// m_pf_layer[0][1]->enable(pf_enable[0]);
-// m_pf_layer[1][1]->enable(pf_enable[1]);
+// m_pf_layer[0].tmap->enable(pf_enable[0]);
+// m_pf_layer[1].tmap->enable(pf_enable[1]);
+// m_pf_layer[0].wide_tmap->enable(pf_enable[0]);
+// m_pf_layer[1].wide_tmap->enable(pf_enable[1]);
 
 	constexpr int rowscroll_offs[2] = { 0xf000 >> 1, 0xf400 >> 1 };
 	constexpr int rowscroll_bias[2] = { 2, -2 };
 	for (int layer = 0; layer < 2; layer++)
 	{
-		/* Dirty tilemaps if VRAM base changes */
-		uint8_t const pf_base = uint8_t(layer_ctrl[layer] & 0x3);
-		if (pf_base != m_last_pf[layer])
-		{
-			m_pf_layer[layer][0]->set_user_data(&m_video_data[pf_base << 13]);
-			m_pf_layer[layer][1]->set_user_data(&m_video_data[(pf_base & ~1) << 13]);
-			m_pf_layer[layer][0]->mark_all_dirty();
-			m_pf_layer[layer][1]->mark_all_dirty();
-			m_last_pf[layer] = pf_base;
-		}
-
 		/* Setup scrolling */
 		if (layer_ctrl[layer] & 0x20)
 		{
-			m_pf_layer[layer][0]->set_scroll_rows(512);
-			m_pf_layer[layer][1]->set_scroll_rows(512);
+			m_pf_layer[layer].tmap->set_scroll_rows(512);
+			m_pf_layer[layer].wide_tmap->set_scroll_rows(512);
 
 			for (int i = 0; i < 512; i++)
 			{
-				m_pf_layer[layer][0]->set_scrollx(i, m_video_data[rowscroll_offs[layer] + i] + rowscroll_bias[layer]);
-				m_pf_layer[layer][1]->set_scrollx(i, m_video_data[rowscroll_offs[layer] + i] + rowscroll_bias[layer] + 256);
+				m_pf_layer[layer].tmap->set_scrollx(i, m_video_data[rowscroll_offs[layer] + i] + rowscroll_bias[layer]);
+				m_pf_layer[layer].wide_tmap->set_scrollx(i, m_video_data[rowscroll_offs[layer] + i] + rowscroll_bias[layer] + 256);
 			}
 		}
 		else
 		{
-			m_pf_layer[layer][0]->set_scroll_rows(1);
-			m_pf_layer[layer][1]->set_scroll_rows(1);
-			m_pf_layer[layer][0]->set_scrollx(0, m_video_control_data[1 | (layer<<1)] + rowscroll_bias[layer]);
-			m_pf_layer[layer][1]->set_scrollx(0, m_video_control_data[1 | (layer<<1)] + rowscroll_bias[layer] + 256);
+			m_pf_layer[layer].tmap->set_scroll_rows(1);
+			m_pf_layer[layer].wide_tmap->set_scroll_rows(1);
+			m_pf_layer[layer].tmap->set_scrollx(0, m_video_control_data[1 | (layer<<1)] + rowscroll_bias[layer]);
+			m_pf_layer[layer].wide_tmap->set_scrollx(0, m_video_control_data[1 | (layer<<1)] + rowscroll_bias[layer] + 256);
 		}
 	}
 
@@ -319,15 +358,15 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 
 				if (layer_ctrl[1] & 0x4)
 				{
-					m_pf_layer[1][1]->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
-					m_pf_layer[1][1]->draw(screen, bitmap, clip, 0,0);
-					m_pf_layer[1][1]->draw(screen, bitmap, clip, 1,1);
+					m_pf_layer[1].wide_tmap->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
+					m_pf_layer[1].wide_tmap->draw(screen, bitmap, clip, 0,0);
+					m_pf_layer[1].wide_tmap->draw(screen, bitmap, clip, 1,1);
 				}
 				else
 				{
-					m_pf_layer[1][0]->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
-					m_pf_layer[1][0]->draw(screen, bitmap, clip, 0,0);
-					m_pf_layer[1][0]->draw(screen, bitmap, clip, 1,1);
+					m_pf_layer[1].tmap->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
+					m_pf_layer[1].tmap->draw(screen, bitmap, clip, 0,0);
+					m_pf_layer[1].tmap->draw(screen, bitmap, clip, 1,1);
 				}
 			}
 		}
@@ -335,15 +374,15 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 		{
 			if (layer_ctrl[1] & 0x4)
 			{
-				m_pf_layer[1][1]->set_scrolly(0, m_video_control_data[2] );
-				m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 0,0);
-				m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 1,1);
+				m_pf_layer[1].wide_tmap->set_scrolly(0, m_video_control_data[2] );
+				m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
+				m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 1,1);
 			}
 			else
 			{
-				m_pf_layer[1][0]->set_scrolly(0, m_video_control_data[2] );
-				m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 0,0);
-				m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 1,1);
+				m_pf_layer[1].tmap->set_scrolly(0, m_video_control_data[2] );
+				m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, 0,0);
+				m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, 1,1);
 			}
 		}
 	}
@@ -367,15 +406,15 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 
 				if (layer_ctrl[0] & 0x4)
 				{
-					m_pf_layer[0][1]->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
-					m_pf_layer[0][1]->draw(screen, bitmap, clip, 0,0);
-					m_pf_layer[0][1]->draw(screen, bitmap, clip, 1,1);
+					m_pf_layer[0].wide_tmap->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
+					m_pf_layer[0].wide_tmap->draw(screen, bitmap, clip, 0,0);
+					m_pf_layer[0].wide_tmap->draw(screen, bitmap, clip, 1,1);
 				}
 				else
 				{
-					m_pf_layer[0][0]->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
-					m_pf_layer[0][0]->draw(screen, bitmap, clip, 0,0);
-					m_pf_layer[0][0]->draw(screen, bitmap, clip, 1,1);
+					m_pf_layer[0].tmap->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
+					m_pf_layer[0].tmap->draw(screen, bitmap, clip, 0,0);
+					m_pf_layer[0].tmap->draw(screen, bitmap, clip, 1,1);
 				}
 			}
 		}
@@ -383,15 +422,15 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 		{
 			if (layer_ctrl[0] & 0x4)
 			{
-				m_pf_layer[0][1]->set_scrolly(0, m_video_control_data[0] );
-				m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 0,0);
-				m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 1,1);
+				m_pf_layer[0].wide_tmap->set_scrolly(0, m_video_control_data[0] );
+				m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
+				m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 1,1);
 			}
 			else
 			{
-				m_pf_layer[0][0]->set_scrolly(0, m_video_control_data[0] );
-				m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 0,0);
-				m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 1,1);
+				m_pf_layer[0].tmap->set_scrolly(0, m_video_control_data[0] );
+				m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, 0,0);
+				m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, 1,1);
 			}
 		}
 	}
@@ -409,43 +448,43 @@ uint32_t m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &
 
 	/* Setup scrolling */
 	if (m_video_control_data[6]&0x20) {
-		m_pf_layer[0][0]->set_scroll_rows(512);
-		m_pf_layer[0][1]->set_scroll_rows(512);
+		m_pf_layer[0].tmap->set_scroll_rows(512);
+		m_pf_layer[0].wide_tmap->set_scroll_rows(512);
 		for (i=std::min(cliprect.min_y,511); i<=std::min(cliprect.max_y,511); i++) {
-			m_pf_layer[0][0]->set_scrollx(i, m_video_data[0xf400/2+i]-12);
-			m_pf_layer[0][1]->set_scrollx(i, m_video_data[0xf400/2+i]-12+256);
+			m_pf_layer[0].tmap->set_scrollx(i, m_video_data[0xf400/2+i]-12);
+			m_pf_layer[0].wide_tmap->set_scrollx(i, m_video_data[0xf400/2+i]-12+256);
 		}
 	} else {
-		m_pf_layer[0][0]->set_scroll_rows(1);
-		m_pf_layer[0][1]->set_scroll_rows(1);
-		m_pf_layer[0][0]->set_scrollx(0, m_video_data[0xf004/2]-12);
-		m_pf_layer[0][1]->set_scrollx(0, m_video_data[0xf004/2]-12);
+		m_pf_layer[0].tmap->set_scroll_rows(1);
+		m_pf_layer[0].wide_tmap->set_scroll_rows(1);
+		m_pf_layer[0].tmap->set_scrollx(0, m_video_data[0xf004/2]-12);
+		m_pf_layer[0].wide_tmap->set_scrollx(0, m_video_data[0xf004/2]-12);
 	}
 
 	if (m_video_control_data[6] & 0x02) {
-		m_pf_layer[1][1]->mark_all_dirty();
-		m_pf_layer[1][1]->set_scrollx(0, m_video_data[0xf000/2]-16 );
-		m_pf_layer[1][1]->set_scrolly(0, m_video_data[0xf008/2]+388);
-		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[1].wide_tmap->mark_all_dirty();
+		m_pf_layer[1].wide_tmap->set_scrollx(0, m_video_data[0xf000/2]-16 );
+		m_pf_layer[1].wide_tmap->set_scrolly(0, m_video_data[0xf008/2]+388);
+		m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 1,1);
 	} else {
-		m_pf_layer[1][0]->mark_all_dirty();
-		m_pf_layer[1][0]->set_scrollx(0, m_video_data[0xf000/2]-16 );
-		m_pf_layer[1][0]->set_scrolly(0, m_video_data[0xf008/2]-120);
-		m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[1].tmap->mark_all_dirty();
+		m_pf_layer[1].tmap->set_scrollx(0, m_video_data[0xf000/2]-16 );
+		m_pf_layer[1].tmap->set_scrolly(0, m_video_data[0xf008/2]-120);
+		m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, 1,1);
 	}
 
 	if (m_video_control_data[6] & 0x04) {
-		m_pf_layer[0][1]->mark_all_dirty();
-		m_pf_layer[0][1]->set_scrolly(0, m_video_data[0xf00c/2]+392);
-		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[0].wide_tmap->mark_all_dirty();
+		m_pf_layer[0].wide_tmap->set_scrolly(0, m_video_data[0xf00c/2]+392);
+		m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 1,1);
 	} else {
-		m_pf_layer[0][0]->mark_all_dirty();
-		m_pf_layer[0][0]->set_scrolly(0, m_video_data[0xf00c/2]-116);
-		m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[0].tmap->mark_all_dirty();
+		m_pf_layer[0].tmap->set_scrolly(0, m_video_data[0xf00c/2]-116);
+		m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, 1,1);
 	}
 
 	bomblord_draw_sprites(screen,bitmap,cliprect);
@@ -459,35 +498,35 @@ uint32_t m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (!(m_video_data[0xf008/2] & 0x4000)) {
-		m_pf_layer[0][1]->mark_all_dirty();
-		m_pf_layer[0][1]->set_scroll_rows(1);
-		m_pf_layer[0][1]->set_scrollx(0, m_video_data[0xf004/2]+64);
-		m_pf_layer[0][1]->set_scrolly(0, m_video_data[0xf006/2]+512);
-		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[0].wide_tmap->mark_all_dirty();
+		m_pf_layer[0].wide_tmap->set_scroll_rows(1);
+		m_pf_layer[0].wide_tmap->set_scrollx(0, m_video_data[0xf004/2]+64);
+		m_pf_layer[0].wide_tmap->set_scrolly(0, m_video_data[0xf006/2]+512);
+		m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, 1,1);
 	} else {
-		m_pf_layer[0][0]->mark_all_dirty();
-		m_pf_layer[0][0]->set_scroll_rows(1);
-		m_pf_layer[0][0]->set_scrollx(0, m_video_data[0xf004/2]+64);
-		m_pf_layer[0][0]->set_scrolly(0, m_video_data[0xf006/2]+4);
-		m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[0].tmap->mark_all_dirty();
+		m_pf_layer[0].tmap->set_scroll_rows(1);
+		m_pf_layer[0].tmap->set_scrollx(0, m_video_data[0xf004/2]+64);
+		m_pf_layer[0].tmap->set_scrolly(0, m_video_data[0xf006/2]+4);
+		m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, 1,1);
 	}
 
 	if (!(m_video_data[0xf008/2] & 0x8000)) {
-		m_pf_layer[1][1]->mark_all_dirty();
-		m_pf_layer[1][1]->set_scroll_rows(1);
-		m_pf_layer[1][1]->set_scrollx(0, m_video_data[0xf000/2]+68);
-		m_pf_layer[1][1]->set_scrolly(0, m_video_data[0xf002/2]+512);
-		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[1].wide_tmap->mark_all_dirty();
+		m_pf_layer[1].wide_tmap->set_scroll_rows(1);
+		m_pf_layer[1].wide_tmap->set_scrollx(0, m_video_data[0xf000/2]+68);
+		m_pf_layer[1].wide_tmap->set_scrolly(0, m_video_data[0xf002/2]+512);
+		m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, 1,1);
 	} else {
-		m_pf_layer[1][0]->mark_all_dirty();
-		m_pf_layer[1][0]->set_scroll_rows(1);
-		m_pf_layer[1][0]->set_scrollx(0, m_video_data[0xf000/2]+68);
-		m_pf_layer[1][0]->set_scrolly(0, m_video_data[0xf002/2]+4);
-		m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 0,0);
-		m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 1,1);
+		m_pf_layer[1].tmap->mark_all_dirty();
+		m_pf_layer[1].tmap->set_scroll_rows(1);
+		m_pf_layer[1].tmap->set_scrollx(0, m_video_data[0xf000/2]+68);
+		m_pf_layer[1].tmap->set_scrolly(0, m_video_data[0xf002/2]+4);
+		m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, 0,0);
+		m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, 1,1);
 	}
 
 	dynablsb_draw_sprites(screen,bitmap,cliprect);

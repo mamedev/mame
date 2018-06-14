@@ -14,7 +14,7 @@ WRITE8_MEMBER(shisen_state::bankswitch_w)
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 
 	/* bits 0-2 select ROM bank */
-	membank("bank1")->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 
 	/* bits 3-5 select gfx bank */
 	int bank = (data & 0x38) >> 3;
@@ -39,9 +39,9 @@ WRITE8_MEMBER(shisen_state::paletteram_w)
 
 TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
 {
-	int offs = tile_index * 2;
-	int code = m_videoram[offs] + ((m_videoram[offs + 1] & 0x0f) << 8) + (m_gfxbank << 12);
-	int color = (m_videoram[offs + 1] & 0xf0) >> 4;
+	tile_index <<= 1;
+	int code = m_videoram[tile_index] | ((m_videoram[tile_index | 1] & 0x0f) << 8) | (m_gfxbank << 12);
+	int color = (m_videoram[tile_index | 1] & 0xf0) >> 4;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -52,8 +52,6 @@ void shisen_state::video_start()
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
-
 	save_item(NAME(m_gfxbank));
 }
 
@@ -62,7 +60,7 @@ uint32_t shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// on Irem boards, screen flip is handled in both hardware and software.
 	// this game doesn't have cocktail mode so if there's software control we don't
 	// know where it is mapped.
-	flip_screen_set(~ioport("DSW2")->read() & 1);
+	flip_screen_set(~m_dsw_io[1]->read() & 1);
 
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

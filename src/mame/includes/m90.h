@@ -2,6 +2,13 @@
 // copyright-holders:Bryan McPhail
 #include "audio/m72.h"
 
+struct M90_pf_layer_info
+{
+	tilemap_t *     tmap;
+	tilemap_t *     wide_tmap;
+	uint16_t        vram_base;
+};
+
 class m90_state : public driver_device
 {
 public:
@@ -30,15 +37,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_pf_layer[2][2];
-	uint8_t m_last_pf[2];
-	DECLARE_WRITE16_MEMBER(coincounter_w);
-	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
+	M90_pf_layer_info m_pf_layer[2];
+	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(quizf1_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
+	DECLARE_WRITE16_MEMBER(video_control_w);
 	void init_bomblord();
 	void init_quizf1();
 	DECLARE_WRITE16_MEMBER(bootleg_video_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info_wide);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void common_tilemap_init();

@@ -37,12 +37,12 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 
 void vigilant_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 WRITE8_MEMBER(vigilant_state::bank_select_w)
 {
-	membank("bank1")->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 }
 
 /***************************************************************************
@@ -76,7 +76,7 @@ WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 
 void vigilant_state::vigilant_map(address_map &map)
 {
-	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x8000, 0xbfff).bankr("mainbank");        /* Fallthrough */
 	map(0x0000, 0x7fff).rom();
 	map(0xc020, 0xc0df).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
@@ -99,7 +99,7 @@ void vigilant_state::vigilant_io_map(address_map &map)
 
 void vigilant_state::kikcubic_map(address_map &map)
 {
-	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x8000, 0xbfff).bankr("mainbank");        /* Fallthrough */
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc0ff).ram().share("spriteram");
 	map(0xc800, 0xcaff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579645)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(vigilant_state::buccanrs)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 18432000/6)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
@@ -637,7 +637,7 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579645)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))

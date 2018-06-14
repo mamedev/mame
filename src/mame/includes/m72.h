@@ -7,8 +7,10 @@
 *************************************************************************/
 #include "audio/m72.h"
 #include "sound/dac.h"
+#include "machine/gen_latch.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "video/bufsprite.h"
 #include "screen.h"
 
 #define M81_B_B_JUMPER_J3_S \
@@ -26,26 +28,28 @@
 class m72_state : public driver_device
 {
 public:
-	m72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m72_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
+		m_mculatch(*this, "mculatch"),
+		m_samplelatch(*this, "samplelatch"),
 		m_dac(*this, "dac"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
-		m_videoram1(*this, "videoram1"),
-		m_videoram2(*this, "videoram2"),
+		m_videoram(*this, "videoram%u", 1U),
 		m_m82_rowscrollram(*this, "majtitle_rowscr"),
 		m_spriteram2(*this, "spriteram2"),
 		m_soundram(*this, "soundram"),
-		m_generic_paletteram_16(*this, "paletteram"),
-		m_generic_paletteram2_16(*this, "paletteram2"),
+		m_paletteram(*this, "paletteram%u", 1U),
 		m_upd71059c(*this, "upd71059c"),
 		m_upd4701(*this, {"upd4701l", "upd4701h"}),
+		m_sampleregion(*this, "samples"),
+		m_dsw_io(*this, "DSW"),
 		m_fg_source(0),
 		m_bg_source(0),
 		m_m81_b_b_j3(*this, "JumperJ3"),
@@ -56,22 +60,25 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
+	optional_device<generic_latch_8_device> m_mculatch;
+	optional_device<generic_latch_8_device> m_samplelatch;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_videoram1;
-	required_shared_ptr<uint16_t> m_videoram2;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	optional_shared_ptr<uint16_t> m_m82_rowscrollram;
 	optional_shared_ptr<uint16_t> m_spriteram2;
 	optional_shared_ptr<uint8_t> m_soundram;
-	required_shared_ptr<uint16_t> m_generic_paletteram_16;
-	required_shared_ptr<uint16_t> m_generic_paletteram2_16;
+	required_shared_ptr_array<uint16_t, 2> m_paletteram;
 	optional_device<pic8259_device> m_upd71059c;
 	optional_device_array<upd4701_device, 2> m_upd4701;
+	optional_region_ptr<uint8_t> m_sampleregion;
+
+	optional_ioport m_dsw_io;
 
 	std::unique_ptr<uint16_t[]> m_protection_ram;
 	emu_timer *m_scanline_timer;
@@ -82,10 +89,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_large;
-	int32_t m_scrollx1;
-	int32_t m_scrolly1;
-	int32_t m_scrollx2;
-	int32_t m_scrolly2;
+	int32_t m_scrollx[2];
+	int32_t m_scrolly[2];
 	int32_t m_video_off;
 
 	int m_fg_source;
@@ -97,15 +102,11 @@ public:
 	uint16_t m_m82_tmcontrol;
 
 	// m72_i8751 specific
-	uint8_t m_mcu_snd_cmd_latch;
-	uint8_t m_mcu_sample_latch;
 	uint32_t m_mcu_sample_addr;
 
 	// common
-	DECLARE_READ16_MEMBER(palette1_r);
-	DECLARE_READ16_MEMBER(palette2_r);
-	DECLARE_WRITE16_MEMBER(palette1_w);
-	DECLARE_WRITE16_MEMBER(palette2_w);
+	template<int Layer> DECLARE_READ16_MEMBER(palette_r);
+	template<int Layer> DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(videoram1_w);
 	DECLARE_WRITE16_MEMBER(videoram2_w);
 	DECLARE_READ16_MEMBER(soundram_r);
@@ -118,18 +119,14 @@ public:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_sample_r);
 	DECLARE_WRITE8_MEMBER(mcu_ack_w);
-	DECLARE_READ8_MEMBER(mcu_snd_r);
 	DECLARE_WRITE8_MEMBER(mcu_port1_w);
 	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
 	DECLARE_WRITE8_MEMBER(mcu_high_w);
-	DECLARE_READ8_MEMBER(snd_cpu_sample_r);
 	DECLARE_WRITE16_MEMBER(irq_line_w);
-	DECLARE_WRITE16_MEMBER(scrollx1_w);
-	DECLARE_WRITE16_MEMBER(scrollx2_w);
-	DECLARE_WRITE16_MEMBER(scrolly1_w);
-	DECLARE_WRITE16_MEMBER(scrolly2_w);
-	DECLARE_WRITE16_MEMBER(dmaon_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(scrollx_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(scrolly_w);
+	DECLARE_WRITE8_MEMBER(dmaon_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(protection_w);
@@ -151,8 +148,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(m82_m84_get_tile_info);
 
 	TILEMAP_MAPPER_MEMBER(m82_scan_rows);
 
@@ -188,8 +184,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum);
-	inline void m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum);
+	inline void m72_m81_get_tile_info(tile_data &tileinfo, int tile_index, int const layer, int const gfxnum);
 	void register_savestate();
 	inline void changecolor(int color,int r,int g,int b);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -217,6 +212,8 @@ public:
 	void hharry_map(address_map &map);
 	void hharryu_map(address_map &map);
 	void kengo_map(address_map &map);
+	void m72_8751_map(address_map &map);
+	void m72_8751_portmap(address_map &map);
 	void m72_cpu1_common_map(address_map &map);
 	void m72_map(address_map &map);
 	void m72_portmap(address_map &map);
@@ -234,6 +231,7 @@ public:
 	void rtype2_sound_portmap(address_map &map);
 	void rtype_map(address_map &map);
 	void rtype_sound_portmap(address_map &map);
+	void sound_8751_portmap(address_map &map);
 	void sound_portmap(address_map &map);
 	void sound_ram_map(address_map &map);
 	void sound_rom_map(address_map &map);

@@ -51,11 +51,9 @@ DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audi
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
 	, m_sample_addr(0)
-	, m_samples(*this, "^samples")
-	, m_samples_size(0)
-	, m_dac(*this, "^dac")
+	, m_samples(*this, finder_base::DUMMY_TAG)
+	, m_dac(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -65,11 +63,8 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 
 void m72_audio_device::device_start()
 {
-	m_samples_size = m_samples.bytes();
-
 	save_item(NAME(m_sample_addr));
 }
-
 
 
 void m72_audio_device::set_sample_start(int start)
@@ -133,14 +128,5 @@ READ8_MEMBER( m72_audio_device::sample_r )
 WRITE8_MEMBER( m72_audio_device::sample_w )
 {
 	m_dac->write(data);
-	m_sample_addr = (m_sample_addr + 1) & (m_samples_size - 1);
-}
-
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void m72_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
+	m_sample_addr = (m_sample_addr + 1) & m_samples.mask();
 }

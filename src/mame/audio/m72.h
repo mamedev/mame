@@ -12,9 +12,17 @@
 
 #include "sound/dac.h"
 
-class m72_audio_device : public device_t, public device_sound_interface
+class m72_audio_device : public device_t
 {
 public:
+	template <typename T, typename U>
+	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dac_tag, U &&sample_tag)
+		: m72_audio_device(mconfig, tag, owner)
+	{
+		m_dac.set_tag(std::forward<T>(dac_tag));
+		m_samples.set_tag(std::forward<U>(sample_tag));
+	}
+
 	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~m72_audio_device() {}
 
@@ -32,14 +40,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
 private:
 	// internal state
 	uint32_t m_sample_addr;
 	optional_region_ptr<uint8_t> m_samples;
-	uint32_t m_samples_size;
 	optional_device<dac_byte_interface> m_dac;
 };
 

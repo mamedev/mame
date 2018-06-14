@@ -23,10 +23,8 @@ void vigilant_state::video_start()
 {
 	m_bg_bitmap = std::make_unique<bitmap_ind16>(512*4,256);
 
-	save_item(NAME(m_horiz_scroll_low));
-	save_item(NAME(m_horiz_scroll_high));
-	save_item(NAME(m_rear_horiz_scroll_low));
-	save_item(NAME(m_rear_horiz_scroll_high));
+	save_item(NAME(m_horiz_scroll));
+	save_item(NAME(m_rear_horiz_scroll));
 	save_item(NAME(m_rear_color));
 	save_item(NAME(m_rear_disable));
 
@@ -41,10 +39,8 @@ void vigilant_state::vigilant_postload()
 
 void vigilant_state::video_reset()
 {
-	m_horiz_scroll_low = 0;
-	m_horiz_scroll_high = 0;
-	m_rear_horiz_scroll_low = 0;
-	m_rear_horiz_scroll_high = 0;
+	m_horiz_scroll = 0;
+	m_rear_horiz_scroll = 0;
 	m_rear_color = 0;
 	m_rear_disable = 1;
 }
@@ -103,14 +99,14 @@ WRITE8_MEMBER(vigilant_state::paletteram_w)
 	int bank,r,g,b;
 
 
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	bank = offset & 0x400;
 	offset &= 0xff;
 
-	r = (m_generic_paletteram_8[bank + offset + 0x000] << 3) & 0xFF;
-	g = (m_generic_paletteram_8[bank + offset + 0x100] << 3) & 0xFF;
-	b = (m_generic_paletteram_8[bank + offset + 0x200] << 3) & 0xFF;
+	r = (m_paletteram[bank + offset + 0x000] << 3) & 0xFF;
+	g = (m_paletteram[bank + offset + 0x100] << 3) & 0xFF;
+	b = (m_paletteram[bank + offset + 0x200] << 3) & 0xFF;
 
 	m_palette->set_pen_color((bank >> 2) + offset,rgb_t(r,g,b));
 }
@@ -120,29 +116,28 @@ WRITE8_MEMBER(vigilant_state::paletteram_w)
 /***************************************************************************
  vigilant_horiz_scroll_w
 
- horiz_scroll_low  = HSPL, an 8-bit register
- horiz_scroll_high = HSPH, a 1-bit register
+ m_horiz_scroll = 9-bit register, Low 8 bit is HSPL and High 1 bit HSPH
  **************************************************************************/
 WRITE8_MEMBER(vigilant_state::vigilant_horiz_scroll_w)
 {
 	if (offset==0)
-		m_horiz_scroll_low = data;
+		m_horiz_scroll = (m_horiz_scroll & 0x100) | data;
 	else
-		m_horiz_scroll_high = (data & 0x01) * 256;
+		m_horiz_scroll = (m_horiz_scroll & 0x0ff) | ((data & 0x01) << 8);
 }
 
 /***************************************************************************
  vigilant_rear_horiz_scroll_w
 
- rear_horiz_scroll_low  = RHSPL, an 8-bit register
- rear_horiz_scroll_high = RHSPH, an 8-bit register but only 3 bits are saved
+ m_rear_horiz_scroll  = 16-bit register but only 11 bits are saved
+ Low 8 bit is RHSPL and High 8 bit RHSPH
 ***************************************************************************/
 WRITE8_MEMBER(vigilant_state::vigilant_rear_horiz_scroll_w)
 {
 	if (offset==0)
-		m_rear_horiz_scroll_low = data;
+		m_rear_horiz_scroll = (m_rear_horiz_scroll & 0x700) | data;
 	else
-		m_rear_horiz_scroll_high = (data & 0x07) * 256;
+		m_rear_horiz_scroll = (m_rear_horiz_scroll & 0x0ff) | ((data & 0x07) << 8);
 }
 
 /***************************************************************************
@@ -174,13 +169,13 @@ WRITE8_MEMBER(vigilant_state::vigilant_rear_color_w)
 
 void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque )
 {
-	int scroll = -(m_horiz_scroll_low + m_horiz_scroll_high);
+	int scroll = -m_horiz_scroll;
 
 
 	for (int offs = 0; offs < 0x1000; offs += 2)
 	{
-		int sy = 8 * ((offs/2) / 64);
-		int sx = 8 * ((offs/2) % 64);
+		int sy = ((offs/2) >> 6) << 3;
+		int sx = ((offs/2) & 0x3f) << 3;
 		int attributes = m_videoram[offs+1];
 		int color = attributes & 0x0F;
 		int tile_number = m_videoram[offs] | ((attributes & 0xF0) << 4);
@@ -220,7 +215,7 @@ void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &clip
 
 void vigilant_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int scrollx = 0x17a + 16*8 - (m_rear_horiz_scroll_low + m_rear_horiz_scroll_high);
+	int scrollx = 0x17a + 16*8 - m_rear_horiz_scroll;
 
 
 	if (m_rear_refresh)
@@ -270,8 +265,8 @@ uint32_t vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_in
 {
 	for (int offs = 0; offs < 0x1000; offs += 2)
 	{
-		int sy = 8 * ((offs/2) / 64);
-		int sx = 8 * ((offs/2) % 64);
+		int sy = ((offs/2) >> 6) << 3;
+		int sx = ((offs/2) & 0x3f) << 3;
 		int attributes = m_videoram[offs+1];
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = m_videoram[offs] | ((attributes & 0x0F) << 8);
@@ -295,15 +290,15 @@ uint32_t vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_in
 		int r,g,b;
 
 
-		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + i] << 3) & 0xFF;
-		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + i] << 3) & 0xFF;
-		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + i] << 3) & 0xFF;
+		r = (m_paletteram[0x400 + 16 * m_rear_color + i] << 3) & 0xFF;
+		g = (m_paletteram[0x500 + 16 * m_rear_color + i] << 3) & 0xFF;
+		b = (m_paletteram[0x600 + 16 * m_rear_color + i] << 3) & 0xFF;
 
 		m_palette->set_pen_color(512 + i,rgb_t(r,g,b));
 
-		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
-		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
-		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
+		r = (m_paletteram[0x400 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
+		g = (m_paletteram[0x500 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
+		b = (m_paletteram[0x600 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 
 		m_palette->set_pen_color(512 + 16 + i,rgb_t(r,g,b));
 	}

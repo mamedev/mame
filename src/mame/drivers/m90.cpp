@@ -43,21 +43,17 @@ void m90_state::machine_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(m90_state::coincounter_w)
+WRITE8_MEMBER(m90_state::coincounter_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-		if (data & 0xfc) logerror("Coin counter %02x\n",data);
-	}
+	if (data & 0xfc) logerror("Coin counter %02x\n",data);
 }
 
-WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
+WRITE8_MEMBER(m90_state::quizf1_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_mainbank->set_entry(data & 0xf);
+	m_mainbank->set_entry(data & 0xf);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -108,24 +104,24 @@ void m90_state::m90_main_cpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x00, 0x01).portr("P1_P2");
-	map(0x02, 0x03).w(FUNC(m90_state::coincounter_w));
+	map(0x02, 0x02).w(FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x80, 0x8f).writeonly().share("video_control");
+	map(0x80, 0x8f).writeonly().w(FUNC(m90_state::video_control_w)).share("video_control");
 }
 
 void m90_state::quizf1_main_cpu_io_map(address_map &map)
 {
 	m90_main_cpu_io_map(map);
-	map(0x04, 0x05).w(FUNC(m90_state::quizf1_bankswitch_w));
+	map(0x04, 0x04).w(FUNC(m90_state::quizf1_bankswitch_w));
 }
 
 void m90_state::dynablsb_main_cpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x00, 0x01).portr("P1_P2");
-	map(0x02, 0x03).w(FUNC(m90_state::coincounter_w));
+	map(0x02, 0x02).w(FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
 //  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
 	map(0x04, 0x05).portr("DSW");
@@ -767,7 +763,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
@@ -1307,4 +1303,4 @@ GAME( 1992, quizf1,   0,        quizf1,   quizf1,   m90_state, init_quizf1,   RO
 GAME( 1993, riskchal, 0,        riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Risky Challenge", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gussun,   riskchal, riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Gussun Oyoyo (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, matchit2, 0,        matchit2, matchit2, m90_state, empty_init,    ROT0, "Tamtex", "Match It II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  m90_state, empty_init,    ROT0, "Tamtex", "Shisensho II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  m90_state, empty_init,    ROT0, "Tamtex", "Shisensho II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

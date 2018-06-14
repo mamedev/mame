@@ -22,18 +22,18 @@ driver by Nicola Salmoria
 
 READ8_MEMBER(shisen_state::dsw1_r)
 {
-	int ret = ioport("DSW1")->read();
+	int ret = m_dsw_io[0]->read();
 
 	/* Based on the coin mode fill in the upper bits */
-	if (ioport("DSW2")->read() & 0x04)
+	if (m_dsw_io[1]->read() & 0x04)
 	{
 		/* Mode 1 */
-		ret |= (ioport("DSW1")->read() << 4);
+		ret |= (m_dsw_io[0]->read() << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret |= (ioport("DSW1")->read() & 0xf0);
+		ret |= (m_dsw_io[0]->read() & 0xf0);
 	}
 
 	return ret;
@@ -52,7 +52,7 @@ WRITE8_MEMBER(shisen_state::coin_w)
 void shisen_state::shisen_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc800, 0xcaff).ram().w(FUNC(shisen_state::paletteram_w)).share("paletteram");
 	map(0xd000, 0xdfff).ram().w(FUNC(shisen_state::videoram_w)).share("videoram");
 	map(0xe000, 0xffff).ram();
@@ -211,7 +211,10 @@ static GFXDECODE_START( gfx_shisen )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 16 )
 GFXDECODE_END
 
-
+void shisen_state::machine_start()
+{
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+}
 
 MACHINE_CONFIG_START(shisen_state::shisen)
 
@@ -252,7 +255,7 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
@@ -275,8 +278,7 @@ MACHINE_CONFIG_END
 ROM_START( sichuan2 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
 	ROM_LOAD( "ic06.06",      0x00000, 0x10000, CRC(98a2459b) SHA1(42102cf2921f80be7600b11aba63538e3b3858ec) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_LOAD( "ic07.03",      0x10000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
@@ -309,8 +311,7 @@ ROM_END
 ROM_START( sichuan2a )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
 	ROM_LOAD( "sichuan.a6",   0x00000, 0x10000, CRC(f8ac05ef) SHA1(cd20e5239d73264f1323ba6b1e35934685852ba1) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_LOAD( "ic07.03",      0x10000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
@@ -343,7 +344,6 @@ ROM_END
 ROM_START( shisen )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
 	ROM_LOAD( "a-27-a.rom",   0x00000, 0x20000, CRC(de2ecf05) SHA1(7256c5587f92db10a52c43001e3236f3be3df5df) )
-	ROM_RELOAD(               0x10000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
@@ -414,9 +414,8 @@ ROMs  : (All ROMs type 27C512)
 
 ROM_START( matchit )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
-	ROM_LOAD( "2.11d",      0x00000, 0x10000, CRC(299815f7) SHA1(dd25f69d3c825e12e5c2e24b5bbfda9c39400345) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_LOAD( "2.11d",        0x00000, 0x10000, CRC(299815f7) SHA1(dd25f69d3c825e12e5c2e24b5bbfda9c39400345) )
+	ROM_LOAD( "ic07.03",      0x10000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
