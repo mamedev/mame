@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 /* protection data types */
 struct protection_data
@@ -55,6 +56,7 @@ public:
 		, m_adpcm_sound(*this, "adpcm")
 		, m_soundlatch(*this, "soundlatch")
 		, m_term2_adc(*this, "adc")
+		, m_nvram(*this, "nvram")
 		, m_generic_paletteram_16(*this, "paletteram")
 		, m_gfx_rom(*this, "gfx_rom", 16)
 		, m_mainram(*this, "mainram")
@@ -72,6 +74,7 @@ public:
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<adc0844_device> m_term2_adc;
+	required_device<nvram_device> m_nvram;
 
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint8_t> m_gfx_rom;

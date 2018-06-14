@@ -184,7 +184,7 @@ WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
 
 void bfm_swp_state::bfm_swp_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
 	map(0x00000000, 0x000fffff).rom();
 }
 

@@ -112,16 +112,16 @@ WRITE_LINE_MEMBER(sprint8_state::team_w)
 void sprint8_state::sprint8_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(sprint8_state::video_ram_w)).share("video_ram");
-	map(0x1c00, 0x1c00).r(this, FUNC(sprint8_state::collision_r));
-	map(0x1c01, 0x1c08).r(this, FUNC(sprint8_state::input_r));
+	map(0x1800, 0x1bff).ram().w(FUNC(sprint8_state::video_ram_w)).share("video_ram");
+	map(0x1c00, 0x1c00).r(FUNC(sprint8_state::collision_r));
+	map(0x1c01, 0x1c08).r(FUNC(sprint8_state::input_r));
 	map(0x1c09, 0x1c09).portr("IN0");
 	map(0x1c0a, 0x1c0a).portr("IN1");
 	map(0x1c0f, 0x1c0f).portr("VBLANK");
 	map(0x1c00, 0x1c0f).writeonly().share("pos_h_ram");
 	map(0x1c10, 0x1c1f).writeonly().share("pos_v_ram");
 	map(0x1c20, 0x1c2f).writeonly().share("pos_d_ram");
-	map(0x1c30, 0x1c37).w(this, FUNC(sprint8_state::lockout_w));
+	map(0x1c30, 0x1c37).w(FUNC(sprint8_state::lockout_w));
 	map(0x1d00, 0x1d07).w("latch", FUNC(f9334_device::write_d0));
 	map(0x1e00, 0x1e07).w("motor", FUNC(f9334_device::write_d0));
 	map(0x1f00, 0x1f00).nopw(); /* probably a watchdog, disabled in service mode */
@@ -448,7 +448,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sprint8 )
+static GFXDECODE_START( gfx_sprint8 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_1, 0, 18 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_2, 0, 18 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 16 )
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint8)
 	MCFG_PALETTE_ADD("palette", 36)
 	MCFG_PALETTE_INDIRECT_ENTRIES(18)
 	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)

@@ -118,9 +118,9 @@ void pktgaldx_state::pktgaldx_map(address_map &map)
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 	map(0x161800, 0x16180f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
-	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
-	map(0x167800, 0x167fff).rw(this, FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
+	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
 
 	map(0x170000, 0x17ffff).ram();
 }
@@ -172,17 +172,17 @@ void pktgaldx_state::pktgaldb_map(address_map &map)
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
-	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
-	map(0x16500a, 0x16500b).r(this, FUNC(pktgaldx_state::pckgaldx_unknown_r));
-	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x16500a, 0x16500b).r(FUNC(pktgaldx_state::pckgaldx_unknown_r));
+	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
 	/* should we really be using these to read the i/o in the BOOTLEG?
 	  these look like i/o through protection ... */
 	map(0x167842, 0x167843).portr("INPUTS");
 	map(0x167c4c, 0x167c4d).portr("DSW");
 	map(0x167db2, 0x167db3).portr("SYSTEM");
 
-	map(0x167d10, 0x167d11).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
-	map(0x167d1a, 0x167d1b).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
+	map(0x167d10, 0x167d11).r(FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
+	map(0x167d1a, 0x167d1b).r(FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
 
 	map(0x170000, 0x17ffff).ram();
 
@@ -303,7 +303,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( pktgaldx )
+static GFXDECODE_START( gfx_pktgaldx )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites (16x16) */
@@ -321,7 +321,7 @@ static const gfx_layout bootleg_spritelayout =
 	16*64
 };
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_spritelayout,     0, 64 )
 GFXDECODE_END
 
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pktgaldx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bootleg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bootleg)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

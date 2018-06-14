@@ -28,6 +28,7 @@ pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_tms(*this, ":tms"),
 		m_channel(nullptr),
 		m_sound_latch_a(0),
 		m_sound_latch_b(0),
@@ -620,7 +621,6 @@ void pleiads_sound_device::common_start()
 	int i, j;
 	uint32_t shiftreg;
 
-	m_tms = machine().device<tms36xx_device>("tms");
 	m_pc4.level = PC4_MIN;
 	m_poly18 = make_unique_clear<uint32_t[]>(1ul << (18-5));
 

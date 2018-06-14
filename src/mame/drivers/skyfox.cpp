@@ -59,7 +59,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(this, FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
 	map(0xf001, 0xf001).portr("DSW2");
 }
 
@@ -191,7 +191,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
-static GFXDECODE_START( skyfox )
+static GFXDECODE_START( gfx_skyfox )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0, 1 ) // [0] Sprites
 GFXDECODE_END
 
@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyfox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyfox)
 	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
 	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 

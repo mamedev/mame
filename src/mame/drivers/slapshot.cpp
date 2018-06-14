@@ -242,8 +242,8 @@ void slapshot_state::slapshot_map(address_map &map)
 	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
-	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));  /* service mirror */
-	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xc00020, 0xc0002f).r(FUNC(slapshot_state::service_input_r));  /* service mirror */
+	map(0xd00000, 0xd00003).rw(FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
 }
 
 void slapshot_state::opwolf3_map(address_map &map)
@@ -258,8 +258,8 @@ void slapshot_state::opwolf3_map(address_map &map)
 	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
-	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));   /* service mirror */
-	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xc00020, 0xc0002f).r(FUNC(slapshot_state::service_input_r));   /* service mirror */
+	map(0xd00000, 0xd00003).rw(FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
 	map(0xe00000, 0xe0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0xff00);
 //  map(0xe80000, 0xe80001) // gun recoil here?
 }
@@ -279,7 +279,7 @@ void slapshot_state::opwolf3_z80_sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(slapshot_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(slapshot_state::sound_bankswitch_w));
 }
 
 
@@ -423,7 +423,7 @@ static const gfx_layout slapshot_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( slapshot )
+static GFXDECODE_START( gfx_slapshot )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,  0, 256 ) /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, slapshot_charlayout, 4096, 256 )    /* sprites & playfield */
 GFXDECODE_END
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")

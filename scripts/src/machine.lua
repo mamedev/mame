@@ -746,6 +746,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/busmouse.h,MACHINES["BUSMOUSE"] = true
+---------------------------------------------------
+
+if (MACHINES["BUSMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/busmouse.cpp",
+		MAME_DIR .. "src/devices/machine/busmouse.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/cdp1852.h,MACHINES["CDP1852"] = true
 ---------------------------------------------------
 
@@ -3514,5 +3526,19 @@ if (MACHINES["OUTPUT_LATCH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/output_latch.cpp",
 		MAME_DIR .. "src/devices/machine/output_latch.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/z80daisy.h,MACHINES["Z80DAISY"] = true
+---------------------------------------------------
+
+if (MACHINES["Z80DAISY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z80daisy.cpp",
+		MAME_DIR .. "src/devices/machine/z80daisy.h",
+		MAME_DIR .. "src/devices/machine/z80daisy_generic.cpp",
+		MAME_DIR .. "src/devices/machine/z80daisy_generic.h",
 	}
 end

@@ -1,5 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_SATURN_H
+#define MAME_INCLUDES_SATURN_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
@@ -17,6 +21,7 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class saturn_state : public driver_device
@@ -450,4 +455,6 @@ public:
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_SATURN_H

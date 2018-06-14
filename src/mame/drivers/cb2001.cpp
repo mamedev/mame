@@ -46,6 +46,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "cpu/nec/v25.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -573,7 +574,7 @@ void cb2001_state::cb2001_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0x20fff).ram().share("vrafg");
-	map(0x21000, 0x21fff).ram().w(this, FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
+	map(0x21000, 0x21fff).ram().w(FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
 	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
 }
 
@@ -584,9 +585,9 @@ void cb2001_state::cb2001_io(address_map &map)
 	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	map(0x30, 0x30).r(this, FUNC(cb2001_state::irq_ack_r));
-	map(0x30, 0x31).w(this, FUNC(cb2001_state::cb2001_vidctrl_w));
-	map(0x32, 0x33).w(this, FUNC(cb2001_state::cb2001_vidctrl2_w));
+	map(0x30, 0x30).r(FUNC(cb2001_state::irq_ack_r));
+	map(0x30, 0x31).w(FUNC(cb2001_state::cb2001_vidctrl_w));
+	map(0x32, 0x33).w(FUNC(cb2001_state::cb2001_vidctrl2_w));
 }
 
 static INPUT_PORTS_START( cb2001 )
@@ -786,7 +787,7 @@ static const gfx_layout cb2001_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( cb2001 )
+static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 32 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
@@ -837,7 +838,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

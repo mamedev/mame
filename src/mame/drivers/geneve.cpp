@@ -178,25 +178,6 @@
     Bit 14: 0 = protect cartridge range >7000->7fff
     bit 15: 1 = add 1 extra wait state when accessing 0-wait-state SRAM???
 
-
-    Keyboard interface:
-
-    The XT keyboard interface is described in various places on the internet,
-    like (http://www-2.cs.cmu.edu/afs/cs/usr/jmcm/www/info/key2.txt).  It is a
-    synchronous unidirectional serial interface: the data line is driven by the
-    keyboard to send data to the CPU; the CTS/clock line has a pull up resistor
-    and can be driven low by both keyboard and CPU.  To send data to the CPU,
-    the keyboard pulses the clock line low 9 times, and the Geneve samples all
-    8 bits of data (plus one start bit) on each falling edge of the clock.
-    When the key code buffer is full, the Geneve gate array asserts the kbdint*
-    line (connected to 9901 int8_t*).  The Geneve gate array will hold the
-    CTS/clock line low as long as the keyboard buffer is full or CRU bit @>F78
-    is 0.  Writing a 0 to >F79 will clear the Geneve keyboard buffer, and
-    writing a 1 will resume normal operation: you need to write a 0 to >F78
-    before clearing >F79, or the keyboard will be enabled to send data the gate
-    array when >F79 is is set to 0, and any such incoming data from the
-    keyboard will be cleared as soon as it is buffered by the gate array.
-
     Original version 2003 by Raphael Nabet
 
     Rewritten 2012 by Michael Zapf
@@ -216,11 +197,15 @@
 
 #include "speaker.h"
 
-#define TRACE_READY 0
-#define TRACE_LINES 0
-#define TRACE_CRU 0
+#define LOG_WARN    (1U<<1)
+#define LOG_READY   (1U<<2)
+#define LOG_LINES   (1U<<3)
+#define LOG_CRU     (1U<<4)
 
-#define GENMOD 0x01
+// Minimum log should be settings and warnings
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
+
+#include "logmacro.h"
 
 class geneve_state : public driver_device
 {
@@ -285,7 +270,10 @@ public:
 
 	int m_ready_line;
 	int m_ready_line1;
-	void geneve_60hz(machine_config &config);
+	void geneve_common(machine_config &config);
+	void geneve(machine_config &config);
+	void genmod(machine_config &config);
+
 	void crumap(address_map &map);
 	void memmap(address_map &map);
 };
@@ -309,48 +297,52 @@ void geneve_state::memmap(address_map &map)
 */
 void geneve_state::crumap(address_map &map)
 {
-	map(0x0000, 0x0fff).r(this, FUNC(geneve_state::cruread));
+	map(0x0000, 0x0fff).r(FUNC(geneve_state::cruread));
 	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x7fff).w(this, FUNC(geneve_state::cruwrite));
+	map(0x0000, 0x7fff).w(FUNC(geneve_state::cruwrite));
 	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
 }
 
-/* TI joysticks. The keyboard is implemented in genboard.c. */
-static INPUT_PORTS_START(geneve)
-
-	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(TI_PERIBOX_TAG, bus::ti99::peb::peribox_device, genmod_changed, 0)
-		PORT_CONFSETTING(    0x00, "Standard" )
-		PORT_CONFSETTING(    GENMOD, "GenMod" )
+static INPUT_PORTS_START(geneve_common)
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
-		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
-		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
+	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
+		PORT_CONFSETTING( GENEVE_EPROM, "EPROM" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
 		PORT_CONFSETTING( GENEVE_PFM512A, "PFM 512A" )
-
-	PORT_START( "SRAM" )
-	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" ) PORT_CONDITION( "MODE", 0x01, EQUALS, 0x00 )
-		PORT_CONFSETTING( 0x00, "32 KiB" )
-		PORT_CONFSETTING( 0x01, "64 KiB" )
-		PORT_CONFSETTING( 0x02, "384 KiB" )
 
 	PORT_START( "VRAM" )
 	PORT_CONFNAME( 0x01, 0x00, "Video RAM" )
 		PORT_CONFSETTING( 0x00, "128 KiB" )
 		PORT_CONFSETTING( 0x01, "192 KiB" )
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(geneve)
+	PORT_INCLUDE(geneve_common)
+
+	PORT_START( "SRAM" )
+	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" )
+		PORT_CONFSETTING( 0x00, "32 KiB" )
+		PORT_CONFSETTING( 0x01, "64 KiB" )
+		PORT_CONFSETTING( 0x02, "384 KiB" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(genmod)
+	PORT_INCLUDE(geneve_common)
+
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
+	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::genmod_mapper_device, setgm_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 2)
+	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::genmod_mapper_device, setgm_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TIM, DEF_STR( On ))
 
 INPUT_PORTS_END
+
 
 /****************************************************************************
     CRU handling
@@ -368,10 +360,11 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
 	{
 		int bit = (addroff & 0x003e)>>1;
-		logerror("Single step not implemented; bit %d set to %d\n", bit, data);
+		LOGMASKED(LOG_WARN, "Single step not implemented; bit %d set to %d\n", bit, data);
 		return;
 	}
 
+	// This is just mirroring the internal flags of the 9995
 	if ((addroff & 0xffe0) == CRU_CONTROL_BASE)
 	{
 		int bit = (addroff & 0x001e)>>1;
@@ -379,47 +372,47 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 		{
 		case 5:
 			// No one really cares...
-			if (TRACE_CRU) logerror("Set PAL flag = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Set PAL flag = %02x\n", data);
 			// m_palvideo = (data!=0);
 			break;
 		case 7:
 			// m_capslock = (data!=0);
-			if (TRACE_CRU) logerror("Set capslock flag = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Set capslock flag = %02x\n", data);
 			break;
 		case 8:
-			if (TRACE_CRU) logerror("Set keyboard clock flag = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Set keyboard clock flag = %02x\n", data);
 			m_keyboard->clock_control((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 9:
-			if (TRACE_CRU) logerror("Set keyboard scan flag = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Set keyboard scan flag = %02x\n", data);
 			m_keyboard->send_scancodes((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 10:
-			if (TRACE_CRU) logerror("Geneve mode = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Geneve mode = %02x\n", data);
 			m_mapper->set_geneve_mode(data!=0);
 			break;
 		case 11:
-			if (TRACE_CRU) logerror("Direct mode = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Direct mode = %02x\n", data);
 			m_mapper->set_direct_mode(data!=0);
 			break;
 		case 12:
-			if (TRACE_CRU) logerror("Cartridge size 8K = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Cartridge size 8K = %02x\n", data);
 			m_mapper->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
 			break;
 		case 13:
-			if (TRACE_CRU) logerror("Cartridge writable 6000 = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Cartridge writable 6000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x6000, (data!=0));
 			break;
 		case 14:
-			if (TRACE_CRU) logerror("Cartridge writable 7000 = %02x\n", data);
+			LOGMASKED(LOG_CRU, "Cartridge writable 7000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x7000, (data!=0));
 			break;
 		case 15:
-			if (TRACE_CRU) logerror("Extra wait states = %02x\n", data==0);
+			LOGMASKED(LOG_CRU, "Extra wait states = %02x\n", data==0);
 			m_mapper->set_extra_waitstates(data==0);  // let's use the inverse semantics
 			break;
 		default:
-			logerror("set CRU address %04x=%02x ignored\n", addroff, data);
+			LOGMASKED(LOG_WARN, "set CRU address %04x=%02x ignored\n", addroff, data);
 			break;
 		}
 	}
@@ -439,7 +432,7 @@ READ8_MEMBER( geneve_state::cruread )
 	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
 	{
 		int bit = (addroff & 0x003e)>>1;
-		logerror("Single step not implemented; attempting to read bit %d\n", bit);
+		LOGMASKED(LOG_WARN, "Single step not implemented; attempting to read bit %d\n", bit);
 		return value;
 	}
 
@@ -491,7 +484,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		if (m_intb==CLEAR_LINE) answer |= 0x10;
 		if (m_video_wait==ASSERT_LINE) answer |= 0x20;
 		// TODO: PAL pin 5
-		if (TRACE_LINES) logerror("INT15-8 = %02x\n", answer);
+		LOGMASKED(LOG_LINES, "INT15-8 = %02x\n", answer);
 		break;
 
 	case tms9901_device::P0_P7:
@@ -519,7 +512,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 */
 WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 {
-	logerror("Peripheral bus reset request; not implemented yet.\n");
+	LOGMASKED(LOG_WARN, "Peripheral bus reset request; not implemented yet.\n");
 }
 
 /*
@@ -527,7 +520,7 @@ WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 */
 WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 {
-	logerror("Video reset request; not implemented yet.\n");
+	LOGMASKED(LOG_WARN, "Video reset request; not implemented yet.\n");
 }
 
 /*
@@ -543,7 +536,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 */
 WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 {
-	logerror("External bus wait states set to %d, not implemented yet.\n", state);
+	LOGMASKED(LOG_WARN, "External bus wait states set to %d, not implemented yet.\n", state);
 }
 
 /*
@@ -552,7 +545,7 @@ WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 */
 WRITE_LINE_MEMBER( geneve_state::video_wait_states )
 {
-	if (TRACE_LINES) logerror("Video wait states set to %d\n", state);
+	LOGMASKED(LOG_LINES, "Video wait states set to %d\n", state);
 	m_mapper->set_video_waitstates(state==ASSERT_LINE);
 	m_video_wait = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -594,14 +587,14 @@ WRITE_LINE_MEMBER( geneve_state::intb )
 
 WRITE_LINE_MEMBER( geneve_state::ext_ready )
 {
-	if (TRACE_READY) logerror("READY level (ext) = %02x\n", state);
+	LOGMASKED(LOG_READY, "READY level (ext) = %02x\n", state);
 	m_ready_line = state;
 	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 {
-	if (TRACE_READY) logerror("READY level (mapper) = %02x\n", state);
+	LOGMASKED(LOG_READY, "READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
 	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
@@ -636,7 +629,8 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 WRITE8_MEMBER( geneve_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	if (offset != IDLE_OP) logerror("External operation %s not implemented on Geneve board\n", extop[offset]);
+	if (offset != IDLE_OP)
+		LOGMASKED(LOG_WARN, "External operation %s not implemented on Geneve board\n", extop[offset]);
 }
 
 /*
@@ -688,12 +682,35 @@ void geneve_state::machine_reset()
 
 	m_ready_line = m_ready_line1 = ASSERT_LINE;
 
-	m_peribox->set_genmod(ioport("MODE")->read()==GENMOD);
-
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-MACHINE_CONFIG_START(geneve_state::geneve_60hz)
+MACHINE_CONFIG_START(geneve_state::geneve)
+	geneve_common(config);
+	// Mapper
+	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
+	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
+	// Peripheral expansion box (Geneve composition)
+	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(geneve_state::genmod)
+	geneve_common(config);
+	// Mapper
+	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENMOD_MAPPER, 0)
+	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
+	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
+	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GENMOD, 0)
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(geneve_state::geneve_common)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
@@ -720,20 +737,10 @@ MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	MCFG_TMS9901_P13_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, geneve_state, tms9901_interrupt) )
 
-	// Mapper
-	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
-	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
-
 	// Clock
 	MCFG_DEVICE_ADD(GENEVE_CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour
 	MCFG_MM58274C_DAY1(0)   // sunday
-
-	// Peripheral expansion box (Geneve composition)
-	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
@@ -756,7 +763,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
-	// SRAM 384K (max; stock Geneve: 32K)
+	// SRAM 384K (max; stock Geneve: 32K, but later MDOS releases require 64K)
 	MCFG_RAM_ADD(GENEVE_SRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("384K")
 	MCFG_RAM_DEFAULT_VALUE(0)
@@ -769,11 +776,20 @@ MACHINE_CONFIG_END
 
 ROM_START(geneve)
 	/*CPU memory space*/
-	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs v1.0 */
-	ROM_LOAD_OPTIONAL("genbt098.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs v0.98 */
-	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("0.98")
+	ROM_SYSTEM_BIOS(0, "0.98", "Geneve Boot ROM 0.98")
+	ROMX_LOAD("genbt098.bin", 0x0000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "1.00", "Geneve Boot ROM 1.00")
+	ROMX_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109), ROM_BIOS(1))
+ROM_END
+
+ROM_START(genmod)
+	/*CPU memory space*/
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("gnmbt100.bin", 0x0000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47))
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT         COMPANY  FULLNAME       FLAGS
-COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)
+COMP( 1987, geneve, 0,      0,      geneve,      geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)
+COMP( 1990, genmod, 0,      0,      genmod,      genmod, geneve_state, init_geneve, "Myarc / Ron G. Walters", "Geneve 9640 Mod",  MACHINE_SUPPORTS_SAVE)

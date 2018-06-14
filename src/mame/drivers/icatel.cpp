@@ -24,6 +24,7 @@
 //#include "sound/speaker.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -86,11 +87,11 @@ void icatel_state::i80c31_io(address_map &map)
 	map(0x8000, 0x8002).ram(); /* HACK! */
 	map(0x8040, 0x8040).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::control_write)); // not sure yet. CI12 (73LS273)
 	map(0x8041, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::data_write)); // not sure yet.  CI12
-	map(0x8060, 0x8060).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
-	map(0x8080, 0x8080).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
-	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
-	map(0xC000, 0xCFFF).rw(this, FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
-	map(0xE000, 0xEFFF).rw(this, FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
+	map(0x8060, 0x8060).mirror(0x3F1F).rw(FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
+	map(0x8080, 0x8080).mirror(0x3F1F).rw(FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
+	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
+	map(0xC000, 0xCFFF).rw(FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
+	map(0xE000, 0xEFFF).rw(FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
 }
 
 void icatel_state::i80c31_data(address_map &map)
@@ -232,7 +233,7 @@ static const gfx_layout prot_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( icatel )
+static GFXDECODE_START( gfx_icatel )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, prot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -272,7 +273,7 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(icatel_state, icatel)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", icatel)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_icatel)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

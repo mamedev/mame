@@ -11,7 +11,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
@@ -21,6 +21,7 @@
 
 #include "formats/nanos_dsk.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -45,9 +46,9 @@ public:
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
-		, m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"})
+		, m_lines(*this, "LINE%u", 0U)
 		, m_linec(*this, "LINEC")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER( nanos_tc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
@@ -154,7 +155,7 @@ void nanos_state::nanos_io(address_map &map)
 	map(0x8C, 0x8F).rw(m_ctc_0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* FDC card */
-	map(0x92, 0x92).w(this, FUNC(nanos_state::nanos_tc_w));
+	map(0x92, 0x92).w(FUNC(nanos_state::nanos_tc_w));
 	map(0x94, 0x95).m(m_fdc, FUNC(upd765a_device::map));
 	/* V24+IFSS card */
 	map(0xA0, 0xA3).rw(m_sio_0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
@@ -456,7 +457,7 @@ static const gfx_layout nanos_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( nanos )
+static GFXDECODE_START( gfx_nanos )
 	GFXDECODE_ENTRY( "chargen", 0x0000, nanos_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -476,7 +477,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nanos)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nanos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */

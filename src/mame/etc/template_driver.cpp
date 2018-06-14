@@ -10,6 +10,7 @@ Template for skeleton drivers
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -129,7 +130,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( xxx )
+static GFXDECODE_START( gfx_xxx )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -165,7 +166,7 @@ MACHINE_CONFIG_START(xxx_state::xxx)
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxx)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(xxx_state, xxx)

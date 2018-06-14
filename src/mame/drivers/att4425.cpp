@@ -26,6 +26,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -112,9 +113,9 @@ void att4425_state::att4425_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x10, 0x10).w(this, FUNC(att4425_state::port10_w));
-	map(0x14, 0x14).rw(this, FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
-	map(0x15, 0x15).r(this, FUNC(att4425_state::port15_r));
+	map(0x10, 0x10).w(FUNC(att4425_state::port10_w));
+	map(0x14, 0x14).rw(FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
+	map(0x15, 0x15).r(FUNC(att4425_state::port15_r));
 	map(0x18, 0x1b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1c, 0x1f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
@@ -205,7 +206,7 @@ static const gfx_layout att4425_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( att4425 )
+static GFXDECODE_START( gfx_att4425 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, att4425_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -253,7 +254,7 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_SIZE(720, 351)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", att4425)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_att4425)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?

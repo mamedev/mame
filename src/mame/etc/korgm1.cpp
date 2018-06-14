@@ -16,6 +16,7 @@
 #include "cpu/nec/nec.h"
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 
 #define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 
@@ -148,7 +149,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( korgm1 )
+static GFXDECODE_START( gfx_korgm1 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -184,7 +185,7 @@ MACHINE_CONFIG_START(korgm1_state::korgm1)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", korgm1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korgm1)
 
 	MCFG_PALETTE_ADD("palette", 8)
 

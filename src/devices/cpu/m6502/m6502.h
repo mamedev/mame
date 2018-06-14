@@ -96,6 +96,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

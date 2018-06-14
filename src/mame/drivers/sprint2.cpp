@@ -115,7 +115,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 	m_watchdog->watchdog_enable(!service_mode());
 
 	if (!service_mode())
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -225,24 +225,24 @@ WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 void sprint2_state::sprint2_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x03ff).rw(this, FUNC(sprint2_state::sprint2_wram_r), FUNC(sprint2_state::sprint2_wram_w));
-	map(0x0400, 0x07ff).ram().w(this, FUNC(sprint2_state::sprint2_video_ram_w)).share("video_ram");
-	map(0x0818, 0x081f).r(this, FUNC(sprint2_state::sprint2_input_A_r));
-	map(0x0828, 0x082f).r(this, FUNC(sprint2_state::sprint2_input_B_r));
-	map(0x0830, 0x0837).r(this, FUNC(sprint2_state::sprint2_dip_r));
+	map(0x0000, 0x03ff).rw(FUNC(sprint2_state::sprint2_wram_r), FUNC(sprint2_state::sprint2_wram_w));
+	map(0x0400, 0x07ff).ram().w(FUNC(sprint2_state::sprint2_video_ram_w)).share("video_ram");
+	map(0x0818, 0x081f).r(FUNC(sprint2_state::sprint2_input_A_r));
+	map(0x0828, 0x082f).r(FUNC(sprint2_state::sprint2_input_B_r));
+	map(0x0830, 0x0837).r(FUNC(sprint2_state::sprint2_dip_r));
 	map(0x0840, 0x087f).portr("COIN");
-	map(0x0880, 0x08bf).r(this, FUNC(sprint2_state::sprint2_steering1_r));
-	map(0x08c0, 0x08ff).r(this, FUNC(sprint2_state::sprint2_steering2_r));
-	map(0x0c00, 0x0fff).r(this, FUNC(sprint2_state::sprint2_sync_r));
-	map(0x0c00, 0x0c7f).w(this, FUNC(sprint2_state::output_latch_w));
+	map(0x0880, 0x08bf).r(FUNC(sprint2_state::sprint2_steering1_r));
+	map(0x08c0, 0x08ff).r(FUNC(sprint2_state::sprint2_steering2_r));
+	map(0x0c00, 0x0fff).r(FUNC(sprint2_state::sprint2_sync_r));
+	map(0x0c00, 0x0c7f).w(FUNC(sprint2_state::output_latch_w));
 	map(0x0c80, 0x0cff).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x0d00, 0x0d7f).w(this, FUNC(sprint2_state::sprint2_collision_reset1_w));
-	map(0x0d80, 0x0dff).w(this, FUNC(sprint2_state::sprint2_collision_reset2_w));
-	map(0x0e00, 0x0e7f).w(this, FUNC(sprint2_state::sprint2_steering_reset1_w));
-	map(0x0e80, 0x0eff).w(this, FUNC(sprint2_state::sprint2_steering_reset2_w));
-	map(0x0f00, 0x0f7f).w(this, FUNC(sprint2_state::sprint2_noise_reset_w));
-	map(0x1000, 0x13ff).r(this, FUNC(sprint2_state::sprint2_collision1_r));
-	map(0x1400, 0x17ff).r(this, FUNC(sprint2_state::sprint2_collision2_r));
+	map(0x0d00, 0x0d7f).w(FUNC(sprint2_state::sprint2_collision_reset1_w));
+	map(0x0d80, 0x0dff).w(FUNC(sprint2_state::sprint2_collision_reset2_w));
+	map(0x0e00, 0x0e7f).w(FUNC(sprint2_state::sprint2_steering_reset1_w));
+	map(0x0e80, 0x0eff).w(FUNC(sprint2_state::sprint2_steering_reset2_w));
+	map(0x0f00, 0x0f7f).w(FUNC(sprint2_state::sprint2_noise_reset_w));
+	map(0x1000, 0x13ff).r(FUNC(sprint2_state::sprint2_collision1_r));
+	map(0x1400, 0x17ff).r(FUNC(sprint2_state::sprint2_collision2_r));
 	map(0x1800, 0x1800).nopr();  /* debugger ROM location? */
 	map(0x2000, 0x3fff).rom();
 }
@@ -484,7 +484,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sprint2 )
+static GFXDECODE_START( gfx_sprint2 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 4, 4 )
 GFXDECODE_END
@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint2)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(sprint2_state, sprint2)

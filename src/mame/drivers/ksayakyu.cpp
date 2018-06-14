@@ -123,12 +123,12 @@ void ksayakyu_state::maincpu_map(address_map &map)
 	map(0xa801, 0xa801).portr("P2");
 	map(0xa802, 0xa802).portr("DSW");
 	map(0xa803, 0xa803).nopr(); /* watchdog ? */
-	map(0xa804, 0xa804).w(this, FUNC(ksayakyu_state::ksayakyu_videoctrl_w));
-	map(0xa805, 0xa805).w(this, FUNC(ksayakyu_state::latch_w));
-	map(0xa806, 0xa806).r(this, FUNC(ksayakyu_state::sound_status_r));
-	map(0xa807, 0xa807).r(this, FUNC(ksayakyu_state::int_ack_r));
-	map(0xa808, 0xa808).w(this, FUNC(ksayakyu_state::bank_select_w));
-	map(0xb000, 0xb7ff).ram().w(this, FUNC(ksayakyu_state::ksayakyu_videoram_w)).share("videoram");
+	map(0xa804, 0xa804).w(FUNC(ksayakyu_state::ksayakyu_videoctrl_w));
+	map(0xa805, 0xa805).w(FUNC(ksayakyu_state::latch_w));
+	map(0xa806, 0xa806).r(FUNC(ksayakyu_state::sound_status_r));
+	map(0xa807, 0xa807).r(FUNC(ksayakyu_state::int_ack_r));
+	map(0xa808, 0xa808).w(FUNC(ksayakyu_state::bank_select_w));
+	map(0xb000, 0xb7ff).ram().w(FUNC(ksayakyu_state::ksayakyu_videoram_w)).share("videoram");
 	map(0xb800, 0xbfff).ram().share("spriteram");
 }
 
@@ -139,8 +139,8 @@ void ksayakyu_state::soundcpu_map(address_map &map)
 	map(0xa001, 0xa001).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xa002, 0xa003).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0xa006, 0xa007).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0xa008, 0xa008).w("dac", FUNC(dac_byte_interface::write));
-	map(0xa00c, 0xa00c).w(this, FUNC(ksayakyu_state::tomaincpu_w));
+	map(0xa008, 0xa008).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xa00c, 0xa00c).w(FUNC(ksayakyu_state::tomaincpu_w));
 	map(0xa010, 0xa010).nopw(); //a timer of some sort?
 }
 
@@ -233,7 +233,7 @@ static const gfx_layout spritelayout =
 	8*8*4
 };
 
-static GFXDECODE_START( ksayakyu )
+static GFXDECODE_START( gfx_ksayakyu )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout2,  0x80, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksayakyu)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksayakyu)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 

@@ -32,6 +32,7 @@
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -684,10 +685,10 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		m_pio->write(space, io_port & 3, data);
 	else
 	if(io_port == 0x3a)
-		m_sn1->write(space, 0, data);
+		m_sn1->write(data);
 	else
 	if(io_port == 0x3b)
-		m_sn2->write(space, 0, data);
+		m_sn2->write(data);
 	else
 	if(io_port == 0x3c)
 		pasopia7_memory_ctrl_w(space,0, data);
@@ -703,17 +704,17 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 void pasopia7_state::pasopia7_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).w(this, FUNC(pasopia7_state::ram_bank_w));
+	map(0x0000, 0x7fff).w(FUNC(pasopia7_state::ram_bank_w));
 	map(0x0000, 0x3fff).bankr("bank1");
 	map(0x4000, 0x7fff).bankr("bank2");
-	map(0x8000, 0xbfff).rw(this, FUNC(pasopia7_state::vram_r), FUNC(pasopia7_state::vram_w));
+	map(0x8000, 0xbfff).rw(FUNC(pasopia7_state::vram_r), FUNC(pasopia7_state::vram_w));
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
 void pasopia7_state::pasopia7_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(pasopia7_state::pasopia7_io_r), FUNC(pasopia7_state::pasopia7_io_w));
+	map(0x0000, 0xffff).rw(FUNC(pasopia7_state::pasopia7_io_r), FUNC(pasopia7_state::pasopia7_io_w));
 }
 
 /* TODO: where are SPACE and RETURN keys? */
@@ -743,7 +744,7 @@ static const gfx_layout p7_chars_16x16 =
 	16*16
 };
 
-static GFXDECODE_START( pasopia7 )
+static GFXDECODE_START( gfx_pasopia7 )
 	GFXDECODE_ENTRY( "font",   0x00000, p7_chars_8x8,    0, 0x10 )
 	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
@@ -981,7 +982,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1002,7 +1003,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

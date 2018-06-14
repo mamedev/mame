@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 
 struct duart_t
 {
@@ -76,7 +77,8 @@ public:
 		, m_reel5(*this, "reel5")
 		, m_meters(*this, "meters")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+		, m_lamp_output(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
@@ -156,4 +158,5 @@ private:
 	optional_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
 	output_finder<300> m_digits;
+	output_finder<256> m_lamp_output;
 };

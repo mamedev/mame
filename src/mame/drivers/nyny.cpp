@@ -79,6 +79,7 @@
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -436,8 +437,8 @@ void nyny_state::nyny_main_map(address_map &map)
 	map(0xa000, 0xa0ff).ram().share("nvram"); /* SRAM (coin counter, shown when holding F2) */
 	map(0xa100, 0xa100).mirror(0x00fe).w(m_mc6845, FUNC(mc6845_device::address_w));
 	map(0xa101, 0xa101).mirror(0x00fe).w(m_mc6845, FUNC(mc6845_device::register_w));
-	map(0xa200, 0xa20f).mirror(0x00f0).rw(this, FUNC(nyny_state::nyny_pia_1_2_r), FUNC(nyny_state::nyny_pia_1_2_w));
-	map(0xa300, 0xa300).mirror(0x00ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(this, FUNC(nyny_state::audio_1_command_w));
+	map(0xa200, 0xa20f).mirror(0x00f0).rw(FUNC(nyny_state::nyny_pia_1_2_r), FUNC(nyny_state::nyny_pia_1_2_w));
+	map(0xa300, 0xa300).mirror(0x00ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_command_w));
 	map(0xa400, 0xa7ff).noprw();
 	map(0xa800, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
@@ -450,7 +451,7 @@ void nyny_state::nyny_audio_1_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x0fff).noprw();
-	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(nyny_state::audio_1_answer_w));
+	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_answer_w));
 	map(0x2000, 0x2000).mirror(0x0fff).portr("SW3");
 	map(0x3000, 0x3000).mirror(0x0ffc).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x3000, 0x3001).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_address_w));
@@ -653,7 +654,7 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 
 	MCFG_DEVICE_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nyny_state, nyny_ay8910_37_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_DEVICE_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)

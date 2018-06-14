@@ -180,20 +180,20 @@ void laserbat_state_base::laserbat_map(address_map &map)
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi3, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1800, 0x1bff).mirror(0x6000).w(this, FUNC(laserbat_state_base::videoram_w));
+	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(laserbat_state_base::videoram_w));
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 }
 
 void laserbat_state_base::laserbat_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(laserbat_state_base::rhsc_r)).w(this, FUNC(laserbat_state_base::cnt_eff_w));
-	map(0x01, 0x01) /* RBALL */ .w(this, FUNC(laserbat_state_base::cnt_nav_w));
-	map(0x02, 0x02).r(this, FUNC(laserbat_state_base::rrowx_r)).w(this, FUNC(laserbat_state_base::csound1_w));
-	map(0x03, 0x03).w(this, FUNC(laserbat_state_base::whsc_w));
-	map(0x04, 0x04).w(this, FUNC(laserbat_state_base::wcoh_w));
-	map(0x05, 0x05).w(this, FUNC(laserbat_state_base::wcov_w));
-	map(0x06, 0x06).w(this, FUNC(laserbat_state_base::ct_io_w));
-	map(0x07, 0x07).w(this, FUNC(laserbat_state_base::csound2_w));
+	map(0x00, 0x00).r(FUNC(laserbat_state_base::rhsc_r)).w(FUNC(laserbat_state_base::cnt_eff_w));
+	map(0x01, 0x01) /* RBALL */ .w(FUNC(laserbat_state_base::cnt_nav_w));
+	map(0x02, 0x02).r(FUNC(laserbat_state_base::rrowx_r)).w(FUNC(laserbat_state_base::csound1_w));
+	map(0x03, 0x03).w(FUNC(laserbat_state_base::whsc_w));
+	map(0x04, 0x04).w(FUNC(laserbat_state_base::wcoh_w));
+	map(0x05, 0x05).w(FUNC(laserbat_state_base::wcov_w));
+	map(0x06, 0x06).w(FUNC(laserbat_state_base::ct_io_w));
+	map(0x07, 0x07).w(FUNC(laserbat_state_base::csound2_w));
 }
 
 
@@ -402,9 +402,9 @@ static const gfx_layout sprites_layout =
 	32*32*2
 };
 
-static GFXDECODE_START( laserbat )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 256 ) /* Rom chars */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 ) /* Sprites   */
+static GFXDECODE_START( gfx_laserbat )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 256 ) // ROM chars
+	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 ) // sprites
 GFXDECODE_END
 
 
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", laserbat)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_laserbat)
 
 MACHINE_CONFIG_END
 

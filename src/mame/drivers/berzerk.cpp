@@ -34,9 +34,22 @@ public:
 		m_custom(*this, "exidy"),
 		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_led(*this, "led0")
 	{ }
 
+	void berzerk(machine_config &config);
+	void frenzy(machine_config &config);
+
+	void init_moonwarp();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
 	required_device<ttl74181_device> m_ls181_10c;
@@ -46,6 +59,8 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+
+	output_finder<> m_led;
 
 	uint8_t m_magicram_control;
 	uint8_t m_last_shift_data;
@@ -76,12 +91,6 @@ public:
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
 
-	void init_moonwarp();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void sound_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(irq_callback);
@@ -93,8 +102,6 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
-	void berzerk(machine_config &config);
-	void frenzy(machine_config &config);
 	void berzerk_io_map(address_map &map);
 	void berzerk_map(address_map &map);
 	void frenzy_map(address_map &map);
@@ -125,13 +132,13 @@ static const uint8_t nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x
 
 /*************************************
  *
- *  Start LED handling
+ *  LED handling
  *
  *************************************/
 
 READ8_MEMBER(berzerk_state::led_on_r)
 {
-	output().set_led_value(0, 1);
+	m_led = 1;
 
 	return 0;
 }
@@ -139,13 +146,13 @@ READ8_MEMBER(berzerk_state::led_on_r)
 
 WRITE8_MEMBER(berzerk_state::led_on_w)
 {
-	output().set_led_value(0, 1);
+	m_led = 1;
 }
 
 
 READ8_MEMBER(berzerk_state::led_off_r)
 {
-	output().set_led_value(0, 0);
+	m_led = 0;
 
 	return 0;
 }
@@ -153,7 +160,7 @@ READ8_MEMBER(berzerk_state::led_off_r)
 
 WRITE8_MEMBER(berzerk_state::led_off_w)
 {
-	output().set_led_value(0, 0);
+	m_led = 0;
 }
 
 
@@ -305,7 +312,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 
 	/* pulse the NMI line if enabled */
 	if (m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
@@ -342,6 +349,8 @@ void berzerk_state::machine_start()
 	create_irq_timer();
 	create_nmi_timer();
 
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));
 	save_item(NAME(m_last_shift_data));
@@ -362,7 +371,7 @@ void berzerk_state::machine_reset()
 {
 	m_irq_enabled = 0;
 	m_nmi_enabled = 0;
-	output().set_led_value(0, 0);
+	m_led = 0;
 	m_magicram_control = 0;
 
 	start_irq_timer();
@@ -610,7 +619,7 @@ void berzerk_state::berzerk_map(address_map &map)
 	map(0x0800, 0x0bff).mirror(0x0400).ram().share("nvram");
 	map(0x1000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram().share("videoram");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(berzerk_state::magicram_w)).share("videoram");
+	map(0x6000, 0x7fff).ram().w(FUNC(berzerk_state::magicram_w)).share("videoram");
 	map(0x8000, 0x87ff).mirror(0x3800).ram().share("colorram");
 	map(0xc000, 0xffff).noprw();
 }
@@ -620,7 +629,7 @@ void berzerk_state::frenzy_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram().share("videoram");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(berzerk_state::magicram_w)).share("videoram");
+	map(0x6000, 0x7fff).ram().w(FUNC(berzerk_state::magicram_w)).share("videoram");
 	map(0x8000, 0x87ff).mirror(0x3800).ram().share("colorram");
 	map(0xc000, 0xcfff).rom();
 	map(0xf800, 0xfbff).mirror(0x0400).ram().share("nvram");
@@ -638,15 +647,15 @@ void berzerk_state::berzerk_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).noprw();
-	map(0x40, 0x47).rw(this, FUNC(berzerk_state::audio_r), FUNC(berzerk_state::audio_w));
+	map(0x40, 0x47).rw(FUNC(berzerk_state::audio_r), FUNC(berzerk_state::audio_w));
 	map(0x48, 0x48).portr("P1").nopw();
 	map(0x49, 0x49).portr("SYSTEM").nopw();
 	map(0x4a, 0x4a).portr("P2").nopw();
-	map(0x4b, 0x4b).nopr().w(this, FUNC(berzerk_state::magicram_control_w));
-	map(0x4c, 0x4c).rw(this, FUNC(berzerk_state::nmi_enable_r), FUNC(berzerk_state::nmi_enable_w));
-	map(0x4d, 0x4d).rw(this, FUNC(berzerk_state::nmi_disable_r), FUNC(berzerk_state::nmi_disable_w));
-	map(0x4e, 0x4e).r(this, FUNC(berzerk_state::intercept_v256_r)).nopw(); // note reading from here should clear pending frame interrupts, see zfb-1.tiff 74ls74 at 3D pin 13 /CLR
-	map(0x4f, 0x4f).nopr().w(this, FUNC(berzerk_state::irq_enable_w));
+	map(0x4b, 0x4b).nopr().w(FUNC(berzerk_state::magicram_control_w));
+	map(0x4c, 0x4c).rw(FUNC(berzerk_state::nmi_enable_r), FUNC(berzerk_state::nmi_enable_w));
+	map(0x4d, 0x4d).rw(FUNC(berzerk_state::nmi_disable_r), FUNC(berzerk_state::nmi_disable_w));
+	map(0x4e, 0x4e).r(FUNC(berzerk_state::intercept_v256_r)).nopw(); // note reading from here should clear pending frame interrupts, see zfb-1.tiff 74ls74 at 3D pin 13 /CLR
+	map(0x4f, 0x4f).nopr().w(FUNC(berzerk_state::irq_enable_w));
 	map(0x50, 0x57).noprw(); /* second sound board, initialized but not used */
 	map(0x58, 0x5f).noprw();
 	map(0x60, 0x60).mirror(0x18).portr("F3").nopw();
@@ -655,8 +664,8 @@ void berzerk_state::berzerk_io_map(address_map &map)
 	map(0x63, 0x63).mirror(0x18).portr("F5").nopw();
 	map(0x64, 0x64).mirror(0x18).portr("F4").nopw();
 	map(0x65, 0x65).mirror(0x18).portr("SW2").nopw();
-	map(0x66, 0x66).mirror(0x18).rw(this, FUNC(berzerk_state::led_off_r), FUNC(berzerk_state::led_off_w));
-	map(0x67, 0x67).mirror(0x18).rw(this, FUNC(berzerk_state::led_on_r), FUNC(berzerk_state::led_on_w));
+	map(0x66, 0x66).mirror(0x18).rw(FUNC(berzerk_state::led_off_r), FUNC(berzerk_state::led_off_w));
+	map(0x67, 0x67).mirror(0x18).rw(FUNC(berzerk_state::led_on_r), FUNC(berzerk_state::led_on_w));
 	map(0x80, 0xff).noprw();
 }
 

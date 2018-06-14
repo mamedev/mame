@@ -22,6 +22,7 @@ ROMs are contained on a small sub-board
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

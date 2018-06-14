@@ -13,6 +13,7 @@
 
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "diserial.h"
 
 
 //**************************************************************************

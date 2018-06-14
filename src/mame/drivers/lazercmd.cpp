@@ -415,8 +415,8 @@ void lazercmd_state::lazercmd_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::lazercmd_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::lazercmd_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
@@ -426,8 +426,8 @@ void lazercmd_state::medlanes_map(address_map &map)
 	map(0x1000, 0x17ff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::medlanes_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::medlanes_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
@@ -436,15 +436,15 @@ void lazercmd_state::bbonk_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::bbonk_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::bbonk_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
 void lazercmd_state::lazercmd_portmap(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(lazercmd_state::lazercmd_ctrl_port_r), FUNC(lazercmd_state::lazercmd_ctrl_port_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(lazercmd_state::lazercmd_data_port_r), FUNC(lazercmd_state::lazercmd_data_port_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(lazercmd_state::lazercmd_ctrl_port_r), FUNC(lazercmd_state::lazercmd_ctrl_port_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(lazercmd_state::lazercmd_data_port_r), FUNC(lazercmd_state::lazercmd_data_port_w));
 }
 
 
@@ -591,7 +591,7 @@ static const gfx_layout charlayout =
 	10*8                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( lazercmd )
+static GFXDECODE_START( gfx_lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 

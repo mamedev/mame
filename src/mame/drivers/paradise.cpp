@@ -132,9 +132,9 @@ void paradise_state::base_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0xbfff).bankr("prgbank");    /* ROM (banked) */
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
+	map(0xc000, 0xc7ff).ram().w(FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
+	map(0xc800, 0xcfff).ram().w(FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
+	map(0xd000, 0xd7ff).ram().w(FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
 }
 
 void paradise_state::paradise_map(address_map &map)
@@ -162,24 +162,24 @@ void paradise_state::torus_map(address_map &map)
 
 void paradise_state::torus_io_map(address_map &map)
 {
-	map(0x0000, 0x17ff).ram().w(this, FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
-	map(0x1800, 0x1800).w(this, FUNC(paradise_state::priority_w));  // Layers priority
-	map(0x2001, 0x2001).w(this, FUNC(paradise_state::flipscreen_w));    // Flip Screen
-	map(0x2004, 0x2004).w(this, FUNC(paradise_state::palbank_w));   // Layers palette bank
-	map(0x2006, 0x2006).w(this, FUNC(paradise_state::rombank_w));   // ROM bank
+	map(0x0000, 0x17ff).ram().w(FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
+	map(0x1800, 0x1800).w(FUNC(paradise_state::priority_w));  // Layers priority
+	map(0x2001, 0x2001).w(FUNC(paradise_state::flipscreen_w));    // Flip Screen
+	map(0x2004, 0x2004).w(FUNC(paradise_state::palbank_w));   // Layers palette bank
+	map(0x2006, 0x2006).w(FUNC(paradise_state::rombank_w));   // ROM bank
 	map(0x2010, 0x2010).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 0
 	map(0x2020, 0x2020).portr("DSW1");
 	map(0x2021, 0x2021).portr("DSW2");
 	map(0x2022, 0x2022).portr("P1");
 	map(0x2023, 0x2023).portr("P2");
 	map(0x2024, 0x2024).portr("SYSTEM");
-	map(0x8000, 0xffff).ram().w(this, FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
+	map(0x8000, 0xffff).ram().w(FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
 }
 
 void paradise_state::paradise_io_map(address_map &map)
 {
 	torus_io_map(map);
-	map(0x2007, 0x2007).w(this, FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
+	map(0x2007, 0x2007).w(FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
 	map(0x2030, 0x2030).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 1
 }
 
@@ -678,21 +678,21 @@ static const gfx_layout torus_layout_16x16x8 =
 	128*8
 };
 
-static GFXDECODE_START( paradise )
+static GFXDECODE_START( gfx_paradise )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x100, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,   0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,   0x300, 1  ) // [2] Midground
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( torus )
+static GFXDECODE_START( gfx_torus )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x100, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,        0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( madball )
+static GFXDECODE_START( gfx_madball )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x500, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paradise)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paradise)
 	MCFG_PALETTE_ADD("palette", 0x800 + 16)
 
 
@@ -779,7 +779,7 @@ MACHINE_CONFIG_START(paradise_state::torus)
 	MCFG_DEVICE_PROGRAM_MAP(torus_map)
 	MCFG_DEVICE_IO_MAP(torus_io_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", torus)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_torus)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_torus)
 
@@ -789,7 +789,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(paradise_state::madball)
 	torus(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_madball)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)

@@ -6,20 +6,18 @@
 #pragma once
 
 #include "sr.h"
+#include "screen.h"
 #include "video/bt459.h"
 #include "video/dp8510.h"
 
-class gt_device_base : public sr_card_device_base
+class gt_device_base : public device_t
 {
 protected:
 	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map);
 
 public:
-	static const u32 GT_PIXCLOCK    = 80'000'000; // just a guess
-	static const int GT_XPIXELS     = 1184;
-	static const int GT_YPIXELS     = 884;
 	static const int GT_BUFFER_SIZE = 0x100000;   // 1 megabyte
 	static const u32 GT_BUFFER_MASK = (GT_BUFFER_SIZE - 1);
 
@@ -56,7 +54,7 @@ public:
 		GFX_MONSENSE_60HZ           = 0x0e000000
 	};
 
-	DECLARE_READ32_MEMBER(control_r) { return m_control; };
+	DECLARE_READ32_MEMBER(control_r) { return m_control | (get_gt(0).screen->vblank() ? GFX_VERT_BLNK : 0); }
 	DECLARE_WRITE32_MEMBER(control_w);
 
 	DECLARE_READ8_MEMBER(contrast_dac_r) { return m_contrast_dac; }
@@ -103,7 +101,7 @@ public:
 	DECLARE_READ16_MEMBER(bsga_xmax_r) { return m_bsga_xmax; }
 	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); }
 	DECLARE_READ16_MEMBER(bsga_ymax_r) { return m_bsga_ymax; }
-	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); }
+	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); bsga_clip_status(m_bsga_xin1, m_bsga_yin1); }
 
 	DECLARE_READ16_MEMBER(bsga_src0_r) { return m_bsga_xin1; }
 	DECLARE_READ16_MEMBER(bsga_src1_r) { return m_bsga_xin1; }
@@ -114,23 +112,23 @@ public:
 
 	enum bsga_status_mask
 	{
-		STATUS_CLIP0_YMAX = 0x1000, // y1 > max y
-		STATUS_CLIP0_YMIN = 0x0800, // y1 < min y
-		STATUS_CLIP0_XMAX = 0x0400, // x1 > max x
-		STATUS_CLIP0_XMIN = 0x0200, // x1 < min x
-		STATUS_CLIP1_YMAX = 0x0100, // y2 > max y
-		STATUS_CLIP1_YMIN = 0x0080, // y2 < min y
-		STATUS_CLIP1_XMAX = 0x0040, // x2 > max x
-		STATUS_CLIP1_XMIN = 0x0020, // x2 < min x
+		STATUS_CLIP0_YMAX  = 0x1000, // y1 > max y
+		STATUS_CLIP0_YMIN  = 0x0800, // y1 < min y
+		STATUS_CLIP0_XMAX  = 0x0400, // x1 > max x
+		STATUS_CLIP0_XMIN  = 0x0200, // x1 < min x
+		STATUS_CLIP1_YMAX  = 0x0100, // y2 > max y
+		STATUS_CLIP1_YMIN  = 0x0080, // y2 < min y
+		STATUS_CLIP1_XMAX  = 0x0040, // x2 > max x
+		STATUS_CLIP1_XMIN  = 0x0020, // x2 < min x
 
 		STATUS_FLOAT_OFLOW = 0x0010,
 
-		STATUS_CLIP_BOTH = 0x0008, // set if both inputs fall outside clipping region
-		STATUS_CLIP_ANY = 0x0004, // set if any input falls outside clipping region
+		STATUS_CLIP_BOTH   = 0x0008, // set if both inputs fall outside clipping region
+		STATUS_CLIP_ANY    = 0x0004, // set if any input falls outside clipping region
 
-		STATUS_CLIP0_MASK = 0x1e00, // x1,y1 clip result
-		STATUS_CLIP1_MASK = 0x01e0, // x2,y2 clip result
-		STATUS_CLIP_MASK = 0x1fe0  // both clip results
+		STATUS_CLIP0_MASK  = 0x1e00, // x1,y1 clip result
+		STATUS_CLIP1_MASK  = 0x01e0, // x2,y2 clip result
+		STATUS_CLIP_MASK   = 0x1fe0  // both clip results
 	};
 	DECLARE_READ16_MEMBER(bsga_status_r);
 
@@ -176,22 +174,22 @@ protected:
 
 	typedef struct
 	{
+		required_device<screen_device> screen;
 		required_device<bt459_device> ramdac;
 		required_device<dp8510_device> bpu;
 
 		std::unique_ptr<u8[]> buffer;
 		std::unique_ptr<u8[]> mask;
 	}
-	gt_screen_t;
+	gt_t;
 
 	virtual const int get_screen_count() const = 0;
-	virtual gt_screen_t &get_screen(const int number) = 0;
-	virtual const gt_screen_t &active_screen() const = 0;
+	virtual gt_t &get_gt(const int number) = 0;
+	virtual const gt_t &active_gt() const = 0;
 
-	u32 buffer_read(const gt_screen_t &screen, const offs_t offset) const;
-	void buffer_write(const gt_screen_t &screen, const offs_t offset, const u32 data, const u32 mask);
+	u32 buffer_read(const gt_t &gt, const offs_t offset) const;
+	void buffer_write(const gt_t &gt, const offs_t offset, const u32 data, const u32 mask);
 
-	TIMER_CALLBACK_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(blit);
 	TIMER_CALLBACK_MEMBER(line);
 	TIMER_CALLBACK_MEMBER(done);
@@ -200,7 +198,7 @@ protected:
 
 	bool kuzmin_clip(s16 sx1, s16 sy1, s16 sx2, s16 sy2, s16 wx1, s16 wy1, s16 wx2, s16 wy2);
 	void bresenham_line(s16 major, s16 minor, s16 major_step, s16 minor_step, int steps, s16 error, s16 error_major, s16 error_minor, bool shallow);
-	void write_vram(const gt_screen_t &screen, const offs_t offset, const u8 data);
+	void write_vram(const gt_t &gt, const offs_t offset, const u8 data);
 
 	u8 m_contrast_dac;
 
@@ -244,7 +242,6 @@ protected:
 	u32 m_ri_control;
 	u32 m_ri_xfer;
 
-	emu_timer *m_vblank_timer;
 	emu_timer *m_blit_timer;
 	emu_timer *m_line_timer;
 	emu_timer *m_done_timer;
@@ -259,19 +256,19 @@ protected:
 
 	virtual DECLARE_WRITE32_MEMBER(blit_control_w) override;
 
-	DECLARE_READ32_MEMBER(buffer_r) { return buffer_read(m_screen[0], offset); }
-	DECLARE_WRITE32_MEMBER(buffer_w) { buffer_write(m_screen[0], offset, data, mem_mask); }
+	DECLARE_READ32_MEMBER(buffer_r) { return buffer_read(m_gt[0], offset); }
+	DECLARE_WRITE32_MEMBER(buffer_w) { buffer_write(m_gt[0], offset, data, mem_mask); }
 
 	virtual const int get_screen_count() const override { return GT_SCREEN_COUNT; }
-	virtual gt_screen_t &get_screen(const int number) override { return m_screen[number]; }
-	virtual const gt_screen_t &active_screen() const override { return m_screen[0]; }
+	virtual gt_t &get_gt(const int number) override { return m_gt[number]; }
+	virtual const gt_t &active_gt() const override { return m_gt[0]; }
 
 	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	static const int GT_SCREEN_COUNT = 1;
 
-	gt_screen_t m_screen[GT_SCREEN_COUNT];
+	gt_t m_gt[GT_SCREEN_COUNT];
 };
 
 class dual_gt_device_base : public gt_device_base
@@ -283,12 +280,12 @@ protected:
 
 	virtual DECLARE_WRITE32_MEMBER(blit_control_w) override;
 
-	DECLARE_READ32_MEMBER(buffer_r) { return buffer_read(m_screen[(offset & 0x80000) ? 1 : 0], offset); }
-	DECLARE_WRITE32_MEMBER(buffer_w) { buffer_write(m_screen[(offset & 0x80000) ? 1 : 0], offset, data, mem_mask); }
+	DECLARE_READ32_MEMBER(buffer_r) { return buffer_read(m_gt[(offset & 0x80000) ? 1 : 0], offset); }
+	DECLARE_WRITE32_MEMBER(buffer_w) { buffer_write(m_gt[(offset & 0x80000) ? 1 : 0], offset, data, mem_mask); }
 
 	virtual const int get_screen_count() const override { return GT_SCREEN_COUNT; }
-	virtual gt_screen_t &get_screen(const int number) override { return m_screen[number]; }
-	virtual const gt_screen_t &active_screen() const override { return m_screen[(m_control & GFX_SCR1_SEL) ? 1 : 0]; }
+	virtual gt_t &get_gt(const int number) override { return m_gt[number]; }
+	virtual const gt_t &active_gt() const override { return m_gt[(m_control & GFX_SCR1_SEL) ? 1 : 0]; }
 
 	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -296,56 +293,84 @@ protected:
 private:
 	static const int GT_SCREEN_COUNT = 2;
 
-	gt_screen_t m_screen[GT_SCREEN_COUNT];
+	gt_t m_gt[GT_SCREEN_COUNT];
 };
 
-class mpcb963_device : public single_gt_device_base
+class mpcb963_device : public single_gt_device_base, public cbus_card_device_base
 {
 public:
 	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
+
+	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcba79_device : public dual_gt_device_base
+class mpcba79_device : public dual_gt_device_base, public cbus_card_device_base
 {
 public:
 	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
+
+	virtual void map(address_map &map) override { cbus_card_device_base::map(map); dual_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
-class mpcb070_device : public single_gt_device_base
+class msmt070_device : public single_gt_device_base, public cbus_card_device_base
 {
 public:
-	mpcb070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
+
+	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcb071_device : public dual_gt_device_base
+class msmt071_device : public dual_gt_device_base, public cbus_card_device_base
 {
 public:
-	mpcb071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
+
+	virtual void map(address_map &map) override { cbus_card_device_base::map(map); dual_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcb081_device : public single_gt_device_base
+class msmt081_device : public single_gt_device_base, public cbus_card_device_base
 {
 public:
-	mpcb081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
+
+	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class mpcbb92_device : public single_gt_device_base, public srx_card_device_base
+{
+public:
+	mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
+
+	virtual void map(address_map &map) override { srx_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
@@ -353,8 +378,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(MPCB963, mpcb963_device)
 DECLARE_DEVICE_TYPE(MPCBA79, mpcba79_device)
-DECLARE_DEVICE_TYPE(MPCB070, mpcb070_device)
-DECLARE_DEVICE_TYPE(MPCB071, mpcb071_device)
-DECLARE_DEVICE_TYPE(MPCB081, mpcb081_device)
+DECLARE_DEVICE_TYPE(MSMT070, msmt070_device)
+DECLARE_DEVICE_TYPE(MSMT071, msmt071_device)
+DECLARE_DEVICE_TYPE(MSMT081, msmt081_device)
+DECLARE_DEVICE_TYPE(MPCBB92, mpcbb92_device)
 
 #endif // MAME_BUS_INTERPRO_SR_GT_H

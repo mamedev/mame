@@ -7,7 +7,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
@@ -19,6 +19,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 /* Bits in m_portf0 variable:

@@ -15,6 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -180,7 +181,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( intrscti )
+static GFXDECODE_START( gfx_intrscti )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -206,7 +207,7 @@ MACHINE_CONFIG_START(intrscti_state::intrscti)
 	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intrscti)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_intrscti)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 

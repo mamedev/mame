@@ -65,6 +65,7 @@ this requires the -joystick_contradictory switch on the commandline.
 #include "sound/ay8910.h"
 #include "machine/i2cmem.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -284,16 +285,16 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 
 void twins_state::twins_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
+	map(0x00000, 0xfffff).rw(FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
 }
 
 void twins_state::twins_io(address_map &map)
 {
 	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x0004, 0x0005).rw(this, FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
-	map(0x0006, 0x0007).w(this, FUNC(twins_state::twins_pal_w)).share("paletteram");
-	map(0x000e, 0x000f).w(this, FUNC(twins_state::porte_paloff0_w));
+	map(0x0004, 0x0005).rw(FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0006, 0x0007).w(FUNC(twins_state::twins_pal_w)).share("paletteram");
+	map(0x000e, 0x000f).w(FUNC(twins_state::porte_paloff0_w));
 }
 
 void twins_state::video_start()
@@ -426,7 +427,7 @@ void twins_state::twinsa_io(address_map &map)
 	map(0x0004, 0x0004).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x0008, 0x0008).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x0010, 0x0010).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x0018, 0x0019).r(this, FUNC(twins_state::twins_port4_r)).w(this, FUNC(twins_state::twins_port4_w));
+	map(0x0018, 0x0019).r(FUNC(twins_state::twins_port4_r)).w(FUNC(twins_state::twins_port4_w));
 }
 
 
@@ -547,14 +548,14 @@ void twins_state::spider_io(address_map &map)
 {
 	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x0004, 0x0005).rw(this, FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
-	map(0x0008, 0x0009).w(this, FUNC(twins_state::spider_pal_w)).share("paletteram");
-	map(0x0010, 0x0011).w(this, FUNC(twins_state::spider_paloff0_w));
+	map(0x0004, 0x0005).rw(FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0008, 0x0009).w(FUNC(twins_state::spider_pal_w)).share("paletteram");
+	map(0x0010, 0x0011).w(FUNC(twins_state::spider_paloff0_w));
 
-	map(0x0018, 0x0019).r(this, FUNC(twins_state::spider_port_18_r));
-	map(0x001a, 0x001b).w(this, FUNC(twins_state::spider_port_1a_w));
-	map(0x001c, 0x001d).w(this, FUNC(twins_state::spider_port_1c_w));
-	map(0x001e, 0x001f).r(this, FUNC(twins_state::spider_port_1e_r));
+	map(0x0018, 0x0019).r(FUNC(twins_state::spider_port_18_r));
+	map(0x001a, 0x001b).w(FUNC(twins_state::spider_port_1a_w));
+	map(0x001c, 0x001d).w(FUNC(twins_state::spider_port_1c_w));
+	map(0x001e, 0x001f).r(FUNC(twins_state::spider_port_1e_r));
 
 
 }

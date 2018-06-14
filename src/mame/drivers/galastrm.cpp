@@ -111,9 +111,9 @@ void galastrm_state::galastrm_map(address_map &map)
 	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
-	map(0x900000, 0x900003).w(this, FUNC(galastrm_state::galastrm_palette_w));                               /* TC0110PCR */
-	map(0xb00000, 0xb00003).w(this, FUNC(galastrm_state::galastrm_tc0610_0_w));                              /* TC0610 */
-	map(0xc00000, 0xc00003).w(this, FUNC(galastrm_state::galastrm_tc0610_1_w));
+	map(0x900000, 0x900003).w(FUNC(galastrm_state::galastrm_palette_w));                               /* TC0110PCR */
+	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::galastrm_tc0610_0_w));                              /* TC0610 */
+	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::galastrm_tc0610_1_w));
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 }
@@ -188,7 +188,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( galastrm )
+static GFXDECODE_START( gfx_galastrm )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout, 0, 4096 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,       0, 4096 )
 GFXDECODE_END
@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	MCFG_DEVICE_PROGRAM_MAP(galastrm_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 6))
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	MCFG_SCREEN_UPDATE_DRIVER(galastrm_state, screen_update_galastrm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galastrm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galastrm)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)

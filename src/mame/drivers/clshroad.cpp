@@ -78,10 +78,10 @@ void clshroad_state::clshroad_map(address_map &map)
 	map(0x9800, 0x9dff).ram();
 	map(0x9e00, 0x9fff).ram().share("spriteram");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa100, 0xa107).r(this, FUNC(clshroad_state::input_r));
-	map(0xa800, 0xafff).ram().w(this, FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0xa100, 0xa107).r(FUNC(clshroad_state::input_r));
+	map(0xa800, 0xafff).ram().w(FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
 	map(0xb000, 0xb003).writeonly().share("vregs"); // Scroll
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0xc000, 0xc7ff).ram().w(FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
 }
 
 void clshroad_state::clshroad_sound_map(address_map &map)
@@ -246,13 +246,13 @@ static const gfx_layout layout_16x16x4 =
 	16*16*2
 };
 
-static GFXDECODE_START( firebatl )
+static GFXDECODE_START( gfx_firebatl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,  16,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
 GFXDECODE_END
 
-static GFXDECODE_START( clshroad )
+static GFXDECODE_START( gfx_clshroad )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,    0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,      0, 16 ) // [2] Layer 1
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebatl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebatl)
 	MCFG_PALETTE_ADD("palette", 512+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clshroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clshroad)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)

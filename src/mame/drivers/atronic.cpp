@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "emupal.h"
 #include "screen.h"
 
 

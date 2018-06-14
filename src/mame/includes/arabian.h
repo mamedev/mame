@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class arabian_state : public driver_device
 {
 public:

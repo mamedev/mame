@@ -55,12 +55,12 @@ void subs_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x01ff).ram();
-	map(0x0000, 0x0000).w(this, FUNC(subs_state::noise_reset_w));
-	map(0x0000, 0x0007).r(this, FUNC(subs_state::control_r));
-	map(0x0020, 0x0020).w(this, FUNC(subs_state::steer_reset_w));
-	map(0x0020, 0x0027).r(this, FUNC(subs_state::coin_r));
+	map(0x0000, 0x0000).w(FUNC(subs_state::noise_reset_w));
+	map(0x0000, 0x0007).r(FUNC(subs_state::control_r));
+	map(0x0020, 0x0020).w(FUNC(subs_state::steer_reset_w));
+	map(0x0020, 0x0027).r(FUNC(subs_state::coin_r));
 //  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
-	map(0x0060, 0x0063).r(this, FUNC(subs_state::options_r));
+	map(0x0060, 0x0063).r(FUNC(subs_state::options_r));
 	map(0x0060, 0x006f).w("latch", FUNC(ls259_device::write_a0));
 	map(0x0090, 0x009f).share("spriteram");
 	map(0x0800, 0x0bff).ram().share("videoram");
@@ -161,7 +161,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( subs )
+static GFXDECODE_START( gfx_subs )
 	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )    /* playfield graphics */
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )    /* motion graphics */
 GFXDECODE_END
@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subs)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(subs_state, subs)

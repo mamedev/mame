@@ -59,6 +59,7 @@ Infinite loop is reached at address 0x7699
 #include "cpu/mcs51/mcs51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -223,7 +224,7 @@ static const gfx_layout henry_prot_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( hprot1 )
+static GFXDECODE_START( gfx_hprot1 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, henry_prot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -261,7 +262,7 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hprot1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hprot1)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

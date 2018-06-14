@@ -436,7 +436,7 @@ WRITE8_MEMBER( s2636_device::write_data )
 
 WRITE_LINE_MEMBER( s2636_device::write_intack )
 {
-	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state) || (PULSE_LINE == state));
+	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state));
 
 	// pretend interrupt acknowledge is handled instantaneously
 	m_intack = state;

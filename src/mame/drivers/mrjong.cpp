@@ -77,17 +77,17 @@ void mrjong_state::mrjong_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa7ff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(mrjong_state::mrjong_videoram_w)).share("videoram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(mrjong_state::mrjong_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(mrjong_state::mrjong_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(mrjong_state::mrjong_colorram_w)).share("colorram");
 }
 
 void mrjong_state::mrjong_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P2").w(this, FUNC(mrjong_state::mrjong_flipscreen_w));
-	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::write));
-	map(0x03, 0x03).r(this, FUNC(mrjong_state::io_0x03_r));     // Unknown
+	map(0x00, 0x00).portr("P2").w(FUNC(mrjong_state::mrjong_flipscreen_w));
+	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).r(FUNC(mrjong_state::io_0x03_r));     // Unknown
 }
 
 /*************************************
@@ -173,7 +173,7 @@ static const gfx_layout spritelayout =
 	32*8                /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( mrjong )
+static GFXDECODE_START( gfx_mrjong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,    0, 32 )
 GFXDECODE_END
@@ -202,7 +202,7 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrjong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrjong)
 	MCFG_PALETTE_ADD("palette", 4*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)

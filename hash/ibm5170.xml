@@ -2519,6 +2519,7 @@
 		<description>DR DOS 6.0</description>
 		<year>1991</year>
 		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
 		<info name="serial" value="E1182-2160" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Start Up"/>
@@ -3012,7 +3013,7 @@
 				<rom name="Disk01 1.30.img" size="1474560" crc="167b3fea" sha1="48916ab96812ca1015f99bba0d67e791527aa4f3" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disk02 1.30.img" size="1474560" crc="b7fd656d" sha1="76758dd96706d146875a38775ffb05f3cf45b69b" offset="0"/>
 			</dataarea>
@@ -5395,6 +5396,120 @@
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="deskmte5.dsk" size="1474560" crc="c2ed638a" sha1="82b897d4a10c8897c2a467152a14d739b10aeb1f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excel21">
+		<description>Excel (Version 2.10)</description>
+		<year>1988</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Setup Disk).img" size="368640" crc="4926e208" sha1="c1aa891ad591e5ec06bdb5dc2a67ed9bf10212ce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Documentation Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Documentation Disk 1).img" size="368640" crc="0c33d263" sha1="2eb83a3819068038d5fc50ff6c9cd9a17fb3e015" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Documentation Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Documentation Disk 2).img" size="368640" crc="5a1e6083" sha1="b176e7cbf63fcfe3c0cb91e585339a4267e468ac" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Documentation Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Documentation Disk 3).img" size="368640" crc="3fbade3b" sha1="46426c396b9f7049eac730a44ef93061fb454ea7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Documentation Disk 4" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Documentation Disk 4).img" size="368640" crc="acd398a3" sha1="96bd41e37ce4345194e55d489a2d0bca7a964e84" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Library Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Library Disk 1).img" size="368640" crc="21cdf97c" sha1="e9906e836ab4fe143965261b9967817781c9deca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Library Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Library Disk 2).img" size="368640" crc="974f571e" sha1="b83a3aa7363e58d1711d7138aeba997b201293b7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Program Disk 1).img" size="368640" crc="b705f4ef" sha1="5fb608f3796d07792d2fbb08caa07029568078e3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Program Disk 2).img" size="368640" crc="679d81d6" sha1="4e7737b8c6d680b20ed21a19d8ac28af12e8052a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Build Disk 1).img" size="368640" crc="e38c4b47" sha1="fcbb3ade85bdd7667b4563e98bfc9e0b7df405b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Build Disk 2).img" size="368640" crc="20d3cfc7" sha1="f3224d5a2506d6eff6e41ccd527d654b6d89ea0c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Build Disk 3).img" size="368640" crc="8762a670" sha1="f1411f6ac1bea6483de4c0197e1132b399b08ec4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Utilities Disk 1).img" size="368640" crc="4dff9021" sha1="8cd9a5a2d32205d7db3dbd69c98af9f06affbdd1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Utilities Disk 2).img" size="368640" crc="f5670bbb" sha1="1d359146016ea85c956731012b2c130ad7553c0a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Utilities Disk 3).img" size="368640" crc="eeabffbf" sha1="e0f4123a3acdb9389af064ba660db0a6878aa0e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities 4" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Utilities 4).img" size="368640" crc="afb90500" sha1="8b6364e287280c0dd6dacffd615ba80888f48a6b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="Fonts Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Fonts Disk 1).img" size="368640" crc="e4d7fd6d" sha1="6a49e6209d326320506d972ab5dbfcb7d4f80d87" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_5_25">
+			<feature name="part_id" value="Fonts Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel (USA) (Version 2.10) (Fonts Disk 2).img" size="368640" crc="e8295fb3" sha1="653c9a46a41f03fc694d651e368e1efc4ccf67f2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7800,6 +7915,33 @@
 		</part>
 	</software>
 
+	<software name="enchntia">
+		<description>Curse of Enchantia</description>
+		<year>1992</year>
+		<publisher>Core Design</publisher>
+		<info name="developer" value="Core Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Curse of Enchantia [Core Design] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="5d552e03" sha1="138ea81a545caf308388cbd53ec784c5d9d03345" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Curse of Enchantia [Core Design] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="8a6dd58f" sha1="d947a378ff7a4093bd7bbbed19c26ee6045c6b77" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Curse of Enchantia [Core Design] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="bf250bc6" sha1="9ff0c76fa5d46b2f1f85284828bb5420c4ebf252" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Curse of Enchantia [Core Design] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="4f77ff34" sha1="7b3c73dcb4a8c139d019b94ecdfc771c80650a3a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cybrstrk">
 		<description>Cyberstrike</description>
 		<year>1994</year>
@@ -7883,7 +8025,40 @@
 		</part>
 	</software>
 
-	<software name="descsw">
+	<software name="descent">
+		<description>Descent</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Parallax Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Descent (v1.0) [Interplay] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="2b405860" sha1="4ea8a7a044806685fefc09249a3b8870fae38ad0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Descent (v1.0) [Interplay] [1995] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="0bca9a16" sha1="e08052c8da3fc1796acbf5f8c109a4d43d589310" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Descent (v1.0) [Interplay] [1995] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="a9c50996" sha1="a0e9602d613704a08686af21e005773ec8fdaa19" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Descent (v1.0) [Interplay] [1995] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="8b01e5ff" sha1="455ce6f7a3d8acfd2838c7937c58a6049be028e5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Descent (v1.0) [Interplay] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4f0022c9" sha1="54dedac09a167e511ec77871f2e9b647b5f00f28" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="descsw" cloneof="descent">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Descent (Shareware, 1.0)</description>
 		<year>1994</year>
@@ -8683,6 +8858,34 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Gods [Renegade Software] [1991] [3.5HD].img" size="1474560" crc="ac47d483" sha1="8c1767c96fc5b881a7145d6bcf68a75bf4281e66" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gs2000">
+		<description>Gunship 2000</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="469.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk A].img" size="737280" crc="dd1d35e7" sha1="3444c64b3f8a2d541f0f5cc7b64792c31e9fc472" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk B].img" size="737280" crc="f82d1530" sha1="fed8f972ec25cd1661b22ac22960fe0bc23779d8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk C].img" size="737280" crc="f0a2d993" sha1="e3adc0b20defc9769d37c1c4f7bd6ccd9f6cfa67" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="3dd3f5a6" sha1="d981a909fa08cf21d0cd975fd80b5b39ec9dcbe2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

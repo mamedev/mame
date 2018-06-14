@@ -11,9 +11,6 @@
 
 #pragma once
 
-#define MCFG_SGI_HAL2_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SGI_HAL2, 0)
-
 class hal2_device : public device_t
 {
 public:

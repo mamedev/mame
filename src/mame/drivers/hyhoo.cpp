@@ -48,12 +48,12 @@ void hyhoo_state::hyhoo_io_map(address_map &map)
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x90, 0x90).portr("SYSTEM");
-	map(0x90, 0x97).w(this, FUNC(hyhoo_state::hyhoo_blitter_w));
+	map(0x90, 0x97).w(FUNC(hyhoo_state::hyhoo_blitter_w));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::write));     // unknown read
-	map(0xe0, 0xe0).w(this, FUNC(hyhoo_state::hyhoo_romsel_w));
+	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::data_w));     // unknown read
+	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
 	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP

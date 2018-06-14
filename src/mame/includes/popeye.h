@@ -4,6 +4,7 @@
 
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 
 class tnx1_state : public driver_device
 {
@@ -38,8 +39,9 @@ protected:
 	static const res_net_decode_info mb7051_decode_info;
 	static const res_net_decode_info mb7052_decode_info;
 	static const res_net_info txt_mb7051_net_info;
-	static const res_net_info bak_mb7051_net_info;
+	static const res_net_info tnx1_bak_mb7051_net_info;
 	static const res_net_info obj_mb7052_net_info;
+	virtual const res_net_info bak_mb7051_net_info() { return tnx1_bak_mb7051_net_info; };
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	std::vector<uint8_t> m_sprite_ram;
@@ -76,6 +78,8 @@ protected:
 
 	virtual void maincpu_program_map(address_map &map);
 	void maincpu_io_map(address_map &map);
+
+	virtual bool bootleg_sprites() const { return false; }
 };
 
 class tpp1_state : public tnx1_state
@@ -84,6 +88,9 @@ class tpp1_state : public tnx1_state
 protected:
 	virtual DECLARE_PALETTE_INIT(palette_init) override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	static const res_net_info tpp1_bak_mb7051_net_info;
+	virtual const res_net_info bak_mb7051_net_info() override { return tpp1_bak_mb7051_net_info; };
 };
 
 class popeyebl_state : public tpp1_state
@@ -92,6 +99,8 @@ class popeyebl_state : public tpp1_state
 protected:
 	virtual void decrypt_rom() override;
 	virtual void maincpu_program_map(address_map &map) override;
+
+	virtual bool bootleg_sprites() const override { return true; }
 };
 
 class tpp2_state : public tpp1_state

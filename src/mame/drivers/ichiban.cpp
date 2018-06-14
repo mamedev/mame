@@ -40,6 +40,7 @@ HSync - 15.510kHz
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -102,7 +103,7 @@ static const gfx_layout charlayout =
 	8*8*8
 };
 
-static GFXDECODE_START( ichibanjyan )
+static GFXDECODE_START( gfx_ichibanjyan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 1 )
 GFXDECODE_END
@@ -136,7 +137,7 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ichibanjyan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 

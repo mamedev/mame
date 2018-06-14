@@ -252,12 +252,12 @@ void naughtyb_state::naughtyb_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x8fff).ram().share("videoram2");
-	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::naughtyb_videoreg_w));
+	map(0x9000, 0x97ff).w(FUNC(naughtyb_state::naughtyb_videoreg_w));
 	map(0x9800, 0x9fff).ram().share("scrollreg");
 	map(0xa000, 0xa7ff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_a_w));
 	map(0xa800, 0xafff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_b_w));
-	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
-	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+	map(0xb000, 0xb7ff).r(FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(FUNC(naughtyb_state::dsw0_port_r));   // DSW0
 }
 
 void naughtyb_state::popflame_map(address_map &map)
@@ -266,12 +266,12 @@ void naughtyb_state::popflame_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x8fff).ram().share("videoram2");
-	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::popflame_videoreg_w));
+	map(0x9000, 0x97ff).w(FUNC(naughtyb_state::popflame_videoreg_w));
 	map(0x9800, 0x9fff).ram().share("scrollreg");
 	map(0xa000, 0xa7ff).w(m_popflame_custom, FUNC(popflame_sound_device::control_a_w));
 	map(0xa800, 0xafff).w(m_popflame_custom, FUNC(popflame_sound_device::control_b_w));
-	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
-	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+	map(0xb000, 0xb7ff).r(FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(FUNC(naughtyb_state::dsw0_port_r));   // DSW0
 }
 
 
@@ -402,7 +402,7 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( naughtyb )
+static GFXDECODE_START( gfx_naughtyb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(naughtyb_state::popflame)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 

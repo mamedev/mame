@@ -78,7 +78,7 @@ void mouser_state::mouser_sound_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4000).w(this, FUNC(mouser_state::mouser_sound_nmi_clear_w));
+	map(0x4000, 0x4000).w(FUNC(mouser_state::mouser_sound_nmi_clear_w));
 }
 
 void mouser_state::mouser_sound_io_map(address_map &map)
@@ -174,7 +174,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( mouser )
+static GFXDECODE_START( gfx_mouser )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, spritelayout,     0, 16 )
@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mouser_state, mouser_nmi_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mouser)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mouser)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
 

@@ -259,7 +259,7 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 WRITE8_MEMBER(gsword_state::sound_command_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(gsword_state::adpcm_data_w)
@@ -305,7 +305,7 @@ READ8_MEMBER(gsword_state::i8741_3_r )
 INTERRUPT_GEN_MEMBER(gsword_state::sound_interrupt)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void gsword_state::init_gsword()
@@ -412,7 +412,7 @@ WRITE8_MEMBER(josvolly_state::mcu1_p2_w)
 		// this is just a hacky guess at how it works
 		if (m_cpu2_nmi_enable && (data & (data ^ m_mcu1_p2) & 0x01))
 		{
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_cpu2_nmi_enable = false;
 		}
 
@@ -463,11 +463,11 @@ void gsword_state_base::cpu1_map(address_map &map)
 	map(0xa380, 0xa3ff).ram().share("spritetile_ram");
 	map(0xa400, 0xa77f).ram();
 	map(0xa780, 0xa7ff).ram().share("spritexy_ram");
-	map(0xa980, 0xa980).w(this, FUNC(gsword_state_base::charbank_w));
-	map(0xaa80, 0xaa80).w(this, FUNC(gsword_state_base::videoctrl_w));   /* flip screen, char palette bank */
-	map(0xab00, 0xab00).w(this, FUNC(gsword_state_base::scroll_w));
+	map(0xa980, 0xa980).w(FUNC(gsword_state_base::charbank_w));
+	map(0xaa80, 0xaa80).w(FUNC(gsword_state_base::videoctrl_w));   /* flip screen, char palette bank */
+	map(0xab00, 0xab00).w(FUNC(gsword_state_base::scroll_w));
 	map(0xab80, 0xabff).writeonly().share("spriteattram");
-	map(0xb000, 0xb7ff).readonly().w(this, FUNC(gsword_state_base::videoram_w)).share("videoram");
+	map(0xb000, 0xb7ff).readonly().w(FUNC(gsword_state_base::videoram_w)).share("videoram");
 }
 
 
@@ -481,7 +481,7 @@ void gsword_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("cpu2_ram");
-	map(0x6000, 0x6000).w(this, FUNC(gsword_state::sound_command_w));
+	map(0x6000, 0x6000).w(FUNC(gsword_state::sound_command_w));
 }
 
 void gsword_state::cpu2_io_map(address_map &map)
@@ -490,9 +490,9 @@ void gsword_state::cpu2_io_map(address_map &map)
 	map(0x00, 0x01).rw("taito8741", FUNC(taito8741_4pack_device::read_2), FUNC(taito8741_4pack_device::write_2));
 	map(0x20, 0x21).rw("taito8741", FUNC(taito8741_4pack_device::read_3), FUNC(taito8741_4pack_device::write_3));
 	map(0x40, 0x41).rw("taito8741", FUNC(taito8741_4pack_device::read_1), FUNC(taito8741_4pack_device::write_1));
-	map(0x60, 0x60).rw(this, FUNC(gsword_state::fake_0_r), FUNC(gsword_state::ay8910_control_port_0_w));
+	map(0x60, 0x60).rw(FUNC(gsword_state::fake_0_r), FUNC(gsword_state::ay8910_control_port_0_w));
 	map(0x61, 0x61).rw(m_ay0, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x80, 0x80).rw(this, FUNC(gsword_state::fake_1_r), FUNC(gsword_state::ay8910_control_port_1_w));
+	map(0x80, 0x80).rw(FUNC(gsword_state::fake_1_r), FUNC(gsword_state::ay8910_control_port_1_w));
 	map(0x81, 0x81).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
 	map(0xe0, 0xe0).nopr(); /* ?? */
@@ -503,7 +503,7 @@ void gsword_state::cpu2_io_map(address_map &map)
 void gsword_state::cpu3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).w(this, FUNC(gsword_state::adpcm_data_w));
+	map(0x8000, 0x8000).w(FUNC(gsword_state::adpcm_data_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -529,13 +529,13 @@ void josvolly_state::josvolly_cpu2_map(address_map &map)
 void josvolly_state::josvolly_cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(josvolly_state::fake_0_r), FUNC(josvolly_state::ay8910_control_port_0_w));
+	map(0x00, 0x00).rw(FUNC(josvolly_state::fake_0_r), FUNC(josvolly_state::ay8910_control_port_0_w));
 	map(0x01, 0x01).rw(m_ay0, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x40, 0x40).rw(this, FUNC(josvolly_state::fake_1_r), FUNC(josvolly_state::ay8910_control_port_1_w));
+	map(0x40, 0x40).rw(FUNC(josvolly_state::fake_1_r), FUNC(josvolly_state::ay8910_control_port_1_w));
 	map(0x41, 0x41).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
-	map(0x81, 0x81).w(this, FUNC(josvolly_state::cpu2_nmi_enable_w));
-	map(0xC1, 0xC1).w(this, FUNC(josvolly_state::cpu2_irq_clear_w));
+	map(0x81, 0x81).w(FUNC(josvolly_state::cpu2_nmi_enable_w));
+	map(0xC1, 0xC1).w(FUNC(josvolly_state::cpu2_irq_clear_w));
 }
 
 
@@ -775,7 +775,7 @@ static const gfx_layout gsword_sprites2 =
 	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
-static GFXDECODE_START( gsword )
+static GFXDECODE_START( gfx_gsword )
 	GFXDECODE_ENTRY( "gfx1", 0, gsword_text,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, gsword_sprites1,  64*4, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, gsword_sprites2,  64*4, 64 )
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gsword)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
@@ -886,7 +886,7 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	MCFG_SCREEN_UPDATE_DRIVER(josvolly_state, screen_update_gsword)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gsword)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(josvolly_state, josvolly)

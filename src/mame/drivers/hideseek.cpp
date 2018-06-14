@@ -28,6 +28,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 #include "emu.h"
 #include "cpu/sh/sh2.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,7 +85,7 @@ INPUT_PORTS_END
 
 static GFXLAYOUT_RAW( hideseek, 2048, 1, 2048*8, 2048*8 )
 
-static GFXDECODE_START( hideseek )
+static GFXDECODE_START( gfx_hideseek )
 	GFXDECODE_ENTRY( "blit_data", 0, hideseek,     0x0000, 0x1 )
 GFXDECODE_END
 
@@ -117,7 +118,7 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hideseek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hideseek)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

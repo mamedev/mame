@@ -596,44 +596,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
 
 void mac_state::mac512ke_map(address_map &map)
 {
-	map(0x800000, 0x9fffff).r(this, FUNC(mac_state::mac_scc_r));
-	map(0xa00000, 0xbfffff).w(this, FUNC(mac_state::mac_scc_w));
-	map(0xc00000, 0xdfffff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xfffff0, 0xffffff).rw(this, FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+	map(0x800000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
+	map(0xa00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
 }
 
 void mac_state::macplus_map(address_map &map)
 {
-	map(0x580000, 0x5fffff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
-	map(0x800000, 0x9fffff).r(this, FUNC(mac_state::mac_scc_r));
-	map(0xa00000, 0xbfffff).w(this, FUNC(mac_state::mac_scc_w));
-	map(0xc00000, 0xdfffff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xfffff0, 0xffffff).rw(this, FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+	map(0x580000, 0x5fffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
+	map(0x800000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
+	map(0xa00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
 }
 
 void mac_state::macse_map(address_map &map)
 {
-	map(0x580000, 0x5fffff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
-	map(0x900000, 0x9fffff).r(this, FUNC(mac_state::mac_scc_r));
-	map(0xb00000, 0xbfffff).w(this, FUNC(mac_state::mac_scc_w));
-	map(0xd00000, 0xdfffff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xfffff0, 0xffffff).rw(this, FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+	map(0x580000, 0x5fffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
+	map(0x900000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
+	map(0xb00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
+	map(0xd00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
 }
 
 void mac_state::macprtb_map(address_map &map)
 {
 	map(0x900000, 0x93ffff).rom().region("bootrom", 0).mirror(0x0c0000);
-	map(0xf60000, 0xf6ffff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xf70000, 0xf7ffff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xf90000, 0xf9ffff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
+	map(0xf60000, 0xf6ffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xf70000, 0xf7ffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xf90000, 0xf9ffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
 	map(0xfa8000, 0xfaffff).ram().share("vram16");  // VRAM
 	map(0xfb0000, 0xfbffff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0xfc0000, 0xfcffff).r(this, FUNC(mac_state::mac_config_r));
-	map(0xfd0000, 0xfdffff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0xfffff0, 0xffffff).rw(this, FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+	map(0xfc0000, 0xfcffff).r(FUNC(mac_state::mac_config_r));
+	map(0xfd0000, 0xfdffff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
 }
 
 void mac_state::maclc_map(address_map &map)
@@ -642,15 +642,15 @@ void mac_state::maclc_map(address_map &map)
 
 	map(0xa00000, 0xafffff).rom().region("bootrom", 0); // ROM (in 32-bit mode)
 
-	map(0xf00000, 0xf01fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xf04000, 0xf05fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0xf06000, 0xf07fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
-	map(0xf10000, 0xf11fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
-	map(0xf12000, 0xf13fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0xf00000, 0xf01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xf04000, 0xf05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0xf06000, 0xf07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0xf10000, 0xf11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0xf12000, 0xf13fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
 	map(0xf14000, 0xf15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0xf16000, 0xf17fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xf24000, 0xf24003).rw(this, FUNC(mac_state::rbv_ramdac_r), FUNC(mac_state::ariel_ramdac_w));
-	map(0xf26000, 0xf27fff).rw(this, FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w));    // VIA2 (V8)
+	map(0xf16000, 0xf17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xf24000, 0xf24003).rw(FUNC(mac_state::rbv_ramdac_r), FUNC(mac_state::ariel_ramdac_w));
+	map(0xf26000, 0xf27fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w));    // VIA2 (V8)
 	map(0xf40000, 0xfbffff).ram().share("vram");
 }
 
@@ -658,18 +658,18 @@ void mac_state::maclc3_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50007fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50025fff).w(this, FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(this, FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
-	map(0x50028000, 0x50028003).rw(this, FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
+	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
+	map(0x50028000, 0x50028003).rw(FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
 
-	map(0x5ffffffc, 0x5fffffff).r(this, FUNC(mac_state::mac_read_id));
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
 	map(0x60000000, 0x600fffff).ram().mirror(0x0ff00000).share("vram");
 }
@@ -679,47 +679,47 @@ void mac_state::macii_map(address_map &map)
 	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
 
 	// MMU remaps I/O without the F
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50002000, 0x50003fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50006003).w(this, FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50006060, 0x50006063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012060, 0x50012063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50006003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50006060, 0x50006063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50040000, 0x50041fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
 }
 
 void mac_state::maciici_map(address_map &map)
 {
 	map(0x40000000, 0x4007ffff).rom().region("bootrom", 0).mirror(0x0ff80000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50007fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012060, 0x50012063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50024007).w(this, FUNC(mac_state::rbv_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(this, FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
-	map(0x50040000, 0x50041fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50024007).w(FUNC(mac_state::rbv_ramdac_w)).mirror(0x00f00000);
+	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
 }
 
 void mac_state::macse30_map(address_map &map)
 {
 	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50002000, 0x50003fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50007fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012060, 0x50012063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50040000, 0x50041fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000); // mirror
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000); // mirror
 
 	map(0xfe000000, 0xfe00ffff).ram().share("vram");
 	map(0xfee00000, 0xfee0ffff).ram().share("vram").mirror(0x000f0000);
@@ -730,18 +730,18 @@ void mac_state::maciifx_map(address_map &map)
 {
 	map(0x40000000, 0x4007ffff).rom().region("bootrom", 0).mirror(0x0ff80000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::scciop_r), FUNC(mac_state::scciop_w)).mirror(0x00f00000);
-	map(0x5000a000, 0x5000bfff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x5000c060, 0x5000c063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
-	map(0x5000d000, 0x5000d003).w(this, FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x5000d060, 0x5000d063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::scciop_r), FUNC(mac_state::scciop_w)).mirror(0x00f00000);
+	map(0x5000a000, 0x5000bfff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x5000c060, 0x5000c063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x5000d000, 0x5000d003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x5000d060, 0x5000d063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw(this, FUNC(mac_state::swimiop_r), FUNC(mac_state::swimiop_w)).mirror(0x00f00000);
-	map(0x50018000, 0x50019fff).rw(this, FUNC(mac_state::biu_r), FUNC(mac_state::biu_w)).mirror(0x00f00000);
-	map(0x5001a000, 0x5001bfff).rw(this, FUNC(mac_state::oss_r), FUNC(mac_state::oss_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50027fff).r(this, FUNC(mac_state::buserror_r)).mirror(0x00f00000);   // must bus error on access here so ROM can determine we're an FMC
-	map(0x50040000, 0x50041fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::swimiop_r), FUNC(mac_state::swimiop_w)).mirror(0x00f00000);
+	map(0x50018000, 0x50019fff).rw(FUNC(mac_state::biu_r), FUNC(mac_state::biu_w)).mirror(0x00f00000);
+	map(0x5001a000, 0x5001bfff).rw(FUNC(mac_state::oss_r), FUNC(mac_state::oss_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50027fff).r(FUNC(mac_state::buserror_r)).mirror(0x00f00000);   // must bus error on access here so ROM can determine we're an FMC
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
 }
 
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
@@ -749,15 +749,15 @@ void mac_state::macpb140_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x01f00000);
-	map(0x50002000, 0x50003fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x01f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x01f00000);
-	map(0x50006000, 0x50007fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x01f00000);
-	map(0x50010000, 0x50011fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x01f00000);
-	map(0x50012060, 0x50012063).r(this, FUNC(mac_state::macii_scsi_drq_r)).mirror(0x01f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x01f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x01f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x01f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x01f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x01f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x01f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x01f00000);
-	map(0x50016000, 0x50017fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x01f00000);
-	map(0x50024000, 0x50027fff).r(this, FUNC(mac_state::buserror_r)).mirror(0x01f00000);   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x01f00000);
+	map(0x50024000, 0x50027fff).r(FUNC(mac_state::buserror_r)).mirror(0x01f00000);   // bus error here to make sure we aren't mistaken for another decoder
 
 	map(0xfee08000, 0xfeffffff).ram().share("vram");
 }
@@ -766,16 +766,16 @@ void mac_state::macpb160_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	map(0x50f00000, 0x50f01fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0x50f02000, 0x50f03fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
-	map(0x50f04000, 0x50f05fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0x50f06000, 0x50f07fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
-	map(0x50f10000, 0x50f11fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
-	map(0x50f12060, 0x50f12063).r(this, FUNC(mac_state::macii_scsi_drq_r));
+	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
+	map(0x50f04000, 0x50f05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0x50f06000, 0x50f07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0x50f10000, 0x50f11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0x50f12060, 0x50f12063).r(FUNC(mac_state::macii_scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0x50f20000, 0x50f21fff).rw(this, FUNC(mac_state::mac_gsc_r), FUNC(mac_state::mac_gsc_w));
-	map(0x50f24000, 0x50f27fff).r(this, FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50f16000, 0x50f17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0x50f20000, 0x50f21fff).rw(FUNC(mac_state::mac_gsc_r), FUNC(mac_state::mac_gsc_w));
+	map(0x50f24000, 0x50f27fff).r(FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
 
 	map(0x60000000, 0x6001ffff).ram().share("vram").mirror(0x0ffe0000);
 }
@@ -784,20 +784,20 @@ void mac_state::macpb165c_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	map(0x50f00000, 0x50f01fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0x50f02000, 0x50f03fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
-	map(0x50f04000, 0x50f05fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0x50f06000, 0x50f07fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
-	map(0x50f10000, 0x50f11fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
-	map(0x50f12060, 0x50f12063).r(this, FUNC(mac_state::macii_scsi_drq_r));
+	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
+	map(0x50f04000, 0x50f05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0x50f06000, 0x50f07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0x50f10000, 0x50f11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0x50f12060, 0x50f12063).r(FUNC(mac_state::macii_scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0x50f20000, 0x50f21fff).r(this, FUNC(mac_state::buserror_r));    // bus error here to detect we're not the grayscale 160/165/180
-	map(0x50f24000, 0x50f27fff).r(this, FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50f16000, 0x50f17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0x50f20000, 0x50f21fff).r(FUNC(mac_state::buserror_r));    // bus error here to detect we're not the grayscale 160/165/180
+	map(0x50f24000, 0x50f27fff).r(FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
 
 	// on-board color video on 165c/180c
 	map(0xfc000000, 0xfc07ffff).ram().share("vram").mirror(0x00380000); // 512k of VRAM
-	map(0xfc400000, 0xfcefffff).rw(this, FUNC(mac_state::macwd_r), FUNC(mac_state::macwd_w));
+	map(0xfc400000, 0xfcefffff).rw(FUNC(mac_state::macwd_r), FUNC(mac_state::macwd_w));
 // fc4003c8 = DAC control, fc4003c9 = DAC data
 // fc4003da bit 3 is VBL
 	map(0xfcff8000, 0xfcffffff).rom().region("vrom", 0x0000);
@@ -807,18 +807,18 @@ void mac_state::macpd210_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	map(0x50f00000, 0x50f01fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0x50f02000, 0x50f03fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
-	map(0x50f04000, 0x50f05fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0x50f06000, 0x50f07fff).rw(this, FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
-	map(0x50f10000, 0x50f11fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
-	map(0x50f12060, 0x50f12063).r(this, FUNC(mac_state::macii_scsi_drq_r));
+	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
+	map(0x50f04000, 0x50f05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0x50f06000, 0x50f07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0x50f10000, 0x50f11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0x50f12060, 0x50f12063).r(FUNC(mac_state::macii_scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0x50f20000, 0x50f21fff).rw(this, FUNC(mac_state::mac_gsc_r), FUNC(mac_state::mac_gsc_w));
-	map(0x50f24000, 0x50f27fff).r(this, FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50f16000, 0x50f17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0x50f20000, 0x50f21fff).rw(FUNC(mac_state::mac_gsc_r), FUNC(mac_state::mac_gsc_w));
+	map(0x50f24000, 0x50f27fff).r(FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
 
-	map(0x5ffffffc, 0x5fffffff).r(this, FUNC(mac_state::mac_read_id));
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
 	map(0x60000000, 0x6001ffff).ram().share("vram").mirror(0x0ffe0000);
 }
@@ -827,20 +827,20 @@ void mac_state::quadra700_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00fc0000);
-	map(0x50002000, 0x50003fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00fc0000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00fc0000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00fc0000);
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-	map(0x5000f000, 0x5000f3ff).rw(this, FUNC(mac_state::mac_5396_r), FUNC(mac_state::mac_5396_w)).mirror(0x00fc0000);
-	map(0x5000c000, 0x5000dfff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00fc0000);
+	map(0x5000f000, 0x5000f3ff).rw(FUNC(mac_state::mac_5396_r), FUNC(mac_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000c000, 0x5000dfff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
-	map(0x5001e000, 0x5001ffff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00fc0000);
+	map(0x5001e000, 0x5001ffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00fc0000);
 
 	// f9800000 = VDAC / DAFB
 	map(0xf9000000, 0xf91fffff).ram().share("vram");
-	map(0xf9800000, 0xf98001ff).rw(this, FUNC(mac_state::dafb_r), FUNC(mac_state::dafb_w));
-	map(0xf9800200, 0xf980023f).rw(this, FUNC(mac_state::dafb_dac_r), FUNC(mac_state::dafb_dac_w));
+	map(0xf9800000, 0xf98001ff).rw(FUNC(mac_state::dafb_r), FUNC(mac_state::dafb_w));
+	map(0xf9800200, 0xf980023f).rw(FUNC(mac_state::dafb_dac_r), FUNC(mac_state::dafb_dac_w));
 }
 
 void mac_state::pwrmac_map(address_map &map)
@@ -849,23 +849,23 @@ void mac_state::pwrmac_map(address_map &map)
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);
 
-	map(0x50000000, 0x50001fff).rw(this, FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(this, FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
 	// 50008000 = ethernet ID PROM
 	// 5000a000 = MACE ethernet controller
-	map(0x50010000, 0x50011fff).rw(this, FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
 	// 50014000 = sound registers (AWACS)
 	map(0x50014000, 0x50015fff).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write)).mirror(0x01f00000);
-	map(0x50016000, 0x50017fff).rw(this, FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50025fff).w(this, FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(this, FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
-	map(0x50028000, 0x50028007).rw(this, FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
+	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
+	map(0x50028000, 0x50028007).rw(FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
 	// 5002a000 = interrupt controller
 	// 5002c000 = diagnostic registers
-	map(0x5002c000, 0x5002dfff).r(this, FUNC(mac_state::pmac_diag_r)).mirror(0x00f00000);
-	map(0x50031000, 0x50032fff).rw(this, FUNC(mac_state::amic_dma_r), FUNC(mac_state::amic_dma_w)).mirror(0x00f00000);
-	map(0x50040000, 0x5004000f).rw(this, FUNC(mac_state::hmc_r), FUNC(mac_state::hmc_w)).mirror(0x00f00000);
-	map(0x5ffffff8, 0x5fffffff).r(this, FUNC(mac_state::mac_read_id));
+	map(0x5002c000, 0x5002dfff).r(FUNC(mac_state::pmac_diag_r)).mirror(0x00f00000);
+	map(0x50031000, 0x50032fff).rw(FUNC(mac_state::amic_dma_r), FUNC(mac_state::amic_dma_w)).mirror(0x00f00000);
+	map(0x50040000, 0x5004000f).rw(FUNC(mac_state::hmc_r), FUNC(mac_state::hmc_w)).mirror(0x00f00000);
+	map(0x5ffffff8, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
@@ -2174,17 +2174,17 @@ ROM_END
 ROM_START( macii )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "default", "rev. B")
-	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
+	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
-	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
+	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( maciihmu )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "default", "rev. B")
-	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
+	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
-	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
+	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( mac2fdhd )   // same ROM for II FDHD, IIx, IIcx, and SE/30

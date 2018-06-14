@@ -76,8 +76,8 @@ WRITE8_MEMBER(atarifb_state::soccer_out1_w)
 	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
 	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
-//  output().set_led_value(0, data & 0x10);  // !!!!!!!!!! Is this correct????
-	output().set_led_value(1, data & 0x80);
+//  m_leds[0] = BIT(data, 4);  // !!!!!!!!!! Is this correct????
+	m_leds[1] = BIT(data, 7);
 }
 
 

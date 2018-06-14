@@ -102,6 +102,7 @@ Lower PCB is plugged in with components facing up.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -442,24 +443,24 @@ void marinedt_state::marinedt_map(address_map &map)
 	map.global_mask(0x7fff); /* A15 is not decoded */
 	map(0x0000, 0x3fff).rom().region("ipl", 0);
 	map(0x4000, 0x43ff).mirror(0x0400).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(marinedt_state::vram_w)).share("vram");
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(marinedt_state::vram_w)).share("vram");
 }
 
 void marinedt_state::marinedt_io(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x00, 0x00).portr("DSW1");
-	map(0x01, 0x01).r(this, FUNC(marinedt_state::trackball_r));
-	map(0x02, 0x02).select(0xc).r(this, FUNC(marinedt_state::pc3259_r));
-	map(0x02, 0x04).w(this, FUNC(marinedt_state::obj_0_w));
+	map(0x01, 0x01).r(FUNC(marinedt_state::trackball_r));
+	map(0x02, 0x02).select(0xc).r(FUNC(marinedt_state::pc3259_r));
+	map(0x02, 0x04).w(FUNC(marinedt_state::obj_0_w));
 	map(0x03, 0x03).portr("SYSTEM");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x05, 0x05).w(this, FUNC(marinedt_state::bgm_w));
-	map(0x06, 0x06).w(this, FUNC(marinedt_state::sfx_w));
-	map(0x08, 0x0b).w(this, FUNC(marinedt_state::obj_1_w));
-	map(0x0d, 0x0d).w(this, FUNC(marinedt_state::layer_enable_w));
+	map(0x05, 0x05).w(FUNC(marinedt_state::bgm_w));
+	map(0x06, 0x06).w(FUNC(marinedt_state::sfx_w));
+	map(0x08, 0x0b).w(FUNC(marinedt_state::obj_1_w));
+	map(0x0d, 0x0d).w(FUNC(marinedt_state::layer_enable_w));
 	map(0x0e, 0x0e).nopw(); // watchdog
-	map(0x0f, 0x0f).w(this, FUNC(marinedt_state::output_w));
+	map(0x0f, 0x0f).w(FUNC(marinedt_state::output_w));
 }
 
 static INPUT_PORTS_START( marinedt )
@@ -568,7 +569,7 @@ static const gfx_layout objlayout =
 	32*32*2
 };
 
-static GFXDECODE_START( marinedt )
+static GFXDECODE_START( gfx_marinedt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, objlayout,     48, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, objlayout,     32, 4 )
@@ -640,7 +641,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marinedt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marinedt)
 
 	MCFG_PALETTE_ADD("palette", 64+64)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)

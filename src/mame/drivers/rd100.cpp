@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -116,7 +117,7 @@ MACHINE_CONFIG_START(rd100_state::rd100)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", rd100)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rd100)
 MACHINE_CONFIG_END
 
 ROM_START( rd100 )

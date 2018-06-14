@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -129,6 +130,6 @@ public:
 
 INPUT_PORTS_EXTERN( pgm );
 
-GFXDECODE_EXTERN( pgm );
+extern gfx_decode_entry const gfx_pgm[];
 
 #endif // MAME_INCLUDES_PGM_H

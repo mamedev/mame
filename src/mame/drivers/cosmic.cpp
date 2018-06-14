@@ -385,10 +385,10 @@ void cosmic_state::panic_map(address_map &map)
 	map(0x6801, 0x6801).portr("P2");
 	map(0x6802, 0x6802).portr("DSW");
 	map(0x6803, 0x6803).portr("SYSTEM");
-	map(0x7000, 0x700b).w(this, FUNC(cosmic_state::panic_sound_output_w));
-	map(0x700c, 0x700e).w(this, FUNC(cosmic_state::cosmic_color_register_w));
-	map(0x700f, 0x700f).w(this, FUNC(cosmic_state::flip_screen_w));
-	map(0x7800, 0x7801).w(this, FUNC(cosmic_state::panic_sound_output2_w));
+	map(0x7000, 0x700b).w(FUNC(cosmic_state::panic_sound_output_w));
+	map(0x700c, 0x700e).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x700f, 0x700f).w(FUNC(cosmic_state::flip_screen_w));
+	map(0x7800, 0x7801).w(FUNC(cosmic_state::panic_sound_output2_w));
 }
 
 
@@ -400,10 +400,10 @@ void cosmic_state::cosmica_map(address_map &map)
 	map(0x6800, 0x6800).portr("P1");
 	map(0x6801, 0x6801).portr("P2");
 	map(0x6802, 0x6802).portr("DSW");
-	map(0x6803, 0x6803).r(this, FUNC(cosmic_state::cosmica_pixel_clock_r));
-	map(0x7000, 0x700b).w(this, FUNC(cosmic_state::cosmica_sound_output_w));
-	map(0x700c, 0x700d).w(this, FUNC(cosmic_state::cosmic_color_register_w));
-	map(0x700f, 0x700f).w(this, FUNC(cosmic_state::flip_screen_w));
+	map(0x6803, 0x6803).r(FUNC(cosmic_state::cosmica_pixel_clock_r));
+	map(0x7000, 0x700b).w(FUNC(cosmic_state::cosmica_sound_output_w));
+	map(0x700c, 0x700d).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x700f, 0x700f).w(FUNC(cosmic_state::flip_screen_w));
 }
 
 
@@ -415,21 +415,21 @@ void cosmic_state::cosmicg_map(address_map &map)
 
 void cosmic_state::cosmicg_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(cosmic_state::cosmicg_port_0_r));
+	map(0x00, 0x00).r(FUNC(cosmic_state::cosmicg_port_0_r));
 	map(0x01, 0x01).portr("IN1");
-	map(0x00, 0x15).w(this, FUNC(cosmic_state::cosmicg_output_w));
-	map(0x16, 0x17).w(this, FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x00, 0x15).w(FUNC(cosmic_state::cosmicg_output_w));
+	map(0x16, 0x17).w(FUNC(cosmic_state::cosmic_color_register_w));
 }
 
 
 void cosmic_state::magspot_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x3800, 0x3807).r(this, FUNC(cosmic_state::magspot_coinage_dip_r));
+	map(0x3800, 0x3807).r(FUNC(cosmic_state::magspot_coinage_dip_r));
 	map(0x4000, 0x401f).writeonly().share("spriteram");
-	map(0x4800, 0x4800).w(this, FUNC(cosmic_state::dac_w));
-	map(0x480c, 0x480d).w(this, FUNC(cosmic_state::cosmic_color_register_w));
-	map(0x480f, 0x480f).w(this, FUNC(cosmic_state::flip_screen_w));
+	map(0x4800, 0x4800).w(FUNC(cosmic_state::dac_w));
+	map(0x480c, 0x480d).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x480f, 0x480f).w(FUNC(cosmic_state::flip_screen_w));
 	map(0x5000, 0x5000).portr("IN0");
 	map(0x5001, 0x5001).portr("IN1");
 	map(0x5002, 0x5002).portr("IN2");
@@ -902,12 +902,12 @@ static const gfx_layout cosmic_spritelayout32 =
 };
 
 
-static GFXDECODE_START( panic )
+static GFXDECODE_START( gfx_panic )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout16, 16, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout32, 16, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cosmica )
+static GFXDECODE_START( gfx_cosmica )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout16,  8, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout32,  8, 16 )
 GFXDECODE_END
@@ -1042,7 +1042,7 @@ MACHINE_CONFIG_START(cosmic_state::panic)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cosmic_state, panic_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(cosmic_state::cosmica)
 	MCFG_DEVICE_PROGRAM_MAP(cosmica_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cosmica)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cosmica)
 	MCFG_PALETTE_ADD("palette", 8+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
@@ -1135,7 +1135,7 @@ MACHINE_CONFIG_START(cosmic_state::magspot)
 	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
@@ -1171,7 +1171,7 @@ MACHINE_CONFIG_START(cosmic_state::nomnlnd)
 	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)

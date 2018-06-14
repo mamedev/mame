@@ -380,9 +380,9 @@ void sslam_state::sslam_program_map(address_map &map)
 	map(0x000000, 0xffffff).rom();   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 
 	map(0x000400, 0x07ffff).ram();
-	map(0x100000, 0x103fff).ram().w(this, FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
-	map(0x104000, 0x107fff).ram().w(this, FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
-	map(0x108000, 0x10ffff).ram().w(this, FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
+	map(0x100000, 0x103fff).ram().w(FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
+	map(0x104000, 0x107fff).ram().w(FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
+	map(0x108000, 0x10ffff).ram().w(FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
 	map(0x110000, 0x11000d).ram().share("regs");
 	map(0x200000, 0x200001).nopw();
 	map(0x280000, 0x280fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -395,14 +395,14 @@ void sslam_state::sslam_program_map(address_map &map)
 	map(0x300018, 0x300019).portr("IN4");
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-	map(0x30001f, 0x30001f).w(this, FUNC(sslam_state::sslam_snd_w));
+	map(0x30001f, 0x30001f).w(FUNC(sslam_state::sslam_snd_w));
 	map(0xf00000, 0xffffff).ram();   /* Main RAM */
 }
 
 void sslam_state::powerbls_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram().w(this, FUNC(sslam_state::powerbls_bg_tileram_w)).share("bg_tileram");
+	map(0x100000, 0x103fff).ram().w(FUNC(sslam_state::powerbls_bg_tileram_w)).share("bg_tileram");
 	map(0x104000, 0x107fff).ram(); // not used
 	map(0x110000, 0x11000d).ram().share("regs");
 	map(0x200000, 0x200001).nopw();
@@ -413,7 +413,7 @@ void sslam_state::powerbls_map(address_map &map)
 	map(0x300014, 0x300015).portr("IN2");
 	map(0x30001a, 0x30001b).portr("DSW1");
 	map(0x30001c, 0x30001d).portr("DSW2");
-	map(0x30001e, 0x30001f).w(this, FUNC(sslam_state::powerbls_sound_w));
+	map(0x30001e, 0x30001f).w(FUNC(sslam_state::powerbls_sound_w));
 	map(0x304000, 0x304001).nopw();
 	map(0xff0000, 0xffffff).ram();   /* Main RAM */
 }
@@ -676,14 +676,14 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( sslam )
+static GFXDECODE_START( gfx_sslam )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0x300, 16 ) /* spr */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout,     0, 16 ) /* bg */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0x100, 16 ) /* mid */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x200, 16 ) /* tx */
 GFXDECODE_END
 
-static GFXDECODE_START( powerbls )
+static GFXDECODE_START( gfx_powerbls )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0x100, 16 ) /* spr */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,       0, 16 ) /* bg */
 GFXDECODE_END
@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(sslam_state::sslam)
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_sslam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sslam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sslam)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_powerbls)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbls)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbls)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

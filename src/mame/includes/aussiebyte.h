@@ -14,7 +14,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "machine/clock.h"
 #include "machine/msm5832.h"
@@ -30,6 +30,9 @@
 #include "video/mc6845.h"
 
 #include "imagedev/snapquik.h"
+
+#include "emupal.h"
+
 
 
 /***********************************************************

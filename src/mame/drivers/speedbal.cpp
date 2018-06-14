@@ -59,8 +59,8 @@ void speedbal_state::main_cpu_map(address_map &map)
 {
 	map(0x0000, 0xdbff).rom();
 	map(0xdc00, 0xdfff).ram().share("share1"); // shared with SOUND
-	map(0xe000, 0xe1ff).ram().w(this, FUNC(speedbal_state::background_videoram_w)).share("bg_videoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(speedbal_state::foreground_videoram_w)).share("fg_videoram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(speedbal_state::background_videoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(speedbal_state::foreground_videoram_w)).share("fg_videoram");
 	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf600, 0xfeff).ram();
 	map(0xff00, 0xffff).ram().share("spriteram");
@@ -78,8 +78,8 @@ void speedbal_state::main_cpu_io_map(address_map &map)
 	map(0x10, 0x10).portr("DSW1");
 	map(0x20, 0x20).portr("P1");
 	map(0x30, 0x30).portr("P2");
-	map(0x40, 0x40).w(this, FUNC(speedbal_state::coincounter_w));
-	map(0x50, 0x50).w(this, FUNC(speedbal_state::maincpu_50_w));
+	map(0x40, 0x40).w(FUNC(speedbal_state::coincounter_w));
+	map(0x50, 0x50).w(FUNC(speedbal_state::maincpu_50_w));
 }
 
 void speedbal_state::sound_cpu_map(address_map &map)
@@ -125,10 +125,10 @@ void speedbal_state::sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
-	map(0x40, 0x40).w(this, FUNC(speedbal_state::leds_output_block));
-	map(0x80, 0x80).w(this, FUNC(speedbal_state::leds_start_block));
+	map(0x40, 0x40).w(FUNC(speedbal_state::leds_output_block));
+	map(0x80, 0x80).w(FUNC(speedbal_state::leds_start_block));
 	map(0x82, 0x82).nopw(); // ?
-	map(0xc1, 0xc1).w(this, FUNC(speedbal_state::leds_shift_bit));
+	map(0xc1, 0xc1).w(FUNC(speedbal_state::leds_shift_bit));
 }
 
 
@@ -255,7 +255,7 @@ static const gfx_layout spritelayout =
 	128*8  /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( speedbal )
+static GFXDECODE_START( gfx_speedbal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  512, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(speedbal_state::speedbal)
 	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedbal)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

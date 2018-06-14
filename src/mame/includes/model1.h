@@ -12,10 +12,12 @@
 #include "cpu/v60/v60.h"
 #include "machine/i8251.h"
 #include "machine/gen_fifo.h"
+#include "machine/mb8421.h"
 #include "machine/m1comm.h"
 #include "machine/timer.h"
 #include "video/segaic24.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #include <glm/vec3.hpp>
@@ -34,6 +36,7 @@ public:
 	model1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_dpram(*this, "dpram")
 		, m_m1audio(*this, M1AUDIO_TAG)
 		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
@@ -116,9 +119,8 @@ public:
 	u32 m_copro_ram_adr;
 
 	uint16_t m_r360_state;
-	void init_wingwar360();
-	DECLARE_READ16_MEMBER(r360_r);
-	DECLARE_WRITE16_MEMBER(r360_w);
+	DECLARE_READ8_MEMBER(r360_r);
+	DECLARE_WRITE8_MEMBER(r360_w);
 
 	// Rendering
 	DECLARE_VIDEO_START(model1);
@@ -235,6 +237,7 @@ private:
 
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
+	required_device<mb8421_device> m_dpram;
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	required_device<i8251_device> m_m1uart;
 	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
@@ -502,6 +505,7 @@ private:
 
 	// I/O related
 	output_finder<2> m_digits;
+	DECLARE_READ8_MEMBER(dpram_r);
 	DECLARE_WRITE8_MEMBER(vf_outputs_w);
 	DECLARE_WRITE8_MEMBER(vr_outputs_w);
 	DECLARE_WRITE8_MEMBER(swa_outputs_w);

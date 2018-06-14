@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define COSMICG_MASTER_CLOCK     XTAL(9'828'000)

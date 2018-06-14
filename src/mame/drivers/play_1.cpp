@@ -93,13 +93,13 @@ void play_1_state::chance_map(address_map &map)
 
 void play_1_state::play_1_io(address_map &map)
 {
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(play_1_state::port01_w)); //segments
-	map(0x02, 0x02).portr("IN2").w(this, FUNC(play_1_state::port02_w)); // N1-8
-	map(0x03, 0x03).portr("IN3").w(this, FUNC(play_1_state::port03_w)); // D1-4
-	map(0x04, 0x04).portr("IN4").w(this, FUNC(play_1_state::port04_w)); // U1-8
-	map(0x05, 0x05).portr("IN5").w(this, FUNC(play_1_state::port05_w)); // V1-8
-	map(0x06, 0x06).portr("IN6").w(this, FUNC(play_1_state::port06_w)); // W1-8
-	map(0x07, 0x07).r(this, FUNC(play_1_state::port07_r));
+	map(0x01, 0x01).portr("IN1").w(FUNC(play_1_state::port01_w)); //segments
+	map(0x02, 0x02).portr("IN2").w(FUNC(play_1_state::port02_w)); // N1-8
+	map(0x03, 0x03).portr("IN3").w(FUNC(play_1_state::port03_w)); // D1-4
+	map(0x04, 0x04).portr("IN4").w(FUNC(play_1_state::port04_w)); // U1-8
+	map(0x05, 0x05).portr("IN5").w(FUNC(play_1_state::port05_w)); // V1-8
+	map(0x06, 0x06).portr("IN6").w(FUNC(play_1_state::port06_w)); // W1-8
+	map(0x07, 0x07).r(FUNC(play_1_state::port07_r));
 }
 
 static INPUT_PORTS_START( chance )

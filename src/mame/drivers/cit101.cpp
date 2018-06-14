@@ -81,6 +81,7 @@ public:
 protected:
 	virtual void machine_start() override;
 private:
+	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(c000_ram_r);
@@ -103,6 +104,7 @@ private:
 	u8 m_e0_latch;
 
 	bool m_blink;
+	u8 m_brightness;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -118,67 +120,99 @@ void cit101_state::machine_start()
 	subdevice<i8251_device>("comuart")->write_cts(0);
 	subdevice<i8251_device>("kbduart")->write_cts(0);
 
+	m_brightness = 0xff;
+
 	save_item(NAME(m_e0_latch));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_brightness));
+}
+
+
+void cit101_state::draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr)
+{
+	// Character attribute bit 0: underline (also used to render cursor)
+	// Character attribute bit 1: reverse video (also used to render cursor)
+	// Character attribute bit 2: boldface
+	// Character attribute bit 3: blinking (half intensity)
+
+	const int char_width = BIT(scrattr, 1) ? 10 : 9;
+	int c = 0;
+	u8 attr = m_extraram[rowaddr];
+	u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+	if (last_line && BIT(attr, 0))
+		char_data ^= 0xff;
+	rgb_t on_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::black() : rgb_t(m_brightness, m_brightness, m_brightness);
+	rgb_t off_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t(m_brightness, m_brightness, m_brightness) : rgb_t::black();
+	if (BIT(attr, 3) && m_blink)
+		on_color = rgb_t(m_brightness * 0.75, m_brightness * 0.75, m_brightness * 0.75);
+	bool last_bit = false;
+	for (int x = 0; x <= maxx; x++)
+	{
+		const bool cur_bit = BIT(char_data, 7);
+		if (x >= minx)
+			pixptr[x] = (cur_bit || (BIT(attr, 2) && last_bit)) ? on_color : off_color;
+		last_bit = cur_bit;
+
+		c++;
+		if (!BIT(rowattr, 9) || !BIT(c, 0))
+		{
+			if (c < (BIT(rowattr, 9) ? char_width << 1 : char_width))
+				char_data = (char_data << 1) | (char_data & 1);
+			else
+			{
+				c = 0;
+				rowaddr = (rowaddr + 1) & 0x3fff;
+				attr = m_extraram[rowaddr];
+				char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+				if (last_line && BIT(attr, 0))
+					char_data ^= 0xff;
+				on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t(m_brightness, m_brightness, m_brightness);
+				off_color = BIT(attr, 1) ? rgb_t(m_brightness, m_brightness, m_brightness) : rgb_t::black();
+				if (BIT(attr, 3) && m_blink)
+					on_color = rgb_t(m_brightness * 0.75, m_brightness * 0.75, m_brightness * 0.75);
+				last_bit = false;
+			}
+		}
+	}
 }
 
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const int char_width = BIT(m_extraram[0], 1) ? 10 : 9;
-	const u16 ptrbase = m_mainram[0];
+	// While screen height is fixed at 240 pixels, the number of character rows and the height of each row are not.
+	// The "Set-Up" screens configure 3 ordinary 10-pixel rows on the top (using two for double-height characters)
+	// and 2 more on the bottom, separated by 11 blank rows of 16 pixels and 1 blank row of 14 pixels. This is
+	// also used to implement the "smooth scroll" option.
 
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	const u8 scrattr = m_extraram[0];
+
+	int y = 0;
+	for (u16 rowptr = m_mainram[0]; y <= cliprect.bottom(); rowptr += 2)
 	{
-		const int row = y / 10;
-		u16 rowaddr = m_mainram[row * 2 + ptrbase + 1] | (m_extraram[row * 2 + ptrbase + 1] & 0x3f) << 8;
-		const u16 rowattr = m_mainram[row * 2 + ptrbase] | m_extraram[row * 2 + ptrbase] << 8;
-		const int line = ((y % 10) / (BIT(rowattr, 8) ? 2 : 1) + (rowattr & 0x000f)) & 0xf;
+		const u16 rowattr = m_mainram[rowptr] | m_extraram[rowptr] << 8;
+		const int rowlines = 16 - ((rowattr & 0x0f0) >> 4);
 
-		// Character attribute bit 0: underline (also used to render cursor)
-		// Character attribute bit 1: reverse video (also used to render cursor)
-		// Character attribute bit 2: boldface
-		// Character attribute bit 3: blinking (half intensity)
-
-		int c = 0;
-		u8 attr = m_extraram[rowaddr];
-		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
-		if (line == 9 && BIT(attr, 0))
-			char_data ^= 0xff;
-		rgb_t on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t::white();
-		rgb_t off_color = BIT(attr, 1) ? rgb_t::white() : rgb_t::black();
-		if (BIT(attr, 3) && m_blink)
-			on_color = rgb_t(0xc0, 0xc0, 0xc0);
-		bool last_bit = false;
-		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+		int z = 0;
+		if (y < cliprect.top())
 		{
-			const bool cur_bit = BIT(char_data, 7);
-			if (x >= cliprect.left() && x <= cliprect.right())
-				bitmap.pix32(y, x) = (cur_bit || (BIT(attr, 2) && last_bit)) ? on_color : off_color;
-			last_bit = cur_bit;
-
-			c++;
-			if (!BIT(rowattr, 9) || !BIT(c, 0))
+			z = cliprect.top() - y;
+			if (z >= rowlines)
 			{
-				if (c < (BIT(rowattr, 9) ? char_width << 1 : char_width))
-					char_data = (char_data << 1) | (char_data & 1);
-				else
-				{
-					c = 0;
-					rowaddr++;
-					attr = m_extraram[rowaddr];
-					char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
-					if (line == 9 && BIT(attr, 0))
-						char_data ^= 0xff;
-					on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t::white();
-					off_color = BIT(attr, 1) ? rgb_t::white() : rgb_t::black();
-					if (BIT(attr, 3) && m_blink)
-						on_color = rgb_t(0xc0, 0xc0, 0xc0);
-					last_bit = false;
-				}
+				y += rowlines;
+				continue;
 			}
+			y = cliprect.top();
+		}
+
+		const u16 rowaddr = m_mainram[rowptr + 1] | (m_extraram[rowptr + 1] & 0x3f) << 8;
+		while (y <= cliprect.bottom())
+		{
+			const int line = ((z / (BIT(rowattr, 8) ? 2 : 1)) + (rowattr & 0x00f)) & 15;
+			const bool last_line = z++ == rowlines - 1;
+			draw_line(&bitmap.pix32(y++), cliprect.left(), cliprect.right(), line, last_line, rowaddr, rowattr, scrattr);
+			if (last_line)
+				break;
 		}
 	}
-
 	return 0;
 }
 
@@ -236,6 +270,8 @@ WRITE8_MEMBER(cit101_state::screen_control_w)
 
 WRITE8_MEMBER(cit101_state::brightness_w)
 {
+	// Function of upper 3 bits is unknown
+	m_brightness = pal5bit(~data & 0x1f);
 }
 
 WRITE8_MEMBER(cit101_state::nvr_address_w)
@@ -264,8 +300,8 @@ void cit101_state::mem_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x7fff).ram().share("mainram");
 	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
-	map(0x8000, 0x8000).w(this, FUNC(cit101_state::screen_control_w));
-	map(0xc000, 0xdfff).rw(this, FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
+	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_w));
+	map(0xc000, 0xdfff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
 	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -286,8 +322,8 @@ void cit101_state::io_map(address_map &map)
 	map(0x40, 0x40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa0, 0xa0).w(this, FUNC(cit101_state::brightness_w));
-	map(0xe0, 0xe0).rw(this, FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
+	map(0xa0, 0xa0).w(FUNC(cit101_state::brightness_w));
+	map(0xe0, 0xe0).rw(FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
 }
 
 
@@ -343,9 +379,11 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+	//MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("auxuart", i8251_device, write_txc))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("auxuart", i8251_device, write_rxc))
+	// OUT2 might be used for an internal expansion similar to the VT100 STP.
+	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
@@ -394,4 +432,4 @@ ROM_START( cit101 )
 	ROM_LOAD( "5g_=7f00=.bin", 0x160, 0x020, NO_DUMP ) // position labeled TBP18S030
 ROM_END
 
-COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101", MACHINE_NOT_WORKING )

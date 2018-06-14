@@ -4,11 +4,11 @@
 
     xavix.cpp
 
-	The dies for these are marked 
-	
-	SSD 97 PA7270-107 (only seen on Ping Pong)
-	SSD 98 PA7351-107
-	SSD 98 PL7351-181
+    The dies for these are marked
+
+    SSD 97 PA7270-107 (only seen on Ping Pong)
+    SSD 98 PA7351-107
+    SSD 98 PL7351-181
 
     6502 with custom opcodes
     integrated gfx / sound
@@ -21,7 +21,7 @@
                   0x00ff contains the DATA bank, set manually in code
                   0x00fe appears to be the current CODE bank, set with either the
                          custom opcodes, or manually (if running from lowbus only?)
-						
+
 ***************************************************************************/
 
 #include "emu.h"

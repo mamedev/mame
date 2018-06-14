@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 #define MCFG_BFM_DM01_BUSY_CB(_devcb) \

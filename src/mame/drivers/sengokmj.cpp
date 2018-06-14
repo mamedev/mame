@@ -61,6 +61,7 @@ RSSENGO2.72   chr.
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -394,10 +395,10 @@ void sengokmj_state::sengokmj_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
 	map(0x08000, 0x09fff).ram().share("nvram");
-	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc0vram_w)).share("sc0_vram");
-	map(0x0c800, 0x0cfff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc1vram_w)).share("sc1_vram");
-	map(0x0d000, 0x0d7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc2vram_w)).share("sc2_vram");
-	map(0x0d800, 0x0e7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc3vram_w)).share("sc3_vram");
+	map(0x0c000, 0x0c7ff).ram().w(FUNC(sengokmj_state::seibucrtc_sc0vram_w)).share("sc0_vram");
+	map(0x0c800, 0x0cfff).ram().w(FUNC(sengokmj_state::seibucrtc_sc1vram_w)).share("sc1_vram");
+	map(0x0d000, 0x0d7ff).ram().w(FUNC(sengokmj_state::seibucrtc_sc2vram_w)).share("sc2_vram");
+	map(0x0d800, 0x0e7ff).ram().w(FUNC(sengokmj_state::seibucrtc_sc3vram_w)).share("sc3_vram");
 	map(0x0e800, 0x0f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0f800, 0x0ffff).ram().share("sprite_ram");
 	map(0xc0000, 0xfffff).rom();
@@ -412,11 +413,11 @@ void sengokmj_state::sengokmj_io_map(address_map &map)
 //  AM_RANGE(0x8080, 0x8081) CRTC extra register?
 //  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
-	map(0x8180, 0x8181).w(this, FUNC(sengokmj_state::out_w));
-	map(0x8140, 0x8141).w(this, FUNC(sengokmj_state::mahjong_panel_w));
+	map(0x8180, 0x8181).w(FUNC(sengokmj_state::out_w));
+	map(0x8140, 0x8141).w(FUNC(sengokmj_state::mahjong_panel_w));
 	map(0xc000, 0xc001).portr("DSW");
-	map(0xc002, 0xc003).r(this, FUNC(sengokmj_state::mahjong_panel_r));
-	map(0xc004, 0xc005).r(this, FUNC(sengokmj_state::system_r)); //switches
+	map(0xc002, 0xc003).r(FUNC(sengokmj_state::mahjong_panel_r));
+	map(0xc004, 0xc005).r(FUNC(sengokmj_state::system_r)); //switches
 }
 
 
@@ -547,7 +548,7 @@ static const gfx_layout charlayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( sengokmj )
+static GFXDECODE_START( gfx_sengokmj )
 	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x400, 0x10 ) /* Tiles */
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x500, 0x10 ) /* Tiles */
@@ -598,7 +599,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, sengokmj_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, sengokmj_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sengokmj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sengokmj)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

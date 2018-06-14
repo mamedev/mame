@@ -132,16 +132,16 @@ void bagman_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(this, FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
-	map(0xa000, 0xa000).r(this, FUNC(bagman_state::pal16r6_r));
+	map(0xa000, 0xa000).r(FUNC(bagman_state::pal16r6_r));
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xc000, 0xffff).rom(); /* Super Bagman only */
 	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by colorram_w */
-	map(0xa800, 0xa807).w(this, FUNC(bagman_state::ls259_w)); /* TMS5110 driving state machine */
+	map(0xa800, 0xa807).w(FUNC(bagman_state::ls259_w)); /* TMS5110 driving state machine */
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb800, 0xb800).nopr();                             /* looks like watchdog from schematics */
 
@@ -157,8 +157,8 @@ void bagman_state::pickin_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x7000, 0x77ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(this, FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x8800, 0x8bff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
 	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by colorram_w */
@@ -385,13 +385,13 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( bagman )
+static GFXDECODE_START( gfx_bagman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 16 ) /* char set #2 */
 GFXDECODE_END
 
-static GFXDECODE_START( pickin )
+static GFXDECODE_START( gfx_pickin )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 ) /* sprites */
 	/* no gfx2 */
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pickin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pickin)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)

@@ -58,6 +58,7 @@ Notes added 2014-09-10:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -141,7 +142,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rcorsair )
+static GFXDECODE_START( gfx_rcorsair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -175,7 +176,7 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rcorsair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rcorsair)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 

@@ -309,12 +309,12 @@ WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 void m92_state::lethalth_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
-	map(0x80000, 0x8ffff).ram().w(this, FUNC(m92_state::m92_vram_w)).share("vram_data");
+	map(0x80000, 0x8ffff).ram().w(FUNC(m92_state::m92_vram_w)).share("vram_data");
 	map(0xe0000, 0xeffff).ram(); /* System ram */
 	map(0xf8000, 0xf87ff).ram().share("spriteram");
-	map(0xf8800, 0xf8fff).rw(this, FUNC(m92_state::m92_paletteram_r), FUNC(m92_state::m92_paletteram_w));
-	map(0xf9000, 0xf900f).w(this, FUNC(m92_state::m92_spritecontrol_w)).share("spritecontrol");
-	map(0xf9800, 0xf9801).w(this, FUNC(m92_state::m92_videocontrol_w));
+	map(0xf8800, 0xf8fff).rw(FUNC(m92_state::m92_paletteram_r), FUNC(m92_state::m92_paletteram_w));
+	map(0xf9000, 0xf900f).w(FUNC(m92_state::m92_spritecontrol_w)).share("spritecontrol");
+	map(0xf9800, 0xf9801).w(FUNC(m92_state::m92_videocontrol_w));
 	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
 }
 
@@ -323,12 +323,12 @@ void m92_state::m92_map(address_map &map)
 	map(0x00000, 0x9ffff).rom();
 	map(0xa0000, 0xbffff).bankr("bank1");
 	map(0xc0000, 0xcffff).rom().region("maincpu", 0x00000); /* Mirror used by In The Hunt as protection */
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m92_state::m92_vram_w)).share("vram_data");
+	map(0xd0000, 0xdffff).ram().w(FUNC(m92_state::m92_vram_w)).share("vram_data");
 	map(0xe0000, 0xeffff).ram(); /* System ram */
 	map(0xf8000, 0xf87ff).ram().share("spriteram");
-	map(0xf8800, 0xf8fff).rw(this, FUNC(m92_state::m92_paletteram_r), FUNC(m92_state::m92_paletteram_w));
-	map(0xf9000, 0xf900f).w(this, FUNC(m92_state::m92_spritecontrol_w)).share("spritecontrol");
-	map(0xf9800, 0xf9801).w(this, FUNC(m92_state::m92_videocontrol_w));
+	map(0xf8800, 0xf8fff).rw(FUNC(m92_state::m92_paletteram_r), FUNC(m92_state::m92_paletteram_w));
+	map(0xf9000, 0xf900f).w(FUNC(m92_state::m92_spritecontrol_w)).share("spritecontrol");
+	map(0xf9800, 0xf9801).w(FUNC(m92_state::m92_videocontrol_w));
 	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
 }
 
@@ -340,13 +340,13 @@ void m92_state::m92_portmap(address_map &map)
 	map(0x06, 0x07).portr("P3_P4");
 	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x02, 0x03).w(this, FUNC(m92_state::m92_coincounter_w));
+	map(0x02, 0x03).w(FUNC(m92_state::m92_coincounter_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x87).w(this, FUNC(m92_state::m92_pf1_control_w));
-	map(0x88, 0x8f).w(this, FUNC(m92_state::m92_pf2_control_w));
-	map(0x90, 0x97).w(this, FUNC(m92_state::m92_pf3_control_w));
-	map(0x98, 0x9f).w(this, FUNC(m92_state::m92_master_control_w));
-	map(0xc0, 0xc1).w(this, FUNC(m92_state::m92_sound_reset_w));
+	map(0x80, 0x87).w(FUNC(m92_state::m92_pf1_control_w));
+	map(0x88, 0x8f).w(FUNC(m92_state::m92_pf2_control_w));
+	map(0x90, 0x97).w(FUNC(m92_state::m92_pf3_control_w));
+	map(0x98, 0x9f).w(FUNC(m92_state::m92_master_control_w));
+	map(0xc0, 0xc1).w(FUNC(m92_state::m92_sound_reset_w));
 }
 
 WRITE16_MEMBER(m92_state::oki_bank_w)
@@ -360,14 +360,14 @@ void m92_state::ppan_portmap(address_map &map)
 	map(0x02, 0x03).portr("COINS_DSW3");
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x10, 0x11).w(this, FUNC(m92_state::oki_bank_w));
+	map(0x10, 0x11).w(FUNC(m92_state::oki_bank_w));
 	map(0x18, 0x18).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x02, 0x03).w(this, FUNC(m92_state::m92_coincounter_w));
+	map(0x02, 0x03).w(FUNC(m92_state::m92_coincounter_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x87).w(this, FUNC(m92_state::m92_pf1_control_w));
-	map(0x88, 0x8f).w(this, FUNC(m92_state::m92_pf2_control_w));
-	map(0x90, 0x97).w(this, FUNC(m92_state::m92_pf3_control_w));
-	map(0x98, 0x9f).w(this, FUNC(m92_state::m92_master_control_w));
+	map(0x80, 0x87).w(FUNC(m92_state::m92_pf1_control_w));
+	map(0x88, 0x8f).w(FUNC(m92_state::m92_pf2_control_w));
+	map(0x90, 0x97).w(FUNC(m92_state::m92_pf3_control_w));
+	map(0x98, 0x9f).w(FUNC(m92_state::m92_master_control_w));
 }
 
 
@@ -849,12 +849,12 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static GFXDECODE_START( m92 )
+static GFXDECODE_START( gfx_m92 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( psoldier )
+static GFXDECODE_START( gfx_psoldier )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 0, 128 )
 GFXDECODE_END
@@ -882,7 +882,7 @@ static const gfx_layout bootleg_spritelayout =
 };
 
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_charlayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bootleg_spritelayout, 0x400, 128 )
 GFXDECODE_END
@@ -920,7 +920,7 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_m92)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m92)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m92)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(m92_state::nbbatman2bl)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bootleg)
 
 	/* 8951 MCU as sound CPU */
 	/* OKI6295 (AD-65) as sound */
@@ -1050,7 +1050,7 @@ MACHINE_CONFIG_START(m92_state::psoldier)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_psoldier)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::dsoccr94j)
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(m92_state::dsoccr94j)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_psoldier)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::gunforc2)

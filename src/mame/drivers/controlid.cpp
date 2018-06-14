@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/nt7534.h"
+#include "emupal.h"
 #include "screen.h"
 
 class controlidx628_state : public driver_device

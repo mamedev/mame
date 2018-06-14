@@ -17,6 +17,7 @@ EC-65 (also known as Octopus)
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define PIA6821_TAG "pia6821"
@@ -166,7 +167,7 @@ static const gfx_layout ec65_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( ec65 )
+static GFXDECODE_START( gfx_ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -184,7 +185,7 @@ MACHINE_CONFIG_START(ec65_state::ec65)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
@@ -222,7 +223,7 @@ MACHINE_CONFIG_START(ec65k_state::ec65k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)

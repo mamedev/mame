@@ -250,10 +250,10 @@ void qix_state::main_map(address_map &map)
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram();
 	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
-	map(0x8c00, 0x8c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
 	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
 	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xa000, 0xffff).rom();
@@ -265,10 +265,10 @@ void qix_state::kram3_main_map(address_map &map)
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram();
 	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
-	map(0x8c00, 0x8c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
 	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
 	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xa000, 0xffff).bankr("bank0");
@@ -281,10 +281,10 @@ void qix_state::zoo_main_map(address_map &map)
 	map(0x0000, 0x03ff).ram().share("share1");
 	map(0x0400, 0x07ff).ram();
 	map(0x0800, 0x0bff).nopr();   /* ACIA */
-	map(0x0c00, 0x0c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x0c01, 0x0c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x0c00, 0x0c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x0c01, 0x0c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
 	map(0x1000, 0x13ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
 	map(0x1800, 0x1bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1c00, 0x1fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xffff).rom();

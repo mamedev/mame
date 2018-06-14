@@ -80,6 +80,7 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/ins8154.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -396,7 +397,7 @@ void vega_state::vega_map(address_map &map)
 
 void vega_state::vega_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+	map(0x00, 0xff).rw(FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
 }
 
 
@@ -696,7 +697,7 @@ static const gfx_layout tile_layout3 =
 };
 
 
-static GFXDECODE_START( test_decode )
+static GFXDECODE_START( gfx_test_decode )
 	GFXDECODE_ENTRY( "gfx1", 0,  text_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0,  tile_layout2, 16, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0,  tile_layout3, 16, 1 )
@@ -832,7 +833,7 @@ MACHINE_CONFIG_START(vega_state::vega)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", test_decode)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_test_decode)
 
 	/* sound hardware */
 

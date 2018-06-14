@@ -31,6 +31,7 @@ into the weeds (jumps to 00000).
 //#include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 #include "machine/z8536.h"
+#include "emupal.h"
 
 
 class c900_state : public driver_device
@@ -71,8 +72,8 @@ void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
-	map(0x0100, 0x0101).r(this, FUNC(c900_state::stat_r));
-	map(0x0110, 0x0111).r(this, FUNC(c900_state::key_r));
+	map(0x0100, 0x0101).r(FUNC(c900_state::stat_r));
+	map(0x0110, 0x0111).r(FUNC(c900_state::key_r));
 	map(0x0111, 0x0111).w(m_terminal, FUNC(generic_terminal_device::write));
 }
 
@@ -110,7 +111,7 @@ static const gfx_layout c900_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( c900 )
+static GFXDECODE_START( gfx_c900 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -123,12 +124,13 @@ MACHINE_CONFIG_START(c900_state::c900)
 
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(c900_state, kbd_put))
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c900)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("cio", Z8036, 6'000'000)
 
-	//MCFG_SCC8030_ADD("scc", 6'000'000, 326400, 0, 326400, 0)
+	//MCFG_DEVICE_ADD("scc", SCC8030, 6'000'000)
+	//MCFG_Z80SCC_OFFSETS(326400, 0, 326400, 0)
 	/* Port A */
 	//MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
 	//MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))

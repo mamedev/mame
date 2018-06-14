@@ -160,11 +160,11 @@ void realbrk_state::base_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();                                         // ROM
 	map(0x200000, 0x203fff).ram().share("spriteram"); // Sprites
 	map(0x400000, 0x40ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
-	map(0x600000, 0x601fff).ram().w(this, FUNC(realbrk_state::vram_0_w)).share("vram_0");  // Background   (0)
-	map(0x602000, 0x603fff).ram().w(this, FUNC(realbrk_state::vram_1_w)).share("vram_1");  // Background   (1)
-	map(0x604000, 0x604fff).ram().w(this, FUNC(realbrk_state::vram_2_w)).share("vram_2");  // Text         (2)
+	map(0x600000, 0x601fff).ram().w(FUNC(realbrk_state::vram_0_w)).share("vram_0");  // Background   (0)
+	map(0x602000, 0x603fff).ram().w(FUNC(realbrk_state::vram_1_w)).share("vram_1");  // Background   (1)
+	map(0x604000, 0x604fff).ram().w(FUNC(realbrk_state::vram_2_w)).share("vram_2");  // Text         (2)
 	map(0x605000, 0x61ffff).ram();                                         //
-	map(0x606000, 0x60600f).ram().w(this, FUNC(realbrk_state::vregs_w)).share("vregs");    // Scroll + Video Regs
+	map(0x606000, 0x60600f).ram().w(FUNC(realbrk_state::vregs_w)).share("vregs");    // Scroll + Video Regs
 	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);   // YMZ280
 	map(0xfe0000, 0xfeffff).ram();                                         // RAM
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
@@ -177,7 +177,7 @@ void realbrk_state::realbrk_mem(address_map &map)
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
 	map(0xc00000, 0xc00001).portr("IN0");                            // P1 & P2 (Inputs)
 	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
-	map(0xc00004, 0xc00005).ram().r(this, FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
+	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
 	map(0xff0000, 0xfffbff).ram();                                         // RAM
 }
 
@@ -186,8 +186,8 @@ void realbrk_state::pkgnsh_mem(address_map &map)
 {
 	base_mem(map);
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);   // YM2413
-	map(0xc00000, 0xc00013).r(this, FUNC(realbrk_state::pkgnsh_input_r));   // P1 & P2 (Inputs)
-	map(0xff0000, 0xfffbff).rw(this, FUNC(realbrk_state::backup_ram_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram"); // RAM
+	map(0xc00000, 0xc00013).r(FUNC(realbrk_state::pkgnsh_input_r));   // P1 & P2 (Inputs)
+	map(0xff0000, 0xfffbff).rw(FUNC(realbrk_state::backup_ram_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram"); // RAM
 }
 
 /*pkgnshdx specific memory map*/
@@ -195,9 +195,9 @@ void realbrk_state::pkgnshdx_mem(address_map &map)
 {
 	base_mem(map);
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
-	map(0xc00000, 0xc00013).r(this, FUNC(realbrk_state::pkgnshdx_input_r));   // P1 & P2 (Inputs)
+	map(0xc00000, 0xc00013).r(FUNC(realbrk_state::pkgnshdx_input_r));   // P1 & P2 (Inputs)
 	map(0xc00004, 0xc00005).writeonly().share("dsw_select"); // DSW select
-	map(0xff0000, 0xfffbff).rw(this, FUNC(realbrk_state::backup_ram_dx_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram");  // RAM
+	map(0xff0000, 0xfffbff).rw(FUNC(realbrk_state::backup_ram_dx_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram");  // RAM
 }
 
 /*dai2kaku specific memory map*/
@@ -209,9 +209,9 @@ void realbrk_state::dai2kaku_mem(address_map &map)
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
 	map(0xc00000, 0xc00001).portr("IN0");                            // P1 & P2 (Inputs)
 	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
-	map(0xc00004, 0xc00005).ram().r(this, FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
+	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
 	map(0xff0000, 0xfffbff).ram();                                         // RAM
-	map(0xfffd0a, 0xfffd0b).w(this, FUNC(realbrk_state::dai2kaku_flipscreen_w));   // Hack! Parallel port data register
+	map(0xfffd0a, 0xfffd0b).w(FUNC(realbrk_state::dai2kaku_flipscreen_w));   // Hack! Parallel port data register
 }
 
 /***************************************************************************
@@ -729,14 +729,14 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( realbrk )
+static GFXDECODE_START( gfx_realbrk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx4", 0, layout_16x16x4,     0, 0x800    )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
-static GFXDECODE_START( dai2kaku )
+static GFXDECODE_START( gfx_dai2kaku )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, realbrk_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", realbrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_realbrk)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(realbrk_state::dai2kaku)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dai2kaku_mem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dai2kaku)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dai2kaku)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_dai2kaku)
 MACHINE_CONFIG_END

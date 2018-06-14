@@ -830,12 +830,12 @@ void arkanoid_state::arkanoid_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().mirror(0x0800);
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w)).mirror(0x0fe6);
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r)).mirror(0x0fe6);
-	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::arkanoid_d008_w)).mirror(0x0fe7);  /* gfx bank, flip screen, 68705 reset, etc. */
+	map(0xd008, 0xd008).w(FUNC(arkanoid_state::arkanoid_d008_w)).mirror(0x0fe7);  /* gfx bank, flip screen, 68705 reset, etc. */
 	map(0xd008, 0xd008).portr("SYSTEM2").mirror(0x0fe3); /* unused p1 and p2 joysticks */
 	map(0xd00c, 0xd00c).portr("SYSTEM").mirror(0x0fe3); /* start, service, coins, and 2 bits from the 68705 */
 	map(0xd010, 0xd010).portr("BUTTONS").w("watchdog", FUNC(watchdog_timer_device::reset_w)).mirror(0x0fe7);
 	map(0xd018, 0xd018).rw(m_mcuintf, FUNC(arkanoid_mcu_device_base::data_r), FUNC(arkanoid_mcu_device_base::data_w)).mirror(0x0fe7); /* input from the 68705 */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
 	map(0xf000, 0xffff).nopr(); /* fixes instant death in final level */
@@ -847,11 +847,11 @@ void arkanoid_state::bootleg_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xd001, 0xd001).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::arkanoid_d008_w));  /* gfx bank, flip screen etc. */
+	map(0xd008, 0xd008).w(FUNC(arkanoid_state::arkanoid_d008_w));  /* gfx bank, flip screen etc. */
 	map(0xd00c, 0xd00c).portr("SYSTEM");
 	map(0xd010, 0xd010).portr("BUTTONS").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xd018, 0xd018).portr("MUX").nopw();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
 	map(0xf000, 0xffff).nopr(); /* fixes instant death in final level */
@@ -864,9 +864,9 @@ void arkanoid_state::hexa_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::hexa_d008_w));
+	map(0xd008, 0xd008).w(FUNC(arkanoid_state::hexa_d008_w));
 	map(0xd010, 0xd010).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* or IRQ acknowledge, or both */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 }
 
 READ8_MEMBER(arkanoid_state::hexaa_f000_r)
@@ -887,11 +887,11 @@ void arkanoid_state::hexaa_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::hexa_d008_w));
+	map(0xd008, 0xd008).w(FUNC(arkanoid_state::hexa_d008_w));
 	map(0xd010, 0xd010).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* or IRQ acknowledge, or both */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xefff).ram();
-	map(0xf000, 0xf000).rw(this, FUNC(arkanoid_state::hexaa_f000_r), FUNC(arkanoid_state::hexaa_f000_w));
+	map(0xf000, 0xf000).rw(FUNC(arkanoid_state::hexaa_f000_r), FUNC(arkanoid_state::hexaa_f000_w));
 }
 
 void arkanoid_state::hexaa_sub_map(address_map &map)
@@ -915,8 +915,8 @@ void arkanoid_state::hexaa_sub_iomap(address_map &map)
 {
 	map.global_mask(0x9f);
 	map(0x00, 0x0f).ram(); // ?? could be communication with the other chip (protection?)
-	map(0x80, 0x80).w(this, FUNC(arkanoid_state::hexaa_sub_80_w));
-	map(0x90, 0x90).r(this, FUNC(arkanoid_state::hexaa_sub_90_r));
+	map(0x80, 0x80).w(FUNC(arkanoid_state::hexaa_sub_80_w));
+	map(0x90, 0x90).r(FUNC(arkanoid_state::hexaa_sub_90_r));
 }
 
 
@@ -927,8 +927,8 @@ void arkanoid_state::brixian_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("protram");
 	map(0xd000, 0xd000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xd001, 0xd001).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::brixian_d008_w));  /* gfx bank, flip screen etc. */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xd008, 0xd008).w(FUNC(arkanoid_state::brixian_d008_w));  /* gfx bank, flip screen etc. */
+	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
 }
@@ -1297,12 +1297,12 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( arkanoid )
+static GFXDECODE_START( gfx_arkanoid )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
 	// sprites use the same characters above, but are 16x8
 GFXDECODE_END
 
-static GFXDECODE_START( hexa )
+static GFXDECODE_START( gfx_hexa )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,  0 , 32 )
 GFXDECODE_END
 
@@ -1365,7 +1365,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
@@ -1439,7 +1439,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
@@ -1482,7 +1482,7 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
@@ -2126,14 +2126,14 @@ void arkanoid_state::init_block2()
 	{
 		// combine these into a single swap..
 		int srctile = bitswap<16>(tile,15,14,13,12,
-						               11,10, 9, 8,
-						                7, 5, 6, 3,
-						                1, 2, 4, 0);
+									   11,10, 9, 8,
+										7, 5, 6, 3,
+										1, 2, 4, 0);
 
 		srctile = bitswap<16>(srctile,15,14,13,12,
-						              11, 9,10, 5,
-						               7, 6, 8, 4,
-						               3, 2, 1, 0);
+									  11, 9,10, 5,
+									   7, 6, 8, 4,
+									   3, 2, 1, 0);
 
 		srctile = srctile ^ 0xd4;
 

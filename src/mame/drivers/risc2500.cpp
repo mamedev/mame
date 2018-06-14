@@ -17,6 +17,7 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,7 +46,7 @@ public:
 protected:
 	DECLARE_READ32_MEMBER(p1000_r);
 	DECLARE_WRITE32_MEMBER(p1000_w);
-	DECLARE_READ32_MEMBER(disable_boot_rom);
+	DECLARE_READ32_MEMBER(disable_boot_rom_r);
 	TIMER_CALLBACK_MEMBER(disable_boot_rom);
 
 	virtual void machine_start() override;
@@ -268,7 +269,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	m_p1000 = data;
 }
 
-READ32_MEMBER(risc2500_state::disable_boot_rom)
+READ32_MEMBER(risc2500_state::disable_boot_rom_r)
 {
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(10), timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
 	return 0;
@@ -305,8 +306,8 @@ void risc2500_state::machine_reset()
 void risc2500_state::risc2500_mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram();
-	map(0x01800000, 0x01800003).r(this, FUNC(risc2500_state::disable_boot_rom));
-	map(0x01000000, 0x01000003).rw(this, FUNC(risc2500_state::p1000_r), FUNC(risc2500_state::p1000_w));
+	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_boot_rom_r));
+	map(0x01000000, 0x01000003).rw(FUNC(risc2500_state::p1000_r), FUNC(risc2500_state::p1000_w));
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
 }
 
@@ -348,15 +349,15 @@ MACHINE_CONFIG_END
 ROM_START( risc )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
 	ROM_SYSTEM_BIOS( 0, "v104", "v1.04" )
-	ROMX_LOAD("s2500_v104.bin", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c), ROM_BIOS(1))
+	ROMX_LOAD("s2500_v104.bin", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v103", "v1.03" )
-	ROMX_LOAD("s2500_v103.bin", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc), ROM_BIOS(2))
+	ROMX_LOAD("s2500_v103.bin", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc), ROM_BIOS(1))
 ROM_END
 
 ROM_START( montreux )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
 	ROM_SYSTEM_BIOS( 0, "v100", "v1.00" )
-	ROMX_LOAD("montreux.bin", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac), ROM_BIOS(1))
+	ROMX_LOAD("montreux.bin", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac), ROM_BIOS(0))
 ROM_END
 
 

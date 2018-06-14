@@ -3,6 +3,7 @@
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mappy_state : public driver_device
@@ -25,7 +26,9 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -39,6 +42,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
 
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_sprite_bitmap;

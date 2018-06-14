@@ -12,6 +12,7 @@
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
 #include "cpu/mcs51/mcs51.h"
+#include "emupal.h"
 
 class bionicc_state : public driver_device
 {

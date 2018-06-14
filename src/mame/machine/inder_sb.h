@@ -10,7 +10,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "sound/dac.h"
 
 

@@ -600,7 +600,7 @@ void ampoker2_state::ampoker2_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().share("nvram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(ampoker2_state::ampoker2_videoram_w)).share("videoram");
+	map(0xe000, 0xefff).ram().w(FUNC(ampoker2_state::ampoker2_videoram_w)).share("videoram");
 }
 
 void ampoker2_state::ampoker2_io_map(address_map &map)
@@ -616,14 +616,14 @@ void ampoker2_state::ampoker2_io_map(address_map &map)
 	map(0x16, 0x16).portr("IN6");
 	map(0x17, 0x17).portr("IN7");
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
-	map(0x30, 0x30).w(this, FUNC(ampoker2_state::ampoker2_port30_w));    /* see write handlers */
-	map(0x31, 0x31).w(this, FUNC(ampoker2_state::ampoker2_port31_w));    /* see write handlers */
-	map(0x32, 0x32).w(this, FUNC(ampoker2_state::ampoker2_port32_w));    /* see write handlers */
-	map(0x33, 0x33).w(this, FUNC(ampoker2_state::ampoker2_port33_w));    /* see write handlers */
-	map(0x34, 0x34).w(this, FUNC(ampoker2_state::ampoker2_port34_w));    /* see write handlers */
-	map(0x35, 0x35).w(this, FUNC(ampoker2_state::ampoker2_port35_w));    /* see write handlers */
-	map(0x36, 0x36).w(this, FUNC(ampoker2_state::ampoker2_port36_w));    /* see write handlers */
-	map(0x37, 0x37).w(this, FUNC(ampoker2_state::ampoker2_watchdog_reset_w));
+	map(0x30, 0x30).w(FUNC(ampoker2_state::ampoker2_port30_w));    /* see write handlers */
+	map(0x31, 0x31).w(FUNC(ampoker2_state::ampoker2_port31_w));    /* see write handlers */
+	map(0x32, 0x32).w(FUNC(ampoker2_state::ampoker2_port32_w));    /* see write handlers */
+	map(0x33, 0x33).w(FUNC(ampoker2_state::ampoker2_port33_w));    /* see write handlers */
+	map(0x34, 0x34).w(FUNC(ampoker2_state::ampoker2_port34_w));    /* see write handlers */
+	map(0x35, 0x35).w(FUNC(ampoker2_state::ampoker2_port35_w));    /* see write handlers */
+	map(0x36, 0x36).w(FUNC(ampoker2_state::ampoker2_port36_w));    /* see write handlers */
+	map(0x37, 0x37).w(FUNC(ampoker2_state::ampoker2_watchdog_reset_w));
 	map(0x38, 0x39).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x3A, 0x3A).r("aysnd", FUNC(ay8910_device::data_r));
 }
@@ -1134,11 +1134,11 @@ static const gfx_layout s2k_charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( ampoker2 )
+static GFXDECODE_START( gfx_ampoker2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( sigma2k )
+static GFXDECODE_START( gfx_sigma2k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, s2k_charlayout, 0, 128 )
 GFXDECODE_END
 
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update_ampoker2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ampoker2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ampoker2)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
 
@@ -1184,7 +1184,7 @@ MACHINE_CONFIG_START(ampoker2_state::sigma2k)
 	ampoker2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sigma2k)
 	MCFG_VIDEO_START_OVERRIDE(ampoker2_state, sigma2k)
 MACHINE_CONFIG_END
 

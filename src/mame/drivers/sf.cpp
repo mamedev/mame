@@ -135,7 +135,7 @@ WRITE8_MEMBER(sf_state::coin_w)
 WRITE8_MEMBER(sf_state::soundcmd_w)
 {
 	m_soundlatch->write(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
@@ -165,7 +165,7 @@ void sf_state::sfan_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x04ffff).rom();
-	map(0x800000, 0x800fff).ram().w(this, FUNC(sf_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(sf_state::videoram_w)).share("videoram");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00002, 0xc00003).portr("IN1");
@@ -175,11 +175,11 @@ void sf_state::sfan_map(address_map &map)
 	map(0xc0000a, 0xc0000b).portr("DSW2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
 	map(0xc0000e, 0xc0000f).nopr();
-	map(0xc00011, 0xc00011).w(this, FUNC(sf_state::coin_w));
-	map(0xc00014, 0xc00015).w(this, FUNC(sf_state::fg_scroll_w));
-	map(0xc00018, 0xc00019).w(this, FUNC(sf_state::bg_scroll_w));
-	map(0xc0001a, 0xc0001b).w(this, FUNC(sf_state::gfxctrl_w));
-	map(0xc0001d, 0xc0001d).w(this, FUNC(sf_state::soundcmd_w));
+	map(0xc00011, 0xc00011).w(FUNC(sf_state::coin_w));
+	map(0xc00014, 0xc00015).w(FUNC(sf_state::fg_scroll_w));
+	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
+	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
+	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
@@ -189,7 +189,7 @@ void sf_state::sfus_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x04ffff).rom();
-	map(0x800000, 0x800fff).ram().w(this, FUNC(sf_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(sf_state::videoram_w)).share("videoram");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00002, 0xc00003).portr("IN1");
@@ -199,11 +199,11 @@ void sf_state::sfus_map(address_map &map)
 	map(0xc0000a, 0xc0000b).portr("DSW2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
 	map(0xc0000e, 0xc0000f).nopr();
-	map(0xc00011, 0xc00011).w(this, FUNC(sf_state::coin_w));
-	map(0xc00014, 0xc00015).w(this, FUNC(sf_state::fg_scroll_w));
-	map(0xc00018, 0xc00019).w(this, FUNC(sf_state::bg_scroll_w));
-	map(0xc0001a, 0xc0001b).w(this, FUNC(sf_state::gfxctrl_w));
-	map(0xc0001d, 0xc0001d).w(this, FUNC(sf_state::soundcmd_w));
+	map(0xc00011, 0xc00011).w(FUNC(sf_state::coin_w));
+	map(0xc00014, 0xc00015).w(FUNC(sf_state::fg_scroll_w));
+	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
+	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
+	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
@@ -213,7 +213,7 @@ void sf_state::sfjp_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x04ffff).rom();
-	map(0x800000, 0x800fff).ram().w(this, FUNC(sf_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(sf_state::videoram_w)).share("videoram");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00002, 0xc00003).portr("IN1");
@@ -223,12 +223,12 @@ void sf_state::sfjp_map(address_map &map)
 	map(0xc0000a, 0xc0000b).portr("DSW2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
 	map(0xc0000e, 0xc0000f).nopr();
-	map(0xc00011, 0xc00011).w(this, FUNC(sf_state::coin_w));
-	map(0xc00014, 0xc00015).w(this, FUNC(sf_state::fg_scroll_w));
-	map(0xc00018, 0xc00019).w(this, FUNC(sf_state::bg_scroll_w));
-	map(0xc0001a, 0xc0001b).w(this, FUNC(sf_state::gfxctrl_w));
-	map(0xc0001d, 0xc0001d).w(this, FUNC(sf_state::soundcmd_w));
-	map(0xc0001e, 0xc0001f).w(this, FUNC(sf_state::protection_w));
+	map(0xc00011, 0xc00011).w(FUNC(sf_state::coin_w));
+	map(0xc00014, 0xc00015).w(FUNC(sf_state::fg_scroll_w));
+	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
+	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
+	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
+	map(0xc0001e, 0xc0001f).w(FUNC(sf_state::protection_w));
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
 }
@@ -252,10 +252,10 @@ void sf_state::sound2_map(address_map &map)
 void sf_state::sound2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sf_state::msm1_5205_w));
-	map(0x01, 0x01).w(this, FUNC(sf_state::msm2_5205_w));
+	map(0x00, 0x00).w(FUNC(sf_state::msm1_5205_w));
+	map(0x01, 0x01).w(FUNC(sf_state::msm2_5205_w));
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x02, 0x02).w(this, FUNC(sf_state::sound2_bank_w));
+	map(0x02, 0x02).w(FUNC(sf_state::sound2_bank_w));
 }
 
 
@@ -516,7 +516,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( sf )
+static GFXDECODE_START( gfx_sf )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 512, 16 )
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(sf_state::sfan)
 	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sf)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

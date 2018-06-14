@@ -21,6 +21,7 @@ QTY     Type    position
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -136,7 +137,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( subhuntr )
+static GFXDECODE_START( gfx_subhuntr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -166,7 +167,7 @@ MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 	MCFG_SCREEN_UPDATE_DRIVER(subhuntr_state, screen_update_subhuntr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subhuntr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subhuntr)
 
 	MCFG_PALETTE_ADD("palette", 26)
 	MCFG_PALETTE_INIT_OWNER(subhuntr_state, subhuntr)

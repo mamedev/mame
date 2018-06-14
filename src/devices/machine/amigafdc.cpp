@@ -24,6 +24,7 @@ amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *ta
 	m_write_dma(*this),
 	m_write_dskblk(*this),
 	m_write_dsksyn(*this),
+	m_leds(*this, "led%u", 1U),
 	floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
 }
@@ -35,6 +36,7 @@ void amiga_fdc_device::device_start()
 	m_write_dma.resolve_safe();
 	m_write_dskblk.resolve_safe();
 	m_write_dsksyn.resolve_safe();
+	m_leds.resolve();
 
 	static const char *names[] = { "0", "1", "2", "3" };
 	for(int i=0; i != 4; i++) {
@@ -440,8 +442,8 @@ void amiga_fdc_device::setup_leds()
 		machine().output().set_value("drive_2_led", drive == 2);
 		machine().output().set_value("drive_3_led", drive == 3);
 
-		machine().output().set_led_value(1, drive == 0); /* update internal drive led */
-		machine().output().set_led_value(2, drive == 1); /* update external drive led */
+		m_leds[0] = drive == 0 ? 1 : 0; // update internal drive led
+		m_leds[1] = drive == 1 ? 1 : 0;  // update external drive led
 	}
 }
 

@@ -147,13 +147,13 @@ void punchout_state::punchout_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc3ff).ram().share("nvram");
 	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfff).ram().w(this, FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
 	map(0xdff0, 0xdff7).share("spr1_ctrlram");
 	map(0xdff8, 0xdffc).share("spr2_ctrlram");
 	map(0xdffd, 0xdffd).share("palettebank");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
-	map(0xf000, 0xffff).ram().w(this, FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");   // also contains scroll RAM
+	map(0xe000, 0xe7ff).ram().w(FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
+	map(0xf000, 0xffff).ram().w(FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");   // also contains scroll RAM
 }
 
 
@@ -162,14 +162,14 @@ void punchout_state::armwrest_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc3ff).ram().share("nvram");
 	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfff).ram().w(this, FUNC(punchout_state::armwrest_fg_videoram_w)).share("armwrest_fgram");
+	map(0xd800, 0xdfff).ram().w(FUNC(punchout_state::armwrest_fg_videoram_w)).share("armwrest_fgram");
 	map(0xdff0, 0xdff7).share("spr1_ctrlram");
 	map(0xdff8, 0xdffc).share("spr2_ctrlram");
 	map(0xdffd, 0xdffd).share("palettebank");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
 }
 
 
@@ -244,9 +244,9 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
 void punchout_state::spnchout_io_map(address_map &map)
 {
 	punchout_io_map(map);
-	map(0x05, 0x05).mirror(0xf0).w(this, FUNC(punchout_state::spunchout_rp5h01_reset_w));
-	map(0x06, 0x06).mirror(0xf0).w(this, FUNC(punchout_state::spunchout_rp5h01_clock_w));
-	map(0x07, 0x07).select(0xf0).rw(this, FUNC(punchout_state::spunchout_exp_r), FUNC(punchout_state::spunchout_exp_w)); // protection ports
+	map(0x05, 0x05).mirror(0xf0).w(FUNC(punchout_state::spunchout_rp5h01_reset_w));
+	map(0x06, 0x06).mirror(0xf0).w(FUNC(punchout_state::spunchout_rp5h01_clock_w));
+	map(0x07, 0x07).select(0xf0).rw(FUNC(punchout_state::spunchout_exp_r), FUNC(punchout_state::spunchout_exp_w)); // protection ports
 }
 
 // 2A03 (sound)
@@ -594,14 +594,14 @@ static const gfx_layout charlayout_3bpp =
 	8*8
 };
 
-static GFXDECODE_START( punchout )
+static GFXDECODE_START( gfx_punchout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp, 0x000, 0x100/4 )   // bg chars (top monitor only)
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp, 0x100, 0x100/4 )   // bg chars (bottom monitor only)
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout_3bpp, 0x000, 0x200/8 )   // big sprite #1 (top and bottom monitor)
 	GFXDECODE_ENTRY( "gfx4", 0, charlayout_2bpp, 0x100, 0x100/4 )   // big sprite #2 (bottom monitor only)
 GFXDECODE_END
 
-static GFXDECODE_START( armwrest )
+static GFXDECODE_START( gfx_armwrest )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp, 0x000, 0x200/4 )   // bg chars (top and bottom monitor)
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp, 0x100, 0x100/8 )   // fg chars (bottom monitor only)
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout_3bpp, 0x000, 0x200/8 )   // big sprite #1 (top and bottom monitor)
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // enable NVRAM?
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", punchout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_punchout)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(punchout_state::armwrest)
 	MCFG_DEVICE_PROGRAM_MAP(armwrest_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", armwrest)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_armwrest)
 
 	MCFG_VIDEO_START_OVERRIDE(punchout_state, armwrest)
 	MCFG_SCREEN_MODIFY("top")

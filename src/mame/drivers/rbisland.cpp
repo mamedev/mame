@@ -353,7 +353,7 @@ void rbisland_state::rbisland_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x201000, 0x203fff).ram();             /* r/w in initial checks */
 	map(0x390000, 0x390003).portr("DSWA");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::rbisland_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(rbisland_state::rbisland_spritectrl_w));
 	map(0x3b0000, 0x3b0003).portr("DSWB");
 	map(0x3c0000, 0x3c0003).nopw();        /* written very often, watchdog? */
 	map(0x3e0000, 0x3e0001).nopr();
@@ -380,9 +380,9 @@ void rbisland_state::jumping_map(address_map &map)
 	map(0x400002, 0x400003).portr("DSWB");
 	map(0x401000, 0x401001).portr("401001");
 	map(0x401002, 0x401003).portr("401003");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::jumping_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(rbisland_state::jumping_spritectrl_w));
 	map(0x3c0000, 0x3c0001).nopw();        /* watchdog? */
-	map(0x400006, 0x400007).w(this, FUNC(rbisland_state::jumping_sound_w));
+	map(0x400006, 0x400007).w(FUNC(rbisland_state::jumping_sound_w));
 	map(0x420000, 0x420001).nopr();         /* read, but result not used */
 	map(0x430000, 0x430003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0x440000, 0x4407ff).ram().share("spriteram");
@@ -429,7 +429,7 @@ void rbisland_state::jumping_sound_map(address_map &map)
 	map(0x8000, 0x8fff).ram();
 	map(0xb000, 0xb001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb400, 0xb401).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xb800, 0xb800).r(this, FUNC(rbisland_state::jumping_latch_r));
+	map(0xb800, 0xb800).r(FUNC(rbisland_state::jumping_latch_r));
 	map(0xbc00, 0xbc00).nopw();    /* looks like a bankswitch, but sound works with or without it */
 	map(0xc000, 0xffff).rom();
 }
@@ -591,7 +591,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( rbisland )
+static GFXDECODE_START( gfx_rbisland )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0, 0x80 )  /* OBJ 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,   0, 0x80 )  /* SCR 8x8 */
 GFXDECODE_END
@@ -619,7 +619,7 @@ static const gfx_layout jumping_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( jumping )
+static GFXDECODE_START( gfx_jumping )
 	GFXDECODE_ENTRY( "gfx2", 0, jumping_spritelayout, 0, 0x80 ) /* OBJ 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, jumping_tilelayout,   0, 0x80 ) /* SCR 8x8 */
 GFXDECODE_END
@@ -683,7 +683,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbisland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbisland)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jumping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jumping)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

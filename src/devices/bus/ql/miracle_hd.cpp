@@ -26,7 +26,7 @@ ROM_START( miracle_hard_disk )
 	ROM_REGION( 0x2000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v202")
 	ROM_SYSTEM_BIOS( 0, "v202", "v2.02" )
-	ROMX_LOAD( "miraculous_winny_v2.02_1989_qjump.rom", 0x0000, 0x2000, CRC(10982b35) SHA1(1beb87a207ecd0f47a43ed4b1bcc81d89ac75ffc), ROM_BIOS(1) )
+	ROMX_LOAD( "miraculous_winny_v2.02_1989_qjump.rom", 0x0000, 0x2000, CRC(10982b35) SHA1(1beb87a207ecd0f47a43ed4b1bcc81d89ac75ffc), ROM_BIOS(0) )
 ROM_END
 
 

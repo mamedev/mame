@@ -2,6 +2,7 @@
 // copyright-holders:Mirko Buffoni
 
 #include "audio/timeplt.h"
+#include "emupal.h"
 
 class tutankhm_state : public driver_device
 {

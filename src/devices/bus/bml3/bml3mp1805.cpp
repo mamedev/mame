@@ -32,8 +32,10 @@ static const floppy_interface bml3_mp1805_floppy_interface =
 
 WRITE_LINE_MEMBER( bml3bus_mp1805_device::bml3_mc6843_intrq_w )
 {
-	if (state) {
-		m_bml3bus->set_nmi_line(PULSE_LINE);
+	if (state)
+	{
+		m_bml3bus->set_nmi_line(ASSERT_LINE);
+		m_bml3bus->set_nmi_line(CLEAR_LINE);
 	}
 }
 

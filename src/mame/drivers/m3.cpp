@@ -14,6 +14,7 @@ From disassembly: chips: Z80, 6845, 8251, 2x 8255, Z80CTC
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class m3_state : public driver_device
@@ -103,7 +104,7 @@ static const gfx_layout charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( f4disp )
+static GFXDECODE_START( gfx_f4disp )
 	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -124,7 +125,7 @@ MACHINE_CONFIG_START(m3_state::m3)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f4disp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f4disp)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */

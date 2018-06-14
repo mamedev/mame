@@ -33,6 +33,7 @@
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -107,8 +108,8 @@ void phunsy_state::phunsy_io(address_map &map)
 void phunsy_state::phunsy_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(phunsy_state::phunsy_ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(phunsy_state::phunsy_ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
 }
 
 
@@ -277,7 +278,7 @@ static const gfx_layout phunsy_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( phunsy )
+static GFXDECODE_START( gfx_phunsy )
 	GFXDECODE_ENTRY( "chargen", 0x0000, phunsy_charlayout, 1, 3 )
 GFXDECODE_END
 
@@ -358,7 +359,7 @@ MACHINE_CONFIG_START(phunsy_state::phunsy)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phunsy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phunsy)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
 

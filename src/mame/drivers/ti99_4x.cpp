@@ -86,7 +86,11 @@ public:
 		m_datamux(*this, TI99_DATAMUX_TAG),
 		m_video(*this, TI_VDP_TAG),
 		m_cassette1(*this, "cassette"),
-		m_cassette2(*this, "cassette2")
+		m_cassette2(*this, "cassette2"),
+		m_keyboard(*this, "COL%u", 0U),
+		m_alpha(*this, "ALPHA"),
+		m_alpha1(*this, "ALPHA1"),
+		m_alphabug(*this, "ALPHABUG")
 	{ }
 
 	// Machine management
@@ -184,6 +188,11 @@ private:
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 
+	optional_ioport_array<6> m_keyboard;
+	optional_ioport m_alpha;
+	optional_ioport m_alpha1;
+	optional_ioport m_alphabug;
+
 	// Timer for EVPC (provided by the TMS9929A, but EVPC replaces that VDP)
 	emu_timer   *m_gromclk_timer;
 
@@ -244,10 +253,10 @@ void ti99_4x_state::memmap(address_map &map)
 */
 void ti99_4x_state::cru_map(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(ti99_4x_state::cruread));
+	map(0x0000, 0x01ff).r(FUNC(ti99_4x_state::cruread));
 	map(0x0000, 0x0003).mirror(0x003c).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x0fff).w(this, FUNC(ti99_4x_state::cruwrite));
+	map(0x0000, 0x0fff).w(FUNC(ti99_4x_state::cruwrite));
 	map(0x0000, 0x001f).mirror(0x01e0).w(m_tms9901, FUNC(tms9901_device::write));
 }
 
@@ -458,8 +467,6 @@ WRITE8_MEMBER( ti99_4x_state::external_operation )
 ***************************************************************************/
 
 
-static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
-
 READ8_MEMBER( ti99_4x_state::read_by_9901 )
 {
 	int answer=0;
@@ -486,15 +493,15 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 			// the line enough to make the TMS9901 sense the low level.
 			// A reported, feasible fix was to cut the line and insert a diode
 			// below the Alphalock key.
-			if ((m_model!=MODEL_4) && (ioport("ALPHABUG")->read()!=0) ) answer |= (ioport("ALPHA")->read() | ioport("ALPHA1")->read());
+			if ((m_model!=MODEL_4) && (m_alphabug->read()!=0) ) answer |= (m_alpha->read() | m_alpha1->read());
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		if (m_check_alphalock)  // never true for TI-99/4
 		{
-			answer &= ~(ioport("ALPHA")->read() | ioport("ALPHA1")->read());
+			answer &= ~(m_alpha->read() | m_alpha1->read());
 		}
 		answer = (answer << 3);
 		if (m_int1 == CLEAR_LINE) answer |= 0x02;
@@ -505,7 +512,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 	case tms9901_device::INT8_INT15:
 		// |1|1|1|INT12|0|K|K|K|
 		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
-		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
+		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
 		answer |= 0xe0;
 		if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
 		break;

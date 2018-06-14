@@ -300,7 +300,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // seen metro_rxd_r
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen metro_rxd_r
 		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
@@ -549,13 +549,13 @@ void metro_state::balcube_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                                             // ROM
 	map(0x300001, 0x300001).r("ymf", FUNC(ymf278b_device::read));   // Sound
 	map(0x300000, 0x30000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); // Sound
-	map(0x400000, 0x41ffff).r(this, FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
+	map(0x400000, 0x41ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
 	map(0x500000, 0x500001).portr("IN0");                                // Inputs
 	map(0x500002, 0x500003).portr("IN1");                                //
 	map(0x500006, 0x500007).nopr();                                         //
-	map(0x500002, 0x500009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x500002, 0x500009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 	map(0x600000, 0x67ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x6788a2, 0x6788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x6788a2, 0x6788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x6788a4, 0x6788a5).writeonly().share("irq_enable");                // IRQ Enable
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
@@ -570,13 +570,13 @@ void metro_state::daitoa_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                             // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x1788a2, 0x1788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x1788a2, 0x1788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x1788a4, 0x1788a5).writeonly().share("irq_enable");                // IRQ Enable
 	map(0x200000, 0x200001).portr("IN0");                                // Inputs
 	map(0x200002, 0x200003).portr("IN1");                                //
 	map(0x200006, 0x200007).nopr();                                         //
-	map(0x200002, 0x200009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(this, FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
+	map(0x200002, 0x200009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
 	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); // Sound
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
@@ -592,13 +592,13 @@ void metro_state::bangball_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                                             // ROM
 	map(0xb00001, 0xb00001).r("ymf", FUNC(ymf278b_device::read));   // Sound
 	map(0xb00000, 0xb0000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); // Sound
-	map(0xc00000, 0xc1ffff).r(this, FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
+	map(0xc00000, 0xc1ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
 	map(0xd00000, 0xd00001).portr("IN0");                                // Inputs
 	map(0xd00002, 0xd00003).portr("IN1");                                //
 	map(0xd00006, 0xd00007).nopr();                                         //
-	map(0xd00002, 0xd00009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0xd00002, 0xd00009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 	map(0xe00000, 0xe7ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0xe788a2, 0xe788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0xe788a2, 0xe788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0xe788a4, 0xe788a5).writeonly().share("irq_enable");                // IRQ Enable
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
@@ -612,14 +612,14 @@ void metro_state::batlbubl_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                             // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x1788a2, 0x1788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x1788a2, 0x1788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x1788a4, 0x1788a5).writeonly().share("irq_enable");                // IRQ Enable
 	map(0x200000, 0x200001).portr("IN1");                                // Inputs
 	map(0x200002, 0x200003).portr("DSW0");                               //
 	map(0x200004, 0x200005).portr("IN0");                                //
 	map(0x200006, 0x200007).portr("IN2");                                //
-	map(0x200002, 0x200009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(this, FUNC(metro_state::balcube_dsw_r));                             // read but ignored?
+	map(0x200002, 0x200009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // read but ignored?
 	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); //
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
@@ -634,13 +634,13 @@ void metro_state::msgogo_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                             // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x1788a2, 0x1788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x1788a2, 0x1788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x1788a4, 0x1788a5).writeonly().share("irq_enable");                // IRQ Enable
 	map(0x200000, 0x200001).portr("COINS");                              // Inputs
 	map(0x200002, 0x200003).portr("JOYS");                               //
 	map(0x200006, 0x200007).nopr();                                         //
-	map(0x200002, 0x200009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(this, FUNC(metro_state::balcube_dsw_r));                             // 3 x DSW
+	map(0x200002, 0x200009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // 3 x DSW
 	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); //
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
@@ -654,15 +654,15 @@ void metro_state::daitorid_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                             // ROM
 	map(0x400000, 0x47ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a2, 0x4788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x4788a2, 0x4788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x4788a4, 0x4788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x4788a8, 0x4788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0x4788a8, 0x4788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
-	map(0xc00000, 0xc00001).portr("IN0").w(this, FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
+	map(0xc00000, 0xc00001).portr("IN0").w(FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
 	map(0xc00002, 0xc00003).portr("IN1");                                //
 	map(0xc00004, 0xc00005).portr("DSW0");                               //
 	map(0xc00006, 0xc00007).portr("IN2");                                //
-	map(0xc00002, 0xc00009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00002, 0xc00009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 }
 
 
@@ -675,14 +675,14 @@ void metro_state::dharma_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();                                             // ROM
 	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 	map(0x800000, 0x87ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x8788a2, 0x8788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a8, 0x8788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
-	map(0xc00000, 0xc00001).portr("IN0").w(this, FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
+	map(0x8788a8, 0x8788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0xc00000, 0xc00001).portr("IN0").w(FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
 	map(0xc00002, 0xc00003).portr("IN1");                                //
 	map(0xc00004, 0xc00005).portr("DSW0");                               //
 	map(0xc00006, 0xc00007).portr("IN2");                                //
-	map(0xc00002, 0xc00009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00002, 0xc00009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 }
 
 
@@ -693,17 +693,17 @@ void metro_state::dharma_map(address_map &map)
 void metro_state::karatour_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                             // ROM
-	map(0x400000, 0x400001).rw(this, FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w)); // From Sound CPU
+	map(0x400000, 0x400001).rw(FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w)); // From Sound CPU
 	map(0x400002, 0x400003).portr("IN0");                                // Inputs
-	map(0x400002, 0x400003).w(this, FUNC(metro_state::metro_coin_lockout_1word_w));               // Coin Lockout
+	map(0x400002, 0x400003).w(FUNC(metro_state::metro_coin_lockout_1word_w));               // Coin Lockout
 	map(0x400004, 0x400005).portr("IN1");                                //
 	map(0x400006, 0x400007).portr("DSW0");                               //
 	map(0x40000a, 0x40000b).portr("DSW1");                               //
 	map(0x40000c, 0x40000d).portr("IN2");                                //
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x8788a2, 0x8788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a8, 0x8788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0x8788a8, 0x8788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -719,13 +719,13 @@ void metro_state::kokushi_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                                             // ROM
 	map(0x700000, 0x70ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 	map(0x800000, 0x87ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause /  IRQ Acknowledge
+	map(0x8788a2, 0x8788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause /  IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a8, 0x8788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
-	map(0xc00000, 0xc00001).portr("IN0").w(this, FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
+	map(0x8788a8, 0x8788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0xc00000, 0xc00001).portr("IN0").w(FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
 	map(0xc00002, 0xc00003).portr("IN1");                                // Inputs
 	map(0xc00004, 0xc00005).portr("DSW0");                               //
-	map(0xc00002, 0xc00009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00002, 0xc00009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 }
 
 
@@ -738,11 +738,11 @@ void metro_state::lastfort_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();                                             // ROM
 	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x8788a2, 0x8788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a8, 0x8788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
-	map(0xc00000, 0xc00001).rw(this, FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w)); // From / To Sound CPU
-	map(0xc00002, 0xc00003).w(this, FUNC(metro_state::metro_coin_lockout_1word_w));               // Coin Lockout
+	map(0x8788a8, 0x8788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0xc00000, 0xc00001).rw(FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w)); // From / To Sound CPU
+	map(0xc00002, 0xc00003).w(FUNC(metro_state::metro_coin_lockout_1word_w));               // Coin Lockout
 	map(0xc00004, 0xc00005).portr("IN0");                                // Inputs
 	map(0xc00006, 0xc00007).portr("IN1");                                //
 	map(0xc00008, 0xc00009).portr("IN2");                                //
@@ -757,17 +757,17 @@ void metro_state::lastfort_map(address_map &map)
 void metro_state::lastforg_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                             // ROM
-	map(0x400000, 0x400001).rw(this, FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w)); // From / To Sound CPU
+	map(0x400000, 0x400001).rw(FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w)); // From / To Sound CPU
 	map(0x400002, 0x400003).portr("IN0");                                // Inputs
-	map(0x400002, 0x400003).w(this, FUNC(metro_state::metro_coin_lockout_1word_w));               // Coin Lockout
+	map(0x400002, 0x400003).w(FUNC(metro_state::metro_coin_lockout_1word_w));               // Coin Lockout
 	map(0x400004, 0x400005).portr("IN1");                                //
 	map(0x400006, 0x400007).portr("DSW0");                               //
 	map(0x40000a, 0x40000b).portr("DSW1");                               //
 	map(0x40000c, 0x40000d).portr("IN2");                                //
 	map(0x880000, 0x8fffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
-	map(0x8f88a2, 0x8f88a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x8f88a2, 0x8f88a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8f88a4, 0x8f88a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8f88a8, 0x8f88a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0x8f88a8, 0x8f88a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 	map(0xc00000, 0xc0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -831,17 +831,17 @@ void metro_state::gakusai_map(address_map &map)
 	map(0x278810, 0x27881f).writeonly().share("irq_levels");                // IRQ Levels
 	map(0x278820, 0x27882f).writeonly().share("irq_vectors");               // IRQ Vectors
 	map(0x278830, 0x278831).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x278832, 0x278833).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x278832, 0x278833).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x278836, 0x278837).nopr().w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x278880, 0x278881).r(this, FUNC(metro_state::gakusai_input_r));                           // Inputs
+	map(0x278880, 0x278881).r(FUNC(metro_state::gakusai_input_r));                           // Inputs
 	map(0x278882, 0x278883).portr("IN0");                                //
 	map(0x278888, 0x278889).writeonly().share("input_sel");                 // Inputs
 	map(0x400000, 0x400001).nopw();                                        // ? 5
-	map(0x500001, 0x500001).w(this, FUNC(metro_state::gakusai_oki_bank_lo_w));           // Sound
+	map(0x500001, 0x500001).w(FUNC(metro_state::gakusai_oki_bank_lo_w));           // Sound
 	map(0x600000, 0x600003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x700001, 0x700001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
-	map(0xc00001, 0xc00001).rw(this, FUNC(metro_state::gakusai_eeprom_r), FUNC(metro_state::gakusai_eeprom_w));      // EEPROM
-	map(0xd00001, 0xd00001).w(this, FUNC(metro_state::gakusai_oki_bank_hi_w));
+	map(0xc00001, 0xc00001).rw(FUNC(metro_state::gakusai_eeprom_r), FUNC(metro_state::gakusai_eeprom_w));      // EEPROM
+	map(0xd00001, 0xd00001).w(FUNC(metro_state::gakusai_oki_bank_hi_w));
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -857,17 +857,17 @@ void metro_state::gakusai2_map(address_map &map)
 	map(0x678810, 0x67881f).writeonly().share("irq_levels");                // IRQ Levels
 	map(0x678820, 0x67882f).writeonly().share("irq_vectors");               // IRQ Vectors
 	map(0x678830, 0x678831).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x678832, 0x678833).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x678832, 0x678833).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x678836, 0x678837).nopr().w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x678880, 0x678881).r(this, FUNC(metro_state::gakusai_input_r));                           // Inputs
+	map(0x678880, 0x678881).r(FUNC(metro_state::gakusai_input_r));                           // Inputs
 	map(0x678882, 0x678883).portr("IN0");                                //
 	map(0x678888, 0x678889).writeonly().share("input_sel");                 // Inputs
 	map(0x800000, 0x800001).nopw();                                        // ? 5
-	map(0x900001, 0x900001).w(this, FUNC(metro_state::gakusai_oki_bank_lo_w));           // Sound bank
-	map(0xa00001, 0xa00001).w(this, FUNC(metro_state::gakusai_oki_bank_hi_w));           //
+	map(0x900001, 0x900001).w(FUNC(metro_state::gakusai_oki_bank_lo_w));           // Sound bank
+	map(0xa00001, 0xa00001).w(FUNC(metro_state::gakusai_oki_bank_hi_w));           //
 	map(0xb00001, 0xb00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xc00000, 0xc00003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00001, 0xe00001).rw(this, FUNC(metro_state::gakusai_eeprom_r), FUNC(metro_state::gakusai_eeprom_w));      // EEPROM
+	map(0xe00001, 0xe00001).rw(FUNC(metro_state::gakusai_eeprom_r), FUNC(metro_state::gakusai_eeprom_w));      // EEPROM
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -908,17 +908,17 @@ void metro_state::dokyusp_map(address_map &map)
 	map(0x278810, 0x27881f).writeonly().share("irq_levels");                // IRQ Levels
 	map(0x278820, 0x27882f).writeonly().share("irq_vectors");               // IRQ Vectors
 	map(0x278830, 0x278831).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x278832, 0x278833).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x278832, 0x278833).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x278836, 0x278837).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x278880, 0x278881).r(this, FUNC(metro_state::gakusai_input_r));                           // Inputs
+	map(0x278880, 0x278881).r(FUNC(metro_state::gakusai_input_r));                           // Inputs
 	map(0x278882, 0x278883).portr("IN0");                                //
 	map(0x278888, 0x278889).writeonly().share("input_sel");                 //
 	map(0x400000, 0x400001).nopw();                                        // ? 5
-	map(0x500001, 0x500001).w(this, FUNC(metro_state::gakusai_oki_bank_lo_w));           // Sound
+	map(0x500001, 0x500001).w(FUNC(metro_state::gakusai_oki_bank_lo_w));           // Sound
 	map(0x600000, 0x600003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x700001, 0x700001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
-	map(0xc00001, 0xc00001).w(this, FUNC(metro_state::dokyusp_eeprom_reset_w));                      // EEPROM
-	map(0xd00001, 0xd00001).rw(this, FUNC(metro_state::dokyusp_eeprom_r), FUNC(metro_state::dokyusp_eeprom_bit_w));  // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(metro_state::dokyusp_eeprom_reset_w));                      // EEPROM
+	map(0xd00001, 0xd00001).rw(FUNC(metro_state::dokyusp_eeprom_r), FUNC(metro_state::dokyusp_eeprom_bit_w));  // EEPROM
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -935,16 +935,16 @@ void metro_state::dokyusei_map(address_map &map)
 	map(0x478820, 0x47882f).writeonly().share("irq_vectors");               // IRQ Vectors
 	map(0x478830, 0x478831).writeonly().share("irq_enable");                // IRQ Enable
 //  AM_RANGE(0x478832, 0x478833) AM_READ(metro_irq_cause_r)                         // IRQ Cause
-	map(0x478832, 0x478833).w(this, FUNC(metro_state::metro_irq_cause_w));                        // IRQ Acknowledge
+	map(0x478832, 0x478833).w(FUNC(metro_state::metro_irq_cause_w));                        // IRQ Acknowledge
 	map(0x478836, 0x478837).nopw();                                        // ? watchdog ?
-	map(0x478880, 0x478881).r(this, FUNC(metro_state::gakusai_input_r));                           // Inputs
+	map(0x478880, 0x478881).r(FUNC(metro_state::gakusai_input_r));                           // Inputs
 	map(0x478882, 0x478883).portr("IN0");                                //
 	map(0x478884, 0x478885).portr("DSW0");                               // 2 x DSW
 	map(0x478886, 0x478887).portr("DSW1");                               //
 	map(0x478888, 0x478889).writeonly().share("input_sel");                 // Inputs
-	map(0x800001, 0x800001).w(this, FUNC(metro_state::gakusai_oki_bank_hi_w));           // Samples Bank?
+	map(0x800001, 0x800001).w(FUNC(metro_state::gakusai_oki_bank_hi_w));           // Samples Bank?
 	map(0x900000, 0x900001).nopw();                                        // ? 4
-	map(0xa00001, 0xa00001).w(this, FUNC(metro_state::gakusai_oki_bank_lo_w));           // Samples Bank
+	map(0xa00001, 0xa00001).w(FUNC(metro_state::gakusai_oki_bank_lo_w));           // Samples Bank
 	map(0xc00000, 0xc00003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);     //
 	map(0xd00001, 0xd00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
@@ -959,11 +959,11 @@ void metro_state::pangpoms_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                             // ROM
 	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
-	map(0x4788a2, 0x4788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x4788a2, 0x4788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x4788a4, 0x4788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x4788a8, 0x4788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
-	map(0x800000, 0x800001).rw(this, FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w));  // From / To Sound CPU
-	map(0x800002, 0x800003).nopr().w(this, FUNC(metro_state::metro_coin_lockout_1word_w));    // Coin Lockout
+	map(0x4788a8, 0x4788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0x800000, 0x800001).rw(FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w));  // From / To Sound CPU
+	map(0x800002, 0x800003).nopr().w(FUNC(metro_state::metro_coin_lockout_1word_w));    // Coin Lockout
 	map(0x800004, 0x800005).portr("IN0");                                // Inputs
 	map(0x800006, 0x800007).portr("IN1");                                //
 	map(0x800008, 0x800009).portr("IN2");                                //
@@ -982,15 +982,15 @@ void metro_state::poitto_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                             // ROM
 	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
-	map(0x800000, 0x800001).portr("IN0").w(this, FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
+	map(0x800000, 0x800001).portr("IN0").w(FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
 	map(0x800002, 0x800003).portr("IN1");                                //
 	map(0x800004, 0x800005).portr("DSW0");                               //
 	map(0x800006, 0x800007).portr("IN2");                                //
-	map(0x800002, 0x800009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x800002, 0x800009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 	map(0xc00000, 0xc7ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
-	map(0xc788a2, 0xc788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0xc788a2, 0xc788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0xc788a4, 0xc788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0xc788a8, 0xc788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0xc788a8, 0xc788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 }
 
 
@@ -1001,8 +1001,8 @@ void metro_state::poitto_map(address_map &map)
 void metro_state::skyalert_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                             // ROM
-	map(0x400000, 0x400001).rw(this, FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w));  // From / To Sound CPU
-	map(0x400002, 0x400003).nopr().w(this, FUNC(metro_state::metro_coin_lockout_1word_w));    // Coin Lockout
+	map(0x400000, 0x400001).rw(FUNC(metro_state::metro_soundstatus_r), FUNC(metro_state::metro_soundstatus_w));  // From / To Sound CPU
+	map(0x400002, 0x400003).nopr().w(FUNC(metro_state::metro_coin_lockout_1word_w));    // Coin Lockout
 	map(0x400004, 0x400005).portr("IN0");                                // Inputs
 	map(0x400006, 0x400007).portr("IN1");                                //
 	map(0x400008, 0x400009).portr("IN2");                                //
@@ -1010,9 +1010,9 @@ void metro_state::skyalert_map(address_map &map)
 	map(0x40000c, 0x40000d).portr("DSW1");                               //
 	map(0x40000e, 0x40000f).portr("IN3");                                //
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x8788a2, 0x8788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a8, 0x8788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0x8788a8, 0x8788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 	map(0xc00000, 0xc0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -1024,16 +1024,16 @@ void metro_state::skyalert_map(address_map &map)
 void metro_state::pururun_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                             // ROM
-	map(0x400000, 0x400001).portr("IN0").w(this, FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
+	map(0x400000, 0x400001).portr("IN0").w(FUNC(metro_state::metro_soundstatus_w));  // To Sound CPU
 	map(0x400002, 0x400003).portr("IN1");                                //
 	map(0x400004, 0x400005).portr("DSW0");                               //
 	map(0x400006, 0x400007).portr("IN2");                                //
-	map(0x400002, 0x400009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x400002, 0x400009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 	map(0xc00000, 0xc7ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0xc788a2, 0xc788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0xc788a2, 0xc788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0xc788a4, 0xc788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0xc788a8, 0xc788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0xc788a8, 0xc788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 }
 
 
@@ -1045,15 +1045,15 @@ void metro_state::toride2g_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                             // ROM
 	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
-	map(0x800000, 0x800001).portr("IN0").w(this, FUNC(metro_state::metro_soundstatus_w));  // Watchdog (R)? / To Sound CPU (W)
+	map(0x800000, 0x800001).portr("IN0").w(FUNC(metro_state::metro_soundstatus_w));  // Watchdog (R)? / To Sound CPU (W)
 	map(0x800002, 0x800003).portr("IN1");                                //
 	map(0x800004, 0x800005).portr("DSW0");                               //
 	map(0x800006, 0x800007).portr("IN2");                                //
-	map(0x800002, 0x800009).w(this, FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
+	map(0x800002, 0x800009).w(FUNC(metro_state::metro_coin_lockout_4words_w));              // Coin Lockout
 	map(0xc00000, 0xc7ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0xc788a2, 0xc788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0xc788a2, 0xc788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0xc788a4, 0xc788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0xc788a8, 0xc788a9).w(this, FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
+	map(0xc788a8, 0xc788a9).w(FUNC(metro_state::metro_soundlatch_w));                       // To Sound CPU
 }
 
 
@@ -1076,7 +1076,7 @@ void metro_state::blzntrnd_sound_map(address_map &map)
 void metro_state::blzntrnd_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(metro_state::blzntrnd_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(metro_state::blzntrnd_sh_bankswitch_w));
 	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw();
 	map(0x80, 0x83).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -1085,10 +1085,10 @@ void metro_state::blzntrnd_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                                             // ROM
 	map(0x200000, 0x27ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x2788a2, 0x2788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x2788a2, 0x2788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x2788a4, 0x2788a5).writeonly().share("irq_enable");                // IRQ Enable
 
-	map(0x400000, 0x43ffff).ram().w(this, FUNC(metro_state::metro_k053936_w)).share("k053936_ram");  // 053936
+	map(0x400000, 0x43ffff).ram().w(FUNC(metro_state::metro_k053936_w)).share("k053936_ram");  // 053936
 	map(0x500000, 0x500fff).w(m_k053936, FUNC(k053936_device::linectrl_w));      // 053936 line control
 	map(0x600000, 0x60001f).w(m_k053936, FUNC(k053936_device::ctrl_w));          // 053936 control
 
@@ -1118,14 +1118,14 @@ void metro_state::mouja_map(address_map &map)
 	map(0x478810, 0x47881f).writeonly().share("irq_levels");                // IRQ Levels
 	map(0x478820, 0x47882f).writeonly().share("irq_vectors");               // IRQ Vectors
 	map(0x478830, 0x478831).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x478832, 0x478833).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
-	map(0x478834, 0x478835).w(this, FUNC(metro_state::mouja_irq_timer_ctrl_w));                   // IRQ set timer count
+	map(0x478832, 0x478833).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w));  // IRQ Cause / IRQ Acknowledge
+	map(0x478834, 0x478835).w(FUNC(metro_state::mouja_irq_timer_ctrl_w));                   // IRQ set timer count
 	map(0x478836, 0x478837).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x478880, 0x478881).portr("IN0");                                // Inputs
 	map(0x478882, 0x478883).portr("IN1");                                //
 	map(0x478884, 0x478885).portr("DSW0");                               //
 	map(0x478886, 0x478887).portr("IN2");                                //
-	map(0x800001, 0x800001).w(this, FUNC(metro_state::mouja_sound_rombank_w));
+	map(0x800001, 0x800001).w(FUNC(metro_state::mouja_sound_rombank_w));
 	map(0xc00000, 0xc00003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
@@ -1240,8 +1240,8 @@ void metro_state::puzzlet_map(address_map &map)
 
 	// TODO: !!! i4300 !!!
 	map(0x700000, 0x77ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x7788a2, 0x7788a3).w(this, FUNC(metro_state::metro_irq_cause_w));                            // IRQ Cause
-	map(0x7788a4, 0x7788a5).w(this, FUNC(metro_state::puzzlet_irq_enable_w)).share("irq_enable");  // IRQ Enable
+	map(0x7788a2, 0x7788a3).w(FUNC(metro_state::metro_irq_cause_w));                            // IRQ Cause
+	map(0x7788a4, 0x7788a5).w(FUNC(metro_state::puzzlet_irq_enable_w)).share("irq_enable");  // IRQ Enable
 
 	map(0x7f2000, 0x7f3fff).ram();
 
@@ -1249,7 +1249,7 @@ void metro_state::puzzlet_map(address_map &map)
 	map(0x7f8884, 0x7f8885).portr("DSW0");
 	map(0x7f8886, 0x7f8887).portr("DSW0");
 
-	map(0x7f88a2, 0x7f88a3).r(this, FUNC(metro_state::metro_irq_cause_r));                         // IRQ Cause
+	map(0x7f88a2, 0x7f88a3).r(FUNC(metro_state::metro_irq_cause_r));                         // IRQ Cause
 }
 
 
@@ -1261,7 +1261,7 @@ WRITE16_MEMBER(metro_state::puzzlet_portb_w)
 void metro_state::puzzlet_io_map(address_map &map)
 {
 	map(h8_device::PORT_7, h8_device::PORT_7).portr("IN2");
-	map(h8_device::PORT_B, h8_device::PORT_B).portr("DSW0").w(this, FUNC(metro_state::puzzlet_portb_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).portr("DSW0").w(FUNC(metro_state::puzzlet_portb_w));
 }
 
 
@@ -1308,15 +1308,15 @@ void metro_state::vmetal_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                             // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x1788a2, 0x1788a3).rw(this, FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
+	map(0x1788a2, 0x1788a3).rw(FUNC(metro_state::metro_irq_cause_r), FUNC(metro_state::metro_irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x1788a4, 0x1788a5).writeonly().share("irq_enable");                // IRQ Enable
 	map(0x200000, 0x200001).portr("P1_P2");
-	map(0x200001, 0x200001).w(this, FUNC(metro_state::vmetal_control_w));
+	map(0x200001, 0x200001).w(FUNC(metro_state::vmetal_control_w));
 	map(0x200002, 0x200003).portr("SYSTEM");
-	map(0x300000, 0x31ffff).r(this, FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
 	map(0x400001, 0x400001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x400003, 0x400003).w(m_oki, FUNC(okim6295_device::write));
-	map(0x500000, 0x500000).w(this, FUNC(metro_state::es8712_reset_w));
+	map(0x500000, 0x500000).w(FUNC(metro_state::es8712_reset_w));
 	map(0x500000, 0x50000d).w(m_essnd, FUNC(es8712_device::write)).umask16(0x00ff);
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
@@ -2997,18 +2997,18 @@ static const gfx_layout layout_053936_16 =
 	8*8*8*4
 };
 
-static GFXDECODE_START( i4100 )
+static GFXDECODE_START( gfx_i4100 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( i4220 )
+static GFXDECODE_START( gfx_i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0,  0x10 ) // [3] 8 Bit Tiles 16x16
 GFXDECODE_END
 
-static GFXDECODE_START( blzntrnd )
+static GFXDECODE_START( gfx_blzntrnd )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3016,7 +3016,7 @@ static GFXDECODE_START( blzntrnd )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_053936,   0x0,  0x10 ) // [4] 053936 Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( gstrik2 )
+static GFXDECODE_START( gfx_gstrik2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3025,7 +3025,7 @@ static GFXDECODE_START( gstrik2 )
 GFXDECODE_END
 
 // same as i4220:
-static GFXDECODE_START( i4300 )
+static GFXDECODE_START( gfx_i4300 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3067,7 +3067,7 @@ MACHINE_CONFIG_START(metro_state::i4100_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp:palette", i4100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp:palette", gfx_i4100)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4220_config)
@@ -3083,7 +3083,7 @@ MACHINE_CONFIG_START(metro_state::i4220_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp2", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp2:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp2:palette", i4220)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4300_config)
@@ -3099,7 +3099,7 @@ MACHINE_CONFIG_START(metro_state::i4300_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp3", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp3:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp3:palette", i4300)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp3:palette", gfx_i4300)
 MACHINE_CONFIG_END
 
 // TODO: these comes from the CRTC inside the i4100
@@ -3444,7 +3444,7 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_DEVICE_PROGRAM_MAP(dokyusp_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3472,7 +3472,7 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_DEVICE_PROGRAM_MAP(gakusai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3501,7 +3501,7 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3750,7 +3750,7 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp2:palette", blzntrnd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_blzntrnd)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_OFFSETS(-77, -21)
@@ -3773,7 +3773,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::gstrik2)
 	blzntrnd(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_DEVICE_MODIFY("k053936")

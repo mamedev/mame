@@ -201,13 +201,13 @@ void macs_state::macs_io(address_map &map)
 {
 	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
-	map(0xc0, 0xc7).rw(this, FUNC(macs_state::macs_input_r), FUNC(macs_state::macs_output_w));
+	map(0xc0, 0xc7).rw(FUNC(macs_state::macs_input_r), FUNC(macs_state::macs_output_w));
 	map(0xe0, 0xe0).nopw(); /* renju = $40, neratte = 0 */
-	map(0xe1, 0xe1).w(this, FUNC(macs_state::macs_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(macs_state::macs_rom_bank_w));
 	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
-	map(0xe6, 0xe6).w(this, FUNC(macs_state::rambank_w)); /* banking ? ram bank ? shared rambank ? */
+	map(0xe6, 0xe6).w(FUNC(macs_state::rambank_w)); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 }

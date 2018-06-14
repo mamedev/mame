@@ -76,7 +76,7 @@ private:
 
 void wpc_an_state::wpc_an_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rw(this, FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
+	map(0x0000, 0x2fff).rw(FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
 	map(0x3000, 0x3faf).ram();
 	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
 	map(0x4000, 0x7fff).bankr("cpubank");

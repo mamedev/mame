@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
 void jrpacman_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram().w(this, FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
+	map(0x4000, 0x47ff).ram().w(FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
 	map(0x4800, 0x4fef).ram();
 	map(0x4ff0, 0x4fff).ram().share("spriteram");
 	map(0x5000, 0x503f).portr("P1");
@@ -155,7 +155,7 @@ void jrpacman_state::main_map(address_map &map)
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
 	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
 	map(0x5080, 0x50bf).portr("DSW");
-	map(0x5080, 0x5080).w(this, FUNC(jrpacman_state::jrpacman_scroll_w));
+	map(0x5080, 0x5080).w(FUNC(jrpacman_state::jrpacman_scroll_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xdfff).rom();
 }
@@ -164,7 +164,7 @@ void jrpacman_state::main_map(address_map &map)
 void jrpacman_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0, 0).w(this, FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
+	map(0, 0).w(FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
 }
 
 
@@ -256,7 +256,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( jrpacman )
+static GFXDECODE_START( gfx_jrpacman )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
 GFXDECODE_END
@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jrpacman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)

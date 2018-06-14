@@ -44,6 +44,7 @@
 #include "machine/vt100_kbd.h"
 #include "video/i8275.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define LOG_GENERAL (1U <<  0)
@@ -139,10 +140,10 @@ void ms6102_state::ms6102_io(address_map &map)
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
+	map(0x40, 0x41).rw(FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
 	map(0x50, 0x5f).noprw(); // video disable?
-	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
-	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_status_r));
+	map(0x60, 0x6f).w(FUNC(ms6102_state::pic_w));
+	map(0x70, 0x7f).r(FUNC(ms6102_state::misc_status_r));
 }
 
 static const gfx_layout ms6102_charlayout =
@@ -156,7 +157,7 @@ static const gfx_layout ms6102_charlayout =
 	16*8
 };
 
-static GFXDECODE_START(ms6102)
+static GFXDECODE_START(gfx_ms6102)
 	GFXDECODE_ENTRY("chargen", 0x0000, ms6102_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -185,7 +186,7 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
-	if (linecount < 12 && !vsp)
+	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
 	if (rvv)
@@ -284,23 +285,23 @@ void ms6102_state::machine_start()
 	// copy over the ascii chars into their new positions (lines 0-7)
 	for (i = 0x20; i < 0x80; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// copy the russian symbols to codes 0xc0-0xff for now
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// for punctuation, get the last 4 lines into place
 	for (i = 0x20; i < 0x40; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1700+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1700+i*8+j];
 	// for letters, get the last 4 lines into place
 	for (i = 0x40; i < 0x80; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1a00+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1a00+i*8+j];
 	// for russian, get the last 4 lines into place
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1604+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1604+i*8+j];
 }
 
 
@@ -320,7 +321,7 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275_1", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms6102)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)

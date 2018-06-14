@@ -49,7 +49,7 @@ void mustache_state::memmap(address_map &map)
 {
 	map(0x0000, 0x7fff).r("sei80bu", FUNC(sei80bu_device::data_r));
 	map(0x8000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(mustache_state::videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(mustache_state::videoram_w)).share("videoram");
 	map(0xd000, 0xd000).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd001, 0xd001).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	map(0xd002, 0xd002).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
@@ -60,8 +60,8 @@ void mustache_state::memmap(address_map &map)
 	map(0xd802, 0xd802).portr("START");
 	map(0xd803, 0xd803).portr("DSWA");
 	map(0xd804, 0xd804).portr("DSWB");
-	map(0xd806, 0xd806).w(this, FUNC(mustache_state::scroll_w));
-	map(0xd807, 0xd807).w(this, FUNC(mustache_state::video_control_w));
+	map(0xd806, 0xd806).w(FUNC(mustache_state::scroll_w));
+	map(0xd807, 0xd807).w(FUNC(mustache_state::video_control_w));
 	map(0xe800, 0xefff).writeonly().share("spriteram");
 	map(0xf000, 0xffff).ram();
 }
@@ -161,7 +161,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( mustache )
+static GFXDECODE_START( gfx_mustache )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
@@ -201,7 +201,7 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mustache)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */

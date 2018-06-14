@@ -49,9 +49,9 @@ void suprloco_state::main_map(address_map &map)
 	map(0xe000, 0xe000).portr("DSW1");
 	map(0xe001, 0xe001).portr("DSW2");
 	map(0xe800, 0xe803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf000, 0xf6ff).ram().w(this, FUNC(suprloco_state::videoram_w)).share("videoram");
+	map(0xf000, 0xf6ff).ram().w(FUNC(suprloco_state::videoram_w)).share("videoram");
 	map(0xf700, 0xf7df).ram(); /* unused */
-	map(0xf7e0, 0xf7ff).ram().w(this, FUNC(suprloco_state::scrollram_w)).share("scrollram");
+	map(0xf7e0, 0xf7ff).ram().w(FUNC(suprloco_state::scrollram_w)).share("scrollram");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -65,9 +65,9 @@ void suprloco_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::write));
-	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::write));
-	map(0xe000, 0xe000).r(this, FUNC(suprloco_state::soundport_r));
+	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::command_w));
+	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xe000, 0xe000).r(FUNC(suprloco_state::soundport_r));
 }
 
 
@@ -164,7 +164,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( suprloco )
+static GFXDECODE_START( gfx_suprloco )
 	/* sprites use colors 256-511 + 512-767 */
 	GFXDECODE_ENTRY( "gfx1", 0x6000, charlayout, 0, 16 )
 GFXDECODE_END
@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprloco)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprloco)
 	MCFG_PALETTE_ADD("palette", 512+256)
 	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
 

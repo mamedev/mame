@@ -788,33 +788,33 @@ WRITE8_MEMBER(calomega_state::pia1_bout_w)
 WRITE8_MEMBER(calomega_state::lamps_903a_w)
 {
 	/* First 5 bits of PIA0 port B */
-	output().set_lamp_value(1, 1-((data) & 1));       /* L1 (Hold 1) */
-	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* L2 (Hold 2) */
-	output().set_lamp_value(3, 1-((data >> 2) & 1));  /* L3 (Hold 3) */
-	output().set_lamp_value(4, 1-((data >> 3) & 1));  /* L4 (Hold 4) */
-	output().set_lamp_value(5, 1-((data >> 4) & 1));  /* L5 (Hold 5) */
+	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
+	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
+	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
+	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
+	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_903b_w)
 {
 	/* First 4 bits of PIA1 port A */
-	output().set_lamp_value(6, 1-((data) & 1));       /* L6 (Cancel) */
-	output().set_lamp_value(7, 1-((data >> 1) & 1));  /* L7 (Bet) */
-	output().set_lamp_value(8, 1-((data >> 2) & 1));  /* L8 (Take) */
-	output().set_lamp_value(9, 1-((data >> 3) & 1));  /* L9 (Door?) */
+	m_lamps[5] = BIT(~data, 0);  /* L6 (Cancel) */
+	m_lamps[6] = BIT(~data, 1);  /* L7 (Bet) */
+	m_lamps[7] = BIT(~data, 2);  /* L8 (Take) */
+	m_lamps[8] = BIT(~data, 3);  /* L9 (Door?) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_905_w)
 {
 	/* Whole 8 bits of PIA0 port B */
-	output().set_lamp_value(1, 1-((data) & 1));       /* L1 (Hold 1) */
-	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* L2 (Hold 2) */
-	output().set_lamp_value(3, 1-((data >> 2) & 1));  /* L3 (Hold 3) */
-	output().set_lamp_value(4, 1-((data >> 3) & 1));  /* L4 (Hold 4) */
-	output().set_lamp_value(5, 1-((data >> 4) & 1));  /* L5 (Hold 5) */
-	output().set_lamp_value(6, 1-((data >> 5) & 1));  /* L6 (unknown) */
-	output().set_lamp_value(7, 1-((data >> 6) & 1));  /* L7 (unknown) */
-	output().set_lamp_value(8, 1-((data >> 7) & 1));  /* L8 (unknown) */
+	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
+	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
+	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
+	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
+	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
+	m_lamps[5] = BIT(~data, 5);  /* L6 (unknown) */
+	m_lamps[6] = BIT(~data, 6);  /* L7 (unknown) */
+	m_lamps[7] = BIT(~data, 7);  /* L8 (unknown) */
 }
 
 
@@ -832,8 +832,8 @@ void calomega_state::sys903_map(address_map &map)
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08d0, 0x08d1).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
 }
 
@@ -846,8 +846,8 @@ void calomega_state::s903mod_map(address_map &map)
 	map(0x0881, 0x0881).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
 }
 
@@ -860,8 +860,8 @@ void calomega_state::sys905_map(address_map &map)
 	map(0x1081, 0x1081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x10c4, 0x10c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x10c8, 0x10cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x2800, 0x7fff).rom();
 }
 
@@ -873,8 +873,8 @@ void calomega_state::sys906_map(address_map &map)
 	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2c08, 0x2c09).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x6000, 0xffff).rom();
 }
 
@@ -2347,12 +2347,12 @@ static const gfx_layout tilelayout =
 *          Graphics Decode Information           *
 *************************************************/
 
-static GFXDECODE_START( calomega )
+static GFXDECODE_START( gfx_calomega )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( sys906 )
+static GFXDECODE_START( gfx_sys906 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 32 )
 GFXDECODE_END
@@ -2597,7 +2597,7 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calomega)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calomega)
 	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
 	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
 
@@ -2684,7 +2684,7 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia1_aout_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia1_bout_w))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sys906)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ay8912")

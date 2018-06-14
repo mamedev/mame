@@ -45,75 +45,6 @@
 
  */
 
-#define MCFG_FD1771_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1771, _clock)
-
-#define MCFG_FD1781_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1781, _clock)
-
-#define MCFG_FD1791_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1791, _clock)
-
-#define MCFG_FD1792_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1792, _clock)
-
-#define MCFG_FD1793_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1793, _clock)
-
-#define MCFG_KR1818VG93_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, KR1818VG93, _clock)
-
-#define MCFG_FD1794_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1794, _clock)
-
-#define MCFG_FD1795_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1795, _clock)
-
-#define MCFG_FD1797_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1797, _clock)
-
-#define MCFG_MB8866_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, MB8866, _clock)
-
-#define MCFG_MB8876_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, MB8876, _clock)
-
-#define MCFG_MB8877_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, MB8877, _clock)
-
-#define MCFG_FD1761_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1761, _clock)
-
-#define MCFG_FD1763_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1763, _clock)
-
-#define MCFG_FD1765_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1765, _clock)
-
-#define MCFG_FD1767_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1767, _clock)
-
-#define MCFG_WD2791_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2791, _clock)
-
-#define MCFG_WD2793_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2793, _clock)
-
-#define MCFG_WD2795_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2795, _clock)
-
-#define MCFG_WD2797_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2797, _clock)
-
-#define MCFG_WD1770_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD1770, _clock)
-
-#define MCFG_WD1772_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD1772, _clock)
-
-#define MCFG_WD1773_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD1773, _clock)
-
 #define MCFG_WD_FDC_FORCE_READY \
 	downcast<wd_fdc_device_base *>(device)->set_force_ready(true);
 
@@ -150,25 +81,25 @@ public:
 	void set_force_ready(bool force_ready);
 	void set_disable_motor_control(bool _disable_motor_control);
 
-	void cmd_w(uint8_t val);
-	uint8_t status_r();
-	DECLARE_READ8_MEMBER( status_r ) { return status_r(); }
-	DECLARE_WRITE8_MEMBER( cmd_w ) { cmd_w(data); }
+	void write_cmd(uint8_t val);
+	uint8_t read_status();
+	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
+	DECLARE_WRITE8_MEMBER( cmd_w ) { write_cmd(data); }
 
-	void track_w(uint8_t val);
-	uint8_t track_r();
-	DECLARE_READ8_MEMBER( track_r ) { return track_r(); }
-	DECLARE_WRITE8_MEMBER( track_w ) { track_w(data); }
+	void write_track(uint8_t val);
+	uint8_t read_track();
+	DECLARE_READ8_MEMBER( track_r ) { return read_track(); }
+	DECLARE_WRITE8_MEMBER( track_w ) { write_track(data); }
 
-	void sector_w(uint8_t val);
-	uint8_t sector_r();
-	DECLARE_READ8_MEMBER( sector_r ) { return sector_r(); }
-	DECLARE_WRITE8_MEMBER( sector_w ) { sector_w(data); }
+	void write_sector(uint8_t val);
+	uint8_t read_sector();
+	DECLARE_READ8_MEMBER( sector_r ) { return read_sector(); }
+	DECLARE_WRITE8_MEMBER( sector_w ) { write_sector(data); }
 
-	void data_w(uint8_t val);
-	uint8_t data_r();
-	DECLARE_READ8_MEMBER( data_r ) { return data_r(); }
-	DECLARE_WRITE8_MEMBER( data_w ) { data_w(data); }
+	void write_data(uint8_t val);
+	uint8_t read_data();
+	DECLARE_READ8_MEMBER( data_r ) { return read_data(); }
+	DECLARE_WRITE8_MEMBER( data_w ) { write_data(data); }
 
 	void gen_w(int reg, uint8_t val);
 	uint8_t gen_r(int reg);

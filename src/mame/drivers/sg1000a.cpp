@@ -321,18 +321,18 @@ void sg1000a_state::decrypted_opcodes_map(address_map &map)
 void sg1000a_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0xdc, 0xdf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void sg1000a_state::sderby2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	// AM_RANGE(0xc0, 0xc1) NEC D8251AC UART
 	map(0xc8, 0xcb).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // NEC D8255AC-2
 }

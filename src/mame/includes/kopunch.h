@@ -6,30 +6,19 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class kopunch_state : public driver_device
 {
 public:
 	kopunch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_vram_fg(*this, "vram_fg"),
-		m_vram_bg(*this, "vram_bg")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_vram_fg(*this, "vram_fg")
+		, m_vram_bg(*this, "vram_bg")
+		, m_lamp(*this, "lamp0")
 	{ }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_vram_fg;
-	required_shared_ptr<uint8_t> m_vram_bg;
-
-	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_gfxbank;
-	uint8_t m_scrollx;
 
 	DECLARE_READ8_MEMBER(sensors1_r);
 	DECLARE_READ8_MEMBER(sensors2_r);
@@ -50,9 +39,27 @@ public:
 	DECLARE_PALETTE_INIT(kopunch);
 	uint32_t screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	void kopunch(machine_config &config);
 	void kopunch_io_map(address_map &map);
 	void kopunch_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_vram_fg;
+	required_shared_ptr<uint8_t> m_vram_bg;
+
+	output_finder<> m_lamp;
+
+	/* video-related */
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	uint8_t m_gfxbank;
+	uint8_t m_scrollx;
 };

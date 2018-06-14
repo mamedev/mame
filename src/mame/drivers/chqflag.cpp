@@ -132,11 +132,11 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x1000, 0x1fff).m(m_bank1000, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x2007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));            /* Sprite control registers */
 	map(0x2400, 0x27ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));            /* Sprite RAM */
-	map(0x2800, 0x2fff).r(this, FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
+	map(0x2800, 0x2fff).r(FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
 	map(0x3000, 0x3000).w("soundlatch", FUNC(generic_latch_8_device::write));                    /* sound code # */
 	map(0x3001, 0x3001).w("soundlatch2", FUNC(generic_latch_8_device::write));                  /* cause interrupt on audio CPU */
-	map(0x3002, 0x3002).w(this, FUNC(chqflag_state::chqflag_bankswitch_w));                     /* bankswitch control */
-	map(0x3003, 0x3003).w(this, FUNC(chqflag_state::chqflag_vreg_w));                           /* enable K051316 ROM reading */
+	map(0x3002, 0x3002).w(FUNC(chqflag_state::chqflag_bankswitch_w));                     /* bankswitch control */
+	map(0x3003, 0x3003).w(FUNC(chqflag_state::chqflag_vreg_w));                           /* enable K051316 ROM reading */
 	map(0x3100, 0x3100).portr("DSW1");                               /* DIPSW #1  */
 	map(0x3200, 0x3200).portr("IN1");                                /* COINSW, STARTSW, test mode */
 	map(0x3201, 0x3201).portr("IN0");                                /* DIPSW #3, SW 4 */
@@ -145,9 +145,9 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x3400, 0x341f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));                    /* 051733 (protection) */
 	map(0x3500, 0x350f).w(m_k051316[0], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 1) */
 	map(0x3600, 0x360f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 2) */
-	map(0x3700, 0x3700).w(this, FUNC(chqflag_state::select_analog_ctrl_w));                     /* select accelerator/wheel */
+	map(0x3700, 0x3700).w(FUNC(chqflag_state::select_analog_ctrl_w));                     /* select accelerator/wheel */
 	map(0x3701, 0x3701).portr("IN2");                                /* Brake + Shift + ? */
-	map(0x3702, 0x3702).rw(this, FUNC(chqflag_state::analog_read_r), FUNC(chqflag_state::select_analog_ctrl_w));  /* accelerator/wheel */
+	map(0x3702, 0x3702).rw(FUNC(chqflag_state::analog_read_r), FUNC(chqflag_state::select_analog_ctrl_w));  /* accelerator/wheel */
 	map(0x4000, 0x7fff).bankr("rombank");                              /* banked ROM */
 	map(0x8000, 0xffff).rom().region("maincpu", 0x48000);               /* ROM */
 }
@@ -155,7 +155,7 @@ void chqflag_state::chqflag_map(address_map &map)
 void chqflag_state::bank1000_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).r(this, FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
+	map(0x1000, 0x17ff).r(FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -179,9 +179,9 @@ void chqflag_state::chqflag_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0x87ff).ram(); /* RAM */
-	map(0x9000, 0x9000).w(this, FUNC(chqflag_state::k007232_bankswitch_w)); /* 007232 bankswitch */
+	map(0x9000, 0x9000).w(FUNC(chqflag_state::k007232_bankswitch_w)); /* 007232 bankswitch */
 	map(0xa000, 0xa00d).rw(m_k007232[0], FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 1) */
-	map(0xa01c, 0xa01c).w(this, FUNC(chqflag_state::k007232_extvolume_w));  /* extra volume, goes to the 007232 w/ A4 */
+	map(0xa01c, 0xa01c).w(FUNC(chqflag_state::k007232_extvolume_w));  /* extra volume, goes to the 007232 w/ A4 */
 															/* selecting a different latch for the external port */
 	map(0xb000, 0xb00d).rw(m_k007232[1], FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 2) */
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   /* YM2151 */

@@ -20,6 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -153,7 +154,7 @@ static const gfx_layout sm1800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( sm1800 )
+static GFXDECODE_START( gfx_sm1800 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sm1800_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -176,7 +177,7 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8255", I8255, 0)

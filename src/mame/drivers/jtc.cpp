@@ -15,6 +15,7 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -278,8 +279,8 @@ void jtces40_state::jtc_es40_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0800, 0x1fff).rom();
-	map(0x4000, 0x5fff).rw(this, FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
-	map(0x6000, 0x63ff).w(this, FUNC(jtces40_state::banksel_w));
+	map(0x4000, 0x5fff).rw(FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
+	map(0x6000, 0x63ff).w(FUNC(jtces40_state::banksel_w));
 	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
 	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
 	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
@@ -717,11 +718,11 @@ static const gfx_layout jtces40_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( jtces23 )
+static GFXDECODE_START( gfx_jtces23 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces23_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jtces40 )
+static GFXDECODE_START( gfx_jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -792,7 +793,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
@@ -815,7 +816,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces40)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
 

@@ -79,6 +79,7 @@ Notes:
 #include "sound/ym2151.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -183,7 +184,7 @@ void dblewing_state::dblewing_map(address_map &map)
 	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
 
 //  AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
-	map(0x280000, 0x283fff).rw(this, FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 
 	map(0x284000, 0x284001).ram();
@@ -212,7 +213,7 @@ void dblewing_state::sound_map(address_map &map)
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
 	map(0xb000, 0xb000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc000, 0xc000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
-	map(0xd000, 0xd000).r(this, FUNC(dblewing_state::irq_latch_r)); //timing? sound latch?
+	map(0xd000, 0xd000).r(FUNC(dblewing_state::irq_latch_r)); //timing? sound latch?
 	map(0xf000, 0xf000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -258,7 +259,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( dblewing )
+static GFXDECODE_START( gfx_dblewing )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0x200, 32 )    /* Sprites (16x16) */
@@ -378,7 +379,7 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblewing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblewing)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)

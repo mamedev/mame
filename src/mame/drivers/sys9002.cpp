@@ -21,6 +21,7 @@ If write to the 6845 is enabled, MAME freezes after 1 or 2 seconds.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -133,7 +134,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", mx2178)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */

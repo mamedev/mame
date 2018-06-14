@@ -6,13 +6,14 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class kaypro_state : public driver_device

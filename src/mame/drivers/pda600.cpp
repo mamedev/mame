@@ -59,6 +59,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -192,7 +193,7 @@ static const gfx_layout pda600_charlayout_19a =
 	8*19
 };
 
-static GFXDECODE_START( pda600 )
+static GFXDECODE_START( gfx_pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x45cd, pda600_charlayout_19, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4892, pda600_charlayout_19a, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4d73, pda600_charlayout_8, 0, 1 )
@@ -216,7 +217,7 @@ MACHINE_CONFIG_START(pda600_state::pda600)
 	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

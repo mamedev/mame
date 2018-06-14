@@ -65,13 +65,13 @@ void commando_state::commando_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(this, FUNC(commando_state::commando_c804_w));
-	map(0xc808, 0xc809).w(this, FUNC(commando_state::commando_scrollx_w));
-	map(0xc80a, 0xc80b).w(this, FUNC(commando_state::commando_scrolly_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(commando_state::commando_videoram2_w)).share("videoram2");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(commando_state::commando_colorram2_w)).share("colorram2");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(commando_state::commando_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(commando_state::commando_colorram_w)).share("colorram");
+	map(0xc804, 0xc804).w(FUNC(commando_state::commando_c804_w));
+	map(0xc808, 0xc809).w(FUNC(commando_state::commando_scrollx_w));
+	map(0xc80a, 0xc80b).w(FUNC(commando_state::commando_scrolly_w));
+	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::commando_videoram2_w)).share("videoram2");
+	map(0xd400, 0xd7ff).ram().w(FUNC(commando_state::commando_colorram2_w)).share("colorram2");
+	map(0xd800, 0xdbff).ram().w(FUNC(commando_state::commando_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(commando_state::commando_colorram_w)).share("colorram");
 	map(0xe000, 0xfdff).ram();
 	map(0xfe00, 0xff7f).ram().share("spriteram");
 	map(0xff80, 0xffff).ram();
@@ -215,7 +215,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( commando )
+static GFXDECODE_START( gfx_commando )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   192, 16 ) // colors 192-255
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 16 ) // colors   0-127
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 128,  4 ) // colors 128-191
@@ -275,7 +275,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, commando_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_commando)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)

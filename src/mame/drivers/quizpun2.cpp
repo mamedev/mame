@@ -92,6 +92,7 @@ Notes:
 
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -320,7 +321,7 @@ WRITE8_MEMBER(quizpun2_state::irq_ack)
 WRITE8_MEMBER(quizpun2_state::soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data ^ 0x80);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void quizpun2_state::quizpun2_map(address_map &map)
@@ -328,8 +329,8 @@ void quizpun2_state::quizpun2_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 
-	map(0xa000, 0xbfff).ram().w(this, FUNC(quizpun2_state::fg_ram_w)).share("fg_ram");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(quizpun2_state::bg_ram_w)).share("bg_ram");
+	map(0xa000, 0xbfff).ram().w(FUNC(quizpun2_state::fg_ram_w)).share("fg_ram");
+	map(0xc000, 0xcfff).ram().w(FUNC(quizpun2_state::bg_ram_w)).share("bg_ram");
 
 	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe000, 0xffff).ram();
@@ -338,14 +339,14 @@ void quizpun2_state::quizpun2_map(address_map &map)
 void quizpun2_state::quizpun2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).w(this, FUNC(quizpun2_state::irq_ack));
-	map(0x50, 0x50).w(this, FUNC(quizpun2_state::soundlatch_w));
-	map(0x60, 0x60).w(this, FUNC(quizpun2_state::rombank_w));
-	map(0x70, 0x70).w(this, FUNC(quizpun2_state::scroll_w));
+	map(0x40, 0x40).w(FUNC(quizpun2_state::irq_ack));
+	map(0x50, 0x50).w(FUNC(quizpun2_state::soundlatch_w));
+	map(0x60, 0x60).w(FUNC(quizpun2_state::rombank_w));
+	map(0x70, 0x70).w(FUNC(quizpun2_state::scroll_w));
 	map(0x80, 0x80).portr("DSW");
 	map(0x90, 0x90).portr("IN0");
 	map(0xa0, 0xa0).portr("IN1");
-	map(0xe0, 0xe0).rw(this, FUNC(quizpun2_state::quizpun_protection_r), FUNC(quizpun2_state::quizpun_protection_w));
+	map(0xe0, 0xe0).rw(FUNC(quizpun2_state::quizpun_protection_r), FUNC(quizpun2_state::quizpun_protection_w));
 }
 
 void quizpun2_state::quizpun2_cop_map(address_map &map)
@@ -560,7 +561,7 @@ static const gfx_layout layout_16x16x1 =
 	16*16*1
 };
 
-static GFXDECODE_START( quizpun2 )
+static GFXDECODE_START( gfx_quizpun2 )
 	GFXDECODE_ENTRY( "bg",  0, layout_16x16x4,     0, 256/16 )
 	GFXDECODE_ENTRY( "fg",  0, layout_16x16x1, 0x100, 256/2  )
 	GFXDECODE_ENTRY( "fg2", 0, layout_16x16x1, 0x100, 256/2  )
@@ -595,7 +596,7 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_COP400_WRITE_SO_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 	MCFG_COP400_WRITE_SK_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -606,7 +607,7 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpun2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpun2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

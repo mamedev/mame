@@ -66,18 +66,18 @@ WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 
 void scotrsht_state::scotrsht_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(scotrsht_state::colorram_w)).share("colorram");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(scotrsht_state::videoram_w)).share("videoram");
+	map(0x0000, 0x07ff).ram().w(FUNC(scotrsht_state::colorram_w)).share("colorram");
+	map(0x0800, 0x0fff).ram().w(FUNC(scotrsht_state::videoram_w)).share("videoram");
 	map(0x1000, 0x10bf).ram().share("spriteram"); /* sprites */
 	map(0x10c0, 0x1fff).ram(); /* work ram */
 	map(0x2000, 0x201f).ram().share("scroll"); /* scroll registers */
 	map(0x2040, 0x2040).nopw();
 	map(0x2041, 0x2041).nopw();
 	map(0x2042, 0x2042).nopw();  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
-	map(0x2043, 0x2043).w(this, FUNC(scotrsht_state::charbank_w));
-	map(0x2044, 0x2044).w(this, FUNC(scotrsht_state::ctrl_w));
-	map(0x3000, 0x3000).w(this, FUNC(scotrsht_state::palettebank_w));
-	map(0x3100, 0x3100).w(this, FUNC(scotrsht_state::soundlatch_w));
+	map(0x2043, 0x2043).w(FUNC(scotrsht_state::charbank_w));
+	map(0x2044, 0x2044).w(FUNC(scotrsht_state::ctrl_w));
+	map(0x3000, 0x3000).w(FUNC(scotrsht_state::palettebank_w));
+	map(0x3100, 0x3100).w(FUNC(scotrsht_state::soundlatch_w));
 	map(0x3200, 0x3200).nopw(); /* it writes 0, 1 */
 	map(0x3100, 0x3100).portr("DSW2");
 	map(0x3200, 0x3200).portr("DSW3");
@@ -182,7 +182,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( scotrsht )
+static GFXDECODE_START( gfx_scotrsht )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 16*8 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, scotrsht_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scotrsht)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)

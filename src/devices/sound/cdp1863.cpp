@@ -138,26 +138,6 @@ void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 
 //-------------------------------------------------
-//  str_w - latch write
-//-------------------------------------------------
-
-WRITE8_MEMBER( cdp1863_device::str_w )
-{
-	m_latch = data;
-}
-
-
-//-------------------------------------------------
-//  str_w - latch write
-//-------------------------------------------------
-
-void cdp1863_device::str_w(uint8_t data)
-{
-	m_latch = data;
-}
-
-
-//-------------------------------------------------
 //  oe_w - output enable write
 //-------------------------------------------------
 

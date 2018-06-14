@@ -39,7 +39,7 @@ static void nascom_floppies(device_slot_interface &device)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(nascom_fdc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fd1793", XTAL(16'000'000) / 4 / 4)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 16_MHz_XTAL / 4 / 4)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)

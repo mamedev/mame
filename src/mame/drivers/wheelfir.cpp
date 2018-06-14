@@ -175,6 +175,7 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -584,15 +585,15 @@ void wheelfir_state::wheelfir_main(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 
-	map(0x700000, 0x70001f).w(this, FUNC(wheelfir_state::wheelfir_blit_w));
+	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w));
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x720003, 0x720003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
 	map(0x740000, 0x740001).w("soundlatch", FUNC(generic_latch_16_device::write));
-	map(0x760000, 0x760001).w(this, FUNC(wheelfir_state::coin_cnt_w));
+	map(0x760000, 0x760001).w(FUNC(wheelfir_state::coin_cnt_w));
 	map(0x780000, 0x78000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x7a0000, 0x7a0001).w(this, FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
-	map(0x7c0000, 0x7c0001).rw(this, FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
+	map(0x7a0000, 0x7a0001).w(FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
+	map(0x7c0000, 0x7c0001).rw(FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
 	map(0x7e0000, 0x7e0001).portr("P1");
 	map(0x7e0002, 0x7e0003).portr("P2");
 }
@@ -605,8 +606,8 @@ void wheelfir_state::wheelfir_sub(address_map &map)
 
 	map(0x780000, 0x780001).r("soundlatch", FUNC(generic_latch_16_device::read));
 
-	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::write));
-	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::write));
+	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::data_w));
+	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::data_w));
 }
 
 
@@ -760,7 +761,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 

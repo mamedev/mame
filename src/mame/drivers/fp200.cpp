@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -424,7 +425,7 @@ void fp200_state::fp200_map(address_map &map)
 
 void fp200_state::fp200_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+	map(0x00, 0xff).rw(FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
 }
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
@@ -547,7 +548,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( fp200 )
+static GFXDECODE_START( gfx_fp200 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -602,7 +603,7 @@ MACHINE_CONFIG_START(fp200_state::fp200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 8*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp200)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp200)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)

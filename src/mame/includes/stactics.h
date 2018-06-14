@@ -10,6 +10,7 @@
 
 
 #include "machine/74259.h"
+#include "emupal.h"
 
 class stactics_state : public driver_device
 {

@@ -180,14 +180,14 @@ void dribling_state::dribling_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).rom();
-	map(0xc000, 0xdfff).ram().w(this, FUNC(dribling_state::dribling_colorram_w)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(FUNC(dribling_state::dribling_colorram_w)).share("colorram");
 }
 
 
 void dribling_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
+	map(0x00, 0xff).rw(FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
 }
 
 

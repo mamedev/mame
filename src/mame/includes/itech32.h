@@ -9,6 +9,7 @@
 
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VIDEO_CLOCK     XTAL(8'000'000)           /* video (pixel) clock */
@@ -37,7 +38,9 @@ public:
 		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
 		m_tms1_boot(*this, "tms1_boot"),
 		m_tms1_ram(*this, "tms1_ram"),
-		m_tms2_ram(*this, "tms2_ram") { }
+		m_tms2_ram(*this, "tms2_ram"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
 
 	required_device<cpu_device> m_maincpu;
@@ -56,6 +59,7 @@ public:
 	optional_shared_ptr<uint32_t> m_tms1_boot;
 	optional_shared_ptr<uint32_t> m_tms1_ram;
 	optional_shared_ptr<uint32_t> m_tms2_ram;
+	output_finder<4> m_leds;
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 

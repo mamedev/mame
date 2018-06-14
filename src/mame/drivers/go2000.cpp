@@ -37,6 +37,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -94,7 +95,7 @@ void go2000_state::go2000_map(address_map &map)
 	map(0x800000, 0x800fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00001).portr("INPUTS");
 	map(0xa00002, 0xa00003).portr("DSW");
-	map(0x620002, 0x620003).w(this, FUNC(go2000_state::sound_cmd_w));
+	map(0x620002, 0x620003).w(FUNC(go2000_state::sound_cmd_w));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP
 //  AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
@@ -115,8 +116,8 @@ void go2000_state::go2000_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
 }
 
 
@@ -192,7 +193,7 @@ static const gfx_layout go2000_layout =
 	8*32
 };
 
-static GFXDECODE_START( go2000 )
+static GFXDECODE_START( gfx_go2000 )
 	GFXDECODE_ENTRY( "gfx1", 0, go2000_layout,   0x0, 0x80  ) /* tiles */
 GFXDECODE_END
 
@@ -351,7 +352,7 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_DEVICE_IO_MAP(go2000_sound_io)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", go2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_go2000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

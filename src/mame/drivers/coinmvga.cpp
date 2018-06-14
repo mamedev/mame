@@ -221,6 +221,7 @@
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -600,11 +601,11 @@ static const gfx_layout tiles16x16_layout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( coinmvga )
+static GFXDECODE_START( gfx_coinmvga )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 16 )  /* Foreground GFX */
 GFXDECODE_END
 
-static GFXDECODE_START( coinmvga2 )
+static GFXDECODE_START( gfx_coinmvga2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x000, 1 )  /* Background GFX */
 GFXDECODE_END
 
@@ -654,8 +655,8 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmvga)
-	MCFG_GFXDECODE_ADD("gfxdecode2", "palette2", coinmvga2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmvga)
+	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "palette2", gfx_coinmvga2)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")

@@ -258,7 +258,7 @@ void pipedrm_state::main_map(address_map &map)
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xffff).rw(this, FUNC(pipedrm_state::fromance_videoram_r), FUNC(pipedrm_state::fromance_videoram_w)).share("videoram");
+	map(0xd000, 0xffff).rw(FUNC(pipedrm_state::fromance_videoram_r), FUNC(pipedrm_state::fromance_videoram_w)).share("videoram");
 }
 
 
@@ -267,12 +267,12 @@ void pipedrm_state::main_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x20, 0x20).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x21, 0x21).portr("P2").w(this, FUNC(pipedrm_state::pipedrm_bankswitch_w));
-	map(0x22, 0x25).w(this, FUNC(pipedrm_state::fromance_scroll_w));
+	map(0x21, 0x21).portr("P2").w(FUNC(pipedrm_state::pipedrm_bankswitch_w));
+	map(0x22, 0x25).w(FUNC(pipedrm_state::fromance_scroll_w));
 	map(0x22, 0x22).portr("DSW1");
 	map(0x23, 0x23).portr("DSW2");
 	map(0x24, 0x24).portr("SYSTEM");
-	map(0x25, 0x25).r(this, FUNC(pipedrm_state::pending_command_r));
+	map(0x25, 0x25).r(FUNC(pipedrm_state::pending_command_r));
 }
 
 
@@ -294,7 +294,7 @@ void pipedrm_state::sound_map(address_map &map)
 void pipedrm_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x04, 0x04).w(this, FUNC(pipedrm_state::sound_bankswitch_w));
+	map(0x04, 0x04).w(FUNC(pipedrm_state::sound_bankswitch_w));
 	map(0x16, 0x16).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x17, 0x17).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
@@ -306,7 +306,7 @@ void pipedrm_state::hatris_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x08).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x05, 0x05).r(this, FUNC(pipedrm_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x05, 0x05).r(FUNC(pipedrm_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
 
@@ -529,14 +529,14 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( pipedrm )
+static GFXDECODE_START( gfx_pipedrm )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( hatris )
+static GFXDECODE_START( gfx_hatris )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 GFXDECODE_END
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipedrm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipedrm)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hatris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hatris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

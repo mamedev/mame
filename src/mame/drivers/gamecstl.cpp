@@ -70,6 +70,7 @@
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -354,7 +355,7 @@ void gamecstl_state::gamecstl_map(address_map &map)
 	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
 	map(0x000e0000, 0x000effff).ram();
 	map(0x000f0000, 0x000fffff).bankr("bank1");
-	map(0x000f0000, 0x000fffff).w(this, FUNC(gamecstl_state::bios_ram_w));
+	map(0x000f0000, 0x000fffff).w(FUNC(gamecstl_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -364,12 +365,12 @@ void gamecstl_state::gamecstl_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x00e8, 0x00eb).noprw();
 	map(0x00ec, 0x00ef).noprw();
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 	map(0x0300, 0x03af).noprw();
 	map(0x03b0, 0x03df).noprw();
-	map(0x0278, 0x027b).w(this, FUNC(gamecstl_state::pnp_config_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
-	map(0x0a78, 0x0a7b).w(this, FUNC(gamecstl_state::pnp_data_w));
+	map(0x0278, 0x027b).w(FUNC(gamecstl_state::pnp_config_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
+	map(0x0a78, 0x0a7b).w(FUNC(gamecstl_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
@@ -389,7 +390,7 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
+static GFXDECODE_START( gfx_cga )
 /* Support up to four CGA fonts */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
@@ -465,7 +466,7 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 	MCFG_PALETTE_ADD("palette", 16)
 
 

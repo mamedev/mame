@@ -733,15 +733,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					if (m_fdc)
 					{
 						//printf("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						switch(ioc_addr & 0xc)
-						{
-							case 0x00: return m_fdc->status_r();
-							case 0x04: return m_fdc->track_r();
-							case 0x08: return m_fdc->sector_r();
-							case 0x0c: return m_fdc->data_r();
-						}
-
-						return 0;
+						return m_fdc->gen_r((ioc_addr >> 2) & 0x03);
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -804,24 +796,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 						if (m_fdc)
 						{
 							//printf("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							switch(ioc_addr & 0xc)
-							{
-								case 0x00:
-									m_fdc->cmd_w(data);
-									return;
-
-								case 0x04:
-									m_fdc->track_w(data);
-									return;
-
-								case 0x08:
-									m_fdc->sector_w(data);
-									return;
-
-									case 0x0c:
-									m_fdc->data_w(data);
-									return;
-							}
+							m_fdc->gen_w((ioc_addr >> 2) & 0x03, data);
+							return;
 						}
 						else
 						{

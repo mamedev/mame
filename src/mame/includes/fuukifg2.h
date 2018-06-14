@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"
+#include "emupal.h"
 #include "screen.h"
 
 class fuuki16_state : public driver_device
@@ -48,7 +49,7 @@ public:
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_unknown;
 	required_shared_ptr<uint16_t> m_priority;
-	
+
 	required_memory_bank m_soundbank;
 
 	/* video-related */

@@ -20,6 +20,7 @@
 
 #include "bus/odyssey2/slot.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -121,13 +122,13 @@ void odyssey2_state::odyssey2_mem(address_map &map)
 
 void odyssey2_state::odyssey2_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
+	map(0x00, 0xff).rw(FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
 }
 
 
 void g7400_state::g7400_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
+	map(0x00, 0xff).rw(FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
 }
 
 
@@ -654,7 +655,7 @@ static const gfx_layout odyssey2_spritelayout =
 };
 
 
-static GFXDECODE_START( odyssey2 )
+static GFXDECODE_START( gfx_odyssey2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_graphicslayout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
@@ -689,7 +690,7 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -715,7 +716,7 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -750,7 +751,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -791,7 +792,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -820,9 +821,9 @@ ROM_END
 ROM_START (videopac)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_SYSTEM_BIOS( 0, "g7000", "g7000" )
-	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(1))
+	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "c52", "c52" )
-	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(2))
+	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(1))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 

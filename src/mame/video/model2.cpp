@@ -87,8 +87,8 @@
     to display more detail when a texture is real close to the viewer. This is currently unemulated.
 
 *********************************************************************************************************************************/
+
 #include "emu.h"
-#include "video/segaic24.h"
 #include "includes/model2.h"
 
 #include <cmath>
@@ -2651,15 +2651,11 @@ void model2_state::video_start()
 uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//logerror("--- frame ---\n");
-	int layer;
-
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 
-	segas24_tile_device *tile = machine().device<segas24_tile_device>("tile");
-
-	for(layer=3;layer>=0;layer--)
-		tile->draw(screen, m_sys24_bitmap, cliprect, layer<<1, 0, 0);
+	for(int layer = 3; layer >= 0; layer--)
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer<<1, 0, 0);
 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
@@ -2680,8 +2676,8 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 
 	m_sys24_bitmap.fill(0, cliprect);
 
-	for(layer=3;layer>=0;layer--)
-		tile->draw(screen, m_sys24_bitmap, cliprect, (layer<<1) | 1, 0, 0);
+	for (int layer = 3; layer >= 0; layer--)
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, (layer<<1) | 1, 0, 0);
 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 

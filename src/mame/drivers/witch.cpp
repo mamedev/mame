@@ -217,7 +217,7 @@ Interesting memory locations
 TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?);
     - Hook up the OKI M5202;
-	- lagging sprites on witch (especially noticeable when game scrolls up/down)
+    - lagging sprites on witch (especially noticeable when game scrolls up/down)
 */
 
 #include "emu.h"
@@ -461,7 +461,7 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 		m_bg_bank = new_bg_bank;
 		m_gfx1_tilemap->mark_all_dirty();
 	}
-//	m_mainbank->set_entry((data >> 6) & 3);
+//  m_mainbank->set_entry((data >> 6) & 3);
 }
 
 WRITE8_MEMBER(witch_state::write_a006)
@@ -515,11 +515,16 @@ READ8_MEMBER(witch_state::prot_read_700x)
 
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
-	m_scrollx=data;
+	m_scrollx = data;
+	// need to mark tiles dirty here, as the tilemap writes are affected by scrollx, see FIX_OFFSET macro.
+	// without it keirin ou can seldomly draw garbage after a big/small bonus game
+	// TODO: rewrite tilemap code so that it doesn't need FIX_OFFSET at all!
+	m_gfx1_tilemap->mark_all_dirty();
 }
+
 WRITE8_MEMBER(witch_state::yscroll_w)
 {
-	m_scrolly=data;
+	m_scrolly = data;
 }
 
 WRITE8_MEMBER(keirinou_state::palette_w)
@@ -569,10 +574,10 @@ void witch_state::common_map(address_map &map)
 	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
 	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
-	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
-	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
+	map(0xc400, 0xc7ff).ram().w(FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
+	map(0xc800, 0xcbff).rw(FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
+	map(0xcc00, 0xcfff).rw(FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
 }
 
 /************************************
@@ -600,7 +605,7 @@ void witch_state::witch_main_map(address_map &map)
 	witch_common_map(map);
 	map(0x0000, UNBANKED_SIZE-1).rom();
 	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::main_write_a008));
 }
 
 
@@ -608,7 +613,7 @@ void witch_state::witch_sub_map(address_map &map)
 {
 	witch_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::sub_write_a008));
 }
 
 /************************************
@@ -623,7 +628,7 @@ void keirinou_state::keirinou_common_map(address_map &map)
 	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(keirinou_state::palette_w)).share("paletteram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(keirinou_state::palette_w)).share("paletteram");
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("nvram"); // shared with sub
 }
@@ -632,14 +637,14 @@ void keirinou_state::keirinou_main_map(address_map &map)
 {
 	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::main_write_a008));
 }
 
 void keirinou_state::keirinou_sub_map(address_map &map)
 {
 	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::sub_write_a008));
 }
 
 static INPUT_PORTS_START( witch )
@@ -849,8 +854,8 @@ static INPUT_PORTS_START( keirinou )
 	PORT_DIPSETTING(    0x05, "90%" )
 	PORT_DIPSETTING(    0x04, "95%" )
 	PORT_DIPSETTING(    0x03, "100%" )
-//	PORT_DIPSETTING(    0x01, "80%" )
-//	PORT_DIPSETTING(    0x00, "90%" )
+//  PORT_DIPSETTING(    0x01, "80%" )
+//  PORT_DIPSETTING(    0x00, "90%" )
 	PORT_DIPNAME( 0x08, 0x08, "Double-Up Rate" )
 	PORT_DIPSETTING(    0x08, "90%" )
 	PORT_DIPSETTING(    0x00, "100%" )
@@ -932,12 +937,12 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static GFXDECODE_START( witch )
+static GFXDECODE_START( gfx_witch )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( keirinou )
+static GFXDECODE_START( gfx_keirinou )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x200, 8 )
@@ -986,7 +991,7 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", witch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1024,9 +1029,9 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x200+0x80)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", keirinou)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
 
-//	MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  MCFG_PALETTE_FORMAT(IIBBGGRR)
 
 	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
@@ -1137,20 +1142,20 @@ ROM_END
 
 ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
+	ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
 
 	ROM_REGION( 0x10000, "sub", ROMREGION_ERASE00 )
-    ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
+	ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
 
 	// rearranged so that it fits available gfx decode
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "a6.a6",        0x0000, 0x4000, CRC(6d59a5e4) SHA1(4580756ee7db4a088ad02cd56f78fd55fef6ec0a) )
 	ROM_CONTINUE(             0x8000, 0x4000 )
-    ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
+	ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
 	ROM_CONTINUE(             0xc000, 0x4000 )
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_ERASE00 )
-    ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
+	ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
 	ROM_CONTINUE(             0x8000, 0x04000 )
 	ROM_CONTINUE(             0x4000, 0x04000 )
 	ROM_CONTINUE(             0xc000, 0x04000 )

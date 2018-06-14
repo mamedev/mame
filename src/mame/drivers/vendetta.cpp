@@ -217,9 +217,9 @@ void vendetta_state::main_map(address_map &map)
 	map(0x5fc3, 0x5fc3).portr("P4");
 	map(0x5fd0, 0x5fd0).portr("EEPROM");
 	map(0x5fd1, 0x5fd1).portr("SERVICE");
-	map(0x5fe0, 0x5fe0).w(this, FUNC(vendetta_state::_5fe0_w));
-	map(0x5fe2, 0x5fe2).w(this, FUNC(vendetta_state::eeprom_w));
-	map(0x5fe4, 0x5fe4).rw(this, FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));
+	map(0x5fe0, 0x5fe0).w(FUNC(vendetta_state::_5fe0_w));
+	map(0x5fe2, 0x5fe2).w(FUNC(vendetta_state::eeprom_w));
+	map(0x5fe4, 0x5fe4).rw(FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));
 	map(0x5fe6, 0x5fe7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x5fe8, 0x5fe9).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x5fea, 0x5fea).r("watchdog", FUNC(watchdog_timer_device::reset_r));
@@ -244,9 +244,9 @@ void vendetta_state::esckids_map(address_map &map)
 	map(0x3fa0, 0x3fa7).w(m_k053246, FUNC(k053247_device::k053246_w));           // 053246 (Sprite)
 	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));           // 053251 (Priority Encoder)
 	map(0x3fc0, 0x3fcf).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));              // Not Emulated (053252 ???)
-	map(0x3fd0, 0x3fd0).w(this, FUNC(vendetta_state::_5fe0_w));      // Coin Counter, 052109 RMRD, 053246 OBJCHA
-	map(0x3fd2, 0x3fd2).w(this, FUNC(vendetta_state::eeprom_w));    // EEPROM, Video banking
-	map(0x3fd4, 0x3fd4).rw(this, FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));            // Sound
+	map(0x3fd0, 0x3fd0).w(FUNC(vendetta_state::_5fe0_w));      // Coin Counter, 052109 RMRD, 053246 OBJCHA
+	map(0x3fd2, 0x3fd2).w(FUNC(vendetta_state::eeprom_w));    // EEPROM, Video banking
+	map(0x3fd4, 0x3fd4).rw(FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));            // Sound
 	map(0x3fd6, 0x3fd7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)); // Sound
 	map(0x3fd8, 0x3fd9).r(m_k053246, FUNC(k053247_device::k053246_r));                // 053246 (Sprite)
 	map(0x3fda, 0x3fda).nopw();                // Not Emulated (Watchdog ???)
@@ -263,7 +263,7 @@ void vendetta_state::videobank0_map(address_map &map)
 
 void vendetta_state::videobank1_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(this, FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
+	map(0x0000, 0x0fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
 	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -272,7 +272,7 @@ void vendetta_state::sound_map(address_map &map)
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfa00, 0xfa00).w(this, FUNC(vendetta_state::z80_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(FUNC(vendetta_state::z80_arm_nmi_w));
 	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 }
 
@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

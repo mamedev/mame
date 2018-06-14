@@ -838,6 +838,8 @@ if (BUSES["HPDIO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603a.cpp",
@@ -3368,6 +3370,8 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
@@ -3404,6 +3408,8 @@ if (BUSES["INTERPRO_SR"]~=null) then
 		MAME_DIR .. "src/devices/bus/interpro/sr/sr_cards.h",
 		MAME_DIR .. "src/devices/bus/interpro/sr/gt.cpp",
 		MAME_DIR .. "src/devices/bus/interpro/sr/gt.h",
+		MAME_DIR .. "src/devices/bus/interpro/sr/edge.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/edge.h",
 	}
 end
 

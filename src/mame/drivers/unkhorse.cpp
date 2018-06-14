@@ -23,6 +23,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -103,7 +104,7 @@ void horse_state::horse_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	map(0x4000, 0x40ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x6000, 0x7fff).ram().share("vram");
-	map(0x8000, 0x87ff).mirror(0x0800).rw(this, FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
 }
 
 void horse_state::horse_io_map(address_map &map)

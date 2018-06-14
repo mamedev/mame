@@ -67,7 +67,7 @@ WRITE16_MEMBER(cchasm_state::io_w)
 			m_sound_flags |= 0x80;
 			m_soundlatch2->write(space, offset, data);
 			m_ctc->trg2(1);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 		case 2:
 			//led = data;

@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

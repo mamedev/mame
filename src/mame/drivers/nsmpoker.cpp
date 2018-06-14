@@ -61,6 +61,7 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -182,14 +183,14 @@ void nsmpoker_state::nsmpoker_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x9000, 0xafff).ram(); // OK... cleared at beginning.
 	map(0xb000, 0xcfff).rom(); // WRONG... just to map the last rom somewhere.
-	map(0xe000, 0xefff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
-	map(0xf000, 0xffff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
+	map(0xe000, 0xefff).ram().w(FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
+	map(0xf000, 0xffff).ram().w(FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
 }
 
 void nsmpoker_state::nsmpoker_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).r(this, FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
+	map(0xf0, 0xf0).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
 }
 
 /* I/O byte R/W
@@ -396,7 +397,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( nsmpoker )
+static GFXDECODE_START( gfx_nsmpoker )
 	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -429,7 +430,7 @@ MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nsmpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nsmpoker)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)

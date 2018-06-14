@@ -51,6 +51,7 @@
 #include "includes/llc.h"
 
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -87,10 +88,10 @@ void llc_state::llc2_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xE0, 0xE3).w(this, FUNC(llc_state::llc2_rom_disable_w));
+	map(0xE0, 0xE3).w(FUNC(llc_state::llc2_rom_disable_w));
 	map(0xE4, 0xE7).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0xE8, 0xEB).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xEC, 0xEC).w(this, FUNC(llc_state::llc2_basic_enable_w));
+	map(0xEC, 0xEC).w(FUNC(llc_state::llc2_basic_enable_w));
 	map(0xF8, 0xFB).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -190,11 +191,11 @@ static const gfx_layout llc2_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( llc1 )
+static GFXDECODE_START( gfx_llc1 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, llc1_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( llc2 )
+static GFXDECODE_START( gfx_llc2 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, llc2_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -218,7 +219,7 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
@@ -261,7 +262,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc2)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

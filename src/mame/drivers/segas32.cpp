@@ -642,6 +642,7 @@ void segas32_upd7725_state::device_start()
 void segas32_cd_state::device_start()
 {
 	common_start(0);
+	m_lamps.resolve();
 }
 
 void sega_multi32_state::device_start()
@@ -1060,19 +1061,19 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
-	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x0eff80).rw(this, FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
-	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
 	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x0fff80).rw("io_chip", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	// 0xc00040-0xc0007f - I/O expansion area
-	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
-	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -1083,14 +1084,14 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
-	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_0_w));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_1_w));
-	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::multi32_mixer_0_w));
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
+	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::multi32_mixer_1_w));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
 	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
@@ -1098,8 +1099,8 @@ void segas32_state::multi32_map(address_map &map)
 	// 0xc00040-0xc0007f - I/O expansion area 0
 	map(0xc80000, 0xc8001f).mirror(0x07ff80).rw("io_chip_1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc80040-0xc8007f - I/O expansion area 1
-	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
-	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -1126,11 +1127,11 @@ void segas32_state::system32_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
-	map(0xb0, 0xbf).w(this, FUNC(segas32_state::sound_bank_hi_w));
-	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
-	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
-	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+	map(0xa0, 0xaf).w(FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(FUNC(segas32_state::sound_bank_hi_w));
+	map(0xc0, 0xcf).w(FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
 }
 
 void segas32_state::rf5c68_map(address_map &map)
@@ -1153,11 +1154,11 @@ void segas32_state::multi32_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
-	map(0xb0, 0xbf).w(this, FUNC(segas32_state::multipcm_bank_w));
-	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
-	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
-	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+	map(0xa0, 0xaf).w(FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(FUNC(segas32_state::multipcm_bank_w));
+	map(0xc0, 0xcf).w(FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
 }
 
 
@@ -2184,7 +2185,7 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static GFXDECODE_START( segas32 )
+static GFXDECODE_START( gfx_segas32 )
 	GFXDECODE_ENTRY( "gfx1", 0, bgcharlayout,   0x00, 0x3ff  )
 GFXDECODE_END
 
@@ -2225,13 +2226,13 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
 	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2313,9 +2314,9 @@ void segas32_trackball_state::system32_trackball_map(address_map &map)
 	map.unmap_value_high();
 	system32_map(map);
 	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
-	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
-	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
-	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
+	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
+	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
+	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 }
 
 MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
@@ -2443,13 +2444,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 WRITE8_MEMBER(segas32_cd_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		machine().output().set_lamp_value(i, BIT(data, i));
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		machine().output().set_lamp_value(8 + i, BIT(data, i));
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
@@ -2507,6 +2508,7 @@ DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 }
 
@@ -2547,13 +2549,13 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
 	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_1_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -2606,7 +2608,7 @@ void sega_multi32_analog_state::multi32_analog_map(address_map &map)
 	map.global_mask(0xffffff);
 	multi32_map(map);
 	map(0xc00050, 0xc00057).mirror(0x07ff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask32(0x00ff00ff);
-	map(0xc00060, 0xc00060).mirror(0x07ff80).w(this, FUNC(sega_multi32_analog_state::analog_bank_w));
+	map(0xc00060, 0xc00060).mirror(0x07ff80).w(FUNC(sega_multi32_analog_state::analog_bank_w));
 }
 
 MACHINE_CONFIG_START(sega_multi32_analog_state::device_add_mconfig)
@@ -5393,11 +5395,11 @@ void segas32_new_state::init_arescue()
 	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
 
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
 }
 
 void segas32_new_state::init_f1en() {
@@ -5407,11 +5409,11 @@ void segas32_new_state::init_f1en() {
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
 
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
 }
 
 void segas32_new_state::init_f1lap()

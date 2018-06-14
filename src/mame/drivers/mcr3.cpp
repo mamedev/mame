@@ -319,9 +319,9 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	output().set_led_value(0, (data >> 3) & 1);
-	output().set_led_value(1, (data >> 2) & 1);
-	output().set_led_value(2, (data >> 1) & 1);
+	m_lamps[0] = BIT(data, 3);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -362,9 +362,9 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	output().set_led_value(0, (data >> 2) & 1);
-	output().set_led_value(1, (data >> 3) & 1);
-	output().set_led_value(2, (data >> 4) & 1);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[2] = BIT(data, 4);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -481,8 +481,8 @@ void mcr3_state::mcrmono_map(address_map &map)
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).ram().share("spriteram");
 	map(0xea00, 0xebff).ram();
-	map(0xec00, 0xec7f).mirror(0x0380).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
+	map(0xec00, 0xec7f).mirror(0x0380).w(FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
 	map(0xf800, 0xffff).rom();     /* schematics show a 2716 @ 2B here, but nobody used it */
 }
 
@@ -496,7 +496,7 @@ void mcr3_state::mcrmono_portmap(address_map &map)
 	map(0x02, 0x02).mirror(0x78).portr("MONO.IP2");
 	map(0x03, 0x03).mirror(0x78).portr("MONO.IP3");
 	map(0x04, 0x04).mirror(0x78).portr("MONO.IP4");
-	map(0x05, 0x05).mirror(0x78).w(this, FUNC(mcr3_state::mcrmono_control_port_w));
+	map(0x05, 0x05).mirror(0x78).w(FUNC(mcr3_state::mcrmono_control_port_w));
 	map(0x07, 0x07).mirror(0x78).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf0, 0xf3).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
@@ -514,11 +514,11 @@ void mcr3_state::spyhunt_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).rom();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xe000, 0xe7ff).ram().w(FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xf9ff).ram().share("spriteram");
-	map(0xfa00, 0xfa7f).mirror(0x0180).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).w(FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
@@ -527,7 +527,7 @@ void mcr3_state::spyhunt_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	m_ssio->ssio_input_ports(map, "ssio");
-	map(0x84, 0x86).w(this, FUNC(mcr3_state::spyhunt_scroll_value_w));
+	map(0x84, 0x86).w(FUNC(mcr3_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -1058,13 +1058,13 @@ static const gfx_layout spyhunt_alphalayout =
 };
 
 
-static GFXDECODE_START( mcr3 )
+static GFXDECODE_START( gfx_mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spyhunt )
+static GFXDECODE_START( gfx_spyhunt )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
@@ -1110,7 +1110,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
 MACHINE_CONFIG_END
 
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spyhunt)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+4)
 

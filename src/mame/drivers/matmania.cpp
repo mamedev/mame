@@ -86,10 +86,10 @@ void matmania_state::matmania_map(address_map &map)
 	map(0x2400, 0x25ff).ram().share("videoram3");
 	map(0x2600, 0x27ff).ram().share("colorram3");
 	map(0x3000, 0x3000).portr("IN0").writeonly().share("pageselect");
-	map(0x3010, 0x3010).portr("IN1").w(this, FUNC(matmania_state::matmania_sh_command_w));
+	map(0x3010, 0x3010).portr("IN1").w(FUNC(matmania_state::matmania_sh_command_w));
 	map(0x3020, 0x3020).portr("DSW2").writeonly().share("scroll");
 	map(0x3030, 0x3030).portr("DSW1").nopw(); /* ?? */
-	map(0x3050, 0x307f).w(this, FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
+	map(0x3050, 0x307f).w(FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
 	map(0x4000, 0xffff).rom();
 }
 
@@ -104,12 +104,12 @@ void matmania_state::maniach_map(address_map &map)
 	map(0x2400, 0x25ff).ram().share("videoram3");
 	map(0x2600, 0x27ff).ram().share("colorram3");
 	map(0x3000, 0x3000).portr("IN0").writeonly().share("pageselect");
-	map(0x3010, 0x3010).portr("IN1").w(this, FUNC(matmania_state::maniach_sh_command_w));
+	map(0x3010, 0x3010).portr("IN1").w(FUNC(matmania_state::maniach_sh_command_w));
 	map(0x3020, 0x3020).portr("DSW2").writeonly().share("scroll");
 	map(0x3030, 0x3030).portr("DSW1").nopw();   /* ?? */
 	map(0x3040, 0x3040).rw(m_mcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x3041, 0x3041).r(this, FUNC(matmania_state::maniach_mcu_status_r));
-	map(0x3050, 0x307f).w(this, FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
+	map(0x3041, 0x3041).r(FUNC(matmania_state::maniach_mcu_status_r));
+	map(0x3050, 0x307f).w(FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
 	map(0x4000, 0xffff).rom();
 }
 
@@ -119,7 +119,7 @@ void matmania_state::matmania_sound_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
 }
@@ -128,7 +128,7 @@ void matmania_state::maniach_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x2000, 0x2001).w("ymsnd", FUNC(ym3526_device::write));
-	map(0x2002, 0x2002).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2002, 0x2002).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2004, 0x2004).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }
@@ -279,13 +279,13 @@ static const gfx_layout maniach_tilelayout =
 	32*8    /* every tile takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( matmania )
+static GFXDECODE_START( gfx_matmania )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, matmania_spritelayout, 8*8, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( maniach )
+static GFXDECODE_START( gfx_maniach )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, maniach_tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, maniach_spritelayout, 8*8, 2 )
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_matmania)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", matmania)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_matmania)
 	MCFG_PALETTE_ADD("palette", 64+16)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_maniach)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", maniach)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_maniach)
 	MCFG_PALETTE_ADD("palette", 64+16)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 

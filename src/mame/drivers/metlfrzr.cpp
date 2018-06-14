@@ -25,6 +25,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -195,7 +196,7 @@ void metlfrzr_state::metlfrzr_map(address_map &map)
 	map(0xd604, 0xd604).portr("DSW2");
 	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	map(0xd700, 0xd700).w(this, FUNC(metlfrzr_state::output_w));
+	map(0xd700, 0xd700).w(FUNC(metlfrzr_state::output_w));
 	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist
@@ -343,7 +344,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START(metlfrzr)
+static GFXDECODE_START(gfx_metlfrzr)
 	GFXDECODE_ENTRY("gfx1", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx2", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx3", 0, sprite_layout, 0, 16)
@@ -376,7 +377,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlfrzr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlfrzr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

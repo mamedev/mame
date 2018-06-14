@@ -49,7 +49,7 @@ void vaportra_state::main_map(address_map &map)
 	map(0x100000, 0x100001).portr("PLAYERS");
 	map(0x100002, 0x100003).portr("COINS");
 	map(0x100004, 0x100005).portr("DSW");
-	map(0x100000, 0x100003).w(this, FUNC(vaportra_state::priority_w));
+	map(0x100000, 0x100003).w(FUNC(vaportra_state::priority_w));
 	map(0x100007, 0x100007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
@@ -57,9 +57,9 @@ void vaportra_state::main_map(address_map &map)
 	map(0x280000, 0x281fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x282000, 0x283fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x2c0000, 0x2c000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x300000, 0x3009ff).ram().w(this, FUNC(vaportra_state::palette_w)).share("palette");
-	map(0x304000, 0x3049ff).ram().w(this, FUNC(vaportra_state::palette_ext_w)).share("palette_ext");
-	map(0x308001, 0x308001).rw(this, FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
+	map(0x300000, 0x3009ff).ram().w(FUNC(vaportra_state::palette_w)).share("palette");
+	map(0x304000, 0x3049ff).ram().w(FUNC(vaportra_state::palette_ext_w)).share("palette_ext");
+	map(0x308001, 0x308001).rw(FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
 	map(0x30c000, 0x30c001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x318000, 0x3187ff).mirror(0xce0000).ram().share("spriteram");
 	map(0xffc000, 0xffffff).ram();
@@ -183,7 +183,7 @@ static const gfx_layout tilelayout =
 	32*16
 };
 
-static GFXDECODE_START( vaportra )
+static GFXDECODE_START( gfx_vaportra )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    0x000, 0x500 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,    0x000, 0x500 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, charlayout,    0x000, 0x500 )    /* Characters 8x8 */
@@ -212,16 +212,16 @@ void vaportra_state::machine_reset()
 MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(24'000'000)/2) /* Custom chip 59 */
+	MCFG_DEVICE_ADD(m_maincpu, M68000,XTAL(24'000'000)/2) /* Custom chip 59 */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vaportra_state, irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
+	MCFG_DEVICE_ADD(m_audiocpu, H6280, XTAL(24'000'000)/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -229,13 +229,12 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("colors")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vaportra)
-	MCFG_PALETTE_ADD("palette", 1280)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_vaportra)
+	MCFG_PALETTE_ADD(m_palette, 1280)
 
-
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DEVICE_ADD(m_deco_tilegen[0], DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
@@ -251,7 +250,7 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DEVICE_ADD(m_deco_tilegen[1], DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
@@ -267,15 +266,15 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 	MCFG_DECO16IC_PF12_16X16_BANK(3)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	MCFG_DEVICE_ADD(m_spritegen, DECO_MXC06, 0)
 	MCFG_DECO_MXC06_GFX_REGION(4)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 0))
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

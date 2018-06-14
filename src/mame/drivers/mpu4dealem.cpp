@@ -18,6 +18,7 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 #include "video/resnet.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,7 +57,7 @@ static const gfx_layout dealemcharlayout =
 };
 
 
-static GFXDECODE_START( dealem )
+static GFXDECODE_START( gfx_dealem )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 32 )
 GFXDECODE_END
 
@@ -222,7 +223,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dealem)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)

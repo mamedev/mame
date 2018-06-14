@@ -183,26 +183,26 @@ void segasp_state::segasp_map(address_map &map)
 	/* Area 0 */
 	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0); // BIOS
 
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_g2_ctrl_r), FUNC(segasp_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_g2_ctrl_r), FUNC(segasp_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_modem_r), FUNC(segasp_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_aica_reg_r), FUNC(segasp_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_modem_r), FUNC(segasp_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(segasp_state::dc_aica_reg_r), FUNC(segasp_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
 
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(segasp_state::sh4_soundram_r), FUNC(segasp_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(segasp_state::sh4_soundram_r), FUNC(segasp_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
 	map(0x01000000, 0x0100ffff).ram(); // banked access to ROM/NET board address space, mainly backup SRAM and ATA
-	map(0x01010000, 0x01010007).rw(this, FUNC(segasp_state::sp_bank_r), FUNC(segasp_state::sp_bank_w));
+	map(0x01010000, 0x01010007).rw(FUNC(segasp_state::sp_bank_r), FUNC(segasp_state::sp_bank_w));
 //  AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
-	map(0x01010100, 0x01010127).r(this, FUNC(segasp_state::sp_io_r));
-	map(0x01010128, 0x0101012f).rw(this, FUNC(segasp_state::sp_eeprom_r), FUNC(segasp_state::sp_eeprom_w));
-	map(0x01010150, 0x01010157).r(this, FUNC(segasp_state::sp_rombdflg_r));
+	map(0x01010100, 0x01010127).r(FUNC(segasp_state::sp_io_r));
+	map(0x01010128, 0x0101012f).rw(FUNC(segasp_state::sp_eeprom_r), FUNC(segasp_state::sp_eeprom_w));
+	map(0x01010150, 0x01010157).r(FUNC(segasp_state::sp_rombdflg_r));
 //  AM_RANGE(0x01010180, 0x010101af) custom UART 1
 //  AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
 
@@ -235,7 +235,7 @@ void segasp_state::segasp_map(address_map &map)
 
 void segasp_state::onchip_port(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(segasp_state::sn_93c46a_r), FUNC(segasp_state::sn_93c46a_w));
+	map(0x00, 0x0f).rw(FUNC(segasp_state::sn_93c46a_r), FUNC(segasp_state::sn_93c46a_w));
 }
 
 
@@ -304,8 +304,8 @@ MACHINE_CONFIG_START(segasp_state::segasp)
 	MCFG_DEVICE_PROGRAM_MAP(segasp_map)
 	MCFG_DEVICE_IO_MAP(onchip_port)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("sp_eeprom")
+	MCFG_DEVICE_ADD("main_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_DEVICE_ADD("sp_eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
@@ -318,7 +318,7 @@ void segasp_state::init_segasp()
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 #define SEGASP_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \

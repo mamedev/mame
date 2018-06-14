@@ -8,9 +8,6 @@
 
 #pragma once
 
-#define MCFG_WPC_LAMP_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, WPC_LAMP, 0 )
-
 class wpc_lamp_device : public device_t
 {
 public:

@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "sstrangr.lh"
@@ -149,7 +150,7 @@ void sstrangr_state::sstrangr_io_map(address_map &map)
 {
 	map(0x41, 0x41).portr("DSW");
 	map(0x42, 0x42).portr("INPUTS");
-	map(0x44, 0x44).portr("EXT").w(this, FUNC(sstrangr_state::port_w));
+	map(0x44, 0x44).portr("EXT").w(FUNC(sstrangr_state::port_w));
 }
 
 

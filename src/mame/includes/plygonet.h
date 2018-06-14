@@ -9,6 +9,7 @@
 #include "machine/k054321.h"
 #include "video/k053936.h"
 #include "cpu/dsp56k/dsp56k.h"
+#include "emupal.h"
 
 
 static const uint16_t dsp56k_bank00_size = 0x1000;

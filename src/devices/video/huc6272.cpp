@@ -45,6 +45,7 @@ void huc6272_device::kram_map(address_map &map)
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6272, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
+		m_huc6271(*this, finder_base::DUMMY_TAG),
 		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
 		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::kram_map), this)),
 		m_microprg_ram(*this, "microprg_ram"),
@@ -76,11 +77,6 @@ void huc6272_device::device_validity_check(validity_checker &valid) const
 void huc6272_device::device_start()
 {
 	m_irq_changed_cb.resolve_safe();
-
-	assert( m_huc6271_tag != nullptr );
-
-	m_huc6271 = machine().device<huc6271_device>(m_huc6271_tag);
-
 }
 
 

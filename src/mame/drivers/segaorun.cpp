@@ -830,7 +830,7 @@ void segaorun_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -1134,7 +1134,7 @@ INPUT_PORTS_END
 //  GRAPHICS DEFINITIONS
 //**************************************************************************
 
-static GFXDECODE_START( segaorun )
+static GFXDECODE_START( gfx_segaorun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -1175,7 +1175,7 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaorun)
 	MCFG_PALETTE_ADD("palette", 4096*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1183,9 +1183,8 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
-	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1214,7 +1213,7 @@ MACHINE_CONFIG_START(segaorun_state::outrundx)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
 
 	// video hardware
-	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_OUTRUN_SPRITES, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaorun_state::outrun)
@@ -1262,7 +1261,7 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)

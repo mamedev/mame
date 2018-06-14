@@ -50,6 +50,7 @@ To do:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,29 +87,18 @@ class subsino2_state : public driver_device
 {
 public:
 	subsino2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_outputs16(*this, "outputs16"),
-		m_outputs(*this, "outputs"),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper") { }
+		: driver_device(mconfig, type, tag)
+		, m_outputs16(*this, "outputs16")
+		, m_outputs(*this, "outputs")
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_hopper(*this, "hopper")
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
-	layer_t m_layers[2];
-	uint8_t m_ss9601_byte_lo;
-	uint8_t m_ss9601_byte_lo2;
-	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
-	std::unique_ptr<bitmap_ind16> m_reelbitmap;
-	uint8_t m_ss9601_scrollctrl;
-	uint8_t m_ss9601_tilesize;
-	uint8_t m_ss9601_disable;
-	uint8_t m_dsw_mask;
-	optional_shared_ptr<uint16_t> m_outputs16;
-	optional_shared_ptr<uint8_t> m_outputs;
-	uint16_t m_bishjan_sound;
-	uint16_t m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
 	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
@@ -176,12 +166,6 @@ public:
 	DECLARE_VIDEO_START(subsino2);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<ticket_dispenser_device> m_hopper;
 
 	void bishjan(machine_config &config);
 	void saklove(machine_config &config);
@@ -204,6 +188,32 @@ public:
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
 	void xtrain_io(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+	layer_t m_layers[2];
+	uint8_t m_ss9601_byte_lo;
+	uint8_t m_ss9601_byte_lo2;
+	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
+	std::unique_ptr<bitmap_ind16> m_reelbitmap;
+	uint8_t m_ss9601_scrollctrl;
+	uint8_t m_ss9601_tilesize;
+	uint8_t m_ss9601_disable;
+	uint8_t m_dsw_mask;
+	optional_shared_ptr<uint16_t> m_outputs16;
+	optional_shared_ptr<uint8_t> m_outputs;
+	uint16_t m_bishjan_sound;
+	uint16_t m_bishjan_input;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_hopper;
+	output_finder<9> m_leds;
+
 private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
@@ -930,44 +940,44 @@ void subsino2_state::bishjan_map(address_map &map)
 	map(0x200000, 0x207fff).ram().share("nvram"); // battery
 
 	// read lo (L1)   (only half tilemap?)
-	map(0x412000, 0x412fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r));
-	map(0x413000, 0x4131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
+	map(0x412000, 0x412fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x413000, 0x4131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// read lo (REEL)
-	map(0x416000, 0x416fff).r(this, FUNC(subsino2_state::ss9601_reelram_lo_r));
-	map(0x417000, 0x4171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
+	map(0x416000, 0x416fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
+	map(0x417000, 0x4171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x422000, 0x422fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r));
-	map(0x423000, 0x4231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
+	map(0x422000, 0x422fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x423000, 0x4231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
-	map(0x426000, 0x426fff).r(this, FUNC(subsino2_state::ss9601_reelram_hi_r));
-	map(0x427000, 0x4271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
+	map(0x426000, 0x426fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
+	map(0x427000, 0x4271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1)
-	map(0x430000, 0x431fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x432000, 0x432fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x433000, 0x4331ff).w(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
+	map(0x430000, 0x431fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x432000, 0x432fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x433000, 0x4331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL)
-	map(0x434000, 0x435fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
-	map(0x436000, 0x436fff).w(this, FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
-	map(0x437000, 0x4371ff).w(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
+	map(0x434000, 0x435fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
+	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	map(0x600000, 0x600001).nopr().w(this, FUNC(subsino2_state::bishjan_sound_w));
-	map(0x600040, 0x600040).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
+	map(0x600000, 0x600001).nopr().w(FUNC(subsino2_state::bishjan_sound_w));
+	map(0x600040, 0x600040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
 	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x600062, 0x600062).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x600080, 0x600080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
-	map(0x6000a0, 0x6000a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x600080, 0x600080).w(FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x6000a0, 0x6000a0).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0xa0001f, 0xa0001f).w(this, FUNC(subsino2_state::ss9601_disable_w));
-	map(0xa00020, 0xa00025).w(this, FUNC(subsino2_state::ss9601_scroll_w));
+	map(0xa0001f, 0xa0001f).w(FUNC(subsino2_state::ss9601_disable_w));
+	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
 
 	map(0xc00000, 0xc00001).portr("DSW");                              // SW1
-	map(0xc00002, 0xc00003).portr("JOY").w(this, FUNC(subsino2_state::bishjan_input_w));   // IN C
-	map(0xc00004, 0xc00005).r(this, FUNC(subsino2_state::bishjan_input_r));                        // IN A & B
-	map(0xc00006, 0xc00007).r(this, FUNC(subsino2_state::bishjan_serial_r));                       // IN D
-	map(0xc00008, 0xc00009).portr("RESET").w(this, FUNC(subsino2_state::bishjan_outputs_w)).share("outputs16");
+	map(0xc00002, 0xc00003).portr("JOY").w(FUNC(subsino2_state::bishjan_input_w));   // IN C
+	map(0xc00004, 0xc00005).r(FUNC(subsino2_state::bishjan_input_r));                        // IN A & B
+	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));                       // IN D
+	map(0xc00008, 0xc00009).portr("RESET").w(FUNC(subsino2_state::bishjan_outputs_w)).share("outputs16");
 }
 
 void subsino2_state::ramdac_map(address_map &map)
@@ -988,20 +998,20 @@ WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
 		case 0:
 			if (ACCESSING_BITS_8_15)
 			{
-				output().set_led_value(0, data & 0x4000); // record?
-				output().set_led_value(1, data & 0x2000); // shoot now
-				output().set_led_value(2, data & 0x1000); // double
-				output().set_led_value(3, data & 0x0800); // black/red
+				m_leds[0] = BIT(data, 14); // record?
+				m_leds[1] = BIT(data, 13); // shoot now
+				m_leds[2] = BIT(data, 12); // double
+				m_leds[3] = BIT(data, 11); // black/red
 			}
 			if (ACCESSING_BITS_0_7)
 			{
-				output().set_led_value(4, data & 0x0080); // start
-				output().set_led_value(5, data & 0x0040); // take
-				output().set_led_value(6, data & 0x0020); // black/red
+				m_leds[4] = BIT(data, 7); // start
+				m_leds[5] = BIT(data, 6); // take
+				m_leds[6] = BIT(data, 5); // black/red
 
 				machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
-				output().set_led_value(7, data & 0x0004); // ?
-				output().set_led_value(8, data & 0x0002); // ?
+				m_leds[7] = BIT(data, 2); // ?
+				m_leds[8] = BIT(data, 1); // ?
 			}
 			break;
 	}
@@ -1020,54 +1030,54 @@ void subsino2_state::new2001_base_map(address_map &map)
 	map(0x200000, 0x207fff).ram().share("nvram"); // battery
 
 	// write both (L1, byte_lo2)
-	map(0x410000, 0x411fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
+	map(0x410000, 0x411fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
 	// read lo (L1)   (only half tilemap?)
-	map(0x412000, 0x412fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r));
-	map(0x413000, 0x4131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
+	map(0x412000, 0x412fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x413000, 0x4131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// write both (L0 & REEL, byte_lo2)
-	map(0x414000, 0x415fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
+	map(0x414000, 0x415fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
 	// read lo (REEL)
-	map(0x416000, 0x416fff).r(this, FUNC(subsino2_state::ss9601_reelram_lo_r));
-	map(0x417000, 0x4171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
+	map(0x416000, 0x416fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
+	map(0x417000, 0x4171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x422000, 0x422fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r));
-	map(0x423000, 0x4231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
+	map(0x422000, 0x422fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x423000, 0x4231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
-	map(0x426000, 0x426fff).r(this, FUNC(subsino2_state::ss9601_reelram_hi_r));
-	map(0x427000, 0x4271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
+	map(0x426000, 0x426fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
+	map(0x427000, 0x4271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1, byte_lo)
-	map(0x430000, 0x431fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x432000, 0x432fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x433000, 0x4331ff).w(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
+	map(0x430000, 0x431fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x432000, 0x432fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x433000, 0x4331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL, byte_lo)
-	map(0x434000, 0x435fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
-	map(0x436000, 0x436fff).w(this, FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
-	map(0x437000, 0x4371ff).w(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
+	map(0x434000, 0x435fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
+	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	map(0x600000, 0x600001).nopr().w(this, FUNC(subsino2_state::bishjan_sound_w));
-	map(0x600020, 0x600020).w(this, FUNC(subsino2_state::ss9601_byte_lo2_w));
-	map(0x600040, 0x600040).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
+	map(0x600000, 0x600001).nopr().w(FUNC(subsino2_state::bishjan_sound_w));
+	map(0x600020, 0x600020).w(FUNC(subsino2_state::ss9601_byte_lo2_w));
+	map(0x600040, 0x600040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
 	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x600062, 0x600062).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x600080, 0x600080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
-	map(0x6000a0, 0x6000a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x600080, 0x600080).w(FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x6000a0, 0x6000a0).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0xa0001f, 0xa0001f).w(this, FUNC(subsino2_state::ss9601_disable_w));
-	map(0xa00020, 0xa00025).w(this, FUNC(subsino2_state::ss9601_scroll_w));
+	map(0xa0001f, 0xa0001f).w(FUNC(subsino2_state::ss9601_disable_w));
+	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
 
 	map(0xc00000, 0xc00001).portr("DSW");
 	map(0xc00002, 0xc00003).portr("IN C");
 	map(0xc00004, 0xc00005).portr("IN A & B");
-	map(0xc00006, 0xc00007).r(this, FUNC(subsino2_state::bishjan_serial_r));
+	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));
 }
 
 void subsino2_state::new2001_map(address_map &map)
 {
 	new2001_base_map(map);
-	map(0xc00008, 0xc00009).w(this, FUNC(subsino2_state::new2001_outputs_w)).share("outputs16");
+	map(0xc00008, 0xc00009).w(FUNC(subsino2_state::new2001_outputs_w)).share("outputs16");
 }
 
 /***************************************************************************
@@ -1083,15 +1093,15 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 		case 0:
 			if (ACCESSING_BITS_8_15)
 			{
-				output().set_led_value(5, data & 0x2000); // big or small
-				output().set_led_value(4, data & 0x0400); // double
-				output().set_led_value(3, data & 0x0200); // big or small
-				output().set_led_value(2, data & 0x0100); // bet
+				m_leds[5] = BIT(data, 13); // big or small
+				m_leds[4] = BIT(data, 10); // double
+				m_leds[3] = BIT(data, 9); // big or small
+				m_leds[2] = BIT(data, 8); // bet
 			}
 			if (ACCESSING_BITS_0_7)
 			{
-				output().set_led_value(1, data & 0x0080); // take
-				output().set_led_value(0, data & 0x0040); // start
+				m_leds[1] = BIT(data, 7); // take
+				m_leds[0] = BIT(data, 6); // start
 				machine().bookkeeping().coin_counter_w(1, data & 0x0004); // key in
 				machine().bookkeeping().coin_counter_w(0, data & 0x0002); // coin in
 			}
@@ -1104,7 +1114,7 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 void subsino2_state::humlan_map(address_map &map)
 {
 	new2001_base_map(map);
-	map(0xc00008, 0xc00009).w(this, FUNC(subsino2_state::humlan_outputs_w)).share("outputs16");
+	map(0xc00008, 0xc00009).w(FUNC(subsino2_state::humlan_outputs_w)).share("outputs16");
 }
 
 /***************************************************************************
@@ -1122,21 +1132,21 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 			break;
 
 		case 1: // C
-			output().set_led_value(0,    data & 0x02);   // raise
+			m_leds[0] = BIT(data, 1);   // raise
 			break;
 
 		case 2: // B
-			output().set_led_value(1,    data & 0x04);   // hold 4 / small & hold 5 / big ?
-			output().set_led_value(2,    data & 0x08);   // hold 1 / bet
-			output().set_led_value(3,    data & 0x10);   // hold 2 / take ?
-			output().set_led_value(4,    data & 0x20);   // hold 3 / double up ?
+			m_leds[1] = BIT(data, 2);   // hold 4 / small & hold 5 / big ?
+			m_leds[2] = BIT(data, 3);   // hold 1 / bet
+			m_leds[3] = BIT(data, 4);   // hold 2 / take ?
+			m_leds[4] = BIT(data, 5);   // hold 3 / double up ?
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			output().set_led_value(5,    data & 0x10);   // start
+			m_leds[5] = BIT(data, 4);   // start
 			break;
 	}
 
@@ -1161,11 +1171,11 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 			break;
 
 		case 1:
-			output().set_led_value(0,    data & 0x01);   // stop reel?
-			output().set_led_value(1,    data & 0x02);   // stop reel? (double or take)
-			output().set_led_value(2,    data & 0x04);   // start all
-			output().set_led_value(3,    data & 0x08);   // bet / stop all
-			output().set_led_value(4,    data & 0x20);   // stop reel? (double or take)
+			m_leds[0] = BIT(data, 0);   // stop reel?
+			m_leds[1] = BIT(data, 1);   // stop reel? (double or take)
+			m_leds[2] = BIT(data, 2);   // start all
+			m_leds[3] = BIT(data, 3);   // bet / stop all
+			m_leds[4] = BIT(data, 5);   // stop reel? (double or take)
 			break;
 
 		case 2:
@@ -1242,30 +1252,30 @@ void subsino2_state::mtrain_map(address_map &map)
 
 	map(0x07800, 0x07fff).ram().share("nvram");   // battery
 
-	map(0x08000, 0x08fff).w(this, FUNC(subsino2_state::mtrain_videoram_w));
+	map(0x08000, 0x08fff).w(FUNC(subsino2_state::mtrain_videoram_w));
 
-	map(0x0911f, 0x0911f).w(this, FUNC(subsino2_state::ss9601_disable_w));
-	map(0x09120, 0x09125).w(this, FUNC(subsino2_state::ss9601_scroll_w));
+	map(0x0911f, 0x0911f).w(FUNC(subsino2_state::ss9601_disable_w));
+	map(0x09120, 0x09125).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0x0912f, 0x0912f).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x0912f, 0x0912f).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0x09140, 0x09142).w(this, FUNC(subsino2_state::mtrain_outputs_w)).share("outputs");
+	map(0x09140, 0x09142).w(FUNC(subsino2_state::mtrain_outputs_w)).share("outputs");
 	map(0x09143, 0x09143).portr("IN D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
 	map(0x09144, 0x09144).portr("IN A"); // A
 	map(0x09145, 0x09145).portr("IN B"); // B
 	map(0x09146, 0x09146).portr("IN C"); // C
-	map(0x09147, 0x09147).r(this, FUNC(subsino2_state::dsw_r));
-	map(0x09148, 0x09148).w(this, FUNC(subsino2_state::dsw_mask_w));
+	map(0x09147, 0x09147).r(FUNC(subsino2_state::dsw_r));
+	map(0x09148, 0x09148).w(FUNC(subsino2_state::dsw_mask_w));
 
-	map(0x09152, 0x09152).r(this, FUNC(subsino2_state::vblank_bit2_r)).w(this, FUNC(subsino2_state::oki_bank_bit0_w));
+	map(0x09152, 0x09152).r(FUNC(subsino2_state::vblank_bit2_r)).w(FUNC(subsino2_state::oki_bank_bit0_w));
 
-	map(0x09158, 0x0915e).r(this, FUNC(subsino2_state::mtrain_prot_r));
+	map(0x09158, 0x0915e).r(FUNC(subsino2_state::mtrain_prot_r));
 
 	map(0x09160, 0x09160).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x09161, 0x09161).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x09162, 0x09162).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x09168, 0x09168).w(this, FUNC(subsino2_state::mtrain_tilesize_w));
+	map(0x09168, 0x09168).w(FUNC(subsino2_state::mtrain_tilesize_w));
 
 	map(0x09800, 0x09fff).ram();
 
@@ -1311,30 +1321,30 @@ void subsino2_state::saklove_map(address_map &map)
 	map(0x00000, 0x07fff).ram().share("nvram"); // battery
 
 	// read lo (L1)   (only half tilemap?)
-	map(0x12000, 0x12fff).rw(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r), FUNC(subsino2_state::ss9601_videoram_1_lo_w));
-	map(0x13000, 0x131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
+	map(0x12000, 0x12fff).rw(FUNC(subsino2_state::ss9601_videoram_1_lo_r), FUNC(subsino2_state::ss9601_videoram_1_lo_w));
+	map(0x13000, 0x131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// read lo (L0)
-	map(0x16000, 0x16fff).rw(this, FUNC(subsino2_state::ss9601_videoram_0_lo_r), FUNC(subsino2_state::ss9601_videoram_0_lo_w));
-	map(0x17000, 0x171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
+	map(0x16000, 0x16fff).rw(FUNC(subsino2_state::ss9601_videoram_0_lo_r), FUNC(subsino2_state::ss9601_videoram_0_lo_w));
+	map(0x17000, 0x171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x22000, 0x22fff).rw(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_w));
-	map(0x23000, 0x231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
+	map(0x22000, 0x22fff).rw(FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_w));
+	map(0x23000, 0x231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (L0)
-	map(0x26000, 0x26fff).rw(this, FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_w));
-	map(0x27000, 0x271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
+	map(0x26000, 0x26fff).rw(FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_w));
+	map(0x27000, 0x271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1)
-	map(0x30000, 0x31fff).rw(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x30000, 0x31fff).rw(FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
 	// write both (L0)
-	map(0x34000, 0x35fff).rw(this, FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x34000, 0x35fff).rw(FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
 
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void subsino2_state::saklove_io(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
+	map(0x0000, 0x0000).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
 
 	map(0x0020, 0x0020).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0040, 0x0041).w("ymsnd", FUNC(ym3812_device::write));
@@ -1343,21 +1353,21 @@ void subsino2_state::saklove_io(address_map &map)
 	map(0x0061, 0x0061).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0062, 0x0062).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x0080, 0x0080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
-	map(0x00a0, 0x00a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
-	map(0x021f, 0x021f).w(this, FUNC(subsino2_state::ss9601_disable_w));
-	map(0x0220, 0x0225).w(this, FUNC(subsino2_state::ss9601_scroll_w));
+	map(0x0080, 0x0080).w(FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x00a0, 0x00a0).w(FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x021f, 0x021f).w(FUNC(subsino2_state::ss9601_disable_w));
+	map(0x0220, 0x0225).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0x0300, 0x0303).w(this, FUNC(subsino2_state::saklove_outputs_w)).share("outputs");
+	map(0x0300, 0x0303).w(FUNC(subsino2_state::saklove_outputs_w)).share("outputs");
 	map(0x0303, 0x0303).portr("IN D"); // 0x40 serial out, 0x80 serial in
 	map(0x0304, 0x0304).portr("IN A");
 	map(0x0305, 0x0305).portr("IN B");
 	map(0x0306, 0x0306).portr("IN C");
 
-	map(0x0307, 0x0307).r(this, FUNC(subsino2_state::dsw_r));
-	map(0x0308, 0x0308).w(this, FUNC(subsino2_state::dsw_mask_w));
+	map(0x0307, 0x0307).r(FUNC(subsino2_state::dsw_r));
+	map(0x0308, 0x0308).w(FUNC(subsino2_state::dsw_mask_w));
 
-	map(0x0312, 0x0312).r(this, FUNC(subsino2_state::vblank_bit2_r)).w(this, FUNC(subsino2_state::oki_bank_bit0_w));
+	map(0x0312, 0x0312).r(FUNC(subsino2_state::vblank_bit2_r)).w(FUNC(subsino2_state::oki_bank_bit0_w));
 
 }
 
@@ -1376,22 +1386,22 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 			break;
 
 		case 1:
-			output().set_led_value(0,    data & 0x02);   // raise
+			m_leds[0] = BIT(data, 1);   // raise
 			break;
 
 		case 2: // B
-			output().set_led_value(1,    data & 0x04);   // hold 1 / big ?
-			output().set_led_value(2,    data & 0x08);   // hold 5 / bet
-			output().set_led_value(3,    data & 0x10);   // hold 4 ?
-			output().set_led_value(4,    data & 0x20);   // hold 2 / double up
-			output().set_led_value(5,    data & 0x40);   // hold 3 / small ?
+			m_leds[1] = BIT(data, 2);   // hold 1 / big ?
+			m_leds[2] = BIT(data, 3);   // hold 5 / bet
+			m_leds[3] = BIT(data, 4);   // hold 4 ?
+			m_leds[4] = BIT(data, 5);   // hold 2 / double up
+			m_leds[5] = BIT(data, 6);   // hold 3 / small ?
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
-			output().set_led_value(6,    data & 0x10);   // start / take
+			m_leds[6] = BIT(data, 4);   // start / take
 			break;
 	}
 
@@ -1403,32 +1413,32 @@ void subsino2_state::xplan_map(address_map &map)
 	map(0x00000, 0x07fff).ram().share("nvram"); // battery
 
 	// write both (L1, byte_lo2)
-	map(0x10000, 0x11fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
+	map(0x10000, 0x11fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
 	// read lo (L1)   (only half tilemap?)
-	map(0x12000, 0x12fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r));
-	map(0x13000, 0x131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
+	map(0x12000, 0x12fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x13000, 0x131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 
 	// write both (L0, byte_lo2)
-	map(0x14000, 0x15fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
+	map(0x14000, 0x15fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
 	// read lo (REEL)
-	map(0x16000, 0x16fff).r(this, FUNC(subsino2_state::ss9601_reelram_lo_r));
-	map(0x17000, 0x171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
+	map(0x16000, 0x16fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
+	map(0x17000, 0x171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x22000, 0x22fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r));
-	map(0x23000, 0x231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
+	map(0x22000, 0x22fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x23000, 0x231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
-	map(0x26000, 0x26fff).r(this, FUNC(subsino2_state::ss9601_reelram_hi_r));
-	map(0x27000, 0x271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
+	map(0x26000, 0x26fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
+	map(0x27000, 0x271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1, byte_lo)
-	map(0x30000, 0x31fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x32000, 0x32fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x33000, 0x331ff).w(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
+	map(0x30000, 0x31fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x32000, 0x32fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x33000, 0x331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL, byte_lo)
-	map(0x34000, 0x35fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
-	map(0x36000, 0x36fff).w(this, FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
-	map(0x37000, 0x371ff).w(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
+	map(0x34000, 0x35fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x36000, 0x36fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
+	map(0x37000, 0x371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -1437,32 +1447,32 @@ void subsino2_state::xplan_io(address_map &map)
 {
 	map(0x0000, 0x0000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x0020, 0x0020).w(this, FUNC(subsino2_state::ss9601_byte_lo2_w));
+	map(0x0020, 0x0020).w(FUNC(subsino2_state::ss9601_byte_lo2_w));
 
-	map(0x0040, 0x0040).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
+	map(0x0040, 0x0040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
 
 	map(0x0060, 0x0060).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0061, 0x0061).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0062, 0x0062).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x0080, 0x0080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
-	map(0x00a0, 0x00a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x0080, 0x0080).w(FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x00a0, 0x00a0).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0x021f, 0x021f).w(this, FUNC(subsino2_state::ss9601_disable_w));
-	map(0x0220, 0x0225).w(this, FUNC(subsino2_state::ss9601_scroll_w));
+	map(0x021f, 0x021f).w(FUNC(subsino2_state::ss9601_disable_w));
+	map(0x0220, 0x0225).w(FUNC(subsino2_state::ss9601_scroll_w));
 
 	map(0x0235, 0x0235).noprw(); // INT0 Ack.?
 
-	map(0x0300, 0x0300).r(this, FUNC(subsino2_state::vblank_bit6_r)).w(this, FUNC(subsino2_state::oki_bank_bit4_w));
-	map(0x0301, 0x0301).w(this, FUNC(subsino2_state::dsw_mask_w));
-	map(0x0302, 0x0302).r(this, FUNC(subsino2_state::dsw_r));
+	map(0x0300, 0x0300).r(FUNC(subsino2_state::vblank_bit6_r)).w(FUNC(subsino2_state::oki_bank_bit4_w));
+	map(0x0301, 0x0301).w(FUNC(subsino2_state::dsw_mask_w));
+	map(0x0302, 0x0302).r(FUNC(subsino2_state::dsw_r));
 	map(0x0303, 0x0303).portr("IN C");
 	map(0x0304, 0x0304).portr("IN B");
 	map(0x0305, 0x0305).portr("IN A");
 	map(0x0306, 0x0306).portr("IN D"); // 0x40 serial out, 0x80 serial in
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(this, FUNC(subsino2_state::xplan_outputs_w)).share("outputs");
+	map(0x0306, 0x0309).w(FUNC(subsino2_state::xplan_outputs_w)).share("outputs");
 }
 
 /***************************************************************************
@@ -1480,23 +1490,23 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 1: // C
-			output().set_led_value(0,    data & 0x02);   // re-double
-			output().set_led_value(1,    data & 0x04);   // half double
+			m_leds[0] = BIT(data, 1);   // re-double
+			m_leds[1] = BIT(data, 2);   // half double
 			break;
 
 		case 2: // B
-			output().set_led_value(2,    data & 0x02);   // hold 3 / small
-			output().set_led_value(3,    data & 0x04);   // hold 2 / big
-			output().set_led_value(4,    data & 0x08);   // bet
-			output().set_led_value(5,    data & 0x10);   // hold1 / take
-			output().set_led_value(6,    data & 0x20);   // double up
+			m_leds[2] = BIT(data, 1);   // hold 3 / small
+			m_leds[3] = BIT(data, 2);   // hold 2 / big
+			m_leds[4] = BIT(data, 3);   // bet
+			m_leds[5] = BIT(data, 4);   // hold1 / take
+			m_leds[6] = BIT(data, 5);   // double up
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			output().set_led_value(7,    data & 0x10);   // start
+			m_leds[7] = BIT(data, 4);   // start
 			break;
 	}
 
@@ -1508,7 +1518,7 @@ void subsino2_state::expcard_io(address_map &map)
 	xplan_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(this, FUNC(subsino2_state::expcard_outputs_w)).share("outputs");
+	map(0x0306, 0x0309).w(FUNC(subsino2_state::expcard_outputs_w)).share("outputs");
 }
 
 void subsino2_state::xtrain_io(address_map &map)
@@ -1516,7 +1526,7 @@ void subsino2_state::xtrain_io(address_map &map)
 	xplan_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(this, FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
+	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
 }
 
 
@@ -1535,7 +1545,7 @@ static const gfx_layout ss9601_8x8_layout =
 	8*8*8
 };
 
-static GFXDECODE_START( ss9601 )
+static GFXDECODE_START( gfx_ss9601 )
 	GFXDECODE_ENTRY( "tilemap", 0, ss9601_8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -2382,7 +2392,7 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
@@ -2433,7 +2443,7 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
@@ -2467,7 +2477,7 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
@@ -2505,7 +2515,7 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC

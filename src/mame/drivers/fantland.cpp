@@ -81,7 +81,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
@@ -131,11 +131,11 @@ void fantland_state::fantland_map(address_map &map)
 
 	map(0xa2000, 0xa21ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0xa3000, 0xa3001).portr("a3000").w(this, FUNC(fantland_state::fantland_nmi_enable_16_w));
-	map(0xa3002, 0xa3003).portr("a3002").w(this, FUNC(fantland_state::fantland_soundlatch_16_w));
+	map(0xa3000, 0xa3001).portr("a3000").w(FUNC(fantland_state::fantland_nmi_enable_16_w));
+	map(0xa3002, 0xa3003).portr("a3002").w(FUNC(fantland_state::fantland_soundlatch_16_w));
 
-	map(0xa4000, 0xa67ff).rw(this, FUNC(fantland_state::spriteram_16_r), FUNC(fantland_state::spriteram_16_w)).share("spriteram");
-	map(0xc0000, 0xcffff).rw(this, FUNC(fantland_state::spriteram2_16_r), FUNC(fantland_state::spriteram2_16_w)).share("spriteram2");
+	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_16_r), FUNC(fantland_state::spriteram_16_w)).share("spriteram");
+	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_16_r), FUNC(fantland_state::spriteram2_16_w)).share("spriteram2");
 
 	map(0xe0000, 0xfffff).rom();
 }
@@ -152,9 +152,9 @@ void fantland_state::galaxygn_map(address_map &map)
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x53000, 0x53000).portr("P1").w(this, FUNC(fantland_state::fantland_nmi_enable_w));
+	map(0x53000, 0x53000).portr("P1").w(FUNC(fantland_state::fantland_nmi_enable_w));
 	map(0x53001, 0x53001).portr("P2");
-	map(0x53002, 0x53002).portr("DSW1").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("DSW1").w(FUNC(fantland_state::fantland_soundlatch_w));
 	map(0x53003, 0x53003).portr("DSW2");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -244,8 +244,8 @@ void fantland_state::borntofi_map(address_map &map)
 	map(0x10000, 0x2ffff).rom();
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x53000, 0x53001).rw(this, FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
-	map(0x53002, 0x53002).portr("DSW").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53000, 0x53001).rw(FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53002, 0x53002).portr("DSW").w(FUNC(fantland_state::fantland_soundlatch_w));
 	map(0x53003, 0x53003).portr("Controls");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -275,9 +275,9 @@ void fantland_state::wheelrun_map(address_map &map)
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x53000, 0x53000).portr("53000").w(this, FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53000, 0x53000).portr("53000").w(FUNC(fantland_state::borntofi_nmi_enable_w));
 	map(0x53001, 0x53001).portr("53001");
-	map(0x53002, 0x53002).portr("53002").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("53002").w(FUNC(fantland_state::fantland_soundlatch_w));
 	map(0x53003, 0x53003).portr("53003").nopw();
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -305,7 +305,7 @@ void fantland_state::fantland_sound_iomap(address_map &map)
 {
 	map(0x0080, 0x0080).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0100, 0x0101).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x0180, 0x0180).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0180, 0x0180).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 void fantland_state::galaxygn_sound_iomap(address_map &map)
@@ -411,7 +411,7 @@ void fantland_state::borntofi_sound_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram();
 	map(0x04000, 0x04000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x04000, 0x0401f).w(this, FUNC(fantland_state::borntofi_msm5205_w));
+	map(0x04000, 0x0401f).w(FUNC(fantland_state::borntofi_msm5205_w));
 	map(0x08000, 0x0ffff).rom();
 	map(0xf8000, 0xfffff).rom();
 }
@@ -817,7 +817,7 @@ static const gfx_layout layout16x16x6 =
 	16*16*6
 };
 
-static GFXDECODE_START( fantland )
+static GFXDECODE_START( gfx_fantland )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16x6, 0, 4 ) // [0] Sprites
 GFXDECODE_END
 
@@ -840,7 +840,7 @@ MACHINE_RESET_MEMBER(fantland_state,fantland)
 WRITE_LINE_MEMBER(fantland_state::fantland_irq)
 {
 	if (state && BIT(m_nmi_enable, 3))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
@@ -875,7 +875,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -923,7 +923,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -958,7 +958,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
 		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
 
@@ -986,7 +986,7 @@ void superqix_state_base::main_map(address_map &map)
 	// the following four ranges are part of a single 6264 64Kibit SRAM chip, called 'VRAM' in POST
 	map(0xe000, 0xe0ff).ram().share("spriteram");
 	map(0xe100, 0xe7ff).ram();
-	map(0xe800, 0xefff).ram().w(this, FUNC(superqix_state_base::superqix_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(superqix_state_base::superqix_videoram_w)).share("videoram");
 	map(0xf000, 0xffff).ram();
 }
 
@@ -996,11 +996,11 @@ void hotsmash_state::pbillian_port_map(address_map &map)
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r)); // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	map(0x0402, 0x0403).w(m_ay1, FUNC(ay8910_device::data_address_w));
-	map(0x0408, 0x0408).rw(this, FUNC(hotsmash_state::hotsmash_Z80_mcu_r), FUNC(hotsmash_state::hotsmash_Z80_mcu_w));
-	map(0x0410, 0x0410).w(this, FUNC(hotsmash_state::pbillian_0410_w)); /* Coin Counters, ROM bank, NMI enable, Flipscreen */
-	map(0x0418, 0x0418).r(this, FUNC(hotsmash_state::nmi_ack_r));
+	map(0x0408, 0x0408).rw(FUNC(hotsmash_state::hotsmash_Z80_mcu_r), FUNC(hotsmash_state::hotsmash_Z80_mcu_w));
+	map(0x0410, 0x0410).w(FUNC(hotsmash_state::pbillian_0410_w)); /* Coin Counters, ROM bank, NMI enable, Flipscreen */
+	map(0x0418, 0x0418).r(FUNC(hotsmash_state::nmi_ack_r));
 	map(0x0419, 0x0419).nopw(); // ??? is this a watchdog, or something else? manual reset of mcu semaphores? manual nmi TRIGGER? used by prebillian
-	map(0x041a, 0x041a).w(this, FUNC(hotsmash_state::pbillian_sample_trigger_w));
+	map(0x041a, 0x041a).w(FUNC(hotsmash_state::pbillian_sample_trigger_w));
 	map(0x041b, 0x041b).nopr();  // input related? but probably not used, may be 'sample has stopped playing' flag? used by prebillian
 }
 
@@ -1009,15 +1009,15 @@ void superqix_state::sqix_port_map(address_map &map)
 	map(0x0000, 0x00ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r));
 	map(0x0402, 0x0402).w(m_ay1, FUNC(ay8910_device::data_w));
-	map(0x0403, 0x0403).w(this, FUNC(superqix_state::z80_ay1_sync_address_w)); // sync on address write, so semaphores are accurately read
+	map(0x0403, 0x0403).w(FUNC(superqix_state::z80_ay1_sync_address_w)); // sync on address write, so semaphores are accurately read
 	map(0x0405, 0x0405).r(m_ay2, FUNC(ay8910_device::data_r));
 	map(0x0406, 0x0407).w(m_ay2, FUNC(ay8910_device::data_address_w));
-	map(0x0408, 0x0408).r(this, FUNC(superqix_state::z80_semaphore_assert_r));
-	map(0x0410, 0x0410).w(this, FUNC(superqix_state::superqix_0410_w));  /* ROM bank, NMI enable, tile bank, bitmap bank */
-	map(0x0418, 0x0418).r(this, FUNC(superqix_state::nmi_ack_r));
+	map(0x0408, 0x0408).r(FUNC(superqix_state::z80_semaphore_assert_r));
+	map(0x0410, 0x0410).w(FUNC(superqix_state::superqix_0410_w));  /* ROM bank, NMI enable, tile bank, bitmap bank */
+	map(0x0418, 0x0418).r(FUNC(superqix_state::nmi_ack_r));
 	// following two ranges are made of two 64kx4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
-	map(0x0800, 0x77ff).ram().w(this, FUNC(superqix_state::superqix_bitmapram_w)).share("bitmapram");
-	map(0x8800, 0xf7ff).ram().w(this, FUNC(superqix_state::superqix_bitmapram2_w)).share("bitmapram2");
+	map(0x0800, 0x77ff).ram().w(FUNC(superqix_state::superqix_bitmapram_w)).share("bitmapram");
+	map(0x8800, 0xf7ff).ram().w(FUNC(superqix_state::superqix_bitmapram2_w)).share("bitmapram2");
 	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
 }
 
@@ -1325,12 +1325,12 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pbillian )
+static GFXDECODE_START( gfx_pbillian )
 	GFXDECODE_ENTRY( "gfx1", 0, pbillian_charlayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,            0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sqix )
+static GFXDECODE_START( gfx_sqix )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sqix_charlayout,   0, 16 )    /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sqix_charlayout,   0, 16 )    /* Background tiles */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,      0, 16 )    /* Sprites */
@@ -1374,7 +1374,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hotsmash_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
@@ -1472,7 +1472,7 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 

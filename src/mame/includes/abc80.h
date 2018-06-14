@@ -14,7 +14,7 @@
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/printer.h"
 #include "imagedev/cassette.h"
@@ -25,6 +25,7 @@
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 #define ABC80_HTOTAL    384
 #define ABC80_HBEND     30

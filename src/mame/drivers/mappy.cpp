@@ -644,9 +644,9 @@ WRITE_LINE_MEMBER(mappy_state::vblank_irq)
 
 void mappy_state::superpac_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
 	map(0x0800, 0x1fff).ram().share("spriteram");       /* work RAM with embedded sprite RAM */
-	map(0x2000, 0x2000).rw(this, FUNC(mappy_state::superpac_flipscreen_r), FUNC(mappy_state::superpac_flipscreen_w));
+	map(0x2000, 0x2000).rw(FUNC(mappy_state::superpac_flipscreen_r), FUNC(mappy_state::superpac_flipscreen_w));
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the sound CPU */
 	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
 	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
@@ -657,7 +657,7 @@ void mappy_state::superpac_cpu1_map(address_map &map)
 
 void mappy_state::phozon_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
 	map(0x0800, 0x1fff).ram().share("spriteram"); /* shared RAM with CPU #2/sprite RAM*/
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the sound CPU */
 	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
@@ -669,9 +669,9 @@ void mappy_state::phozon_cpu1_map(address_map &map)
 
 void mappy_state::mappy_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(mappy_state::mappy_videoram_w)).share("videoram");        /* video RAM */
+	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share("videoram");        /* video RAM */
 	map(0x1000, 0x27ff).ram().share("spriteram");       /* work RAM with embedded sprite RAM */
-	map(0x3800, 0x3fff).w(this, FUNC(mappy_state::mappy_scroll_w));               /* scroll */
+	map(0x3800, 0x3fff).w(FUNC(mappy_state::mappy_scroll_w));               /* scroll */
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the sound CPU */
 	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
 	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
@@ -704,7 +704,7 @@ void mappy_state::mappy_cpu2_map(address_map &map)
 /* extra CPU only present in Phozon */
 void mappy_state::phozon_cpu3_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
 	map(0x0800, 0x1fff).ram().share("spriteram");           /* shared RAM with CPU #2/sprite RAM*/
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with CPU #2 */
 	map(0xa000, 0xa7ff).ram();                         /* RAM */
@@ -1273,22 +1273,22 @@ static const gfx_layout spritelayout_4bpp =
 
 
 
-static GFXDECODE_START( superpac )
+static GFXDECODE_START( gfx_superpac )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_2bpp, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( phozon )
+static GFXDECODE_START( gfx_phozon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_8x8, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( mappy )
+static GFXDECODE_START( gfx_mappy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( todruaga )
+static GFXDECODE_START( gfx_todruaga )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 64 )
 GFXDECODE_END
@@ -1302,14 +1302,16 @@ GFXDECODE_END
 
 WRITE8_MEMBER(mappy_state::out_lamps)
 {
-	output().set_led_value(0, data & 1);
-	output().set_led_value(1, data & 2);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 void mappy_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));
@@ -1343,7 +1345,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
@@ -1471,7 +1473,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
@@ -1521,7 +1523,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mappy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
@@ -1585,7 +1587,7 @@ MACHINE_CONFIG_START(mappy_state::todruaga)
 	digdug2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_todruaga)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
@@ -2077,7 +2079,7 @@ void mappy_state::init_grobda()
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the 15XX may still play some part in conveying speech to the DAC.
 	  */
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac));
 }
 
 

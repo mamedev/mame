@@ -245,9 +245,9 @@ void vidbrain_state::vidbrain_mem(address_map &map)
 
 void vidbrain_state::vidbrain_io(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(vidbrain_state::keyboard_w));
-	map(0x01, 0x01).rw(this, FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
-	map(0x0c, 0x0f).w(this, FUNC(vidbrain_state::f3853_w));
+	map(0x00, 0x00).w(FUNC(vidbrain_state::keyboard_w));
+	map(0x01, 0x01).rw(FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
+	map(0x0c, 0x0f).w(FUNC(vidbrain_state::f3853_w));
 //  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, read, write)
 }
 
@@ -512,7 +512,11 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	// video hardware
 	MCFG_DEFAULT_LAYOUT(layout_vidbrain)
 
-	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(UV201_TAG, uv201_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(3636363, 232, 18, 232, 262, 21, 262)
+	MCFG_DEVICE_ADD(UV201_TAG, UV201, 3636363)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_UV201_EXT_INT_CALLBACK(WRITELINE(*this, vidbrain_state, ext_int_w))
 	MCFG_UV201_HBLANK_CALLBACK(WRITELINE(*this, vidbrain_state, hblank_w))
 	MCFG_UV201_DB_CALLBACK(READ8(*this, vidbrain_state, memory_read_byte))

@@ -299,7 +299,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
 	/* bit 4 = FLIP (not really flip, just offset) */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	output().set_led_value(0, data & 0x04);
+	m_lamp = BIT(data, 2);
 	m_subroc3d_flip = (data >> 4) & 1;
 }
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
 	m_buckrog_obch = data & 0x07;
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	output().set_led_value(0, data & 0x40);
+	m_lamp = BIT(data, 6);
 }
 
 
@@ -416,7 +416,7 @@ WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
 
 WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
 {
-	machine().output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -502,12 +502,12 @@ WRITE8_MEMBER(turbo_state::spriteram_w)
 void turbo_state::turbo_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0xa000, 0xa0ff).mirror(0x0700).rw(this, FUNC(turbo_state::spriteram_r), FUNC(turbo_state::spriteram_w));
+	map(0xa000, 0xa0ff).mirror(0x0700).rw(FUNC(turbo_state::spriteram_r), FUNC(turbo_state::spriteram_w));
 	map(0xa800, 0xa807).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb3ff).mirror(0x0400).ram().share("spritepos");
-	map(0xb800, 0xbfff).w(this, FUNC(turbo_state::turbo_analog_reset_w));
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(turbo_state::turbo_videoram_w)).share("videoram");
-	map(0xe800, 0xefff).w(this, FUNC(turbo_state::turbo_collision_clear_w));
+	map(0xb800, 0xbfff).w(FUNC(turbo_state::turbo_analog_reset_w));
+	map(0xe000, 0xe7ff).ram().w(FUNC(turbo_state::turbo_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).w(FUNC(turbo_state::turbo_collision_clear_w));
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf803).mirror(0x00fc).rw(m_i8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf900, 0xf903).mirror(0x00fc).rw(m_i8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -515,7 +515,7 @@ void turbo_state::turbo_map(address_map &map)
 	map(0xfb00, 0xfb03).mirror(0x00fc).rw(m_i8255_3, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc00, 0xfc01).mirror(0x00fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xfd00, 0xfdff).portr("INPUT");
-	map(0xfe00, 0xfeff).r(this, FUNC(turbo_state::turbo_collision_r));
+	map(0xfe00, 0xfeff).r(FUNC(turbo_state::turbo_collision_r));
 }
 
 
@@ -537,7 +537,7 @@ void turbo_state::subroc3d_map(address_map &map)
 	map(0xa803, 0xa803).mirror(0x07fc).portr("DSW3");                 // INPUT 253
 	map(0xb000, 0xb7ff).ram();                                                 // SCRATCH
 	map(0xb800, 0xbfff);                                                        // HANDLE CL
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
+	map(0xe000, 0xe7ff).ram().w(FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
 	map(0xe800, 0xe803).mirror(0x07fc).rw(m_i8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf003).mirror(0x07fc).rw(m_i8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf800, 0xf801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -554,16 +554,16 @@ void turbo_state::subroc3d_map(address_map &map)
 void turbo_state::buckrog_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
-	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255_0, FUNC(i8255_device::read)).w(this, FUNC(turbo_state::buckrog_i8255_0_w));    // 8255
+	map(0xc000, 0xc7ff).ram().w(FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
+	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255_0, FUNC(i8255_device::read)).w(FUNC(turbo_state::buckrog_i8255_0_w));    // 8255
 	map(0xd000, 0xd003).mirror(0x07fc).rw(m_i8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));            // 8255
 	map(0xd800, 0xd801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xe000, 0xe3ff).ram().share("spritepos");                           // CONT RAM
 	map(0xe400, 0xe7ff).ram().share("spriteram");                           // CONT RAM
 	map(0xe800, 0xe800).mirror(0x07fc).portr("IN0");                  // INPUT
 	map(0xe801, 0xe801).mirror(0x07fc).portr("IN1");
-	map(0xe802, 0xe802).mirror(0x07fc).r(this, FUNC(turbo_state::buckrog_port_2_r));
-	map(0xe803, 0xe803).mirror(0x07fc).r(this, FUNC(turbo_state::buckrog_port_3_r));
+	map(0xe802, 0xe802).mirror(0x07fc).r(FUNC(turbo_state::buckrog_port_2_r));
+	map(0xe803, 0xe803).mirror(0x07fc).r(FUNC(turbo_state::buckrog_port_3_r));
 	map(0xf000, 0xf000);
 	map(0xf800, 0xffff).ram();                                                 // SCRATCH
 }
@@ -576,7 +576,7 @@ void turbo_state::decrypted_opcodes_map(address_map &map)
 void turbo_state::buckrog_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x0000, 0xdfff).w(this, FUNC(turbo_state::buckrog_bitmap_w));
+	map(0x0000, 0xdfff).w(FUNC(turbo_state::buckrog_bitmap_w));
 	map(0xe000, 0xe7ff).mirror(0x1800).ram();
 }
 
@@ -584,7 +584,7 @@ void turbo_state::buckrog_cpu2_map(address_map &map)
 void turbo_state::buckrog_cpu2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).r(this, FUNC(turbo_state::buckrog_cpu2_command_r));
+	map(0x00, 0xff).r(FUNC(turbo_state::buckrog_cpu2_command_r));
 }
 
 
@@ -831,7 +831,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( turbo )
+static GFXDECODE_START( gfx_turbo )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x2_planar, 0, 64 )
 GFXDECODE_END
 
@@ -881,7 +881,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, turbo_state, start_lamp_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
 
@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
 
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
 

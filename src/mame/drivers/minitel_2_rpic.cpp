@@ -52,6 +52,7 @@
 #include "machine/timer.h"
 #include "video/ef9345.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -284,9 +285,9 @@ void minitel_state::mem_prg(address_map &map)
 
 void minitel_state::mem_io(address_map &map)
 {
-	map(0x2000, 0x3fff).rw(this, FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
+	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
 	/* ts9347 */
-	map(0x4000, 0x5ffF).rw(this, FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
+	map(0x4000, 0x5ffF).rw(FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
 }
 
 /* Input ports */
@@ -427,10 +428,10 @@ ROM_START( minitel2 )
 	ROM_DEFAULT_BIOS("ft_bv4")
 
 	ROM_SYSTEM_BIOS(0, "ft_bv4", "Minitel 2 ROM BV4")
-	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
+	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "demov1", "Minitel 2 Demo")
-	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(2) )
+	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4000, "ts9347", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k

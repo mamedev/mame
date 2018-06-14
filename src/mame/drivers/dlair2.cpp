@@ -32,6 +32,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -158,7 +159,7 @@ static const gfx_layout charlayout =
     8*8
 };
 
-static GFXDECODE_START( dlair2 )
+static GFXDECODE_START( gfx_dlair2 )
     GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 */
@@ -197,7 +198,7 @@ MACHINE_CONFIG_START(dlair2_state::dlair2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair2)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair2)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(dlair2_state, dlair2)

@@ -72,7 +72,6 @@ C004      76489 #4 trigger
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/flt_rc.h"
 #include "sound/sn76496.h"
 
 #include "speaker.h"
@@ -146,23 +145,23 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	C = 0;
 	if (offset & 0x008) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;    /* 470000pF = 0.47uF */
-	downcast<filter_rc_device*>(machine().device("filter1"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
+	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
 	if (offset & 0x020) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;    /* 470000pF = 0.47uF */
-		//  dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(,1000,2200,1000,C);
+	//  m_filter[1]->filter_rc_set_RC(,1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;    /* 470000pF = 0.47uF */
-	downcast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
+	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;    /* 470000pF = 0.47uF */
-	downcast<filter_rc_device*>(machine().device("filter3"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
+	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
@@ -181,7 +180,7 @@ void tp84_state::tp84_cpu1_map(address_map &map)
 	map(0x2860, 0x2860).portr("DSW1");
 	map(0x3000, 0x3000).portr("DSW2");
 	map(0x3000, 0x3007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x3800, 0x3800).w(this, FUNC(tp84_state::tp84_sh_irqtrigger_w));
+	map(0x3800, 0x3800).w(FUNC(tp84_state::tp84_sh_irqtrigger_w));
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3c00, 0x3c00).writeonly().share("scroll_x");
 	map(0x3e00, 0x3e00).writeonly().share("scroll_y");
@@ -207,7 +206,7 @@ void tp84_state::tp84b_cpu1_map(address_map &map)
 	map(0x1a60, 0x1a60).portr("DSW1");
 	map(0x1c00, 0x1c00).portr("DSW2");
 	map(0x1c00, 0x1c07).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x1e00, 0x1e00).w(this, FUNC(tp84_state::tp84_sh_irqtrigger_w));
+	map(0x1e00, 0x1e00).w(FUNC(tp84_state::tp84_sh_irqtrigger_w));
 	map(0x1e80, 0x1e80).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1f00, 0x1f00).writeonly().share("scroll_x");
 	map(0x1f80, 0x1f80).writeonly().share("scroll_y");
@@ -226,10 +225,10 @@ WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 void tp84_state::cpu2_map(address_map &map)
 {
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
-	map(0x2000, 0x2000).r(this, FUNC(tp84_state::tp84_scanline_r)); /* beam position */
-	map(0x4000, 0x4000).w(this, FUNC(tp84_state::sub_irq_mask_w));
+	map(0x2000, 0x2000).r(FUNC(tp84_state::tp84_scanline_r)); /* beam position */
+	map(0x4000, 0x4000).w(FUNC(tp84_state::sub_irq_mask_w));
 	map(0x6000, 0x679f).ram();
-	map(0x67a0, 0x67ff).ram().w(this, FUNC(tp84_state::tp84_spriteram_w)).share("spriteram");
+	map(0x67a0, 0x67ff).ram().w(FUNC(tp84_state::tp84_spriteram_w)).share("spriteram");
 	map(0x8000, 0x87ff).ram().share("share1");
 	map(0xe000, 0xffff).rom();
 }
@@ -240,12 +239,12 @@ void tp84_state::audio_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x8000).r(this, FUNC(tp84_state::tp84_sh_timer_r));
-	map(0xa000, 0xa1ff).w(this, FUNC(tp84_state::tp84_filter_w));
+	map(0x8000, 0x8000).r(FUNC(tp84_state::tp84_sh_timer_r));
+	map(0xa000, 0xa1ff).w(FUNC(tp84_state::tp84_filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::command_w));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::command_w));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::command_w));
 }
 
 
@@ -324,7 +323,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( tp84 )
+static GFXDECODE_START( gfx_tp84 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 64*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
@@ -364,7 +363,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tp84_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tp84)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tp84)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(tp84_state, tp84)

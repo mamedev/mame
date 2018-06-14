@@ -6,6 +6,7 @@
 #pragma once
 
 #include "audio/pleiads.h"
+#include "emupal.h"
 
 class phoenix_state : public driver_device
 {

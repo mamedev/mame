@@ -147,7 +147,7 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -318,11 +318,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 /* the data lines are flipped */
 WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
 {
-		m_sn1->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
+	m_sn1->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 {
-		m_sn2->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
+	m_sn2->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -338,21 +338,21 @@ void segag80r_state::main_map(address_map &map)
 	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
 	map(0x0800, 0x7fff).rom();     /* PROM board ROM area */
 	map(0x8000, 0xbfff).rom();     /* PROM board ROM area */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80r_state::mainram_w)).share("mainram");
-	map(0xe000, 0xffff).ram().w(this, FUNC(segag80r_state::vidram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(segag80r_state::mainram_w)).share("mainram");
+	map(0xe000, 0xffff).ram().w(FUNC(segag80r_state::vidram_w)).share("videoram");
 }
 
 void segag80r_state::g80r_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(segag80r_state::g80r_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(segag80r_state::g80r_opcode_r));
 }
 
 void segag80r_state::sega_315_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
-	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80r_state::mainram_w)).share("mainram");
-	map(0xe000, 0xffff).ram().w(this, FUNC(segag80r_state::vidram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(segag80r_state::mainram_w)).share("mainram");
+	map(0xe000, 0xffff).ram().w(FUNC(segag80r_state::vidram_w)).share("videoram");
 }
 
 
@@ -360,9 +360,9 @@ void segag80r_state::sega_315_opcodes_map(address_map &map)
 void segag80r_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xbe, 0xbf).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
-	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80r_state::coin_count_w));
-	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xbe, 0xbf).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80r_state::coin_count_w));
+	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 
@@ -371,9 +371,9 @@ void segag80r_state::main_ppi8255_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x0c, 0x0f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xbe, 0xbf).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
-	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80r_state::coin_count_w));
-	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xbe, 0xbf).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80r_state::coin_count_w));
+	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 
@@ -381,9 +381,9 @@ void segag80r_state::main_ppi8255_portmap(address_map &map)
 void segag80r_state::sindbadm_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x42, 0x43).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0x42, 0x43).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
 	map(0x80, 0x83).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
 }
 
 
@@ -399,9 +399,9 @@ void segag80r_state::sindbadm_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
-	map(0xa000, 0xa003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
-	map(0xc000, 0xc003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1fff).r(this, FUNC(segag80r_state::sindbadm_sound_data_r));
+	map(0xa000, 0xa003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
+	map(0xc000, 0xc003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(segag80r_state::sindbadm_sound_data_r));
 }
 
 
@@ -814,18 +814,18 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( segag80r )
+static GFXDECODE_START( gfx_segag80r )
 	GFXDECODE_ENTRY( nullptr, 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spaceod )
+static GFXDECODE_START( gfx_spaceod )
 	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x6_planar, 64, 1 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( monsterb )
+static GFXDECODE_START( gfx_monsterb )
 	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar, 64, 16 )
 GFXDECODE_END
@@ -848,16 +848,13 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segag80r)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(segag80r_state, screen_update_segag80r)
 	MCFG_SCREEN_PALETTE("palette")
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
@@ -865,6 +862,9 @@ MACHINE_CONFIG_START(segag80r_state::astrob)
 	g80r_base(config);
 
 	/* basic machine hardware */
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
 	astrob_sound_board(config);
@@ -880,6 +880,9 @@ MACHINE_CONFIG_START(segag80r_state::sega005)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+
 	/* sound boards */
 	sega005_sound_board(config);
 MACHINE_CONFIG_END
@@ -893,9 +896,12 @@ MACHINE_CONFIG_START(segag80r_state::spaceod)
 	/* background board changes */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spaceod)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
 	spaceod_sound_board(config);
@@ -906,17 +912,22 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 	g80r_base(config);
 
 	/* basic machine hardware */
-
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
+	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(m_soundbrd, monsterb_sound_device, sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(m_soundbrd, monsterb_sound_device, sound_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(m_soundbrd, monsterb_sound_device, n7751_status_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(m_soundbrd, monsterb_sound_device, n7751_command_w))
+
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	monsterb_sound_board(config);
+	MCFG_DEVICE_ADD(m_soundbrd, MONSTERB_SOUND, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segag80r_state::monster2)
@@ -936,12 +947,15 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 	/* basic machine hardware */
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+
 	/* sound boards */
-	MCFG_SEGAUSB_ADD("usbsnd")
+	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
 MACHINE_CONFIG_END
 
 
@@ -961,12 +975,14 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segag80r_state, sindbadm_misc_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
-	/* sound boards */
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
 
+	/* sound boards */
 	MCFG_DEVICE_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(sindbadm_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
@@ -1013,7 +1029,7 @@ ROM_START( astrob )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
@@ -1046,7 +1062,7 @@ ROM_START( astrob2 )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
@@ -1079,7 +1095,7 @@ ROM_START( astrob2a )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
@@ -1109,7 +1125,7 @@ ROM_START( astrob1 )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
@@ -1139,7 +1155,7 @@ ROM_START( astrobg )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b_speech_de.u07", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "830_speech_de.u06", 0x0000, 0x0800, CRC(2d840552) SHA1(7a2a7b54378b6cc85b8ab5c26e42266aa747c635) )
 	ROM_LOAD( "831_speech_de.u05", 0x0800, 0x0800, CRC(46b30ee4) SHA1(c9e19a9b9ebc9b3b853e79f93ad74e4ec5dfd1ae) )
 	ROM_LOAD( "832_speech_de.u04", 0x1000, 0x0800, CRC(d05280b8) SHA1(8d30b23b83b32465a8a2decd2ce9bfed24394e7e) )
@@ -1280,7 +1296,7 @@ ROM_START( monsterb )
 	ROM_LOAD( "1800b.prom-u22", 0xb000, 0x0800, CRC(6a062a04) SHA1(cae125f5c0867898f2c0a159026da69ff5a2897f) )
 	ROM_LOAD( "1801b.prom-u23", 0xb800, 0x0800, CRC(f38488fe) SHA1(dd0f2c655970e8755f9ca1898313ff5fd9f11563) )
 
-	ROM_REGION( 0x400, "audiocpu", 0 )
+	ROM_REGION( 0x400, "soundbrd:audiocpu", 0 )
 	ROM_LOAD( "7751.bin",       0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -1290,7 +1306,7 @@ ROM_START( monsterb )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "1518a.bg-u22",   0x0000, 0x2000, CRC(2d5932fe) SHA1(a9ca239a062e047b307cf3d0740cb6492a55abb4) )
 
-	ROM_REGION( 0x2000, "n7751", 0 )
+	ROM_REGION( 0x2000, "soundbrd:n7751", 0 )
 	ROM_LOAD( "1543snd.bin",    0x0000, 0x1000, CRC(b525ce8f) SHA1(61e541061a0a579101e52ffa2431540010b9df3e) ) /* U19 */
 	ROM_LOAD( "1544snd.bin",    0x1000, 0x1000, CRC(56c79fb0) SHA1(26de83efcc97318220603f83acf4387f6d70d806) ) /* U23 */
 
@@ -1307,7 +1323,7 @@ ROM_START( monsterb2 )
 	ROM_LOAD( "epr-1552.22",  0x8000, 0x2000, CRC(e876e216) SHA1(31301f2b576689aefcb42a4233f8fafb7f4791a7) )
 	ROM_LOAD( "epr-1553.23",  0xa000, 0x2000, CRC(4a839fb2) SHA1(3a15d74a0abd0548cb90c13f4d5baebe3ec83d23) )
 
-	ROM_REGION( 0x400, "audiocpu", 0 )
+	ROM_REGION( 0x400, "soundbrd:audiocpu", 0 )
 	ROM_LOAD( "7751.34",      0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -1317,7 +1333,7 @@ ROM_START( monsterb2 )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "epr-1554.58",  0x0000, 0x2000, CRC(a87937d0) SHA1(cfc2fca52bd74beb2f20ece07e9dd3e3f1038f7c) )
 
-	ROM_REGION( 0x2000, "n7751", 0 )
+	ROM_REGION( 0x2000, "soundbrd:n7751", 0 )
 	ROM_LOAD( "epr-1543.19",  0x0000, 0x1000, CRC(b525ce8f) SHA1(61e541061a0a579101e52ffa2431540010b9df3e) )
 	ROM_LOAD( "epr-1544.23",  0x1000, 0x1000, CRC(56c79fb0) SHA1(26de83efcc97318220603f83acf4387f6d70d806) )
 
@@ -1546,8 +1562,6 @@ void segag80r_state::init_monsterb()
 
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
-	save_item(NAME(m_n7751_command));
-	save_item(NAME(m_n7751_busy));
 }
 
 
@@ -1570,8 +1584,6 @@ void segag80r_state::init_monster2()
 
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
-	save_item(NAME(m_n7751_command));
-	save_item(NAME(m_n7751_busy));
 }
 
 

@@ -56,6 +56,7 @@ Grndtour:
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,7 +87,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
 	if((scanline % 32) == 16)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if ((scanline % 32) == 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -124,10 +125,10 @@ void iqblock_state::main_portmap(address_map &map)
 	map(0x5090, 0x5090).portr("SW0");
 	map(0x50a0, 0x50a0).portr("SW1");
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // UM3567_data_port_0_w
-	map(0x50c0, 0x50c0).w(this, FUNC(iqblock_state::irqack_w));
-	map(0x6000, 0x603f).w(this, FUNC(iqblock_state::fgscroll_w));
-	map(0x6800, 0x69ff).w(this, FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
-	map(0x7000, 0x7fff).ram().w(this, FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
+	map(0x50c0, 0x50c0).w(FUNC(iqblock_state::irqack_w));
+	map(0x6000, 0x603f).w(FUNC(iqblock_state::fgscroll_w));
+	map(0x6800, 0x69ff).w(FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
+	map(0x7000, 0x7fff).ram().w(FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
 	map(0x8000, 0xffff).rom().region("user1", 0);
 }
 
@@ -332,7 +333,7 @@ static const gfx_layout tilelayout3 =
 };
 #endif
 
-static GFXDECODE_START( iqblock )
+static GFXDECODE_START( gfx_iqblock )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )    /* only odd color codes are used */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )    /* only color codes 0 and 3 used */
 GFXDECODE_END
@@ -362,7 +363,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", iqblock)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_iqblock)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
