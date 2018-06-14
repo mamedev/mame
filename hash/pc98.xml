@@ -82,17 +82,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="essvitam" supported="no">
-		<description>PC-9801N/NS/NV Essential Vitamins</description>
-		<year>19??</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="746496">
-				<rom name="pc-9801n_ns_nv-essential_vitamins.hdm" size="746496" crc="ee60cb77" sha1="5540f386bb708cff61e41387c9760184083fcad8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="n88basms">
 		<description>N88 BASIC + compiler (for MS-DOS)</description>
 		<year>19??</year>
@@ -2430,13 +2419,13 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="88 kantai monogatari (disk 2).hdm" size="1261568" crc="7f0f49fc" sha1="8198ab31437dd32ccaa801d036b4c71081dea003" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="88 kantai monogatari (disk 3).hdm" size="1261568" crc="2ba08a83" sha1="411ea29e987876ef261e3e7ce9b2393acf21b3b2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="88 kantai monogatari (disk 4).hdm" size="1261568" crc="fc17242a" sha1="b425abdf6bdeca91ea95413053cc2f5be10c0123" offset="0" />
