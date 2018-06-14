@@ -81,11 +81,11 @@ public:
 	/RS is bit 1, /WS is bit 0
 	Note this is a hack and probably can be removed later, once the 'real'
 	line handlers above defer by at least 4 clock cycles before taking effect */
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( data_w ) { write_data(data); }
+	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
 
-	void data_w(uint8_t data);
-	uint8_t status_r();
+	void write_data(uint8_t data);
+	uint8_t read_status();
 
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );
@@ -123,6 +123,8 @@ private:
 	int cycles_to_ready();
 	int int_read();
 	void process(int16_t *buffer, unsigned int size);
+	int16_t clip_analog(int16_t cliptemp) const;
+	int32_t matrix_multiply(int32_t a, int32_t b) const;
 	int32_t lattice_filter();
 	void process_command(unsigned char cmd);
 	void parse_frame();
@@ -135,6 +137,9 @@ private:
 	bool NEW_FRAME_STOP_FLAG() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
 	bool NEW_FRAME_SILENCE_FLAG() const { return m_new_frame_energy_idx == 0; } // ditto as above
 	bool NEW_FRAME_UNVOICED_FLAG() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+
+	// debugging helper
+	void printbits(long data, int num);
 
 	// internal state
 

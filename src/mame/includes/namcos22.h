@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 enum

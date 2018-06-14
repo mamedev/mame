@@ -77,7 +77,7 @@ void vp595_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 	{
 		if (!data) data = 0x80;
 
-		m_pfg->str_w(data);
+		m_pfg->write_str(data);
 	}
 }
 

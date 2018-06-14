@@ -50,7 +50,7 @@ void inderp_state::maincpu_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).mirror(0x500).ram(); // 2x 5101/2101, battery-backed
 	map(0x0200, 0x02ff).mirror(0x400); // outputs CI-110 (displays)
-	map(0x0300, 0x030f).mirror(0x4c0).rw(this, FUNC(inderp_state::inputs_r), FUNC(inderp_state::inputs_w)); // outputs, one per address CI-118; inputs: whole range CI-159
+	map(0x0300, 0x030f).mirror(0x4c0).rw(FUNC(inderp_state::inputs_r), FUNC(inderp_state::inputs_w)); // outputs, one per address CI-118; inputs: whole range CI-159
 	map(0x0310, 0x0310).mirror(0x4cf); // outputs, D0-D2, BOB0-7 (solenoids) CI-121
 	map(0x0320, 0x0320).mirror(0x4cf); // outputs, D0-D3, (sound) CI-122
 	map(0x0330, 0x0337).mirror(0x4c8); // outputs, D0-D7, one per address to 16 sets of 4-bit outputs (lamps)

@@ -168,6 +168,12 @@ class screen_device : public device_t
 public:
 	// construction/destruction
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type)
+		: screen_device(mconfig, tag, owner, (u32)0)
+	{
+		set_type(type);
+	}
 	~screen_device();
 
 	// configuration readers
@@ -199,6 +205,7 @@ public:
 	}
 	void set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
+	void set_refresh_hz(attoseconds_t hz) { set_refresh(HZ_TO_ATTOSECONDS(hz)); }
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
@@ -470,8 +477,7 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
  */
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(_type)
+	MCFG_DEVICE_ADD(_tag, SCREEN, SCREEN_TYPE_##_type)
 
 #define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \

@@ -80,6 +80,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -432,8 +433,8 @@ void kingdrby_state::master_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x33ff).ram().mirror(0xc00).share("share1");
-	map(0x4000, 0x43ff).ram().w(this, FUNC(kingdrby_state::sc0_vram_w)).share("vram");
-	map(0x5000, 0x53ff).ram().w(this, FUNC(kingdrby_state::sc0_attr_w)).share("attr");
+	map(0x4000, 0x43ff).ram().w(FUNC(kingdrby_state::sc0_vram_w)).share("vram");
+	map(0x5000, 0x53ff).ram().w(FUNC(kingdrby_state::sc0_attr_w)).share("attr");
 }
 
 void kingdrby_state::master_io_map(address_map &map)
@@ -453,7 +454,7 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x7801, 0x780f).w(this, FUNC(kingdrby_state::led_array_w));
+	map(0x7801, 0x780f).w(FUNC(kingdrby_state::led_array_w));
 	map(0x7a00, 0x7a00).ram(); //buffer for the key matrix
 	map(0x7c00, 0x7c00).portr("DSW");
 }
@@ -478,7 +479,7 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x7801, 0x7801).portr("KEY1");
 	map(0x7802, 0x7802).portr("KEY2");
 	map(0x7803, 0x7803).portr("KEY3");
-	map(0x7800, 0x7803).w(this, FUNC(kingdrby_state::kingdrbb_lamps_w));
+	map(0x7800, 0x7803).w(FUNC(kingdrby_state::kingdrbb_lamps_w));
 	map(0x7a00, 0x7a00).portr("SYSTEM");
 	map(0x7c00, 0x7c00).portr("DSW");
 }

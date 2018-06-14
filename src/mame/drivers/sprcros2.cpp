@@ -56,6 +56,7 @@ SC-61.5A
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,15 +66,15 @@ class sprcros2_state : public driver_device
 {
 public:
 	sprcros2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_master_cpu(*this, "master_cpu"),
-			m_slave_cpu(*this, "slave_cpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_fgvram(*this, "fgvram"),
-			m_fgattr(*this, "fgattr"),
-			m_bgvram(*this, "bgvram"),
-			m_bgattr(*this, "bgattr"),
-			m_sprram(*this, "sprram")
+		: driver_device(mconfig, type, tag)
+		, m_master_cpu(*this, "master_cpu")
+		, m_slave_cpu(*this, "slave_cpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_fgvram(*this, "fgvram")
+		, m_fgattr(*this, "fgattr")
+		, m_bgvram(*this, "bgvram")
+		, m_bgattr(*this, "bgattr")
+		, m_sprram(*this, "sprram")
 	{ }
 
 	// devices
@@ -257,12 +258,12 @@ void sprcros2_state::master_map(address_map &map)
 void sprcros2_state::master_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("EXTRA").w("sn3", FUNC(sn76489_device::write));
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("EXTRA").w("sn3", FUNC(sn76489_device::command_w));
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).portr("DSW2");
-	map(0x07, 0x07).w(this, FUNC(sprcros2_state::master_output_w));
+	map(0x07, 0x07).w(FUNC(sprcros2_state::master_output_w));
 }
 
 void sprcros2_state::slave_map(address_map &map)
@@ -278,9 +279,9 @@ void sprcros2_state::slave_map(address_map &map)
 void sprcros2_state::slave_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sprcros2_state::bg_scrollx_w));
-	map(0x01, 0x01).w(this, FUNC(sprcros2_state::bg_scrolly_w));
-	map(0x03, 0x03).w(this, FUNC(sprcros2_state::slave_output_w));
+	map(0x00, 0x00).w(FUNC(sprcros2_state::bg_scrollx_w));
+	map(0x01, 0x01).w(FUNC(sprcros2_state::bg_scrolly_w));
+	map(0x03, 0x03).w(FUNC(sprcros2_state::slave_output_w));
 }
 
 static INPUT_PORTS_START( sprcros2 )

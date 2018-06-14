@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/ssem/ssem.h"
 #include "imagedev/snapquik.h"
+#include "emupal.h"
 #include "screen.h"
 
 

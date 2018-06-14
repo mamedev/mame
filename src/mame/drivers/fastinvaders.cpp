@@ -18,6 +18,7 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "machine/timer.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -527,18 +528,18 @@ void fastinvaders_state::fastinvaders_6845_io(address_map &map)
 	map(0x20, 0x20).w(m_crtc6845, FUNC(mc6845_device::address_w));
 	map(0x21, 0x21).rw(m_crtc6845, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x40, 0x4f).w(this, FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
+	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
-	map(0x60, 0x60).r(this, FUNC(fastinvaders_state::io_60_r));
-	map(0x70, 0x70).w(this, FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
+	map(0x60, 0x60).r(FUNC(fastinvaders_state::io_60_r));
+	map(0x70, 0x70).w(FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
 	map(0x80, 0x80).noprw(); //ds8  write here a LOT ?????
-	map(0x90, 0x90).w(this, FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
-	map(0xa0, 0xa0).w(this, FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
-	map(0xb0, 0xb0).w(this, FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
-	map(0xc0, 0xc0).w(this, FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
-	map(0xd0, 0xd0).w(this, FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
-	map(0xe0, 0xe0).w(this, FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
-	map(0xf0, 0xf0).w(this, FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
+	map(0x90, 0x90).w(FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
+	map(0xa0, 0xa0).w(FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
+	map(0xb0, 0xb0).w(FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
+	map(0xc0, 0xc0).w(FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
+	map(0xd0, 0xd0).w(FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
+	map(0xe0, 0xe0).w(FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
+	map(0xf0, 0xf0).w(FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
 }
 
 
@@ -550,19 +551,19 @@ void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 
 map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x40, 0x4f).w(this, FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
+	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
-	map(0x60, 0x60).r(this, FUNC(fastinvaders_state::io_60_r));
-	map(0x70, 0x70).w(this, FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
+	map(0x60, 0x60).r(FUNC(fastinvaders_state::io_60_r));
+	map(0x70, 0x70).w(FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
 	map(0x80, 0x80).noprw(); //write here a LOT
 	//AM_RANGE(0x80, 0x80) AM_WRITE(io_80_w)    //ds8 ????
-	map(0x90, 0x90).w(this, FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
-	map(0xa0, 0xa0).w(this, FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
-	map(0xb0, 0xb0).w(this, FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
-	map(0xc0, 0xc0).w(this, FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
-	map(0xd0, 0xd0).w(this, FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
-	map(0xe0, 0xe0).w(this, FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
-	map(0xf0, 0xf0).w(this, FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
+	map(0x90, 0x90).w(FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
+	map(0xa0, 0xa0).w(FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
+	map(0xb0, 0xb0).w(FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
+	map(0xc0, 0xc0).w(FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
+	map(0xd0, 0xd0).w(FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
+	map(0xe0, 0xe0).w(FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
+	map(0xf0, 0xf0).w(FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
 }
 
 

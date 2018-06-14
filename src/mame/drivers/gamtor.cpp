@@ -63,7 +63,7 @@ void gaminator_state::gaminator_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).rom();
 	map(0x08000000, 0x0bffffff).ram();
-	map(0x1e040008, 0x1e04000b).w(this, FUNC(gaminator_state::gamtor_unk_w));
+	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
 
 	map(0x20000000, 0x2003ffff).ram();
 

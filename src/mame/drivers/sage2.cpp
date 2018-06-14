@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi0_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, sage2_state, ppi1_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi1_pc_w))
 

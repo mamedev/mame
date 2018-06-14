@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class mugsmash_state : public driver_device
 {

@@ -220,47 +220,47 @@ private:
 
 void sun3x_state::sun3_80_mem(address_map &map)
 {
-	map(0x00000000, 0x03ffffff).ram().share("p_ram").w(this, FUNC(sun3x_state::ramwrite_w));
-	map(0x40000000, 0x40000003).rw(this, FUNC(sun3x_state::cause_buserr_r), FUNC(sun3x_state::cause_buserr_w));
-	map(0x50300000, 0x50300003).r(this, FUNC(sun3x_state::p4id_r));
+	map(0x00000000, 0x03ffffff).ram().share("p_ram").w(FUNC(sun3x_state::ramwrite_w));
+	map(0x40000000, 0x40000003).rw(FUNC(sun3x_state::cause_buserr_r), FUNC(sun3x_state::cause_buserr_w));
+	map(0x50300000, 0x50300003).r(FUNC(sun3x_state::p4id_r));
 	map(0x50400000, 0x504fffff).ram().share("bw2_vram");
-	map(0x60000000, 0x60001fff).rw(this, FUNC(sun3x_state::iommu_r), FUNC(sun3x_state::iommu_w));
-	map(0x61000000, 0x61000003).rw(this, FUNC(sun3x_state::enable_r), FUNC(sun3x_state::enable_w));
-	map(0x61000400, 0x61000403).rw(this, FUNC(sun3x_state::buserr_r), FUNC(sun3x_state::buserr_w));
-	map(0x61000800, 0x61000803).rw(this, FUNC(sun3x_state::diag_r), FUNC(sun3x_state::diag_w));
-	map(0x61001000, 0x61001003).rw(this, FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
-	map(0x61001004, 0x61001007).rw(this, FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
-	map(0x61001400, 0x61001403).rw(this, FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
+	map(0x60000000, 0x60001fff).rw(FUNC(sun3x_state::iommu_r), FUNC(sun3x_state::iommu_w));
+	map(0x61000000, 0x61000003).rw(FUNC(sun3x_state::enable_r), FUNC(sun3x_state::enable_w));
+	map(0x61000400, 0x61000403).rw(FUNC(sun3x_state::buserr_r), FUNC(sun3x_state::buserr_w));
+	map(0x61000800, 0x61000803).rw(FUNC(sun3x_state::diag_r), FUNC(sun3x_state::diag_w));
+	map(0x61001000, 0x61001003).rw(FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
+	map(0x61001004, 0x61001007).rw(FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
+	map(0x61001400, 0x61001403).rw(FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
 	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 	map(0x64000000, 0x640007ff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x66000000, 0x6600003f).rw(ESP_TAG, FUNC(ncr539x_device::read), FUNC(ncr539x_device::write)).umask32(0xff000000);
 	map(0x6e000000, 0x6e000007).m(m_fdc, FUNC(n82077aa_device::map));
-	map(0x6e000400, 0x6e000403).rw(this, FUNC(sun3x_state::fdc_control_r), FUNC(sun3x_state::fdc_control_w));
-	map(0x6f00003c, 0x6f00003f).rw(this, FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
+	map(0x6e000400, 0x6e000403).rw(FUNC(sun3x_state::fdc_control_r), FUNC(sun3x_state::fdc_control_w));
+	map(0x6f00003c, 0x6f00003f).rw(FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
 	map(0xfefe0000, 0xfefeffff).rom().region("user1", 0);
 }
 
 void sun3x_state::sun3_460_mem(address_map &map)
 {
-	map(0x00000000, 0x03ffffff).ram().share("p_ram").w(this, FUNC(sun3x_state::ramwrite_w));
-	map(0x09000000, 0x09000003).rw(this, FUNC(sun3x_state::cause_buserr_r), FUNC(sun3x_state::cause_buserr_w));
-	map(0x50300000, 0x50300003).r(this, FUNC(sun3x_state::p4id_r));
+	map(0x00000000, 0x03ffffff).ram().share("p_ram").w(FUNC(sun3x_state::ramwrite_w));
+	map(0x09000000, 0x09000003).rw(FUNC(sun3x_state::cause_buserr_r), FUNC(sun3x_state::cause_buserr_w));
+	map(0x50300000, 0x50300003).r(FUNC(sun3x_state::p4id_r));
 	map(0x50400000, 0x504fffff).ram().share("bw2_vram");
-	map(0x5c000f14, 0x5c000f17).r(this, FUNC(sun3x_state::fpa_r));
-	map(0x60000000, 0x60001fff).rw(this, FUNC(sun3x_state::iommu_r), FUNC(sun3x_state::iommu_w));
-	map(0x61000000, 0x61000003).rw(this, FUNC(sun3x_state::enable_r), FUNC(sun3x_state::enable_w));
-	map(0x61000400, 0x61000403).rw(this, FUNC(sun3x_state::buserr_r), FUNC(sun3x_state::buserr_w));
-	map(0x61000800, 0x61000803).rw(this, FUNC(sun3x_state::diag_r), FUNC(sun3x_state::diag_w));
-	map(0x61001000, 0x61001003).rw(this, FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
-	map(0x61001004, 0x61001007).rw(this, FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
-	map(0x61001400, 0x61001403).rw(this, FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
+	map(0x5c000f14, 0x5c000f17).r(FUNC(sun3x_state::fpa_r));
+	map(0x60000000, 0x60001fff).rw(FUNC(sun3x_state::iommu_r), FUNC(sun3x_state::iommu_w));
+	map(0x61000000, 0x61000003).rw(FUNC(sun3x_state::enable_r), FUNC(sun3x_state::enable_w));
+	map(0x61000400, 0x61000403).rw(FUNC(sun3x_state::buserr_r), FUNC(sun3x_state::buserr_w));
+	map(0x61000800, 0x61000803).rw(FUNC(sun3x_state::diag_r), FUNC(sun3x_state::diag_w));
+	map(0x61001000, 0x61001003).rw(FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
+	map(0x61001004, 0x61001007).rw(FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
+	map(0x61001400, 0x61001403).rw(FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
 	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 
-	map(0x6f00003c, 0x6f00003f).rw(this, FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
+	map(0x6f00003c, 0x6f00003f).rw(FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
 	map(0xfefe0000, 0xfefeffff).rom().region("user1", 0);
 }
 

@@ -334,13 +334,13 @@ void bpmmicro_state::i286_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).ram(); // 512k ram
-	map(0x082200, 0x82201).w(this, FUNC(bpmmicro_state::unknown_82200_w));
-	map(0x084000, 0x84001).r(this, FUNC(bpmmicro_state::latch_84000_r)); // GUESS: this is reading the octal latch
-	map(0x084002, 0x84003).w(this, FUNC(bpmmicro_state::latch_84002_w)); // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
-	map(0x08400e, 0x8400f).w(this, FUNC(bpmmicro_state::unknown_8400e_w));
-	map(0x084018, 0x84019).w(this, FUNC(bpmmicro_state::unknown_84018_w));
-	map(0x08401a, 0x8401b).w(this, FUNC(bpmmicro_state::unknown_8401a_w));
-	map(0x08401c, 0x8401d).w(this, FUNC(bpmmicro_state::eeprom_8401c_w));
+	map(0x082200, 0x82201).w(FUNC(bpmmicro_state::unknown_82200_w));
+	map(0x084000, 0x84001).r(FUNC(bpmmicro_state::latch_84000_r)); // GUESS: this is reading the octal latch
+	map(0x084002, 0x84003).w(FUNC(bpmmicro_state::latch_84002_w)); // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
+	map(0x08400e, 0x8400f).w(FUNC(bpmmicro_state::unknown_8400e_w));
+	map(0x084018, 0x84019).w(FUNC(bpmmicro_state::unknown_84018_w));
+	map(0x08401a, 0x8401b).w(FUNC(bpmmicro_state::unknown_8401a_w));
+	map(0x08401c, 0x8401d).w(FUNC(bpmmicro_state::eeprom_8401c_w));
 	map(0x0f0000, 0x0fffff).rom().region("bios", 0x10000);
 	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
 	map(0xfffff0, 0xffffff).rom().region("bios", 0x1fff0); //?
@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(bpmmicro_state::bpmmicro)
 	MCFG_DEVICE_PROGRAM_MAP(i286_mem)
 	MCFG_DEVICE_IO_MAP(i286_io)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom_u38")
+	MCFG_DEVICE_ADD("eeprom_u38", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 

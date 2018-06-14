@@ -453,7 +453,7 @@ void sb2m600_state::osi600_mem(address_map &map)
 	map(0x0000, 0x1fff).bankrw("bank1");
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xd3ff).ram().share("video_ram");
-	map(0xdf00, 0xdf00).rw(this, FUNC(sb2m600_state::keyboard_r), FUNC(sb2m600_state::keyboard_w));
+	map(0xdf00, 0xdf00).rw(FUNC(sb2m600_state::keyboard_r), FUNC(sb2m600_state::keyboard_w));
 	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
@@ -464,7 +464,7 @@ void uk101_state::uk101_mem(address_map &map)
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).noprw();  // bios sets this to spaces at boot
-	map(0xdc00, 0xdfff).r(this, FUNC(uk101_state::keyboard_r)).w(this, FUNC(uk101_state::keyboard_w));
+	map(0xdc00, 0xdfff).r(FUNC(uk101_state::keyboard_r)).w(FUNC(uk101_state::keyboard_w));
 	map(0xf000, 0xf001).mirror(0x00fe).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
@@ -478,11 +478,11 @@ void c1p_state::c1p_mem(address_map &map)
 	map(0xc70c, 0xc70f).rw("pia_3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).ram().share("color_ram");
-	map(0xd800, 0xd800).w(this, FUNC(c1p_state::ctrl_w));
-	map(0xdf00, 0xdf00).rw(this, FUNC(c1p_state::keyboard_r), FUNC(c1p_state::keyboard_w));
+	map(0xd800, 0xd800).w(FUNC(c1p_state::ctrl_w));
+	map(0xdf00, 0xdf00).rw(FUNC(c1p_state::keyboard_r), FUNC(c1p_state::keyboard_w));
 	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xf7c0, 0xf7c0).w(this, FUNC(c1p_state::osi630_sound_w));
-	map(0xf7e0, 0xf7e0).w(this, FUNC(c1p_state::osi630_ctrl_w));
+	map(0xf7c0, 0xf7c0).w(FUNC(c1p_state::osi630_sound_w));
+	map(0xf7e0, 0xf7e0).w(FUNC(c1p_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -497,11 +497,11 @@ void c1pmf_state::c1pmf_mem(address_map &map)
 	map(0xc70c, 0xc70f).rw("pia_3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).ram().share("color_ram");
-	map(0xd800, 0xd800).w(this, FUNC(c1pmf_state::ctrl_w));
-	map(0xdf00, 0xdf00).rw(this, FUNC(c1pmf_state::keyboard_r), FUNC(c1pmf_state::keyboard_w));
+	map(0xd800, 0xd800).w(FUNC(c1pmf_state::ctrl_w));
+	map(0xdf00, 0xdf00).rw(FUNC(c1pmf_state::keyboard_r), FUNC(c1pmf_state::keyboard_w));
 	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xf7c0, 0xf7c0).w(this, FUNC(c1pmf_state::osi630_sound_w));
-	map(0xf7e0, 0xf7e0).w(this, FUNC(c1pmf_state::osi630_ctrl_w));
+	map(0xf7c0, 0xf7c0).w(FUNC(c1pmf_state::osi630_sound_w));
+	map(0xf7e0, 0xf7e0).w(FUNC(c1pmf_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
 }
 

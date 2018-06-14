@@ -130,7 +130,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 void midcoin24cdjuke_state::midcoin24cdjuke_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x7800, 0x780f).w(this, FUNC(midcoin24cdjuke_state::digit_w));
+	map(0x7800, 0x780f).w(FUNC(midcoin24cdjuke_state::digit_w));
 	map(0x8000, 0xffff).ram();
 }
 
@@ -141,7 +141,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke_io(address_map &map)
 	map(0x04, 0x07).rw("ic11", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0c, 0x0c).nopw();
-	map(0x10, 0x1f).r(this, FUNC(midcoin24cdjuke_state::unknown_r));
+	map(0x10, 0x1f).r(FUNC(midcoin24cdjuke_state::unknown_r));
 }
 
 static INPUT_PORTS_START( midcoin24cdjuke )

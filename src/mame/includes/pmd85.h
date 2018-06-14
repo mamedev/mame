@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 
 class pmd85_state : public driver_device

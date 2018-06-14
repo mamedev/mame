@@ -32,6 +32,7 @@ f5
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -107,7 +108,7 @@ void mosaicf2_state::mosaicf2_io(address_map &map)
 	map(0x4003, 0x4003).r("oki", FUNC(okim6295_device::read));
 	map(0x4813, 0x4813).r("ymsnd", FUNC(ym2151_device::status_r));
 	map(0x5000, 0x5003).portr("P1");
-	map(0x5200, 0x5203).r(this, FUNC(mosaicf2_state::f32_input_port_1_r));
+	map(0x5200, 0x5203).r(FUNC(mosaicf2_state::f32_input_port_1_r));
 	map(0x5400, 0x5403).portr("EEPROMIN");
 	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
 	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));
@@ -172,7 +173,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_DEVICE_IO_MAP(mosaicf2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
@@ -251,7 +252,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_DEVICE_IO_MAP(royalpk2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 

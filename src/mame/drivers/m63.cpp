@@ -124,6 +124,7 @@ Dip locations verified for:
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -479,14 +480,14 @@ void m63_state::m63_map(address_map &map)
 	map(0xe000, 0xe1ff).ram();
 	map(0xe200, 0xe2ff).ram().share("spriteram");
 	map(0xe300, 0xe3ff).ram().share("scrollram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
-	map(0xe800, 0xebff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
-	map(0xec00, 0xefff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xe800, 0xebff).ram().w(FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xec00, 0xefff).ram().w(FUNC(m63_state::m63_colorram_w)).share("colorram");
 	map(0xf000, 0xf007).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xf800, 0xf800).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf801, 0xf801).portr("P2").nopw(); /* continues game when in stop mode (cleared by NMI handler) */
 	map(0xf802, 0xf802).portr("DSW1");
-	map(0xf803, 0xf803).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf803, 0xf803).w(FUNC(m63_state::snd_irq_w));
 	map(0xf806, 0xf806).portr("DSW2");
 }
 
@@ -498,18 +499,18 @@ void m63_state::fghtbskt_map(address_map &map)
 	map(0xd000, 0xd1ff).ram();
 	map(0xd200, 0xd2ff).ram().share("spriteram");
 	map(0xd300, 0xd3ff).ram().share("scrollram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
-	map(0xf000, 0xf000).r(this, FUNC(m63_state::snd_status_r));
+	map(0xd400, 0xd7ff).ram().w(FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xd800, 0xdbff).ram().w(FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xf000, 0xf000).r(FUNC(m63_state::snd_status_r));
 	map(0xf001, 0xf001).portr("P1");
 	map(0xf002, 0xf002).portr("P2");
 	map(0xf003, 0xf003).portr("DSW");
-	map(0xf000, 0xf000).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf000, 0xf000).w(FUNC(m63_state::snd_irq_w));
 	map(0xf001, 0xf001).nopw();
 	map(0xf002, 0xf002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf800, 0xf807).w("outlatch", FUNC(ls259_device::write_d0));
-	map(0xf807, 0xf807).w(this, FUNC(m63_state::fghtbskt_samples_w)); // FIXME
+	map(0xf807, 0xf807).w(FUNC(m63_state::fghtbskt_samples_w)); // FIXME
 }
 
 void m63_state::i8039_map(address_map &map)
@@ -520,7 +521,7 @@ void m63_state::i8039_map(address_map &map)
 
 void m63_state::i8039_port_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
+	map(0x00, 0xff).rw(FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
 }
 
 

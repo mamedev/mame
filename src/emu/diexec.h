@@ -140,10 +140,10 @@ public:
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
-    template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
+	template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
 	{
 		m_vblank_interrupt = std::forward<Object>(cb);
-        m_vblank_interrupt_screen = tag;
+		m_vblank_interrupt_screen = tag;
 	}
 	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
 	{
@@ -290,7 +290,7 @@ private:
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-    const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
+	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 

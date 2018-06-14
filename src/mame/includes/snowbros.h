@@ -5,6 +5,7 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora
+#include "emupal.h"
 
 class snowbros_state : public driver_device
 {

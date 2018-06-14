@@ -13,6 +13,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define PCW_BORDER_HEIGHT 8

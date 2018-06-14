@@ -103,6 +103,7 @@
 #include "emu.h"
 #include "includes/tdv2324.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -153,9 +154,9 @@ void tdv2324_state::tdv2324_io(address_map &map)
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
-	map(0x30, 0x30).r(this, FUNC(tdv2324_state::tdv2324_main_io_30));
+	map(0x30, 0x30).r(FUNC(tdv2324_state::tdv2324_main_io_30));
 //  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
-	map(0xe6, 0xe6).r(this, FUNC(tdv2324_state::tdv2324_main_io_e6));
+	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8253_5_0_TAG, pit8253_device, read, write)
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(MK3887N4_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8259A_TAG, pic8259_device, read, write)

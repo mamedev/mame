@@ -61,18 +61,18 @@ write:
 void dday_state::dday_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(this, FUNC(dday_state::dday_sl_control_w));
-	map(0x5000, 0x53ff).ram().w(this, FUNC(dday_state::dday_textvideoram_w)).share("textvideoram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(dday_state::dday_fgvideoram_w)).share("fgvideoram");
-	map(0x5800, 0x5bff).ram().w(this, FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
-	map(0x5c00, 0x5fff).rw(this, FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).w(FUNC(dday_state::dday_sl_control_w));
+	map(0x5000, 0x53ff).ram().w(FUNC(dday_state::dday_textvideoram_w)).share("textvideoram");
+	map(0x5400, 0x57ff).ram().w(FUNC(dday_state::dday_fgvideoram_w)).share("fgvideoram");
+	map(0x5800, 0x5bff).ram().w(FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
+	map(0x5c00, 0x5fff).rw(FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
 	map(0x6000, 0x63ff).ram();
 	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8910_device::address_data_w));
 	map(0x6800, 0x6801).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x6c00, 0x6c00).portr("BUTTONS");
 	map(0x7000, 0x7000).portr("DSW0");
 	map(0x7400, 0x7400).portr("DSW1");
-	map(0x7800, 0x7800).rw(this, FUNC(dday_state::dday_countdown_timer_r), FUNC(dday_state::dday_control_w));
+	map(0x7800, 0x7800).rw(FUNC(dday_state::dday_countdown_timer_r), FUNC(dday_state::dday_control_w));
 	map(0x7c00, 0x7c00).portr("PADDLE");
 }
 

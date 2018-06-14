@@ -105,6 +105,7 @@ protected:
 
 	void vrtc_start();
 	void vrtc_end();
+	void dma_start();
 
 	void recompute_parameters();
 
@@ -201,7 +202,7 @@ protected:
 	int m_buffer_idx;
 	int m_fifo_idx;
 	int m_dma_idx;
-	bool m_fifo_next;
+	uint8_t m_dma_last_char;
 	int m_buffer_dma;
 
 	int m_lpen;

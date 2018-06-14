@@ -46,6 +46,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -244,11 +245,11 @@ WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 void carjmbre_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8803, 0x8803).w(this, FUNC(carjmbre_state::nmi_enable_w));
-	map(0x8805, 0x8805).w(this, FUNC(carjmbre_state::bgcolor_w));
-	map(0x8807, 0x8807).w(this, FUNC(carjmbre_state::flipscreen_w));
+	map(0x8803, 0x8803).w(FUNC(carjmbre_state::nmi_enable_w));
+	map(0x8805, 0x8805).w(FUNC(carjmbre_state::bgcolor_w));
+	map(0x8807, 0x8807).w(FUNC(carjmbre_state::flipscreen_w));
 	map(0x8000, 0x87ff).ram(); // 6116
-	map(0x9000, 0x97ff).ram().w(this, FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
+	map(0x9000, 0x97ff).ram().w(FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
 	map(0x9800, 0x98ff).ram().share("spriteram"); // 5101*2
 	map(0xa000, 0xa000).portr("IN1");
 	map(0xa800, 0xa800).portr("IN2");

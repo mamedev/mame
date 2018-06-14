@@ -392,13 +392,13 @@ void segag80v_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
 	map(0x0800, 0xbfff).rom();     /* PROM board ROM area */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80v_state::mainram_w)).share("mainram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(segag80v_state::vectorram_w)).share("vectorram");
+	map(0xc800, 0xcfff).ram().w(FUNC(segag80v_state::mainram_w)).share("mainram");
+	map(0xe000, 0xefff).ram().w(FUNC(segag80v_state::vectorram_w)).share("vectorram");
 }
 
 void segag80v_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(segag80v_state::g80v_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(segag80v_state::g80v_opcode_r));
 }
 
 
@@ -407,12 +407,12 @@ void segag80v_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xbc, 0xbc); /* AM_READ ??? */
-	map(0xbd, 0xbe).w(this, FUNC(segag80v_state::multiply_w));
-	map(0xbe, 0xbe).r(this, FUNC(segag80v_state::multiply_r));
-	map(0xbf, 0xbf).w(this, FUNC(segag80v_state::unknown_w));
+	map(0xbd, 0xbe).w(FUNC(segag80v_state::multiply_w));
+	map(0xbe, 0xbe).r(FUNC(segag80v_state::multiply_r));
+	map(0xbf, 0xbf).w(FUNC(segag80v_state::unknown_w));
 
-	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80v_state::coin_count_w));
-	map(0xf8, 0xfb).r(this, FUNC(segag80v_state::mangled_ports_r));
+	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80v_state::coin_count_w));
+	map(0xf8, 0xfb).r(FUNC(segag80v_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 

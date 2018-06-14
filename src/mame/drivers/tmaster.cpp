@@ -100,6 +100,7 @@ Chips:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -262,7 +263,7 @@ void tmaster_state::tmaster_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x27ffff).ram();
 	map(0x280000, 0x28ffef).ram().share("nvram");
-	map(0x28fff0, 0x28ffff).rw(this, FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
+	map(0x28fff0, 0x28ffff).rw(FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 
 	map(0x300010, 0x300011).portr("COIN");
 

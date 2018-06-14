@@ -42,6 +42,7 @@
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -269,19 +270,19 @@ void pyl601_state::pyl601_mem(address_map &map)
 	map(0xe000, 0xe5ff).bankrw("bank3");
 	map(0xe600, 0xe600).mirror(4).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe601, 0xe601).mirror(4).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe628, 0xe628).r(this, FUNC(pyl601_state::keyboard_r));
-	map(0xe629, 0xe629).rw(this, FUNC(pyl601_state::video_mode_r), FUNC(pyl601_state::video_mode_w));
-	map(0xe62a, 0xe62a).rw(this, FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
-	map(0xe62b, 0xe62b).rw(this, FUNC(pyl601_state::timer_r), FUNC(pyl601_state::speaker_w));
-	map(0xe62d, 0xe62d).r(this, FUNC(pyl601_state::video_mode_r));
-	map(0xe62e, 0xe62e).rw(this, FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
-	map(0xe680, 0xe680).w(this, FUNC(pyl601_state::vdisk_page_w));
-	map(0xe681, 0xe681).w(this, FUNC(pyl601_state::vdisk_h_w));
-	map(0xe682, 0xe682).w(this, FUNC(pyl601_state::vdisk_l_w));
-	map(0xe683, 0xe683).rw(this, FUNC(pyl601_state::vdisk_data_r), FUNC(pyl601_state::vdisk_data_w));
-	map(0xe6c0, 0xe6c0).rw(this, FUNC(pyl601_state::floppy_r), FUNC(pyl601_state::floppy_w));
+	map(0xe628, 0xe628).r(FUNC(pyl601_state::keyboard_r));
+	map(0xe629, 0xe629).rw(FUNC(pyl601_state::video_mode_r), FUNC(pyl601_state::video_mode_w));
+	map(0xe62a, 0xe62a).rw(FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
+	map(0xe62b, 0xe62b).rw(FUNC(pyl601_state::timer_r), FUNC(pyl601_state::speaker_w));
+	map(0xe62d, 0xe62d).r(FUNC(pyl601_state::video_mode_r));
+	map(0xe62e, 0xe62e).rw(FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
+	map(0xe680, 0xe680).w(FUNC(pyl601_state::vdisk_page_w));
+	map(0xe681, 0xe681).w(FUNC(pyl601_state::vdisk_h_w));
+	map(0xe682, 0xe682).w(FUNC(pyl601_state::vdisk_l_w));
+	map(0xe683, 0xe683).rw(FUNC(pyl601_state::vdisk_data_r), FUNC(pyl601_state::vdisk_data_w));
+	map(0xe6c0, 0xe6c0).rw(FUNC(pyl601_state::floppy_r), FUNC(pyl601_state::floppy_w));
 	map(0xe6d0, 0xe6d1).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xe6f0, 0xe6f0).rw(this, FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
+	map(0xe6f0, 0xe6f0).rw(FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
 	map(0xe700, 0xefff).bankrw("bank4");
 	map(0xf000, 0xffff).bankr("bank5").bankw("bank6");
 }

@@ -82,8 +82,8 @@ void zorba_state::zorba_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x04, 0x04).rw(this, FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
-	map(0x05, 0x05).rw(this, FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
+	map(0x04, 0x04).rw(FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
+	map(0x05, 0x05).rw(FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
 	map(0x10, 0x11).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x20, 0x20).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x21, 0x21).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -91,8 +91,8 @@ void zorba_state::zorba_io(address_map &map)
 	map(0x23, 0x23).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x24, 0x24).rw(m_uart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x25, 0x25).rw(m_uart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x26, 0x26).w(this, FUNC(zorba_state::intmask_w));
-	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x26, 0x26).w(FUNC(zorba_state::intmask_w));
+	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x50, 0x53).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x60, 0x63).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -137,9 +137,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zorba_state::zorba)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, Z80, 24_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(zorba_mem)
-	MCFG_DEVICE_IO_MAP(zorba_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
+	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	// port B - parallel interface
 	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zorba_state, pia0_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("parprndata", output_latch_device, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("parprndata", output_latch_device, bus_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE("parprn", centronics_device, write_strobe))
 
 	// IEEE488 interface

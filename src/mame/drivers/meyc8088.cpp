@@ -30,6 +30,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -230,11 +231,11 @@ void meyc8088_state::meyc8088_map(address_map &map)
 	map(0xb0800, 0xb0807).rw("i8155_2", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xb1000, 0xb10ff).rw("i8155_1", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0xb1800, 0xb1807).rw("i8155_1", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xb2000, 0xb2000).w(this, FUNC(meyc8088_state::drive_w));
+	map(0xb2000, 0xb2000).w(FUNC(meyc8088_state::drive_w));
 	map(0xb3000, 0xb3000).noprw(); // i8251A data (debug related, unpopulated on sold boards)
 	map(0xb3800, 0xb3800).noprw(); // "
-	map(0xb4000, 0xb4000).rw(this, FUNC(meyc8088_state::screen_flip_r), FUNC(meyc8088_state::screen_flip_w));
-	map(0xb5000, 0xb5000).rw(this, FUNC(meyc8088_state::video5_flip_r), FUNC(meyc8088_state::video5_flip_w));
+	map(0xb4000, 0xb4000).rw(FUNC(meyc8088_state::screen_flip_r), FUNC(meyc8088_state::screen_flip_w));
+	map(0xb5000, 0xb5000).rw(FUNC(meyc8088_state::video5_flip_r), FUNC(meyc8088_state::video5_flip_w));
 	map(0xf8000, 0xfffff).rom();
 }
 

@@ -356,7 +356,7 @@ void _4enlinea_state::main_map(address_map &map)
 //  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
 	map(0xc000, 0xdfff).ram();
 
-	map(0xe000, 0xe001).r(this, FUNC(_4enlinea_state::serial_r));
+	map(0xe000, 0xe001).r(FUNC(_4enlinea_state::serial_r));
 }
 
 void _4enlinea_state::main_portmap(address_map &map)
@@ -394,10 +394,10 @@ void _4enlinea_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xf800, 0xfbff).ram();
-	map(0xfc24, 0xfc24).r(this, FUNC(_4enlinea_state::hack_r));
-	map(0xfc28, 0xfc28).r(this, FUNC(_4enlinea_state::hack_r));
-	map(0xfc30, 0xfc31).w(this, FUNC(_4enlinea_state::serial_w));
-	map(0xfc32, 0xfc32).rw(this, FUNC(_4enlinea_state::serial_status_r), FUNC(_4enlinea_state::serial_status_w));
+	map(0xfc24, 0xfc24).r(FUNC(_4enlinea_state::hack_r));
+	map(0xfc28, 0xfc28).r(FUNC(_4enlinea_state::hack_r));
+	map(0xfc30, 0xfc31).w(FUNC(_4enlinea_state::serial_w));
+	map(0xfc32, 0xfc32).rw(FUNC(_4enlinea_state::serial_status_r), FUNC(_4enlinea_state::serial_status_w));
 	map(0xfc48, 0xfc49).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 
 }

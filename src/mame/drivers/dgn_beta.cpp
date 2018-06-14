@@ -165,12 +165,12 @@ void dgn_beta_state::dgnbeta_map(address_map &map)
 	map(0xfc80, 0xfc80).w(m_mc6845, FUNC(mc6845_device::address_w));
 	map(0xfc81, 0xfc81).rw(m_mc6845, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xfc82, 0xfC9F).noprw();
-	map(0xFCA0, 0xFCA3).nopr().w(this, FUNC(dgn_beta_state::dgnbeta_colour_ram_w));         /* 4x4bit colour ram for graphics modes */
+	map(0xFCA0, 0xFCA3).nopr().w(FUNC(dgn_beta_state::dgnbeta_colour_ram_w));         /* 4x4bit colour ram for graphics modes */
 	map(0xFCC0, 0xFCC3).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfcC4, 0xfcdf).noprw();
-	map(0xfce0, 0xfce3).rw(this, FUNC(dgn_beta_state::dgnbeta_wd2797_r), FUNC(dgn_beta_state::dgnbeta_wd2797_w));  /* Onboard disk interface */
+	map(0xfce0, 0xfce3).rw(FUNC(dgn_beta_state::dgnbeta_wd2797_r), FUNC(dgn_beta_state::dgnbeta_wd2797_w));  /* Onboard disk interface */
 	map(0xfce4, 0xfdff).noprw();
-	map(0xFE00, 0xFE0F).rw(this, FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
+	map(0xFE00, 0xFE0F).rw(FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
 	map(0xfe10, 0xfEff).noprw();
 	map(0xFF00, 0xFFFF).bankrw("bank17");
 

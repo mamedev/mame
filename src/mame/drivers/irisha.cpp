@@ -23,6 +23,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -79,7 +80,7 @@ void irisha_state::irisha_mem(address_map &map)
 
 void irisha_state::irisha_io(address_map &map)
 {
-	map(0x04, 0x05).r(this, FUNC(irisha_state::irisha_keyboard_r));
+	map(0x04, 0x05).r(FUNC(irisha_state::irisha_keyboard_r));
 	map(0x06, 0x06).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x07, 0x07).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x08, 0x0B).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));

@@ -50,9 +50,9 @@ void special_state::erik_mem(address_map &map)
 void special_state::erik_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf1, 0xf1).rw(this, FUNC(special_state::erik_rr_reg_r), FUNC(special_state::erik_rr_reg_w));
-	map(0xf2, 0xf2).rw(this, FUNC(special_state::erik_rc_reg_r), FUNC(special_state::erik_rc_reg_w));
-	map(0xf3, 0xf3).rw(this, FUNC(special_state::erik_disk_reg_r), FUNC(special_state::erik_disk_reg_w));
+	map(0xf1, 0xf1).rw(FUNC(special_state::erik_rr_reg_r), FUNC(special_state::erik_rr_reg_w));
+	map(0xf2, 0xf2).rw(FUNC(special_state::erik_rc_reg_r), FUNC(special_state::erik_rc_reg_w));
+	map(0xf3, 0xf3).rw(FUNC(special_state::erik_disk_reg_r), FUNC(special_state::erik_disk_reg_w));
 	map(0xf4, 0xf7).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 }
 
@@ -67,9 +67,9 @@ void special_state::specimx_mem(address_map &map)
 	map(0xffe4, 0xffe7).ram(); //external 8255
 	map(0xffe8, 0xffeb).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0xffec, 0xffef).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xfff0, 0xfff3).rw(this, FUNC(special_state::specimx_disk_ctrl_r), FUNC(special_state::specimx_disk_ctrl_w));
-	map(0xfff8, 0xfffb).rw(this, FUNC(special_state::specimx_video_color_r), FUNC(special_state::specimx_video_color_w));
-	map(0xfffc, 0xffff).w(this, FUNC(special_state::specimx_select_bank));
+	map(0xfff0, 0xfff3).rw(FUNC(special_state::specimx_disk_ctrl_r), FUNC(special_state::specimx_disk_ctrl_w));
+	map(0xfff8, 0xfffb).rw(FUNC(special_state::specimx_video_color_r), FUNC(special_state::specimx_video_color_w));
+	map(0xfffc, 0xffff).w(FUNC(special_state::specimx_select_bank));
 }
 
 /* Input ports */

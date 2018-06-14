@@ -29,6 +29,7 @@ TODO:
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

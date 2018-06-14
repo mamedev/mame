@@ -87,6 +87,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -126,8 +127,8 @@ void hexion_state::hexion_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
-	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
+	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
 	map(0xe800, 0xe8ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
@@ -138,9 +139,9 @@ void hexion_state::hexion_map(address_map &map)
 	map(0xf403, 0xf403).portr("P2");
 	map(0xf440, 0xf440).portr("DSW3");
 	map(0xf441, 0xf441).portr("SYSTEM");
-	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
-	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
-	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
+	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
 	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -149,8 +150,8 @@ void hexion_state::hexionb_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
-	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
+	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
 	map(0xe800, 0xe87f).noprw(); // all the code to use the k051649 is still present
 	map(0xe880, 0xe889).noprw(); // but the bootleg has an additional M6295 @ 0xf5c0 instead
@@ -165,9 +166,9 @@ void hexion_state::hexionb_map(address_map &map)
 	map(0xf403, 0xf403).portr("P2");
 	map(0xf440, 0xf440).portr("DSW3");
 	map(0xf441, 0xf441).portr("SYSTEM");
-	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
-	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
-	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
+	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
 	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf5c0, 0xf5c0).w("oki2", FUNC(okim6295_device::write));
 }

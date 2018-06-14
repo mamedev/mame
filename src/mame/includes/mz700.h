@@ -20,6 +20,7 @@
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mz_state : public driver_device

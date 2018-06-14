@@ -362,18 +362,18 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 void badlands_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0xfc0000, 0xfc1fff).r(this, FUNC(badlands_state::sound_busy_r)).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0xfc0000, 0xfc1fff).r(FUNC(badlands_state::sound_busy_r)).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
 	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0xfe0000, 0xfe1fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xfe2000, 0xfe3fff).w(this, FUNC(badlands_state::video_int_ack_w));
+	map(0xfe2000, 0xfe3fff).w(FUNC(badlands_state::video_int_ack_w));
 	map(0xfe4000, 0xfe5fff).portr("FE4000");
 	map(0xfe6000, 0xfe6001).portr("FE6000");
 	map(0xfe6002, 0xfe6003).portr("FE6002");
-	map(0xfe6004, 0xfe6005).r(this, FUNC(badlands_state::pedal_0_r));
-	map(0xfe6006, 0xfe6007).r(this, FUNC(badlands_state::pedal_1_r));
+	map(0xfe6004, 0xfe6005).r(FUNC(badlands_state::pedal_0_r));
+	map(0xfe6006, 0xfe6007).r(FUNC(badlands_state::pedal_1_r));
 	map(0xfe8000, 0xfe9fff).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)).umask16(0xff00);
 	map(0xfea000, 0xfebfff).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r)).umask16(0xff00);
-	map(0xfec000, 0xfedfff).w(this, FUNC(badlands_state::badlands_pf_bank_w));
+	map(0xfec000, 0xfedfff).w(FUNC(badlands_state::badlands_pf_bank_w));
 	map(0xfee000, 0xfeffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xffc000, 0xffc3ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0xffe000, 0xffefff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
@@ -393,7 +393,7 @@ void badlands_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2bff).rw(this, FUNC(badlands_state::audio_io_r), FUNC(badlands_state::audio_io_w));
+	map(0x2800, 0x2bff).rw(FUNC(badlands_state::audio_io_r), FUNC(badlands_state::audio_io_w));
 	map(0x3000, 0x3fff).bankr("soundbank");
 	map(0x4000, 0xffff).rom();
 }

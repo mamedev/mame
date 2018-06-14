@@ -266,32 +266,32 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 void sms_state::sms1_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).w(this, FUNC(sms_state::write_cart));
-	map(0x0000, 0x3fff).r(this, FUNC(sms_state::read_0000));
-	map(0x4000, 0x7fff).r(this, FUNC(sms_state::read_4000));
-	map(0x8000, 0xbfff).r(this, FUNC(sms_state::read_8000));
-	map(0xc000, 0xfff7).rw(this, FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
-	map(0xfff8, 0xfffb).rw(this, FUNC(sms_state::sms_sscope_r), FUNC(sms_state::sms_sscope_w));       /* 3-D glasses */
-	map(0xfffc, 0xffff).rw(this, FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+	map(0x0000, 0xbfff).w(FUNC(sms_state::write_cart));
+	map(0x0000, 0x3fff).r(FUNC(sms_state::read_0000));
+	map(0x4000, 0x7fff).r(FUNC(sms_state::read_4000));
+	map(0x8000, 0xbfff).r(FUNC(sms_state::read_8000));
+	map(0xc000, 0xfff7).rw(FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
+	map(0xfff8, 0xfffb).rw(FUNC(sms_state::sms_sscope_r), FUNC(sms_state::sms_sscope_w));       /* 3-D glasses */
+	map(0xfffc, 0xffff).rw(FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
 }
 
 void sms_state::sms_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).w(this, FUNC(sms_state::write_cart));
-	map(0x0000, 0x3fff).r(this, FUNC(sms_state::read_0000));
-	map(0x4000, 0x7fff).r(this, FUNC(sms_state::read_4000));
-	map(0x8000, 0xbfff).r(this, FUNC(sms_state::read_8000));
-	map(0xc000, 0xfffb).rw(this, FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
-	map(0xfffc, 0xffff).rw(this, FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+	map(0x0000, 0xbfff).w(FUNC(sms_state::write_cart));
+	map(0x0000, 0x3fff).r(FUNC(sms_state::read_0000));
+	map(0x4000, 0x7fff).r(FUNC(sms_state::read_4000));
+	map(0x8000, 0xbfff).r(FUNC(sms_state::read_8000));
+	map(0xc000, 0xfffb).rw(FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
+	map(0xfffc, 0xffff).rw(FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
 }
 
 void smssdisp_state::sms_store_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();                     /* BIOS */
 	map(0x4000, 0x47ff).ram();                     /* RAM */
-	map(0x6000, 0x7fff).r(this, FUNC(smssdisp_state::store_cart_peek));
-	map(0x8000, 0x8000).portr("DSW").w(this, FUNC(smssdisp_state::sms_store_control_w)); /* Control */
-	map(0xc000, 0xc000).rw(this, FUNC(smssdisp_state::sms_store_cart_select_r), FUNC(smssdisp_state::sms_store_cart_select_w)); /* cartridge/card slot selector */
+	map(0x6000, 0x7fff).r(FUNC(smssdisp_state::store_cart_peek));
+	map(0x8000, 0x8000).portr("DSW").w(FUNC(smssdisp_state::sms_store_control_w)); /* Control */
+	map(0xc000, 0xc000).rw(FUNC(smssdisp_state::sms_store_cart_select_r), FUNC(smssdisp_state::sms_store_cart_select_w)); /* cartridge/card slot selector */
 	map(0xd800, 0xd800).portr("GAMESEL1");         /* Game selector port #1 */
 	map(0xdc00, 0xdc00).portr("GAMESEL2");         /* Game selector port #2 */
 }
@@ -301,23 +301,23 @@ void sms_state::sg1000m3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xc0, 0xc7).mirror(0x38).rw(this, FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
+	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
 }
 
 void sms_state::sms_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
-	map(0x01, 0x01).mirror(0x3e).w(this, FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x00, 0x00).mirror(0x3e).w(FUNC(sms_state::sms_mem_control_w));
+	map(0x01, 0x01).mirror(0x3e).w(FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xc0, 0xc0).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dd_r));
 }
 
 
@@ -329,13 +329,13 @@ void sms_state::smskr_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xc0, 0xc0).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dd_r));
 }
 
 
@@ -345,18 +345,18 @@ void sms_state::smsj_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xc0, 0xc0).r(this, FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(this, FUNC(sms_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(this, FUNC(sms_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(this, FUNC(sms_state::sms_input_port_dd_r));
-	map(0xf0, 0xf0).w(this, FUNC(sms_state::smsj_ym2413_register_port_w));
-	map(0xf1, 0xf1).w(this, FUNC(sms_state::smsj_ym2413_data_port_w));
-	map(0xf2, 0xf2).rw(this, FUNC(sms_state::smsj_audio_control_r), FUNC(sms_state::smsj_audio_control_w));
+	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0xf0, 0xf0).w(FUNC(sms_state::smsj_ym2413_register_port_w));
+	map(0xf1, 0xf1).w(FUNC(sms_state::smsj_ym2413_data_port_w));
+	map(0xf2, 0xf2).rw(FUNC(sms_state::smsj_audio_control_r), FUNC(sms_state::smsj_audio_control_w));
 }
 
 
@@ -366,18 +366,18 @@ void sms_state::gg_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).r(this, FUNC(sms_state::gg_input_port_00_r));
-	map(0x01, 0x05).rw(this, FUNC(sms_state::gg_sio_r), FUNC(sms_state::gg_sio_w));
-	map(0x06, 0x06).w(this, FUNC(sms_state::gg_psg_stereo_w));
-	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
+	map(0x00, 0x00).r(FUNC(sms_state::gg_input_port_00_r));
+	map(0x01, 0x05).rw(FUNC(sms_state::gg_sio_r), FUNC(sms_state::gg_sio_w));
+	map(0x06, 0x06).w(FUNC(sms_state::gg_psg_stereo_w));
+	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xc0, 0xc0).r(this, FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(this, FUNC(sms_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(this, FUNC(sms_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(FUNC(sms_state::sms_input_port_dd_r));
 }
 
 

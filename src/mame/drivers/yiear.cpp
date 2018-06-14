@@ -138,11 +138,11 @@ INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
 
 void yiear_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(yiear_state::yiear_speech_r));
-	map(0x4000, 0x4000).w(this, FUNC(yiear_state::yiear_control_w));
-	map(0x4800, 0x4800).w(this, FUNC(yiear_state::konami_SN76496_latch_w));
-	map(0x4900, 0x4900).w(this, FUNC(yiear_state::konami_SN76496_w));
-	map(0x4a00, 0x4a00).w(this, FUNC(yiear_state::yiear_VLM5030_control_w));
+	map(0x0000, 0x0000).r(FUNC(yiear_state::yiear_speech_r));
+	map(0x4000, 0x4000).w(FUNC(yiear_state::yiear_control_w));
+	map(0x4800, 0x4800).w(FUNC(yiear_state::konami_SN76496_latch_w));
+	map(0x4900, 0x4900).w(FUNC(yiear_state::konami_SN76496_w));
+	map(0x4a00, 0x4a00).w(FUNC(yiear_state::yiear_VLM5030_control_w));
 	map(0x4b00, 0x4b00).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x4c00, 0x4c00).portr("DSW2");
 	map(0x4d00, 0x4d00).portr("DSW3");
@@ -154,7 +154,7 @@ void yiear_state::main_map(address_map &map)
 	map(0x5000, 0x5fff).ram();
 	map(0x5000, 0x502f).ram().share("spriteram");
 	map(0x5400, 0x542f).ram().share("spriteram2");
-	map(0x5800, 0x5fff).w(this, FUNC(yiear_state::yiear_videoram_w)).share("videoram");
+	map(0x5800, 0x5fff).w(FUNC(yiear_state::yiear_videoram_w)).share("videoram");
 	map(0x8000, 0xffff).rom();
 }
 

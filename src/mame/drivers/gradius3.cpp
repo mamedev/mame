@@ -32,6 +32,7 @@
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -154,20 +155,20 @@ void gradius3_state::gradius3_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
 	map(0x080000, 0x080fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x0c0000, 0x0c0001).w(this, FUNC(gradius3_state::cpuA_ctrl_w));  /* halt cpu B, irq enable, priority, coin counters, other? */
+	map(0x0c0000, 0x0c0001).w(FUNC(gradius3_state::cpuA_ctrl_w));  /* halt cpu B, irq enable, priority, coin counters, other? */
 	map(0x0c8000, 0x0c8001).portr("SYSTEM");
 	map(0x0c8002, 0x0c8003).portr("P1");
 	map(0x0c8004, 0x0c8005).portr("P2");
 	map(0x0c8006, 0x0c8007).portr("DSW3");
 	map(0x0d0000, 0x0d0001).portr("DSW1");
 	map(0x0d0002, 0x0d0003).portr("DSW2");
-	map(0x0d8000, 0x0d8001).w(this, FUNC(gradius3_state::cpuB_irqtrigger_w));
+	map(0x0d8000, 0x0d8001).w(FUNC(gradius3_state::cpuB_irqtrigger_w));
 	map(0x0e0000, 0x0e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0e8000, 0x0e8000).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0f0000, 0x0f0001).w(this, FUNC(gradius3_state::sound_irq_w));
+	map(0x0f0000, 0x0f0001).w(FUNC(gradius3_state::sound_irq_w));
 	map(0x100000, 0x103fff).ram().share("share1");
-	map(0x14c000, 0x153fff).rw(this, FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
-	map(0x180000, 0x19ffff).ram().w(this, FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
+	map(0x14c000, 0x153fff).rw(FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
+	map(0x180000, 0x19ffff).ram().w(FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
 }
 
 
@@ -175,20 +176,20 @@ void gradius3_state::gradius3_map2(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x140000, 0x140001).w(this, FUNC(gradius3_state::cpuB_irqenable_w));
+	map(0x140000, 0x140001).w(FUNC(gradius3_state::cpuB_irqenable_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x24c000, 0x253fff).rw(this, FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
-	map(0x280000, 0x29ffff).ram().w(this, FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
-	map(0x2c0000, 0x2c000f).rw(this, FUNC(gradius3_state::k051937_halfword_r), FUNC(gradius3_state::k051937_halfword_w));
-	map(0x2c0800, 0x2c0fff).rw(this, FUNC(gradius3_state::k051960_halfword_r), FUNC(gradius3_state::k051960_halfword_w));
-	map(0x400000, 0x5fffff).r(this, FUNC(gradius3_state::gradius3_gfxrom_r));     /* gfx ROMs are mapped here, and copied to RAM */
+	map(0x24c000, 0x253fff).rw(FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
+	map(0x280000, 0x29ffff).ram().w(FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
+	map(0x2c0000, 0x2c000f).rw(FUNC(gradius3_state::k051937_halfword_r), FUNC(gradius3_state::k051937_halfword_w));
+	map(0x2c0800, 0x2c0fff).rw(FUNC(gradius3_state::k051960_halfword_r), FUNC(gradius3_state::k051960_halfword_w));
+	map(0x400000, 0x5fffff).r(FUNC(gradius3_state::gradius3_gfxrom_r));     /* gfx ROMs are mapped here, and copied to RAM */
 }
 
 
 void gradius3_state::gradius3_s_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf000).w(this, FUNC(gradius3_state::sound_bank_w));             /* 007232 bankswitch */
+	map(0xf000, 0xf000).w(FUNC(gradius3_state::sound_bank_w));             /* 007232 bankswitch */
 	map(0xf010, 0xf010).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xf020, 0xf02d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xf030, 0xf031).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));

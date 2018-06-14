@@ -15,6 +15,7 @@
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -234,7 +235,7 @@ void paso1600_state::paso1600_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x7ffff).ram();
 	map(0xb0000, 0xb0fff).ram().share("vram"); // tvram
-	map(0xbfff0, 0xbffff).rw(this, FUNC(paso1600_state::paso1600_pcg_r), FUNC(paso1600_state::paso1600_pcg_w));
+	map(0xbfff0, 0xbffff).rw(FUNC(paso1600_state::paso1600_pcg_r), FUNC(paso1600_state::paso1600_pcg_w));
 	map(0xc0000, 0xdffff).ram().share("gvram");// gvram
 	map(0xe0000, 0xeffff).rom().region("kanji", 0);// kanji rom, banked via port 0x93
 	map(0xfe000, 0xfffff).rom().region("ipl", 0);
@@ -245,11 +246,11 @@ void paso1600_state::paso1600_io(address_map &map)
 	map.unmap_value_low();
 	map(0x0000, 0x000f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0010, 0x0011).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // i8259
-	map(0x001a, 0x001b).r(this, FUNC(paso1600_state::test_hi_r)); // causes RAM error otherwise?
-	map(0x0030, 0x0033).rw(this, FUNC(paso1600_state::key_r), FUNC(paso1600_state::key_w)); //UART keyboard?
-	map(0x0048, 0x0049).r(this, FUNC(paso1600_state::test_hi_r));
-	map(0x0090, 0x0090).rw(this, FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
-	map(0x0091, 0x0091).rw(this, FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
+	map(0x001a, 0x001b).r(FUNC(paso1600_state::test_hi_r)); // causes RAM error otherwise?
+	map(0x0030, 0x0033).rw(FUNC(paso1600_state::key_r), FUNC(paso1600_state::key_w)); //UART keyboard?
+	map(0x0048, 0x0049).r(FUNC(paso1600_state::test_hi_r));
+	map(0x0090, 0x0090).rw(FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
+	map(0x0091, 0x0091).rw(FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
 //  AM_RANGE(0x00d8,0x00df) //fdc, unknown type
 // other undefined ports: 18, 1C, 92
 }

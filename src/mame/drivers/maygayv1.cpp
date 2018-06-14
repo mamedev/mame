@@ -138,6 +138,7 @@ Find lamps/reels after UPD changes.
 #include "sound/upd7759.h"
 #include "sound/ym2413.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -572,9 +573,9 @@ void maygayv1_state::main_map(address_map &map)
 	map(0x820001, 0x820001).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0x820003, 0x820003).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x800000, 0x800003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
-	map(0x860000, 0x86000d).rw(this, FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
-	map(0x86000e, 0x86000f).w(this, FUNC(maygayv1_state::vsync_int_ctrl));
-	map(0x880000, 0x89ffff).rw(this, FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
+	map(0x860000, 0x86000d).rw(FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
+	map(0x86000e, 0x86000f).w(FUNC(maygayv1_state::vsync_int_ctrl));
+	map(0x880000, 0x89ffff).rw(FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
 	map(0x8a0000, 0x8a001f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x8c0000, 0x8c000f).r("pia", FUNC(pia6821_device::read)).umask16(0x00ff);
 	map(0x8c0000, 0x8c000f).w("pia", FUNC(pia6821_device::write)).umask16(0xff00);
@@ -669,7 +670,7 @@ void maygayv1_state::sound_data(address_map &map)
 
 void maygayv1_state::sound_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(maygayv1_state::mcu_r), FUNC(maygayv1_state::mcu_w));
+	map(0x00, 0xff).rw(FUNC(maygayv1_state::mcu_r), FUNC(maygayv1_state::mcu_w));
 }
 
 

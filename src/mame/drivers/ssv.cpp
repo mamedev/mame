@@ -398,19 +398,19 @@ void ssv_state::ssv_map(address_map &map, u32 rom)
 	map(0x100000, 0x13ffff).ram().share("spriteram");                                                                /*  Sprites */
 	map(0x140000, 0x15ffff).ram().w("palette", FUNC(palette_device::write16)).share("palette");                      /*  Palette */
 	map(0x160000, 0x17ffff).ram();                                                                                   /*          */
-	map(0x1c0000, 0x1c0001).r(this, FUNC(ssv_state::vblank_r));                                                      /*  Vblank? */
+	map(0x1c0000, 0x1c0001).r(FUNC(ssv_state::vblank_r));                                                      /*  Vblank? */
 /**/map(0x1c0002, 0x1c007f).readonly();                                                                              /*  Scroll  */
-	map(0x1c0000, 0x1c007f).w(this, FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
+	map(0x1c0000, 0x1c007f).w(FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
 	map(0x210002, 0x210003).portr("DSW1");
 	map(0x210004, 0x210005).portr("DSW2");
 	map(0x210008, 0x210009).portr("P1");
 	map(0x21000a, 0x21000b).portr("P2");
 	map(0x21000c, 0x21000d).portr("SYSTEM");
-	map(0x21000e, 0x21000f).nopr().w(this, FUNC(ssv_state::lockout_w));                                              /*  Lockout */
+	map(0x21000e, 0x21000f).nopr().w(FUNC(ssv_state::lockout_w));                                              /*  Lockout */
 	map(0x210010, 0x210011).nopw();
 	map(0x230000, 0x230071).writeonly().share("irq_vectors");                                                        /*  IRQ Vec */
-	map(0x240000, 0x240071).w(this, FUNC(ssv_state::irq_ack_w));                                                     /*  IRQ Ack */
-	map(0x260000, 0x260001).w(this, FUNC(ssv_state::irq_enable_w));                                                  /*  IRQ En  */
+	map(0x240000, 0x240071).w(FUNC(ssv_state::irq_ack_w));                                                     /*  IRQ Ack */
+	map(0x260000, 0x260001).w(FUNC(ssv_state::irq_enable_w));                                                  /*  IRQ En  */
 	map(0x300000, 0x30007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);    /*  Sound   */
 	map(rom, 0xffffff).rom().region("maincpu", 0);                                                                   /*  ROM     */
 }
@@ -429,12 +429,12 @@ void ssv_state::drifto94_map(address_map &map)
 	ssv_map(map, 0xc00000);
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
 	map(0x400000, 0x47ffff).writeonly();                                       // ?
-	map(0x480000, 0x480001).rw(this, FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
-	map(0x482000, 0x482fff).rw(this, FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
+	map(0x480000, 0x480001).rw(FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
+	map(0x482000, 0x482fff).rw(FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
 	map(0x483000, 0x485fff).nopw();                                        // ?
 	map(0x500000, 0x500001).nopw();                                        // ??
-	map(0x510000, 0x510001).r(this, FUNC(ssv_state::drifto94_unknown_r));                       // ??
-	map(0x520000, 0x520001).r(this, FUNC(ssv_state::drifto94_unknown_r));                       // ??
+	map(0x510000, 0x510001).r(FUNC(ssv_state::drifto94_unknown_r));                       // ??
+	map(0x520000, 0x520001).r(FUNC(ssv_state::drifto94_unknown_r));                       // ??
 	map(0x580000, 0x5807ff).ram().share("nvram");   // NVRAM
 }
 
@@ -476,11 +476,11 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 void ssv_state::gdfs_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
-	map(0x400000, 0x41ffff).ram().w(this, FUNC(ssv_state::gdfs_tmapram_w)).share("gdfs_tmapram");
+	map(0x400000, 0x41ffff).ram().w(FUNC(ssv_state::gdfs_tmapram_w)).share("gdfs_tmapram");
 	map(0x420000, 0x43ffff).ram();
 	map(0x440000, 0x44003f).ram().share("gdfs_tmapscroll");
-	map(0x500000, 0x500001).w(this, FUNC(ssv_state::gdfs_eeprom_w));
-	map(0x540000, 0x540001).r(this, FUNC(ssv_state::gdfs_eeprom_r));
+	map(0x500000, 0x500001).w(FUNC(ssv_state::gdfs_eeprom_w));
+	map(0x540000, 0x540001).r(FUNC(ssv_state::gdfs_eeprom_r));
 	map(0x600000, 0x600fff).ram();
 	map(0x800000, 0x87ffff).rw(m_gdfs_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
 	map(0x8c0000, 0x8c00ff).rw(m_gdfs_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
@@ -517,9 +517,9 @@ void ssv_state::hypreact_map(address_map &map)
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
-	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));            // Inverted lockout lines
+	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));            // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
-	map(0xc00000, 0xc00001).r(this, FUNC(ssv_state::hypreact_input_r));              // Inputs
+	map(0xc00000, 0xc00001).r(FUNC(ssv_state::hypreact_input_r));              // Inputs
 	map(0xc00006, 0xc00007).ram().share("input_sel");           //
 	map(0xc00008, 0xc00009).noprw();                                 //
 }
@@ -534,10 +534,10 @@ void ssv_state::hypreac2_map(address_map &map)
 	ssv_map(map, 0xe00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
-	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                // Inverted lockout lines
+	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
-	map(0x500000, 0x500001).r(this, FUNC(ssv_state::hypreact_input_r));                  // Inputs
-	map(0x500002, 0x500003).r(this, FUNC(ssv_state::hypreact_input_r));                  // (again?)
+	map(0x500000, 0x500001).r(FUNC(ssv_state::hypreact_input_r));                  // Inputs
+	map(0x500002, 0x500003).r(FUNC(ssv_state::hypreact_input_r));                  // (again?)
 	map(0x520000, 0x520001).writeonly().share("input_sel"); // Inputs
 //  0x540000, 0x540003  communication with other units
 }
@@ -556,7 +556,7 @@ void ssv_state::janjans1_map(address_map &map)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	map(0x210006, 0x210007).nopr();
 	map(0x800000, 0x800001).writeonly().share("input_sel"); // Inputs
-	map(0x800002, 0x800003).r(this, FUNC(ssv_state::srmp4_input_r));                     // Inputs
+	map(0x800002, 0x800003).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
 }
 
 
@@ -607,7 +607,7 @@ WRITE16_MEMBER(ssv_state::mainram_w)
 void ssv_state::mslider_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
-	map(0x010000, 0x01ffff).rw(this, FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror
+	map(0x010000, 0x01ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	map(0x400000, 0x47ffff).writeonly();                           // ?
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP                          // ? ff at the start
@@ -647,7 +647,7 @@ void ssv_state::srmp4_map(address_map &map)
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
-	map(0xc0000a, 0xc0000b).r(this, FUNC(ssv_state::srmp4_input_r));                     // Inputs
+	map(0xc0000a, 0xc0000b).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
 	map(0xc0000e, 0xc0000f).writeonly().share("input_sel"); // Inputs
 	map(0xc00010, 0xc00011).nopw();                            //
 }
@@ -696,11 +696,11 @@ void ssv_state::srmp7_map(address_map &map)
 	map(0x010000, 0x050faf).ram();                                     // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
-	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                // Coin Counters / Lockouts
-	map(0x300076, 0x300077).r(this, FUNC(ssv_state::srmp7_irqv_r));                      // Sound
+	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                // Coin Counters / Lockouts
+	map(0x300076, 0x300077).r(FUNC(ssv_state::srmp7_irqv_r));                      // Sound
 //  0x540000, 0x540003, related to lev 5 irq?
-	map(0x580000, 0x580001).w(this, FUNC(ssv_state::srmp7_sound_bank_w));               // Sound Bank
-	map(0x600000, 0x600001).r(this, FUNC(ssv_state::srmp7_input_r));                     // Inputs
+	map(0x580000, 0x580001).w(FUNC(ssv_state::srmp7_sound_bank_w));               // Sound Bank
+	map(0x600000, 0x600001).r(FUNC(ssv_state::srmp7_input_r));                     // Inputs
 	map(0x680000, 0x680001).writeonly().share("input_sel"); // Inputs
 }
 
@@ -764,10 +764,10 @@ void ssv_state::sxyreact_map(address_map &map)
 //  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
-	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
-	map(0x500002, 0x500003).r(this, FUNC(ssv_state::sxyreact_ballswitch_r));                         // ?
-	map(0x500004, 0x500005).rw(this, FUNC(ssv_state::sxyreact_dial_r), FUNC(ssv_state::sxyreact_motor_w));        // Dial Value (serial)
-	map(0x520000, 0x520001).w(this, FUNC(ssv_state::sxyreact_dial_w));                              // Dial Value (advance 1 bit)
+	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
+	map(0x500002, 0x500003).r(FUNC(ssv_state::sxyreact_ballswitch_r));                         // ?
+	map(0x500004, 0x500005).rw(FUNC(ssv_state::sxyreact_dial_r), FUNC(ssv_state::sxyreact_motor_w));        // Dial Value (serial)
+	map(0x520000, 0x520001).w(FUNC(ssv_state::sxyreact_dial_w));                              // Dial Value (advance 1 bit)
 	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
 }
 
@@ -783,8 +783,8 @@ void ssv_state::twineag2_map(address_map &map)
 	ssv_map(map, 0xe00000);
 	map(0x010000, 0x03ffff).ram();                         // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with mem 8)
-	map(0x480000, 0x480001).rw(this, FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
-	map(0x482000, 0x482fff).rw(this, FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
+	map(0x480000, 0x480001).rw(FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
+	map(0x482000, 0x482fff).rw(FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
 }
 
 
@@ -841,10 +841,10 @@ WRITE16_MEMBER(ssv_state::latch16_w)
 void ssv_state::jsk_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
-	map(0x050000, 0x05ffff).rw(this, FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror?
+	map(0x050000, 0x05ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror?
 	map(0x210000, 0x210001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x400000, 0x47ffff).ram();                                     // RAM?
-	map(0x900000, 0x900007).rw(this, FUNC(ssv_state::latch16_r), FUNC(ssv_state::latch16_w));
+	map(0x900000, 0x900007).rw(FUNC(ssv_state::latch16_r), FUNC(ssv_state::latch16_w));
 }
 
 
@@ -853,7 +853,7 @@ void ssv_state::jsk_v810_mem(address_map &map)
 	map(0x00000000, 0x0001ffff).ram();
 	map(0x80000000, 0x8001ffff).ram();
 	map(0xc0000000, 0xc001ffff).ram();
-	map(0x40000000, 0x4000000f).rw(this, FUNC(ssv_state::latch32_r), FUNC(ssv_state::latch32_w));
+	map(0x40000000, 0x4000000f).rw(FUNC(ssv_state::latch32_r), FUNC(ssv_state::latch32_w));
 	map(0xfff80000, 0xffffffff).rom().region("sub", 0);
 }
 
@@ -896,12 +896,12 @@ WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
 void ssv_state::eaglshot_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
-	map(0x180000, 0x1bffff).rw(this, FUNC(ssv_state::eaglshot_gfxram_r), FUNC(ssv_state::eaglshot_gfxram_w));
+	map(0x180000, 0x1bffff).rw(FUNC(ssv_state::eaglshot_gfxram_r), FUNC(ssv_state::eaglshot_gfxram_w));
 	map(0x210000, 0x210001).nopr(); /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
-	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
-	map(0x800000, 0x800000).w(this, FUNC(ssv_state::eaglshot_gfxrom_bank_w));
-	map(0x900000, 0x900000).w(this, FUNC(ssv_state::eaglshot_trackball_w));
+	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
+	map(0x800000, 0x800000).w(FUNC(ssv_state::eaglshot_gfxrom_bank_w));
+	map(0x900000, 0x900000).w(FUNC(ssv_state::eaglshot_trackball_w));
 	map(0xa00000, 0xbfffff).bankr("gfxrom");
 	map(0xc00000, 0xc007ff).ram().share("nvram");   // NVRAM
 	map(0xd00000, 0xd00000).r(m_upd4701, FUNC(upd4701_device::d_r));
@@ -2606,7 +2606,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock
 	MCFG_ADC0808_IN0_CB(IOPORT("GUNX1"))

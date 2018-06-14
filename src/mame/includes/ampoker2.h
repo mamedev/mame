@@ -2,6 +2,7 @@
 // copyright-holders:Roberto Fresca
 
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 class ampoker2_state : public driver_device
 {

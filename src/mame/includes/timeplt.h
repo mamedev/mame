@@ -8,6 +8,7 @@
 
 #include "machine/74259.h"
 #include "sound/tc8830f.h"
+#include "emupal.h"
 #include "screen.h"
 
 class timeplt_state : public driver_device

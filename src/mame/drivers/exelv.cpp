@@ -64,6 +64,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -418,8 +419,8 @@ void exelv_state::tms7020_mem(address_map &map)
 	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
 	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
 
-	map(0x0130, 0x0130).rw(this, FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
-	map(0x0200, 0x7fff).r(this, FUNC(exelv_state::rom_r));
+	map(0x0130, 0x0130).rw(FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
+	map(0x0200, 0x7fff).r(FUNC(exelv_state::rom_r));
 	map(0x8000, 0xbfff).noprw();
 	map(0xc000, 0xc7ff).ram();                                     /* CPU RAM */
 	map(0xc800, 0xf7ff).noprw();
@@ -434,7 +435,7 @@ void exelv_state::tms7040_mem(address_map &map)
 	map(0x0128, 0x0128).r(m_tms3556, FUNC(tms3556_device::initptr_r));
 	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
 	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
-	map(0x0130, 0x0130).rw(this, FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
+	map(0x0130, 0x0130).rw(FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
 	map(0x0200, 0x7fff).bankr("bank1");                                /* system ROM */
 	map(0x8000, 0xbfff).noprw();
 	map(0xc000, 0xc7ff).ram();                                     /* CPU RAM */

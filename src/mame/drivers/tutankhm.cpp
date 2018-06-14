@@ -142,8 +142,8 @@ void tutankhm_state::main_map(address_map &map)
 	map(0x81c0, 0x81c0).mirror(0x000f).portr("IN2");  /* IN2: Player 2 I/O */
 	map(0x81e0, 0x81e0).mirror(0x000f).portr("DSW1"); /* DSW1 (inverted bits) */
 	map(0x8200, 0x8207).mirror(0x00f8).nopr().w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x8300, 0x8300).mirror(0x00ff).w(this, FUNC(tutankhm_state::tutankhm_bankselect_w));
-	map(0x8600, 0x8600).mirror(0x00ff).w(this, FUNC(tutankhm_state::sound_on_w));
+	map(0x8300, 0x8300).mirror(0x00ff).w(FUNC(tutankhm_state::tutankhm_bankselect_w));
+	map(0x8600, 0x8600).mirror(0x00ff).w(FUNC(tutankhm_state::sound_on_w));
 	map(0x8700, 0x8700).mirror(0x00ff).w(m_timeplt_audio, FUNC(timeplt_audio_device::sound_data_w));
 	map(0x8800, 0x8fff).ram();
 	map(0x9000, 0x9fff).bankr("bank1");

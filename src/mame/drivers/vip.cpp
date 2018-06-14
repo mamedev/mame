@@ -375,7 +375,7 @@ WRITE8_MEMBER( vip_state::io_w )
 void vip_state::vip_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(vip_state::read), FUNC(vip_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vip_state::read), FUNC(vip_state::write));
 }
 
 
@@ -386,7 +386,7 @@ void vip_state::vip_mem(address_map &map)
 void vip_state::vip_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(this, FUNC(vip_state::io_r), FUNC(vip_state::io_w));
+	map(0x00, 0x07).rw(FUNC(vip_state::io_r), FUNC(vip_state::io_w));
 }
 
 

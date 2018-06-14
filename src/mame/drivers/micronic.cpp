@@ -229,27 +229,27 @@ void micronic_state::micronic_io(address_map &map)
 	map.global_mask(0xff);
 
 	/* keypad */
-	map(0x00, 0x00).r(this, FUNC(micronic_state::keypad_r));
-	map(0x02, 0x02).w(this, FUNC(micronic_state::kp_matrix_w));
+	map(0x00, 0x00).r(FUNC(micronic_state::keypad_r));
+	map(0x02, 0x02).w(FUNC(micronic_state::kp_matrix_w));
 
 	/* hd61830 */
 	map(0x03, 0x03).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
 	map(0x23, 0x23).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 
 	/* rtc-146818 */
-	map(0x08, 0x08).w(this, FUNC(micronic_state::rtc_address_w));
-	map(0x28, 0x28).rw(this, FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
+	map(0x08, 0x08).w(FUNC(micronic_state::rtc_address_w));
+	map(0x28, 0x28).rw(FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
 
 	/* sound */
-	map(0x2b, 0x2b).w(this, FUNC(micronic_state::beep_w));
+	map(0x2b, 0x2b).w(FUNC(micronic_state::beep_w));
 
 	/* basic machine */
-	map(0x05, 0x05).r(this, FUNC(micronic_state::irq_flag_r));
-	map(0x2c, 0x2c).w(this, FUNC(micronic_state::port_2c_w));
-	map(0x47, 0x47).w(this, FUNC(micronic_state::bank_select_w));
-	map(0x46, 0x46).w(this, FUNC(micronic_state::lcd_contrast_w));
-	map(0x48, 0x48).w(this, FUNC(micronic_state::status_flag_w));
-	map(0x49, 0x49).r(this, FUNC(micronic_state::status_flag_r));
+	map(0x05, 0x05).r(FUNC(micronic_state::irq_flag_r));
+	map(0x2c, 0x2c).w(FUNC(micronic_state::port_2c_w));
+	map(0x47, 0x47).w(FUNC(micronic_state::bank_select_w));
+	map(0x46, 0x46).w(FUNC(micronic_state::lcd_contrast_w));
+	map(0x48, 0x48).w(FUNC(micronic_state::status_flag_w));
+	map(0x49, 0x49).r(FUNC(micronic_state::status_flag_r));
 }
 
 /* Input ports */

@@ -92,7 +92,7 @@ void batman_state::main_map(address_map &map)
 	map(0x260010, 0x260011).mirror(0x11ff8e).portr("260010");
 	map(0x260031, 0x260031).mirror(0x11ff8e).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0x260041, 0x260041).mirror(0x11ff8e).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0x260050, 0x260051).mirror(0x11ff8e).w(this, FUNC(batman_state::latch_w));
+	map(0x260050, 0x260051).mirror(0x11ff8e).w(FUNC(batman_state::latch_w));
 	map(0x260060, 0x260061).mirror(0x11ff8e).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x2a0000, 0x2a0001).mirror(0x11fffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x2e0000, 0x2e0fff).mirror(0x100000).ram().w("palette", FUNC(palette_device::write16)).share("palette");

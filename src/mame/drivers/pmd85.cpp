@@ -222,12 +222,12 @@ uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &b
 
 void pmd85_state::pmd85_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
+	map(0x00, 0xff).rw(FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
 }
 
 void pmd85_state::mato_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
+	map(0x00, 0xff).rw(FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
 }
 
 /* memory w/r functions */

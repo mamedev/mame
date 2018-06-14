@@ -62,15 +62,15 @@ void mbc55x_state::mbc55x_mem(address_map &map)
 void mbc55x_state::mbc55x_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0003).rw(this, FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
-	map(0x0008, 0x000F).rw(this, FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
-	map(0x0010, 0x0010).rw(this, FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
-	map(0x0018, 0x001F).rw(this, FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
-	map(0x0020, 0x0027).rw(this, FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
-	map(0x0028, 0x002B).rw(this, FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
+	map(0x0000, 0x0003).rw(FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
+	map(0x0008, 0x000F).rw(FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
+	map(0x0010, 0x0010).rw(FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
+	map(0x0018, 0x001F).rw(FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
+	map(0x0020, 0x0027).rw(FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
+	map(0x0028, 0x002B).rw(FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
 	map(0x0030, 0x0031).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0032, 0x0033).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0038, 0x003B).rw(this, FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
+	map(0x0038, 0x003B).rw(FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
 }
 
 static INPUT_PORTS_START( mbc55x )

@@ -47,6 +47,7 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -242,8 +243,8 @@ void egghunt_state::egghunt_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(egghunt_state::egghunt_atram_w)).share("atram");
-	map(0xd000, 0xdfff).rw(this, FUNC(egghunt_state::egghunt_bgram_r), FUNC(egghunt_state::egghunt_bgram_w));
+	map(0xc800, 0xcfff).ram().w(FUNC(egghunt_state::egghunt_atram_w)).share("atram");
+	map(0xd000, 0xdfff).rw(FUNC(egghunt_state::egghunt_bgram_r), FUNC(egghunt_state::egghunt_bgram_w));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -251,10 +252,10 @@ void egghunt_state::egghunt_map(address_map &map)
 void egghunt_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w(this, FUNC(egghunt_state::egghunt_vidram_bank_w));
-	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(egghunt_state::egghunt_gfx_banking_w));
+	map(0x00, 0x00).portr("DSW1").w(FUNC(egghunt_state::egghunt_vidram_bank_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(egghunt_state::egghunt_gfx_banking_w));
 	map(0x02, 0x02).portr("P1");
-	map(0x03, 0x03).portr("P2").w(this, FUNC(egghunt_state::egghunt_soundlatch_w));
+	map(0x03, 0x03).portr("P2").w(FUNC(egghunt_state::egghunt_soundlatch_w));
 	map(0x04, 0x04).portr("DSW2");
 	map(0x06, 0x06).portr("UNK").nopw();
 	map(0x07, 0x07).nopw();
@@ -264,7 +265,7 @@ void egghunt_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe001, 0xe001).rw(this, FUNC(egghunt_state::egghunt_okibanking_r), FUNC(egghunt_state::egghunt_okibanking_w));
+	map(0xe001, 0xe001).rw(FUNC(egghunt_state::egghunt_okibanking_r), FUNC(egghunt_state::egghunt_okibanking_w));
 	map(0xe004, 0xe004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf000, 0xffff).ram();
 }

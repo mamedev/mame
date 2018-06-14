@@ -108,9 +108,9 @@ void malzak_state::malzak_map(address_map &map)
 	map(0x1200, 0x12ff).mirror(0x6000).ram();
 	map(0x1300, 0x13ff).mirror(0x6000).ram();
 	map(0x1400, 0x14ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x14cb, 0x14cb).mirror(0x6000).r(this, FUNC(malzak_state::fake_VRLE_r));
+	map(0x14cb, 0x14cb).mirror(0x6000).r(FUNC(malzak_state::fake_VRLE_r));
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).ram().w(this, FUNC(malzak_state::malzak_playfield_w));
+	map(0x1600, 0x16ff).mirror(0x6000).ram().w(FUNC(malzak_state::malzak_playfield_w));
 	map(0x1700, 0x17ff).mirror(0x6000).ram();
 	map(0x1800, 0x1fff).mirror(0x6000).ram().share("videoram");
 	map(0x2000, 0x2fff).rom();
@@ -129,10 +129,10 @@ void malzak_state::malzak2_map(address_map &map)
 	map(0x1200, 0x12ff).mirror(0x6000).ram();
 	map(0x1300, 0x13ff).mirror(0x6000).ram();
 	map(0x1400, 0x14ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x14cb, 0x14cb).mirror(0x6000).r(this, FUNC(malzak_state::fake_VRLE_r));
-	map(0x14cc, 0x14cc).mirror(0x6000).r(this, FUNC(malzak_state::s2636_portA_r));
+	map(0x14cb, 0x14cb).mirror(0x6000).r(FUNC(malzak_state::fake_VRLE_r));
+	map(0x14cc, 0x14cc).mirror(0x6000).r(FUNC(malzak_state::s2636_portA_r));
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).ram().w(this, FUNC(malzak_state::malzak_playfield_w));
+	map(0x1600, 0x16ff).mirror(0x6000).ram().w(FUNC(malzak_state::malzak_playfield_w));
 	map(0x1700, 0x17ff).mirror(0x6000).ram().share("nvram");
 	map(0x1800, 0x1fff).mirror(0x6000).ram().share("videoram");
 	map(0x2000, 0x2fff).rom();
@@ -183,17 +183,17 @@ READ8_MEMBER(malzak_state::collision_r)
 
 void malzak_state::malzak_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(malzak_state::collision_r)); // returns where a collision can occur.
-	map(0x40, 0x40).w(this, FUNC(malzak_state::port40_w));  // possibly sound codes for dual SN76477s
-	map(0x60, 0x60).w(this, FUNC(malzak_state::port60_w));  // possibly playfield scroll X offset
+	map(0x00, 0x00).r(FUNC(malzak_state::collision_r)); // returns where a collision can occur.
+	map(0x40, 0x40).w(FUNC(malzak_state::port40_w));  // possibly sound codes for dual SN76477s
+	map(0x60, 0x60).w(FUNC(malzak_state::port60_w));  // possibly playfield scroll X offset
 	map(0x80, 0x80).portr("IN0");  //controls
 	map(0xa0, 0xa0).nopw();  // echoes I/O port read from port 0x80
-	map(0xc0, 0xc0).w(this, FUNC(malzak_state::portc0_w));  // possibly playfield row selection for writing and/or collisions
+	map(0xc0, 0xc0).w(FUNC(malzak_state::portc0_w));  // possibly playfield row selection for writing and/or collisions
 }
 
 void malzak_state::malzak_data_map(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(malzak_state::s2650_data_r));  // read upon death
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(malzak_state::s2650_data_r));  // read upon death
 }
 
 

@@ -67,7 +67,7 @@ private:
 
 void microkit_state::microkit_mem(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
+	map(0x0000, 0x0000).rw(FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
 	map(0x8000, 0x81ff).rom().region("maincpu", 0);
 	map(0x8200, 0x83ff).ram();
 }

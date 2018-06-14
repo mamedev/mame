@@ -109,6 +109,7 @@ TODO:
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -451,7 +452,7 @@ void pasogo_state::emsbank_map(address_map &map)
 
 void pasogo_state::pasogo_mem(address_map &map)
 {
-	map(0x80000, 0xeffff).rw(this, FUNC(pasogo_state::emsram_r), FUNC(pasogo_state::emsram_w));
+	map(0x80000, 0xeffff).rw(FUNC(pasogo_state::emsram_r), FUNC(pasogo_state::emsram_w));
 	map(0xb8000, 0xbffff).ram().share("vram");
 	map(0xf0000, 0xfffff).bankr("bank27");
 }
@@ -460,8 +461,8 @@ void pasogo_state::pasogo_mem(address_map &map)
 void pasogo_state::pasogo_io(address_map &map)
 {
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x0026, 0x0027).rw(this, FUNC(pasogo_state::vg230_io_r), FUNC(pasogo_state::vg230_io_w));
-	map(0x006c, 0x006f).rw(this, FUNC(pasogo_state::ems_r), FUNC(pasogo_state::ems_w));
+	map(0x0026, 0x0027).rw(FUNC(pasogo_state::vg230_io_r), FUNC(pasogo_state::vg230_io_w));
+	map(0x006c, 0x006f).rw(FUNC(pasogo_state::ems_r), FUNC(pasogo_state::ems_w));
 }
 
 

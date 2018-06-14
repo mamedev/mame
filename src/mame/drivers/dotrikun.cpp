@@ -29,6 +29,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "dotrikun.lh"
@@ -145,14 +146,14 @@ uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void dotrikun_state::dotrikun_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x8000, 0x85ff).ram().w(this, FUNC(dotrikun_state::vram_w)).share("vram");
+	map(0x8000, 0x85ff).ram().w(FUNC(dotrikun_state::vram_w)).share("vram");
 	map(0x8600, 0x87ff).ram();
 }
 
 void dotrikun_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).mirror(0xff).portr("INPUTS").w(this, FUNC(dotrikun_state::color_w));
+	map(0x00, 0x00).mirror(0xff).portr("INPUTS").w(FUNC(dotrikun_state::color_w));
 }
 
 

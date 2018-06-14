@@ -87,8 +87,8 @@ void mexico86_state::mexico86_map(address_map &map)
 	map(0xc000, 0xe7ff).ram().share("mainram");         /* shared with sound cpu */
 	map(0xe800, 0xe8ff).ram().share("protection_ram");  /* shared with mcu */
 	map(0xe900, 0xefff).ram();
-	map(0xf000, 0xf000).w(this, FUNC(mexico86_state::mexico86_bankswitch_w));    /* program and gfx ROM banks */
-	map(0xf008, 0xf008).w(this, FUNC(mexico86_state::mexico86_f008_w));          /* cpu reset lines + other unknown stuff */
+	map(0xf000, 0xf000).w(FUNC(mexico86_state::mexico86_bankswitch_w));    /* program and gfx ROM banks */
+	map(0xf008, 0xf008).w(FUNC(mexico86_state::mexico86_f008_w));          /* cpu reset lines + other unknown stuff */
 	map(0xf010, 0xf010).portr("IN3");
 	map(0xf018, 0xf018).nopw();                        /* watchdog? */
 	map(0xf800, 0xffff).ram().share("subram");          /* communication ram - to connect 4 players's subboard */
@@ -99,7 +99,7 @@ void mexico86_state::mexico86_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xa7ff).ram().share("mainram");  /* shared with main */
 	map(0xa800, 0xbfff).ram();
-	map(0xc000, 0xc001).r(this, FUNC(mexico86_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).r(FUNC(mexico86_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 }
 
 WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
@@ -119,7 +119,7 @@ void mexico86_state::mexico86_sub_cpu_map(address_map &map)
 	map(0xc001, 0xc001).portr("IN5");
 	map(0xc002, 0xc002).portr("IN6");
 	map(0xc003, 0xc003).portr("IN7");
-	map(0xc004, 0xc004).w(this, FUNC(mexico86_state::mexico86_sub_output_w));
+	map(0xc004, 0xc004).w(FUNC(mexico86_state::mexico86_sub_output_w));
 }
 
 /*************************************

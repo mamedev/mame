@@ -278,26 +278,26 @@ void dcs_audio_device::dcs_2k_program_map(address_map &map)
 
 void dcs_audio_device::dcs_2k_data_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x0000, 0x07ff).mirror(0x1800).rw(FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
 	map(0x2000, 0x2fff).bankr("databank");
-	map(0x3000, 0x33ff).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
-	map(0x3400, 0x37ff).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
+	map(0x3000, 0x33ff).w(FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3400, 0x37ff).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
 	map(0x3800, 0x39ff).ram();
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 
 /* DCS 2k with UART memory map */
 void dcs_audio_device::dcs_2k_uart_data_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x0000, 0x07ff).mirror(0x1800).rw(FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
 	map(0x2000, 0x2fff).bankr("databank");
-	map(0x3000, 0x33ff).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3000, 0x33ff).w(FUNC(dcs_audio_device::dcs_data_bank_select_w));
 	map(0x3400, 0x3402).noprw();                             /* UART (ignored) */
-	map(0x3403, 0x3403).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
+	map(0x3403, 0x3403).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
 	map(0x3404, 0x3405).noprw();                             /* UART (ignored) */
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 
@@ -306,18 +306,18 @@ void dcs_audio_device::dcs_8k_program_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("dcsint");
 	map(0x0800, 0x1fff).ram().share("dcsext");
-	map(0x3000, 0x3003).rw(this, FUNC(dcs_audio_device::input_latch32_r), FUNC(dcs_audio_device::output_latch32_w)); // why?
+	map(0x3000, 0x3003).rw(FUNC(dcs_audio_device::input_latch32_r), FUNC(dcs_audio_device::output_latch32_w)); // why?
 }
 
 void dcs_audio_device::dcs_8k_data_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x1fff).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x0800, 0x1fff).rw(FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
 	map(0x2000, 0x2fff).bankr("databank");
-	map(0x3000, 0x3000).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
-	map(0x3400, 0x3403).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w)); // mk3 etc. need this
+	map(0x3000, 0x3000).w(FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3400, 0x3403).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w)); // mk3 etc. need this
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 /* Williams WPC DCS/Security Pinball */
@@ -330,12 +330,12 @@ void dcs_audio_device::dcs_wpc_program_map(address_map &map)
 void dcs_audio_wpc_device::dcs_wpc_data_map(address_map &map)
 {
 	map(0x0000, 0x07ff).bankr("databank");
-	map(0x1000, 0x2fff).rw(this, FUNC(dcs_audio_wpc_device::dcs_dataram_r), FUNC(dcs_audio_wpc_device::dcs_dataram_w));
-	map(0x3000, 0x3000).w(this, FUNC(dcs_audio_wpc_device::dcs_data_bank_select_w));
-	map(0x3100, 0x3100).w(this, FUNC(dcs_audio_wpc_device::dcs_data_bank_select2_w));
-	map(0x3300, 0x3303).rw(this, FUNC(dcs_audio_wpc_device::input_latch_r), FUNC(dcs_audio_wpc_device::output_latch_w));
+	map(0x1000, 0x2fff).rw(FUNC(dcs_audio_wpc_device::dcs_dataram_r), FUNC(dcs_audio_wpc_device::dcs_dataram_w));
+	map(0x3000, 0x3000).w(FUNC(dcs_audio_wpc_device::dcs_data_bank_select_w));
+	map(0x3100, 0x3100).w(FUNC(dcs_audio_wpc_device::dcs_data_bank_select2_w));
+	map(0x3300, 0x3303).rw(FUNC(dcs_audio_wpc_device::input_latch_r), FUNC(dcs_audio_wpc_device::output_latch_w));
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_wpc_device::adsp_control_r), FUNC(dcs_audio_wpc_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_wpc_device::adsp_control_r), FUNC(dcs_audio_wpc_device::adsp_control_w));
 }
 
 /*************************************
@@ -360,27 +360,27 @@ void dcs_audio_device::dcs2_2104_program_map(address_map &map)
 void dcs_audio_device::dcs2_2115_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 void dcs_audio_device::dcs2_2104_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 
@@ -403,7 +403,7 @@ void dcs_audio_device::dsio_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m("data_map_bank", FUNC(address_map_bank_device::amap16));
 	map(0x2000, 0x3fdf).ram().share("dcsint_data");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 void dcs_audio_device::dsio_rambank_map(address_map &map)
@@ -415,12 +415,12 @@ void dcs_audio_device::dsio_rambank_map(address_map &map)
 void dcs_audio_device::dsio_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::dsio_r), FUNC(dcs_audio_device::dsio_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::dsio_r), FUNC(dcs_audio_device::dsio_w));
 }
 
 
@@ -443,7 +443,7 @@ void dcs_audio_device::denver_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m("data_map_bank", FUNC(address_map_bank_device::amap16));
 	map(0x2000, 0x3fdf).ram().share("dcsint_data");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 void dcs_audio_device::denver_rambank_map(address_map &map)
@@ -456,12 +456,12 @@ void dcs_audio_device::denver_rambank_map(address_map &map)
 void dcs_audio_device::denver_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::denver_r), FUNC(dcs_audio_device::denver_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::denver_r), FUNC(dcs_audio_device::denver_w));
 }
 
 

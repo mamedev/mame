@@ -417,7 +417,7 @@ CUSTOM_INPUT_MEMBER( astrocde_state::votrax_speech_status_r )
 void astrocde_state::seawolf2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x0000, 0x3fff).w(this, FUNC(astrocde_state::astrocade_funcgen_w));
+	map(0x0000, 0x3fff).w(FUNC(astrocde_state::astrocade_funcgen_w));
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0xc000, 0xc3ff).ram();
 }
@@ -426,7 +426,7 @@ void astrocde_state::seawolf2_map(address_map &map)
 void ebases_state::ebases_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x0000, 0x3fff).w(this, FUNC(astrocde_state::astrocade_funcgen_w));
+	map(0x0000, 0x3fff).w(FUNC(astrocde_state::astrocade_funcgen_w));
 	map(0x4000, 0x7fff).ram().share("videoram");
 }
 
@@ -434,9 +434,9 @@ void ebases_state::ebases_map(address_map &map)
 void astrocde_state::spacezap_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x0000, 0x3fff).w(this, FUNC(astrocde_state::astrocade_funcgen_w));
+	map(0x0000, 0x3fff).w(FUNC(astrocde_state::astrocade_funcgen_w));
 	map(0x4000, 0x7fff).ram().share("videoram");
-	map(0xd000, 0xd03f).rw(this, FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xd000, 0xd03f).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
 	map(0xd040, 0xd7ff).ram();
 }
 
@@ -444,10 +444,10 @@ void astrocde_state::spacezap_map(address_map &map)
 void astrocde_state::wow_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x0000, 0x3fff).w(this, FUNC(astrocde_state::astrocade_funcgen_w));
+	map(0x0000, 0x3fff).w(FUNC(astrocde_state::astrocade_funcgen_w));
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0xcfff).rom();
-	map(0xd000, 0xd03f).rw(this, FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xd000, 0xd03f).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
 	map(0xd040, 0xdfff).ram();
 }
 
@@ -455,11 +455,11 @@ void astrocde_state::wow_map(address_map &map)
 void astrocde_state::robby_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x0000, 0x3fff).w(this, FUNC(astrocde_state::astrocade_funcgen_w));
+	map(0x0000, 0x3fff).w(FUNC(astrocde_state::astrocade_funcgen_w));
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xe000, 0xe1ff).rw(this, FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
 	map(0xe800, 0xffff).ram();
 }
 
@@ -467,8 +467,8 @@ void astrocde_state::robby_map(address_map &map)
 void astrocde_state::demndrgn_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x0000, 0x3fff).w(this, FUNC(astrocde_state::astrocade_funcgen_w));
-	map(0x4000, 0x7fff).r(m_bank4000, FUNC(address_map_bank_device::read8)).w(this, FUNC(astrocde_state::profpac_videoram_w));
+	map(0x0000, 0x3fff).w(FUNC(astrocde_state::astrocade_funcgen_w));
+	map(0x4000, 0x7fff).r(m_bank4000, FUNC(address_map_bank_device::read8)).w(FUNC(astrocde_state::profpac_videoram_w));
 	map(0x8000, 0xbfff).bankr("bank8000");
 	map(0xc000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
@@ -479,13 +479,13 @@ void astrocde_state::demndrgn_map(address_map &map)
 void astrocde_state::profpac_map(address_map &map)
 {
 	demndrgn_map(map);
-	map(0xe000, 0xe1ff).rw(this, FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
 }
 
 
 void astrocde_state::bank4000_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(astrocde_state::profpac_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(astrocde_state::profpac_videoram_r));
 	map(0x4000, 0x7fff).rom().region("banks", 0x08000);
 	map(0x8000, 0xbfff).rom().region("banks", 0x10000);
 	map(0xc000, 0xffff).rom().region("banks", 0x18000);
@@ -517,42 +517,42 @@ void tenpindx_state::sub_map(address_map &map)
 
 void astrocde_state::port_map(address_map &map)
 {
-	map(0x0000, 0x000f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x0000, 0x000f).select(0xff00).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x0010, 0x001f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
 	map(0x0010, 0x0018).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
-	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
+	map(0x0019, 0x0019).mirror(0xff00).w(FUNC(astrocde_state::expand_register_w));
 }
 
 
 void seawolf2_state::port_map_discrete(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x00, 0x0f).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x10, 0x10).portr("P1HANDLE");
 	map(0x11, 0x11).portr("P2HANDLE");
 	map(0x12, 0x12).portr("P3HANDLE");
 	map(0x13, 0x13).portr("P4HANDLE");
-	map(0x19, 0x19).w(this, FUNC(astrocde_state::expand_register_w));
-	map(0x40, 0x40).mirror(0x18).w(this, FUNC(seawolf2_state::sound_1_w));
-	map(0x41, 0x41).mirror(0x18).w(this, FUNC(seawolf2_state::sound_2_w));
-	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::write));
-	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::write));
+	map(0x19, 0x19).w(FUNC(astrocde_state::expand_register_w));
+	map(0x40, 0x40).mirror(0x18).w(FUNC(seawolf2_state::sound_1_w));
+	map(0x41, 0x41).mirror(0x18).w(FUNC(seawolf2_state::sound_2_w));
+	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::bus_w));
+	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::bus_w));
 }
 
 
 void ebases_state::port_map_ebases(address_map &map)
 {
 	port_map(map);
-	map(0x0020, 0x0020).mirror(0xff07).w(this, FUNC(ebases_state::coin_w));
-	map(0x0028, 0x0028).mirror(0xff07).w(this, FUNC(ebases_state::trackball_select_w));
+	map(0x0020, 0x0020).mirror(0xff07).w(FUNC(ebases_state::coin_w));
+	map(0x0028, 0x0028).mirror(0xff07).w(FUNC(ebases_state::trackball_select_w));
 }
 
 
 void astrocde_state::port_map_mono_pattern(address_map &map)
 {
 	port_map(map);
-	map(0x0078, 0x007e).mirror(0xff00).w(this, FUNC(astrocde_state::astrocade_pattern_board_w));
-	map(0xa55b, 0xa55b).w(this, FUNC(astrocde_state::protected_ram_enable_w));
+	map(0x0078, 0x007e).mirror(0xff00).w(FUNC(astrocde_state::astrocade_pattern_board_w));
+	map(0xa55b, 0xa55b).w(FUNC(astrocde_state::protected_ram_enable_w));
 }
 
 
@@ -566,23 +566,23 @@ void astrocde_state::port_map_stereo_pattern(address_map &map)
 void astrocde_state::port_map_16col_pattern(address_map &map)
 {
 	port_map_stereo_pattern(map);
-	map(0x00bf, 0x00bf).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_page_select_w));
-	map(0x00c3, 0x00c3).mirror(0xff00).r(this, FUNC(astrocde_state::profpac_intercept_r));
-	map(0x00c0, 0x00c5).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_screenram_ctrl_w));
-	map(0x00f3, 0x00f3).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_banksw_w));
+	map(0x00bf, 0x00bf).mirror(0xff00).w(FUNC(astrocde_state::profpac_page_select_w));
+	map(0x00c3, 0x00c3).mirror(0xff00).r(FUNC(astrocde_state::profpac_intercept_r));
+	map(0x00c0, 0x00c5).mirror(0xff00).w(FUNC(astrocde_state::profpac_screenram_ctrl_w));
+	map(0x00f3, 0x00f3).mirror(0xff00).w(FUNC(astrocde_state::profpac_banksw_w));
 }
 
 
 void astrocde_state::port_map_16col_pattern_nosound(address_map &map)
 {
-	map(0x0000, 0x000f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
-	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
-	map(0x0078, 0x007e).mirror(0xff00).w(this, FUNC(astrocde_state::astrocade_pattern_board_w));
-	map(0x00bf, 0x00bf).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_page_select_w));
-	map(0x00c3, 0x00c3).mirror(0xff00).r(this, FUNC(astrocde_state::profpac_intercept_r));
-	map(0x00c0, 0x00c5).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_screenram_ctrl_w));
-	map(0x00f3, 0x00f3).mirror(0xff00).w(this, FUNC(astrocde_state::demndrgn_banksw_w));
-	map(0xa55b, 0xa55b).w(this, FUNC(astrocde_state::protected_ram_enable_w));
+	map(0x0000, 0x000f).select(0xff00).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x0019, 0x0019).mirror(0xff00).w(FUNC(astrocde_state::expand_register_w));
+	map(0x0078, 0x007e).mirror(0xff00).w(FUNC(astrocde_state::astrocade_pattern_board_w));
+	map(0x00bf, 0x00bf).mirror(0xff00).w(FUNC(astrocde_state::profpac_page_select_w));
+	map(0x00c3, 0x00c3).mirror(0xff00).r(FUNC(astrocde_state::profpac_intercept_r));
+	map(0x00c0, 0x00c5).mirror(0xff00).w(FUNC(astrocde_state::profpac_screenram_ctrl_w));
+	map(0x00f3, 0x00f3).mirror(0xff00).w(FUNC(astrocde_state::demndrgn_banksw_w));
+	map(0xa55b, 0xa55b).w(FUNC(astrocde_state::protected_ram_enable_w));
 }
 
 
@@ -590,7 +590,7 @@ void demndrgn_state::port_map_16col_pattern_demndrgn(address_map &map)
 {
 	port_map_16col_pattern_nosound(map);
 	map(0x0010, 0x001f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
-	map(0x0097, 0x0097).mirror(0xff00).w(this, FUNC(demndrgn_state::sound_w));
+	map(0x0097, 0x0097).mirror(0xff00).w(FUNC(demndrgn_state::sound_w));
 }
 
 
@@ -602,9 +602,9 @@ void tenpindx_state::port_map_16col_pattern_tenpindx(address_map &map)
 	map(0x0062, 0x0062).mirror(0xff00).portr("P62");
 	map(0x0063, 0x0063).mirror(0xff00).portr("P63");
 	map(0x0064, 0x0064).mirror(0xff00).portr("P64");
-	map(0x0065, 0x0066).mirror(0xff00).w(this, FUNC(tenpindx_state::lamp_w));
-	map(0x0067, 0x0067).mirror(0xff00).w(this, FUNC(tenpindx_state::counter_w));
-	map(0x0068, 0x0068).mirror(0xff00).w(this, FUNC(tenpindx_state::lights_w));
+	map(0x0065, 0x0066).mirror(0xff00).w(FUNC(tenpindx_state::lamp_w));
+	map(0x0067, 0x0067).mirror(0xff00).w(FUNC(tenpindx_state::counter_w));
+	map(0x0068, 0x0068).mirror(0xff00).w(FUNC(tenpindx_state::lights_w));
 	map(0x0097, 0x0097).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -1332,7 +1332,7 @@ MACHINE_CONFIG_START(astrocde_state::spacezap)
 
 	MCFG_DEVICE_MODIFY("astrocade1")
 	MCFG_ASTROCADE_IO_SO0_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
-	MCFG_ASTROCADE_IO_SO3_STROBE_CB(WRITE8("outlatch", output_latch_device, write))
+	MCFG_ASTROCADE_IO_SO3_STROBE_CB(WRITE8("outlatch", output_latch_device, bus_w))
 
 	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // MC14174B on game board at U16
 	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
@@ -1483,8 +1483,8 @@ MACHINE_CONFIG_START(astrocde_state::profpac)
 	MCFG_OUTPUT_LATCH_BIT6_HANDLER(OUTPUT("lamp5"))   // right lamp C
 
 	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO4_STROBE_CB(WRITE8("outlatch", output_latch_device, write))
-	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("lamplatch", output_latch_device, write))
+	MCFG_ASTROCADE_IO_SO4_STROBE_CB(WRITE8("outlatch", output_latch_device, bus_w))
+	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("lamplatch", output_latch_device, bus_w))
 MACHINE_CONFIG_END
 
 
@@ -1505,7 +1505,7 @@ MACHINE_CONFIG_START(demndrgn_state::demndrgn)
 	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(*this, demndrgn_state, input_select_w))
 
 	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO4_STROBE_CB(WRITE8("outlatch", output_latch_device, write))
+	MCFG_ASTROCADE_IO_SO4_STROBE_CB(WRITE8("outlatch", output_latch_device, bus_w))
 	MCFG_ASTROCADE_IO_POT0("FIREX")
 	MCFG_ASTROCADE_IO_POT1("FIREY")
 MACHINE_CONFIG_END

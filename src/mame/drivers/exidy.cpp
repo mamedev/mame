@@ -212,7 +212,7 @@ void exidy_state::exidy_map(address_map &map)
 	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
 	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
 	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
-	map(0x5103, 0x5103).mirror(0x00fc).r(this, FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5103, 0x5103).mirror(0x00fc).r(FUNC(exidy_state::exidy_interrupt_r));
 	map(0x5210, 0x5212).writeonly().share("color_latch");
 	map(0x5213, 0x5213).portr("IN2");
 }
@@ -223,8 +223,8 @@ void exidy_state::sidetrac_map(address_map &map)
 	exidy_map(map);
 	map(0x0800, 0x3fff).rom();
 	map(0x4800, 0x4fff).rom().share("characterram");
-	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
 }
 
@@ -234,8 +234,8 @@ void exidy_state::targ_map(address_map &map)
 	exidy_map(map);
 	map(0x0800, 0x3fff).rom();
 	map(0x4800, 0x4fff).ram().share("characterram");
-	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(this, FUNC(exidy_state::targ_audio_2_w));
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::targ_audio_2_w));
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
 }
 
@@ -245,8 +245,8 @@ void exidy_state::spectar_map(address_map &map)
 	exidy_map(map);
 	map(0x0800, 0x3fff).rom();
 	map(0x4800, 0x4fff).ram().share("characterram");
-	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
 }
 
@@ -263,9 +263,9 @@ void exidy_state::rallys_map(address_map &map)
 	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
 	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
 	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
-	map(0x5103, 0x5103).mirror(0x00fc).r(this, FUNC(exidy_state::exidy_interrupt_r));
-	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5103, 0x5103).mirror(0x00fc).r(FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
 	map(0x5210, 0x5212).writeonly().share("color_latch");
 	map(0x5213, 0x5213).portr("IN2");
 	map(0x5300, 0x5300).writeonly().share("sprite2_xpos");
@@ -299,7 +299,7 @@ void exidy_state::fax_map(address_map &map)
 	map(0x0400, 0x07ff).ram();
 	map(0x1a00, 0x1a00).portr("IN4");
 	map(0x1c00, 0x1c00).portr("IN3");
-	map(0x2000, 0x2000).w(this, FUNC(exidy_state::fax_bank_select_w));
+	map(0x2000, 0x2000).w(FUNC(exidy_state::fax_bank_select_w));
 	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */

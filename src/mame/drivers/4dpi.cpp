@@ -220,9 +220,9 @@ void sgi_ip6_state::machine_reset()
 
 void sgi_ip6_state::sgi_ip6_map(address_map &map)
 {
-	map(0x1f880000, 0x1f880003).rw(this, FUNC(sgi_ip6_state::ip6_unk1_r), FUNC(sgi_ip6_state::ip6_unk1_w));
-	map(0x1fb00000, 0x1fb00003).rw(this, FUNC(sgi_ip6_state::ip6_unk3_r), FUNC(sgi_ip6_state::ip6_unk3_w));
-	map(0x1fbc004c, 0x1fbc004f).rw(this, FUNC(sgi_ip6_state::ip6_unk2_r), FUNC(sgi_ip6_state::ip6_unk2_w));
+	map(0x1f880000, 0x1f880003).rw(FUNC(sgi_ip6_state::ip6_unk1_r), FUNC(sgi_ip6_state::ip6_unk1_w));
+	map(0x1fb00000, 0x1fb00003).rw(FUNC(sgi_ip6_state::ip6_unk3_r), FUNC(sgi_ip6_state::ip6_unk3_w));
+	map(0x1fbc004c, 0x1fbc004f).rw(FUNC(sgi_ip6_state::ip6_unk2_r), FUNC(sgi_ip6_state::ip6_unk2_w));
 	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
 }
 

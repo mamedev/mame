@@ -399,6 +399,7 @@
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -903,14 +904,14 @@ WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 
 void magicard_state::scc68070_mem(address_map &map)
 {
-	map(0x80001000, 0x8000100f).rw(this, FUNC(magicard_state::scc68070_ext_irqc_r), FUNC(magicard_state::scc68070_ext_irqc_w)).share("scc_xirqc_regs"); //lir
-	map(0x80002000, 0x8000200f).rw(this, FUNC(magicard_state::scc68070_iic_r), FUNC(magicard_state::scc68070_iic_w)).share("scc_iic_regs"); //i2c
-	map(0x80002010, 0x8000201f).rw(this, FUNC(magicard_state::scc68070_uart_r), FUNC(magicard_state::scc68070_uart_w)).share("scc_uart_regs");
-	map(0x80002020, 0x8000202f).rw(this, FUNC(magicard_state::scc68070_timer_r), FUNC(magicard_state::scc68070_timer_w)).share("scc_timer_regs");
-	map(0x80002040, 0x8000204f).rw(this, FUNC(magicard_state::scc68070_int_irqc_r), FUNC(magicard_state::scc68070_int_irqc_w)).share("scc_iirqc_regs");
-	map(0x80004000, 0x8000403f).rw(this, FUNC(magicard_state::scc68070_dma_ch1_r), FUNC(magicard_state::scc68070_dma_ch1_w)).share("scc_dma1_regs");
-	map(0x80004040, 0x8000407f).rw(this, FUNC(magicard_state::scc68070_dma_ch2_r), FUNC(magicard_state::scc68070_dma_ch2_w)).share("scc_dma2_regs");
-	map(0x80008000, 0x8000807f).rw(this, FUNC(magicard_state::scc68070_mmu_r), FUNC(magicard_state::scc68070_mmu_w)).share("scc_mmu_regs");
+	map(0x80001000, 0x8000100f).rw(FUNC(magicard_state::scc68070_ext_irqc_r), FUNC(magicard_state::scc68070_ext_irqc_w)).share("scc_xirqc_regs"); //lir
+	map(0x80002000, 0x8000200f).rw(FUNC(magicard_state::scc68070_iic_r), FUNC(magicard_state::scc68070_iic_w)).share("scc_iic_regs"); //i2c
+	map(0x80002010, 0x8000201f).rw(FUNC(magicard_state::scc68070_uart_r), FUNC(magicard_state::scc68070_uart_w)).share("scc_uart_regs");
+	map(0x80002020, 0x8000202f).rw(FUNC(magicard_state::scc68070_timer_r), FUNC(magicard_state::scc68070_timer_w)).share("scc_timer_regs");
+	map(0x80002040, 0x8000204f).rw(FUNC(magicard_state::scc68070_int_irqc_r), FUNC(magicard_state::scc68070_int_irqc_w)).share("scc_iirqc_regs");
+	map(0x80004000, 0x8000403f).rw(FUNC(magicard_state::scc68070_dma_ch1_r), FUNC(magicard_state::scc68070_dma_ch1_w)).share("scc_dma1_regs");
+	map(0x80004040, 0x8000407f).rw(FUNC(magicard_state::scc68070_dma_ch2_r), FUNC(magicard_state::scc68070_dma_ch2_w)).share("scc_dma2_regs");
+	map(0x80008000, 0x8000807f).rw(FUNC(magicard_state::scc68070_mmu_r), FUNC(magicard_state::scc68070_mmu_w)).share("scc_mmu_regs");
 }
 
 void magicard_state::magicard_mem(address_map &map)
@@ -920,16 +921,16 @@ void magicard_state::magicard_mem(address_map &map)
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	/* 001ffc00-001ffdff System I/O */
-	map(0x001ffc00, 0x001ffc01).mirror(0x7fe00000).r(this, FUNC(magicard_state::test_r));
-	map(0x001ffc40, 0x001ffc41).mirror(0x7fe00000).r(this, FUNC(magicard_state::test_r));
+	map(0x001ffc00, 0x001ffc01).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
+	map(0x001ffc40, 0x001ffc41).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
 	map(0x001ffd01, 0x001ffd01).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x001ffd03, 0x001ffd03).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x001ffd05, 0x001ffd05).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x001ffd40, 0x001ffd43).mirror(0x7fe00000).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).r(this, FUNC(magicard_state::test_r));
+	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
 	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).nopw(); //?
 	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
-	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(this, FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
+	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
 }
 
 void magicard_state::hotslots_mem(address_map &map)
@@ -939,7 +940,7 @@ void magicard_state::hotslots_mem(address_map &map)
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
-	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(this, FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
+	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
 	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x00414005, 0x00414005).w("ramdac", FUNC(ramdac_device::mask_w));

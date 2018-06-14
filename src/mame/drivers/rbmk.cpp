@@ -61,6 +61,7 @@ Keep pressed 9 and press reset to enter service mode.
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -178,25 +179,25 @@ void rbmk_state::rbmk_mem(address_map &map)
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x9c0000, 0x9c0fff).ram().share("vidram");
-	map(0xb00000, 0xb00001).w(this, FUNC(rbmk_state::eeprom_w));
-	map(0xc00000, 0xc00001).rw(this, FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0xc08000, 0xc08001).portr("IN1").w(this, FUNC(rbmk_state::tilebank_w));
+	map(0xb00000, 0xb00001).w(FUNC(rbmk_state::eeprom_w));
+	map(0xc00000, 0xc00001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(rbmk_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
-	map(0xc18080, 0xc18081).r(this, FUNC(rbmk_state::unk_r));
+	map(0xc18080, 0xc18081).r(FUNC(rbmk_state::unk_r));
 	map(0xc20000, 0xc20001).portr("IN3");
-	map(0xc28000, 0xc28001).w(this, FUNC(rbmk_state::unk_w));
+	map(0xc28000, 0xc28001).w(FUNC(rbmk_state::unk_w));
 }
 
 void rbmk_state::rbspm_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x200001).w(this, FUNC(rbmk_state::eeprom_w)); // wrong
-	map(0x300000, 0x300001).rw(this, FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0x308000, 0x308001).portr("IN1").w(this, FUNC(rbmk_state::tilebank_w)); // ok
+	map(0x200000, 0x200001).w(FUNC(rbmk_state::eeprom_w)); // wrong
+	map(0x300000, 0x300001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0x308000, 0x308001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
 	map(0x310000, 0x310001).portr("IN2");
-	map(0x318080, 0x318081).r(this, FUNC(rbmk_state::unk_r));
+	map(0x318080, 0x318081).r(FUNC(rbmk_state::unk_r));
 	map(0x320000, 0x320001).portr("IN3");
-	map(0x328000, 0x328001).w(this, FUNC(rbmk_state::unk_w));
+	map(0x328000, 0x328001).w(FUNC(rbmk_state::unk_w));
 	map(0x500000, 0x50ffff).ram();
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // if removed fails gfx test?
 	map(0x940000, 0x940fff).ram().share("vidram2"); // if removed fails palette test?
@@ -246,7 +247,7 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 
 void rbmk_state::mcu_io(address_map &map)
 {
-	map(0x0ff00, 0x0ffff).rw(this, FUNC(rbmk_state::mcu_io_r), FUNC(rbmk_state::mcu_io_w));
+	map(0x0ff00, 0x0ffff).rw(FUNC(rbmk_state::mcu_io_r), FUNC(rbmk_state::mcu_io_w));
 }
 
 static INPUT_PORTS_START( rbmk )
@@ -587,7 +588,7 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 
 	SPEAKER(config, "lspeaker").front_left();

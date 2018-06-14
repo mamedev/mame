@@ -101,13 +101,13 @@ void hec2hrp_state::hecdisc2_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// ROM page handling
-	map(0x000, 0x00f).rw(this, FUNC(hec2hrp_state::disc2_io00_port_r), FUNC(hec2hrp_state::disc2_io00_port_w));
+	map(0x000, 0x00f).rw(FUNC(hec2hrp_state::disc2_io00_port_r), FUNC(hec2hrp_state::disc2_io00_port_w));
 	// RS232 - 8251 comms handling
-	map(0x020, 0x02f).rw(this, FUNC(hec2hrp_state::disc2_io20_port_r), FUNC(hec2hrp_state::disc2_io20_port_w));
+	map(0x020, 0x02f).rw(FUNC(hec2hrp_state::disc2_io20_port_r), FUNC(hec2hrp_state::disc2_io20_port_w));
 	// Hector comms handling
-	map(0x030, 0x03f).rw(this, FUNC(hec2hrp_state::disc2_io30_port_r), FUNC(hec2hrp_state::disc2_io30_port_w));
-	map(0x040, 0x04f).rw(this, FUNC(hec2hrp_state::disc2_io40_port_r), FUNC(hec2hrp_state::disc2_io40_port_w));
-	map(0x050, 0x05f).rw(this, FUNC(hec2hrp_state::disc2_io50_port_r), FUNC(hec2hrp_state::disc2_io50_port_w));
+	map(0x030, 0x03f).rw(FUNC(hec2hrp_state::disc2_io30_port_r), FUNC(hec2hrp_state::disc2_io30_port_w));
+	map(0x040, 0x04f).rw(FUNC(hec2hrp_state::disc2_io40_port_r), FUNC(hec2hrp_state::disc2_io40_port_w));
+	map(0x050, 0x05f).rw(FUNC(hec2hrp_state::disc2_io50_port_r), FUNC(hec2hrp_state::disc2_io50_port_w));
 	// uPD765 link
 	map(0x060, 0x061).m(m_upd_fdc, FUNC(upd765a_device::map));
 	map(0x070, 0x07f).rw(m_upd_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
@@ -120,13 +120,13 @@ void hec2hrp_state::hec2hrp_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 
 	/* Hardware address mapping */
-	map(0x0800, 0x0808).w(this, FUNC(hec2hrp_state::switch_bank_w));/* Bank handling */
-	map(0x1000, 0x1000).w(this, FUNC(hec2hrp_state::color_a_w));  /* Color c0/c1 */
-	map(0x1800, 0x1800).w(this, FUNC(hec2hrp_state::color_b_w));  /* Color c2/c3 */
-	map(0x2000, 0x2003).w(this, FUNC(hec2hrp_state::sn_2000_w));  /* Sound */
-	map(0x2800, 0x2803).w(this, FUNC(hec2hrp_state::sn_2800_w));  /* Sound */
-	map(0x3000, 0x3000).rw(this, FUNC(hec2hrp_state::cassette_r), FUNC(hec2hrp_state::sn_3000_w));  /* Write necessary */
-	map(0x3800, 0x3807).rw(this, FUNC(hec2hrp_state::keyboard_r), FUNC(hec2hrp_state::keyboard_w)); /* Keyboard */
+	map(0x0800, 0x0808).w(FUNC(hec2hrp_state::switch_bank_w));/* Bank handling */
+	map(0x1000, 0x1000).w(FUNC(hec2hrp_state::color_a_w));  /* Color c0/c1 */
+	map(0x1800, 0x1800).w(FUNC(hec2hrp_state::color_b_w));  /* Color c2/c3 */
+	map(0x2000, 0x2003).w(FUNC(hec2hrp_state::sn_2000_w));  /* Sound */
+	map(0x2800, 0x2803).w(FUNC(hec2hrp_state::sn_2800_w));  /* Sound */
+	map(0x3000, 0x3000).rw(FUNC(hec2hrp_state::cassette_r), FUNC(hec2hrp_state::sn_3000_w));  /* Write necessary */
+	map(0x3800, 0x3807).rw(FUNC(hec2hrp_state::keyboard_r), FUNC(hec2hrp_state::keyboard_w)); /* Keyboard */
 
 	/* Video br mapping */
 	map(0x4000, 0x49ff).ram().share("videoram");
@@ -143,13 +143,13 @@ void hec2hrp_state::hec2hrx_mem(address_map &map)
 	map(0x0000, 0x3fff).bankr("bank2");
 
 	/* Hardware address mapping*/
-	map(0x0800, 0x0808).w(this, FUNC(hec2hrp_state::switch_bank_w));/* Bank handling */
-	map(0x1000, 0x1000).w(this, FUNC(hec2hrp_state::color_a_w));  /* Color c0/c1 */
-	map(0x1800, 0x1800).w(this, FUNC(hec2hrp_state::color_b_w));  /* Color c2/c3 */
-	map(0x2000, 0x2003).w(this, FUNC(hec2hrp_state::sn_2000_w));  /* Sound */
-	map(0x2800, 0x2803).w(this, FUNC(hec2hrp_state::sn_2800_w));  /* Sound */
-	map(0x3000, 0x3000).rw(this, FUNC(hec2hrp_state::cassette_r), FUNC(hec2hrp_state::sn_3000_w));  /* Write necessary */
-	map(0x3800, 0x3807).rw(this, FUNC(hec2hrp_state::keyboard_r), FUNC(hec2hrp_state::keyboard_w)); /* Keyboard */
+	map(0x0800, 0x0808).w(FUNC(hec2hrp_state::switch_bank_w));/* Bank handling */
+	map(0x1000, 0x1000).w(FUNC(hec2hrp_state::color_a_w));  /* Color c0/c1 */
+	map(0x1800, 0x1800).w(FUNC(hec2hrp_state::color_b_w));  /* Color c2/c3 */
+	map(0x2000, 0x2003).w(FUNC(hec2hrp_state::sn_2000_w));  /* Sound */
+	map(0x2800, 0x2803).w(FUNC(hec2hrp_state::sn_2800_w));  /* Sound */
+	map(0x3000, 0x3000).rw(FUNC(hec2hrp_state::cassette_r), FUNC(hec2hrp_state::sn_3000_w));  /* Write necessary */
+	map(0x3800, 0x3807).rw(FUNC(hec2hrp_state::keyboard_r), FUNC(hec2hrp_state::keyboard_w)); /* Keyboard */
 
 	/* Video br mapping */
 	map(0x4000, 0x49ff).ram().share("videoram");
@@ -163,14 +163,14 @@ void hec2hrp_state::hec2hrp_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x000, 0x0ff).rw(this, FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x000, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2hrx_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x0f0, 0x0ff).rw(this, FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x0f0, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2mdhrx_io(address_map &map)
@@ -180,24 +180,24 @@ void hec2hrp_state::hec2mdhrx_io(address_map &map)
 
 	// Minidisc commands and changing the rom page */
 	map(0x04, 0x07).rw(m_minidisc_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x08, 0x08).w(this, FUNC(hec2hrp_state::minidisc_control_w));
-	map(0x0f0, 0x0ff).rw(this, FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x08, 0x08).w(FUNC(hec2hrp_state::minidisc_control_w));
+	map(0x0f0, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2mx40_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x000, 0x0ef).w(this, FUNC(hec2hrp_state::mx40_io_port_w));
-	map(0x0f0, 0x0f3).rw(this, FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x000, 0x0ef).w(FUNC(hec2hrp_state::mx40_io_port_w));
+	map(0x0f0, 0x0f3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2mx80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x000, 0x0ef).w(this, FUNC(hec2hrp_state::mx80_io_port_w));
-	map(0x0f0, 0x0f3).rw(this, FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x000, 0x0ef).w(FUNC(hec2hrp_state::mx80_io_port_w));
+	map(0x0f0, 0x0f3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 
 
 }

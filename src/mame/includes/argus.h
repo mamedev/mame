@@ -3,6 +3,7 @@
 
 #include "machine/timer.h"
 #include "video/jalblend.h"
+#include "emupal.h"
 #include "screen.h"
 
 class argus_state : public driver_device

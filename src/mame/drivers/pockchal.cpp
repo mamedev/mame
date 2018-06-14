@@ -27,6 +27,7 @@ Cart sizes: 1MB, 2MB, 4MB
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

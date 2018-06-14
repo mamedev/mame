@@ -96,9 +96,9 @@ void idsa_state::maincpu_io_map(address_map &map)
 	map(0x50, 0x5f).portr("X5");
 	map(0x60, 0x6f).portr("X6");
 	map(0x70, 0x7f).portr("X7");
-	map(0x80, 0x8f).w(this, FUNC(idsa_state::port80_w));
-	map(0x90, 0x9f).w(this, FUNC(idsa_state::port90_w));
-	map(0xb0, 0xb3).r(this, FUNC(idsa_state::portb0_r));
+	map(0x80, 0x8f).w(FUNC(idsa_state::port80_w));
+	map(0x90, 0x9f).w(FUNC(idsa_state::port90_w));
+	map(0xb0, 0xb3).r(FUNC(idsa_state::portb0_r));
 	map(0xbd, 0xbd).portr("X8");
 	map(0xd0, 0xdf).w(m_speech, FUNC(sp0256_device::ald_w));
 	map(0xe0, 0xef).rw("aysnd1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));

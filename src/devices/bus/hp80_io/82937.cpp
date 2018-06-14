@@ -157,7 +157,7 @@ READ8_MEMBER(hp82937_io_card_device::dio_r)
 	if (m_dio_out) {
 		return 0xff;
 	} else {
-		return m_ieee488->dio_r();
+		return m_ieee488->read_dio();
 	}
 }
 
@@ -253,7 +253,7 @@ void hp82937_io_card_device::device_reset()
 
 void hp82937_io_card_device::update_data_out()
 {
-	m_ieee488->dio_w(m_dio_out ? m_cpu->p2_r(machine().dummy_space() , 0) : 0xff);
+	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r(machine().dummy_space() , 0) : 0xff);
 }
 
 void hp82937_io_card_device::update_signals()
@@ -320,7 +320,7 @@ void hp82937_io_card_device::cpu_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x01).rw("xlator", FUNC(hp_1mb5_device::uc_r), FUNC(hp_1mb5_device::uc_w));
-	map(0x03, 0x03).rw(this, FUNC(hp82937_io_card_device::switch_r), FUNC(hp82937_io_card_device::latch_w));
+	map(0x03, 0x03).rw(FUNC(hp82937_io_card_device::switch_r), FUNC(hp82937_io_card_device::latch_w));
 }
 
 const tiny_rom_entry *hp82937_io_card_device::device_rom_region() const

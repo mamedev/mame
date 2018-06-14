@@ -75,7 +75,7 @@ void cm1800_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x00).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0x01, 0x01).r(this, FUNC(cm1800_state::uart_status_r));
+	map(0x01, 0x01).r(FUNC(cm1800_state::uart_status_r));
 }
 
 /* Input ports */

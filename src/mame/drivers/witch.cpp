@@ -574,10 +574,10 @@ void witch_state::common_map(address_map &map)
 	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
 	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
-	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
-	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
+	map(0xc400, 0xc7ff).ram().w(FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
+	map(0xc800, 0xcbff).rw(FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
+	map(0xcc00, 0xcfff).rw(FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
 }
 
 /************************************
@@ -605,7 +605,7 @@ void witch_state::witch_main_map(address_map &map)
 	witch_common_map(map);
 	map(0x0000, UNBANKED_SIZE-1).rom();
 	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::main_write_a008));
 }
 
 
@@ -613,7 +613,7 @@ void witch_state::witch_sub_map(address_map &map)
 {
 	witch_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::sub_write_a008));
 }
 
 /************************************
@@ -628,7 +628,7 @@ void keirinou_state::keirinou_common_map(address_map &map)
 	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(keirinou_state::palette_w)).share("paletteram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(keirinou_state::palette_w)).share("paletteram");
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("nvram"); // shared with sub
 }
@@ -637,14 +637,14 @@ void keirinou_state::keirinou_main_map(address_map &map)
 {
 	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::main_write_a008));
 }
 
 void keirinou_state::keirinou_sub_map(address_map &map)
 {
 	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::sub_write_a008));
 }
 
 static INPUT_PORTS_START( witch )

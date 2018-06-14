@@ -9,6 +9,7 @@
 #include "machine/intelfsh.h"
 #include "cpu/sh/sh2.h"
 #include "audio/cps3.h"
+#include "emupal.h"
 
 
 class cps3_state : public driver_device

@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_EMUMEM_H
 #define MAME_EMU_EMUMEM_H
 
+#include <type_traits>
+
 using s8 = std::int8_t;
 using u8 = std::uint8_t;
 using s16 = std::int16_t;
@@ -102,6 +104,129 @@ typedef device_delegate<void (address_space &, offs_t, u8, u8)> write8_delegate;
 typedef device_delegate<void (address_space &, offs_t, u16, u16)> write16_delegate;
 typedef device_delegate<void (address_space &, offs_t, u32, u32)> write32_delegate;
 typedef device_delegate<void (address_space &, offs_t, u64, u64)> write64_delegate;
+
+namespace emu { namespace detail {
+
+template <typename T, typename Enable = void> struct read8_device_class { };
+template <typename T, typename Enable = void> struct read16_device_class { };
+template <typename T, typename Enable = void> struct read32_device_class { };
+template <typename T, typename Enable = void> struct read64_device_class { };
+
+template <typename T, typename Ret, typename... Params>
+struct read8_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read8_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read8_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read8_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read8_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read8_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read8_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read8_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T, typename Ret, typename... Params>
+struct read16_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read16_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read16_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read16_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read16_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read16_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read16_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read16_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T, typename Ret, typename... Params>
+struct read32_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read32_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read32_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read32_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read32_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read32_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read32_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read32_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T, typename Ret, typename... Params>
+struct read64_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read64_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read64_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read64_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read64_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read64_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct read64_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read64_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T> using read8_device_class_t = typename read8_device_class<T>::type;
+template <typename T> using read16_device_class_t = typename read16_device_class<T>::type;
+template <typename T> using read32_device_class_t = typename read32_device_class<T>::type;
+template <typename T> using read64_device_class_t = typename read64_device_class<T>::type;
+
+template <typename T, typename Enable = void> struct write8_device_class { };
+template <typename T, typename Enable = void> struct write16_device_class { };
+template <typename T, typename Enable = void> struct write32_device_class { };
+template <typename T, typename Enable = void> struct write64_device_class { };
+
+template <typename T, typename Ret, typename... Params>
+struct write8_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write8_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write8_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write8_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write8_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write8_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write8_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write8_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T, typename Ret, typename... Params>
+struct write16_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write16_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write16_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write16_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write16_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write16_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write16_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write16_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T, typename Ret, typename... Params>
+struct write32_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write32_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write32_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write32_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write32_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write32_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write32_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write32_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T, typename Ret, typename... Params>
+struct write64_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write64_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write64_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write64_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write64_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write64_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename T, typename Ret, typename... Params>
+struct write64_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write64_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+
+template <typename T> using write8_device_class_t = typename write8_device_class<T>::type;
+template <typename T> using write16_device_class_t = typename write16_device_class<T>::type;
+template <typename T> using write32_device_class_t = typename write32_device_class<T>::type;
+template <typename T> using write64_device_class_t = typename write64_device_class<T>::type;
+
+template <typename T>
+inline read8_delegate make_delegate(T &&func, const char *name, const char *tag, read8_device_class_t<std::remove_reference_t<T> > *obj)
+{ return read8_delegate(func, name, tag, obj); }
+template <typename T>
+inline read16_delegate make_delegate(T &&func, const char *name, const char *tag, read16_device_class_t<std::remove_reference_t<T> > *obj)
+{ return read16_delegate(func, name, tag, obj); }
+template <typename T>
+inline read32_delegate make_delegate(T &&func, const char *name, const char *tag, read32_device_class_t<std::remove_reference_t<T> > *obj)
+{ return read32_delegate(func, name, tag, obj); }
+template <typename T>
+inline read64_delegate make_delegate(T &&func, const char *name, const char *tag, read64_device_class_t<std::remove_reference_t<T> > *obj)
+{ return read64_delegate(func, name, tag, obj); }
+
+template <typename T>
+inline write8_delegate make_delegate(T &&func, const char *name, const char *tag, write8_device_class_t<std::remove_reference_t<T> > *obj)
+{ return write8_delegate(func, name, tag, obj); }
+template <typename T>
+inline write16_delegate make_delegate(T &&func, const char *name, const char *tag, write16_device_class_t<std::remove_reference_t<T> > *obj)
+{ return write16_delegate(func, name, tag, obj); }
+template <typename T>
+inline write32_delegate make_delegate(T &&func, const char *name, const char *tag, write32_device_class_t<std::remove_reference_t<T> > *obj)
+{ return write32_delegate(func, name, tag, obj); }
+template <typename T>
+inline write64_delegate make_delegate(T &&func, const char *name, const char *tag, write64_device_class_t<std::remove_reference_t<T> > *obj)
+{ return write64_delegate(func, name, tag, obj); }
+
+} } // namespace emu::detail
+
 
 // ======================> setoffset_delegate
 

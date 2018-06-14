@@ -535,8 +535,8 @@ public:
 	ioport_port *ioport(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
-	template<class DeviceClass> inline DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
-	template<class DeviceClass> inline DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
+	template<class DeviceClass> DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
+	template<class DeviceClass> DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
@@ -579,7 +579,7 @@ public:
 	device_debug *debug() const { return m_debug.get(); }
 
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
-	bool findit(bool pre_map, bool isvalidation) const;
+	bool findit(bool isvalidation) const;
 
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;

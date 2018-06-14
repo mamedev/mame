@@ -17,6 +17,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -70,9 +71,9 @@ WRITE8_MEMBER(svmu_state::page_w)
 READ8_MEMBER(svmu_state::prog_r)
 {
 	if (m_page == 1)
-		return m_flash->read(offset);
+		return m_flash->read(space, offset);
 	else if (m_page == 2)
-		return m_flash->read(0x10000 + offset);
+		return m_flash->read(space, 0x10000 + offset);
 	else
 		return m_bios[offset];
 }
@@ -80,9 +81,9 @@ READ8_MEMBER(svmu_state::prog_r)
 WRITE8_MEMBER(svmu_state::prog_w)
 {
 	if (m_page == 1)
-		m_flash->write(offset, data);
+		m_flash->write(space, offset, data);
 	else if (m_page == 2)
-		m_flash->write(0x10000 + offset, data);
+		m_flash->write(space, 0x10000 + offset, data);
 }
 
 /*
@@ -127,14 +128,14 @@ READ8_MEMBER(svmu_state::p7_r)
 
 void svmu_state::svmu_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(svmu_state::prog_r), FUNC(svmu_state::prog_w));
+	map(0x0000, 0xffff).rw(FUNC(svmu_state::prog_r), FUNC(svmu_state::prog_w));
 }
 
 void svmu_state::svmu_io_mem(address_map &map)
 {
-	map(LC8670_PORT1, LC8670_PORT1).rw(this, FUNC(svmu_state::p1_r), FUNC(svmu_state::p1_w));
+	map(LC8670_PORT1, LC8670_PORT1).rw(FUNC(svmu_state::p1_r), FUNC(svmu_state::p1_w));
 	map(LC8670_PORT3, LC8670_PORT3).portr("P3");
-	map(LC8670_PORT7, LC8670_PORT7).r(this, FUNC(svmu_state::p7_r));
+	map(LC8670_PORT7, LC8670_PORT7).r(FUNC(svmu_state::p7_r));
 }
 
 /* Input ports */

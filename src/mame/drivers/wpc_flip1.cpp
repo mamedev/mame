@@ -11,7 +11,7 @@
 
 void wpc_flip1_state::wpc_flip1_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rw(this, FUNC(wpc_flip1_state::ram_r), FUNC(wpc_flip1_state::ram_w));
+	map(0x0000, 0x2fff).rw(FUNC(wpc_flip1_state::ram_r), FUNC(wpc_flip1_state::ram_w));
 	map(0x3000, 0x31ff).bankrw("dmdbank1");
 	map(0x3200, 0x33ff).bankrw("dmdbank2");
 	map(0x3400, 0x35ff).bankrw("dmdbank3");

@@ -31,6 +31,7 @@ into the weeds (jumps to 00000).
 //#include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 #include "machine/z8536.h"
+#include "emupal.h"
 
 
 class c900_state : public driver_device
@@ -71,8 +72,8 @@ void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
-	map(0x0100, 0x0101).r(this, FUNC(c900_state::stat_r));
-	map(0x0110, 0x0111).r(this, FUNC(c900_state::key_r));
+	map(0x0100, 0x0101).r(FUNC(c900_state::stat_r));
+	map(0x0110, 0x0111).r(FUNC(c900_state::key_r));
 	map(0x0111, 0x0111).w(m_terminal, FUNC(generic_terminal_device::write));
 }
 

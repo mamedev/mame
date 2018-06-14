@@ -9,6 +9,7 @@
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/nb1413m3.h"      // needed for mahjong input controller
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VRAM_MAX    2
@@ -122,7 +123,6 @@ public:
 	void mjuraden(machine_config &config);
 	void psailor1(machine_config &config);
 	void ngpgal(machine_config &config);
-	void shabdama(machine_config &config);
 	void mjgottsu(machine_config &config);
 	void mkeibaou(machine_config &config);
 	void gal10ren(machine_config &config);
@@ -178,8 +178,6 @@ public:
 	void sailorws_map(address_map &map);
 	void sailorws_sound_io_map(address_map &map);
 	void sailorws_sound_map(address_map &map);
-	void shabdama_io_map(address_map &map);
-	void shabdama_map(address_map &map);
 	void yosimotm_io_map(address_map &map);
 	void yosimoto_io_map(address_map &map);
 protected:

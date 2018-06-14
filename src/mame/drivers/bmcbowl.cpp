@@ -109,6 +109,7 @@ Main board:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -322,7 +323,7 @@ void bmcbowl_state::bmcbowl_mem(address_map &map)
 
 	map(0x090800, 0x090803).nopw();
 	map(0x091000, 0x091001).nopw();
-	map(0x091800, 0x091801).w(this, FUNC(bmcbowl_state::scroll_w));
+	map(0x091800, 0x091801).w(FUNC(bmcbowl_state::scroll_w));
 
 	map(0x092000, 0x09201f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
 
@@ -344,9 +345,9 @@ void bmcbowl_state::bmcbowl_mem(address_map &map)
 	map(0x30c040, 0x30c041).nopw();
 	map(0x30c080, 0x30c081).nopw();
 	map(0x30c0c0, 0x30c0c1).nopw();
-	map(0x30c100, 0x30c101).r(this, FUNC(bmcbowl_state::bmc_protection_r));
+	map(0x30c100, 0x30c101).r(FUNC(bmcbowl_state::bmc_protection_r));
 	map(0x30c140, 0x30c141).nopw();
-	map(0x30ca00, 0x30ca01).r(this, FUNC(bmcbowl_state::bmc_random_read)).nopw();
+	map(0x30ca00, 0x30ca01).r(FUNC(bmcbowl_state::bmc_random_read)).nopw();
 }
 
 

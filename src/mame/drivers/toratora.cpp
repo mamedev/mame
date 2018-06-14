@@ -199,7 +199,7 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 	if (m_timer & 0x100)
 		popmessage("watchdog!");
 
-	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
+	m_pia_u1->write_porta(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }
@@ -323,8 +323,8 @@ void toratora_state::main_map(address_map &map)
 	map(0x8000, 0x9fff).ram().share("videoram");
 	map(0xa000, 0xf047).noprw();
 	map(0xf048, 0xf049).noprw();
-	map(0xf04a, 0xf04a).w(this, FUNC(toratora_state::clear_tv_w));   /* the read is mark *LEDEN, but not used */
-	map(0xf04b, 0xf04b).rw(this, FUNC(toratora_state::timer_r), FUNC(toratora_state::clear_timer_w));
+	map(0xf04a, 0xf04a).w(FUNC(toratora_state::clear_tv_w));   /* the read is mark *LEDEN, but not used */
+	map(0xf04b, 0xf04b).rw(FUNC(toratora_state::timer_r), FUNC(toratora_state::clear_timer_w));
 	map(0xf04c, 0xf09f).noprw();
 	map(0xf0a0, 0xf0a3).rw(m_pia_u1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf0a4, 0xf0a7).rw(m_pia_u2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));

@@ -20,32 +20,32 @@ DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 SCSI")
 
 void ncr5390_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(ncr5390_device::tcounter_lo_r), FUNC(ncr5390_device::tcount_lo_w));
-	map(0x1, 0x1).rw(this, FUNC(ncr5390_device::tcounter_hi_r), FUNC(ncr5390_device::tcount_hi_w));
-	map(0x2, 0x2).rw(this, FUNC(ncr5390_device::fifo_r), FUNC(ncr5390_device::fifo_w));
-	map(0x3, 0x3).rw(this, FUNC(ncr5390_device::command_r), FUNC(ncr5390_device::command_w));
-	map(0x4, 0x4).rw(this, FUNC(ncr5390_device::status_r), FUNC(ncr5390_device::bus_id_w));
-	map(0x5, 0x5).rw(this, FUNC(ncr5390_device::istatus_r), FUNC(ncr5390_device::timeout_w));
-	map(0x6, 0x6).rw(this, FUNC(ncr5390_device::seq_step_r), FUNC(ncr5390_device::sync_period_w));
-	map(0x7, 0x7).rw(this, FUNC(ncr5390_device::fifo_flags_r), FUNC(ncr5390_device::sync_offset_w));
-	map(0x8, 0x8).rw(this, FUNC(ncr5390_device::conf_r), FUNC(ncr5390_device::conf_w));
-	map(0xa, 0xa).w(this, FUNC(ncr5390_device::test_w));
-	map(0x9, 0x9).w(this, FUNC(ncr5390_device::clock_w));
+	map(0x0, 0x0).rw(FUNC(ncr5390_device::tcounter_lo_r), FUNC(ncr5390_device::tcount_lo_w));
+	map(0x1, 0x1).rw(FUNC(ncr5390_device::tcounter_hi_r), FUNC(ncr5390_device::tcount_hi_w));
+	map(0x2, 0x2).rw(FUNC(ncr5390_device::fifo_r), FUNC(ncr5390_device::fifo_w));
+	map(0x3, 0x3).rw(FUNC(ncr5390_device::command_r), FUNC(ncr5390_device::command_w));
+	map(0x4, 0x4).rw(FUNC(ncr5390_device::status_r), FUNC(ncr5390_device::bus_id_w));
+	map(0x5, 0x5).rw(FUNC(ncr5390_device::istatus_r), FUNC(ncr5390_device::timeout_w));
+	map(0x6, 0x6).rw(FUNC(ncr5390_device::seq_step_r), FUNC(ncr5390_device::sync_period_w));
+	map(0x7, 0x7).rw(FUNC(ncr5390_device::fifo_flags_r), FUNC(ncr5390_device::sync_offset_w));
+	map(0x8, 0x8).rw(FUNC(ncr5390_device::conf_r), FUNC(ncr5390_device::conf_w));
+	map(0xa, 0xa).w(FUNC(ncr5390_device::test_w));
+	map(0x9, 0x9).w(FUNC(ncr5390_device::clock_w));
 }
 
 void ncr53c90a_device::map(address_map &map)
 {
 	ncr5390_device::map(map);
 
-	map(0xb, 0xb).rw(this, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
+	map(0xb, 0xb).rw(FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 }
 
 void ncr53c94_device::map(address_map &map)
 {
 	ncr53c90a_device::map(map);
 
-	map(0xc, 0xc).rw(this, FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
-	map(0xf, 0xf).w(this, FUNC(ncr53c94_device::fifo_align_w));
+	map(0xc, 0xc).rw(FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
+	map(0xf, 0xf).w(FUNC(ncr53c94_device::fifo_align_w));
 }
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

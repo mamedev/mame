@@ -84,26 +84,26 @@ void leland_state::master_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
-	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(this, FUNC(leland_state::leland_battery_ram_w)).share("battery");
+	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(leland_state::leland_battery_ram_w)).share("battery");
 	map(0xe000, 0xefff).ram().share(m_mainram);
-	map(0xf000, 0xf3ff).rw(this, FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
-	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_master_video_addr_w));
+	map(0xf000, 0xf3ff).rw(FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
+	map(0xf800, 0xf801).w(FUNC(leland_state::leland_master_video_addr_w));
 }
 
 void leland_state::master_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
-	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
+	map(0xf0, 0xf0).w(FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xfd, 0xff).rw(FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
 }
 
 void redline_state::master_redline_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(redline_state::redline_master_alt_bankswitch_w));
+	map(0xf0, 0xf0).w(FUNC(redline_state::redline_master_alt_bankswitch_w));
 	map(0xf2, 0xf2).rw(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r), FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
 	map(0xf4, 0xf4).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
-	map(0xfd, 0xff).rw(this, FUNC(redline_state::leland_master_analog_key_r), FUNC(redline_state::leland_master_analog_key_w));
+	map(0xfd, 0xff).rw(FUNC(redline_state::leland_master_analog_key_r), FUNC(redline_state::leland_master_analog_key_w));
 }
 
 
@@ -111,9 +111,9 @@ void ataxx_state::master_map_program_2(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
-	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(this, FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
+	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
 	map(0xe000, 0xf7ff).ram().share(m_mainram);
-	map(0xf800, 0xffff).rw(this, FUNC(ataxx_state::ataxx_paletteram_and_misc_r), FUNC(ataxx_state::ataxx_paletteram_and_misc_w)).share("palette");
+	map(0xf800, 0xffff).rw(FUNC(ataxx_state::ataxx_paletteram_and_misc_r), FUNC(ataxx_state::ataxx_paletteram_and_misc_w)).share("palette");
 }
 
 
@@ -124,9 +124,9 @@ void ataxx_state::master_map_io_2(address_map &map)
 	map(0x05, 0x05).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
 	map(0x06, 0x06).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
 	map(0x0c, 0x0c).w(m_sound, FUNC(leland_80186_sound_device::ataxx_80186_control_w));
-	map(0x20, 0x20).rw(this, FUNC(ataxx_state::ataxx_eeprom_r), FUNC(ataxx_state::ataxx_eeprom_w));
-	map(0xd0, 0xef).rw(this, FUNC(ataxx_state::ataxx_mvram_port_r), FUNC(ataxx_state::ataxx_mvram_port_w));
-	map(0xf0, 0xff).rw(this, FUNC(ataxx_state::ataxx_master_input_r), FUNC(ataxx_state::ataxx_master_output_w));
+	map(0x20, 0x20).rw(FUNC(ataxx_state::ataxx_eeprom_r), FUNC(ataxx_state::ataxx_eeprom_w));
+	map(0xd0, 0xef).rw(FUNC(ataxx_state::ataxx_mvram_port_r), FUNC(ataxx_state::ataxx_mvram_port_w));
+	map(0xf0, 0xff).rw(FUNC(ataxx_state::ataxx_master_input_r), FUNC(ataxx_state::ataxx_master_output_w));
 }
 
 
@@ -142,9 +142,9 @@ void leland_state::slave_small_map_program(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0xdfff).bankr(m_slave_bankslot);
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
-	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
-	map(0xf803, 0xf803).w(this, FUNC(leland_state::leland_slave_small_banksw_w));
+	map(0xf800, 0xf801).w(FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(FUNC(leland_state::leland_raster_r));
+	map(0xf803, 0xf803).w(FUNC(leland_state::leland_slave_small_banksw_w));
 }
 
 
@@ -152,18 +152,18 @@ void redline_state::slave_large_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0xbfff).bankr(m_slave_bankslot);
-	map(0xc000, 0xc000).w(this, FUNC(leland_state::leland_slave_large_banksw_w));
+	map(0xc000, 0xc000).w(FUNC(leland_state::leland_slave_large_banksw_w));
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
-	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xf800, 0xf801).w(FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(FUNC(leland_state::leland_raster_r));
 }
 
 
 void leland_state::slave_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x1f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
-	map(0x40, 0x5f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+	map(0x00, 0x1f).rw(FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+	map(0x40, 0x5f).rw(FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
 }
 
 
@@ -173,16 +173,16 @@ void leland_state::slave_map_program(address_map &map)
 	map(0x2000, 0x9fff).bankr(m_slave_bankslot);
 	map(0xa000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
-	map(0xfffc, 0xfffd).w(this, FUNC(leland_state::leland_slave_video_addr_w));
-	map(0xfffe, 0xfffe).r(this, FUNC(leland_state::leland_raster_r));
-	map(0xffff, 0xffff).w(this, FUNC(leland_state::ataxx_slave_banksw_w));
+	map(0xfffc, 0xfffd).w(FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xfffe, 0xfffe).r(FUNC(leland_state::leland_raster_r));
+	map(0xffff, 0xffff).w(FUNC(leland_state::ataxx_slave_banksw_w));
 }
 
 
 void ataxx_state::slave_map_io_2(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x60, 0x7f).rw(this, FUNC(ataxx_state::ataxx_svram_port_r), FUNC(ataxx_state::ataxx_svram_port_w));
+	map(0x60, 0x7f).rw(FUNC(ataxx_state::ataxx_svram_port_r), FUNC(ataxx_state::ataxx_svram_port_w));
 }
 
 /*************************************
@@ -990,7 +990,7 @@ MACHINE_CONFIG_START(leland_state::leland)
 	MCFG_DEVICE_PROGRAM_MAP(slave_small_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD(m_eeprom)
+	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT)
 	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
@@ -1061,8 +1061,7 @@ MACHINE_CONFIG_START(ataxx_state::ataxx)
 	MCFG_DEVICE_PROGRAM_MAP(slave_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io_2)
 
-	MCFG_EEPROM_SERIAL_93C56_ADD(m_eeprom)
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C56_16BIT, eeprom_serial_streaming::ENABLE)
 
 	MCFG_NVRAM_ADD_0FILL("battery")
 

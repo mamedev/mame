@@ -68,6 +68,7 @@ Summary of Monitor commands.
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -282,7 +283,7 @@ void rx78_state::rx78_mem(address_map &map)
 	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
 	map(0x6000, 0xafff).ram(); //ext RAM
 	map(0xb000, 0xebff).ram();
-	map(0xec00, 0xffff).rw(this, FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
+	map(0xec00, 0xffff).rw(FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
 }
 
 void rx78_state::rx78_io(address_map &map)
@@ -291,14 +292,14 @@ void rx78_state::rx78_io(address_map &map)
 	map.global_mask(0xff);
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-	map(0xf0, 0xf0).rw(this, FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
-	map(0xf1, 0xf1).w(this, FUNC(rx78_state::vram_read_bank_w));
-	map(0xf2, 0xf2).w(this, FUNC(rx78_state::vram_write_bank_w));
-	map(0xf4, 0xf4).rw(this, FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
-	map(0xf5, 0xfb).w(this, FUNC(rx78_state::vdp_reg_w)); //vdp
-	map(0xfc, 0xfc).w(this, FUNC(rx78_state::vdp_bg_reg_w)); //vdp
-	map(0xfe, 0xfe).w(this, FUNC(rx78_state::vdp_pri_mask_w));
-	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
+	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
+	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
+	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
+	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
+	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
+	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
+	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
 }
 
 /* Input ports */

@@ -21,6 +21,7 @@
 
 #include "formats/nanos_dsk.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -154,7 +155,7 @@ void nanos_state::nanos_io(address_map &map)
 	map(0x8C, 0x8F).rw(m_ctc_0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* FDC card */
-	map(0x92, 0x92).w(this, FUNC(nanos_state::nanos_tc_w));
+	map(0x92, 0x92).w(FUNC(nanos_state::nanos_tc_w));
 	map(0x94, 0x95).m(m_fdc, FUNC(upd765a_device::map));
 	/* V24+IFSS card */
 	map(0xA0, 0xA3).rw(m_sio_0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));

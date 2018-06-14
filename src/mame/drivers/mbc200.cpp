@@ -52,6 +52,7 @@ TODO:
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -150,7 +151,7 @@ void mbc200_state::mbc200_io(address_map &map)
 	map.global_mask(0xff);
 	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	//AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	map(0xe0, 0xe1).r(this, FUNC(mbc200_state::keyboard_r)).nopw();
+	map(0xe0, 0xe1).r(FUNC(mbc200_state::keyboard_r)).nopw();
 	map(0xe4, 0xe7).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
 	map(0xe8, 0xeb).rw(m_ppi_m, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xec, 0xec).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));

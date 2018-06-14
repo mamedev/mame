@@ -38,6 +38,7 @@
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -336,10 +337,10 @@ void eurocom2_state::eurocom2_map(address_map &map)
 	map(0xf000, 0xfcef).rom().region("maincpu", 0);
 	map(0xfcf0, 0xfcf3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfcf4, 0xfcf5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xfcf6, 0xfcf7).w(this, FUNC(eurocom2_state::vico_w));
+	map(0xfcf6, 0xfcf7).w(FUNC(eurocom2_state::vico_w));
 	map(0xfcf8, 0xfcfb).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfd30, 0xfd37).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0xfd38, 0xfd38).rw(this, FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
+	map(0xfd38, 0xfd38).rw(FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
 	map(0xfd40, 0xffff).rom().region("maincpu", 0xd40).nopw();
 }
 
@@ -349,7 +350,7 @@ void waveterm_state::waveterm_map(address_map &map)
 	map(0xfd00, 0xfd03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfd08, 0xfd0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xfd10, 0xfd17).unmaprw();
-	map(0xfd18, 0xfd18).r(this, FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
+	map(0xfd18, 0xfd18).r(FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
 //  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
 }
 

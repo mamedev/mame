@@ -354,6 +354,7 @@ VIDEOS["PPU2C0X"] = true
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["BUSMOUSE"] = true
 MACHINES["NCR53C7XX"] = true
 MACHINES["LSI53C810"] = true
 MACHINES["6522VIA"] = true
@@ -2895,6 +2896,7 @@ files {
 	MAME_DIR .. "src/mame/includes/nbmj9195.h",
 	MAME_DIR .. "src/mame/video/nbmj9195.cpp",
 	MAME_DIR .. "src/mame/drivers/nightgal.cpp",
+	MAME_DIR .. "src/mame/drivers/nichild.cpp",
 	MAME_DIR .. "src/mame/audio/nichisnd.cpp",
 	MAME_DIR .. "src/mame/audio/nichisnd.h",
 	MAME_DIR .. "src/mame/drivers/niyanpai.cpp",

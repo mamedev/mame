@@ -31,9 +31,9 @@ void s11c_bg_device::s11c_bg_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x67ff).w(this, FUNC(s11c_bg_device::bg_speech_digit_w));
-	map(0x6800, 0x6fff).w(this, FUNC(s11c_bg_device::bg_speech_clock_w));
-	map(0x7800, 0x7fff).w(this, FUNC(s11c_bg_device::bgbank_w));
+	map(0x6000, 0x67ff).w(FUNC(s11c_bg_device::bg_speech_digit_w));
+	map(0x6800, 0x6fff).w(FUNC(s11c_bg_device::bg_speech_clock_w));
+	map(0x7800, 0x7fff).w(FUNC(s11c_bg_device::bgbank_w));
 	map(0x8000, 0xffff).bankr("bgbank");
 }
 
@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 
 WRITE8_MEMBER( s11c_bg_device::pia40_pb_w )
 {
-//  m_pia34->portb_w(data);
+//  m_pia34->write_portb(data);
 }
 
 void s11c_bg_device::ctrl_w(uint8_t data)
@@ -54,7 +54,7 @@ void s11c_bg_device::ctrl_w(uint8_t data)
 
 void s11c_bg_device::data_w(uint8_t data)
 {
-	m_pia40->portb_w(data);
+	m_pia40->write_portb(data);
 }
 
 MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
@@ -74,7 +74,7 @@ MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11c_bg_device, pia40_pb_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE("ym2151", ym2151_device, reset_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11c_bg_device, pia40_cb2_w))

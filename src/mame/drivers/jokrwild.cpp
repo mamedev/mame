@@ -76,6 +76,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
@@ -180,9 +181,9 @@ READ8_MEMBER(jokrwild_state::rng_r)
 
 void jokrwild_state::jokrwild_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().w(this, FUNC(jokrwild_state::jokrwild_videoram_w)).share("videoram");
+	map(0x0000, 0x03ff).ram().w(FUNC(jokrwild_state::jokrwild_videoram_w)).share("videoram");
 	map(0x0400, 0x07ff).ram(); //FIXME: backup RAM
-	map(0x2000, 0x23ff).ram().w(this, FUNC(jokrwild_state::jokrwild_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(jokrwild_state::jokrwild_colorram_w)).share("colorram");
 	map(0x2400, 0x27ff).ram(); //stack RAM
 	map(0x4004, 0x4007).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //optical sensor is here
@@ -190,7 +191,7 @@ void jokrwild_state::jokrwild_map(address_map &map)
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x6001, 0x6001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x6100, 0x6100).portr("SW1");
-	map(0x6200, 0x6203).r(this, FUNC(jokrwild_state::rng_r));//another PIA?
+	map(0x6200, 0x6203).r(FUNC(jokrwild_state::rng_r));//another PIA?
 	map(0x6300, 0x6300).portr("SW2");
 	map(0x8000, 0xffff).rom();
 }

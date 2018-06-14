@@ -200,10 +200,10 @@ void vsnes_state::vsnes_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_0_w));
-	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).rw(this, FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
 	map(0x6000, 0x7fff).bankrw("extra1");
 	map(0x8000, 0xffff).rom();
 }
@@ -212,10 +212,10 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram_1");
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_1_w));
-	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
-	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).w(this, FUNC(vsnes_state::vsnes_coin_counter_1_w));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_1_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_1_w));
 	map(0x6000, 0x7fff).bankrw("extra2");
 	map(0x8000, 0xffff).rom();
 }
@@ -251,11 +251,11 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4000, 0x4017).w(this, FUNC(vsnes_state::bootleg_sound_write));
-	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_0_w));
-	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).rw(this, FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4000, 0x4017).w(FUNC(vsnes_state::bootleg_sound_write));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
 	map(0x6000, 0x7fff).bankrw("extra1");
 	map(0x8000, 0xffff).rom();
 }
@@ -270,15 +270,15 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 
-	map(0x4000, 0x4000).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
+	map(0x4000, 0x4000).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
 
-	map(0x6000, 0x6000).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_latch_r)); // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
-	map(0x6001, 0x6001).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
+	map(0x6000, 0x6000).r(FUNC(vsnes_state::vsnes_bootleg_z80_latch_r)); // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
+	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
-	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
-	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::command_w));
 
 }
 

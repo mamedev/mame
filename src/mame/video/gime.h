@@ -51,8 +51,8 @@ public:
 	template <class Object> devcb_base &set_floating_bus_rd_callback(Object &&cb) { return m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( read ) { return read(offset); }
-	DECLARE_WRITE8_MEMBER( write ) { write(offset, data); }
+	DECLARE_READ8_MEMBER( bus_r ) { return read(offset); }
+	DECLARE_WRITE8_MEMBER( bus_w ) { write(offset, data); }
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }

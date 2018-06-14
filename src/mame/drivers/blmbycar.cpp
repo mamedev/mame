@@ -107,8 +107,8 @@ void blmbycar_state::common_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0xfec000, 0xfeffff).ram();
 	map(0x100000, 0x103fff).writeonly();                                               // ???
-	map(0x104000, 0x105fff).ram().w(this, FUNC(blmbycar_state::vram_1_w)).share("vram_1"); // Layer 1
-	map(0x106000, 0x107fff).ram().w(this, FUNC(blmbycar_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x104000, 0x105fff).ram().w(FUNC(blmbycar_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0x106000, 0x107fff).ram().w(FUNC(blmbycar_state::vram_0_w)).share("vram_0"); // Layer 0
 	map(0x108000, 0x10bfff).writeonly();                                               // ???
 	map(0x10c000, 0x10c003).writeonly().share("scroll_1");              // Scroll 1
 	map(0x10c004, 0x10c007).writeonly().share("scroll_0");              // Scroll 0
@@ -118,7 +118,7 @@ void blmbycar_state::common_map(address_map &map)
 	map(0x444000, 0x445fff).writeonly().share("spriteram");// Sprites (size?)
 	map(0x700000, 0x700001).portr("DSW");
 	map(0x700002, 0x700003).portr("P1_P2");
-	map(0x70000c, 0x70000d).w(this, FUNC(blmbycar_state::okibank_w));                               // Sound
+	map(0x70000c, 0x70000d).w(FUNC(blmbycar_state::okibank_w));                               // Sound
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 }
 
@@ -126,12 +126,12 @@ void blmbycar_state::blmbycar_map(address_map &map)
 {
 	common_map(map);
 
-	map(0x700004, 0x700005).r(this, FUNC(blmbycar_state::blmbycar_opt_wheel_r));                              // Wheel (optical)
+	map(0x700004, 0x700005).r(FUNC(blmbycar_state::blmbycar_opt_wheel_r));                              // Wheel (optical)
 	map(0x700006, 0x700007).portr("UNK");
-	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
+	map(0x700008, 0x700009).r(FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
 	map(0x70000a, 0x70000b).nopw();                                                // ? Wheel
-	map(0x70006a, 0x70006b).nopr().w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
-	map(0x70007a, 0x70007b).nopr().w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
+	map(0x70006a, 0x70006b).nopr().w(FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
+	map(0x70007a, 0x70007b).nopr().w(FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
 }
 
 READ16_MEMBER(blmbycar_state::waterball_unk_r)
@@ -145,7 +145,7 @@ void blmbycar_state::watrball_map(address_map &map)
 	common_map(map);
 
 	map(0x700006, 0x700007).nopr();                                                 // read
-	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::waterball_unk_r));                                   // 0x0008 must toggle
+	map(0x700008, 0x700009).r(FUNC(blmbycar_state::waterball_unk_r));                                   // 0x0008 must toggle
 	map(0x70000a, 0x70000b).writeonly();                                               // ?? busy
 }
 

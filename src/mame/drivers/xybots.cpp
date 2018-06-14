@@ -78,11 +78,11 @@ void xybots_state::main_map(address_map &map)
 	map(0x805000, 0x805fff).mirror(0x7f8000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x806000, 0x8060ff).mirror(0x7f8000).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r)).umask16(0x00ff);
 	map(0x806100, 0x8061ff).mirror(0x7f8000).portr("FFE100");
-	map(0x806200, 0x8062ff).mirror(0x7f8000).r(this, FUNC(xybots_state::special_port1_r));
+	map(0x806200, 0x8062ff).mirror(0x7f8000).r(FUNC(xybots_state::special_port1_r));
 	map(0x806800, 0x8068ff).mirror(0x7f8000).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x806900, 0x8069ff).mirror(0x7f8000).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w)).umask16(0x00ff);
 	map(0x806a00, 0x806aff).mirror(0x7f8000).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x806b00, 0x806bff).mirror(0x7f8000).w(this, FUNC(xybots_state::video_int_ack_w));
+	map(0x806b00, 0x806bff).mirror(0x7f8000).w(FUNC(xybots_state::video_int_ack_w));
 	map(0x806e00, 0x806eff).mirror(0x7f8000).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
 }
 

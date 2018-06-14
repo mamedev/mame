@@ -446,6 +446,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -682,10 +683,10 @@ void magicfly_state::magicfly_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");    /* MK48Z02B NVRAM */
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(magicfly_state::magicfly_videoram_w)).share("videoram"); /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(magicfly_state::magicfly_colorram_w)).share("colorram"); /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
-	map(0x2800, 0x2800).r(this, FUNC(magicfly_state::mux_port_r));    /* multiplexed input port */
-	map(0x3000, 0x3000).w(this, FUNC(magicfly_state::mux_port_w));   /* output port */
+	map(0x1000, 0x13ff).ram().w(FUNC(magicfly_state::magicfly_videoram_w)).share("videoram"); /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(FUNC(magicfly_state::magicfly_colorram_w)).share("colorram"); /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	map(0x2800, 0x2800).r(FUNC(magicfly_state::mux_port_r));    /* multiplexed input port */
+	map(0x3000, 0x3000).w(FUNC(magicfly_state::mux_port_w));   /* output port */
 	map(0xc000, 0xffff).rom();                 /* ROM space */
 }
 

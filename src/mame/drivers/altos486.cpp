@@ -109,12 +109,12 @@ static void altos486_floppies(device_slot_interface &device)
 void altos486_state::altos486_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0xfffff).rw(this, FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
+	map(0x00000, 0xfffff).rw(FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
 }
 
 void altos486_state::altos486_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
 }
 
 void altos486_state::altos486_z80_mem(address_map &map)

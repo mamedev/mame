@@ -292,22 +292,22 @@ void lwings_state::avengers_map(address_map &map)
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdf7f).ram().share("spriteram");
 	map(0xdf80, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xf801).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
-	map(0xf802, 0xf803).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
-	map(0xf804, 0xf804).w(this, FUNC(lwings_state::trojan_bg2_scrollx_w));
-	map(0xf805, 0xf805).w(this, FUNC(lwings_state::trojan_bg2_image_w));
+	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
+	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
 
 	map(0xf808, 0xf808).portr("SERVICE").nopw(); /* ? */
-	map(0xf809, 0xf809).portr("P1").w(this, FUNC(lwings_state::avengers_protection_w));
+	map(0xf809, 0xf809).portr("P1").w(FUNC(lwings_state::avengers_protection_w));
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWB");
-	map(0xf80c, 0xf80c).portr("DSWA").w(this, FUNC(lwings_state::avengers_prot_bank_w));
-	map(0xf80d, 0xf80d).rw(this, FUNC(lwings_state::avengers_protection_r), FUNC(lwings_state::avengers_adpcm_w));
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80c, 0xf80c).portr("DSWA").w(FUNC(lwings_state::avengers_prot_bank_w));
+	map(0xf80d, 0xf80d).rw(FUNC(lwings_state::avengers_protection_r), FUNC(lwings_state::avengers_adpcm_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::lwings_map(address_map &map)
@@ -316,20 +316,20 @@ void lwings_state::lwings_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
-	map(0xf808, 0xf809).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf808, 0xf809).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
-	map(0xf80a, 0xf80b).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::trojan_map(address_map &map)
@@ -339,22 +339,22 @@ void lwings_state::trojan_map(address_map &map)
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdf7f).ram().share("spriteram");
 	map(0xdf80, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0xf800, 0xf801).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
-	map(0xf802, 0xf803).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
-	map(0xf804, 0xf804).w(this, FUNC(lwings_state::trojan_bg2_scrollx_w));
-	map(0xf805, 0xf805).w(this, FUNC(lwings_state::trojan_bg2_image_w));
+	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
+	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
 	map(0xf808, 0xf808).portr("SERVICE").nopw(); //watchdog
 	map(0xf809, 0xf809).portr("P1");
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
 	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::lwings_sound_map(address_map &map)
@@ -364,7 +364,7 @@ void lwings_state::lwings_sound_map(address_map &map)
 	map(0xc800, 0xc800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe001).w("2203a", FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w("2203b", FUNC(ym2203_device::write));
-	map(0xe006, 0xe006).r(this, FUNC(lwings_state::avengers_soundlatch2_r)); //AT: (avengers061gre)
+	map(0xe006, 0xe006).r(FUNC(lwings_state::avengers_soundlatch2_r)); //AT: (avengers061gre)
 	map(0xe006, 0xe006).writeonly().share("soundlatch_2");
 }
 
@@ -376,22 +376,22 @@ void lwings_state::fball_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
-	map(0xf808, 0xf809).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf808, 0xf809).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
-	map(0xf80a, 0xf80b).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).portr("P3").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf80e, 0xf80e).portr("P4");
 
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 
@@ -416,7 +416,7 @@ void lwings_state::fball_sound_map(address_map &map)
 
 	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	map(0xA000, 0xA000).w(this, FUNC(lwings_state::fball_oki_bank_w));
+	map(0xA000, 0xA000).w(FUNC(lwings_state::fball_oki_bank_w));
 
 	map(0xc000, 0xc7ff).ram();
 
@@ -432,15 +432,15 @@ void lwings_state::trojan_adpcm_map(address_map &map)
 void lwings_state::avengers_adpcm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(lwings_state::avengers_adpcm_r));
-	map(0x01, 0x01).w(this, FUNC(lwings_state::msm5205_w));
+	map(0x00, 0x00).r(FUNC(lwings_state::avengers_adpcm_r));
+	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
 }
 
 void lwings_state::trojan_adpcm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(lwings_state::msm5205_w));
+	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
 }
 
 /*************************************

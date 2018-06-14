@@ -187,9 +187,9 @@ void luxor_55_10828_device::luxor_55_10828_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x70, 0x73).mirror(0x0c).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xb0, 0xb3).mirror(0x0c).rw(this, FUNC(luxor_55_10828_device::fdc_r), FUNC(luxor_55_10828_device::fdc_w));
-	map(0xd0, 0xd0).mirror(0x0f).w(this, FUNC(luxor_55_10828_device::status_w));
-	map(0xe0, 0xe0).mirror(0x0f).w(this, FUNC(luxor_55_10828_device::ctrl_w));
+	map(0xb0, 0xb3).mirror(0x0c).rw(FUNC(luxor_55_10828_device::fdc_r), FUNC(luxor_55_10828_device::fdc_w));
+	map(0xd0, 0xd0).mirror(0x0f).w(FUNC(luxor_55_10828_device::status_w));
+	map(0xe0, 0xe0).mirror(0x0f).w(FUNC(luxor_55_10828_device::ctrl_w));
 }
 
 

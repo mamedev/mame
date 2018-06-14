@@ -5,6 +5,7 @@
 #include "machine/input_merger.h"
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class nycaptor_state : public driver_device
 {

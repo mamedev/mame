@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+
+#include "emupal.h"
+
 class snookr10_state : public driver_device
 {
 public:

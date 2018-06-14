@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define PIXMAP_COLOR_BASE  (16 + 32)

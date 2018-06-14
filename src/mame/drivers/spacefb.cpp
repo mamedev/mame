@@ -239,9 +239,9 @@ void spacefb_state::spacefb_main_io_map(address_map &map)
 	map(0x03, 0x03).portr("DSW");
 	map(0x04, 0x07).nopr();  /* yes, this is correct (1-of-8 decoder) */
 
-	map(0x00, 0x00).mirror(0x04).w(this, FUNC(spacefb_state::port_0_w));
-	map(0x01, 0x01).mirror(0x04).w(this, FUNC(spacefb_state::port_1_w));
-	map(0x02, 0x02).mirror(0x04).w(this, FUNC(spacefb_state::port_2_w));
+	map(0x00, 0x00).mirror(0x04).w(FUNC(spacefb_state::port_0_w));
+	map(0x01, 0x01).mirror(0x04).w(FUNC(spacefb_state::port_1_w));
+	map(0x02, 0x02).mirror(0x04).w(FUNC(spacefb_state::port_2_w));
 	map(0x03, 0x03).mirror(0x04).nopw();
 }
 
@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(spacefb_state::spacefb)
 
 	MCFG_DEVICE_ADD("audiocpu", I8035, SPACEFB_AUDIO_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(spacefb_audio_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, spacefb_state, audio_p2_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, spacefb_state, audio_t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, spacefb_state, audio_t1_r))

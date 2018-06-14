@@ -2,6 +2,7 @@
 // copyright-holders:Yochizo, Takahiro Nogi
 #include "sound/msm5205.h"
 #include "video/seta001.h"
+#include "emupal.h"
 
 struct iox_t
 {

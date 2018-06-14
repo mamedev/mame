@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "machine/taitoio.h"
 #include "video/tc0080vco.h"
+#include "emupal.h"
 
 
 class taitoh_state : public driver_device

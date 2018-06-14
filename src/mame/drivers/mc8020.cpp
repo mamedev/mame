@@ -21,6 +21,7 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mc8020_state : public driver_device

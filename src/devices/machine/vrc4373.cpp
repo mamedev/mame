@@ -73,25 +73,25 @@ DEFINE_DEVICE_TYPE(VRC4373, vrc4373_device, "vrc4373", "NEC VRC4373 System Contr
 void vrc4373_device::config_map(address_map &map)
 {
 	pci_bridge_device::config_map(map);
-	map(0x40, 0x43).rw(this, FUNC(vrc4373_device::pcictrl_r), FUNC(vrc4373_device::pcictrl_w));
+	map(0x40, 0x43).rw(FUNC(vrc4373_device::pcictrl_r), FUNC(vrc4373_device::pcictrl_w));
 }
 
 // cpu i/f map
 void vrc4373_device::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x0000007b).rw(this, FUNC(vrc4373_device::cpu_if_r), FUNC(vrc4373_device::cpu_if_w));
+	map(0x00000000, 0x0000007b).rw(FUNC(vrc4373_device::cpu_if_r), FUNC(vrc4373_device::cpu_if_w));
 }
 
 // Target Window 1 map
 void vrc4373_device::target1_map(address_map &map)
 {
-	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc4373_device::target1_r), FUNC(vrc4373_device::target1_w));
+	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc4373_device::target1_r), FUNC(vrc4373_device::target1_w));
 }
 
 // Target Window 2 map
 void vrc4373_device::target2_map(address_map &map)
 {
-	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc4373_device::target2_r), FUNC(vrc4373_device::target2_w));
+	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc4373_device::target2_r), FUNC(vrc4373_device::target2_w));
 }
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

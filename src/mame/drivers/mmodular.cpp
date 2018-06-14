@@ -176,7 +176,7 @@ void berlinp_state::berlinp_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x800000, 0x800000).r(this, FUNC(berlinp_state::berlinp_input_r));
+	map(0x800000, 0x800000).r(FUNC(berlinp_state::berlinp_input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));

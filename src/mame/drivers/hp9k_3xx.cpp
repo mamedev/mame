@@ -198,11 +198,11 @@ uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bi
 // shared mappings for all 9000/3xx systems
 void hp9k3xx_state::hp9k3xx_common(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
-	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
+	map(0x00000000, 0xffffffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
-	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
@@ -216,14 +216,14 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
 	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
-	map(0x470000, 0x47001f).mirror(0x00ffe0).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x470000, 0x47001f).mirror(0x00ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
-	map(0x510000, 0x510003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
-	map(0x538000, 0x538003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
-	map(0x5c0000, 0x5c0003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no add-on FP coprocessor
+	map(0x510000, 0x510003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
+	map(0x538000, 0x538003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
+	map(0x5c0000, 0x5c0003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no add-on FP coprocessor
 
 	map(0x5f8000, 0x5f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0x600000, 0x7fffff).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // prevent reading invalid DIO slots
+	map(0x600000, 0x7fffff).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // prevent reading invalid DIO slots
 	map(0x800000, 0xffffff).ram();
 }
 
@@ -246,7 +246,7 @@ void hp9k3xx_state::hp9k330_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -258,7 +258,7 @@ void hp9k3xx_state::hp9k332_map(address_map &map)
 	map(0x00200000, 0x002fffff).ram().share("vram");    // 98544 mono framebuffer
 	map(0x00560000, 0x00563fff).rom().region("graphics", 0x0000);   // 98544 mono ROM
 
-	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -267,7 +267,7 @@ void hp9k3xx_state::hp9k370_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xff700000, 0xff7fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xff700000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xff800000, 0xffffffff).ram();
 }
 
@@ -276,9 +276,9 @@ void hp9k3xx_state::hp9k380_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0x0051a000, 0x0051afff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
+	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 
-	map(0xc0000000, 0xff7fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xc0000000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xff800000, 0xffffffff).ram();
 }
 
@@ -287,10 +287,10 @@ void hp9k3xx_state::hp9k382_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 
-	map(0x0051a000, 0x0051afff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
+	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 }
 
 void hp9k3xx_state::iocpu_map(address_map &map)
@@ -658,7 +658,7 @@ ROM_START( hp9k320 )
 	ROM_LOAD16_BYTE( "5061-6541.bin", 0x008000, 0x004000, CRC(39d32998) SHA1(6de1bda75187b0878c03c074942b807cf2924f0e) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k330 )
@@ -667,7 +667,7 @@ ROM_START( hp9k330 )
 	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k332 )
@@ -676,7 +676,7 @@ ROM_START( hp9k332 )
 	ROM_LOAD16_BYTE( "1818-4797.bin", 0x000001, 0x010000, CRC(98129eb1) SHA1(f3451a854060f1be1bee9f17c5c198b4b1cd61ac) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 
 	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD16_BYTE( "5180-0471.bin", 0x000001, 0x002000, CRC(7256af2e) SHA1(584e8d4dcae8c898c1438125dc9c4709631b32f7) )
@@ -688,7 +688,7 @@ ROM_START( hp9k340 )
 	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k370 )
@@ -697,7 +697,7 @@ ROM_START( hp9k370 )
 	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k380 )
@@ -705,7 +705,7 @@ ROM_START( hp9k380 )
 	ROM_LOAD16_WORD_SWAP( "1818-5062_98754_9000-380_27c210.bin", 0x000000, 0x020000, CRC(500a0797) SHA1(4c0a3929e45202a2689e353657e5c4b58ff9a1fd) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k382 )
@@ -713,7 +713,7 @@ ROM_START( hp9k382 )
 	ROM_LOAD16_WORD_SWAP( "1818-5468_27c1024.bin", 0x000000, 0x020000, CRC(d1d9ef13) SHA1(6bbb17b9adad402fbc516dc2f3143e9c38ceef8e) )
 
 	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
+	ROM_LOAD( "1820-4784.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 
 	ROM_REGION( 0x2000, "unknown", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD( "1818-5282_8ce61e951207_28c64.bin", 0x000000, 0x002000, CRC(740442f3) SHA1(ab65bd4eec1024afb97fc2dd3bd3f017e90f49ae) )

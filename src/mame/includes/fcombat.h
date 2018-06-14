@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
+#include "emupal.h"
+
 
 /* this is compied from Exerion, but it should be correct */
 #define FCOMBAT_MASTER_CLOCK        (20000000)

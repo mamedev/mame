@@ -64,6 +64,7 @@ $842f = lives
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -388,21 +389,21 @@ void ddayjlc_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram().share("mainram");
 	map(0x9000, 0x93ff).ram().share("spriteram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(ddayjlc_state::vram_w)).share("videoram");
-	map(0x9800, 0x9fff).ram().w(this, FUNC(ddayjlc_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
+	map(0x9400, 0x97ff).ram().w(FUNC(ddayjlc_state::vram_w)).share("videoram");
+	map(0x9800, 0x9fff).ram().w(FUNC(ddayjlc_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
 	map(0xa000, 0xdfff).bankr("bank1").nopw();
-	map(0xe000, 0xe003).w(this, FUNC(ddayjlc_state::i8257_CH0_w));
+	map(0xe000, 0xe003).w(FUNC(ddayjlc_state::i8257_CH0_w));
 	map(0xe008, 0xe008).nopw(); // i8257 control byte
-	map(0xf000, 0xf000).w(this, FUNC(ddayjlc_state::sound_w));
+	map(0xf000, 0xf000).w(FUNC(ddayjlc_state::sound_w));
 	map(0xf100, 0xf100).nopw(); // sound related (f/f irq trigger?)
-	map(0xf080, 0xf080).portr("P2").w(this, FUNC(ddayjlc_state::char_bank_w));
-	map(0xf081, 0xf081).w(this, FUNC(ddayjlc_state::flip_screen_w));
-	map(0xf083, 0xf083).w(this, FUNC(ddayjlc_state::i8257_LMSR_w));
-	map(0xf084, 0xf084).w(this, FUNC(ddayjlc_state::bg0_w));
-	map(0xf085, 0xf085).w(this, FUNC(ddayjlc_state::bg1_w));
-	map(0xf086, 0xf086).w(this, FUNC(ddayjlc_state::bg2_w));
-	map(0xf101, 0xf101).w(this, FUNC(ddayjlc_state::main_nmi_w));
-	map(0xf102, 0xf105).w(this, FUNC(ddayjlc_state::prot_w));
+	map(0xf080, 0xf080).portr("P2").w(FUNC(ddayjlc_state::char_bank_w));
+	map(0xf081, 0xf081).w(FUNC(ddayjlc_state::flip_screen_w));
+	map(0xf083, 0xf083).w(FUNC(ddayjlc_state::i8257_LMSR_w));
+	map(0xf084, 0xf084).w(FUNC(ddayjlc_state::bg0_w));
+	map(0xf085, 0xf085).w(FUNC(ddayjlc_state::bg1_w));
+	map(0xf086, 0xf086).w(FUNC(ddayjlc_state::bg2_w));
+	map(0xf101, 0xf101).w(FUNC(ddayjlc_state::main_nmi_w));
+	map(0xf102, 0xf105).w(FUNC(ddayjlc_state::prot_w));
 	map(0xf000, 0xf000).portr("P1");
 	map(0xf100, 0xf100).portr("SYSTEM");
 	map(0xf180, 0xf180).portr("DSW1");
@@ -418,7 +419,7 @@ void ddayjlc_state::sound_map(address_map &map)
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x5000, 0x5000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::address_w));
-	map(0x7000, 0x7000).w(this, FUNC(ddayjlc_state::sound_nmi_w));
+	map(0x7000, 0x7000).w(FUNC(ddayjlc_state::sound_nmi_w));
 }
 
 static INPUT_PORTS_START( ddayjlc )

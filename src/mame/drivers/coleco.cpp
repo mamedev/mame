@@ -104,13 +104,13 @@ void coleco_state::coleco_map(address_map &map)
 void coleco_state::coleco_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).mirror(0x1f).w(this, FUNC(coleco_state::paddle_off_w));
-	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0xc0, 0xc0).mirror(0x1f).w(this, FUNC(coleco_state::paddle_on_w));
-	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
-	map(0xe0, 0xe0).mirror(0x1d).r(this, FUNC(coleco_state::paddle_1_r));
-	map(0xe2, 0xe2).mirror(0x1d).r(this, FUNC(coleco_state::paddle_2_r));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));
 }
 
 void coleco_state::czz50_map(address_map &map)

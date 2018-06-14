@@ -24,6 +24,7 @@ likewise a 2 screen game
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -84,7 +85,7 @@ void xmen_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
 	map(0x101000, 0x101fff).ram();
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(this, FUNC(xmen_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w));
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
@@ -94,7 +95,7 @@ void xmen_state::main_map(address_map &map)
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 	map(0x110000, 0x113fff).ram();     /* main RAM */
 	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::lsb_r), FUNC(k052109_device::lsb_w));
-	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
+	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 }
 
 void xmen_state::sound_map(address_map &map)
@@ -105,7 +106,7 @@ void xmen_state::sound_map(address_map &map)
 	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe800, 0xe801).mirror(0x0400).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(xmen_state::sound_bankswitch_w));
+	map(0xf800, 0xf800).w(FUNC(xmen_state::sound_bankswitch_w));
 }
 
 
@@ -118,7 +119,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x102000, 0x102fff).ram().share("spriteramright");  /* sprites (screen 2) */
 	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(this, FUNC(xmen_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w)); /* sprites */
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
@@ -130,7 +131,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x110000, 0x113fff).ram();     /* main RAM */
 /*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
 	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
-	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
+	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 /*
     map(0x1ac000, 0x1af7ff).readonly();
     map(0x1ac000, 0x1af7ff).writeonly();
@@ -307,7 +308,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -360,7 +361,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

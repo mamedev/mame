@@ -69,7 +69,7 @@ void acs8600_ics_device::ics_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("icscpu", 0);
 	map(0x1000, 0x17ff).ram();
-	map(0x8000, 0xffff).rw(this, FUNC(acs8600_ics_device::hostram_r), FUNC(acs8600_ics_device::hostram_w));
+	map(0x8000, 0xffff).rw(FUNC(acs8600_ics_device::hostram_r), FUNC(acs8600_ics_device::hostram_w));
 }
 
 void acs8600_ics_device::ics_io(address_map &map)
@@ -81,8 +81,8 @@ void acs8600_ics_device::ics_io(address_map &map)
 	map(0x0c, 0x0f).rw("sio4", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x10, 0x11).rw("stc1", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
 	map(0x14, 0x15).rw("stc2", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
-	map(0x18, 0x18).w(this, FUNC(acs8600_ics_device::ctrl_w));
-	map(0x1c, 0x1c).w(this, FUNC(acs8600_ics_device::hiaddr_w));
+	map(0x18, 0x18).w(FUNC(acs8600_ics_device::ctrl_w));
+	map(0x1c, 0x1c).w(FUNC(acs8600_ics_device::hiaddr_w));
 }
 
 static const z80_daisy_config ics_daisy_chain[] =

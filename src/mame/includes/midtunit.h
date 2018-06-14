@@ -11,6 +11,7 @@
 #include "audio/williams.h"
 
 #include "cpu/tms34010/tms34010.h"
+#include "emupal.h"
 
 
 class midtunit_state : public driver_device

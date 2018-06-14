@@ -39,10 +39,10 @@ void cchasm_state::memmap(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x04000f).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0x050000, 0x050001).w(this, FUNC(cchasm_state::refresh_control_w));
-	map(0x060000, 0x060001).portr("DSW").w(this, FUNC(cchasm_state::led_w));
+	map(0x050000, 0x050001).w(FUNC(cchasm_state::refresh_control_w));
+	map(0x060000, 0x060001).portr("DSW").w(FUNC(cchasm_state::led_w));
 	map(0x070000, 0x070001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xf80000, 0xf800ff).rw(this, FUNC(cchasm_state::io_r), FUNC(cchasm_state::io_w));
+	map(0xf80000, 0xf800ff).rw(FUNC(cchasm_state::io_r), FUNC(cchasm_state::io_w));
 	map(0xffb000, 0xffffff).ram().share("ram");
 }
 
@@ -58,13 +58,13 @@ void cchasm_state::sound_memmap(address_map &map)
 	map(0x4000, 0x43ff).ram();
 	map(0x5000, 0x53ff).ram();
 	map(0x6000, 0x6001).mirror(0xf9e).w("ay1", FUNC(ay8910_device::address_data_w));
-	map(0x6000, 0x6000).mirror(0xf9e).r(this, FUNC(cchasm_state::coin_sound_r));
+	map(0x6000, 0x6000).mirror(0xf9e).r(FUNC(cchasm_state::coin_sound_r));
 	map(0x6001, 0x6001).mirror(0xf9e).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x6020, 0x6021).mirror(0xf9e).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x6021, 0x6021).mirror(0xf9e).r("ay2", FUNC(ay8910_device::data_r));
 	map(0x6040, 0x6040).mirror(0xf9e).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch3, FUNC(generic_latch_8_device::write));
-	map(0x6041, 0x6041).mirror(0xf9e).rw(this, FUNC(cchasm_state::soundlatch2_r), FUNC(cchasm_state::soundlatch4_w));
-	map(0x6061, 0x6061).mirror(0xf9e).w(this, FUNC(cchasm_state::reset_coin_flag_w));
+	map(0x6041, 0x6041).mirror(0xf9e).rw(FUNC(cchasm_state::soundlatch2_r), FUNC(cchasm_state::soundlatch4_w));
+	map(0x6061, 0x6061).mirror(0xf9e).w(FUNC(cchasm_state::reset_coin_flag_w));
 	map(0x7041, 0x7041).noprw(); // TODO
 }
 

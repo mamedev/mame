@@ -352,31 +352,31 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
 void shadfrce_state::shadfrce_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(shadfrce_state::bg0videoram_w)).share("bg0videoram"); /* video */
+	map(0x100000, 0x100fff).ram().w(FUNC(shadfrce_state::bg0videoram_w)).share("bg0videoram"); /* video */
 	map(0x101000, 0x101fff).ram();
-	map(0x102000, 0x1027ff).ram().w(this, FUNC(shadfrce_state::bg1videoram_w)).share("bg1videoram"); /* bg 2 */
+	map(0x102000, 0x1027ff).ram().w(FUNC(shadfrce_state::bg1videoram_w)).share("bg1videoram"); /* bg 2 */
 	map(0x102800, 0x103fff).ram();
-	map(0x140000, 0x141fff).ram().w(this, FUNC(shadfrce_state::fgvideoram_w)).share("fgvideoram");
+	map(0x140000, 0x141fff).ram().w(FUNC(shadfrce_state::fgvideoram_w)).share("fgvideoram");
 	map(0x142000, 0x143fff).ram().share("spvideoram"); /* sprites */
 	map(0x180000, 0x187fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1c0000, 0x1c0001).w(this, FUNC(shadfrce_state::bg0scrollx_w)); /* SCROLL X */
-	map(0x1c0002, 0x1c0003).w(this, FUNC(shadfrce_state::bg0scrolly_w)); /* SCROLL Y */
-	map(0x1c0004, 0x1c0005).w(this, FUNC(shadfrce_state::bg1scrollx_w)); /* SCROLL X */
-	map(0x1c0006, 0x1c0007).w(this, FUNC(shadfrce_state::bg1scrolly_w)); /* SCROLL Y */
+	map(0x1c0000, 0x1c0001).w(FUNC(shadfrce_state::bg0scrollx_w)); /* SCROLL X */
+	map(0x1c0002, 0x1c0003).w(FUNC(shadfrce_state::bg0scrolly_w)); /* SCROLL Y */
+	map(0x1c0004, 0x1c0005).w(FUNC(shadfrce_state::bg1scrollx_w)); /* SCROLL X */
+	map(0x1c0006, 0x1c0007).w(FUNC(shadfrce_state::bg1scrolly_w)); /* SCROLL Y */
 	map(0x1c0008, 0x1c0009).nopw(); /* ?? */
-	map(0x1c000a, 0x1c000b).nopr().w(this, FUNC(shadfrce_state::flip_screen));
+	map(0x1c000a, 0x1c000b).nopr().w(FUNC(shadfrce_state::flip_screen));
 	map(0x1c000c, 0x1c000d).nopw(); /* ?? */
-	map(0x1d0000, 0x1d0005).w(this, FUNC(shadfrce_state::irq_ack_w));
-	map(0x1d0006, 0x1d0007).w(this, FUNC(shadfrce_state::irq_w));
-	map(0x1d0008, 0x1d0009).w(this, FUNC(shadfrce_state::scanline_w));
+	map(0x1d0000, 0x1d0005).w(FUNC(shadfrce_state::irq_ack_w));
+	map(0x1d0006, 0x1d0007).w(FUNC(shadfrce_state::irq_w));
+	map(0x1d0008, 0x1d0009).w(FUNC(shadfrce_state::scanline_w));
 	map(0x1d000c, 0x1d000d).nopr();
 	map(0x1d000c, 0x1d000c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1d000d, 0x1d000d).w(this, FUNC(shadfrce_state::screen_brt_w));
+	map(0x1d000d, 0x1d000d).w(FUNC(shadfrce_state::screen_brt_w));
 	map(0x1d0010, 0x1d0011).nopw(); /* ?? */
 	map(0x1d0012, 0x1d0013).nopw(); /* ?? */
 	map(0x1d0014, 0x1d0015).nopw(); /* ?? */
 	map(0x1d0016, 0x1d0017).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x1d0020, 0x1d0027).r(this, FUNC(shadfrce_state::input_ports_r));
+	map(0x1d0020, 0x1d0027).r(FUNC(shadfrce_state::input_ports_r));
 	map(0x1f0000, 0x1fffff).ram();
 }
 
@@ -394,7 +394,7 @@ void shadfrce_state::shadfrce_sound_map(address_map &map)
 	map(0xc800, 0xc801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd800, 0xd800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).w(this, FUNC(shadfrce_state::oki_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(shadfrce_state::oki_bankswitch_w));
 	map(0xf000, 0xffff).ram();
 }
 

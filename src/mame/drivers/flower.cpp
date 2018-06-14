@@ -82,6 +82,7 @@ CHIP #  POSITION   TYPE
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "audio/flower.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -340,20 +341,20 @@ void flower_state::shared_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram().share("workram");
 	map(0xa000, 0xa000).nopw();
-	map(0xa001, 0xa001).w(this, FUNC(flower_state::flipscreen_w));
+	map(0xa001, 0xa001).w(FUNC(flower_state::flipscreen_w));
 	map(0xa002, 0xa002).nopw(); // master irq related (0 at start, 1 at end)
 	map(0xa003, 0xa003).nopw(); // slave irq related (0 at start, 1 at end)
-	map(0xa004, 0xa004).w(this, FUNC(flower_state::coin_counter_w));
+	map(0xa004, 0xa004).w(FUNC(flower_state::coin_counter_w));
 	map(0xa005, 0xa005).nopw();
 	map(0xa100, 0xa100).portr("P1");
 	map(0xa101, 0xa101).portr("P2");
 	map(0xa102, 0xa102).portr("DSW1");
 	map(0xa103, 0xa103).portr("DSW2");
-	map(0xa400, 0xa400).w(this, FUNC(flower_state::sound_command_w));
+	map(0xa400, 0xa400).w(FUNC(flower_state::sound_command_w));
 	map(0xe000, 0xefff).ram().share("txvram");
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(flower_state::fgvram_w)).share("fgvram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(flower_state::fgvram_w)).share("fgvram");
 	map(0xf200, 0xf200).ram().share("fgscroll");
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(flower_state::bgvram_w)).share("bgvram");
+	map(0xf800, 0xf9ff).ram().w(FUNC(flower_state::bgvram_w)).share("bgvram");
 	map(0xfa00, 0xfa00).ram().share("bgscroll");
 }
 
@@ -361,7 +362,7 @@ void flower_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4000).nopw(); // audio irq related (0 at start, 1 at end)
-	map(0x4001, 0x4001).w(this, FUNC(flower_state::audio_nmi_mask_w));
+	map(0x4001, 0x4001).w(FUNC(flower_state::audio_nmi_mask_w));
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x803f).w("flower", FUNC(flower_sound_device::lower_write));
 	map(0xa000, 0xa03f).w("flower", FUNC(flower_sound_device::upper_write));

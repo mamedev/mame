@@ -119,7 +119,7 @@ void rambo_state::rambo_data_map(address_map &map)
 
 void rambo_state::rambo_io_map(address_map &map)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(this, FUNC(rambo_state::port_r), FUNC(rambo_state::port_w));
+	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(rambo_state::port_r), FUNC(rambo_state::port_w));
 }
 
 /****************************************************\

@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -289,12 +290,12 @@ WRITE16_MEMBER(galaxygame_state::clk_w)
 void galaxygame_state::galaxygame_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0xfec0, 0xfecf).rw(this, FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
-	map(0xff52, 0xff53).rw(this, FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
+	map(0xfec0, 0xfecf).rw(FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
+	map(0xff52, 0xff53).rw(FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
 	map(0xff54, 0xff55).portr("COINAC"); // 177524 COINAC
-	map(0xff5a, 0xff5b).rw(this, FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
+	map(0xff5a, 0xff5b).rw(FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
 	map(0xff5c, 0xff5d).portr("SR");     // 177534 SR
-	map(0xff66, 0xff67).w(this, FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
+	map(0xff66, 0xff67).w(FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
 }
 
 

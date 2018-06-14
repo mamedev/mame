@@ -14,6 +14,7 @@
 
 #include "sound/samples.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 

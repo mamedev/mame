@@ -896,32 +896,32 @@ void next_state::next_mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom().region("user1", 0);
 	map(0x01000000, 0x0101ffff).rom().region("user1", 0);
-	map(0x02000000, 0x020001ff).mirror(0x300200).rw(this, FUNC(next_state::dma_ctrl_r), FUNC(next_state::dma_ctrl_w));
-	map(0x02004000, 0x020041ff).mirror(0x300200).rw(this, FUNC(next_state::dma_regs_r), FUNC(next_state::dma_regs_w));
+	map(0x02000000, 0x020001ff).mirror(0x300200).rw(FUNC(next_state::dma_ctrl_r), FUNC(next_state::dma_ctrl_w));
+	map(0x02004000, 0x020041ff).mirror(0x300200).rw(FUNC(next_state::dma_regs_r), FUNC(next_state::dma_regs_w));
 	map(0x02006000, 0x0200600f).mirror(0x300000).m(net, FUNC(mb8795_device::map));
 //  AM_RANGE(0x02006010, 0x02006013) AM_MIRROR(0x300000) memory timing
-	map(0x02007000, 0x02007003).mirror(0x300000).r(this, FUNC(next_state::irq_status_r));
-	map(0x02007800, 0x02007803).mirror(0x300000).rw(this, FUNC(next_state::irq_mask_r), FUNC(next_state::irq_mask_w));
-	map(0x02008000, 0x02008003).mirror(0x300000).r(this, FUNC(next_state::dsp_r));
-	map(0x0200c000, 0x0200c003).mirror(0x300000).r(this, FUNC(next_state::scr1_r));
-	map(0x0200c800, 0x0200c803).mirror(0x300000).r(this, FUNC(next_state::rom_map_r));
-	map(0x0200d000, 0x0200d003).mirror(0x300000).rw(this, FUNC(next_state::scr2_r), FUNC(next_state::scr2_w));
+	map(0x02007000, 0x02007003).mirror(0x300000).r(FUNC(next_state::irq_status_r));
+	map(0x02007800, 0x02007803).mirror(0x300000).rw(FUNC(next_state::irq_mask_r), FUNC(next_state::irq_mask_w));
+	map(0x02008000, 0x02008003).mirror(0x300000).r(FUNC(next_state::dsp_r));
+	map(0x0200c000, 0x0200c003).mirror(0x300000).r(FUNC(next_state::scr1_r));
+	map(0x0200c800, 0x0200c803).mirror(0x300000).r(FUNC(next_state::rom_map_r));
+	map(0x0200d000, 0x0200d003).mirror(0x300000).rw(FUNC(next_state::scr2_r), FUNC(next_state::scr2_w));
 //  AM_RANGE(0x0200d800, 0x0200d803) AM_MIRROR(0x300000) RMTINT
 	map(0x0200e000, 0x0200e00b).mirror(0x300000).m(keyboard, FUNC(nextkbd_device::amap));
 //  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
 //  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
 	map(0x02012000, 0x0201201f).mirror(0x300000).m(mo, FUNC(nextmo_device::map));
 	map(0x02014000, 0x0201400f).mirror(0x300000).m(scsi, FUNC(ncr5390_device::map));
-	map(0x02014020, 0x02014023).mirror(0x300000).rw(this, FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
-	map(0x02016000, 0x02016003).mirror(0x300000).rw(this, FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
-	map(0x02016004, 0x02016007).mirror(0x300000).rw(this, FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
+	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
+	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
+	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
 	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w));
 //  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
 //  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
 //  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
-	map(0x0201a000, 0x0201a003).mirror(0x300000).r(this, FUNC(next_state::event_counter_r)); // EVENTC
+	map(0x0201a000, 0x0201a003).mirror(0x300000).r(FUNC(next_state::event_counter_r)); // EVENTC
 //  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
-	map(0x020c0030, 0x020c0037).mirror(0x300000).rw(this, FUNC(next_state::phy_r), FUNC(next_state::phy_w));
+	map(0x020c0030, 0x020c0037).mirror(0x300000).rw(FUNC(next_state::phy_r), FUNC(next_state::phy_w));
 	map(0x04000000, 0x07ffffff).ram(); //work ram
 //  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
 //  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
@@ -943,7 +943,7 @@ void next_state::next_fdc_mem(address_map &map)
 {
 	next_mem(map);
 	map(0x02014100, 0x02014107).mirror(0x300000).m(fdc, FUNC(n82077aa_device::map));
-	map(0x02014108, 0x0201410b).mirror(0x300000).rw(this, FUNC(next_state::fdc_control_r), FUNC(next_state::fdc_control_w));
+	map(0x02014108, 0x0201410b).mirror(0x300000).rw(FUNC(next_state::fdc_control_r), FUNC(next_state::fdc_control_w));
 }
 
 void next_state::next_0b_m_mem(address_map &map)
@@ -962,14 +962,14 @@ void next_state::next_0c_c_mem(address_map &map)
 {
 	next_fdc_mem(map);
 	map(0x0c000000, 0x0c1fffff).ram().share("vram");
-	map(0x02018180, 0x02018183).mirror(0x300000).w(this, FUNC(next_state::ramdac_w));
+	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
 }
 
 void next_state::next_2c_c_mem(address_map &map)
 {
 	next_fdc_mem(map);
 	map(0x2c000000, 0x2c1fffff).ram().share("vram");
-	map(0x02018180, 0x02018183).mirror(0x300000).w(this, FUNC(next_state::ramdac_w));
+	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
 }
 
 

@@ -5,6 +5,7 @@
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"
+#include "emupal.h"
 #include "screen.h"
 
 class n8080_state : public driver_device
