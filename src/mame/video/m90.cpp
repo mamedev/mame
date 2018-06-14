@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(m90_state::get_tile_info)
 {
 	M90_pf_layer_info *layer = (M90_pf_layer_info *)tilemap.user_data();
 
-	uint16_t *vram = &m_video_data[layer->vram_base];
+	const uint16_t *vram = &m_video_data[layer->vram_base];
 	int tile,color;
 
 	tile=vram[tile_index<<1];
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(m90_state::get_tile_info_wide)
 {
 	M90_pf_layer_info *layer = (M90_pf_layer_info *)tilemap.user_data();
 
-	uint16_t *vram = &m_video_data[layer->vram_base & ~0x2000];
+	const uint16_t *vram = &m_video_data[layer->vram_base & ~0x2000];
 	int tile,color;
 
 	tile=vram[tile_index<<1];
@@ -68,7 +68,6 @@ TILE_GET_INFO_MEMBER(m90_state::get_tile_info_wide)
 
 void m90_state::common_tilemap_init()
 {
-	
 	for (int laynum = 0; laynum < 2; laynum++)
 	{
 		M90_pf_layer_info *layer = &m_pf_layer[laynum];
