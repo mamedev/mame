@@ -383,6 +383,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -161,20 +161,20 @@ WRITE8_MEMBER(bottom9_state::sound_bank_w)
 
 void bottom9_state::main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
-	map(0x0000, 0x07ff).rw(this, FUNC(bottom9_state::bottom9_bankedram1_r), FUNC(bottom9_state::bottom9_bankedram1_w));
-	map(0x1f80, 0x1f80).w(this, FUNC(bottom9_state::bankswitch_w));
-	map(0x1f90, 0x1f90).w(this, FUNC(bottom9_state::bottom9_1f90_w));
+	map(0x0000, 0x3fff).rw(FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
+	map(0x0000, 0x07ff).rw(FUNC(bottom9_state::bottom9_bankedram1_r), FUNC(bottom9_state::bottom9_bankedram1_w));
+	map(0x1f80, 0x1f80).w(FUNC(bottom9_state::bankswitch_w));
+	map(0x1f90, 0x1f90).w(FUNC(bottom9_state::bottom9_1f90_w));
 	map(0x1fa0, 0x1fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1fb0, 0x1fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1fc0, 0x1fc0).w(this, FUNC(bottom9_state::bottom9_sh_irqtrigger_w));
+	map(0x1fc0, 0x1fc0).w(FUNC(bottom9_state::bottom9_sh_irqtrigger_w));
 	map(0x1fd0, 0x1fd0).portr("SYSTEM");
 	map(0x1fd1, 0x1fd1).portr("P1");
 	map(0x1fd2, 0x1fd2).portr("P2");
 	map(0x1fd3, 0x1fd3).portr("DSW1");
 	map(0x1fe0, 0x1fe0).portr("DSW2");
 	map(0x1ff0, 0x1fff).w(m_k051316, FUNC(k051316_device::ctrl_w));
-	map(0x2000, 0x27ff).rw(this, FUNC(bottom9_state::bottom9_bankedram2_r), FUNC(bottom9_state::bottom9_bankedram2_w)).share("palette");
+	map(0x2000, 0x27ff).rw(FUNC(bottom9_state::bottom9_bankedram2_r), FUNC(bottom9_state::bottom9_bankedram2_w)).share("palette");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
@@ -184,11 +184,11 @@ void bottom9_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(bottom9_state::sound_bank_w));
+	map(0x9000, 0x9000).w(FUNC(bottom9_state::sound_bank_w));
 	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).w(this, FUNC(bottom9_state::nmi_enable_w));
+	map(0xf000, 0xf000).w(FUNC(bottom9_state::nmi_enable_w));
 }
 
 

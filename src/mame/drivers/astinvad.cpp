@@ -22,6 +22,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -488,14 +489,14 @@ void astinvad_state::spaceint_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x5fff).ram().w(this, FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram().w(FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
 }
 
 
 void astinvad_state::kamikaze_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
+	map(0x00, 0xff).rw(FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
 }
 
 
@@ -504,9 +505,9 @@ void astinvad_state::spaceint_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).w(this, FUNC(astinvad_state::spaceint_sound1_w));
-	map(0x03, 0x03).w(this, FUNC(astinvad_state::color_latch_w));
-	map(0x04, 0x04).w(this, FUNC(astinvad_state::spaceint_sound2_w));
+	map(0x02, 0x02).w(FUNC(astinvad_state::spaceint_sound1_w));
+	map(0x03, 0x03).w(FUNC(astinvad_state::color_latch_w));
+	map(0x04, 0x04).w(FUNC(astinvad_state::spaceint_sound2_w));
 }
 
 

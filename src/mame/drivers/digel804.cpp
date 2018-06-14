@@ -505,25 +505,25 @@ void digel804_state::z80_io_1_4(address_map &map)
 	map.global_mask(0xff);
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	map(0x00, 0x00).mirror(0x38).w(this, FUNC(digel804_state::op00)); // W, banked ram
-	map(0x40, 0x40).mirror(0xB8).rw(this, FUNC(digel804_state::ip40), FUNC(digel804_state::op40)); // RW, eprom socket data bus input/output value
-	map(0x41, 0x41).mirror(0xB8).w(this, FUNC(digel804_state::op41)); // W, eprom socket address low out
-	map(0x42, 0x42).mirror(0xB8).w(this, FUNC(digel804_state::op42)); // W, eprom socket address hi/control out
-	map(0x43, 0x43).mirror(0xB8).rw(this, FUNC(digel804_state::ip43), FUNC(digel804_state::op43_1_4)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
-	map(0x44, 0x44).mirror(0xB8).w(this, FUNC(digel804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
-	map(0x45, 0x45).mirror(0xB8).w(this, FUNC(digel804_state::op45)); // W, speaker bit; every write inverts state
-	map(0x46, 0x46).mirror(0xB8).rw(this, FUNC(digel804_state::ip46), FUNC(digel804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
-	map(0x47, 0x47).mirror(0xB8).w(this, FUNC(digel804_state::op47)); // W eprom socket power and timing control
+	map(0x00, 0x00).mirror(0x38).w(FUNC(digel804_state::op00)); // W, banked ram
+	map(0x40, 0x40).mirror(0xB8).rw(FUNC(digel804_state::ip40), FUNC(digel804_state::op40)); // RW, eprom socket data bus input/output value
+	map(0x41, 0x41).mirror(0xB8).w(FUNC(digel804_state::op41)); // W, eprom socket address low out
+	map(0x42, 0x42).mirror(0xB8).w(FUNC(digel804_state::op42)); // W, eprom socket address hi/control out
+	map(0x43, 0x43).mirror(0xB8).rw(FUNC(digel804_state::ip43), FUNC(digel804_state::op43_1_4)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	map(0x44, 0x44).mirror(0xB8).w(FUNC(digel804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
+	map(0x45, 0x45).mirror(0xB8).w(FUNC(digel804_state::op45)); // W, speaker bit; every write inverts state
+	map(0x46, 0x46).mirror(0xB8).rw(FUNC(digel804_state::ip46), FUNC(digel804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
+	map(0x47, 0x47).mirror(0xB8).w(FUNC(digel804_state::op47)); // W eprom socket power and timing control
 	// io bits: 1 0 x x x * * *
 	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
-	map(0x80, 0x80).mirror(0x38).w(this, FUNC(digel804_state::acia_txd_w)); // (ACIA xmit reg)
-	map(0x81, 0x81).mirror(0x38).r(this, FUNC(digel804_state::acia_rxd_r)); // (ACIA rcv reg)
-	map(0x82, 0x82).mirror(0x38).w(this, FUNC(digel804_state::acia_reset_w)); // (ACIA reset reg)
-	map(0x83, 0x83).mirror(0x38).r(this, FUNC(digel804_state::acia_status_r)); // (ACIA status reg)
-	map(0x84, 0x84).mirror(0x38).w(this, FUNC(digel804_state::acia_command_w)); // (ACIA command reg)
-	map(0x85, 0x85).mirror(0x38).r(this, FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
-	map(0x86, 0x86).mirror(0x38).w(this, FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
-	map(0x87, 0x87).mirror(0x38).r(this, FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
+	map(0x80, 0x80).mirror(0x38).w(FUNC(digel804_state::acia_txd_w)); // (ACIA xmit reg)
+	map(0x81, 0x81).mirror(0x38).r(FUNC(digel804_state::acia_rxd_r)); // (ACIA rcv reg)
+	map(0x82, 0x82).mirror(0x38).w(FUNC(digel804_state::acia_reset_w)); // (ACIA reset reg)
+	map(0x83, 0x83).mirror(0x38).r(FUNC(digel804_state::acia_status_r)); // (ACIA status reg)
+	map(0x84, 0x84).mirror(0x38).w(FUNC(digel804_state::acia_command_w)); // (ACIA command reg)
+	map(0x85, 0x85).mirror(0x38).r(FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
+	map(0x86, 0x86).mirror(0x38).w(FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
+	map(0x87, 0x87).mirror(0x38).r(FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 }
@@ -534,24 +534,24 @@ void ep804_state::z80_io_1_2(address_map &map)
 	map.global_mask(0xff);
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	map(0x40, 0x40).mirror(0xB8).rw(this, FUNC(ep804_state::ip40), FUNC(ep804_state::op40)); // RW, eprom socket data bus input/output value
-	map(0x41, 0x41).mirror(0xB8).w(this, FUNC(ep804_state::op41)); // W, eprom socket address low out
-	map(0x42, 0x42).mirror(0xB8).w(this, FUNC(ep804_state::op42)); // W, eprom socket address hi/control out
-	map(0x43, 0x43).mirror(0xB8).rw(this, FUNC(ep804_state::ip43), FUNC(ep804_state::op43)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
-	map(0x44, 0x44).mirror(0xB8).w(this, FUNC(ep804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
-	map(0x45, 0x45).mirror(0xB8).w(this, FUNC(ep804_state::op45)); // W, speaker bit; every write inverts state
-	map(0x46, 0x46).mirror(0xB8).rw(this, FUNC(ep804_state::ip46), FUNC(ep804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
-	map(0x47, 0x47).mirror(0xB8).w(this, FUNC(ep804_state::op47)); // W eprom socket power and timing control
+	map(0x40, 0x40).mirror(0xB8).rw(FUNC(ep804_state::ip40), FUNC(ep804_state::op40)); // RW, eprom socket data bus input/output value
+	map(0x41, 0x41).mirror(0xB8).w(FUNC(ep804_state::op41)); // W, eprom socket address low out
+	map(0x42, 0x42).mirror(0xB8).w(FUNC(ep804_state::op42)); // W, eprom socket address hi/control out
+	map(0x43, 0x43).mirror(0xB8).rw(FUNC(ep804_state::ip43), FUNC(ep804_state::op43)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	map(0x44, 0x44).mirror(0xB8).w(FUNC(ep804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
+	map(0x45, 0x45).mirror(0xB8).w(FUNC(ep804_state::op45)); // W, speaker bit; every write inverts state
+	map(0x46, 0x46).mirror(0xB8).rw(FUNC(ep804_state::ip46), FUNC(ep804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
+	map(0x47, 0x47).mirror(0xB8).w(FUNC(ep804_state::op47)); // W eprom socket power and timing control
 	// io bits: 1 0 x x x * * *
 	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
-	map(0x80, 0x80).mirror(0x38).w(this, FUNC(ep804_state::acia_txd_w)); // (ACIA xmit reg)
-	map(0x81, 0x81).mirror(0x38).r(this, FUNC(ep804_state::acia_rxd_r)); // (ACIA rcv reg)
-	map(0x82, 0x82).mirror(0x38).w(this, FUNC(ep804_state::acia_reset_w)); // (ACIA reset reg)
-	map(0x83, 0x83).mirror(0x38).r(this, FUNC(ep804_state::acia_status_r)); // (ACIA status reg)
-	map(0x84, 0x84).mirror(0x38).w(this, FUNC(ep804_state::acia_command_w)); // (ACIA command reg)
-	map(0x85, 0x85).mirror(0x38).r(this, FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
-	map(0x86, 0x86).mirror(0x38).w(this, FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
-	map(0x87, 0x87).mirror(0x38).r(this, FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
+	map(0x80, 0x80).mirror(0x38).w(FUNC(ep804_state::acia_txd_w)); // (ACIA xmit reg)
+	map(0x81, 0x81).mirror(0x38).r(FUNC(ep804_state::acia_rxd_r)); // (ACIA rcv reg)
+	map(0x82, 0x82).mirror(0x38).w(FUNC(ep804_state::acia_reset_w)); // (ACIA reset reg)
+	map(0x83, 0x83).mirror(0x38).r(FUNC(ep804_state::acia_status_r)); // (ACIA status reg)
+	map(0x84, 0x84).mirror(0x38).w(FUNC(ep804_state::acia_command_w)); // (ACIA command reg)
+	map(0x85, 0x85).mirror(0x38).r(FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
+	map(0x86, 0x86).mirror(0x38).w(FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
+	map(0x87, 0x87).mirror(0x38).r(FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 }

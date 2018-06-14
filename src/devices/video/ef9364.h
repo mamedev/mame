@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 #define MCFG_EF9364_PALETTE(_palette_tag) \
 	downcast<ef9364_device &>(*device).set_palette_tag(_palette_tag);
 

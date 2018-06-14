@@ -127,11 +127,11 @@ void alesis_state::hr16_mem(address_map &map)
 void alesis_state::hr16_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).r(this, FUNC(alesis_state::kb_r));
+	map(0x0000, 0x0000).r(FUNC(alesis_state::kb_r));
 	map(0x0002, 0x0002).w("dm3ag", FUNC(alesis_dm3ag_device::write));
-	map(0x0004, 0x0004).w(this, FUNC(alesis_state::led_w));
+	map(0x0004, 0x0004).w(FUNC(alesis_state::led_w));
 	map(0x0006, 0x0007).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
-	map(0x0008, 0x0008).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0x0008, 0x0008).w(FUNC(alesis_state::kb_matrix_w));
 	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
 }
 
@@ -145,9 +145,9 @@ void alesis_state::sr16_io(address_map &map)
 {
 	//ADDRESS_MAP_UNMAP_HIGH
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
-	map(0x0200, 0x0200).mirror(0xff).w(this, FUNC(alesis_state::sr16_lcd_w));
-	map(0x0300, 0x0300).mirror(0xff).w(this, FUNC(alesis_state::kb_matrix_w));
-	map(0x0400, 0x0400).mirror(0xff).r(this, FUNC(alesis_state::kb_r));
+	map(0x0200, 0x0200).mirror(0xff).w(FUNC(alesis_state::sr16_lcd_w));
+	map(0x0300, 0x0300).mirror(0xff).w(FUNC(alesis_state::kb_matrix_w));
+	map(0x0400, 0x0400).mirror(0xff).r(FUNC(alesis_state::kb_r));
 	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
 }
 
@@ -155,9 +155,9 @@ void alesis_state::mmt8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("nvram");   // 2x32Kx8 SRAM, (battery-backed)
-	map(0xff02, 0xff02).w(this, FUNC(alesis_state::track_led_w));
-	map(0xff04, 0xff04).rw(this, FUNC(alesis_state::mmt8_led_r), FUNC(alesis_state::mmt8_led_w));
-	map(0xff06, 0xff06).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0xff02, 0xff02).w(FUNC(alesis_state::track_led_w));
+	map(0xff04, 0xff04).rw(FUNC(alesis_state::mmt8_led_r), FUNC(alesis_state::mmt8_led_w));
+	map(0xff06, 0xff06).w(FUNC(alesis_state::kb_matrix_w));
 	map(0xff08, 0xff09).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0xff0e, 0xff0e).nopr();
 }

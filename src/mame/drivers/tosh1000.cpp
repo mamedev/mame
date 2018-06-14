@@ -239,8 +239,8 @@ void tosh1000_state::tosh1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x00c0, 0x00c3).rw(this, FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
-	map(0x00c8, 0x00c8).w(this, FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
+	map(0x00c0, 0x00c3).rw(FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
+	map(0x00c8, 0x00c8).w(FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
 	map(0x02c0, 0x02df).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 

@@ -121,6 +121,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -438,13 +439,13 @@ void sol20_state::sol20_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).rw(this, FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
+	map(0xf8, 0xf8).rw(FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
 	map(0xf9, 0xf9).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0xfa, 0xfa).rw(this, FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
+	map(0xfa, 0xfa).rw(FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
 	map(0xfb, 0xfb).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0xfc, 0xfc).r(this, FUNC(sol20_state::sol20_fc_r));
-	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
-	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
+	map(0xfc, 0xfc).r(FUNC(sol20_state::sol20_fc_r));
+	map(0xfd, 0xfd).rw(FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
+	map(0xfe, 0xfe).w(FUNC(sol20_state::sol20_fe_w));
 	map(0xff, 0xff).portr("S2");
 /*  map(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
     map(0xf9, 0xf9) serial data in, out

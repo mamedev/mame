@@ -104,6 +104,7 @@ Game is V30 based, with rom banking (2Mb)
 #include "sound/okim6376.h"
 #include "video/ramdac.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -328,15 +329,15 @@ void highvdeo_state::tv_vcf_map(address_map &map)
 
 void highvdeo_state::tv_vcf_io(address_map &map)
 {
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
-	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
-	map(0x000c, 0x000d).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
+	map(0x000c, 0x000d).r(FUNC(highvdeo_state::read2_r));
 	map(0x0010, 0x0010).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0012, 0x0012).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x0014, 0x0014).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x0030, 0x0031).w(this, FUNC(highvdeo_state::bankselect_w<0x03>)).r(this, FUNC(highvdeo_state::tv_oki6376_r));
+	map(0x0030, 0x0031).w(FUNC(highvdeo_state::bankselect_w<0x03>)).r(FUNC(highvdeo_state::tv_oki6376_r));
 }
 
 
@@ -378,12 +379,12 @@ void highvdeo_state::tv_ncf_map(address_map &map)
 
 void highvdeo_state::tv_ncf_io(address_map &map)
 {
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0008, 0x0009).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_w));
-	map(0x000a, 0x000b).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
-	map(0x000c, 0x000d).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x0010, 0x0011).r(this, FUNC(highvdeo_state::tv_ncf_read1_r));
-	map(0x0012, 0x0013).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0008, 0x0009).w(FUNC(highvdeo_state::tv_ncf_oki6376_w));
+	map(0x000a, 0x000b).w(FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
+	map(0x000c, 0x000d).r(FUNC(highvdeo_state::read0_r));
+	map(0x0010, 0x0011).r(FUNC(highvdeo_state::tv_ncf_read1_r));
+	map(0x0012, 0x0013).r(FUNC(highvdeo_state::read2_r));
 	map(0x0030, 0x0030).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0032, 0x0032).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x0034, 0x0034).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -400,17 +401,17 @@ void highvdeo_state::nyjoker_map(address_map &map)
 
 void highvdeo_state::nyjoker_io(address_map &map)
 {
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w));    // lamps
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w));    // lamps
 	map(0x0002, 0x0003).nopw();            // alternate coin counter (bits 0 and 2)
-	map(0x0004, 0x0005).w(this, FUNC(highvdeo_state::nyj_write2_w)); // coin and note counter
+	map(0x0004, 0x0005).w(FUNC(highvdeo_state::nyj_write2_w)); // coin and note counter
 //  AM_RANGE(0x0006, 0x0007) AM_WRITENOP
-	map(0x0008, 0x0009).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_w));
-	map(0x000a, 0x000b).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
+	map(0x0008, 0x0009).w(FUNC(highvdeo_state::tv_ncf_oki6376_w));
+	map(0x000a, 0x000b).w(FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
 	map(0x000c, 0x000d).portr("IN0");
 	map(0x000e, 0x000f).portr("DSW");
 	map(0x0010, 0x0011).portr("IN2");
 	map(0x0012, 0x0013).portr("IN3");
-	map(0x0014, 0x0015).r(this, FUNC(highvdeo_state::tv_ncf_read1_r));
+	map(0x0014, 0x0015).r(FUNC(highvdeo_state::tv_ncf_read1_r));
 	map(0x0020, 0x0021).nopw();
 	map(0x0030, 0x0030).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0032, 0x0032).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -444,11 +445,11 @@ void highvdeo_state::tv_tcf_map(address_map &map)
 
 void highvdeo_state::tv_tcf_io(address_map &map)
 {
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
-	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
-	map(0x0030, 0x0031).r(this, FUNC(highvdeo_state::read2_r)).w(this, FUNC(highvdeo_state::bankselect_w<0x07>));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::read2_r)).w(FUNC(highvdeo_state::bankselect_w<0x07>));
 }
 
 /****************************
@@ -474,7 +475,7 @@ READ16_MEMBER(highvdeo_state::ciclone_status_r)
 void highvdeo_state::ciclone_io(address_map &map)
 {
 	tv_tcf_io(map);
-	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::ciclone_status_r));
+	map(0x0030, 0x0033).r(FUNC(highvdeo_state::ciclone_status_r));
 }
 
 /****************************
@@ -542,15 +543,15 @@ void highvdeo_state::newmcard_map(address_map &map)
 
 void highvdeo_state::newmcard_io_base(address_map &map)
 {
-	map(0x0030, 0x0031).w(this, FUNC(highvdeo_state::bankselect_w<0x07>));
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
-	map(0x0004, 0x0005).w(this, FUNC(highvdeo_state::newmcard_vblank_w));
-	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
-	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
-	map(0x000c, 0x000d).r(this, FUNC(highvdeo_state::newmcard_vblank_r));
-	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0030, 0x0031).w(FUNC(highvdeo_state::bankselect_w<0x07>));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0004, 0x0005).w(FUNC(highvdeo_state::newmcard_vblank_w));
+	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
+	map(0x000c, 0x000d).r(FUNC(highvdeo_state::newmcard_vblank_r));
+	map(0x000e, 0x000f).r(FUNC(highvdeo_state::read2_r));
 	map(0x0010, 0x0010).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0012, 0x0012).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x0014, 0x0014).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -559,13 +560,13 @@ void highvdeo_state::newmcard_io_base(address_map &map)
 void highvdeo_state::newmcard_io(address_map &map)
 {
 	newmcard_io_base(map);
-	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::newmcard_status_r));
+	map(0x0030, 0x0033).r(FUNC(highvdeo_state::newmcard_status_r));
 }
 
 void highvdeo_state::record_io(address_map &map)
 {
 	newmcard_io_base(map);
-	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::record_status_r));
+	map(0x0030, 0x0033).r(FUNC(highvdeo_state::record_status_r));
 }
 
 /****************************
@@ -665,14 +666,14 @@ void highvdeo_state::brasil_map(address_map &map)
 
 void highvdeo_state::brasil_io(address_map &map)
 {
-	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::brasil_status_r));
-	map(0x0030, 0x0031).w(this, FUNC(highvdeo_state::brasil_status_w));
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
-	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
-	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
-	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0030, 0x0033).r(FUNC(highvdeo_state::brasil_status_r));
+	map(0x0030, 0x0031).w(FUNC(highvdeo_state::brasil_status_w));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
+	map(0x000e, 0x000f).r(FUNC(highvdeo_state::read2_r));
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 }
@@ -693,34 +694,34 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 void highvdeo_state::fashion_io(address_map &map)
 {
 	brasil_io(map);
-	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::fashion_output_w));
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::fashion_output_w));
 }
 
 void highvdeo_state::grancapi_io(address_map &map)
 {
-	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::grancapi_status_r));
-	map(0x000e, 0x000f).w(this, FUNC(highvdeo_state::grancapi_status_w));
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
-	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
-	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
-	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0030, 0x0033).r(FUNC(highvdeo_state::grancapi_status_r));
+	map(0x000e, 0x000f).w(FUNC(highvdeo_state::grancapi_status_w));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
+	map(0x000e, 0x000f).r(FUNC(highvdeo_state::read2_r));
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 }
 
 void highvdeo_state::magicbom_io(address_map &map)
 {
-	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::fashion_output_w));
-	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::magicbom_status_r));
-	map(0x000e, 0x000f).w(this, FUNC(highvdeo_state::grancapi_status_w));
-	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
-	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
-	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
-	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
-	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::fashion_output_w));
+	map(0x0030, 0x0033).r(FUNC(highvdeo_state::magicbom_status_r));
+	map(0x000e, 0x000f).w(FUNC(highvdeo_state::grancapi_status_w));
+	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
+	map(0x000e, 0x000f).r(FUNC(highvdeo_state::read2_r));
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 }

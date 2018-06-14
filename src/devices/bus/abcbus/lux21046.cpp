@@ -153,15 +153,15 @@ void luxor_55_21046_device::luxor_55_21046_mem(address_map &map)
 void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0c, 0x0c).mirror(0xff03).r(this, FUNC(luxor_55_21046_device::out_r));
-	map(0x1c, 0x1c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::inp_w));
-	map(0x2c, 0x2c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_4b_w));
-	map(0x3c, 0x3c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_9b_w));
-	map(0x4c, 0x4c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_8a_w));
-	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(this, FUNC(luxor_55_21046_device::_9a_r));
+	map(0x0c, 0x0c).mirror(0xff03).r(FUNC(luxor_55_21046_device::out_r));
+	map(0x1c, 0x1c).mirror(0xff03).w(FUNC(luxor_55_21046_device::inp_w));
+	map(0x2c, 0x2c).mirror(0xff03).w(FUNC(luxor_55_21046_device::_4b_w));
+	map(0x3c, 0x3c).mirror(0xff03).w(FUNC(luxor_55_21046_device::_9b_w));
+	map(0x4c, 0x4c).mirror(0xff03).w(FUNC(luxor_55_21046_device::_8a_w));
+	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(FUNC(luxor_55_21046_device::_9a_r));
 	map(0x68, 0x6b).mirror(0xff00).r(SAB1793_TAG, FUNC(fd1793_device::read));
 	map(0x78, 0x7b).mirror(0xff00).w(SAB1793_TAG, FUNC(fd1793_device::write));
-	map(0x80, 0x80).mirror(0xff77).rw(Z80DMA_TAG, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x80, 0x80).mirror(0xff77).rw(Z80DMA_TAG, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 }
 
 

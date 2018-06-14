@@ -72,7 +72,7 @@ MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	//MCFG_VIA6522_READPB_HANDLER(READ8(*this, electron_m2105_device, m2105_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, electron_m2105_device, m2105_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))

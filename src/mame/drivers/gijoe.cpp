@@ -212,12 +212,12 @@ void gijoe_state::gijoe_map(address_map &map)
 	map(0x1a0000, 0x1a001f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x1b0000, 0x1b003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x1c0000, 0x1c001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x1d0000, 0x1d0001).w(this, FUNC(gijoe_state::sound_irq_w));
+	map(0x1d0000, 0x1d0001).w(FUNC(gijoe_state::sound_irq_w));
 	map(0x1e0000, 0x1e0001).portr("P1_P2");
 	map(0x1e0002, 0x1e0003).portr("P3_P4");
 	map(0x1e4000, 0x1e4001).portr("SYSTEM");
 	map(0x1e4002, 0x1e4003).portr("START");
-	map(0x1e8000, 0x1e8001).rw(this, FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
+	map(0x1e8000, 0x1e8001).rw(FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
 	map(0x1f0000, 0x1f0001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 #if JOE_DEBUG
 	map(0x110000, 0x110007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

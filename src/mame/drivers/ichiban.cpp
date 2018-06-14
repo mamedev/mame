@@ -40,6 +40,7 @@ HSync - 15.510kHz
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

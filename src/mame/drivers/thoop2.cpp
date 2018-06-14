@@ -118,14 +118,14 @@ READ8_MEMBER(thoop2_state::shareram_r)
 
 void thoop2_state::mcu_hostmem_map(address_map &map)
 {
-	map(0x8000, 0xffff).rw(this, FUNC(thoop2_state::shareram_r), FUNC(thoop2_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+	map(0x8000, 0xffff).rw(FUNC(thoop2_state::shareram_r), FUNC(thoop2_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
 }
 
 
 void thoop2_state::thoop2_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                 /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(thoop2_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(thoop2_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                 /* Video Registers */
 	map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                           /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette */
@@ -139,7 +139,7 @@ void thoop2_state::thoop2_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000d, 0x70000d).w(this, FUNC(thoop2_state::OKIM6295_bankswitch_w));               /* OKI6295 bankswitch */
+	map(0x70000d, 0x70000d).w(FUNC(thoop2_state::OKIM6295_bankswitch_w));               /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                  /* OKI6295 data register */
 	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */
 	map(0xfe8000, 0xfeffff).ram().share("shareram");                     /* Work RAM (shared with D5002FP) */

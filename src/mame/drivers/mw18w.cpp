@@ -178,13 +178,13 @@ void mw18w_state::mw18w_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(mw18w_state::mw18w_sound0_w));
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(mw18w_state::mw18w_sound1_w));
-	map(0x02, 0x02).portr("IN2").w(this, FUNC(mw18w_state::mw18w_lamps_w));
-	map(0x03, 0x03).portr("DSW").w(this, FUNC(mw18w_state::mw18w_led_display_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(mw18w_state::mw18w_sound0_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(mw18w_state::mw18w_sound1_w));
+	map(0x02, 0x02).portr("IN2").w(FUNC(mw18w_state::mw18w_lamps_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(mw18w_state::mw18w_led_display_w));
 	map(0x04, 0x04).portr("IN4");
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(this, FUNC(mw18w_state::mw18w_irq0_clear_w));
+	map(0x07, 0x07).w(FUNC(mw18w_state::mw18w_irq0_clear_w));
 }
 
 

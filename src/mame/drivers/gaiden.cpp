@@ -391,63 +391,63 @@ void gaiden_state::gaiden_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x060000, 0x063fff).ram();
-	map(0x070000, 0x070fff).ram().w(this, FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
-	map(0x072000, 0x073fff).ram().w(this, FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
-	map(0x074000, 0x075fff).ram().w(this, FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
+	map(0x070000, 0x070fff).ram().w(FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
+	map(0x072000, 0x073fff).ram().w(FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
+	map(0x074000, 0x075fff).ram().w(FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
 	map(0x076000, 0x077fff).ram().share("spriteram");
 	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x07a000, 0x07a001).portr("SYSTEM");
-	map(0x07a002, 0x07a003).portr("P1_P2").w(this, FUNC(gaiden_state::gaiden_sproffsety_w));
+	map(0x07a002, 0x07a003).portr("P1_P2").w(FUNC(gaiden_state::gaiden_sproffsety_w));
 	map(0x07a004, 0x07a005).portr("DSW");
-	map(0x07a104, 0x07a105).w(this, FUNC(gaiden_state::gaiden_txscrolly_w));
-	map(0x07a108, 0x07a109).w(this, FUNC(gaiden_state::gaiden_txoffsety_w));
-	map(0x07a10c, 0x07a10d).w(this, FUNC(gaiden_state::gaiden_txscrollx_w));
-	map(0x07a204, 0x07a205).w(this, FUNC(gaiden_state::gaiden_fgscrolly_w));
-	map(0x07a208, 0x07a209).w(this, FUNC(gaiden_state::gaiden_fgoffsety_w));
-	map(0x07a20c, 0x07a20d).w(this, FUNC(gaiden_state::gaiden_fgscrollx_w));
-	map(0x07a304, 0x07a305).w(this, FUNC(gaiden_state::gaiden_bgscrolly_w));
-	map(0x07a308, 0x07a309).w(this, FUNC(gaiden_state::gaiden_bgoffsety_w));
-	map(0x07a30c, 0x07a30d).w(this, FUNC(gaiden_state::gaiden_bgscrollx_w));
+	map(0x07a104, 0x07a105).w(FUNC(gaiden_state::gaiden_txscrolly_w));
+	map(0x07a108, 0x07a109).w(FUNC(gaiden_state::gaiden_txoffsety_w));
+	map(0x07a10c, 0x07a10d).w(FUNC(gaiden_state::gaiden_txscrollx_w));
+	map(0x07a204, 0x07a205).w(FUNC(gaiden_state::gaiden_fgscrolly_w));
+	map(0x07a208, 0x07a209).w(FUNC(gaiden_state::gaiden_fgoffsety_w));
+	map(0x07a20c, 0x07a20d).w(FUNC(gaiden_state::gaiden_fgscrollx_w));
+	map(0x07a304, 0x07a305).w(FUNC(gaiden_state::gaiden_bgscrolly_w));
+	map(0x07a308, 0x07a309).w(FUNC(gaiden_state::gaiden_bgoffsety_w));
+	map(0x07a30c, 0x07a30d).w(FUNC(gaiden_state::gaiden_bgscrollx_w));
 	map(0x07a800, 0x07a801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
 	// It's not clear which 8 data lines are actually connected, but byte smearing is almost certainly involved.
 	map(0x07a802, 0x07a803).w("soundlatch", FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x07a806, 0x07a807).w(this, FUNC(gaiden_state::irq_ack_w));
-	map(0x07a808, 0x07a809).w(this, FUNC(gaiden_state::gaiden_flip_w));
+	map(0x07a806, 0x07a807).w(FUNC(gaiden_state::irq_ack_w));
+	map(0x07a808, 0x07a809).w(FUNC(gaiden_state::gaiden_flip_w));
 }
 
 void gaiden_state::wildfang_map(address_map &map)
 {
 	gaiden_map(map);
-	map(0x07a006, 0x07a007).r(this, FUNC(gaiden_state::wildfang_protection_r));
-	map(0x07a804, 0x07a805).w(this, FUNC(gaiden_state::wildfang_protection_w));
+	map(0x07a006, 0x07a007).r(FUNC(gaiden_state::wildfang_protection_r));
+	map(0x07a804, 0x07a805).w(FUNC(gaiden_state::wildfang_protection_w));
 }
 
 void gaiden_state::raiga_map(address_map &map)
 {
 	gaiden_map(map);
-	map(0x07a006, 0x07a007).r(this, FUNC(gaiden_state::raiga_protection_r));
-	map(0x07a804, 0x07a805).w(this, FUNC(gaiden_state::raiga_protection_w));
+	map(0x07a006, 0x07a007).r(FUNC(gaiden_state::raiga_protection_r));
+	map(0x07a804, 0x07a805).w(FUNC(gaiden_state::raiga_protection_w));
 }
 
 void gaiden_state::drgnbowl_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x060000, 0x063fff).ram();
-	map(0x070000, 0x070fff).ram().w(this, FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
-	map(0x072000, 0x073fff).ram().w(this, FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
-	map(0x074000, 0x075fff).ram().w(this, FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
+	map(0x070000, 0x070fff).ram().w(FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
+	map(0x072000, 0x073fff).ram().w(FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
+	map(0x074000, 0x075fff).ram().w(FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
 	map(0x076000, 0x077fff).ram().share("spriteram");
 	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x07a000, 0x07a001).portr("SYSTEM");
 	map(0x07a002, 0x07a003).portr("P1_P2");
 	map(0x07a004, 0x07a005).portr("DSW");
 	map(0x07a00e, 0x07a00e).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x07e000, 0x07e000).w(this, FUNC(gaiden_state::drgnbowl_irq_ack_w));
-	map(0x07f000, 0x07f001).w(this, FUNC(gaiden_state::gaiden_bgscrolly_w));
-	map(0x07f002, 0x07f003).w(this, FUNC(gaiden_state::gaiden_bgscrollx_w));
-	map(0x07f004, 0x07f005).w(this, FUNC(gaiden_state::gaiden_fgscrolly_w));
-	map(0x07f006, 0x07f007).w(this, FUNC(gaiden_state::gaiden_fgscrollx_w));
+	map(0x07e000, 0x07e000).w(FUNC(gaiden_state::drgnbowl_irq_ack_w));
+	map(0x07f000, 0x07f001).w(FUNC(gaiden_state::gaiden_bgscrolly_w));
+	map(0x07f002, 0x07f003).w(FUNC(gaiden_state::gaiden_bgscrollx_w));
+	map(0x07f004, 0x07f005).w(FUNC(gaiden_state::gaiden_fgscrolly_w));
+	map(0x07f006, 0x07f007).w(FUNC(gaiden_state::gaiden_fgscrollx_w));
 }
 
 void gaiden_state::sound_map(address_map &map)
@@ -937,7 +937,7 @@ void gaiden_state::mastninj_sound_map(address_map &map)
 	map(0xc800, 0xc801).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xcc00, 0xcc00).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xd000, 0xd000).w("adpcm_select2", FUNC(ls157_device::ba_w));
-	map(0xd400, 0xd400).w(this, FUNC(gaiden_state::adpcm_bankswitch_w));
+	map(0xd400, 0xd400).w(FUNC(gaiden_state::adpcm_bankswitch_w));
 	map(0xd800, 0xd800).w("adpcm_select1", FUNC(ls157_device::ba_w));
 	map(0xf000, 0xf7ff).ram();
 }
@@ -975,9 +975,9 @@ void gaiden_state::mastninj_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x060000, 0x063fff).ram();
-	map(0x070000, 0x070fff).ram().w(this, FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
-	map(0x072000, 0x073fff).ram().w(this, FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
-	map(0x074000, 0x075fff).ram().w(this, FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
+	map(0x070000, 0x070fff).ram().w(FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
+	map(0x072000, 0x073fff).ram().w(FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
+	map(0x074000, 0x075fff).ram().w(FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
 	map(0x076000, 0x077fff).ram().share("spriteram");
 	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
@@ -986,15 +986,15 @@ void gaiden_state::mastninj_map(address_map &map)
 	map(0x07a004, 0x07a005).portr("DSW");
 //  AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
 //  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
-	map(0x07f000, 0x07f001).w(this, FUNC(gaiden_state::gaiden_bgscrolly_w));
-	map(0x07f002, 0x07f003).w(this, FUNC(gaiden_state::gaiden_bgscrollx_w));
-	map(0x07f004, 0x07f005).w(this, FUNC(gaiden_state::gaiden_fgscrolly_w));
-	map(0x07f006, 0x07f007).w(this, FUNC(gaiden_state::gaiden_fgscrollx_w));
+	map(0x07f000, 0x07f001).w(FUNC(gaiden_state::gaiden_bgscrolly_w));
+	map(0x07f002, 0x07f003).w(FUNC(gaiden_state::gaiden_bgscrollx_w));
+	map(0x07f004, 0x07f005).w(FUNC(gaiden_state::gaiden_fgscrolly_w));
+	map(0x07f006, 0x07f007).w(FUNC(gaiden_state::gaiden_fgscrollx_w));
 	map(0x07a800, 0x07a801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 	map(0x07a00e, 0x07a00e).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x07e000, 0x07e000).w(this, FUNC(gaiden_state::drgnbowl_irq_ack_w));
+	map(0x07e000, 0x07e000).w(FUNC(gaiden_state::drgnbowl_irq_ack_w));
 }
 
 MACHINE_CONFIG_START(gaiden_state::mastninj)

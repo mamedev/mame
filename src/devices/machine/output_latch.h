@@ -33,12 +33,12 @@
 class output_latch_device : public device_t
 {
 public:
-	output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <unsigned Bit, class Object> devcb_base &set_bit_handler(Object &&cb) { return m_bit_handlers[Bit].set_callback(std::forward<Object>(cb)); }
 
 	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER(write) { write(data); }
+	DECLARE_WRITE8_MEMBER(bus_w) { write(data); }
 
 protected:
 	virtual void device_resolve_objects() override;

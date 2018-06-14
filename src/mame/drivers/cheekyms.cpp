@@ -33,8 +33,8 @@ void cheekyms_state::io_map(address_map &map)
 	map(0x00, 0x00).portr("DSW");
 	map(0x01, 0x01).portr("INPUTS");
 	map(0x20, 0x3f).writeonly().share("spriteram");
-	map(0x40, 0x40).w(this, FUNC(cheekyms_state::port_40_w));
-	map(0x80, 0x80).w(this, FUNC(cheekyms_state::port_80_w)).share("port_80");
+	map(0x40, 0x40).w(FUNC(cheekyms_state::port_40_w));
+	map(0x80, 0x80).w(FUNC(cheekyms_state::port_80_w)).share("port_80");
 }
 
 

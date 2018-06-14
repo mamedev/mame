@@ -568,13 +568,13 @@ void esripsys_state::game_cpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("share1");
 	map(0x4000, 0x42ff).ram().share("pal_ram");
-	map(0x4300, 0x4300).w(this, FUNC(esripsys_state::esripsys_bg_intensity_w));
+	map(0x4300, 0x4300).w(FUNC(esripsys_state::esripsys_bg_intensity_w));
 	map(0x4400, 0x47ff).noprw(); // Collision detection RAM
-	map(0x4800, 0x4bff).rw(this, FUNC(esripsys_state::g_status_r), FUNC(esripsys_state::g_status_w));
-	map(0x4c00, 0x4fff).rw(this, FUNC(esripsys_state::g_iobus_r), FUNC(esripsys_state::g_iobus_w));
-	map(0x5000, 0x53ff).w(this, FUNC(esripsys_state::g_ioadd_w));
+	map(0x4800, 0x4bff).rw(FUNC(esripsys_state::g_status_r), FUNC(esripsys_state::g_status_w));
+	map(0x4c00, 0x4fff).rw(FUNC(esripsys_state::g_iobus_r), FUNC(esripsys_state::g_iobus_w));
+	map(0x5000, 0x53ff).w(FUNC(esripsys_state::g_ioadd_w));
 	map(0x5400, 0x57ff).noprw();
-	map(0x5c00, 0x5fff).rw(this, FUNC(esripsys_state::uart_r), FUNC(esripsys_state::uart_w));
+	map(0x5c00, 0x5fff).rw(FUNC(esripsys_state::uart_r), FUNC(esripsys_state::uart_w));
 	map(0x6000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xffff).rom();
 }
@@ -583,9 +583,9 @@ void esripsys_state::game_cpu_map(address_map &map)
 void esripsys_state::frame_cpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("share1");
-	map(0x4000, 0x4fff).rw(this, FUNC(esripsys_state::fdt_r), FUNC(esripsys_state::fdt_w));
-	map(0x6000, 0x6000).rw(this, FUNC(esripsys_state::f_status_r), FUNC(esripsys_state::f_status_w));
-	map(0x8000, 0x8000).w(this, FUNC(esripsys_state::frame_w));
+	map(0x4000, 0x4fff).rw(FUNC(esripsys_state::fdt_r), FUNC(esripsys_state::fdt_w));
+	map(0x6000, 0x6000).rw(FUNC(esripsys_state::f_status_r), FUNC(esripsys_state::f_status_w));
+	map(0x8000, 0x8000).w(FUNC(esripsys_state::frame_w));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -594,12 +594,12 @@ void esripsys_state::sound_cpu_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0fff).ram(); // Not installed on later PCBs
-	map(0x2008, 0x2009).rw(this, FUNC(esripsys_state::tms5220_r), FUNC(esripsys_state::tms5220_w));
-	map(0x200a, 0x200b).w(this, FUNC(esripsys_state::esripsys_dac_w));
-	map(0x200c, 0x200c).w("dacvol", FUNC(dac_byte_interface::write));
-	map(0x200d, 0x200d).w(this, FUNC(esripsys_state::control_w));
-	map(0x200e, 0x200e).rw(this, FUNC(esripsys_state::s_200e_r), FUNC(esripsys_state::s_200e_w));
-	map(0x200f, 0x200f).rw(this, FUNC(esripsys_state::s_200f_r), FUNC(esripsys_state::s_200f_w));
+	map(0x2008, 0x2009).rw(FUNC(esripsys_state::tms5220_r), FUNC(esripsys_state::tms5220_w));
+	map(0x200a, 0x200b).w(FUNC(esripsys_state::esripsys_dac_w));
+	map(0x200c, 0x200c).w("dacvol", FUNC(dac_byte_interface::data_w));
+	map(0x200d, 0x200d).w(FUNC(esripsys_state::control_w));
+	map(0x200e, 0x200e).rw(FUNC(esripsys_state::s_200e_r), FUNC(esripsys_state::s_200e_w));
+	map(0x200f, 0x200f).rw(FUNC(esripsys_state::s_200f_r), FUNC(esripsys_state::s_200f_w));
 	map(0x2020, 0x2027).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x8000, 0x9fff).bankr("bank2");
 	map(0xa000, 0xbfff).bankr("bank3");
@@ -628,7 +628,7 @@ void esripsys_state::init_esripsys()
 	m_fdt_b = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
 	m_cmos_ram = std::make_unique<uint8_t[]>(CMOS_RAM_SIZE);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
+	subdevice<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);

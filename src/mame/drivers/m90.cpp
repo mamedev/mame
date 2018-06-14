@@ -73,7 +73,7 @@ void m90_state::m90_main_cpu_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
+	map(0xd0000, 0xdffff).ram().w(FUNC(m90_state::m90_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();
 }
@@ -89,7 +89,7 @@ void m90_state::dynablsb_main_cpu_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x6000e, 0x60fff).ram().share("spriteram");
 	map(0xa0000, 0xa3fff).ram();
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::bootleg_video_w)).share("video_data");
+	map(0xd0000, 0xdffff).ram().w(FUNC(m90_state::bootleg_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();
 }
@@ -99,7 +99,7 @@ void m90_state::bomblord_main_cpu_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
 	map(0xc000e, 0xc0fff).ram().share("spriteram");
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::bootleg_video_w)).share("video_data");
+	map(0xd0000, 0xdffff).ram().w(FUNC(m90_state::bootleg_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();
 }
@@ -108,7 +108,7 @@ void m90_state::m90_main_cpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x00, 0x01).portr("P1_P2");
-	map(0x02, 0x03).w(this, FUNC(m90_state::coincounter_w));
+	map(0x02, 0x03).w(FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
@@ -118,14 +118,14 @@ void m90_state::m90_main_cpu_io_map(address_map &map)
 void m90_state::quizf1_main_cpu_io_map(address_map &map)
 {
 	m90_main_cpu_io_map(map);
-	map(0x04, 0x05).w(this, FUNC(m90_state::quizf1_bankswitch_w));
+	map(0x04, 0x05).w(FUNC(m90_state::quizf1_bankswitch_w));
 }
 
 void m90_state::dynablsb_main_cpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x00, 0x01).portr("P1_P2");
-	map(0x02, 0x03).w(this, FUNC(m90_state::coincounter_w));
+	map(0x02, 0x03).w(FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
 //  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
 	map(0x04, 0x05).portr("DSW");
@@ -158,7 +158,7 @@ void m90_state::dynablsb_sound_cpu_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x82, 0x82).w("dac", FUNC(dac_byte_interface::write));
+	map(0x82, 0x82).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 void m90_state::m99_sound_cpu_io_map(address_map &map)

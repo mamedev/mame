@@ -241,6 +241,7 @@
 
 #include "emu.h"
 #include "cpu/h8/h83002.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

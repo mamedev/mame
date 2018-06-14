@@ -418,18 +418,18 @@ void polygonet_state::main_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x400000, 0x40001f).rw(m_k053936, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
-	map(0x440000, 0x440fff).rw(this, FUNC(polygonet_state::polygonet_roz_ram_r), FUNC(polygonet_state::polygonet_roz_ram_w));
-	map(0x480000, 0x480003).r(this, FUNC(polygonet_state::polygonet_inputs_r));
-	map(0x4c0000, 0x4c0003).w(this, FUNC(polygonet_state::polygonet_sys_w));
-	map(0x500000, 0x503fff).ram().w(this, FUNC(polygonet_state::shared_ram_write)).share("shared_ram");
-	map(0x504000, 0x504003).w(this, FUNC(polygonet_state::dsp_w_lines));
-	map(0x506000, 0x50600f).rw(this, FUNC(polygonet_state::dsp_host_interface_r), FUNC(polygonet_state::dsp_host_interface_w));
-	map(0x540000, 0x540fff).rw(this, FUNC(polygonet_state::polygonet_ttl_ram_r), FUNC(polygonet_state::polygonet_ttl_ram_w));
+	map(0x440000, 0x440fff).rw(FUNC(polygonet_state::polygonet_roz_ram_r), FUNC(polygonet_state::polygonet_roz_ram_w));
+	map(0x480000, 0x480003).r(FUNC(polygonet_state::polygonet_inputs_r));
+	map(0x4c0000, 0x4c0003).w(FUNC(polygonet_state::polygonet_sys_w));
+	map(0x500000, 0x503fff).ram().w(FUNC(polygonet_state::shared_ram_write)).share("shared_ram");
+	map(0x504000, 0x504003).w(FUNC(polygonet_state::dsp_w_lines));
+	map(0x506000, 0x50600f).rw(FUNC(polygonet_state::dsp_host_interface_r), FUNC(polygonet_state::dsp_host_interface_w));
+	map(0x540000, 0x540fff).rw(FUNC(polygonet_state::polygonet_ttl_ram_r), FUNC(polygonet_state::polygonet_ttl_ram_w));
 	map(0x541000, 0x54101f).ram();
 	map(0x580000, 0x5807ff).ram();
-	map(0x580800, 0x580803).r(this, FUNC(polygonet_state::network_r)).nopw(); /* network RAM | registers? */
+	map(0x580800, 0x580803).r(FUNC(polygonet_state::network_r)).nopw(); /* network RAM | registers? */
 	map(0x600000, 0x60000f).m(m_k054321, FUNC(k054321_device::main_map));
-	map(0x640000, 0x640003).w(this, FUNC(polygonet_state::sound_irq_w));
+	map(0x640000, 0x640003).w(FUNC(polygonet_state::sound_irq_w));
 	map(0x680000, 0x680003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0x700000, 0x73ffff).rom().region("gfx2", 0);
 	map(0x780000, 0x79ffff).rom().region("gfx1", 0);
@@ -442,17 +442,17 @@ void polygonet_state::dsp_program_map(address_map &map)
 {
 	map(0x7000, 0x7fff).ram().share("dsp56k_p_mirror"); /* Unsure of size, but 0x1000 matches bank01 */
 	map(0x8000, 0x87ff).ram().share("dsp56k_p_8000");
-	map(0xc000, 0xc000).r(this, FUNC(polygonet_state::dsp56k_bootload_r));
+	map(0xc000, 0xc000).r(FUNC(polygonet_state::dsp56k_bootload_r));
 }
 
 void polygonet_state::dsp_data_map(address_map &map)
 {
 	map(0x0800, 0x5fff).ram();      /* Appears to not be affected by banking? */
-	map(0x6000, 0x6fff).rw(this, FUNC(polygonet_state::dsp56k_ram_bank00_read), FUNC(polygonet_state::dsp56k_ram_bank00_write));
-	map(0x7000, 0x7fff).rw(this, FUNC(polygonet_state::dsp56k_ram_bank01_read), FUNC(polygonet_state::dsp56k_ram_bank01_write));  /* Mirrored in program space @ 0x7000 */
-	map(0x8000, 0xbfff).rw(this, FUNC(polygonet_state::dsp56k_ram_bank02_read), FUNC(polygonet_state::dsp56k_ram_bank02_write));
-	map(0xc000, 0xdfff).rw(this, FUNC(polygonet_state::dsp56k_shared_ram_read), FUNC(polygonet_state::dsp56k_shared_ram_write));
-	map(0xe000, 0xffbf).rw(this, FUNC(polygonet_state::dsp56k_ram_bank04_read), FUNC(polygonet_state::dsp56k_ram_bank04_write));
+	map(0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp56k_ram_bank00_read), FUNC(polygonet_state::dsp56k_ram_bank00_write));
+	map(0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp56k_ram_bank01_read), FUNC(polygonet_state::dsp56k_ram_bank01_write));  /* Mirrored in program space @ 0x7000 */
+	map(0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp56k_ram_bank02_read), FUNC(polygonet_state::dsp56k_ram_bank02_write));
+	map(0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp56k_shared_ram_read), FUNC(polygonet_state::dsp56k_shared_ram_write));
+	map(0xe000, 0xffbf).rw(FUNC(polygonet_state::dsp56k_ram_bank04_read), FUNC(polygonet_state::dsp56k_ram_bank04_write));
 }
 
 /**********************************************************************************/
@@ -485,7 +485,7 @@ void polygonet_state::sound_map(address_map &map)
 	map(0xe400, 0xe62f).nopr().nopw(); // Second 054539 (not present)
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(polygonet_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(polygonet_state::sound_ctrl_w));
 }
 
 
@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

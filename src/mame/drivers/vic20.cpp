@@ -361,7 +361,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 
 void vic20_state::vic20_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(vic20_state::read), FUNC(vic20_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vic20_state::read), FUNC(vic20_state::write));
 }
 
 
@@ -371,7 +371,7 @@ void vic20_state::vic20_mem(address_map &map)
 
 void vic20_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(vic20_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(vic20_state::vic_videoram_r));
 }
 
 

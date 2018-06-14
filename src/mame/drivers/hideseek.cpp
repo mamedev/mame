@@ -28,6 +28,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 #include "emu.h"
 #include "cpu/sh/sh2.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

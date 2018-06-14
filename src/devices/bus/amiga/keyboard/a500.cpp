@@ -38,16 +38,16 @@ void a500_kbd_device::mpu6500_map(address_map &map)
 {
 	map.global_mask(0xfff);
 	map(0x000, 0x03f).ram();
-	map(0x080, 0x080).rw(this, FUNC(a500_kbd_device::port_a_r), FUNC(a500_kbd_device::port_a_w));
-	map(0x081, 0x081).portr("special").w(this, FUNC(a500_kbd_device::port_b_w));
-	map(0x082, 0x082).w(this, FUNC(a500_kbd_device::port_c_w));
-	map(0x083, 0x083).w(this, FUNC(a500_kbd_device::port_d_w));
-	map(0x084, 0x085).w(this, FUNC(a500_kbd_device::latch_w));
-	map(0x086, 0x087).r(this, FUNC(a500_kbd_device::counter_r));
-	map(0x088, 0x088).w(this, FUNC(a500_kbd_device::transfer_latch_w));
-	map(0x089, 0x089).w(this, FUNC(a500_kbd_device::clear_pa0_detect));
-	map(0x08a, 0x08a).w(this, FUNC(a500_kbd_device::clear_pa1_detect));
-	map(0x08f, 0x08f).rw(this, FUNC(a500_kbd_device::control_r), FUNC(a500_kbd_device::control_w));
+	map(0x080, 0x080).rw(FUNC(a500_kbd_device::port_a_r), FUNC(a500_kbd_device::port_a_w));
+	map(0x081, 0x081).portr("special").w(FUNC(a500_kbd_device::port_b_w));
+	map(0x082, 0x082).w(FUNC(a500_kbd_device::port_c_w));
+	map(0x083, 0x083).w(FUNC(a500_kbd_device::port_d_w));
+	map(0x084, 0x085).w(FUNC(a500_kbd_device::latch_w));
+	map(0x086, 0x087).r(FUNC(a500_kbd_device::counter_r));
+	map(0x088, 0x088).w(FUNC(a500_kbd_device::transfer_latch_w));
+	map(0x089, 0x089).w(FUNC(a500_kbd_device::clear_pa0_detect));
+	map(0x08a, 0x08a).w(FUNC(a500_kbd_device::clear_pa1_detect));
+	map(0x08f, 0x08f).rw(FUNC(a500_kbd_device::control_r), FUNC(a500_kbd_device::control_w));
 	map(0x090, 0x0ff).noprw();
 	map(0x800, 0xfff).rom().region("ic1", 0);
 }

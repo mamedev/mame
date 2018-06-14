@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 #include "emu.h"
 #include "includes/tatsumi.h"
 #include "screen.h"
@@ -56,15 +56,18 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
 }
 
 // apply shadowing to underlying layers
-// TODO: it might mix up with the lower palette bank instead 
-void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+// TODO: it might mix up with the lower palette bank instead (color bank 0x1400?)
+void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output)
 {
 	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
 	{
 		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
 		{
 			uint8_t shadow = shadow_bitmap.pix8(y, x);
-			if(shadow)
+			// xor_output is enabled during Chen boss fight (where shadows have more brightness than everything else)
+			// TODO: transition before fighting him should also black out all the background tilemaps too!? 
+			//       (more evidence that we need to mix with color bank 0x1400 instead of doing true RGB mixing).
+			if(shadow ^ xor_output)
 			{
 				rgb_t shadow_pen = bitmap.pix32(y, x);
 				bitmap.pix32(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
@@ -702,7 +705,7 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 	screen.priority().fill(0, cliprect);
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
 //  draw_ground(bitmap, cliprect);
 	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1038,7 +1041,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);
 	draw_road(bitmap,cliprect);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1057,6 +1060,36 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
  * Cycle Warriors / Big Fight
  *
  *********************************/
+
+/*
+ * these video registers never changes 
+ * 
+ * Big Fight
+ * 72f2 5af2 3af2 22fa
+ *
+ * Cycle Warriors
+ * 5673 92c2 3673 267b
+ *
+ * Following is complete guesswork (since nothing changes it's very hard to pinpoint what these bits do :/)
+ * Layer order is 3-1-2-0 ?
+ * x--- -x-- ---- ---- one of these might be enable page select
+ * ---- ---- x--- ---- tilemap size 
+ * ---x ---- ---- x--- one these might be color bank
+ * 
+ */
+WRITE16_MEMBER(cyclwarr_state::video_config_w)
+{
+	COMBINE_DATA(&m_video_config[offset]);
+}
+
+// mixing control (seems to be available only for Big Fight and Cycle Warriors)
+// --x- ---- enabled in Big Fight, disabled in Cycle Warriors (unknown purpose)
+// ---- -x-- enable shadow mixing
+// ---- ---x if 1 invert shadows, i.e. shadows are drawn with original pen while non shadows are halved (Chen stage in Big Fight)
+WRITE16_MEMBER(cyclwarr_state::mixing_control_w)
+{
+	COMBINE_DATA(&m_mixing_control);
+}
 
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
@@ -1162,9 +1195,14 @@ VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
 	// set up scroll bases
 	// TODO: more HW configs
 	m_layer[3]->set_scrolldx(-8,-8);
+	m_layer_page_size[3] = 0x200;
 	m_layer[2]->set_scrolldx(-8,-8);
+	m_layer_page_size[2] = 0x200;
 	m_layer[1]->set_scrolldx(-8,-8);	
+	m_layer_page_size[1] = 0x200;
 	m_layer[0]->set_scrolldx(-0x10,-0x10);
+	m_layer_page_size[0] = 0x100;
+	
 	m_layer1_can_be_road = true;
 }
 
@@ -1184,11 +1222,14 @@ VIDEO_START_MEMBER(cyclwarr_state,bigfight)
 	m_layer[2]->set_scrolldx(-8,-8);
 	m_layer[1]->set_scrolldx(-8,-8);
 	m_layer[0]->set_scrolldx(-0x10,-0x10);
+	for(int i=0;i<4;i++)
+		m_layer_page_size[i] = 0x200;
+
 	m_layer1_can_be_road = false;
 }
 
 
-void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, int hi_priority)
+void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority)
 {
 	rectangle clip;
 	clip.min_x = cliprect.min_x;
@@ -1196,21 +1237,31 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	// TODO: both always enabled when this occurs
 	bool rowscroll_enable = (scrollx[0] & 0x1000) == 0;
 	bool colscroll_enable = (scrollx[0] & 0x2000) == 0;
-
+	// this controls wraparound (tilemap can't go above a threshold)
+	// TODO: Actually scrolly registers 0xf0 to 0xff are used (can split the tilemap furthermore?)
+	uint16_t page_select = scrolly[0xff];
+	
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{
 		clip.min_y = clip.max_y = y;
 		int y_base = rowscroll_enable ? y : 0;
 		int x_base = colscroll_enable ? y : 0;
-		int src_y = (scrolly[y_base] & 0xfff);
+		int src_y = (scrolly[y_base] & 0x7ff);
 		int src_x = (scrollx[x_base] & 0x7ff);
-
+		// apparently if this is on disables wraparound target
+		int page_disable = scrolly[y_base] & 0x800;
+		int cur_page = src_y + y;
+				
 		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
 		if(is_road == true)
 		{
 			if(scrolly[y_base] & 0x8000)
+			{
 				m_road_color_bank = (scrolly[y_base] >> 13) & 3;
+				// road mode disables page wraparound
+				page_disable = 1;
+			}
 			else
 				m_road_color_bank = 0;
 
@@ -1221,6 +1272,13 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 			}
 		}
 
+		// apply wraparound, if enabled tilemaps can't go above a certain threshold
+		// cfr. Cycle Warriors scrolling text (ranking, ending), backgrounds when uphill,
+		// Big Fight vertical scrolling in the morning Funnel stage (not the one chosen at start),
+		// also Big Fight text garbage in the stage after Mevella joins you (forgot the name)
+		if((cur_page - page_select) >= layer_page_size && page_disable == 0)
+			src_y -= layer_page_size;
+		
 		src->set_scrollx(0,src_x);
 		src->set_scrolly(0,src_y);
 		src->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(hi_priority), 0);
@@ -1229,10 +1287,10 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 
 void cyclwarr_state::draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority)
 {
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], false, hi_priority);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], false, hi_priority);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], m_layer1_can_be_road, hi_priority);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], m_layer_page_size[3], false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], m_layer_page_size[2],false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], m_layer_page_size[1],m_layer1_can_be_road, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], m_layer_page_size[0], false, hi_priority);
 }
 
 uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1251,16 +1309,19 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	#ifdef UNUSED_FUNCTION
-	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
-													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
-														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
-														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	popmessage("%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)"
+                                                        ,m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100],m_cyclwarr_videoram[1][0x1ff]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300],m_cyclwarr_videoram[1][0x3ff]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100],m_cyclwarr_videoram[0][0x1ff]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300],m_cyclwarr_videoram[0][0x3ff]);
 	#endif													
 
+//	popmessage("%04x %04x %04x %04x",m_video_config[0],m_video_config[1],m_video_config[2],m_video_config[3]);
+	
 	screen.priority().fill(0, cliprect);
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_bg_layers(screen, bitmap, cliprect, 0);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), m_mixing_control & 1);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg_layers(screen, bitmap, cliprect, 1);
 	return 0;

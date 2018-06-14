@@ -172,8 +172,8 @@ void littlerb_state::littlerb_main(address_map &map)
 
 	map(0x700000, 0x700007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
-	map(0x740000, 0x740001).w(this, FUNC(littlerb_state::littlerb_l_sound_w));
-	map(0x760000, 0x760001).w(this, FUNC(littlerb_state::littlerb_r_sound_w));
+	map(0x740000, 0x740001).w(FUNC(littlerb_state::littlerb_l_sound_w));
+	map(0x760000, 0x760001).w(FUNC(littlerb_state::littlerb_r_sound_w));
 	map(0x780000, 0x780001).nopw(); // generic outputs
 	map(0x7c0000, 0x7c0001).portr("DSW");
 	map(0x7e0000, 0x7e0001).portr("P1");

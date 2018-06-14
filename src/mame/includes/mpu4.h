@@ -14,6 +14,7 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+#include "emupal.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)

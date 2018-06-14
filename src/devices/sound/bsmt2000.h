@@ -20,10 +20,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_BSMT2000_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, BSMT2000, _clock)
-#define MCFG_BSMT2000_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, BSMT2000, _clock)
 #define MCFG_BSMT2000_READY_CALLBACK(_class, _method) \
 	downcast<bsmt2000_device &>(*device).set_ready_callback(bsmt2000_device::ready_callback(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 

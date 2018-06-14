@@ -322,12 +322,12 @@ void atarig42_state::main_map(address_map &map)
 	map(0xe00002, 0xe00003).portr("IN1");
 	map(0xe00010, 0xe00011).portr("IN2");
 	map(0xe00012, 0xe00013).portr("jsa:JSAIII");
-	map(0xe00020, 0xe0002f).rw(this, FUNC(atarig42_state::a2d_data_r), FUNC(atarig42_state::a2d_select_w)).umask16(0xff00);
+	map(0xe00020, 0xe0002f).rw(FUNC(atarig42_state::a2d_data_r), FUNC(atarig42_state::a2d_select_w)).umask16(0xff00);
 	map(0xe00031, 0xe00031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0xe00041, 0xe00041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0xe00050, 0xe00051).w(this, FUNC(atarig42_state::io_latch_w));
+	map(0xe00050, 0xe00051).w(FUNC(atarig42_state::io_latch_w));
 	map(0xe00060, 0xe00061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0xe03000, 0xe03001).w(this, FUNC(atarig42_state::video_int_ack_w));
+	map(0xe03000, 0xe03001).w(FUNC(atarig42_state::video_int_ack_w));
 	map(0xe03800, 0xe03801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xe80000, 0xe80fff).ram();
 	map(0xf40000, 0xf40001).r(m_asic65, FUNC(asic65_device::io_r));
@@ -339,7 +339,7 @@ void atarig42_state::main_map(address_map &map)
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff2000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0xff7000, 0xff7001).w(this, FUNC(atarig42_state::mo_command_w)).share("mo_command");
+	map(0xff7000, 0xff7001).w(FUNC(atarig42_state::mo_command_w)).share("mo_command");
 }
 
 

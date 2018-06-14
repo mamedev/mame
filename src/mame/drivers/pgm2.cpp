@@ -519,7 +519,7 @@ void pgm2_state::pgm2_map(address_map &map)
 
 	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery ram' (in CPU?)
 
-	map(0x03600000, 0x036bffff).rw(this, FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
+	map(0x03600000, 0x036bffff).rw(FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
 
 	map(0x03900000, 0x03900003).portr("INPUTS0");
 	map(0x03a00000, 0x03a00003).portr("INPUTS1");
@@ -528,8 +528,8 @@ void pgm2_state::pgm2_map(address_map &map)
 
 	map(0x30000000, 0x30001fff).ram().share("sp_videoram"); // spriteram ('move' ram in test mode)
 
-	map(0x30020000, 0x30021fff).ram().w(this, FUNC(pgm2_state::bg_videoram_w)).share("bg_videoram");
-	map(0x30040000, 0x30045fff).ram().w(this, FUNC(pgm2_state::fg_videoram_w)).share("fg_videoram");
+	map(0x30020000, 0x30021fff).ram().w(FUNC(pgm2_state::bg_videoram_w)).share("bg_videoram");
+	map(0x30040000, 0x30045fff).ram().w(FUNC(pgm2_state::fg_videoram_w)).share("fg_videoram");
 
 	map(0x30060000, 0x30063fff).ram().w(m_sp_palette, FUNC(palette_device::write32)).share("sp_palette");
 
@@ -545,15 +545,15 @@ void pgm2_state::pgm2_map(address_map &map)
 	what is the real size? */
 	map(0x300e0000, 0x300e03ff).ram().share("lineram").mirror(0x000fc00);
 
-	map(0x30100000, 0x301000ff).rw(this, FUNC(pgm2_state::shareram_r), FUNC(pgm2_state::shareram_w)).umask32(0x00ff00ff);
+	map(0x30100000, 0x301000ff).rw(FUNC(pgm2_state::shareram_r), FUNC(pgm2_state::shareram_w)).umask32(0x00ff00ff);
 
 	map(0x30120000, 0x30120003).ram().share("bgscroll"); // scroll
 	map(0x30120008, 0x3012000b).ram().share("fgscroll");
 	map(0x3012000c, 0x3012000f).ram().share("vidmode");
-	map(0x30120014, 0x30120017).w(this, FUNC(pgm2_state::unk30120014_w));
-	map(0x30120018, 0x30120019).w(this, FUNC(pgm2_state::vbl_ack_w));
-	map(0x30120032, 0x30120033).w(this, FUNC(pgm2_state::share_bank_w));
-	map(0x30120038, 0x3012003b).w(this, FUNC(pgm2_state::sprite_encryption_w));
+	map(0x30120014, 0x30120017).w(FUNC(pgm2_state::unk30120014_w));
+	map(0x30120018, 0x30120019).w(FUNC(pgm2_state::vbl_ack_w));
+	map(0x30120032, 0x30120033).w(FUNC(pgm2_state::share_bank_w));
+	map(0x30120038, 0x3012003b).w(FUNC(pgm2_state::sprite_encryption_w));
 	// there are other 0x301200xx regs
 
 	map(0x40000000, 0x40000003).r("ymz774", FUNC(ymz774_device::read)).w("ymz774", FUNC(ymz774_device::write));
@@ -568,12 +568,12 @@ void pgm2_state::pgm2_map(address_map &map)
 	map(0xfffff430, 0xfffff437).nopw(); // often
 	// AM_RANGE(0xfffffd00, 0xfffffd0b) RSTC (Reset Controller)
 	// AM_RANGE(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
-	map(0xfffffd28, 0xfffffd2b).r(this, FUNC(pgm2_state::rtc_r));
+	map(0xfffffd28, 0xfffffd2b).r(FUNC(pgm2_state::rtc_r));
 	// AM_RANGE(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
 	// custom IGS036 stuff starts here
-	map(0xfffffa08, 0xfffffa0b).w(this, FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-	map(0xfffffa0c, 0xfffffa0f).r(this, FUNC(pgm2_state::unk_startup_r)); // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
-	map(0xfffffc00, 0xfffffcff).rw(this, FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
+	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
+	map(0xfffffa0c, 0xfffffa0f).r(FUNC(pgm2_state::unk_startup_r)); // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
+	map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
 }
 
 
@@ -593,11 +593,11 @@ void pgm2_state::pgm2_ram_rom_map(address_map &map)
 void pgm2_state::pgm2_module_rom_map(address_map &map)
 {
 	pgm2_rom_map(map);
-	map(0x10000000, 0x107fffff).w(this, FUNC(pgm2_state::module_rom_w));
-	map(0x10000000, 0x1000000f).r(this, FUNC(pgm2_state::module_rom_r));
-	map(0xfffff430, 0xfffff433).w(this, FUNC(pgm2_state::pio_sodr_w));
-	map(0xfffff434, 0xfffff437).w(this, FUNC(pgm2_state::pio_codr_w));
-	map(0xfffff43c, 0xfffff43f).r(this, FUNC(pgm2_state::pio_pdsr_r));
+	map(0x10000000, 0x107fffff).w(FUNC(pgm2_state::module_rom_w));
+	map(0x10000000, 0x1000000f).r(FUNC(pgm2_state::module_rom_r));
+	map(0xfffff430, 0xfffff433).w(FUNC(pgm2_state::pio_sodr_w));
+	map(0xfffff434, 0xfffff437).w(FUNC(pgm2_state::pio_codr_w));
+	map(0xfffff43c, 0xfffff43f).r(FUNC(pgm2_state::pio_pdsr_r));
 }
 
 static INPUT_PORTS_START( pgm2 )

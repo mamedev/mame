@@ -304,9 +304,9 @@ void prof80_state::prof80_io(address_map &map)
 //  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
 //  AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
-	map(0xd8, 0xd8).mirror(0xff00).w(this, FUNC(prof80_state::flr_w));
-	map(0xda, 0xda).mirror(0xff00).r(this, FUNC(prof80_state::status_r));
-	map(0xdb, 0xdb).mirror(0xff00).r(this, FUNC(prof80_state::status2_r));
+	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(prof80_state::flr_w));
+	map(0xda, 0xda).mirror(0xff00).r(FUNC(prof80_state::status_r));
+	map(0xdb, 0xdb).mirror(0xff00).r(FUNC(prof80_state::status2_r));
 	map(0xdc, 0xdd).mirror(0xff00).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xde, 0xde).mirror(0x0001).select(0xff00).w(m_mmu, FUNC(prof80_mmu_device::par_w));
 }

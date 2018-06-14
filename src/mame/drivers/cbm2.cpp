@@ -11,6 +11,7 @@
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1159,7 +1160,7 @@ READ8_MEMBER( p500_state::vic_colorram_r )
 
 void cbm2_state::cbm2_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(cbm2_state::read), FUNC(cbm2_state::write));
+	map(0x00000, 0xfffff).rw(FUNC(cbm2_state::read), FUNC(cbm2_state::write));
 }
 
 
@@ -1169,7 +1170,7 @@ void cbm2_state::cbm2_mem(address_map &map)
 
 void cbm2_state::ext_mem(address_map &map)
 {
-	map(0x00000, 0xeffff).r(this, FUNC(cbm2_state::ext_read)).w(this, FUNC(cbm2_state::ext_write));
+	map(0x00000, 0xeffff).r(FUNC(cbm2_state::ext_read)).w(FUNC(cbm2_state::ext_write));
 	map(0xf0000, 0xf0fff).mirror(0xf000).rom().region(EXT_I8088_TAG, 0);
 }
 
@@ -1192,7 +1193,7 @@ void cbm2_state::ext_io(address_map &map)
 
 void p500_state::p500_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(p500_state::read), FUNC(p500_state::write));
+	map(0x00000, 0xfffff).rw(FUNC(p500_state::read), FUNC(p500_state::write));
 }
 
 
@@ -1202,7 +1203,7 @@ void p500_state::p500_mem(address_map &map)
 
 void p500_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(p500_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(p500_state::vic_videoram_r));
 }
 
 
@@ -1212,7 +1213,7 @@ void p500_state::vic_videoram_map(address_map &map)
 
 void p500_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(p500_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(p500_state::vic_colorram_r));
 }
 
 

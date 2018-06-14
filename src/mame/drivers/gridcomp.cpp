@@ -76,6 +76,7 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -325,7 +326,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
-	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
 
@@ -342,7 +343,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
-	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
 

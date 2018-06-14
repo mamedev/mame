@@ -7,6 +7,7 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

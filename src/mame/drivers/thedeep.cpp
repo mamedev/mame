@@ -154,18 +154,18 @@ void thedeep_state::main_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");    // ROM (banked)
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram();                             // RAM (MCU data copied here)
-	map(0xe000, 0xe000).rw(this, FUNC(thedeep_state::protection_r), FUNC(thedeep_state::protection_w));   // To MCU
-	map(0xe004, 0xe004).rw(this, FUNC(thedeep_state::e004_r), FUNC(thedeep_state::nmi_w));    //
+	map(0xe000, 0xe000).rw(FUNC(thedeep_state::protection_r), FUNC(thedeep_state::protection_w));   // To MCU
+	map(0xe004, 0xe004).rw(FUNC(thedeep_state::e004_r), FUNC(thedeep_state::nmi_w));    //
 	map(0xe008, 0xe008).portr("e008");           // P1 (Inputs)
 	map(0xe009, 0xe009).portr("e009");           // P2
 	map(0xe00a, 0xe00a).portr("e00a");           // DSW1
 	map(0xe00b, 0xe00b).portr("e00b");           // DSW2
 	map(0xe00c, 0xe00c).w(m_soundlatch, FUNC(generic_latch_8_device::write));  // To Sound CPU
-	map(0xe100, 0xe100).w(this, FUNC(thedeep_state::e100_w));   // ?
+	map(0xe100, 0xe100).w(FUNC(thedeep_state::e100_w));   // ?
 	map(0xe210, 0xe213).writeonly().share("scroll");    // Scroll
 	map(0xe400, 0xe7ff).ram().share("spriteram");   // Sprites
-	map(0xe800, 0xefff).ram().w(this, FUNC(thedeep_state::vram_1_w)).share("vram_1");  // Text Layer
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(thedeep_state::vram_0_w)).share("vram_0");  // Background Layer
+	map(0xe800, 0xefff).ram().w(FUNC(thedeep_state::vram_1_w)).share("vram_1");  // Text Layer
+	map(0xf000, 0xf7ff).ram().w(FUNC(thedeep_state::vram_0_w)).share("vram_0");  // Background Layer
 	map(0xf800, 0xf83f).ram().share("scroll2"); // Column Scroll
 	map(0xf840, 0xffff).ram();
 }

@@ -23,6 +23,7 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -344,39 +345,39 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x403fff).ram().share("nvram");
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(this, FUNC(umipoker_state::umipoker_vram_0_w)).share("vra0");
-	map(0x802000, 0x803fff).ram().w(this, FUNC(umipoker_state::umipoker_vram_1_w)).share("vra1");
-	map(0x804000, 0x805fff).ram().w(this, FUNC(umipoker_state::umipoker_vram_2_w)).share("vra2");
-	map(0x806000, 0x807fff).ram().w(this, FUNC(umipoker_state::umipoker_vram_3_w)).share("vra3");
-	map(0xc00000, 0xc0ffff).r(this, FUNC(umipoker_state::z80_rom_readback_r)).umask16(0x00ff);
-	map(0xc1f000, 0xc1ffff).rw(this, FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).umask16(0x00ff);
+	map(0x800000, 0x801fff).ram().w(FUNC(umipoker_state::umipoker_vram_0_w)).share("vra0");
+	map(0x802000, 0x803fff).ram().w(FUNC(umipoker_state::umipoker_vram_1_w)).share("vra1");
+	map(0x804000, 0x805fff).ram().w(FUNC(umipoker_state::umipoker_vram_2_w)).share("vra2");
+	map(0x806000, 0x807fff).ram().w(FUNC(umipoker_state::umipoker_vram_3_w)).share("vra3");
+	map(0xc00000, 0xc0ffff).r(FUNC(umipoker_state::z80_rom_readback_r)).umask16(0x00ff);
+	map(0xc1f000, 0xc1ffff).rw(FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).umask16(0x00ff);
 	map(0xe00000, 0xe00001).portr("IN0");
 	map(0xe00004, 0xe00005).portr("IN1"); // unused?
 	map(0xe00008, 0xe00009).portr("IN2");
-	map(0xe00010, 0xe00011).w(this, FUNC(umipoker_state::umi_counters_w));
+	map(0xe00010, 0xe00011).w(FUNC(umipoker_state::umi_counters_w));
 //  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
 	map(0xe00014, 0xe00015).portr("DSW1-2");
 	map(0xe00018, 0xe00019).portr("DSW3-4");
-	map(0xe00020, 0xe00021).w(this, FUNC(umipoker_state::umipoker_scrolly_0_w));
-	map(0xe00022, 0xe00023).w(this, FUNC(umipoker_state::umipoker_irq_ack_w));
-	map(0xe00026, 0xe00027).w(this, FUNC(umipoker_state::umipoker_scrolly_2_w));
-	map(0xe0002a, 0xe0002b).w(this, FUNC(umipoker_state::umipoker_scrolly_1_w));
+	map(0xe00020, 0xe00021).w(FUNC(umipoker_state::umipoker_scrolly_0_w));
+	map(0xe00022, 0xe00023).w(FUNC(umipoker_state::umipoker_irq_ack_w));
+	map(0xe00026, 0xe00027).w(FUNC(umipoker_state::umipoker_scrolly_2_w));
+	map(0xe0002a, 0xe0002b).w(FUNC(umipoker_state::umipoker_scrolly_1_w));
 	map(0xe0002c, 0xe0002d).nopw(); // unknown meaning, bit 0 goes from 0 -> 1 on IRQ service routine
-	map(0xe0002e, 0xe0002f).w(this, FUNC(umipoker_state::umipoker_scrolly_3_w));
+	map(0xe0002e, 0xe0002f).w(FUNC(umipoker_state::umipoker_scrolly_3_w));
 }
 
 void saiyukip_state::saiyukip_map(address_map &map)
 {
 	umipoker_map(map);
-	map(0xe0000c, 0xe0000d).w(this, FUNC(saiyukip_state::lamps_w));
-	map(0xe00010, 0xe00011).w(this, FUNC(saiyukip_state::saiyu_counters_w));
+	map(0xe0000c, 0xe0000d).w(FUNC(saiyukip_state::lamps_w));
+	map(0xe00010, 0xe00011).w(FUNC(saiyukip_state::saiyu_counters_w));
 }
 
 void umipoker_state::umipoker_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xf800, 0xffff).rw(this, FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).share("z80_wram");
+	map(0xf800, 0xffff).rw(FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).share("z80_wram");
 }
 
 void umipoker_state::umipoker_audio_io_map(address_map &map)

@@ -626,7 +626,7 @@ void segaybd_state::suby_map(address_map &map)
 	map(0x0c0000, 0x0cffff).ram().share("shareram");
 	map(0x180000, 0x1807ff).mirror(0x007800).ram().share("rotateram");
 	map(0x188000, 0x188fff).mirror(0x007000).ram().share("bsprites");
-	map(0x190000, 0x193fff).mirror(0x004000).ram().w(this, FUNC(segaybd_state::paletteram_w)).share("paletteram");
+	map(0x190000, 0x193fff).mirror(0x004000).ram().w(FUNC(segaybd_state::paletteram_w)).share("paletteram");
 	map(0x198000, 0x19ffff).r(m_segaic16vid, FUNC(segaic16_video_device::rotate_control_r));
 	map(0x1f0000, 0x1fffff).ram();
 }
@@ -690,8 +690,8 @@ void segaybd_state::main_map_link(address_map &map)
 {
 	main_map(map);
 	map(0x190000, 0x190fff).rw("mb8421", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
-	map(0x191000, 0x191001).r(this, FUNC(segaybd_state::link_r));
-	map(0x192000, 0x192001).rw(this, FUNC(segaybd_state::link2_r), FUNC(segaybd_state::link2_w));
+	map(0x191000, 0x191001).r(FUNC(segaybd_state::link_r));
+	map(0x192000, 0x192001).rw(FUNC(segaybd_state::link2_r), FUNC(segaybd_state::link2_w));
 }
 
 
@@ -1326,10 +1326,9 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("bsprites")
-	MCFG_SEGA_YBOARD_SPRITES_ADD("ysprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("bsprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("ysprites", SEGA_YBOARD_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	MCFG_PALETTE_ADD("palette", 8192*3)
 

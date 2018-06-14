@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SOFTCARD, a2bus_softcard_device, "a2softcard", "Microso
 
 void a2bus_softcard_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(a2bus_softcard_device::dma_r), FUNC(a2bus_softcard_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(a2bus_softcard_device::dma_r), FUNC(a2bus_softcard_device::dma_w));
 }
 
 /***************************************************************************

@@ -157,26 +157,26 @@ void namco_30test_state::namco_30test_map(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // internal I/O
 	map(0x0040, 0x007f).ram(); // more internal I/O, HC11 change pending
-	map(0x007c, 0x007c).rw(this, FUNC(namco_30test_state::hc11_mux_r), FUNC(namco_30test_state::hc11_mux_w));
-	map(0x007e, 0x007e).rw(this, FUNC(namco_30test_state::hc11_okibank_r), FUNC(namco_30test_state::hc11_okibank_w));
+	map(0x007c, 0x007c).rw(FUNC(namco_30test_state::hc11_mux_r), FUNC(namco_30test_state::hc11_mux_w));
+	map(0x007e, 0x007e).rw(FUNC(namco_30test_state::hc11_okibank_r), FUNC(namco_30test_state::hc11_okibank_w));
 	map(0x0080, 0x037f).ram(); // internal RAM
 	map(0x0d80, 0x0dbf).ram(); // EEPROM read-back data goes there
 	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	/* 0x401e-0x401f: time */
-	map(0x4000, 0x401f).w(this, FUNC(namco_30test_state::namco_30test_led_w)); // 7-seg leds
+	map(0x4000, 0x401f).w(FUNC(namco_30test_state::namco_30test_led_w)); // 7-seg leds
 	/* 0x6000: 1st place 7-seg led */
 	/* 0x6001: 2nd place 7-seg led */
 	/* 0x6002: 3rd place 7-seg led */
 	/* 0x6003: current / last play score */
 	/* 0x6004: lamps */
-	map(0x6000, 0x6003).w(this, FUNC(namco_30test_state::namco_30test_led_rank_w));
-	map(0x6004, 0x6004).w(this, FUNC(namco_30test_state::namco_30test_lamps_w));
+	map(0x6000, 0x6003).w(FUNC(namco_30test_state::namco_30test_led_rank_w));
+	map(0x6004, 0x6004).w(FUNC(namco_30test_state::namco_30test_lamps_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void namco_30test_state::namco_30test_io(address_map &map)
 {
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).r(this, FUNC(namco_30test_state::namco_30test_mux_r));
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).r(FUNC(namco_30test_state::namco_30test_mux_r));
 //  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	map(MC68HC11_IO_PORTE, MC68HC11_IO_PORTE).portr("SYSTEM");
 }

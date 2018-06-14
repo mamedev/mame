@@ -19,6 +19,7 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -213,10 +214,10 @@ READ8_MEMBER(osbexec_state::osbexec_rtc_r)
 
 void osbexec_state::osbexec_mem(address_map &map)
 {
-	map(0x0000, 0x1FFF).bankr("0000").w(this, FUNC(osbexec_state::osbexec_0000_w));   /* ROM and maybe also banked ram */
+	map(0x0000, 0x1FFF).bankr("0000").w(FUNC(osbexec_state::osbexec_0000_w));   /* ROM and maybe also banked ram */
 	map(0x2000, 0x3FFF).bankrw("2000");                               /* Banked RAM */
 	map(0x4000, 0xBFFF).bankrw("4000");                               /* Banked RAM */
-	map(0xC000, 0xDFFF).rw(this, FUNC(osbexec_state::osbexec_c000_r), FUNC(osbexec_state::osbexec_c000_w));    /* Video ram / Banked RAM */
+	map(0xC000, 0xDFFF).rw(FUNC(osbexec_state::osbexec_c000_r), FUNC(osbexec_state::osbexec_c000_w));    /* Video ram / Banked RAM */
 	map(0xE000, 0xEFFF).bankrw("e000");                               /* Banked RAM */
 	map(0xF000, 0xFFFF).ram();                                           /* 4KB of non-banked RAM for system stack etc */
 }
@@ -230,8 +231,8 @@ void osbexec_state::osbexec_io(address_map &map)
 	map(0x08, 0x0B).mirror(0xff00).rw(m_mb8877, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));  /* MB8877 @ UB17 input clock = 1MHz */
 	map(0x0C, 0x0F).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));    /* SIO @ UD4 */
 	map(0x10, 0x13).mirror(0xff00).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));       /* 6821 PIA @ UD8 */
-	map(0x14, 0x17).select(0xff00).r(this, FUNC(osbexec_state::osbexec_kbd_r));                                      /* KBD */
-	map(0x18, 0x1b).mirror(0xff00).r(this, FUNC(osbexec_state::osbexec_rtc_r));                                      /* "RTC" @ UE13/UF13 */
+	map(0x14, 0x17).select(0xff00).r(FUNC(osbexec_state::osbexec_kbd_r));                                      /* KBD */
+	map(0x18, 0x1b).mirror(0xff00).r(FUNC(osbexec_state::osbexec_rtc_r));                                      /* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
 }
 

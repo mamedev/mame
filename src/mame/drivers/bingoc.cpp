@@ -37,6 +37,7 @@ SOUND : YM2151 uPD7759C
 #include "machine/i8251.h"
 #include "sound/ym2151.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -146,7 +147,7 @@ void bingoc_state::main_map(address_map &map)
 	map(0x10003b, 0x10003b).rw("uart8", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x180000, 0x18001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0x00ff); //lamps?
 #if 0 // !SOUND_TEST
-	map(0x180010, 0x180011).w(this, FUNC(bingoc_state::main_sound_latch_w)); //WRONG there...
+	map(0x180010, 0x180011).w(FUNC(bingoc_state::main_sound_latch_w)); //WRONG there...
 #endif
 	map(0xff8000, 0xffffff).ram();
 }
@@ -161,12 +162,12 @@ void bingoc_state::sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).w(this, FUNC(bingoc_state::sound_play_w));
+	map(0x40, 0x40).w(FUNC(bingoc_state::sound_play_w));
 	map(0x80, 0x80).w(m_upd7759, FUNC(upd7759_device::port_w));
 #if !SOUND_TEST
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 #else
-	map(0xc0, 0xc0).r(this, FUNC(bingoc_state::sound_test_r));
+	map(0xc0, 0xc0).r(FUNC(bingoc_state::sound_test_r));
 #endif
 }
 

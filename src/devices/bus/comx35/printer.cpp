@@ -177,5 +177,5 @@ void comx_prn_device::comx_io_w(address_space &space, offs_t offset, uint8_t dat
 	    OUT 2 is used to send a bit to the printer
 	*/
 
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }

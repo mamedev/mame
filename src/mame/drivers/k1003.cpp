@@ -128,12 +128,12 @@ WRITE8_MEMBER( k1003_state::disp_w )
 void k1003_state::k1003_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).r(this, FUNC(k1003_state::key_r));
-	map(0x02, 0x02).r(this, FUNC(k1003_state::port2_r));
+	map(0x00, 0x00).r(FUNC(k1003_state::key_r));
+	map(0x02, 0x02).r(FUNC(k1003_state::port2_r));
 
-	map(0x08, 0x08).w(this, FUNC(k1003_state::disp_w));
-	map(0x09, 0x09).w(this, FUNC(k1003_state::disp_2_w));
-	map(0x10, 0x10).w(this, FUNC(k1003_state::disp_1_w));
+	map(0x08, 0x08).w(FUNC(k1003_state::disp_w));
+	map(0x09, 0x09).w(FUNC(k1003_state::disp_2_w));
+	map(0x10, 0x10).w(FUNC(k1003_state::disp_1_w));
 }
 
 /* Input ports */

@@ -560,9 +560,9 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x00a0, 0x00a0).rw(this, FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
-	map(0x00f2, 0x00f2).w(this, FUNC(pcjr_state::pcjr_fdc_dor_w));
+	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::command_w));
+	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x02f8, 0x02ff).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -584,7 +584,7 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 {
 	map.unmap_value_high();
 	ibmpcjr_io(map);
-	map(0x01ff, 0x01ff).rw(this, FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
+	map(0x01ff, 0x01ff).rw(FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
 }
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)

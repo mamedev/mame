@@ -84,7 +84,7 @@ void rowamet_state::rowamet_map(address_map &map)
 	map(0x2808, 0x2808).portr("X8");
 	map(0x4000, 0x407f).ram();
 	map(0x4080, 0x408f).ram().share("ram");
-	map(0x4090, 0x409f).rw(this, FUNC(rowamet_state::io_r), FUNC(rowamet_state::io_w));
+	map(0x4090, 0x409f).rw(FUNC(rowamet_state::io_r), FUNC(rowamet_state::io_w));
 	map(0x40a0, 0x40ff).ram();
 }
 
@@ -97,8 +97,8 @@ void rowamet_state::rowamet_sub_map(address_map &map)
 void rowamet_state::rowamet_sub_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(rowamet_state::sound_r), FUNC(rowamet_state::mute_w));
-	map(0x01, 0x01).w("dac", FUNC(dac_byte_interface::write));
+	map(0x00, 0x00).rw(FUNC(rowamet_state::sound_r), FUNC(rowamet_state::mute_w));
+	map(0x01, 0x01).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( rowamet )

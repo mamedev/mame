@@ -43,7 +43,7 @@ void e0c6s46_device::e0c6s46_data(address_map &map)
 	map(0x0000, 0x027f).ram();
 	map(0x0e00, 0x0e4f).ram().share("vram1");
 	map(0x0e80, 0x0ecf).ram().share("vram2");
-	map(0x0f00, 0x0f7f).rw(this, FUNC(e0c6s46_device::io_r), FUNC(e0c6s46_device::io_w));
+	map(0x0f00, 0x0f7f).rw(FUNC(e0c6s46_device::io_r), FUNC(e0c6s46_device::io_w));
 }
 
 

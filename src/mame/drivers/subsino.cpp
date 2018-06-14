@@ -225,6 +225,7 @@ To Do:
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -779,8 +780,8 @@ void subsino_state::srider_map(address_map &map)
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
 
-	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::out_b_w));
-	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::out_a_w));
+	map(0x0d009, 0x0d009).w(FUNC(subsino_state::out_b_w));
+	map(0x0d00a, 0x0d00a).w(FUNC(subsino_state::out_a_w));
 
 	map(0x0d00c, 0x0d00c).portr("INC");
 
@@ -788,10 +789,10 @@ void subsino_state::srider_map(address_map &map)
 
 	map(0x0d018, 0x0d018).w("oki", FUNC(okim6295_device::write));
 
-	map(0x0d01b, 0x0d01b).w(this, FUNC(subsino_state::tiles_offset_w));
+	map(0x0d01b, 0x0d01b).w(FUNC(subsino_state::tiles_offset_w));
 
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
 }
 
 
@@ -803,8 +804,8 @@ void subsino_state::sharkpy_map(address_map &map)
 	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
-	map(0x09009, 0x09009).w(this, FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::out_a_w));
+	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
 
 	map(0x0900c, 0x0900c).portr("INC");
 
@@ -812,11 +813,11 @@ void subsino_state::sharkpy_map(address_map &map)
 
 	map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
 
-	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::tiles_offset_w));
+	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
 }
 
 /*
@@ -844,11 +845,11 @@ void subsino_state::victor21_map(address_map &map)
 
 	map(0x0900e, 0x0900f).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x0900d, 0x0900d).w(this, FUNC(subsino_state::tiles_offset_w));
+	map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom();
 }
@@ -908,7 +909,7 @@ WRITE8_MEMBER(subsino_state::flash_w)
 void subsino_state::victor5_map(address_map &map)
 {
 	victor21_map(map);
-	map(0x0900a, 0x0900a).rw(this, FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
 	map(0x0900b, 0x0900b).nopr(); //"flash" status, bit 0
 }
 
@@ -930,13 +931,13 @@ void subsino_state::crsbingo_map(address_map &map)
 	map(0x09002, 0x09002).portr("INA");
 	map(0x09003, 0x09003).portr("INB");
 	map(0x09004, 0x09004).portr("INC");
-	map(0x09005, 0x09005).w(this, FUNC(subsino_state::out_a_w));
+	map(0x09005, 0x09005).w(FUNC(subsino_state::out_a_w));
 
 	map(0x09008, 0x09008).portr("SW4");
 	map(0x09009, 0x09009).portr("SW3");  // AM_WRITE(out_a_w )
-	map(0x0900a, 0x0900a).rw(this, FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
 
-	map(0x09010, 0x09010).rw(this, FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+	map(0x09010, 0x09010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
 //  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym2413_device::write));
@@ -946,8 +947,8 @@ void subsino_state::crsbingo_map(address_map &map)
 //  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(tiles_offset_w )
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom(); //overlap unmapped regions
 
@@ -976,9 +977,9 @@ void subsino_state::tisub_map(address_map &map)
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
-	map(0x09008, 0x09008).w(this, FUNC(subsino_state::out_c_w));
-	map(0x09009, 0x09009).w(this, FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::out_a_w));
+	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
+	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
 
 	map(0x0900c, 0x0900c).portr("INC");
 
@@ -986,11 +987,11 @@ void subsino_state::tisub_map(address_map &map)
 
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::tiles_offset_w));
+	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom();
 	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
@@ -999,9 +1000,9 @@ void subsino_state::tisub_map(address_map &map)
 	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
 	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
 
-	map(0x15800, 0x159ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0x15a00, 0x15bff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0x15c00, 0x15dff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0x15800, 0x159ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x15a00, 0x15bff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x15c00, 0x15dff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -1071,8 +1072,8 @@ void subsino_state::stbsub_map(address_map &map)
 
 	map(0x0d008, 0x0d008).ram().share("stbsub_out_c");
 
-	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::out_b_w));
-	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::out_a_w));
+	map(0x0d009, 0x0d009).w(FUNC(subsino_state::out_b_w));
+	map(0x0d00a, 0x0d00a).w(FUNC(subsino_state::out_a_w));
 
 	map(0x0d00c, 0x0d00c).portr("INC");
 
@@ -1084,14 +1085,14 @@ void subsino_state::stbsub_map(address_map &map)
 
 //  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(tiles_offset_w )
 
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
 
-	map(0xf000, 0xf7ff).rw(this, FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
+	map(0xf000, 0xf7ff).rw(FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
 
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0xf800, 0xf9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0xfa00, 0xfbff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0xfc00, 0xfdff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 
@@ -1124,14 +1125,14 @@ void subsino_state::mtrainnv_map(address_map &map)
 
 //  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
 
-	map(0xf000, 0xf7ff).rw(this, FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
+	map(0xf000, 0xf7ff).rw(FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
 
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0xf800, 0xf9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0xfa00, 0xfbff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0xfc00, 0xfdff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 

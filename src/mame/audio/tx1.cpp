@@ -417,11 +417,11 @@ void tx1_sound_device::tx1_sound_prg(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x3000, 0x37ff).ram().mirror(0x800).share("z80_ram");
-	map(0x4000, 0x4000).w(this, FUNC(tx1_sound_device::z80_intreq_w));
+	map(0x4000, 0x4000).w(FUNC(tx1_sound_device::z80_intreq_w));
 	map(0x5000, 0x5003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6003).rw(this, FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
-	map(0x7000, 0x7fff).w(this, FUNC(tx1_sound_device::tx1_ppi_latch_w));
-	map(0xb000, 0xbfff).rw(this, FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+	map(0x6000, 0x6003).rw(FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
+	map(0x7000, 0x7fff).w(FUNC(tx1_sound_device::tx1_ppi_latch_w));
+	map(0xb000, 0xbfff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
 }
 
 void tx1_sound_device::tx1_sound_io(address_map &map)
@@ -851,11 +851,11 @@ void buggyboy_sound_device::buggyboy_sound_prg(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("z80_ram");
-	map(0x6000, 0x6001).r(this, FUNC(buggyboy_sound_device::bb_analog_r));
+	map(0x6000, 0x6001).r(FUNC(buggyboy_sound_device::bb_analog_r));
 	map(0x6800, 0x6803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7000, 0x7003).rw(this, FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
-	map(0x7800, 0x7800).w(this, FUNC(tx1_sound_device::z80_intreq_w));
-	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+	map(0x7000, 0x7003).rw(FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x7800, 0x7800).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
 }
 
 /* Buggy Boy Jr Sound PCB TC043 */
@@ -863,10 +863,10 @@ void buggyboyjr_sound_device::buggybjr_sound_prg(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("z80_ram");
-	map(0x5000, 0x5003).rw(this, FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
-	map(0x6000, 0x6001).r(this, FUNC(buggyboyjr_sound_device::bbjr_analog_r));
-	map(0x7000, 0x7000).w(this, FUNC(tx1_sound_device::z80_intreq_w));
-	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+	map(0x5000, 0x5003).rw(FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x6000, 0x6001).r(FUNC(buggyboyjr_sound_device::bbjr_analog_r));
+	map(0x7000, 0x7000).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
 }
 
 /* Common */

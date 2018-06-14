@@ -40,7 +40,7 @@ void h83008_device::map(address_map &map)
 	map(0xfee009, 0xfee009).w("porta", FUNC(h8_port_device::ddr_w));
 	map(0xfee00a, 0xfee00a).w("portb", FUNC(h8_port_device::ddr_w));
 
-	map(0xfee012, 0xfee012).rw(this, FUNC(h83008_device::syscr_r), FUNC(h83008_device::syscr_w));
+	map(0xfee012, 0xfee012).rw(FUNC(h83008_device::syscr_r), FUNC(h83008_device::syscr_w));
 	map(0xfee014, 0xfee014).rw("intc", FUNC(h8h_intc_device::iscr_r), FUNC(h8h_intc_device::iscr_w));
 	map(0xfee015, 0xfee015).rw("intc", FUNC(h8h_intc_device::ier_r), FUNC(h8h_intc_device::ier_w));
 	map(0xfee016, 0xfee016).rw("intc", FUNC(h8h_intc_device::isr_r), FUNC(h8h_intc_device::isr_w));

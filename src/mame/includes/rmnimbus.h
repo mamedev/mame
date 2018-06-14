@@ -23,6 +23,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "bus/centronics/ctronics.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAINCPU_TAG "maincpu"

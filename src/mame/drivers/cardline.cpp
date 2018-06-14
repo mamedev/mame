@@ -25,6 +25,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -228,18 +229,18 @@ void cardline_state::mem_io(address_map &map)
 	map(0x2003, 0x2003).portr("IN0");
 	map(0x2005, 0x2005).portr("IN1");
 	map(0x2006, 0x2006).portr("DSW");
-	map(0x2007, 0x2007).w(this, FUNC(cardline_state::lamps_w));
+	map(0x2007, 0x2007).w(FUNC(cardline_state::lamps_w));
 	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
 	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
-	map(0x2100, 0x213f).rw(this, FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
+	map(0x2100, 0x213f).rw(FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
 	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
 	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
 	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
-	map(0x3003, 0x3003).w(this, FUNC(cardline_state::a3003_w));
-	map(0xc000, 0xdfff).w(this, FUNC(cardline_state::vram_w)).share("videoram");
-	map(0xe000, 0xffff).w(this, FUNC(cardline_state::attr_w)).share("colorram");
+	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
+	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
+	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");
 }
 
 

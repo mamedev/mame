@@ -9,6 +9,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class xain_state : public driver_device
@@ -27,9 +28,9 @@ public:
 		, m_charram(*this, "charram")
 		, m_bgram(*this, "bgram%u", 0U)
 		, m_spriteram(*this, "spriteram")
-		, m_rom_banks(*this, { "mainbank", "subbank" })
 		, m_char_tilemap(nullptr)
 		, m_bg_tilemaps{ nullptr, nullptr }
+		, m_rom_banks(*this, { "mainbank", "subbank" })
 	{
 	}
 
@@ -85,10 +86,10 @@ protected:
 	required_shared_ptr_array<u8, 2> m_bgram;
 	required_shared_ptr<u8> m_spriteram;
 
-	required_memory_bank_array<2> m_rom_banks;
-
 	tilemap_t   *m_char_tilemap;
 	tilemap_t   *m_bg_tilemaps[2];
+
+	required_memory_bank_array<2> m_rom_banks;
 
 	int     m_vblank;
 

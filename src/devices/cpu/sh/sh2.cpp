@@ -125,25 +125,25 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
 
 void sh2_device::sh7604_map(address_map &map)
 {
-	map(0x40000000, 0xbfffffff).r(this, FUNC(sh2_device::sh2_internal_a5));
+	map(0x40000000, 0xbfffffff).r(FUNC(sh2_device::sh2_internal_a5));
 /*!
   @todo: cps3boot breaks with this enabled. Needs customization ...
   */
 //  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
 //  AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
-	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(this, FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
+	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
 }
 
 void sh2a_device::sh7021_map(address_map &map)
 {
 //  fall-back
-	map(0x05fffe00, 0x05ffffff).rw(this, FUNC(sh2a_device::sh7021_r), FUNC(sh2a_device::sh7021_w)); // SH-7032H internal i/o
+	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh2a_device::sh7021_r), FUNC(sh2a_device::sh7021_w)); // SH-7032H internal i/o
 //  overrides
-	map(0x05ffff40, 0x05ffff43).rw(this, FUNC(sh2a_device::dma_sar0_r), FUNC(sh2a_device::dma_sar0_w));
-	map(0x05ffff44, 0x05ffff47).rw(this, FUNC(sh2a_device::dma_dar0_r), FUNC(sh2a_device::dma_dar0_w));
-	map(0x05ffff48, 0x05ffff49).rw(this, FUNC(sh2a_device::dmaor_r), FUNC(sh2a_device::dmaor_w));
-	map(0x05ffff4a, 0x05ffff4b).rw(this, FUNC(sh2a_device::dma_tcr0_r), FUNC(sh2a_device::dma_tcr0_w));
-	map(0x05ffff4e, 0x05ffff4f).rw(this, FUNC(sh2a_device::dma_chcr0_r), FUNC(sh2a_device::dma_chcr0_w));
+	map(0x05ffff40, 0x05ffff43).rw(FUNC(sh2a_device::dma_sar0_r), FUNC(sh2a_device::dma_sar0_w));
+	map(0x05ffff44, 0x05ffff47).rw(FUNC(sh2a_device::dma_dar0_r), FUNC(sh2a_device::dma_dar0_w));
+	map(0x05ffff48, 0x05ffff49).rw(FUNC(sh2a_device::dmaor_r), FUNC(sh2a_device::dmaor_w));
+	map(0x05ffff4a, 0x05ffff4b).rw(FUNC(sh2a_device::dma_tcr0_r), FUNC(sh2a_device::dma_tcr0_w));
+	map(0x05ffff4e, 0x05ffff4f).rw(FUNC(sh2a_device::dma_chcr0_r), FUNC(sh2a_device::dma_chcr0_w));
 //  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 //  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 }
@@ -151,7 +151,7 @@ void sh2a_device::sh7021_map(address_map &map)
 void sh1_device::sh7032_map(address_map &map)
 {
 //  fall-back
-	map(0x05fffe00, 0x05ffffff).rw(this, FUNC(sh1_device::sh7032_r), FUNC(sh1_device::sh7032_w)); // SH-7032H internal i/o
+	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh1_device::sh7032_r), FUNC(sh1_device::sh7032_w)); // SH-7032H internal i/o
 }
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

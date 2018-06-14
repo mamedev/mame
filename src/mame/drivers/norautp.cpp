@@ -845,7 +845,7 @@ void norautp_state::norautp_portmap(address_map &map)
 	//AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
 	//AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
 	//AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
-	map(0xef, 0xef).r(this, FUNC(norautp_state::test2_r));
+	map(0xef, 0xef).r(FUNC(norautp_state::test2_r));
 }
 
 /*

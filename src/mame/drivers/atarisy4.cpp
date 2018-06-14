@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -707,20 +708,20 @@ void atarisy4_state::main_map(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("m68k_ram");
 	map(0x010000, 0x01ffff).ram();
 	map(0x580000, 0x580001).portr("JOYSTICK");
-	map(0x588000, 0x588001).r(this, FUNC(atarisy4_state::analog_r));
+	map(0x588000, 0x588001).r(FUNC(atarisy4_state::analog_r));
 	map(0x598000, 0x598001).noprw(); /* Sound board */
-	map(0x7c0000, 0x7c4fff).rw(this, FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
-	map(0x7f0000, 0x7f4fff).rw(this, FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
-	map(0x7f6000, 0x7f6001).rw(this, FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
+	map(0x7c0000, 0x7c4fff).rw(FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
+	map(0x7f0000, 0x7f4fff).rw(FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
+	map(0x7f6000, 0x7f6001).rw(FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
 	map(0xa00400, 0xbfffff).ram().share("screen_ram");
-	map(0xff8000, 0xff8fff).rw(this, FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
+	map(0xff8000, 0xff8fff).rw(FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
 }
 
 void airrace_state::airrace_map(address_map &map)
 {
 	main_map(map);
 
-	map(0x7c6000, 0x7c6001).rw(this, FUNC(airrace_state::dsp1_status_r), FUNC(airrace_state::dsp1_control_w));
+	map(0x7c6000, 0x7c6001).rw(FUNC(airrace_state::dsp1_status_r), FUNC(airrace_state::dsp1_control_w));
 }
 
 
@@ -739,7 +740,7 @@ void atarisy4_state::dsp0_map(address_map &map)
 
 void atarisy4_state::dsp0_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(atarisy4_state::dsp0_bank_w));
+	map(0x00, 0x01).w(FUNC(atarisy4_state::dsp0_bank_w));
 }
 
 
@@ -758,7 +759,7 @@ void airrace_state::dsp1_map(address_map &map)
 
 void airrace_state::dsp1_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(airrace_state::dsp1_bank_w));
+	map(0x00, 0x01).w(FUNC(airrace_state::dsp1_bank_w));
 }
 
 

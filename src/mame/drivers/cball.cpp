@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -166,7 +167,7 @@ void cball_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 
-	map(0x0000, 0x03ff).r(this, FUNC(cball_state::wram_r)).mask(0x7f);
+	map(0x0000, 0x03ff).r(FUNC(cball_state::wram_r)).mask(0x7f);
 	map(0x0400, 0x07ff).readonly();
 	map(0x1001, 0x1001).portr("1001");
 	map(0x1003, 0x1003).portr("1003");
@@ -176,8 +177,8 @@ void cball_state::cpu_map(address_map &map)
 	map(0x2000, 0x2001).noprw();
 	map(0x2800, 0x2800).portr("2800");
 
-	map(0x0000, 0x03ff).w(this, FUNC(cball_state::wram_w)).mask(0x7f);
-	map(0x0400, 0x07ff).w(this, FUNC(cball_state::vram_w)).share("video_ram");
+	map(0x0000, 0x03ff).w(FUNC(cball_state::wram_w)).mask(0x7f);
+	map(0x0400, 0x07ff).w(FUNC(cball_state::vram_w)).share("video_ram");
 	map(0x1800, 0x1800).noprw(); /* watchdog? */
 	map(0x1810, 0x1811).noprw();
 	map(0x1820, 0x1821).noprw();

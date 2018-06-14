@@ -322,16 +322,16 @@ void wiz_state::kungfut_main_map(address_map &map)
 	map(0xe800, 0xe83f).ram().share("attrram");
 	map(0xe840, 0xe85f).ram().share("spriteram");
 	map(0xf000, 0xf000).portr("DSW0");
-	map(0xf001, 0xf001).w(this, FUNC(wiz_state::wiz_main_nmi_mask_w));
-	map(0xf002, 0xf003).w(this, FUNC(wiz_state::wiz_palette_bank_w));
-	map(0xf004, 0xf005).w(this, FUNC(wiz_state::wiz_char_bank_w));
-	map(0xf006, 0xf006).w(this, FUNC(wiz_state::wiz_flipx_w));
-	map(0xf007, 0xf007).w(this, FUNC(wiz_state::wiz_flipy_w));
+	map(0xf001, 0xf001).w(FUNC(wiz_state::wiz_main_nmi_mask_w));
+	map(0xf002, 0xf003).w(FUNC(wiz_state::wiz_palette_bank_w));
+	map(0xf004, 0xf005).w(FUNC(wiz_state::wiz_char_bank_w));
+	map(0xf006, 0xf006).w(FUNC(wiz_state::wiz_flipx_w));
+	map(0xf007, 0xf007).w(FUNC(wiz_state::wiz_flipy_w));
 	map(0xf008, 0xf008).portr("DSW1");
 	map(0xf010, 0xf010).portr("IN0");
 	map(0xf018, 0xf018).portr("IN1");
 	map(0xf800, 0xf800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf818, 0xf818).w(this, FUNC(wiz_state::wiz_bgcolor_w));
+	map(0xf818, 0xf818).w(FUNC(wiz_state::wiz_bgcolor_w));
 }
 
 void wiz_state::decrypted_opcodes_map(address_map &map)
@@ -342,9 +342,9 @@ void wiz_state::decrypted_opcodes_map(address_map &map)
 void wiz_state::wiz_main_map(address_map &map)
 {
 	kungfut_main_map(map);
-	map(0xc800, 0xc801).w(this, FUNC(wiz_state::wiz_coin_counter_w));
-	map(0xd400, 0xd400).r(this, FUNC(wiz_state::wiz_protection_r));
-	map(0xf000, 0xf000).w(this, FUNC(wiz_state::wiz_sprite_bank_w));
+	map(0xc800, 0xc801).w(FUNC(wiz_state::wiz_coin_counter_w));
+	map(0xd400, 0xd400).r(FUNC(wiz_state::wiz_protection_r));
+	map(0xf000, 0xf000).w(FUNC(wiz_state::wiz_sprite_bank_w));
 }
 
 void wiz_state::stinger_main_map(address_map &map)
@@ -352,8 +352,8 @@ void wiz_state::stinger_main_map(address_map &map)
 	kungfut_main_map(map);
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xf808, 0xf808).w(this, FUNC(wiz_state::stinger_explosion_w));
-	map(0xf80a, 0xf80a).w(this, FUNC(wiz_state::stinger_shot_w));
+	map(0xf808, 0xf808).w(FUNC(wiz_state::stinger_explosion_w));
+	map(0xf80a, 0xf80a).w(FUNC(wiz_state::stinger_shot_w));
 }
 
 
@@ -373,7 +373,7 @@ void wiz_state::kungfut_sound_map(address_map &map)
 	map(0x4000, 0x4001).w("8910.3", FUNC(ay8910_device::address_data_w));
 	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
-	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
 }
 
 void wiz_state::stinger_sound_map(address_map &map)
@@ -381,7 +381,7 @@ void wiz_state::stinger_sound_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
 	map(0x4000, 0x4000).nopw(); // ?
 	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));

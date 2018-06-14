@@ -6,6 +6,7 @@
 #include "machine/gen_latch.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 
 class legionna_state : public driver_device, protected seibu_sound_common
 {
@@ -37,6 +38,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_mid_data;
 	std::unique_ptr<uint16_t[]> m_textram;
 	std::unique_ptr<uint16_t[]> m_scrollram16;
+	std::unique_ptr<uint16_t[]> m_paletteram;
 	uint16_t m_layer_disable;
 	std::unique_ptr<uint16_t[]> m_layer_config;
 	int m_sprite_xoffs;

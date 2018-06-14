@@ -48,17 +48,17 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 void kncljoe_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(kncljoe_state::kncljoe_videoram_w)).share("videoram");
-	map(0xd000, 0xd001).w(this, FUNC(kncljoe_state::kncljoe_scroll_w)).share("scrollregs");
+	map(0xc000, 0xcfff).ram().w(FUNC(kncljoe_state::kncljoe_videoram_w)).share("videoram");
+	map(0xd000, 0xd001).w(FUNC(kncljoe_state::kncljoe_scroll_w)).share("scrollregs");
 	map(0xd800, 0xd800).portr("SYSTEM");
 	map(0xd801, 0xd801).portr("P1");
 	map(0xd802, 0xd802).portr("P2");
 	map(0xd803, 0xd803).portr("DSWA");
 	map(0xd804, 0xd804).portr("DSWB");
-	map(0xd800, 0xd800).w(this, FUNC(kncljoe_state::sound_cmd_w));
-	map(0xd801, 0xd801).w(this, FUNC(kncljoe_state::kncljoe_control_w));
-	map(0xd802, 0xd802).w("sn1", FUNC(sn76489_device::write));
-	map(0xd803, 0xd803).w("sn2", FUNC(sn76489_device::write));
+	map(0xd800, 0xd800).w(FUNC(kncljoe_state::sound_cmd_w));
+	map(0xd801, 0xd801).w(FUNC(kncljoe_state::kncljoe_control_w));
+	map(0xd802, 0xd802).w("sn1", FUNC(sn76489_device::command_w));
+	map(0xd803, 0xd803).w("sn2", FUNC(sn76489_device::command_w));
 	map(0xd807, 0xd807).nopr();     /* unknown read */
 	map(0xd817, 0xd817).nopr();     /* unknown read */
 	map(0xe800, 0xefff).ram().share("spriteram");
@@ -108,14 +108,14 @@ void kncljoe_state::sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0fff).nopw();
-	map(0x1000, 0x1fff).w(this, FUNC(kncljoe_state::sound_irq_ack_w));
+	map(0x1000, 0x1fff).w(FUNC(kncljoe_state::sound_irq_ack_w));
 	map(0x2000, 0x7fff).rom();
 }
 
 void kncljoe_state::sound_portmap(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(kncljoe_state::m6803_port1_r), FUNC(kncljoe_state::m6803_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(kncljoe_state::m6803_port2_r), FUNC(kncljoe_state::m6803_port2_w));
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(kncljoe_state::m6803_port1_r), FUNC(kncljoe_state::m6803_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(kncljoe_state::m6803_port2_r), FUNC(kncljoe_state::m6803_port2_w));
 }
 
 

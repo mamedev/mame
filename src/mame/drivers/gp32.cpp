@@ -1628,25 +1628,25 @@ void gp32_state::gp32_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x0c000000, 0x0c7fffff).ram().share("s3c240x_ram");
-	map(0x14000000, 0x1400003b).rw(this, FUNC(gp32_state::s3c240x_memcon_r), FUNC(gp32_state::s3c240x_memcon_w));
-	map(0x14200000, 0x1420005b).rw(this, FUNC(gp32_state::s3c240x_usb_host_r), FUNC(gp32_state::s3c240x_usb_host_w));
-	map(0x14400000, 0x14400017).rw(this, FUNC(gp32_state::s3c240x_irq_r), FUNC(gp32_state::s3c240x_irq_w));
-	map(0x14600000, 0x1460007b).rw(this, FUNC(gp32_state::s3c240x_dma_r), FUNC(gp32_state::s3c240x_dma_w));
-	map(0x14800000, 0x14800017).rw(this, FUNC(gp32_state::s3c240x_clkpow_r), FUNC(gp32_state::s3c240x_clkpow_w));
-	map(0x14a00000, 0x14a003ff).rw(this, FUNC(gp32_state::s3c240x_lcd_r), FUNC(gp32_state::s3c240x_lcd_w));
-	map(0x14a00400, 0x14a007ff).rw(this, FUNC(gp32_state::s3c240x_lcd_palette_r), FUNC(gp32_state::s3c240x_lcd_palette_w));
-	map(0x15000000, 0x1500002b).rw(this, FUNC(gp32_state::s3c240x_uart_0_r), FUNC(gp32_state::s3c240x_uart_0_w));
-	map(0x15004000, 0x1500402b).rw(this, FUNC(gp32_state::s3c240x_uart_1_r), FUNC(gp32_state::s3c240x_uart_1_w));
-	map(0x15100000, 0x15100043).rw(this, FUNC(gp32_state::s3c240x_pwm_r), FUNC(gp32_state::s3c240x_pwm_w));
-	map(0x15200140, 0x152001fb).rw(this, FUNC(gp32_state::s3c240x_usb_device_r), FUNC(gp32_state::s3c240x_usb_device_w));
-	map(0x15300000, 0x1530000b).rw(this, FUNC(gp32_state::s3c240x_watchdog_r), FUNC(gp32_state::s3c240x_watchdog_w));
-	map(0x15400000, 0x1540000f).rw(this, FUNC(gp32_state::s3c240x_iic_r), FUNC(gp32_state::s3c240x_iic_w));
-	map(0x15508000, 0x15508013).rw(this, FUNC(gp32_state::s3c240x_iis_r), FUNC(gp32_state::s3c240x_iis_w));
-	map(0x15600000, 0x1560005b).rw(this, FUNC(gp32_state::s3c240x_gpio_r), FUNC(gp32_state::s3c240x_gpio_w));
-	map(0x15700040, 0x1570008b).rw(this, FUNC(gp32_state::s3c240x_rtc_r), FUNC(gp32_state::s3c240x_rtc_w));
-	map(0x15800000, 0x15800007).rw(this, FUNC(gp32_state::s3c240x_adc_r), FUNC(gp32_state::s3c240x_adc_w));
-	map(0x15900000, 0x15900017).rw(this, FUNC(gp32_state::s3c240x_spi_r), FUNC(gp32_state::s3c240x_spi_w));
-	map(0x15a00000, 0x15a0003f).rw(this, FUNC(gp32_state::s3c240x_mmc_r), FUNC(gp32_state::s3c240x_mmc_w));
+	map(0x14000000, 0x1400003b).rw(FUNC(gp32_state::s3c240x_memcon_r), FUNC(gp32_state::s3c240x_memcon_w));
+	map(0x14200000, 0x1420005b).rw(FUNC(gp32_state::s3c240x_usb_host_r), FUNC(gp32_state::s3c240x_usb_host_w));
+	map(0x14400000, 0x14400017).rw(FUNC(gp32_state::s3c240x_irq_r), FUNC(gp32_state::s3c240x_irq_w));
+	map(0x14600000, 0x1460007b).rw(FUNC(gp32_state::s3c240x_dma_r), FUNC(gp32_state::s3c240x_dma_w));
+	map(0x14800000, 0x14800017).rw(FUNC(gp32_state::s3c240x_clkpow_r), FUNC(gp32_state::s3c240x_clkpow_w));
+	map(0x14a00000, 0x14a003ff).rw(FUNC(gp32_state::s3c240x_lcd_r), FUNC(gp32_state::s3c240x_lcd_w));
+	map(0x14a00400, 0x14a007ff).rw(FUNC(gp32_state::s3c240x_lcd_palette_r), FUNC(gp32_state::s3c240x_lcd_palette_w));
+	map(0x15000000, 0x1500002b).rw(FUNC(gp32_state::s3c240x_uart_0_r), FUNC(gp32_state::s3c240x_uart_0_w));
+	map(0x15004000, 0x1500402b).rw(FUNC(gp32_state::s3c240x_uart_1_r), FUNC(gp32_state::s3c240x_uart_1_w));
+	map(0x15100000, 0x15100043).rw(FUNC(gp32_state::s3c240x_pwm_r), FUNC(gp32_state::s3c240x_pwm_w));
+	map(0x15200140, 0x152001fb).rw(FUNC(gp32_state::s3c240x_usb_device_r), FUNC(gp32_state::s3c240x_usb_device_w));
+	map(0x15300000, 0x1530000b).rw(FUNC(gp32_state::s3c240x_watchdog_r), FUNC(gp32_state::s3c240x_watchdog_w));
+	map(0x15400000, 0x1540000f).rw(FUNC(gp32_state::s3c240x_iic_r), FUNC(gp32_state::s3c240x_iic_w));
+	map(0x15508000, 0x15508013).rw(FUNC(gp32_state::s3c240x_iis_r), FUNC(gp32_state::s3c240x_iis_w));
+	map(0x15600000, 0x1560005b).rw(FUNC(gp32_state::s3c240x_gpio_r), FUNC(gp32_state::s3c240x_gpio_w));
+	map(0x15700040, 0x1570008b).rw(FUNC(gp32_state::s3c240x_rtc_r), FUNC(gp32_state::s3c240x_rtc_w));
+	map(0x15800000, 0x15800007).rw(FUNC(gp32_state::s3c240x_adc_r), FUNC(gp32_state::s3c240x_adc_w));
+	map(0x15900000, 0x15900017).rw(FUNC(gp32_state::s3c240x_spi_r), FUNC(gp32_state::s3c240x_spi_w));
+	map(0x15a00000, 0x15a0003f).rw(FUNC(gp32_state::s3c240x_mmc_r), FUNC(gp32_state::s3c240x_mmc_w));
 }
 
 static INPUT_PORTS_START( gp32 )

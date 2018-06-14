@@ -13,6 +13,7 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -151,12 +152,12 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 void ultrsprt_state::ultrsprt_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("vram");
-	map(0x70000000, 0x70000000).rw(this, FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
-	map(0x70000020, 0x70000023).r(this, FUNC(ultrsprt_state::upd1_r));
-	map(0x70000040, 0x70000043).r(this, FUNC(ultrsprt_state::upd2_r));
+	map(0x70000000, 0x70000000).rw(FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
+	map(0x70000020, 0x70000023).r(FUNC(ultrsprt_state::upd1_r));
+	map(0x70000040, 0x70000043).r(FUNC(ultrsprt_state::upd2_r));
 	map(0x70000080, 0x7000008f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x700000c0, 0x700000cf).nopw(); // Written following DMA interrupt - unused int ack?
-	map(0x700000e0, 0x700000e3).w(this, FUNC(ultrsprt_state::int_ack_w));
+	map(0x700000e0, 0x700000e3).w(FUNC(ultrsprt_state::int_ack_w));
 	map(0x7f000000, 0x7f01ffff).ram().share("workram");
 	map(0x7f700000, 0x7f703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x7f800000, 0x7f9fffff).mirror(0x00600000).rom().region("program", 0);
@@ -243,7 +244,7 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("P1X")

@@ -161,7 +161,7 @@ READ8_MEMBER( d9060_device_base::dio_r )
 
 	*/
 
-	return m_bus->dio_r();
+	return m_bus->read_dio();
 }
 
 

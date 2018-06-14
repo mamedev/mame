@@ -1259,11 +1259,11 @@ void fidel6502_state::eas_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
-	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
-	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x7020, 0x7027).w(FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(fidel6502_state::eas_input_r));
 	map(0x8000, 0x9fff).rom();
 	map(0xc000, 0xffff).rom();
 }
@@ -1272,11 +1272,11 @@ void fidel6502_state::eag_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
-	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
-	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x7020, 0x7027).w(FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(fidel6502_state::eas_input_r));
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).bankr("rombank");
 	map(0xc000, 0xffff).rom();
@@ -1286,13 +1286,13 @@ void fidel6502_state::pc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x7000, 0x7000).w(this, FUNC(fidel6502_state::eas_ppi_porta_w));
-	map(0x7010, 0x7010).r(this, FUNC(fidel6502_state::eas_ppi_portb_r));
-	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
-	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
-	map(0x7040, 0x7040).w(this, FUNC(fidel6502_state::eas_ppi_portc_w));
-	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x7000, 0x7000).w(FUNC(fidel6502_state::eas_ppi_porta_w));
+	map(0x7010, 0x7010).r(FUNC(fidel6502_state::eas_ppi_portb_r));
+	map(0x7020, 0x7027).w(FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7040, 0x7040).w(FUNC(fidel6502_state::eas_ppi_portc_w));
+	map(0x7050, 0x7050).r(FUNC(fidel6502_state::eas_input_r));
 	map(0x8000, 0x9fff).ram();
 	map(0xb000, 0xffff).rom();
 }
@@ -1304,17 +1304,17 @@ void fidel6502_state::sc9_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::sc9_control_w));
-	map(0x8000, 0x8007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::sc9_led_w)).nopr();
-	map(0xa000, 0xa000).mirror(0x1fff).r(this, FUNC(fidel6502_state::sc9_input_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::sc9_control_w));
+	map(0x8000, 0x8007).mirror(0x1ff8).w(FUNC(fidel6502_state::sc9_led_w)).nopr();
+	map(0xa000, 0xa000).mirror(0x1fff).r(FUNC(fidel6502_state::sc9_input_r));
 	map(0xc000, 0xffff).rom();
 }
 
 void fidel6502_state::sc9d_map(address_map &map)
 {
 	sc9_map(map);
-	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc9d_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::sc9d_input_r));
 }
 
 
@@ -1322,17 +1322,17 @@ void fidel6502_state::sc9d_map(address_map &map)
 
 void fidel6502_state::sc12_trampoline(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(fidel6502_state::sc12_trampoline_r), FUNC(fidel6502_state::sc12_trampoline_w));
+	map(0x0000, 0xffff).rw(FUNC(fidel6502_state::sc12_trampoline_r), FUNC(fidel6502_state::sc12_trampoline_w));
 }
 
 void fidel6502_state::sc12_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::sc12_control_w));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::sc12_control_w));
 	map(0x8000, 0x9fff).rom();
-	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc12_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::sc12_input_r));
 	map(0xc000, 0xcfff).mirror(0x1000).rom();
 	map(0xe000, 0xffff).rom();
 }
@@ -1341,11 +1341,11 @@ void fidel6502_state::as12_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x1800, 0x1807).w(this, FUNC(fidel6502_state::as12_led_w)).nopr();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::as12_control_w));
+	map(0x1800, 0x1807).w(FUNC(fidel6502_state::as12_led_w)).nopr();
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::as12_control_w));
 	map(0x8000, 0x9fff).rom();
-	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::as12_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::as12_input_r));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -1355,7 +1355,7 @@ void fidel6502_state::as12_map(address_map &map)
 void fidel6502_state::fexcel_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	//map(0x8000, 0x8000).nopr(); // checks for opening book module, but hw doesn't have a module slot
 	map(0xc000, 0xffff).rom();
 }
@@ -1363,14 +1363,14 @@ void fidel6502_state::fexcel_map(address_map &map)
 void fidel6502_state::fexcelp_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void fidel6502_state::fexcelb_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcelb_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcelb_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1380,9 +1380,9 @@ void fidel6502_state::fexcelb_map(address_map &map)
 void fidel6502_state::fdesdis_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::fdesdis_lcd_w));
+	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(fidel6502_state::fdesdis_lcd_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1396,16 +1396,16 @@ void fidel6502_state::fphantom_map(address_map &map)
 void fidel6502_state::chesster_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::write));
+	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void fidel6502_state::kishon_map(address_map &map)
 {
 	chesster_map(map);
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
 }
 
 

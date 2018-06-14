@@ -66,7 +66,7 @@ void m1comm_device::m1comm_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xffff).mask(0x0fff).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
 }
 
 /*************************************
@@ -77,8 +77,8 @@ void m1comm_device::m1comm_io(address_map &map)
 	map.global_mask(0x7f);
 	map(0x00, 0x1f).rw(m_dlc, FUNC(mb89374_device::read), FUNC(mb89374_device::write));
 	map(0x20, 0x2f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x40, 0x5f).mask(0x01).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
-	map(0x60, 0x7f).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+	map(0x40, 0x5f).mask(0x01).rw(FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
 }
 
 ROM_START( m1comm )

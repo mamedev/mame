@@ -21,6 +21,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "barricad.lh"
@@ -224,29 +225,29 @@ void hitme_state::hitme_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x09ff).rom();
-	map(0x0c00, 0x0eff).ram().w(this, FUNC(hitme_state::hitme_vidram_w)).share("videoram");
+	map(0x0c00, 0x0eff).ram().w(FUNC(hitme_state::hitme_vidram_w)).share("videoram");
 	map(0x1000, 0x10ff).mirror(0x300).ram();
-	map(0x1400, 0x14ff).r(this, FUNC(hitme_state::hitme_port_0_r));
-	map(0x1500, 0x15ff).r(this, FUNC(hitme_state::hitme_port_1_r));
-	map(0x1600, 0x16ff).r(this, FUNC(hitme_state::hitme_port_2_r));
-	map(0x1700, 0x17ff).r(this, FUNC(hitme_state::hitme_port_3_r));
+	map(0x1400, 0x14ff).r(FUNC(hitme_state::hitme_port_0_r));
+	map(0x1500, 0x15ff).r(FUNC(hitme_state::hitme_port_1_r));
+	map(0x1600, 0x16ff).r(FUNC(hitme_state::hitme_port_2_r));
+	map(0x1700, 0x17ff).r(FUNC(hitme_state::hitme_port_3_r));
 	map(0x1800, 0x18ff).portr("IN4");
 	map(0x1900, 0x19ff).portr("IN5");
-	map(0x1d00, 0x1dff).w(this, FUNC(hitme_state::output_port_0_w));
-	map(0x1e00, 0x1fff).w(this, FUNC(hitme_state::output_port_1_w));
+	map(0x1d00, 0x1dff).w(FUNC(hitme_state::output_port_0_w));
+	map(0x1e00, 0x1fff).w(FUNC(hitme_state::output_port_1_w));
 }
 
 
 void hitme_state::hitme_portmap(address_map &map)
 {
-	map(0x14, 0x14).r(this, FUNC(hitme_state::hitme_port_0_r));
-	map(0x15, 0x15).r(this, FUNC(hitme_state::hitme_port_1_r));
-	map(0x16, 0x16).r(this, FUNC(hitme_state::hitme_port_2_r));
-	map(0x17, 0x17).r(this, FUNC(hitme_state::hitme_port_3_r));
+	map(0x14, 0x14).r(FUNC(hitme_state::hitme_port_0_r));
+	map(0x15, 0x15).r(FUNC(hitme_state::hitme_port_1_r));
+	map(0x16, 0x16).r(FUNC(hitme_state::hitme_port_2_r));
+	map(0x17, 0x17).r(FUNC(hitme_state::hitme_port_3_r));
 	map(0x18, 0x18).portr("IN4");
 	map(0x19, 0x19).portr("IN5");
-	map(0x1d, 0x1d).w(this, FUNC(hitme_state::output_port_0_w));
-	map(0x1e, 0x1f).w(this, FUNC(hitme_state::output_port_1_w));
+	map(0x1d, 0x1d).w(FUNC(hitme_state::output_port_0_w));
+	map(0x1e, 0x1f).w(FUNC(hitme_state::output_port_1_w));
 }
 
 

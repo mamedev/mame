@@ -672,7 +672,7 @@ READ8_MEMBER( c128_state::vic_colorram_r )
 
 void c128_state::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::z80_r), FUNC(c128_state::z80_w));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::z80_r), FUNC(c128_state::z80_w));
 }
 
 
@@ -682,7 +682,7 @@ void c128_state::z80_mem(address_map &map)
 
 void c128_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::z80_io_r), FUNC(c128_state::z80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::z80_io_r), FUNC(c128_state::z80_io_w));
 }
 
 
@@ -692,7 +692,7 @@ void c128_state::z80_io(address_map &map)
 
 void c128_state::m8502_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::read), FUNC(c128_state::write));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::read), FUNC(c128_state::write));
 }
 
 
@@ -702,7 +702,7 @@ void c128_state::m8502_mem(address_map &map)
 
 void c128_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(c128_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(c128_state::vic_videoram_r));
 }
 
 
@@ -712,7 +712,7 @@ void c128_state::vic_videoram_map(address_map &map)
 
 void c128_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(c128_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(c128_state::vic_colorram_r));
 }
 
 

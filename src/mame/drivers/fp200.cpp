@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -424,7 +425,7 @@ void fp200_state::fp200_map(address_map &map)
 
 void fp200_state::fp200_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+	map(0x00, 0xff).rw(FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
 }
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)

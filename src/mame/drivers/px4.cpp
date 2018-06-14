@@ -24,6 +24,7 @@
 #include "sound/spkrdev.h"
 
 #include "diserial.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1271,37 +1272,37 @@ void px4_state::px4_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// gapnit, 0x00-0x07
-	map(0x00, 0x00).rw(this, FUNC(px4_state::icrlc_r), FUNC(px4_state::ctrl1_w));
-	map(0x01, 0x01).rw(this, FUNC(px4_state::icrhc_r), FUNC(px4_state::cmdr_w));
-	map(0x02, 0x02).rw(this, FUNC(px4_state::icrlb_r), FUNC(px4_state::ctrl2_w));
-	map(0x03, 0x03).r(this, FUNC(px4_state::icrhb_r));
-	map(0x04, 0x04).rw(this, FUNC(px4_state::isr_r), FUNC(px4_state::ier_w));
-	map(0x05, 0x05).rw(this, FUNC(px4_state::str_r), FUNC(px4_state::bankr_w));
-	map(0x06, 0x06).rw(this, FUNC(px4_state::sior_r), FUNC(px4_state::sior_w));
+	map(0x00, 0x00).rw(FUNC(px4_state::icrlc_r), FUNC(px4_state::ctrl1_w));
+	map(0x01, 0x01).rw(FUNC(px4_state::icrhc_r), FUNC(px4_state::cmdr_w));
+	map(0x02, 0x02).rw(FUNC(px4_state::icrlb_r), FUNC(px4_state::ctrl2_w));
+	map(0x03, 0x03).r(FUNC(px4_state::icrhb_r));
+	map(0x04, 0x04).rw(FUNC(px4_state::isr_r), FUNC(px4_state::ier_w));
+	map(0x05, 0x05).rw(FUNC(px4_state::str_r), FUNC(px4_state::bankr_w));
+	map(0x06, 0x06).rw(FUNC(px4_state::sior_r), FUNC(px4_state::sior_w));
 	map(0x07, 0x07).noprw();
 	// gapndl, 0x08-0x0f
-	map(0x08, 0x08).w(this, FUNC(px4_state::vadr_w));
-	map(0x09, 0x09).w(this, FUNC(px4_state::yoff_w));
-	map(0x0a, 0x0a).w(this, FUNC(px4_state::fr_w));
-	map(0x0b, 0x0b).w(this, FUNC(px4_state::spur_w));
+	map(0x08, 0x08).w(FUNC(px4_state::vadr_w));
+	map(0x09, 0x09).w(FUNC(px4_state::yoff_w));
+	map(0x0a, 0x0a).w(FUNC(px4_state::fr_w));
+	map(0x0b, 0x0b).w(FUNC(px4_state::spur_w));
 	map(0x0c, 0x0f).noprw();
 	// gapnio, 0x10-0x1f
-	map(0x10, 0x13).rw(this, FUNC(px4_state::ctgif_r), FUNC(px4_state::ctgif_w));
-	map(0x14, 0x14).rw(this, FUNC(px4_state::artdir_r), FUNC(px4_state::artdor_w));
-	map(0x15, 0x15).rw(this, FUNC(px4_state::artsr_r), FUNC(px4_state::artmr_w));
-	map(0x16, 0x16).rw(this, FUNC(px4_state::iostr_r), FUNC(px4_state::artcr_w));
-	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x18, 0x18).w(this, FUNC(px4_state::swr_w));
-	map(0x19, 0x19).w(this, FUNC(px4_state::ioctlr_w));
+	map(0x10, 0x13).rw(FUNC(px4_state::ctgif_r), FUNC(px4_state::ctgif_w));
+	map(0x14, 0x14).rw(FUNC(px4_state::artdir_r), FUNC(px4_state::artdor_w));
+	map(0x15, 0x15).rw(FUNC(px4_state::artsr_r), FUNC(px4_state::artmr_w));
+	map(0x16, 0x16).rw(FUNC(px4_state::iostr_r), FUNC(px4_state::artcr_w));
+	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x18, 0x18).w(FUNC(px4_state::swr_w));
+	map(0x19, 0x19).w(FUNC(px4_state::ioctlr_w));
 	map(0x1a, 0x1f).noprw();
 }
 
 void px4p_state::px4p_io(address_map &map)
 {
 	px4_io(map);
-	map(0x90, 0x92).w(this, FUNC(px4p_state::ramdisk_address_w));
-	map(0x93, 0x93).rw(this, FUNC(px4p_state::ramdisk_data_r), FUNC(px4p_state::ramdisk_data_w));
-	map(0x94, 0x94).r(this, FUNC(px4p_state::ramdisk_control_r));
+	map(0x90, 0x92).w(FUNC(px4p_state::ramdisk_address_w));
+	map(0x93, 0x93).rw(FUNC(px4p_state::ramdisk_data_r), FUNC(px4p_state::ramdisk_data_w));
+	map(0x94, 0x94).r(FUNC(px4p_state::ramdisk_control_r));
 }
 
 

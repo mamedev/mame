@@ -515,8 +515,8 @@ void rollext_state::memmap(address_map &map)
 	map(0x60000000, 0x600fffff).ram().share("disp_ram");
 	map(0x80000000, 0x8000ffff).ram().share("palette_ram");
 	map(0x90000000, 0x9007ffff).ram().share("texture_mask");
-	map(0xa0000000, 0xa00000ff).rw(this, FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
-	map(0xb0000000, 0xb0000007).r(this, FUNC(rollext_state::b0000000_r));
+	map(0xa0000000, 0xa00000ff).rw(FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
+	map(0xb0000000, 0xb0000007).r(FUNC(rollext_state::b0000000_r));
 	map(0xc0000000, 0xc03fffff).rom().region("rom1", 0);
 	map(0xff000000, 0xffffffff).ram().region("rom0", 0);
 }

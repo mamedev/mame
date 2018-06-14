@@ -253,10 +253,10 @@ void ti99_4x_state::memmap(address_map &map)
 */
 void ti99_4x_state::cru_map(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(ti99_4x_state::cruread));
+	map(0x0000, 0x01ff).r(FUNC(ti99_4x_state::cruread));
 	map(0x0000, 0x0003).mirror(0x003c).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x0fff).w(this, FUNC(ti99_4x_state::cruwrite));
+	map(0x0000, 0x0fff).w(FUNC(ti99_4x_state::cruwrite));
 	map(0x0000, 0x001f).mirror(0x01e0).w(m_tms9901, FUNC(tms9901_device::write));
 }
 

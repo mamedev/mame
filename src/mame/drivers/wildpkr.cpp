@@ -167,6 +167,7 @@
 #include "sound/volt_reg.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -282,7 +283,7 @@ WRITE16_MEMBER(wildpkr_state::out1_w)
 
 WRITE8_MEMBER(wildpkr_state::dac_w)
 {
-	m_dac->write(space, 0, data);
+	m_dac->write(data);
 }
 
 WRITE16_MEMBER(wildpkr_state::clock_start_w)
@@ -313,8 +314,8 @@ void wildpkr_state::wildpkr_map(address_map &map)
 	map(0x800000, 0x800001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x800002, 0x800003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 	map(0x800080, 0x80009f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x800180, 0x800180).r(this, FUNC(wildpkr_state::unknown_read8));
-	map(0x800181, 0x800181).w(this, FUNC(wildpkr_state::unknown_write8));
+	map(0x800180, 0x800180).r(FUNC(wildpkr_state::unknown_read8));
+	map(0x800181, 0x800181).w(FUNC(wildpkr_state::unknown_write8));
 	map(0x800200, 0x800200).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x800202, 0x800202).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x800204, 0x800204).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -328,21 +329,21 @@ void wildpkr_state::tabpkr_map(address_map &map)
 {
 	map(0x000000, 0x2fffff).rom();
 	map(0x300000, 0x303fff).ram();
-	map(0x400000, 0x400fff).ram().w(this, FUNC(wildpkr_state::nvram_w)).share("nvram");
+	map(0x400000, 0x400fff).ram().w(FUNC(wildpkr_state::nvram_w)).share("nvram");
 	map(0x500000, 0x500001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x500002, 0x500003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 	map(0x500021, 0x500021).rw("ramdac", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
 	map(0x500023, 0x500023).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x500025, 0x500025).rw("ramdac", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));
 	map(0x500040, 0x50005f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x500060, 0x500061).rw(this, FUNC(wildpkr_state::id_serial_r), FUNC(wildpkr_state::id_serial_w));
-	map(0x600000, 0x600001).portr("IN0").w(this, FUNC(wildpkr_state::out0_w));
-	map(0x600002, 0x600003).portr("IN1").w(this, FUNC(wildpkr_state::out1_w));
+	map(0x500060, 0x500061).rw(FUNC(wildpkr_state::id_serial_r), FUNC(wildpkr_state::id_serial_w));
+	map(0x600000, 0x600001).portr("IN0").w(FUNC(wildpkr_state::out0_w));
+	map(0x600002, 0x600003).portr("IN1").w(FUNC(wildpkr_state::out1_w));
 	map(0x600004, 0x600005).portr("IN2");
-	map(0x600004, 0x600004).w(this, FUNC(wildpkr_state::dac_w));
-	map(0x700000, 0x700001).w(this, FUNC(wildpkr_state::clock_start_w));
-	map(0x700002, 0x700003).w(this, FUNC(wildpkr_state::clock_rate_w));
-	map(0x700004, 0x700007).w(this, FUNC(wildpkr_state::unknown_trigger_w));
+	map(0x600004, 0x600004).w(FUNC(wildpkr_state::dac_w));
+	map(0x700000, 0x700001).w(FUNC(wildpkr_state::clock_start_w));
+	map(0x700002, 0x700003).w(FUNC(wildpkr_state::clock_rate_w));
+	map(0x700004, 0x700007).w(FUNC(wildpkr_state::unknown_trigger_w));
 	map(0x70000a, 0x70000b).nopw(); // only writes 0 at POST
 }
 

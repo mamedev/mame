@@ -95,6 +95,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -233,7 +234,7 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 void sanremo_state::sanremo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(sanremo_state::videoram_w)).share("videoram");  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
+	map(0x8000, 0x87ff).ram().w(FUNC(sanremo_state::videoram_w)).share("videoram");  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
 	map(0xc000, 0xc7ff).ram().share("nvram");                               // battery backed UM6116
 }
 
@@ -243,10 +244,10 @@ void sanremo_state::sanremo_portmap(address_map &map)
 	map(0x01, 0x01).portr("IN0");
 	map(0x02, 0x02).portr("IN1");
 	map(0x04, 0x04).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x05, 0x05).w(this, FUNC(sanremo_state::lamps_w));
+	map(0x05, 0x05).w(FUNC(sanremo_state::lamps_w));
 	map(0x14, 0x14).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x17, 0x17).w("ay8910", FUNC(ay8910_device::data_w));
-	map(0x24, 0x24).w(this, FUNC(sanremo_state::banksel_w));
+	map(0x24, 0x24).w(FUNC(sanremo_state::banksel_w));
 	map(0x27, 0x27).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x37, 0x37).w("ay8910", FUNC(ay8910_device::address_w));
 }

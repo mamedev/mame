@@ -17,6 +17,7 @@
 #include "formats/x07_cas.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "rendlay.h"
 
 //default value for user defined keys, taken for official documentation

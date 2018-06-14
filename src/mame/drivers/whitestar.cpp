@@ -72,10 +72,10 @@ void whitestar_state::whitestar_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x3000, 0x3000).portr("DEDICATED");
 	map(0x3100, 0x3100).portr("DSW0");
-	map(0x3200, 0x3200).w(this, FUNC(whitestar_state::bank_w));
-	map(0x3300, 0x3300).w(this, FUNC(whitestar_state::switch_w));
-	map(0x3400, 0x3400).r(this, FUNC(whitestar_state::switch_r));
-	map(0x3600, 0x3600).w(this, FUNC(whitestar_state::dmddata_w));
+	map(0x3200, 0x3200).w(FUNC(whitestar_state::bank_w));
+	map(0x3300, 0x3300).w(FUNC(whitestar_state::switch_w));
+	map(0x3400, 0x3400).r(FUNC(whitestar_state::switch_r));
+	map(0x3600, 0x3600).w(FUNC(whitestar_state::dmddata_w));
 	map(0x3601, 0x3601).rw(m_decodmd, FUNC(decodmd_type2_device::ctrl_r), FUNC(decodmd_type2_device::ctrl_w));
 	map(0x3700, 0x3700).r(m_decodmd, FUNC(decodmd_type2_device::busy_r));
 	map(0x3800, 0x3800).w(DECOBSMT_TAG, FUNC(decobsmt_device::bsmt_comms_w));

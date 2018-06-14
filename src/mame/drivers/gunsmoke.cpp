@@ -114,15 +114,15 @@ void gunsmoke_state::gunsmoke_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc4c9, 0xc4cb).r(this, FUNC(gunsmoke_state::gunsmoke_protection_r));
+	map(0xc4c9, 0xc4cb).r(FUNC(gunsmoke_state::gunsmoke_protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(this, FUNC(gunsmoke_state::gunsmoke_c804_w));  // ROM bank switch, screen flip
+	map(0xc804, 0xc804).w(FUNC(gunsmoke_state::gunsmoke_c804_w));  // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(gunsmoke_state::gunsmoke_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(gunsmoke_state::gunsmoke_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(gunsmoke_state::gunsmoke_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(gunsmoke_state::gunsmoke_colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
 	map(0xd802, 0xd802).ram().share("scrolly");
-	map(0xd806, 0xd806).w(this, FUNC(gunsmoke_state::gunsmoke_d806_w));  // sprites and bg enable
+	map(0xd806, 0xd806).w(FUNC(gunsmoke_state::gunsmoke_d806_w));  // sprites and bg enable
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share("spriteram");
 }

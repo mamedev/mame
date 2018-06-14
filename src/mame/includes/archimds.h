@@ -13,6 +13,7 @@
 #include "sound/dac.h"
 #include "machine/i2cmem.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade

@@ -150,15 +150,15 @@ void eprom_state::main_map(address_map &map)
 	map(0x000000, 0x09ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(this, FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
+	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(this, FUNC(eprom_state::special_port1_r));
-	map(0x260020, 0x260027).mirror(0x8).r(this, FUNC(eprom_state::adc_r)).umask16(0x00ff);
+	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360000, 0x360001).w(this, FUNC(eprom_state::video_int_ack_w));
-	map(0x360010, 0x360011).w(this, FUNC(eprom_state::eprom_latch_w));
+	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
+	map(0x360010, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_base_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_base_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().share("paletteram");
@@ -176,14 +176,14 @@ void eprom_state::guts_map(address_map &map)
 	map(0x000000, 0x09ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(this, FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
+	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(this, FUNC(eprom_state::special_port1_r));
-	map(0x260020, 0x260027).mirror(0x8).r(this, FUNC(eprom_state::adc_r)).umask16(0x00ff);
+	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360000, 0x360001).w(this, FUNC(eprom_state::video_int_ack_w));
+	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
 //  AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
@@ -208,13 +208,13 @@ void eprom_state::extra_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(this, FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<false>)).share("sync_data");
+	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<false>)).share("sync_data");
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(this, FUNC(eprom_state::special_port1_r));
-	map(0x260020, 0x260027).mirror(0x8).r(this, FUNC(eprom_state::adc_r)).umask16(0x00ff);
+	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
-	map(0x360000, 0x360001).w(this, FUNC(eprom_state::video_int_ack_w));
-	map(0x360010, 0x360011).w(this, FUNC(eprom_state::eprom_latch_w));
+	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
+	map(0x360010, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_base_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_base_device::main_command_w));
 }

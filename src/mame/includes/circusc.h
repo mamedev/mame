@@ -9,6 +9,8 @@
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/discrete.h"
+#include "emupal.h"
+
 class circusc_state : public driver_device
 {
 public:

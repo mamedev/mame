@@ -271,8 +271,8 @@ void vixen_state::vixen_mem(address_map &map)
 void vixen_state::bios_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xefff).r(this, FUNC(vixen_state::opram_r));
-	map(0xf000, 0xffff).r(this, FUNC(vixen_state::oprom_r));
+	map(0x0000, 0xefff).r(FUNC(vixen_state::opram_r));
+	map(0xf000, 0xffff).r(FUNC(vixen_state::oprom_r));
 }
 
 
@@ -285,16 +285,16 @@ void vixen_state::vixen_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
-	map(0x04, 0x04).mirror(0x03).rw(this, FUNC(vixen_state::status_r), FUNC(vixen_state::cmd_w));
+	map(0x04, 0x04).mirror(0x03).rw(FUNC(vixen_state::status_r), FUNC(vixen_state::cmd_w));
 	map(0x08, 0x08).mirror(0x01).rw(P8155H_TAG, FUNC(i8155_device::read), FUNC(i8155_device::write));
 	map(0x0c, 0x0d).w(P8155H_TAG, FUNC(i8155_device::ale_w));
 	map(0x10, 0x10).mirror(0x07).r(m_ieee488, FUNC(ieee488_device::dio_r));
-	map(0x18, 0x18).mirror(0x07).r(this, FUNC(vixen_state::ieee488_r));
+	map(0x18, 0x18).mirror(0x07).r(FUNC(vixen_state::ieee488_r));
 	map(0x20, 0x21).mirror(0x04).w(m_io_i8155, FUNC(i8155_device::ale_w));
 	map(0x28, 0x28).mirror(0x05).rw(m_io_i8155, FUNC(i8155_device::read), FUNC(i8155_device::write));
 	map(0x30, 0x30).mirror(0x06).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x31, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x38, 0x38).mirror(0x07).r(this, FUNC(vixen_state::port3_r));
+	map(0x38, 0x38).mirror(0x07).r(FUNC(vixen_state::port3_r));
 //  AM_RANGE(0xf0, 0xff) Hard Disk?
 }
 

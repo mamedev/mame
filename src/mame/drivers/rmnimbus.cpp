@@ -53,16 +53,16 @@ void rmnimbus_state::nimbus_mem(address_map &map)
 
 void rmnimbus_state::nimbus_io(address_map &map)
 {
-	map(0x0000, 0x0031).rw(this, FUNC(rmnimbus_state::nimbus_video_io_r), FUNC(rmnimbus_state::nimbus_video_io_w));
-	map(0x0080, 0x0080).rw(this, FUNC(rmnimbus_state::nimbus_mcu_r), FUNC(rmnimbus_state::nimbus_mcu_w));
-	map(0x0092, 0x0092).rw(this, FUNC(rmnimbus_state::nimbus_iou_r), FUNC(rmnimbus_state::nimbus_iou_w));
-	map(0x00a4, 0x00a4).rw(this, FUNC(rmnimbus_state::nimbus_mouse_js_r), FUNC(rmnimbus_state::nimbus_mouse_js_w));
-	map(0x00c0, 0x00cf).rw(this, FUNC(rmnimbus_state::nimbus_pc8031_r), FUNC(rmnimbus_state::nimbus_pc8031_w)).umask16(0x00ff);
+	map(0x0000, 0x0031).rw(FUNC(rmnimbus_state::nimbus_video_io_r), FUNC(rmnimbus_state::nimbus_video_io_w));
+	map(0x0080, 0x0080).rw(FUNC(rmnimbus_state::nimbus_mcu_r), FUNC(rmnimbus_state::nimbus_mcu_w));
+	map(0x0092, 0x0092).rw(FUNC(rmnimbus_state::nimbus_iou_r), FUNC(rmnimbus_state::nimbus_iou_w));
+	map(0x00a4, 0x00a4).rw(FUNC(rmnimbus_state::nimbus_mouse_js_r), FUNC(rmnimbus_state::nimbus_mouse_js_w));
+	map(0x00c0, 0x00cf).rw(FUNC(rmnimbus_state::nimbus_pc8031_r), FUNC(rmnimbus_state::nimbus_pc8031_w)).umask16(0x00ff);
 	map(0x00e0, 0x00ef).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x00f0, 0x00f7).rw(m_z80sio, FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
-	map(0x0400, 0x0400).w(this, FUNC(rmnimbus_state::fdc_ctl_w));
+	map(0x0400, 0x0400).w(FUNC(rmnimbus_state::fdc_ctl_w));
 	map(0x0408, 0x040f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
-	map(0x0410, 0x041f).rw(this, FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
+	map(0x0410, 0x041f).rw(FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
 	map(0x0480, 0x049f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
 }
 
@@ -102,7 +102,7 @@ void rmnimbus_state::nimbus_iocpu_mem(address_map &map)
 void rmnimbus_state::nimbus_iocpu_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x000FF).rw(this, FUNC(rmnimbus_state::nimbus_pc8031_iou_r), FUNC(rmnimbus_state::nimbus_pc8031_iou_w));
+	map(0x00000, 0x000FF).rw(FUNC(rmnimbus_state::nimbus_pc8031_iou_r), FUNC(rmnimbus_state::nimbus_pc8031_iou_w));
 }
 
 MACHINE_CONFIG_START(rmnimbus_state::nimbus)
@@ -180,10 +180,10 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_RS232_RI_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rib_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
-	MCFG_EEPROM_SERIAL_93C06_ADD(ER59256_TAG)
+	MCFG_DEVICE_ADD(ER59256_TAG, EEPROM_SERIAL_93C06_16BIT)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, rmnimbus_state,nimbus_via_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(MAINCPU_TAG, i80186_cpu_device, int3_w))

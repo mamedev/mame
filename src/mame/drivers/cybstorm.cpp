@@ -87,10 +87,10 @@ void cybstorm_state::main_map(address_map &map)
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f0000, 0x3fffff).m(m_vadbank, FUNC(address_map_bank_device::amap16));
 	map(0x9f0000, 0x9f0003).portr("9F0000");
-	map(0x9f0010, 0x9f0013).r(this, FUNC(cybstorm_state::special_port1_r));
+	map(0x9f0010, 0x9f0013).r(FUNC(cybstorm_state::special_port1_r));
 	map(0x9f0031, 0x9f0031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0x9f0041, 0x9f0041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0x9f0050, 0x9f0053).w(this, FUNC(cybstorm_state::latch_w));
+	map(0x9f0050, 0x9f0053).w(FUNC(cybstorm_state::latch_w));
 	map(0xfb0000, 0xfb0003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0xfc0000, 0xfc0003).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xfd0000, 0xfd0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);

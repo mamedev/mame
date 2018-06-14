@@ -86,6 +86,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -336,21 +337,21 @@ void prestige_state::prestige_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x05).rw(this, FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x04, 0x05).rw(FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 void prestige_state::glcolor_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 /* Input ports */

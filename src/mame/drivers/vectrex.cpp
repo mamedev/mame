@@ -28,7 +28,7 @@ void vectrex_state::vectrex_map(address_map &map)
 {
 	map(0x0000, 0x7fff).noprw(); // cart area, handled at machine_start
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(this, FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -199,9 +199,9 @@ void raaspec_state::raaspec_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xa000).w(this, FUNC(raaspec_state::raaspec_led_w));
+	map(0xa000, 0xa000).w(FUNC(raaspec_state::raaspec_led_w));
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(this, FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
 	map(0xe000, 0xffff).rom();
 }
 

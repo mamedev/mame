@@ -52,6 +52,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -204,20 +205,20 @@ READ8_MEMBER(mole_state::mole_protection_r)
 void mole_state::mole_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0800, 0x08ff).r(this, FUNC(mole_state::mole_protection_r));
+	map(0x0800, 0x08ff).r(FUNC(mole_state::mole_protection_r));
 	map(0x0800, 0x0800).nopw(); // ???
 	map(0x0820, 0x0820).nopw(); // ???
 	map(0x5000, 0x7fff).mirror(0x8000).rom();
-	map(0x8000, 0x83ff).w(this, FUNC(mole_state::mole_tileram_w)).nopr();
-	map(0x8400, 0x8400).w(this, FUNC(mole_state::mole_tilebank_w));
+	map(0x8000, 0x83ff).w(FUNC(mole_state::mole_tileram_w)).nopr();
+	map(0x8400, 0x8400).w(FUNC(mole_state::mole_tilebank_w));
 	map(0x8c00, 0x8c01).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x8c40, 0x8c40).nopw(); // ???
 	map(0x8c80, 0x8c80).nopw(); // ???
 	map(0x8c81, 0x8c81).nopw(); // ???
-	map(0x8d00, 0x8d00).portr("DSW").w(this, FUNC(mole_state::mole_irqack_w));
+	map(0x8d00, 0x8d00).portr("DSW").w(FUNC(mole_state::mole_irqack_w));
 	map(0x8d40, 0x8d40).portr("IN0");
 	map(0x8d80, 0x8d80).portr("IN1");
-	map(0x8dc0, 0x8dc0).portr("IN2").w(this, FUNC(mole_state::mole_flipscreen_w));
+	map(0x8dc0, 0x8dc0).portr("IN2").w(FUNC(mole_state::mole_flipscreen_w));
 }
 
 

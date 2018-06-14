@@ -70,7 +70,7 @@ void stargame_state::audiocpu_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4001).mirror(0x3ffe).rw("mea8000", FUNC(mea8000_device::read), FUNC(mea8000_device::write));
 	map(0x8000, 0x87ff).mirror(0x3800).ram();
-	map(0xc000, 0xdfff).w(this, FUNC(stargame_state::rint_w)); // RINT - turn off interrupt of the audiocpu
+	map(0xc000, 0xdfff).w(FUNC(stargame_state::rint_w)); // RINT - turn off interrupt of the audiocpu
 	map(0xe000, 0xffff).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w)); // COMAND - acknowledge NMI and read the sound command
 }
 

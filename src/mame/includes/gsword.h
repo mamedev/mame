@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class gsword_state_base : public driver_device
 {

@@ -263,19 +263,19 @@ WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
 
 void pacland_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(pacland_state::videoram_w)).share("videoram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(pacland_state::videoram2_w)).share("videoram2");
+	map(0x0000, 0x0fff).ram().w(FUNC(pacland_state::videoram_w)).share("videoram");
+	map(0x1000, 0x1fff).ram().w(FUNC(pacland_state::videoram2_w)).share("videoram2");
 	map(0x2000, 0x37ff).ram().share("spriteram");
-	map(0x3800, 0x3801).w(this, FUNC(pacland_state::scroll0_w));
-	map(0x3a00, 0x3a01).w(this, FUNC(pacland_state::scroll1_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(pacland_state::bankswitch_w));
+	map(0x3800, 0x3801).w(FUNC(pacland_state::scroll0_w));
+	map(0x3a00, 0x3a01).w(FUNC(pacland_state::scroll1_w));
+	map(0x3c00, 0x3c00).w(FUNC(pacland_state::bankswitch_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
-	map(0x7000, 0x7fff).w(this, FUNC(pacland_state::irq_1_ctrl_w));
+	map(0x7000, 0x7fff).w(FUNC(pacland_state::irq_1_ctrl_w));
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x8fff).w(this, FUNC(pacland_state::subreset_w));
-	map(0x9000, 0x9fff).w(this, FUNC(pacland_state::flipscreen_w));
+	map(0x8000, 0x8fff).w(FUNC(pacland_state::subreset_w));
+	map(0x9000, 0x9fff).w(FUNC(pacland_state::flipscreen_w));
 }
 
 void pacland_state::mcu_map(address_map &map)
@@ -284,10 +284,10 @@ void pacland_state::mcu_map(address_map &map)
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
-	map(0x4000, 0x7fff).w(this, FUNC(pacland_state::irq_2_ctrl_w));
+	map(0x4000, 0x7fff).w(FUNC(pacland_state::irq_2_ctrl_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd003).r(this, FUNC(pacland_state::input_r));
+	map(0xd000, 0xd003).r(FUNC(pacland_state::input_r));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -300,9 +300,9 @@ READ8_MEMBER(pacland_state::readFF)
 void pacland_state::mcu_port_map(address_map &map)
 {
 	map(M6801_PORT1, M6801_PORT1).portr("IN2");
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(pacland_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(pacland_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(pacland_state::led_w));
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(pacland_state::coin_w));
+	map(M6801_PORT2, M6801_PORT2).r(FUNC(pacland_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT2, M6801_PORT2).w(FUNC(pacland_state::led_w));
 }
 
 

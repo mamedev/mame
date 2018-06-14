@@ -204,12 +204,12 @@ as well as PA0 (ST1), PA2 (ST2) and PA3 (ADB /INT)
 void lwriter_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x1fffff).rw(this, FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
+	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//AM_RANGE(0x300000, 0x3fffff) // open bus?
 	map(0x400000, 0x5fffff).ram().region("dram", 0).mirror(0x200000); // 2MB DRAM
-	map(0x800000, 0x800000).w(this, FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
-	map(0x800001, 0x800001).w(this, FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
 	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
 	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);

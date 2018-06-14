@@ -51,108 +51,108 @@ DEFINE_DEVICE_TYPE(TC8566AF,       tc8566af_device,       "tc8566af",       "Tos
 
 void upd765a_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(upd765a_device::msr_r));
-	map(0x1, 0x1).rw(this, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0x0, 0x0).r(FUNC(upd765a_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 }
 
 void upd765b_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(upd765b_device::msr_r));
-	map(0x1, 0x1).rw(this, FUNC(upd765b_device::fifo_r), FUNC(upd765b_device::fifo_w));
+	map(0x0, 0x0).r(FUNC(upd765b_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(upd765b_device::fifo_r), FUNC(upd765b_device::fifo_w));
 }
 
 void i8272a_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(i8272a_device::msr_r));
-	map(0x1, 0x1).rw(this, FUNC(i8272a_device::fifo_r), FUNC(i8272a_device::fifo_w));
+	map(0x0, 0x0).r(FUNC(i8272a_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(i8272a_device::fifo_r), FUNC(i8272a_device::fifo_w));
 }
 
 void upd72065_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(upd72065_device::msr_r));
-	map(0x1, 0x1).rw(this, FUNC(upd72065_device::fifo_r), FUNC(upd72065_device::fifo_w));
+	map(0x0, 0x0).r(FUNC(upd72065_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(upd72065_device::fifo_r), FUNC(upd72065_device::fifo_w));
 }
 
 void i82072_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(i82072_device::msr_r), FUNC(i82072_device::dsr_w));
-	map(0x1, 0x1).rw(this, FUNC(i82072_device::fifo_r), FUNC(i82072_device::fifo_w));
+	map(0x0, 0x0).rw(FUNC(i82072_device::msr_r), FUNC(i82072_device::dsr_w));
+	map(0x1, 0x1).rw(FUNC(i82072_device::fifo_r), FUNC(i82072_device::fifo_w));
 }
 
 void smc37c78_device::map(address_map &map)
 {
-	map(0x2, 0x2).rw(this, FUNC(smc37c78_device::dor_r), FUNC(smc37c78_device::dor_w));
-	map(0x3, 0x3).rw(this, FUNC(smc37c78_device::tdr_r), FUNC(smc37c78_device::tdr_w));
-	map(0x4, 0x4).rw(this, FUNC(smc37c78_device::msr_r), FUNC(smc37c78_device::dsr_w));
-	map(0x5, 0x5).rw(this, FUNC(smc37c78_device::fifo_r), FUNC(smc37c78_device::fifo_w));
-	map(0x7, 0x7).rw(this, FUNC(smc37c78_device::dir_r), FUNC(smc37c78_device::ccr_w));
+	map(0x2, 0x2).rw(FUNC(smc37c78_device::dor_r), FUNC(smc37c78_device::dor_w));
+	map(0x3, 0x3).rw(FUNC(smc37c78_device::tdr_r), FUNC(smc37c78_device::tdr_w));
+	map(0x4, 0x4).rw(FUNC(smc37c78_device::msr_r), FUNC(smc37c78_device::dsr_w));
+	map(0x5, 0x5).rw(FUNC(smc37c78_device::fifo_r), FUNC(smc37c78_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(smc37c78_device::dir_r), FUNC(smc37c78_device::ccr_w));
 }
 
 void n82077aa_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(n82077aa_device::sra_r));
-	map(0x1, 0x1).r(this, FUNC(n82077aa_device::srb_r));
-	map(0x2, 0x2).rw(this, FUNC(n82077aa_device::dor_r), FUNC(n82077aa_device::dor_w));
-	map(0x3, 0x3).rw(this, FUNC(n82077aa_device::tdr_r), FUNC(n82077aa_device::tdr_w));
-	map(0x4, 0x4).rw(this, FUNC(n82077aa_device::msr_r), FUNC(n82077aa_device::dsr_w));
-	map(0x5, 0x5).rw(this, FUNC(n82077aa_device::fifo_r), FUNC(n82077aa_device::fifo_w));
-	map(0x7, 0x7).rw(this, FUNC(n82077aa_device::dir_r), FUNC(n82077aa_device::ccr_w));
+	map(0x0, 0x0).r(FUNC(n82077aa_device::sra_r));
+	map(0x1, 0x1).r(FUNC(n82077aa_device::srb_r));
+	map(0x2, 0x2).rw(FUNC(n82077aa_device::dor_r), FUNC(n82077aa_device::dor_w));
+	map(0x3, 0x3).rw(FUNC(n82077aa_device::tdr_r), FUNC(n82077aa_device::tdr_w));
+	map(0x4, 0x4).rw(FUNC(n82077aa_device::msr_r), FUNC(n82077aa_device::dsr_w));
+	map(0x5, 0x5).rw(FUNC(n82077aa_device::fifo_r), FUNC(n82077aa_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(n82077aa_device::dir_r), FUNC(n82077aa_device::ccr_w));
 }
 
 void pc_fdc_superio_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(pc_fdc_superio_device::sra_r));
-	map(0x1, 0x1).r(this, FUNC(pc_fdc_superio_device::srb_r));
-	map(0x2, 0x2).rw(this, FUNC(pc_fdc_superio_device::dor_r), FUNC(pc_fdc_superio_device::dor_w));
-	map(0x3, 0x3).rw(this, FUNC(pc_fdc_superio_device::tdr_r), FUNC(pc_fdc_superio_device::tdr_w));
-	map(0x4, 0x4).rw(this, FUNC(pc_fdc_superio_device::msr_r), FUNC(pc_fdc_superio_device::dsr_w));
-	map(0x5, 0x5).rw(this, FUNC(pc_fdc_superio_device::fifo_r), FUNC(pc_fdc_superio_device::fifo_w));
-	map(0x7, 0x7).rw(this, FUNC(pc_fdc_superio_device::dir_r), FUNC(pc_fdc_superio_device::ccr_w));
+	map(0x0, 0x0).r(FUNC(pc_fdc_superio_device::sra_r));
+	map(0x1, 0x1).r(FUNC(pc_fdc_superio_device::srb_r));
+	map(0x2, 0x2).rw(FUNC(pc_fdc_superio_device::dor_r), FUNC(pc_fdc_superio_device::dor_w));
+	map(0x3, 0x3).rw(FUNC(pc_fdc_superio_device::tdr_r), FUNC(pc_fdc_superio_device::tdr_w));
+	map(0x4, 0x4).rw(FUNC(pc_fdc_superio_device::msr_r), FUNC(pc_fdc_superio_device::dsr_w));
+	map(0x5, 0x5).rw(FUNC(pc_fdc_superio_device::fifo_r), FUNC(pc_fdc_superio_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(pc_fdc_superio_device::dir_r), FUNC(pc_fdc_superio_device::ccr_w));
 }
 
 void dp8473_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(dp8473_device::sra_r));
-	map(0x1, 0x1).r(this, FUNC(dp8473_device::srb_r));
-	map(0x2, 0x2).rw(this, FUNC(dp8473_device::dor_r), FUNC(dp8473_device::dor_w));
-	map(0x3, 0x3).rw(this, FUNC(dp8473_device::tdr_r), FUNC(dp8473_device::tdr_w));
-	map(0x4, 0x4).rw(this, FUNC(dp8473_device::msr_r), FUNC(dp8473_device::dsr_w));
-	map(0x5, 0x5).rw(this, FUNC(dp8473_device::fifo_r), FUNC(dp8473_device::fifo_w));
-	map(0x7, 0x7).rw(this, FUNC(dp8473_device::dir_r), FUNC(dp8473_device::ccr_w));
+	map(0x0, 0x0).r(FUNC(dp8473_device::sra_r));
+	map(0x1, 0x1).r(FUNC(dp8473_device::srb_r));
+	map(0x2, 0x2).rw(FUNC(dp8473_device::dor_r), FUNC(dp8473_device::dor_w));
+	map(0x3, 0x3).rw(FUNC(dp8473_device::tdr_r), FUNC(dp8473_device::tdr_w));
+	map(0x4, 0x4).rw(FUNC(dp8473_device::msr_r), FUNC(dp8473_device::dsr_w));
+	map(0x5, 0x5).rw(FUNC(dp8473_device::fifo_r), FUNC(dp8473_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(dp8473_device::dir_r), FUNC(dp8473_device::ccr_w));
 }
 
 void pc8477a_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(pc8477a_device::sra_r));
-	map(0x1, 0x1).r(this, FUNC(pc8477a_device::srb_r));
-	map(0x2, 0x2).rw(this, FUNC(pc8477a_device::dor_r), FUNC(pc8477a_device::dor_w));
-	map(0x3, 0x3).rw(this, FUNC(pc8477a_device::tdr_r), FUNC(pc8477a_device::tdr_w));
-	map(0x4, 0x4).rw(this, FUNC(pc8477a_device::msr_r), FUNC(pc8477a_device::dsr_w));
-	map(0x5, 0x5).rw(this, FUNC(pc8477a_device::fifo_r), FUNC(pc8477a_device::fifo_w));
-	map(0x7, 0x7).rw(this, FUNC(pc8477a_device::dir_r), FUNC(pc8477a_device::ccr_w));
+	map(0x0, 0x0).r(FUNC(pc8477a_device::sra_r));
+	map(0x1, 0x1).r(FUNC(pc8477a_device::srb_r));
+	map(0x2, 0x2).rw(FUNC(pc8477a_device::dor_r), FUNC(pc8477a_device::dor_w));
+	map(0x3, 0x3).rw(FUNC(pc8477a_device::tdr_r), FUNC(pc8477a_device::tdr_w));
+	map(0x4, 0x4).rw(FUNC(pc8477a_device::msr_r), FUNC(pc8477a_device::dsr_w));
+	map(0x5, 0x5).rw(FUNC(pc8477a_device::fifo_r), FUNC(pc8477a_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(pc8477a_device::dir_r), FUNC(pc8477a_device::ccr_w));
 }
 
 void wd37c65c_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(wd37c65c_device::msr_r));
-	map(0x1, 0x1).rw(this, FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
+	map(0x0, 0x0).r(FUNC(wd37c65c_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
 }
 
 void mcs3201_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(mcs3201_device::input_r));
-	map(0x2, 0x2).w(this, FUNC(mcs3201_device::dor_w));
-	map(0x4, 0x4).r(this, FUNC(mcs3201_device::msr_r));
-	map(0x5, 0x5).rw(this, FUNC(mcs3201_device::fifo_r), FUNC(mcs3201_device::fifo_w));
-	map(0x7, 0x7).rw(this, FUNC(mcs3201_device::dir_r), FUNC(mcs3201_device::ccr_w));
+	map(0x0, 0x0).r(FUNC(mcs3201_device::input_r));
+	map(0x2, 0x2).w(FUNC(mcs3201_device::dor_w));
+	map(0x4, 0x4).r(FUNC(mcs3201_device::msr_r));
+	map(0x5, 0x5).rw(FUNC(mcs3201_device::fifo_r), FUNC(mcs3201_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(mcs3201_device::dir_r), FUNC(mcs3201_device::ccr_w));
 }
 
 void tc8566af_device::map(address_map &map)
 {
-	map(0x2, 0x2).w(this, FUNC(tc8566af_device::dor_w));
-	map(0x3, 0x3).w(this, FUNC(tc8566af_device::cr1_w));
-	map(0x4, 0x4).r(this, FUNC(tc8566af_device::msr_r));
-	map(0x5, 0x5).rw(this, FUNC(tc8566af_device::fifo_r), FUNC(tc8566af_device::fifo_w));
+	map(0x2, 0x2).w(FUNC(tc8566af_device::dor_w));
+	map(0x3, 0x3).w(FUNC(tc8566af_device::cr1_w));
+	map(0x4, 0x4).r(FUNC(tc8566af_device::msr_r));
+	map(0x5, 0x5).rw(FUNC(tc8566af_device::fifo_r), FUNC(tc8566af_device::fifo_w));
 }
 
 
@@ -398,10 +398,10 @@ WRITE8_MEMBER(upd765_family_device::tdr_w)
 
 READ8_MEMBER(upd765_family_device::msr_r)
 {
-	return msr_r();
+	return read_msr();
 }
 
-uint8_t upd765_family_device::msr_r()
+uint8_t upd765_family_device::read_msr()
 {
 	uint32_t msr = 0;
 	switch(main_phase) {
@@ -453,19 +453,14 @@ void upd765_family_device::set_rate(int rate)
 	cur_rate = rate;
 }
 
-READ8_MEMBER(upd765_family_device::fifo_r)
-{
-	return fifo_r();
-}
-
-uint8_t upd765_family_device::fifo_r()
+uint8_t upd765_family_device::read_fifo()
 {
 	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
 		if(internal_drq)
 			return fifo_pop(false);
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("read_fifo in phase %d\n", main_phase);
 		break;
 
 	case PHASE_RESULT:
@@ -482,19 +477,14 @@ uint8_t upd765_family_device::fifo_r()
 		}
 		break;
 	default:
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("read_fifo in phase %d\n", main_phase);
 		break;
 	}
 
 	return r;
 }
 
-WRITE8_MEMBER(upd765_family_device::fifo_w)
-{
-	fifo_w(data);
-}
-
-void upd765_family_device::fifo_w(uint8_t data)
+void upd765_family_device::write_fifo(uint8_t data)
 {
 	switch(main_phase) {
 	case PHASE_CMD: {
@@ -520,11 +510,11 @@ void upd765_family_device::fifo_w(uint8_t data)
 			fifo_push(data, false);
 			return;
 		}
-		LOGFIFO("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("write_fifo in phase %d\n", main_phase);
 		break;
 
 	default:
-		LOGFIFO("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("write_fifo in phase %d\n", main_phase);
 		break;
 	}
 }

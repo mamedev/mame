@@ -354,6 +354,7 @@ Super Missile Attack Board Layout
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -954,13 +955,13 @@ READ8_MEMBER(missile_state::bootleg_r)
 /* complete memory map derived from schematics (implemented above) */
 void missile_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
 }
 
 /* adjusted from the above to get the bootlegs to boot */
 void missile_state::bootleg_main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
 }
 
 /*************************************

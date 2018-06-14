@@ -90,4 +90,18 @@ inline void device_t::logerror(Format &&fmt, Params &&... args) const
 	}
 }
 
+template <typename T, typename Ret, typename... Params>
+inline std::enable_if_t<device_memory_interface::is_related_class<device_t, T>::value> device_memory_interface::set_addrmap(int spacenum, Ret (T::*func)(Params... args))
+{
+	device_t &dev(device().mconfig().current_device());
+	set_addrmap(spacenum, address_map_constructor(func, dev.tag(), &downcast<T &>(dev)));
+}
+
+template <typename T, typename Ret, typename... Params>
+inline std::enable_if_t<!device_memory_interface::is_related_class<device_t, T>::value> device_memory_interface::set_addrmap(int spacenum, Ret (T::*func)(Params... args))
+{
+	device_t &dev(device().mconfig().current_device());
+	set_addrmap(spacenum, address_map_constructor(func, dev.tag(), &dynamic_cast<T &>(dev)));
+}
+
 #endif // MAME_EMU_DEVICE_IPP

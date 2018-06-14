@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -101,8 +102,8 @@ void plan80_state::plan80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).r(this, FUNC(plan80_state::plan80_04_r));
-	map(0x09, 0x09).w(this, FUNC(plan80_state::plan80_09_w));
+	map(0x04, 0x04).r(FUNC(plan80_state::plan80_04_r));
+	map(0x09, 0x09).w(FUNC(plan80_state::plan80_09_w));
 }
 
 /* Input ports */

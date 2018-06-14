@@ -140,13 +140,13 @@ READ8_MEMBER(targeth_state::shareram_r)
 
 void targeth_state::mcu_hostmem_map(address_map &map)
 {
-	map(0x8000, 0xffff).rw(this, FUNC(targeth_state::shareram_r), FUNC(targeth_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+	map(0x8000, 0xffff).rw(FUNC(targeth_state::shareram_r), FUNC(targeth_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
 }
 
 void targeth_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x103fff).ram().w(this, FUNC(targeth_state::vram_w)).share("videoram");  /* Video RAM */
+	map(0x100000, 0x103fff).ram().w(FUNC(targeth_state::vram_w)).share("videoram");  /* Video RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs"); /* Video Registers */
 	map(0x108000, 0x108001).portr("GUNX1");
 	map(0x108002, 0x108003).portr("GUNY1");
@@ -160,8 +160,8 @@ void targeth_state::main_map(address_map &map)
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700006, 0x700007).portr("SYSTEM");             /* Coins, Start & Fire buttons */
 	map(0x700008, 0x700009).portr("SERVICE");            /* Service & Guns Reload? */
-	map(0x70000a, 0x70000b).select(0x000070).w(this, FUNC(targeth_state::output_latch_w));
-	map(0x70000c, 0x70000d).w(this, FUNC(targeth_state::OKIM6295_bankswitch_w));    /* OKI6295 bankswitch */
+	map(0x70000a, 0x70000b).select(0x000070).w(FUNC(targeth_state::output_latch_w));
+	map(0x70000c, 0x70000d).w(FUNC(targeth_state::OKIM6295_bankswitch_w));    /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status register */
 	map(0x700010, 0x700011).nopw();                        /* ??? Guns reload related? */
 	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */

@@ -473,7 +473,7 @@ WRITE_LINE_MEMBER(hp9895_device::phi_ren_w)
 
 READ8_MEMBER(hp9895_device::phi_dio_r)
 {
-	return m_bus->dio_r();
+	return m_bus->read_dio();
 }
 
 WRITE8_MEMBER(hp9895_device::phi_dio_w)
@@ -858,15 +858,15 @@ void hp9895_device::z80_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x10, 0x17).w("phi", FUNC(phi_device::reg8_w)).r(this, FUNC(hp9895_device::phi_reg_r));
-	map(0x60, 0x60).rw(this, FUNC(hp9895_device::data_r), FUNC(hp9895_device::data_w));
-	map(0x61, 0x61).rw(this, FUNC(hp9895_device::clock_r), FUNC(hp9895_device::clock_w));
-	map(0x62, 0x62).rw(this, FUNC(hp9895_device::drivstat_r), FUNC(hp9895_device::reset_w));
-	map(0x63, 0x63).rw(this, FUNC(hp9895_device::switches_r), FUNC(hp9895_device::leds_w));
-	map(0x64, 0x64).w(this, FUNC(hp9895_device::cntl_w));
-	map(0x65, 0x65).w(this, FUNC(hp9895_device::drv_w));
-	map(0x66, 0x66).w(this, FUNC(hp9895_device::xv_w));
-	map(0x67, 0x67).r(this, FUNC(hp9895_device::switches2_r));
+	map(0x10, 0x17).w("phi", FUNC(phi_device::reg8_w)).r(FUNC(hp9895_device::phi_reg_r));
+	map(0x60, 0x60).rw(FUNC(hp9895_device::data_r), FUNC(hp9895_device::data_w));
+	map(0x61, 0x61).rw(FUNC(hp9895_device::clock_r), FUNC(hp9895_device::clock_w));
+	map(0x62, 0x62).rw(FUNC(hp9895_device::drivstat_r), FUNC(hp9895_device::reset_w));
+	map(0x63, 0x63).rw(FUNC(hp9895_device::switches_r), FUNC(hp9895_device::leds_w));
+	map(0x64, 0x64).w(FUNC(hp9895_device::cntl_w));
+	map(0x65, 0x65).w(FUNC(hp9895_device::drv_w));
+	map(0x66, 0x66).w(FUNC(hp9895_device::xv_w));
+	map(0x67, 0x67).r(FUNC(hp9895_device::switches2_r));
 }
 
 static void hp9895_floppies(device_slot_interface &device)

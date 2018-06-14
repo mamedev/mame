@@ -92,10 +92,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_EMUPAL_H
 #define MAME_EMU_EMUPAL_H
 
@@ -174,8 +170,8 @@
 //**************************************************************************
 
 #define MCFG_PALETTE_ADD(_tag, _entries) \
-	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
-	MCFG_PALETTE_ENTRIES(_entries)
+	MCFG_DEVICE_ADD(_tag, PALETTE, _entries)
+
 #define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
 	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
@@ -289,6 +285,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class palette_device;
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
 
@@ -364,7 +361,7 @@ class palette_device : public device_t, public device_palette_interface
 {
 public:
 	// construction/destruction
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 entries);
 
 	// configuration
 	template <typename Object> void set_init(Object &&init) { m_init = std::forward<Object>(init); }

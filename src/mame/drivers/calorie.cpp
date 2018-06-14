@@ -84,6 +84,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/segacrp2_device.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,14 +270,14 @@ void calorie_state::calorie_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().share("ram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(calorie_state::fg_ram_w)).share("fg_ram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(calorie_state::fg_ram_w)).share("fg_ram");
 	map(0xd800, 0xdbff).ram().share("sprites");
 	map(0xdc00, 0xdcff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xde00).w(this, FUNC(calorie_state::bg_bank_w));
+	map(0xde00, 0xde00).w(FUNC(calorie_state::bg_bank_w));
 	map(0xf000, 0xf000).portr("P1");
 	map(0xf001, 0xf001).portr("P2");
 	map(0xf002, 0xf002).portr("SYSTEM");
-	map(0xf004, 0xf004).portr("DSW1").w(this, FUNC(calorie_state::calorie_flipscreen_w));
+	map(0xf004, 0xf004).portr("DSW1").w(FUNC(calorie_state::calorie_flipscreen_w));
 	map(0xf005, 0xf005).portr("DSW2");
 	map(0xf800, 0xf800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
@@ -292,14 +293,14 @@ void calorie_state::calorie_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xc000, 0xc000).r(this, FUNC(calorie_state::calorie_soundlatch_r));
+	map(0xc000, 0xc000).r(FUNC(calorie_state::calorie_soundlatch_r));
 }
 
 void calorie_state::calorie_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	// 3rd ?
-	map(0x00, 0xff).w(this, FUNC(calorie_state::bogus_w));
+	map(0x00, 0xff).w(FUNC(calorie_state::bogus_w));
 
 	map(0x00, 0x01).w("ay1", FUNC(ym2149_device::address_data_w));
 	map(0x01, 0x01).r("ay1", FUNC(ym2149_device::data_r));

@@ -59,8 +59,8 @@ void hyperspt_state::common_map(address_map &map)
 	map(0x1600, 0x1600).portr("DSW2");
 	map(0x1680, 0x1680).portr("SYSTEM");
 	map(0x1683, 0x1683).portr("DSW1");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(hyperspt_state::videoram_w)).share("videoram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(hyperspt_state::colorram_w)).share("colorram");
+	map(0x2000, 0x27ff).ram().w(FUNC(hyperspt_state::videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(hyperspt_state::colorram_w)).share("colorram");
 	map(0x3000, 0x37ff).ram();
 	map(0x3800, 0x3fff).ram().share("nvram");
 	map(0x4000, 0xffff).rom();
@@ -86,9 +86,9 @@ void hyperspt_state::common_sound_map(address_map &map)
 	map(0x4000, 0x4fff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).r(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
-	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::write));
-	map(0xe001, 0xe001).w(this, FUNC(hyperspt_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
-	map(0xe002, 0xe002).w(this, FUNC(hyperspt_state::konami_SN76496_w));  /* This address triggers the SN chip to read the data port. */
+	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0xe001, 0xe001).w(FUNC(hyperspt_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
+	map(0xe002, 0xe002).w(FUNC(hyperspt_state::konami_SN76496_w));  /* This address triggers the SN chip to read the data port. */
 }
 
 void hyperspt_state::hyperspt_sound_map(address_map &map)

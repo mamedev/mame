@@ -30,6 +30,7 @@
 #include "machine/z80sio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -337,16 +338,16 @@ void apricot_state::apricot_io(address_map &map)
 	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x40, 0x47).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x48, 0x4f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x50, 0x50).mirror(0x06).w("ic7", FUNC(sn76489_device::write));
+	map(0x50, 0x50).mirror(0x06).w("ic7", FUNC(sn76489_device::command_w));
 	map(0x58, 0x5f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x60, 0x60).r(this, FUNC(apricot_state::sio_da_r)).w(m_sio, FUNC(z80sio_device::da_w)).umask16(0x00ff);
-	map(0x62, 0x62).r(this, FUNC(apricot_state::sio_ca_r)).w(m_sio, FUNC(z80sio_device::ca_w)).umask16(0x00ff);
-	map(0x64, 0x64).r(this, FUNC(apricot_state::sio_db_r)).w(m_sio, FUNC(z80sio_device::db_w)).umask16(0x00ff);
-	map(0x66, 0x66).r(this, FUNC(apricot_state::sio_cb_r)).w(m_sio, FUNC(z80sio_device::cb_w)).umask16(0x00ff);
+	map(0x60, 0x60).r(FUNC(apricot_state::sio_da_r)).w(m_sio, FUNC(z80sio_device::da_w)).umask16(0x00ff);
+	map(0x62, 0x62).r(FUNC(apricot_state::sio_ca_r)).w(m_sio, FUNC(z80sio_device::ca_w)).umask16(0x00ff);
+	map(0x64, 0x64).r(FUNC(apricot_state::sio_db_r)).w(m_sio, FUNC(z80sio_device::db_w)).umask16(0x00ff);
+	map(0x66, 0x66).r(FUNC(apricot_state::sio_cb_r)).w(m_sio, FUNC(z80sio_device::cb_w)).umask16(0x00ff);
 	map(0x68, 0x68).mirror(0x04).w(m_crtc, FUNC(hd6845_device::address_w));
 	map(0x6a, 0x6a).mirror(0x04).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0x70, 0x70).mirror(0x04).w(this, FUNC(apricot_state::i8089_ca1_w));
-	map(0x72, 0x72).mirror(0x04).w(this, FUNC(apricot_state::i8089_ca2_w));
+	map(0x70, 0x70).mirror(0x04).w(FUNC(apricot_state::i8089_ca1_w));
+	map(0x72, 0x72).mirror(0x04).w(FUNC(apricot_state::i8089_ca2_w));
 	map(0x78, 0x7f).noprw(); // unavailable
 }
 
@@ -397,8 +398,8 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	// devices
 	MCFG_DEVICE_ADD("ic17", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("cent_data_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTA_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, apricot_state, i8255_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, apricot_state, i8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, apricot_state, i8255_portc_w))

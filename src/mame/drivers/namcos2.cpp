@@ -597,10 +597,10 @@ READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
 void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 {
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
-	map(0x400000, 0x41ffff).rw(this, FUNC(namcos2_state::c123_tilemap_videoram_r), FUNC(namcos2_state::c123_tilemap_videoram_w));
-	map(0x420000, 0x42003f).rw(this, FUNC(namcos2_state::c123_tilemap_control_r), FUNC(namcos2_state::c123_tilemap_control_w));
-	map(0x440000, 0x44ffff).rw(this, FUNC(namcos2_state::paletteram_word_r), FUNC(namcos2_state::paletteram_word_w)).share("paletteram");
-	map(0x460000, 0x460fff).mirror(0xf000).rw(this, FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
+	map(0x400000, 0x41ffff).rw(FUNC(namcos2_state::c123_tilemap_videoram_r), FUNC(namcos2_state::c123_tilemap_videoram_w));
+	map(0x420000, 0x42003f).rw(FUNC(namcos2_state::c123_tilemap_control_r), FUNC(namcos2_state::c123_tilemap_control_w));
+	map(0x440000, 0x44ffff).rw(FUNC(namcos2_state::paletteram_word_r), FUNC(namcos2_state::paletteram_word_w)).share("paletteram");
+	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
@@ -611,10 +611,10 @@ void namcos2_state::common_default_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0xc00000, 0xc03fff).ram().share("spriteram");
-	map(0xc40000, 0xc40001).rw(this, FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
-	map(0xc80000, 0xc9ffff).ram().w(this, FUNC(namcos2_state::rozram_word_w)).share("rozram");
+	map(0xc40000, 0xc40001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
+	map(0xc80000, 0xc9ffff).ram().w(FUNC(namcos2_state::rozram_word_w)).share("rozram");
 	map(0xcc0000, 0xcc000f).ram().share("rozctrl");
-	map(0xd00000, 0xd0000f).rw(this, FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
+	map(0xd00000, 0xd0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
 void namcos2_state::master_default_am(address_map &map)
@@ -622,7 +622,7 @@ void namcos2_state::master_default_am(address_map &map)
 	common_default_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).bankrw(NAMCOS2_68K_MASTER_RAM);
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -640,9 +640,9 @@ void namcos2_state::slave_default_am(address_map &map)
 void namcos2_state::common_finallap_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0x300000, 0x33ffff).r(this, FUNC(namcos2_state::namcos2_finallap_prot_r));
+	map(0x300000, 0x33ffff).r(FUNC(namcos2_state::namcos2_finallap_prot_r));
 	map(0x800000, 0x80ffff).ram().share("spriteram");
-	map(0x840000, 0x840001).rw(this, FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
+	map(0x840000, 0x840001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
 	map(0x880000, 0x89ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
 	map(0x8c0000, 0x8c0001).nopw();
 }
@@ -652,7 +652,7 @@ void namcos2_state::master_finallap_am(address_map &map)
 	common_finallap_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).bankrw(NAMCOS2_68K_MASTER_RAM);
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -669,9 +669,9 @@ void namcos2_state::slave_finallap_am(address_map &map)
 void namcos2_state::common_sgunner_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0x800000, 0x8141ff).rw(this, FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
+	map(0x800000, 0x8141ff).rw(FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
 	map(0x818000, 0x818001).nopw();
-	map(0xa00000, 0xa0000f).rw(this, FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
+	map(0xa00000, 0xa0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
 void namcos2_state::master_sgunner_am(address_map &map)
@@ -679,7 +679,7 @@ void namcos2_state::master_sgunner_am(address_map &map)
 	common_sgunner_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).bankrw(NAMCOS2_68K_MASTER_RAM);
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -697,9 +697,9 @@ void namcos2_state::common_metlhawk_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0xc00000, 0xc03fff).ram().share("spriteram");
-	map(0xc40000, 0xc4ffff).rw(this, FUNC(namcos2_state::c169_roz_videoram_r), FUNC(namcos2_state::c169_roz_videoram_w)).share("rozvideoram");
-	map(0xd00000, 0xd0001f).rw(this, FUNC(namcos2_state::c169_roz_control_r), FUNC(namcos2_state::c169_roz_control_w));
-	map(0xe00000, 0xe00001).rw(this, FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w)); /* ??? */
+	map(0xc40000, 0xc4ffff).rw(FUNC(namcos2_state::c169_roz_videoram_r), FUNC(namcos2_state::c169_roz_videoram_w)).share("rozvideoram");
+	map(0xd00000, 0xd0001f).rw(FUNC(namcos2_state::c169_roz_control_r), FUNC(namcos2_state::c169_roz_control_w));
+	map(0xe00000, 0xe00001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w)); /* ??? */
 }
 
 void namcos2_state::master_metlhawk_am(address_map &map)
@@ -707,7 +707,7 @@ void namcos2_state::master_metlhawk_am(address_map &map)
 	common_metlhawk_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).bankrw(NAMCOS2_68K_MASTER_RAM);
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -724,15 +724,15 @@ void namcos2_state::slave_metlhawk_am(address_map &map)
 void namcos2_state::common_luckywld_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0x800000, 0x8141ff).rw(this, FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
+	map(0x800000, 0x8141ff).rw(FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
 	map(0x818000, 0x818001).noprw(); /* enable? */
 	map(0x81a000, 0x81a001).nopw(); /* enable? */
 	map(0x840000, 0x840001).nopr();
-	map(0x900000, 0x900007).rw(this, FUNC(namcos2_state::c355_obj_position_r), FUNC(namcos2_state::c355_obj_position_w));
+	map(0x900000, 0x900007).rw(FUNC(namcos2_state::c355_obj_position_r), FUNC(namcos2_state::c355_obj_position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
-	map(0xc00000, 0xc0ffff).rw(this, FUNC(namcos2_state::c169_roz_videoram_r), FUNC(namcos2_state::c169_roz_videoram_w)).share("rozvideoram");
-	map(0xd00000, 0xd0001f).rw(this, FUNC(namcos2_state::c169_roz_control_r), FUNC(namcos2_state::c169_roz_control_w));
-	map(0xf00000, 0xf00007).rw(this, FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
+	map(0xc00000, 0xc0ffff).rw(FUNC(namcos2_state::c169_roz_videoram_r), FUNC(namcos2_state::c169_roz_videoram_w)).share("rozvideoram");
+	map(0xd00000, 0xd0001f).rw(FUNC(namcos2_state::c169_roz_control_r), FUNC(namcos2_state::c169_roz_control_w));
+	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
 void namcos2_state::master_luckywld_am(address_map &map)
@@ -740,7 +740,7 @@ void namcos2_state::master_luckywld_am(address_map &map)
 	common_luckywld_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).bankrw(NAMCOS2_68K_MASTER_RAM);
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -761,11 +761,11 @@ void namcos2_state::sound_default_am(address_map &map)
 	map(0x0000, 0x3fff).bankr("bank6"); /* banked */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x6fff).rw("c140", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(this, FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
-	map(0x7800, 0x7fff).rw(this, FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)); /* mirror */
+	map(0x7000, 0x77ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
+	map(0x7800, 0x7fff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)); /* mirror */
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* Amplifier enable on 1st write */
-	map(0xc000, 0xc001).w(this, FUNC(namcos2_state::namcos2_sound_bankselect_w));
+	map(0xc000, 0xc001).w(FUNC(namcos2_state::namcos2_sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* Watchdog */
 	map(0xe000, 0xe000).nopw();
 	map(0xd000, 0xffff).rom();
@@ -783,10 +783,10 @@ void namcos2_state::mcu_default_am(address_map &map)
 	map(0x0000, 0x0000).nopr(); /* Keep logging quiet */
 	map(0x0001, 0x0001).portr("MCUB");
 	map(0x0002, 0x0002).portr("MCUC");
-	map(0x0003, 0x0003).rw(this, FUNC(namcos2_state::namcos2_mcu_port_d_r), FUNC(namcos2_state::namcos2_mcu_port_d_w));
+	map(0x0003, 0x0003).rw(FUNC(namcos2_state::namcos2_mcu_port_d_r), FUNC(namcos2_state::namcos2_mcu_port_d_w));
 	map(0x0007, 0x0007).portr("MCUH");
-	map(0x0010, 0x0010).rw(this, FUNC(namcos2_state::namcos2_mcu_analog_ctrl_r), FUNC(namcos2_state::namcos2_mcu_analog_ctrl_w));
-	map(0x0011, 0x0011).rw(this, FUNC(namcos2_state::namcos2_mcu_analog_port_r), FUNC(namcos2_state::namcos2_mcu_analog_port_w));
+	map(0x0010, 0x0010).rw(FUNC(namcos2_state::namcos2_mcu_analog_ctrl_r), FUNC(namcos2_state::namcos2_mcu_analog_ctrl_w));
+	map(0x0011, 0x0011).rw(FUNC(namcos2_state::namcos2_mcu_analog_port_r), FUNC(namcos2_state::namcos2_mcu_analog_port_w));
 	map(0x0040, 0x01bf).ram();
 	map(0x01c0, 0x1fff).rom();
 	map(0x2000, 0x2000).portr("DSW");
@@ -794,7 +794,7 @@ void namcos2_state::mcu_default_am(address_map &map)
 	map(0x3001, 0x3001).portr("MCUDI1");
 	map(0x3002, 0x3002).portr("MCUDI2");
 	map(0x3003, 0x3003).portr("MCUDI3");
-	map(0x5000, 0x57ff).rw(this, FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
+	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
 	map(0x6000, 0x6fff).nopr(); /* watchdog */
 	map(0x8000, 0xffff).rom();
 }
@@ -821,8 +821,8 @@ void namcos2_state::c68_default_am(address_map &map)
 	map(0x3001, 0x3001).portr("MCUDI1");
 	map(0x3002, 0x3002).portr("MCUDI2");
 	map(0x3003, 0x3003).portr("MCUDI3");
-	map(0x5000, 0x57ff).rw(this, FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
-	map(0x6000, 0x6fff).r(this, FUNC(namcos2_state::ack_mcu_vbl_r)); // VBL ack
+	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
+	map(0x6000, 0x6fff).r(FUNC(namcos2_state::ack_mcu_vbl_r)); // VBL ack
 	map(0x8000, 0xffff).rom().region("c68", 0);
 }
 

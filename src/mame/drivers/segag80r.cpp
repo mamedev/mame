@@ -318,11 +318,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 /* the data lines are flipped */
 WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
 {
-		m_sn1->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
+	m_sn1->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 {
-		m_sn2->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
+	m_sn2->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -338,21 +338,21 @@ void segag80r_state::main_map(address_map &map)
 	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
 	map(0x0800, 0x7fff).rom();     /* PROM board ROM area */
 	map(0x8000, 0xbfff).rom();     /* PROM board ROM area */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80r_state::mainram_w)).share("mainram");
-	map(0xe000, 0xffff).ram().w(this, FUNC(segag80r_state::vidram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(segag80r_state::mainram_w)).share("mainram");
+	map(0xe000, 0xffff).ram().w(FUNC(segag80r_state::vidram_w)).share("videoram");
 }
 
 void segag80r_state::g80r_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(segag80r_state::g80r_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(segag80r_state::g80r_opcode_r));
 }
 
 void segag80r_state::sega_315_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
-	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80r_state::mainram_w)).share("mainram");
-	map(0xe000, 0xffff).ram().w(this, FUNC(segag80r_state::vidram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(segag80r_state::mainram_w)).share("mainram");
+	map(0xe000, 0xffff).ram().w(FUNC(segag80r_state::vidram_w)).share("videoram");
 }
 
 
@@ -360,9 +360,9 @@ void segag80r_state::sega_315_opcodes_map(address_map &map)
 void segag80r_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xbe, 0xbf).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
-	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80r_state::coin_count_w));
-	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xbe, 0xbf).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80r_state::coin_count_w));
+	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 
@@ -371,9 +371,9 @@ void segag80r_state::main_ppi8255_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x0c, 0x0f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xbe, 0xbf).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
-	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80r_state::coin_count_w));
-	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xbe, 0xbf).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80r_state::coin_count_w));
+	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 
@@ -381,9 +381,9 @@ void segag80r_state::main_ppi8255_portmap(address_map &map)
 void segag80r_state::sindbadm_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x42, 0x43).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0x42, 0x43).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
 	map(0x80, 0x83).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
 }
 
 
@@ -399,9 +399,9 @@ void segag80r_state::sindbadm_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
-	map(0xa000, 0xa003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
-	map(0xc000, 0xc003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1fff).r(this, FUNC(segag80r_state::sindbadm_sound_data_r));
+	map(0xa000, 0xa003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
+	map(0xc000, 0xc003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(segag80r_state::sindbadm_sound_data_r));
 }
 
 

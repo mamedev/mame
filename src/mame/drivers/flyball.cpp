@@ -21,6 +21,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
@@ -306,16 +307,16 @@ void flyball_state::flyball_map(address_map &map)
 	map.global_mask(0x1fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
 	map(0x0800, 0x0800).noprw();
-	map(0x0801, 0x0801).w(this, FUNC(flyball_state::pitcher_pic_w));
-	map(0x0802, 0x0802).r(this, FUNC(flyball_state::scanline_r));
-	map(0x0803, 0x0803).r(this, FUNC(flyball_state::potsense_r));
-	map(0x0804, 0x0804).w(this, FUNC(flyball_state::ball_vert_w));
-	map(0x0805, 0x0805).w(this, FUNC(flyball_state::ball_horz_w));
-	map(0x0806, 0x0806).w(this, FUNC(flyball_state::pitcher_vert_w));
-	map(0x0807, 0x0807).w(this, FUNC(flyball_state::pitcher_horz_w));
-	map(0x0900, 0x0900).w(this, FUNC(flyball_state::potmask_w));
-	map(0x0a00, 0x0a07).w(this, FUNC(flyball_state::misc_w));
-	map(0x0b00, 0x0b00).r(this, FUNC(flyball_state::input_r));
+	map(0x0801, 0x0801).w(FUNC(flyball_state::pitcher_pic_w));
+	map(0x0802, 0x0802).r(FUNC(flyball_state::scanline_r));
+	map(0x0803, 0x0803).r(FUNC(flyball_state::potsense_r));
+	map(0x0804, 0x0804).w(FUNC(flyball_state::ball_vert_w));
+	map(0x0805, 0x0805).w(FUNC(flyball_state::ball_horz_w));
+	map(0x0806, 0x0806).w(FUNC(flyball_state::pitcher_vert_w));
+	map(0x0807, 0x0807).w(FUNC(flyball_state::pitcher_horz_w));
+	map(0x0900, 0x0900).w(FUNC(flyball_state::potmask_w));
+	map(0x0a00, 0x0a07).w(FUNC(flyball_state::misc_w));
+	map(0x0b00, 0x0b00).r(FUNC(flyball_state::input_r));
 	map(0x0d00, 0x0eff).writeonly().share("playfield_ram");
 	map(0x1000, 0x1fff).rom().region("maincpu", 0);
 }

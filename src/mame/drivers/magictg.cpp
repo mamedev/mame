@@ -852,17 +852,17 @@ void magictg_state::magictg_map(address_map &map)
 	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 #if defined(USE_TWO_3DFX)
 	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
-	map(0x0c000000, 0x0c000fff).rw(this, FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
+	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
-	map(0x0b000000, 0x0b000fff).rw(this, FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
+	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #endif
-	map(0x0f000000, 0x0f000fff).rw(this, FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
-	map(0x14000100, 0x14000103).rw(this, FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
-	map(0x14000104, 0x14000107).w(this, FUNC(magictg_state::adsp_idma_addr_w));
-	map(0x1b001024, 0x1b001027).r(this, FUNC(magictg_state::adsp_status_r));
-	map(0x1b001108, 0x1b00110b).r(this, FUNC(magictg_state::unk_r));
+	map(0x0f000000, 0x0f000fff).rw(FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
+	map(0x14000100, 0x14000103).rw(FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
+	map(0x14000104, 0x14000107).w(FUNC(magictg_state::adsp_idma_addr_w));
+	map(0x1b001024, 0x1b001027).r(FUNC(magictg_state::adsp_status_r));
+	map(0x1b001108, 0x1b00110b).r(FUNC(magictg_state::unk_r));
 	map(0x1e000000, 0x1e002fff).ram(); // NVRAM?
-	map(0x1e800000, 0x1e800007).rw(this, FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
+	map(0x1e800000, 0x1e800007).rw(FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
 	map(0x1fc00000, 0x1fffffff).rom().region("mips", 0);
 }
 
@@ -884,7 +884,7 @@ void magictg_state::adsp_data_map(address_map &map)
 	map.unmap_value_high();
 //  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
 	map(0x0400, 0x3fdf).ram();
-	map(0x3fe0, 0x3fff).rw(this, FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
 }
 
 void magictg_state::adsp_io_map(address_map &map)

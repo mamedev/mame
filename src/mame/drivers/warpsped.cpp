@@ -87,6 +87,7 @@ L10, L15, L18 and G18 all read the same
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 class warpspeed_state : public driver_device
@@ -236,7 +237,7 @@ uint32_t warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 void warpspeed_state::warpspeed_map(address_map &map)
 {
 	map(0x0000, 0x0dff).rom();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(warpspeed_state::vidram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(warpspeed_state::vidram_w)).share("videoram");
 	map(0x1c00, 0x1cff).ram().share("workram");
 }
 
@@ -247,7 +248,7 @@ void warpspeed_state::warpspeed_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("DSW");
 	map(0x03, 0x03).portr("IN2");
-	map(0x00, 0x27).w(this, FUNC(warpspeed_state::hardware_w));
+	map(0x00, 0x27).w(FUNC(warpspeed_state::hardware_w));
 }
 
 static INPUT_PORTS_START( warpspeed )

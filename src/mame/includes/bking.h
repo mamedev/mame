@@ -4,6 +4,7 @@
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
+#include "emupal.h"
 #include "screen.h"
 
 class bking_state : public driver_device

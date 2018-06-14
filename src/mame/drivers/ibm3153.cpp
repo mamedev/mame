@@ -39,6 +39,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -33,6 +33,7 @@
 #include "video/ef9364.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -196,7 +197,7 @@ void goupil_g2_state::goupil_g2_mem(address_map &map)
 	map(0xE871, 0xE871).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
 	map(0xE8F0, 0xE8FF).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-	map(0xEC00, 0xF3FF).rw(this, FUNC(goupil_g2_state::visu24x80_ram_r), FUNC(goupil_g2_state::visu24x80_ram_w));
+	map(0xEC00, 0xF3FF).rw(FUNC(goupil_g2_state::visu24x80_ram_r), FUNC(goupil_g2_state::visu24x80_ram_w));
 	map(0xF400, 0xF7FF).rom().region("maincpu", 0xF400); // Monitor (MON 1)
 	map(0xF800, 0xFFFF).rom().region("maincpu", 0xF800); // Monitor (MON 2)
 }

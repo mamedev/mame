@@ -4,6 +4,7 @@
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "emupal.h"
 
 class senjyo_state : public driver_device
 {

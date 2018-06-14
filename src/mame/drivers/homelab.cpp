@@ -40,6 +40,7 @@ MB7051 - fuse programmed prom.
 #include "sound/mea8000.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -215,17 +216,17 @@ void homelab_state::homelab2_mem(address_map &map)
 	map(0x2000, 0x27ff).rom();  // ROM 5
 	map(0x2800, 0x2fff).rom();  // ROM 6
 	map(0x3000, 0x37ff).rom();  // Empty
-	map(0x3800, 0x3fff).rw(this, FUNC(homelab_state::key_r), FUNC(homelab_state::cass_w));
+	map(0x3800, 0x3fff).rw(FUNC(homelab_state::key_r), FUNC(homelab_state::cass_w));
 	map(0x4000, 0x7fff).ram();
 	map(0xc000, 0xc3ff).ram().region("maincpu", 0xc000);
-	map(0xe000, 0xe0ff).r(this, FUNC(homelab_state::cass2_r));
+	map(0xe000, 0xe0ff).r(FUNC(homelab_state::cass2_r));
 }
 
 void homelab_state::homelab3_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).ram();
-	map(0xe800, 0xefff).r(this, FUNC(homelab_state::exxx_r));
+	map(0xe800, 0xefff).r(FUNC(homelab_state::exxx_r));
 	map(0xf800, 0xffff).ram().region("maincpu", 0xf800);
 }
 
@@ -233,8 +234,8 @@ void homelab_state::homelab3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x7f, 0x7f).w(this, FUNC(homelab_state::port7f_w));
-	map(0xff, 0xff).w(this, FUNC(homelab_state::portff_w));
+	map(0x7f, 0x7f).w(FUNC(homelab_state::port7f_w));
+	map(0xff, 0xff).w(FUNC(homelab_state::portff_w));
 }
 
 void homelab_state::brailab4_mem(address_map &map)
@@ -242,7 +243,7 @@ void homelab_state::brailab4_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xcfff).ram();
 	map(0xd000, 0xdfff).rom();
-	map(0xe800, 0xefff).r(this, FUNC(homelab_state::exxx_r));
+	map(0xe800, 0xefff).r(FUNC(homelab_state::exxx_r));
 	map(0xf800, 0xffff).bankrw("bank1");
 }
 
@@ -251,8 +252,8 @@ void homelab_state::brailab4_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xf8, 0xf9).rw("mea8000", FUNC(mea8000_device::read), FUNC(mea8000_device::write));
-	map(0x7f, 0x7f).w(this, FUNC(homelab_state::brailab4_port7f_w));
-	map(0xff, 0xff).w(this, FUNC(homelab_state::brailab4_portff_w));
+	map(0x7f, 0x7f).w(FUNC(homelab_state::brailab4_port7f_w));
+	map(0xff, 0xff).w(FUNC(homelab_state::brailab4_portff_w));
 }
 
 

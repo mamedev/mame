@@ -53,7 +53,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
-	isa8_aga_device *m_aga;
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
 	DECLARE_READ8_MEMBER( europc_pio_r );
@@ -385,9 +384,7 @@ void europc_pc_state::init_europc()
 	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
 	//  europc_rtc_set_time();
 
-	machine().device<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
-	m_aga = machine().device<isa8_aga_device>("aga:aga");
-
+	subdevice<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
 }
 
 WRITE8_MEMBER( europc_pc_state::europc_pio_w )
@@ -507,9 +504,9 @@ void europc_pc_state::europc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
-	map(0x0250, 0x025f).rw(this, FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
-	map(0x02e0, 0x02e0).r(this, FUNC(europc_pc_state::europc_jim2_r));
+	map(0x0060, 0x0063).rw(FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
+	map(0x0250, 0x025f).rw(FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
+	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
 
 /* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */

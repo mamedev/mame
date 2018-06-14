@@ -4,6 +4,7 @@
 #include "audio/seibu.h"
 #include "machine/timer.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 
 class deadang_state : public driver_device
 {

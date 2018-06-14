@@ -12,6 +12,7 @@
 
 
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 

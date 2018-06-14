@@ -3410,6 +3410,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="spntass2">
+		<description>Spontaneous Assembly (Version 2.0)</description>
+		<year>1990</year>
+		<publisher>BaseTwo Development</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="TINY/SMALL/MEDIUM/COMPACT Model Libraries"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Spontaneous_Assembly_2_disk_1_of_2.img" size="737280" crc="a263026a" sha1="5ed457ac4930866deecb7e87b683e4189519cb3d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="LARGE Model Libraries, Include/Source/Miscellaneous"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Spontaneous_Assembly_2_disk_2_of_2.img" size="737280" crc="acc152a6" sha1="ceeb980916fcb44d514b8c834a04d317cece2545" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strecalc">
 		<description>StretchCalc</description>
 		<year>1983</year>
@@ -4640,6 +4658,65 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="109434">
 				<rom name="cpm8611.td0" size="109434" crc="c1b7a3f9" sha1="28c3e3edc9698680a63e0fa9ce6d58d6829fdc68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdos6fr">
+		<description>DR DOS 6.0 (French)</description>
+		<year>1991</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 1 of 4].img" size="737280" crc="cb8cab12" sha1="9f27a6985463c91d5eba12e9acc6a4c1ef601abd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Utilitaires-1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 2 of 4].img" size="737280" crc="ae9e312a" sha1="a7ed8bd407f0b26d8ecc0010449701434acf0de7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilitaires-2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 3 of 4].img" size="737280" crc="fbe9927f" sha1="df823afe328fe72cd3be0cbaf87ce9fcea89540d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="ViewMAX" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 4 of 4].img" size="737280" crc="7328e77d" sha1="49d2306f70c09128cad23db7e6882e86da90a20c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdos6fru">
+		<description>DR DOS 6.0 Business Update (French, 5.25")</description>
+		<year>1992</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 1 of 2].img" size="368640" crc="747dfe34" sha1="fc1b19f48ceb4a7c8c5e912582c6eb8889c231fb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 2 of 2].img" size="368640" crc="02a45926" sha1="88a93294606904c2aac270c81d401ee90cd1ad6f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdos6fru35" cloneof="drdos6fru">
+		<description>DR DOS 6.0 Business Update (French, 3.5")</description>
+		<year>1992</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS  6.00 Business Update FR [3.5DD] [Disk 1 of 1].img" size="737280" crc="ce6fe2d7" sha1="684b4a184557b5932ea3c97146b483827e4a6d4d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8992,6 +9069,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Paperboy 2 [Mindscape] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b782a653" sha1="e69a6201bd98b77ea3c04889fc425d3dab1d8a26" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgames3">
+		<description>PC Games #3</description>
+		<year>1988</year>
+		<publisher>I.B. Magazette</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Games #3.img" size="368640" crc="4d2c6ea3" sha1="c9599c1c528f1390d9f1b6b4120516a667997717" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

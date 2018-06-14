@@ -159,8 +159,8 @@ void mephisto_state::rebel5_mem(address_map &map)
 	map(0x0000, 0x1fff).ram();                        // AM_BASE(m_p_ram)
 	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
 	map(0x3000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3000, 0x3007).r(this, FUNC(mephisto_state::read_keys));            // Rebel 5.0
-	map(0x5000, 0x5000).w(this, FUNC(mephisto_state::write_lcd));
+	map(0x3000, 0x3007).r(FUNC(mephisto_state::read_keys));            // Rebel 5.0
+	map(0x5000, 0x5000).w(FUNC(mephisto_state::write_lcd));
 	map(0x6000, 0x6000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x7000, 0x7000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x8000, 0xffff).rom();
@@ -170,13 +170,13 @@ void mephisto_state::rebel5_mem(address_map &map)
 void mephisto_state::mephisto_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); //AM_BASE(m_p_ram)
-	map(0x2000, 0x2000).w(this, FUNC(mephisto_state::write_lcd));
+	map(0x2000, 0x2000).w(FUNC(mephisto_state::write_lcd));
 	map(0x2400, 0x2407).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(this, FUNC(mephisto_state::read_keys));
+	map(0x2c00, 0x2c07).r(FUNC(mephisto_state::read_keys));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
-	map(0x3800, 0x3800).w(this, FUNC(mephisto_state::mephisto_NMI));            // NMI enable
+	map(0x3800, 0x3800).w(FUNC(mephisto_state::mephisto_NMI));            // NMI enable
 	map(0x4000, 0x7fff).rom();                        // Opening Library
 	map(0x8000, 0xffff).rom();
 }
@@ -185,9 +185,9 @@ void mephisto_state::mm2_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); //AM_BASE(m_p_ram)
 	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));       //Status LEDs
-	map(0x1800, 0x1807).r(this, FUNC(mephisto_state::read_keys));
+	map(0x1800, 0x1807).r(FUNC(mephisto_state::read_keys));
 	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x2800, 0x2800).w(this, FUNC(mephisto_state::write_lcd));
+	map(0x2800, 0x2800).w(FUNC(mephisto_state::write_lcd));
 	map(0x3000, 0x3000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x3800, 0x3800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x4000, 0x7fff).rom();                        // Opening Library ?

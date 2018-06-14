@@ -746,14 +746,14 @@ void bnstars_state::bnstars_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
 
-	map(0xfc800000, 0xfc800003).w(this, FUNC(bnstars_state::ms32_sound_w));
+	map(0xfc800000, 0xfc800003).w(FUNC(bnstars_state::ms32_sound_w));
 
 	map(0xfcc00004, 0xfcc00007).portr("P1");
 	map(0xfcc00008, 0xfcc0000b).portr("P2");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 
 	map(0xfce00034, 0xfce00037).nopw();
-	map(0xfce00038, 0xfce0003b).w(this, FUNC(bnstars_state::reset_sub_w));
+	map(0xfce00038, 0xfce0003b).w(FUNC(bnstars_state::reset_sub_w));
 
 	map(0xfce00050, 0xfce00053).nopw();
 	map(0xfce00058, 0xfce0005b).nopw();
@@ -767,22 +767,22 @@ void bnstars_state::bnstars_map(address_map &map)
 	map(0xfce00c00, 0xfce00c17).writeonly().share("tx1_scroll");
 	map(0xfce00c20, 0xfce00c37).writeonly().share("bg1_scroll");
 
-	map(0xfce00e00, 0xfce00e03).w(this, FUNC(bnstars_state::bnstars1_mahjong_select_w)); // ?
+	map(0xfce00e00, 0xfce00e03).w(FUNC(bnstars_state::bnstars1_mahjong_select_w)); // ?
 
-	map(0xfd000000, 0xfd000003).r(this, FUNC(bnstars_state::ms32_sound_r));
+	map(0xfd000000, 0xfd000003).r(FUNC(bnstars_state::ms32_sound_r));
 
 	/* wrote together */
 	map(0xfd040000, 0xfd047fff).ram(); // priority ram
 	map(0xfd080000, 0xfd087fff).ram();
 	map(0xfd200000, 0xfd237fff).rw("palette2", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette2");
 	map(0xfd400000, 0xfd437fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0xfe000000, 0xfe01ffff).ram().w(this, FUNC(bnstars_state::ms32_roz1_ram_w)).share("roz1_ram");
-	map(0xfe400000, 0xfe41ffff).ram().w(this, FUNC(bnstars_state::ms32_roz0_ram_w)).share("roz0_ram");
+	map(0xfe000000, 0xfe01ffff).ram().w(FUNC(bnstars_state::ms32_roz1_ram_w)).share("roz1_ram");
+	map(0xfe400000, 0xfe41ffff).ram().w(FUNC(bnstars_state::ms32_roz0_ram_w)).share("roz0_ram");
 	map(0xfe800000, 0xfe83ffff).ram().share("spram");
-	map(0xfea00000, 0xfea07fff).ram().w(this, FUNC(bnstars_state::ms32_tx1_ram_w)).share("tx1_ram");
-	map(0xfea08000, 0xfea0ffff).ram().w(this, FUNC(bnstars_state::ms32_bg1_ram_w)).share("bg1_ram");
-	map(0xfec00000, 0xfec07fff).ram().w(this, FUNC(bnstars_state::ms32_tx0_ram_w)).share("tx0_ram");
-	map(0xfec08000, 0xfec0ffff).ram().w(this, FUNC(bnstars_state::ms32_bg0_ram_w)).share("bg0_ram");
+	map(0xfea00000, 0xfea07fff).ram().w(FUNC(bnstars_state::ms32_tx1_ram_w)).share("tx1_ram");
+	map(0xfea08000, 0xfea0ffff).ram().w(FUNC(bnstars_state::ms32_bg1_ram_w)).share("bg1_ram");
+	map(0xfec00000, 0xfec07fff).ram().w(FUNC(bnstars_state::ms32_tx0_ram_w)).share("tx0_ram");
+	map(0xfec08000, 0xfec0ffff).ram().w(FUNC(bnstars_state::ms32_bg0_ram_w)).share("bg0_ram");
 
 	map(0xfee00000, 0xfee1ffff).ram();
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
@@ -792,11 +792,11 @@ void bnstars_state::bnstars_sound_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom();
 	map(0x3f00, 0x3f0f).rw("ymf2", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x3f10, 0x3f10).rw(this, FUNC(bnstars_state::latch_r), FUNC(bnstars_state::to_main_w));
+	map(0x3f10, 0x3f10).rw(FUNC(bnstars_state::latch_r), FUNC(bnstars_state::to_main_w));
 	map(0x3f20, 0x3f2f).rw("ymf1", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
 	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
 	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
-	map(0x3f80, 0x3f80).w(this, FUNC(bnstars_state::ms32_snd_bank_w));
+	map(0x3f80, 0x3f80).w(FUNC(bnstars_state::ms32_snd_bank_w));
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("z80bank1");
 	map(0xc000, 0xffff).bankr("z80bank2");

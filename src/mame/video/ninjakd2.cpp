@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 			TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(mnight_state::mnight_get_bg_tile_info)
 {
 	int const lo = m_bg_videoram[(tile_index << 1)];
 	int const hi = m_bg_videoram[(tile_index << 1) | 1];
@@ -60,19 +60,19 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
 			flipy ? TILE_FLIPY : 0);
 }
 
-TILEMAP_MAPPER_MEMBER(ninjakd2_state::robokid_bg_scan)
+TILEMAP_MAPPER_MEMBER(robokid_state::robokid_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x10) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(ninjakd2_state::omegaf_bg_scan)
+TILEMAP_MAPPER_MEMBER(omegaf_state::omegaf_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
 }
 
-void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram)
+void robokid_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram)
 {
 	int const lo = videoram[(tile_index << 1)];
 	int const hi = videoram[(tile_index << 1) | 1];
@@ -85,17 +85,17 @@ void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memo
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg0_tile_info)
+TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg0_tile_info)
 {
 	robokid_get_bg_tile_info(tileinfo, tile_index, 2, m_robokid_bg0_videoram.get());
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg1_tile_info)
+TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg1_tile_info)
 {
 	robokid_get_bg_tile_info(tileinfo, tile_index, 3, m_robokid_bg1_videoram.get());
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
+TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg2_tile_info)
 {
 	robokid_get_bg_tile_info(tileinfo, tile_index, 4, m_robokid_bg2_videoram.get());
 }
@@ -107,21 +107,9 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
  *  Video system start
  *
  *************************************/
-
-void ninjakd2_state::video_init_common(uint32_t vram_alloc_size)
+ 
+void ninjakd2_state::video_init_common()
 {
-	// create video ram
-	if (vram_alloc_size)
-	{
-		m_robokid_bg0_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
-		m_robokid_bg1_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
-		m_robokid_bg2_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
-
-		save_pointer(NAME(m_robokid_bg0_videoram.get()), vram_alloc_size);
-		save_pointer(NAME(m_robokid_bg1_videoram.get()), vram_alloc_size);
-		save_pointer(NAME(m_robokid_bg2_videoram.get()), vram_alloc_size);
-	}
-
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 
@@ -134,9 +122,26 @@ void ninjakd2_state::video_init_common(uint32_t vram_alloc_size)
 	// register for save states
 	save_item(NAME(m_sprites_updated));
 	save_item(NAME(m_next_sprite_overdraw_enabled));
+}
+
+void robokid_state::video_init_banked(uint32_t vram_alloc_size)
+{
+	// create video ram
+	if (vram_alloc_size)
+	{
+		m_robokid_bg0_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
+		m_robokid_bg1_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
+		m_robokid_bg2_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
+
+		save_pointer(NAME(m_robokid_bg0_videoram.get()), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg1_videoram.get()), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg2_videoram.get()), vram_alloc_size);
+	}
+	
 	save_item(NAME(m_robokid_bg0_bank));
 	save_item(NAME(m_robokid_bg1_bank));
 	save_item(NAME(m_robokid_bg2_bank));
+
 }
 
 static bool stencil_ninjakd2( uint16_t pal );
@@ -147,40 +152,41 @@ static bool stencil_omegaf(   uint16_t pal );
 
 void ninjakd2_state::video_start()
 {
-	video_init_common(0);
+	video_init_common();
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_ninjakd2;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,mnight)
+VIDEO_START_MEMBER(mnight_state,mnight)
 {
-	video_init_common(0);
+	video_init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mnight_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_mnight;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,arkarea)
+VIDEO_START_MEMBER(mnight_state,arkarea)
 {
-	video_init_common(0);
+	video_init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mnight_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_arkarea;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,robokid)
+VIDEO_START_MEMBER(robokid_state,robokid)
 {
-	video_init_common(0x0800);
+	video_init_common();
+	video_init_banked(0x0800);
 	m_vram_bank_mask = 1;
 	m_robokid_sprites = 1;
 
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
 
 	m_bg1_tilemap->set_transparent_pen(0xf);
 	m_bg2_tilemap->set_transparent_pen(0xf);
@@ -188,15 +194,16 @@ VIDEO_START_MEMBER(ninjakd2_state,robokid)
 	m_stencil_compare_function = stencil_robokid;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,omegaf)
+VIDEO_START_MEMBER(omegaf_state,omegaf)
 {
-	video_init_common(0x2000);
+	video_init_common();
+	video_init_banked(0x2000);
 	m_vram_bank_mask = 7;
 	m_robokid_sprites = 1;
 
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
 
 	m_bg0_tilemap->set_transparent_pen(0xf);
 	m_bg1_tilemap->set_transparent_pen(0xf);
@@ -226,37 +233,37 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
 }
 
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg0_bank_w)
+WRITE8_MEMBER(robokid_state::robokid_bg0_bank_w)
 {
 	m_robokid_bg0_bank = data & m_vram_bank_mask;
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg1_bank_w)
+WRITE8_MEMBER(robokid_state::robokid_bg1_bank_w)
 {
 	m_robokid_bg1_bank = data & m_vram_bank_mask;
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg2_bank_w)
+WRITE8_MEMBER(robokid_state::robokid_bg2_bank_w)
 {
 	m_robokid_bg2_bank = data & m_vram_bank_mask;
 }
 
-READ8_MEMBER(ninjakd2_state::robokid_bg0_videoram_r)
+READ8_MEMBER(robokid_state::robokid_bg0_videoram_r)
 {
 	return m_robokid_bg0_videoram[(m_robokid_bg0_bank << 10) | offset];
 }
 
-READ8_MEMBER(ninjakd2_state::robokid_bg1_videoram_r)
+READ8_MEMBER(robokid_state::robokid_bg1_videoram_r)
 {
 	return m_robokid_bg1_videoram[(m_robokid_bg1_bank << 10) | offset];
 }
 
-READ8_MEMBER(ninjakd2_state::robokid_bg2_videoram_r)
+READ8_MEMBER(robokid_state::robokid_bg2_videoram_r)
 {
 	return m_robokid_bg2_videoram[(m_robokid_bg2_bank << 10) | offset];
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg0_videoram_w)
+WRITE8_MEMBER(robokid_state::robokid_bg0_videoram_w)
 {
 	int const address = (m_robokid_bg0_bank << 10 ) | offset;
 
@@ -264,7 +271,7 @@ WRITE8_MEMBER(ninjakd2_state::robokid_bg0_videoram_w)
 	m_bg0_tilemap->mark_tile_dirty(address >> 1);
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg1_videoram_w)
+WRITE8_MEMBER(robokid_state::robokid_bg1_videoram_w)
 {
 	int const address = (m_robokid_bg1_bank << 10 ) | offset;
 
@@ -272,7 +279,7 @@ WRITE8_MEMBER(ninjakd2_state::robokid_bg1_videoram_w)
 	m_bg1_tilemap->mark_tile_dirty(address >> 1);
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg2_videoram_w)
+WRITE8_MEMBER(robokid_state::robokid_bg2_videoram_w)
 {
 	int const address = (m_robokid_bg2_bank << 10 ) | offset;
 
@@ -304,17 +311,17 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_bg_ctrl_w)
 	bg_ctrl(offset, data, m_bg_tilemap);
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg0_ctrl_w)
+WRITE8_MEMBER(robokid_state::robokid_bg0_ctrl_w)
 {
 	bg_ctrl(offset, data, m_bg0_tilemap);
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg1_ctrl_w)
+WRITE8_MEMBER(robokid_state::robokid_bg1_ctrl_w)
 {
 	bg_ctrl(offset, data, m_bg1_tilemap);
 }
 
-WRITE8_MEMBER(ninjakd2_state::robokid_bg2_ctrl_w)
+WRITE8_MEMBER(robokid_state::robokid_bg2_ctrl_w)
 {
 	bg_ctrl(offset, data, m_bg2_tilemap);
 }
@@ -474,7 +481,7 @@ uint32_t ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t robokid_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
 	m_sprites_updated = 1;
@@ -490,7 +497,7 @@ uint32_t ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-uint32_t ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t omegaf_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
 	m_sprites_updated = 1;

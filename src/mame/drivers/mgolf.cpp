@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mgolf_state : public driver_device
@@ -235,11 +236,11 @@ void mgolf_state::cpu_map(address_map &map)
 	map.global_mask(0x3fff);
 
 	map(0x0040, 0x0040).portr("40");
-	map(0x0041, 0x0041).r(this, FUNC(mgolf_state::dial_r));
+	map(0x0041, 0x0041).r(FUNC(mgolf_state::dial_r));
 	map(0x0060, 0x0060).portr("60");
-	map(0x0061, 0x0061).r(this, FUNC(mgolf_state::misc_r));
-	map(0x0080, 0x00ff).r(this, FUNC(mgolf_state::wram_r));
-	map(0x0180, 0x01ff).r(this, FUNC(mgolf_state::wram_r));
+	map(0x0061, 0x0061).r(FUNC(mgolf_state::misc_r));
+	map(0x0080, 0x00ff).r(FUNC(mgolf_state::wram_r));
+	map(0x0180, 0x01ff).r(FUNC(mgolf_state::wram_r));
 	map(0x0800, 0x0bff).readonly();
 
 	map(0x0000, 0x0009).nopw();
@@ -253,9 +254,9 @@ void mgolf_state::cpu_map(address_map &map)
 	map(0x006a, 0x006a).nopw();
 	map(0x006c, 0x006c).nopw();
 	map(0x006d, 0x006d).nopw();
-	map(0x0080, 0x00ff).w(this, FUNC(mgolf_state::wram_w));
-	map(0x0180, 0x01ff).w(this, FUNC(mgolf_state::wram_w));
-	map(0x0800, 0x0bff).w(this, FUNC(mgolf_state::vram_w)).share("video_ram");
+	map(0x0080, 0x00ff).w(FUNC(mgolf_state::wram_w));
+	map(0x0180, 0x01ff).w(FUNC(mgolf_state::wram_w));
+	map(0x0800, 0x0bff).w(FUNC(mgolf_state::vram_w)).share("video_ram");
 
 	map(0x2000, 0x3fff).rom();
 }

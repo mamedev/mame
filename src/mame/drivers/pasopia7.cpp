@@ -32,6 +32,7 @@
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -684,10 +685,10 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		m_pio->write(space, io_port & 3, data);
 	else
 	if(io_port == 0x3a)
-		m_sn1->write(space, 0, data);
+		m_sn1->write(data);
 	else
 	if(io_port == 0x3b)
-		m_sn2->write(space, 0, data);
+		m_sn2->write(data);
 	else
 	if(io_port == 0x3c)
 		pasopia7_memory_ctrl_w(space,0, data);
@@ -703,17 +704,17 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 void pasopia7_state::pasopia7_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).w(this, FUNC(pasopia7_state::ram_bank_w));
+	map(0x0000, 0x7fff).w(FUNC(pasopia7_state::ram_bank_w));
 	map(0x0000, 0x3fff).bankr("bank1");
 	map(0x4000, 0x7fff).bankr("bank2");
-	map(0x8000, 0xbfff).rw(this, FUNC(pasopia7_state::vram_r), FUNC(pasopia7_state::vram_w));
+	map(0x8000, 0xbfff).rw(FUNC(pasopia7_state::vram_r), FUNC(pasopia7_state::vram_w));
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
 void pasopia7_state::pasopia7_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(pasopia7_state::pasopia7_io_r), FUNC(pasopia7_state::pasopia7_io_w));
+	map(0x0000, 0xffff).rw(FUNC(pasopia7_state::pasopia7_io_r), FUNC(pasopia7_state::pasopia7_io_w));
 }
 
 /* TODO: where are SPACE and RETURN keys? */

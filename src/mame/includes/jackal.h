@@ -2,6 +2,8 @@
 // copyright-holders:Curt Coder
 // thanks-to:Kenneth Lin (original driver author)
 
+#include "emupal.h"
+
 #define MASTER_CLOCK         XTAL(18'432'000)
 #define SOUND_CLOCK          XTAL(3'579'545)
 

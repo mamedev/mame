@@ -130,7 +130,7 @@ void abc_fd2_device::abc_fd2_io(address_map &map)
 	map.global_mask(0x73);
 	map(0x30, 0x33).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x50, 0x53).rw(FD1771_TAG, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0x60, 0x60).w(this, FUNC(abc_fd2_device::status_w));
+	map(0x60, 0x60).w(FUNC(abc_fd2_device::status_w));
 }
 
 

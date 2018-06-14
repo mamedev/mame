@@ -50,6 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -272,11 +273,11 @@ void tattack_state::tattack_map(address_map &map)
 	map(0x6000, 0x6000).portr("DSW2");
 	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
 	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
-	map(0xc000, 0xc000).portr("INPUTS").w(this, FUNC(tattack_state::sound_w)); // sound
-	map(0xc001, 0xc001).w(this, FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
-	map(0xc005, 0xc005).w(this, FUNC(tattack_state::paddle_w));
-	map(0xc006, 0xc007).w(this, FUNC(tattack_state::ball_w));
+	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
+	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
 	map(0xe000, 0xe3ff).ram().share("ram");
 }
 

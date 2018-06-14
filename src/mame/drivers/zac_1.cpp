@@ -78,7 +78,7 @@ void zac_1_state::zac_1_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x17ff).w(this, FUNC(zac_1_state::reset_int_w));
+	map(0x1400, 0x17ff).w(FUNC(zac_1_state::reset_int_w));
 	map(0x1800, 0x18ff).mirror(0x300).ram().share("ram");
 	map(0x1c00, 0x1fff).rom();
 }
@@ -91,7 +91,7 @@ void zac_1_state::zac_1_io(address_map &map)
 void zac_1_state::zac_1_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
 }
 
 static INPUT_PORTS_START( zac_1 )
@@ -293,8 +293,8 @@ void zac_1_state::locomotp_io(address_map &map)
 
 void zac_1_state::locomotp_data(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(zac_1_state::reset_int_r));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(zac_1_state::reset_int_r));
 }
 
 READ8_MEMBER( zac_1_state::reset_int_r )

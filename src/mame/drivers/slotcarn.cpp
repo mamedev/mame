@@ -21,6 +21,7 @@
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -197,7 +198,7 @@ void slotcarn_state::slotcarn_map(address_map &map)
 
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(slotcarn_state::palette_r), FUNC(slotcarn_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(slotcarn_state::palette_r), FUNC(slotcarn_state::palette_w));
 }
 
 // spielbud - is the ay mirrored, or are there now 2?

@@ -127,7 +127,7 @@ void tk80_state::tk80_mem(address_map &map)
 	map(0x0000, 0x02ff).rom();
 	map(0x0300, 0x03ff).ram(); // EEPROM
 	map(0x8000, 0x83f7).ram(); // RAM
-	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
 }
 
 void tk80_state::tk85_mem(address_map &map)
@@ -136,7 +136,7 @@ void tk80_state::tk85_mem(address_map &map)
 	map.global_mask(0x87ff); // A10-14 not connected
 	map(0x0000, 0x07ff).rom();
 	map(0x8000, 0x83f7).ram();
-	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
 }
 
 void tk80_state::ics8080_mem(address_map &map)
@@ -145,7 +145,7 @@ void tk80_state::ics8080_mem(address_map &map)
 	//ADDRESS_MAP_GLOBAL_MASK(0x87ff) // A10-14 not connected
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x83f7).ram();
-	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
 	map(0x8400, 0x8fff).ram();
 }
 

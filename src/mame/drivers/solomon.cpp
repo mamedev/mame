@@ -53,22 +53,22 @@ void solomon_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(solomon_state::solomon_colorram_w)).share("colorram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(solomon_state::solomon_videoram_w)).share("videoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
+	map(0xd000, 0xd3ff).ram().w(FUNC(solomon_state::solomon_colorram_w)).share("colorram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(solomon_state::solomon_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
+	map(0xdc00, 0xdfff).ram().w(FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
 	map(0xe000, 0xe07f).ram().share("spriteram");
 	map(0xe400, 0xe5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe600, 0xe600).portr("P1");
 	map(0xe601, 0xe601).portr("P2");
 	map(0xe602, 0xe602).portr("SYSTEM");
-	map(0xe603, 0xe603).r(this, FUNC(solomon_state::solomon_0xe603_r));
+	map(0xe603, 0xe603).r(FUNC(solomon_state::solomon_0xe603_r));
 	map(0xe604, 0xe604).portr("DSW1");
 	map(0xe605, 0xe605).portr("DSW2");
 	map(0xe606, 0xe606).nopr(); /* watchdog? */
-	map(0xe600, 0xe600).w(this, FUNC(solomon_state::nmi_mask_w));
-	map(0xe604, 0xe604).w(this, FUNC(solomon_state::solomon_flipscreen_w));
-	map(0xe800, 0xe800).w(this, FUNC(solomon_state::solomon_sh_command_w));
+	map(0xe600, 0xe600).w(FUNC(solomon_state::nmi_mask_w));
+	map(0xe604, 0xe604).w(FUNC(solomon_state::solomon_flipscreen_w));
+	map(0xe800, 0xe800).w(FUNC(solomon_state::solomon_sh_command_w));
 	map(0xf000, 0xffff).rom();
 }
 

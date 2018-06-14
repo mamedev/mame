@@ -380,13 +380,13 @@ WRITE8_MEMBER(fdc37c93x_device::disabled_write)
 
 void fdc37c93x_device::unmap_fdc(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x1, 0x1).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x2, 0x2).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x3, 0x3).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x4, 0x4).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x5, 0x5).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x7, 0x7).rw(this, FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x0, 0x0).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x1, 0x1).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x2, 0x2).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x3, 0x3).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x4, 0x4).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x5, 0x5).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	map(0x7, 0x7).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 }
 #else
 void fdc37c93x_device::unmap_fdc(address_map &map)
@@ -417,7 +417,7 @@ void fdc37c93x_device::unmap_fdc_addresses()
 
 void fdc37c93x_device::map_lpt(address_map &map)
 {
-	map(0x0, 0x3).rw(this, FUNC(fdc37c93x_device::lpt_read), FUNC(fdc37c93x_device::lpt_write));
+	map(0x0, 0x3).rw(FUNC(fdc37c93x_device::lpt_read), FUNC(fdc37c93x_device::lpt_write));
 }
 
 READ8_MEMBER(fdc37c93x_device::lpt_read)
@@ -446,7 +446,7 @@ void fdc37c93x_device::unmap_lpt_addresses()
 
 void fdc37c93x_device::map_rtc(address_map &map)
 {
-	map(0x0, 0xf).rw(this, FUNC(fdc37c93x_device::rtc_read), FUNC(fdc37c93x_device::rtc_write));
+	map(0x0, 0xf).rw(FUNC(fdc37c93x_device::rtc_read), FUNC(fdc37c93x_device::rtc_write));
 }
 
 READ8_MEMBER(fdc37c93x_device::rtc_read)
@@ -475,8 +475,8 @@ void fdc37c93x_device::unmap_rtc_addresses()
 
 void fdc37c93x_device::map_keyboard(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(fdc37c93x_device::at_keybc_r), FUNC(fdc37c93x_device::at_keybc_w));
-	map(0x4, 0x4).rw(this, FUNC(fdc37c93x_device::keybc_status_r), FUNC(fdc37c93x_device::keybc_command_w));
+	map(0x0, 0x0).rw(FUNC(fdc37c93x_device::at_keybc_r), FUNC(fdc37c93x_device::at_keybc_w));
+	map(0x4, 0x4).rw(FUNC(fdc37c93x_device::keybc_status_r), FUNC(fdc37c93x_device::keybc_command_w));
 }
 
 void fdc37c93x_device::unmap_keyboard(address_map &map)

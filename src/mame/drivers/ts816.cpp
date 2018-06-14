@@ -85,21 +85,21 @@ void ts816_state::ts816_io(address_map &map)
 	map(0x40, 0x43).rw("sio4", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 4 for user 7 & 8
 	map(0x48, 0x4b).rw("sio8", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 8 for user 15 & 16
 	//AM_RANGE(0x50, 0x53) // SIO 0 for RS232 1 and part of tape interface
-	map(0x50, 0x50).r(this, FUNC(ts816_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x52, 0x52).r(this, FUNC(ts816_state::status_r));
+	map(0x50, 0x50).r(FUNC(ts816_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x52, 0x52).r(FUNC(ts816_state::status_r));
 	map(0x58, 0x5b).rw("sio9", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 9 for RS232 2 & 3
 	map(0x60, 0x60).portr("DSW");
-	map(0x68, 0x68).w(this, FUNC(ts816_state::port68_w)); // set 2nd bank latch
-	map(0x70, 0x78).w(this, FUNC(ts816_state::port78_w)); // reset 2nd bank latch (manual can't decide between 70 and 78, so we take both)
+	map(0x68, 0x68).w(FUNC(ts816_state::port68_w)); // set 2nd bank latch
+	map(0x70, 0x78).w(FUNC(ts816_state::port78_w)); // reset 2nd bank latch (manual can't decide between 70 and 78, so we take both)
 	map(0x80, 0x83).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // CTC 1 (ch 0 baud A)
-	map(0x90, 0x93).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // DMA
+	map(0x90, 0x93).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // DMA
 	map(0xA0, 0xA0); // WDC status / command
 	map(0xA1, 0xA1); // WDC data
 	map(0xB0, 0xB0).noprw(); // undocumented, written to at @0707 and @0710
 	map(0xC0, 0xC3).rw("ctc2", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // CTC 2 (ch 0 baud B, ch 1 baud C)
 	map(0xD0, 0xD3).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xE0, 0xE0).w(this, FUNC(ts816_state::porte0_w)); // set ENDRAM memory banking
-	map(0xF0, 0xF0).w(this, FUNC(ts816_state::portf0_w)); // reset ENDRAM memory banking
+	map(0xE0, 0xE0).w(FUNC(ts816_state::porte0_w)); // set ENDRAM memory banking
+	map(0xF0, 0xF0).w(FUNC(ts816_state::portf0_w)); // reset ENDRAM memory banking
 }
 
 

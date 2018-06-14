@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 class kaneko_grap2_device : public device_t, public device_rom_interface
 {

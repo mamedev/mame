@@ -68,7 +68,7 @@ void tv955_state::mem_map(address_map &map)
 {
 	// verified from maintenance manual (131968-00-C)
 	map(0x0000, 0x07ff).mirror(0x0800).ram().share("nvram");
-	map(0x1100, 0x1100).mirror(0x00ff).w(this, FUNC(tv955_state::control_latch_w));
+	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(tv955_state::control_latch_w));
 	map(0x1200, 0x1203).mirror(0x00fc).rw("keybuart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x1400, 0x1403).mirror(0x00fc).rw("printuart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x1800, 0x1803).mirror(0x00fc).rw("hostuart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));

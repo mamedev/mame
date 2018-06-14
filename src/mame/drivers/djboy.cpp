@@ -215,7 +215,7 @@ void djboy_state::mastercpu_am(address_map &map)
 void djboy_state::mastercpu_port_am(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(djboy_state::mastercpu_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(djboy_state::mastercpu_bankswitch_w));
 }
 
 /******************************************************************************/
@@ -224,8 +224,8 @@ void djboy_state::slavecpu_am(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slave_bank");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(djboy_state::djboy_videoram_w)).share("videoram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(djboy_state::djboy_paletteram_w)).share("paletteram");
+	map(0xc000, 0xcfff).ram().w(FUNC(djboy_state::djboy_videoram_w)).share("videoram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(djboy_state::djboy_paletteram_w)).share("paletteram");
 	map(0xd400, 0xd8ff).ram();
 	map(0xe000, 0xffff).ram().share("share1");
 }
@@ -233,14 +233,14 @@ void djboy_state::slavecpu_am(address_map &map)
 void djboy_state::slavecpu_port_am(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(djboy_state::slavecpu_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(djboy_state::slavecpu_bankswitch_w));
 	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read)).w(m_beastlatch, FUNC(generic_latch_8_device::write));
-	map(0x06, 0x06).w(this, FUNC(djboy_state::djboy_scrolly_w));
-	map(0x08, 0x08).w(this, FUNC(djboy_state::djboy_scrollx_w));
-	map(0x0a, 0x0a).w(this, FUNC(djboy_state::trigger_nmi_on_mastercpu));
-	map(0x0c, 0x0c).r(this, FUNC(djboy_state::beast_status_r));
-	map(0x0e, 0x0e).w(this, FUNC(djboy_state::coin_count_w));
+	map(0x06, 0x06).w(FUNC(djboy_state::djboy_scrolly_w));
+	map(0x08, 0x08).w(FUNC(djboy_state::djboy_scrollx_w));
+	map(0x0a, 0x0a).w(FUNC(djboy_state::trigger_nmi_on_mastercpu));
+	map(0x0c, 0x0c).r(FUNC(djboy_state::beast_status_r));
+	map(0x0e, 0x0e).w(FUNC(djboy_state::coin_count_w));
 }
 
 /******************************************************************************/
@@ -255,7 +255,7 @@ void djboy_state::soundcpu_am(address_map &map)
 void djboy_state::soundcpu_port_am(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(djboy_state::soundcpu_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(djboy_state::soundcpu_bankswitch_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x06, 0x06).rw("oki_l", FUNC(okim6295_device::read), FUNC(okim6295_device::write));

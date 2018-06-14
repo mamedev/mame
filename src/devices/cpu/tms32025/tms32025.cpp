@@ -189,12 +189,12 @@ DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS
 
 void tms32025_device::tms32025_data(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
-	map(0x0001, 0x0001).rw(this, FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
-	map(0x0002, 0x0002).rw(this, FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
-	map(0x0003, 0x0003).rw(this, FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
-	map(0x0004, 0x0004).rw(this, FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
-	map(0x0005, 0x0005).rw(this, FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0000, 0x0000).rw(FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
+	map(0x0001, 0x0001).rw(FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
+	map(0x0002, 0x0002).rw(FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
+	map(0x0003, 0x0003).rw(FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
+	map(0x0004, 0x0004).rw(FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
+	map(0x0005, 0x0005).rw(FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
 	map(0x0060, 0x007f).ram().share("b2");
 	map(0x0200, 0x02ff).ram().share("b0");
 	map(0x0300, 0x03ff).ram().share("b1");
@@ -202,12 +202,12 @@ void tms32025_device::tms32025_data(address_map &map)
 
 void tms32025_device::tms32026_data(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
-	map(0x0001, 0x0001).rw(this, FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
-	map(0x0002, 0x0002).rw(this, FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
-	map(0x0003, 0x0003).rw(this, FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
-	map(0x0004, 0x0004).rw(this, FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
-	map(0x0005, 0x0005).rw(this, FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0000, 0x0000).rw(FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
+	map(0x0001, 0x0001).rw(FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
+	map(0x0002, 0x0002).rw(FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
+	map(0x0003, 0x0003).rw(FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
+	map(0x0004, 0x0004).rw(FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
+	map(0x0005, 0x0005).rw(FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
 	map(0x0060, 0x007f).ram().share("b2");
 	map(0x0200, 0x03ff).ram().share("b0");
 	map(0x0400, 0x05ff).ram().share("b1");

@@ -309,24 +309,24 @@ WRITE8_MEMBER(ccastles_state::nvram_w)
 /* complete memory map derived from schematics */
 void ccastles_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().w(this, FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
-	map(0x0000, 0x0001).w(this, FUNC(ccastles_state::ccastles_bitmode_addr_w));
-	map(0x0002, 0x0002).rw(this, FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
+	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
+	map(0x0000, 0x0001).w(FUNC(ccastles_state::ccastles_bitmode_addr_w));
+	map(0x0002, 0x0002).rw(FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
 	map(0x8000, 0x8fff).ram();
 	map(0x8e00, 0x8fff).share("spriteram");
-	map(0x9000, 0x90ff).mirror(0x0300).rw(this, FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
-	map(0x9400, 0x9403).mirror(0x01fc).r(this, FUNC(ccastles_state::leta_r));
+	map(0x9000, 0x90ff).mirror(0x0300).rw(FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
+	map(0x9400, 0x9403).mirror(0x01fc).r(FUNC(ccastles_state::leta_r));
 	map(0x9600, 0x97ff).portr("IN0");
 	map(0x9800, 0x980f).mirror(0x01f0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x9a00, 0x9a0f).mirror(0x01f0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x9c00, 0x9c7f).w(this, FUNC(ccastles_state::nvram_recall_w));
-	map(0x9c80, 0x9cff).w(this, FUNC(ccastles_state::ccastles_hscroll_w));
-	map(0x9d00, 0x9d7f).w(this, FUNC(ccastles_state::ccastles_vscroll_w));
-	map(0x9d80, 0x9dff).w(this, FUNC(ccastles_state::irq_ack_w));
+	map(0x9c00, 0x9c7f).w(FUNC(ccastles_state::nvram_recall_w));
+	map(0x9c80, 0x9cff).w(FUNC(ccastles_state::ccastles_hscroll_w));
+	map(0x9d00, 0x9d7f).w(FUNC(ccastles_state::ccastles_vscroll_w));
+	map(0x9d80, 0x9dff).w(FUNC(ccastles_state::irq_ack_w));
 	map(0x9e00, 0x9e7f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x9e80, 0x9e87).mirror(0x0078).w("outlatch0", FUNC(ls259_device::write_d0));
-	map(0x9f00, 0x9f07).mirror(0x0078).w(this, FUNC(ccastles_state::ccastles_video_control_w));
-	map(0x9f80, 0x9fbf).mirror(0x0040).w(this, FUNC(ccastles_state::ccastles_paletteram_w));
+	map(0x9f00, 0x9f07).mirror(0x0078).w(FUNC(ccastles_state::ccastles_video_control_w));
+	map(0x9f80, 0x9fbf).mirror(0x0040).w(FUNC(ccastles_state::ccastles_paletteram_w));
 	map(0xa000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xffff).rom();
 }

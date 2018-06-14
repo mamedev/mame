@@ -6,6 +6,7 @@
 #include "machine/i8255.h"
 #include "machine/segacrp2_device.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class system1_state : public driver_device

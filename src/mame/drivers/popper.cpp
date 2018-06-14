@@ -42,6 +42,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -131,23 +132,23 @@ void popper_state::main_map(address_map &map)
 	map(0xcf00, 0xcfff).ram();
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
 	map(0xd800, 0xdfff).ram().share("shared");
-	map(0xe000, 0xe003).mirror(0x03fc).r(this, FUNC(popper_state::inputs_r));
-	map(0xe000, 0xe000).mirror(0x1ff8).w(this, FUNC(popper_state::nmi_control_w));
-	map(0xe001, 0xe001).mirror(0x1ff8).w(this, FUNC(popper_state::crt_direction_w));
-	map(0xe002, 0xe002).mirror(0x1ff8).w(this, FUNC(popper_state::back_color_select_w));
-	map(0xe003, 0xe003).mirror(0x1ff8).w(this, FUNC(popper_state::vram_page_select_w));
-	map(0xe004, 0xe007).mirror(0x1ff8).w(this, FUNC(popper_state::intcycle_w));
-	map(0xe400, 0xe400).mirror(0x03ff).r(this, FUNC(popper_state::subcpu_nmi_r));
+	map(0xe000, 0xe003).mirror(0x03fc).r(FUNC(popper_state::inputs_r));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(FUNC(popper_state::nmi_control_w));
+	map(0xe001, 0xe001).mirror(0x1ff8).w(FUNC(popper_state::crt_direction_w));
+	map(0xe002, 0xe002).mirror(0x1ff8).w(FUNC(popper_state::back_color_select_w));
+	map(0xe003, 0xe003).mirror(0x1ff8).w(FUNC(popper_state::vram_page_select_w));
+	map(0xe004, 0xe007).mirror(0x1ff8).w(FUNC(popper_state::intcycle_w));
+	map(0xe400, 0xe400).mirror(0x03ff).r(FUNC(popper_state::subcpu_nmi_r));
 	map(0xe800, 0xf7ff).noprw();
-	map(0xf800, 0xf800).mirror(0x03ff).r(this, FUNC(popper_state::subcpu_reset_r));
-	map(0xfc00, 0xfc00).mirror(0x03ff).r(this, FUNC(popper_state::watchdog_clear_r));
+	map(0xf800, 0xf800).mirror(0x03ff).r(FUNC(popper_state::subcpu_reset_r));
+	map(0xfc00, 0xfc00).mirror(0x03ff).r(FUNC(popper_state::watchdog_clear_r));
 }
 
 void popper_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x7fff).noprw();
-	map(0x8000, 0x8003).mirror(0x1ffc).w(this, FUNC(popper_state::ay1_w));
+	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(popper_state::ay1_w));
 	map(0xa000, 0xa003).mirror(0x1ffc).w("ay2", FUNC(ay8910_device::write_bc1_bc2));
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("shared");
 	map(0xe000, 0xffff).noprw();

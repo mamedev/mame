@@ -33,6 +33,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -50,16 +51,16 @@ void galaxy_state::galaxyp_io(address_map &map)
 void galaxy_state::galaxy_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
 }
 
 void galaxy_state::galaxyp_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); // ROM A
 	map(0x1000, 0x1fff).rom(); // ROM B
-	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
 	map(0xe000, 0xefff).rom(); // ROM C
 	map(0xf000, 0xffff).rom(); // ROM D
 }

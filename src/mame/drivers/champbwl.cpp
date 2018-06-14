@@ -158,6 +158,7 @@ Notes:
 #include "machine/ticket.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -261,13 +262,13 @@ void champbwl_state::champbwl_map(address_map &map)
 	map(0xe300, 0xe303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
 	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
 
-	map(0xf000, 0xf000).r(this, FUNC(champbwl_state::trackball_r));
+	map(0xf000, 0xf000).r(FUNC(champbwl_state::trackball_r));
 	map(0xf002, 0xf002).portr("IN0");
-	map(0xf004, 0xf004).r(this, FUNC(champbwl_state::trackball_reset_r));
+	map(0xf004, 0xf004).r(FUNC(champbwl_state::trackball_reset_r));
 	map(0xf006, 0xf006).portr("IN2");
 	map(0xf007, 0xf007).portr("IN3");
 
-	map(0xf000, 0xf000).w(this, FUNC(champbwl_state::champbwl_misc_w));
+	map(0xf000, 0xf000).w(FUNC(champbwl_state::champbwl_misc_w));
 	map(0xf002, 0xf002).nopw(); //buttons light?
 	map(0xf004, 0xf004).nopw(); //buttons light?
 	map(0xf006, 0xf006).nopw(); //buttons light?
@@ -300,7 +301,7 @@ void champbwl_state::doraemon(address_map &map)
 	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
 	map(0xe300, 0xe303).w(m_seta001, FUNC(seta001_device::spritectrl_w8));
 	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf000, 0xf000).portr("IN0").w(this, FUNC(champbwl_state::doraemon_outputs_w));
+	map(0xf000, 0xf000).portr("IN0").w(FUNC(champbwl_state::doraemon_outputs_w));
 	map(0xf002, 0xf002).portr("IN1").nopw();    // Ack?
 	map(0xf004, 0xf004).nopw();                        // Ack?
 	map(0xf006, 0xf006).portr("DSW").nopw();    // Ack?

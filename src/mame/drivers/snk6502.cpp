@@ -345,16 +345,16 @@ CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
 void snk6502_state::sasuke_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
 	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x4000, 0x8fff).rom();
 	map(0xb000, 0xb001).w("snk6502", FUNC(sasuke_sound_device::sound_w));
-	map(0xb002, 0xb002).w(this, FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
-	map(0xb003, 0xb003).w(this, FUNC(snk6502_state::satansat_backcolor_w));
+	map(0xb002, 0xb002).w(FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
+	map(0xb003, 0xb003).w(FUNC(snk6502_state::satansat_backcolor_w));
 	map(0xb004, 0xb004).portr("IN0");
 	map(0xb005, 0xb005).portr("IN1");
 	map(0xb006, 0xb006).portr("DSW");
@@ -365,16 +365,16 @@ void snk6502_state::sasuke_map(address_map &map)
 void snk6502_state::satansat_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
 	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x4000, 0x9fff).rom();
 	map(0xb000, 0xb001).w("snk6502", FUNC(satansat_sound_device::sound_w));
-	map(0xb002, 0xb002).w(this, FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
-	map(0xb003, 0xb003).w(this, FUNC(snk6502_state::satansat_backcolor_w));
+	map(0xb002, 0xb002).w(FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
+	map(0xb003, 0xb003).w(FUNC(snk6502_state::satansat_backcolor_w));
 	map(0xb004, 0xb004).portr("IN0");
 	map(0xb005, 0xb005).portr("IN1");
 	map(0xb006, 0xb006).portr("DSW");
@@ -385,20 +385,20 @@ void snk6502_state::satansat_map(address_map &map)
 void snk6502_state::vanguard_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
 	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x3100, 0x3102).w("snk6502", FUNC(vanguard_sound_device::sound_w));
-	map(0x3103, 0x3103).w(this, FUNC(snk6502_state::flipscreen_w));
+	map(0x3103, 0x3103).w(FUNC(snk6502_state::flipscreen_w));
 	map(0x3104, 0x3104).portr("IN0");
 	map(0x3105, 0x3105).portr("IN1");
 	map(0x3106, 0x3106).portr("DSW");
 	map(0x3107, 0x3107).portr("IN2");
-	map(0x3200, 0x3200).w(this, FUNC(snk6502_state::scrollx_w));
-	map(0x3300, 0x3300).w(this, FUNC(snk6502_state::scrolly_w));
+	map(0x3200, 0x3200).w(FUNC(snk6502_state::scrollx_w));
+	map(0x3300, 0x3300).w(FUNC(snk6502_state::scrolly_w));
 	map(0x3400, 0x3400).w("snk6502", FUNC(vanguard_sound_device::speech_w)); // speech
 	map(0x4000, 0xbfff).rom();
 	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
@@ -407,20 +407,20 @@ void snk6502_state::vanguard_map(address_map &map)
 void fantasy_state::fantasy_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(fantasy_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(fantasy_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(fantasy_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(fantasy_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(fantasy_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
 	map(0x2000, 0x2000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x2100, 0x2102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
-	map(0x2103, 0x2103).w(this, FUNC(fantasy_state::fantasy_flipscreen_w)); // affects both video and sound
+	map(0x2103, 0x2103).w(FUNC(fantasy_state::fantasy_flipscreen_w)); // affects both video and sound
 	map(0x2104, 0x2104).portr("IN0");
 	map(0x2105, 0x2105).portr("IN1");
 	map(0x2106, 0x2106).portr("DSW");
 	map(0x2107, 0x2107).portr("IN2");
-	map(0x2200, 0x2200).w(this, FUNC(fantasy_state::scrollx_w));
-	map(0x2300, 0x2300).w(this, FUNC(fantasy_state::scrolly_w));
+	map(0x2200, 0x2200).w(FUNC(fantasy_state::scrollx_w));
+	map(0x2300, 0x2300).w(FUNC(fantasy_state::scrolly_w));
 	map(0x2400, 0x2400).w("snk6502", FUNC(fantasy_sound_device::speech_w));  // speech
 	map(0x3000, 0xbfff).rom();
 	map(0xf000, 0xffff).rom();
@@ -429,21 +429,21 @@ void fantasy_state::fantasy_map(address_map &map)
 void fantasy_state::pballoon_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(fantasy_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(fantasy_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(fantasy_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(fantasy_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(fantasy_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
 	map(0x3000, 0x9fff).rom();
 	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xb100, 0xb102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
-	map(0xb103, 0xb103).w(this, FUNC(fantasy_state::fantasy_flipscreen_w)); // affects both video and sound
+	map(0xb103, 0xb103).w(FUNC(fantasy_state::fantasy_flipscreen_w)); // affects both video and sound
 	map(0xb104, 0xb104).portr("IN0");
 	map(0xb105, 0xb105).portr("IN1");
 	map(0xb106, 0xb106).portr("DSW");
 	map(0xb107, 0xb107).portr("IN2");
-	map(0xb200, 0xb200).w(this, FUNC(fantasy_state::scrollx_w));
-	map(0xb300, 0xb300).w(this, FUNC(fantasy_state::scrolly_w));
+	map(0xb200, 0xb200).w(FUNC(fantasy_state::scrollx_w));
+	map(0xb300, 0xb300).w(FUNC(fantasy_state::scrolly_w));
 	map(0xf000, 0xffff).rom();
 }
 

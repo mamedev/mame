@@ -8,15 +8,15 @@ DEFINE_DEVICE_TYPE(NEXTMO, nextmo_device, "nextmo", "NeXT Magneto-optical drive"
 
 void nextmo_device::map(address_map &map)
 {
-	map(0x04, 0x04).rw(this, FUNC(nextmo_device::r4_r), FUNC(nextmo_device::r4_w));
-	map(0x05, 0x05).rw(this, FUNC(nextmo_device::r5_r), FUNC(nextmo_device::r5_w));
-	map(0x06, 0x06).rw(this, FUNC(nextmo_device::r6_r), FUNC(nextmo_device::r6_w));
-	map(0x07, 0x07).rw(this, FUNC(nextmo_device::r7_r), FUNC(nextmo_device::r7_w));
-	map(0x08, 0x08).rw(this, FUNC(nextmo_device::r8_r), FUNC(nextmo_device::r8_w));
-	map(0x09, 0x09).rw(this, FUNC(nextmo_device::r9_r), FUNC(nextmo_device::r9_w));
-	map(0x0a, 0x0a).rw(this, FUNC(nextmo_device::ra_r), FUNC(nextmo_device::ra_w));
-	map(0x0b, 0x0b).rw(this, FUNC(nextmo_device::rb_r), FUNC(nextmo_device::rb_w));
-	map(0x10, 0x17).rw(this, FUNC(nextmo_device::r10_r), FUNC(nextmo_device::r10_w));
+	map(0x04, 0x04).rw(FUNC(nextmo_device::r4_r), FUNC(nextmo_device::r4_w));
+	map(0x05, 0x05).rw(FUNC(nextmo_device::r5_r), FUNC(nextmo_device::r5_w));
+	map(0x06, 0x06).rw(FUNC(nextmo_device::r6_r), FUNC(nextmo_device::r6_w));
+	map(0x07, 0x07).rw(FUNC(nextmo_device::r7_r), FUNC(nextmo_device::r7_w));
+	map(0x08, 0x08).rw(FUNC(nextmo_device::r8_r), FUNC(nextmo_device::r8_w));
+	map(0x09, 0x09).rw(FUNC(nextmo_device::r9_r), FUNC(nextmo_device::r9_w));
+	map(0x0a, 0x0a).rw(FUNC(nextmo_device::ra_r), FUNC(nextmo_device::ra_w));
+	map(0x0b, 0x0b).rw(FUNC(nextmo_device::rb_r), FUNC(nextmo_device::rb_w));
+	map(0x10, 0x17).rw(FUNC(nextmo_device::r10_r), FUNC(nextmo_device::r10_w));
 }
 
 nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

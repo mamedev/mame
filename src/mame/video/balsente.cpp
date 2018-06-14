@@ -42,7 +42,7 @@ void balsente_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_videoram_w)
+WRITE8_MEMBER(balsente_state::videoram_w)
 {
 	/* expand the two pixel values into two bytes */
 	m_videoram[offset] = data;
@@ -59,7 +59,7 @@ WRITE8_MEMBER(balsente_state::balsente_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
+WRITE8_MEMBER(balsente_state::palette_select_w)
 {
 	/* only update if changed */
 	if (m_palettebank_vis != (data & 3))
@@ -80,7 +80,7 @@ WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_paletteram_w)
+WRITE8_MEMBER(balsente_state::paletteram_w)
 {
 	int r, g, b;
 

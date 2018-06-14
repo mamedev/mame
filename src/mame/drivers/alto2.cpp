@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
+#include "emupal.h"
 #include "screen.h"
 #include "rendlay.h"
 #include "speaker.h"

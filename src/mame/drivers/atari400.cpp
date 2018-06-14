@@ -575,7 +575,7 @@ void a400_state::a400_mem(address_map &map)
 void a400_state::a600xl_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x5000, 0x57ff).r(this, FUNC(a400_state::a600xl_low_r));    // self test or NOP
+	map(0x5000, 0x57ff).r(FUNC(a400_state::a600xl_low_r));    // self test or NOP
 	map(0xa000, 0xbfff).rom(); // BASIC
 	map(0xc000, 0xcfff).rom(); // OS
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
@@ -590,53 +590,53 @@ void a400_state::a600xl_mem(address_map &map)
 
 void a400_state::a1200xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a1200xl_low_r), FUNC(a400_state::xegs_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a1200xl_low_r), FUNC(a400_state::xegs_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
 void a400_state::a800xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a800xl_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a800xl_low_r), FUNC(a400_state::a800xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
 void a400_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
 void a400_state::xegs_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::xegs_low_r), FUNC(a400_state::xegs_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::xegs_low_r), FUNC(a400_state::xegs_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
@@ -2012,8 +2012,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 
 MACHINE_RESET_MEMBER( a400_state, a400 )
 {
-	pokey_device *pokey = machine().device<pokey_device>("pokey");
-	pokey->write(15,0);
+	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
 }
 
 
