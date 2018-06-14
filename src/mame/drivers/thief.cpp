@@ -137,20 +137,20 @@ void thief_state::sharkatt_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();     /* 2114 */
-	map(0xc000, 0xdfff).rw(this, FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
+	map(0xc000, 0xdfff).rw(FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
 }
 
 void thief_state::thief_main_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(thief_state::thief_blit_w));
+	map(0x0000, 0x0000).w(FUNC(thief_state::thief_blit_w));
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();     /* 2114 */
 	map(0xa000, 0xafff).rom();     /* NATO Defense diagnostic ROM */
-	map(0xc000, 0xdfff).rw(this, FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
-	map(0xe000, 0xe008).rw(this, FUNC(thief_state::thief_coprocessor_r), FUNC(thief_state::thief_coprocessor_w));
+	map(0xc000, 0xdfff).rw(FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
+	map(0xe000, 0xe008).rw(FUNC(thief_state::thief_coprocessor_r), FUNC(thief_state::thief_coprocessor_w));
 	map(0xe010, 0xe02f).rom();
-	map(0xe080, 0xe0bf).rw(this, FUNC(thief_state::thief_context_ram_r), FUNC(thief_state::thief_context_ram_w));
-	map(0xe0c0, 0xe0c0).w(this, FUNC(thief_state::thief_context_bank_w));
+	map(0xe080, 0xe0bf).rw(FUNC(thief_state::thief_context_ram_r), FUNC(thief_state::thief_context_ram_w));
+	map(0xe0c0, 0xe0c0).w(FUNC(thief_state::thief_context_bank_w));
 }
 
 
@@ -158,15 +158,15 @@ void thief_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw(); /* watchdog */
-	map(0x10, 0x10).w(this, FUNC(thief_state::thief_video_control_w));
+	map(0x10, 0x10).w(FUNC(thief_state::thief_video_control_w));
 	map(0x30, 0x33).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x41).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x41, 0x41).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x42, 0x43).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x43, 0x43).r("ay2", FUNC(ay8910_device::data_r));
-	map(0x50, 0x50).w(this, FUNC(thief_state::thief_color_plane_w));
+	map(0x50, 0x50).w(FUNC(thief_state::thief_color_plane_w));
 	map(0x60, 0x6f).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
-	map(0x70, 0x7f).w(this, FUNC(thief_state::thief_color_map_w));
+	map(0x70, 0x7f).w(FUNC(thief_state::thief_color_map_w));
 }
 
 

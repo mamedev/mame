@@ -112,23 +112,23 @@
 
 void imds2_state::ipc_mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(imds2_state::ipc_mem_read), FUNC(imds2_state::ipc_mem_write));
+	map(0x0000, 0xffff).rw(FUNC(imds2_state::ipc_mem_read), FUNC(imds2_state::ipc_mem_write));
 }
 
 void imds2_state::ipc_io_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0xc0, 0xc0).rw(this, FUNC(imds2_state::imds2_ipc_dbbout_r), FUNC(imds2_state::imds2_ipc_dbbin_data_w));
-	map(0xc1, 0xc1).rw(this, FUNC(imds2_state::imds2_ipc_status_r), FUNC(imds2_state::imds2_ipc_dbbin_cmd_w));
-		map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-		map(0xf4, 0xf4).rw(m_ipcusart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-		map(0xf5, 0xf5).rw(m_ipcusart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-		map(0xf6, 0xf6).rw(m_ipcusart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-		map(0xf7, 0xf7).rw(m_ipcusart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc0).rw(FUNC(imds2_state::imds2_ipc_dbbout_r), FUNC(imds2_state::imds2_ipc_dbbin_data_w));
+	map(0xc1, 0xc1).rw(FUNC(imds2_state::imds2_ipc_status_r), FUNC(imds2_state::imds2_ipc_dbbin_cmd_w));
+	map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf4, 0xf4).rw(m_ipcusart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf5, 0xf5).rw(m_ipcusart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf6, 0xf6).rw(m_ipcusart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf7, 0xf7).rw(m_ipcusart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf8, 0xf9).rw(m_iocpio, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
-	map(0xfa, 0xfb).rw(this, FUNC(imds2_state::imds2_ipclocpic_r), FUNC(imds2_state::imds2_ipclocpic_w));
-	map(0xfc, 0xfd).rw(this, FUNC(imds2_state::imds2_ipcsyspic_r), FUNC(imds2_state::imds2_ipcsyspic_w));
-	map(0xff, 0xff).w(this, FUNC(imds2_state::imds2_ipc_control_w));
+	map(0xfa, 0xfb).rw(FUNC(imds2_state::imds2_ipclocpic_r), FUNC(imds2_state::imds2_ipclocpic_w));
+	map(0xfc, 0xfd).rw(FUNC(imds2_state::imds2_ipcsyspic_r), FUNC(imds2_state::imds2_ipcsyspic_w));
+	map(0xff, 0xff).w(FUNC(imds2_state::imds2_ipc_control_w));
 }
 
 void imds2_state::ioc_mem_map(address_map &map)
@@ -141,16 +141,16 @@ void imds2_state::ioc_mem_map(address_map &map)
 void imds2_state::ioc_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x0f).w(this, FUNC(imds2_state::imds2_ioc_dbbout_w));
-	map(0x20, 0x2f).w(this, FUNC(imds2_state::imds2_ioc_f0_w));
-	map(0x30, 0x3f).w(this, FUNC(imds2_state::imds2_ioc_set_f1_w));
-	map(0x40, 0x4f).w(this, FUNC(imds2_state::imds2_ioc_reset_f1_w));
-	map(0x50, 0x5f).w(this, FUNC(imds2_state::imds2_start_timer_w));
-	map(0x60, 0x6f).w(this, FUNC(imds2_state::imds2_miscout_w));
-	map(0x80, 0x8f).r(this, FUNC(imds2_state::imds2_miscin_r));
-	map(0x90, 0x9f).r(this, FUNC(imds2_state::imds2_kb_read));
-	map(0xa0, 0xaf).r(this, FUNC(imds2_state::imds2_ioc_status_r));
-	map(0xb0, 0xbf).r(this, FUNC(imds2_state::imds2_ioc_dbbin_r));
+	map(0x00, 0x0f).w(FUNC(imds2_state::imds2_ioc_dbbout_w));
+	map(0x20, 0x2f).w(FUNC(imds2_state::imds2_ioc_f0_w));
+	map(0x30, 0x3f).w(FUNC(imds2_state::imds2_ioc_set_f1_w));
+	map(0x40, 0x4f).w(FUNC(imds2_state::imds2_ioc_reset_f1_w));
+	map(0x50, 0x5f).w(FUNC(imds2_state::imds2_start_timer_w));
+	map(0x60, 0x6f).w(FUNC(imds2_state::imds2_miscout_w));
+	map(0x80, 0x8f).r(FUNC(imds2_state::imds2_miscin_r));
+	map(0x90, 0x9f).r(FUNC(imds2_state::imds2_kb_read));
+	map(0xa0, 0xaf).r(FUNC(imds2_state::imds2_ioc_status_r));
+	map(0xb0, 0xbf).r(FUNC(imds2_state::imds2_ioc_dbbin_r));
 	map(0xc0, 0xcf).m(m_iocfdc, FUNC(i8271_device::map));
 	map(0xd0, 0xdf).rw(m_ioccrtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xe0, 0xef).rw(m_ioctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));

@@ -41,6 +41,7 @@
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -391,23 +392,23 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 void alphatro_state::alphatro_map(address_map &map)
 {
 	map(0x0000, 0x5fff).m(m_lowbank, FUNC(address_map_bank_device::amap8));
-	map(0x6000, 0x9fff).rw(this, FUNC(alphatro_state::ram6000_r), FUNC(alphatro_state::ram6000_w));
+	map(0x6000, 0x9fff).rw(FUNC(alphatro_state::ram6000_r), FUNC(alphatro_state::ram6000_w));
 	map(0xa000, 0xdfff).m("cartbank", FUNC(address_map_bank_device::amap8));
-	map(0xe000, 0xefff).rw(this, FUNC(alphatro_state::rame000_r), FUNC(alphatro_state::rame000_w));
+	map(0xe000, 0xefff).rw(FUNC(alphatro_state::rame000_r), FUNC(alphatro_state::rame000_w));
 	map(0xf000, 0xffff).m("monbank", FUNC(address_map_bank_device::amap8));
 
 }
 
 void alphatro_state::rombank_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom().region("roms", 0x0000).w(this, FUNC(alphatro_state::ram0000_w));
-	map(0x6000, 0xbfff).rw(this, FUNC(alphatro_state::ram0000_r), FUNC(alphatro_state::ram0000_w));
+	map(0x0000, 0x5fff).rom().region("roms", 0x0000).w(FUNC(alphatro_state::ram0000_w));
+	map(0x6000, 0xbfff).rw(FUNC(alphatro_state::ram0000_r), FUNC(alphatro_state::ram0000_w));
 }
 
 void alphatro_state::cartbank_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(m_cart, FUNC(generic_slot_device::read_rom)).w(this, FUNC(alphatro_state::rama000_w));
-	map(0x4000, 0x7fff).rw(this, FUNC(alphatro_state::rama000_r), FUNC(alphatro_state::rama000_w));
+	map(0x0000, 0x3fff).r(m_cart, FUNC(generic_slot_device::read_rom)).w(FUNC(alphatro_state::rama000_w));
+	map(0x4000, 0x7fff).rw(FUNC(alphatro_state::rama000_r), FUNC(alphatro_state::rama000_w));
 }
 
 void alphatro_state::monbank_map(address_map &map)
@@ -421,8 +422,8 @@ void alphatro_state::alphatro_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x10, 0x10).rw(this, FUNC(alphatro_state::port10_r), FUNC(alphatro_state::port10_w));
-	map(0x20, 0x20).portr("X0").w(this, FUNC(alphatro_state::port20_w));
+	map(0x10, 0x10).rw(FUNC(alphatro_state::port10_r), FUNC(alphatro_state::port10_w));
+	map(0x20, 0x20).portr("X0").w(FUNC(alphatro_state::port20_w));
 	map(0x21, 0x21).portr("X1");
 	map(0x22, 0x22).portr("X2");
 	map(0x23, 0x23).portr("X3");
@@ -434,7 +435,7 @@ void alphatro_state::alphatro_io(address_map &map)
 	map(0x29, 0x29).portr("X9");
 	map(0x2a, 0x2a).portr("XA");
 	map(0x2b, 0x2b).portr("XB");
-	map(0x30, 0x30).rw(this, FUNC(alphatro_state::port30_r), FUNC(alphatro_state::port30_w));
+	map(0x30, 0x30).rw(FUNC(alphatro_state::port30_r), FUNC(alphatro_state::port30_w));
 	// USART for cassette reading and writing
 	map(0x40, 0x40).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -445,7 +446,7 @@ void alphatro_state::alphatro_io(address_map &map)
 	map(0x60, 0x68).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	// 8259 PIT
 	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
-	map(0xf0, 0xf0).r(this, FUNC(alphatro_state::portf0_r)).w(this, FUNC(alphatro_state::portf0_w));
+	map(0xf0, 0xf0).r(FUNC(alphatro_state::portf0_r)).w(FUNC(alphatro_state::portf0_w));
 	map(0xf8, 0xf8).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0xf9, 0xf9).r(m_fdc, FUNC(upd765a_device::msr_r));
 }

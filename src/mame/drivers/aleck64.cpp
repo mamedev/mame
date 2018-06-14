@@ -179,6 +179,7 @@ Notes:
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -336,7 +337,7 @@ void aleck64_state::n64_map(address_map &map)
 
 	map(0xc0000000, 0xc07fffff).ram(); // SDRAM, Aleck 64 specific
 
-	map(0xc0800000, 0xc0800fff).rw(this, FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
+	map(0xc0800000, 0xc0800fff).rw(FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
 }
 
 /*
@@ -375,7 +376,7 @@ void aleck64_state::e90_map(address_map &map)
 	n64_map(map);
 	map(0xd0000000, 0xd0000fff).ram().share("e90vram");// x/y offsets
 	map(0xd0010000, 0xd0010fff).ram().share("e90pal");// RGB555 palette
-	map(0xd0030000, 0xd003001f).rw(this, FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
+	map(0xd0030000, 0xd003001f).rw(FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
 }
 
 void aleck64_state::rsp_map(address_map &map)

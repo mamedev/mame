@@ -128,7 +128,7 @@ void wmg_state::wmg_cpu1(address_map &map)
 	map(0x9000, 0xbfff).ram();
 	map(0xc000, 0xcfff).bankr("bank7");
 	map(0xd000, 0xffff).bankr("bank5");
-	map(0xd000, 0xd000).w(this, FUNC(wmg_state::wmg_d000_w));
+	map(0xd000, 0xd000).w(FUNC(wmg_state::wmg_d000_w));
 }
 
 void wmg_state::wmg_cpu2(address_map &map)
@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END

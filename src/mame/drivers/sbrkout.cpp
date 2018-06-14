@@ -40,6 +40,7 @@
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "sbrkout.lh"
@@ -400,16 +401,16 @@ void sbrkout_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x007f).mirror(0x380).bankrw("bank1");
-	map(0x0400, 0x07ff).ram().w(this, FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
-	map(0x0800, 0x083f).r(this, FUNC(sbrkout_state::switches_r));
+	map(0x0400, 0x07ff).ram().w(FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
+	map(0x0800, 0x083f).r(FUNC(sbrkout_state::switches_r));
 	map(0x0840, 0x0840).mirror(0x003f).portr("COIN");
 	map(0x0880, 0x0880).mirror(0x003f).portr("START");
 	map(0x08c0, 0x08c0).mirror(0x003f).portr("SERVICE");
-	map(0x0c00, 0x0c00).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync_r));
-	map(0x0c00, 0x0c7f).w(this, FUNC(sbrkout_state::output_latch_w));
+	map(0x0c00, 0x0c00).mirror(0x03ff).r(FUNC(sbrkout_state::sync_r));
+	map(0x0c00, 0x0c7f).w(FUNC(sbrkout_state::output_latch_w));
 	map(0x0c80, 0x0c80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0e00, 0x0e00).mirror(0x007f).w(this, FUNC(sbrkout_state::irq_ack_w));
-	map(0x1000, 0x1000).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync2_r));
+	map(0x0e00, 0x0e00).mirror(0x007f).w(FUNC(sbrkout_state::irq_ack_w));
+	map(0x1000, 0x1000).mirror(0x03ff).r(FUNC(sbrkout_state::sync2_r));
 	map(0x2800, 0x3fff).rom();
 }
 

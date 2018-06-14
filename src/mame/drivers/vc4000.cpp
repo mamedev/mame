@@ -189,8 +189,8 @@ void vc4000_state::vc4000_mem(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x1fff);
 	map(0x0000, 0x07ff).rom();
-	map(0x1680, 0x16ff).rw(this, FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl)).mirror(0x0800);
-	map(0x1700, 0x17ff).rw(this, FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w)).mirror(0x0800);
+	map(0x1680, 0x16ff).rw(FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl)).mirror(0x0800);
+	map(0x1700, 0x17ff).rw(FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w)).mirror(0x0800);
 }
 
 void vc4000_state::elektor_mem(address_map &map)
@@ -199,9 +199,9 @@ void vc4000_state::elektor_mem(address_map &map)
 	map.global_mask(0x1fff);
 	map(0x0000, 0x07ff).rom();
 	map(0x0800, 0x15ff).ram();
-	map(0x1980, 0x19ff).mirror(0x400).rw(this, FUNC(vc4000_state::elektor_cass_r), FUNC(vc4000_state::elektor_cass_w));
-	map(0x1680, 0x168f).mirror(0x800).rw(this, FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl));
-	map(0x1700, 0x17ff).mirror(0x800).rw(this, FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w));
+	map(0x1980, 0x19ff).mirror(0x400).rw(FUNC(vc4000_state::elektor_cass_r), FUNC(vc4000_state::elektor_cass_w));
+	map(0x1680, 0x168f).mirror(0x800).rw(FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl));
+	map(0x1700, 0x17ff).mirror(0x800).rw(FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w));
 }
 
 static INPUT_PORTS_START( vc4000 )

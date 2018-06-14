@@ -17,6 +17,7 @@
 #include "bus/epson_sio/epson_sio.h"
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 
 #define HD6301V1_MAIN_TAG   "8g"

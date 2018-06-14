@@ -47,6 +47,7 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -185,18 +186,18 @@ void onetwo_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0x10000);
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc800, 0xc87f).ram().w(this, FUNC(onetwo_state::palette1_w)).share("paletteram");
-	map(0xc900, 0xc97f).ram().w(this, FUNC(onetwo_state::palette2_w)).share("paletteram2");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(onetwo_state::onetwo_fgram_w)).share("fgram");
+	map(0xc800, 0xc87f).ram().w(FUNC(onetwo_state::palette1_w)).share("paletteram");
+	map(0xc900, 0xc97f).ram().w(FUNC(onetwo_state::palette2_w)).share("paletteram2");
+	map(0xd000, 0xdfff).ram().w(FUNC(onetwo_state::onetwo_fgram_w)).share("fgram");
 	map(0xe000, 0xffff).ram();
 }
 
 void onetwo_state::main_cpu_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w(this, FUNC(onetwo_state::onetwo_coin_counters_w));
+	map(0x00, 0x00).portr("DSW1").w(FUNC(onetwo_state::onetwo_coin_counters_w));
 	map(0x01, 0x01).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).portr("P1").w(this, FUNC(onetwo_state::onetwo_cpubank_w));
+	map(0x02, 0x02).portr("P1").w(FUNC(onetwo_state::onetwo_cpubank_w));
 	map(0x03, 0x03).portr("P2");
 	map(0x04, 0x04).portr("SYSTEM");
 }

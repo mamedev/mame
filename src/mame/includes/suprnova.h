@@ -6,6 +6,8 @@
 
 #include "cpu/sh/sh2.h"
 
+#include "emupal.h"
+
 
 struct hit_t
 {

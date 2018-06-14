@@ -72,7 +72,7 @@ WRITE8_MEMBER( sv802_device::iorq_w )
 {
 	switch (offset)
 	{
-	case 0x10: m_cent_data_out->write(space, 0, data); break;
+	case 0x10: m_cent_data_out->write(data); break;
 	case 0x11: m_centronics->write_strobe(BIT(data, 0)); break;
 	}
 }

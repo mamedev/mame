@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 
 class tx1_sound_device : public device_t, public device_sound_interface
@@ -19,27 +20,29 @@ public:
 	tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE16_MEMBER( z80_busreq_w );
-	DECLARE_WRITE8_MEMBER( z80_intreq_w );
+	DECLARE_READ16_MEMBER( dipswitches_r );
 	DECLARE_READ16_MEMBER( z80_shared_r );
 	DECLARE_WRITE16_MEMBER( z80_shared_w );
 
-	READ16_MEMBER( dipswitches_r );
+	DECLARE_WRITE8_MEMBER( z80_intreq_w );
+
 	DECLARE_WRITE8_MEMBER( ts_w );
 	DECLARE_READ8_MEMBER( ts_r );
+
+	DECLARE_READ8_MEMBER( pit8253_r );
+	DECLARE_WRITE8_MEMBER( pit8253_w );
+
+	INTERRUPT_GEN_MEMBER( z80_irq );
+
+protected:
 
 	DECLARE_WRITE8_MEMBER( tx1_ppi_latch_w );
 	DECLARE_WRITE8_MEMBER( tx1_coin_cnt_w );
 	DECLARE_READ8_MEMBER( tx1_ppi_porta_r );
 	DECLARE_READ8_MEMBER( tx1_ppi_portb_r );
 
-	DECLARE_READ8_MEMBER( pit8253_r );
-	DECLARE_WRITE8_MEMBER( pit8253_w );
 	DECLARE_WRITE8_MEMBER( ay8910_a_w );
 	DECLARE_WRITE8_MEMBER( ay8910_b_w );
-
-	INTERRUPT_GEN_MEMBER( z80_irq );
-
-protected:
 
 	/*************************************
 	 *
@@ -78,6 +81,13 @@ protected:
 	// internal state
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_z80_ram;
+	optional_device<i8255_device> m_ppi;
+
+	required_ioport m_dsw;
+	required_ioport m_steering;
+	required_ioport m_accelerator;
+	required_ioport m_brake;
+	optional_ioport m_ppi_portd;
 
 	sound_stream *m_stream;
 	uint32_t m_freq_to_step;
@@ -119,9 +129,7 @@ protected:
 class tx1j_sound_device : public tx1_sound_device
 {
 public:
-	tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		tx1_sound_device(mconfig, tag, owner, clock)
-	{ }
+	tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 
@@ -134,12 +142,8 @@ class buggyboy_sound_device : public tx1_sound_device
 public:
 	buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( ym1_a_w );
 	DECLARE_WRITE8_MEMBER( ym2_a_w );
 	DECLARE_WRITE8_MEMBER( ym2_b_w );
-
-	DECLARE_READ8_MEMBER( bb_analog_r );
-	DECLARE_WRITE8_MEMBER( bb_coin_cnt_w );
 
 protected:
 	buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -152,6 +156,11 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	DECLARE_WRITE8_MEMBER( ym1_a_w );
+
+	DECLARE_READ8_MEMBER( bb_analog_r );
+	DECLARE_WRITE8_MEMBER( bb_coin_cnt_w );
 
 	virtual bool has_coin_counters() { return false; }
 
@@ -166,12 +175,12 @@ class buggyboyjr_sound_device : public buggyboy_sound_device
 public:
 	buggyboyjr_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( bbjr_analog_r );
-
 protected:
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	DECLARE_READ8_MEMBER( bbjr_analog_r );
 
 	virtual bool has_coin_counters() override { return true; }
 

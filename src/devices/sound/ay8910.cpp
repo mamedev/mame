@@ -1394,35 +1394,9 @@ void ay8910_device::device_reset()
  *
  *************************************/
 
-u8 ay8910_device::data_r()
-{
-	return ay8910_read_ym();
-}
-
-void ay8910_device::address_w(u8 data)
-{
-	ay8910_write_ym(0, data);
-}
-
-void ay8910_device::data_w(u8 data)
-{
-	ay8910_write_ym(1, data);
-}
-
 READ8_MEMBER( ay8910_device::data_r )
 {
 	return ay8910_read_ym();
-}
-
-WRITE8_MEMBER( ay8910_device::data_address_w )
-{
-	/* note that directly connecting BC1 to A0 puts data on 0 and address on 1 */
-	ay8910_write_ym(~offset & 1, data);
-}
-
-WRITE8_MEMBER( ay8910_device::address_data_w )
-{
-	ay8910_write_ym(offset & 1, data);
 }
 
 WRITE8_MEMBER( ay8910_device::address_w )
@@ -1460,16 +1434,6 @@ WRITE8_MEMBER( ay8910_device::write_bc1_bc2 )
 		address_w(space, 0, data);
 		break;
 	}
-}
-
-WRITE8_MEMBER( ay8910_device::reset_w )
-{
-	reset_w();
-}
-
-void ay8910_device::reset_w()
-{
-	ay8910_reset_ym();
 }
 
 static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };

@@ -78,44 +78,44 @@ DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "Toshiba TMP8
 void tlcs870_device::tmp87ph40an_mem(address_map &map)
 {
 #if 0
-	map(0x0000, 0x0000).rw(this, FUNC(tlcs870_device::port0_r), FUNC(tlcs870_device::port0_w));
-	map(0x0001, 0x0001).rw(this, FUNC(tlcs870_device::port1_r), FUNC(tlcs870_device::port1_w));
-	map(0x0002, 0x0002).rw(this, FUNC(tlcs870_device::port2_r), FUNC(tlcs870_device::port2_w));
-	map(0x0003, 0x0003).rw(this, FUNC(tlcs870_device::port3_r), FUNC(tlcs870_device::port3_w));
-	map(0x0004, 0x0004).rw(this, FUNC(tlcs870_device::port4_r), FUNC(tlcs870_device::port4_w));
-	map(0x0005, 0x0005).rw(this, FUNC(tlcs870_device::port5_r), FUNC(tlcs870_device::port5_w));
-	map(0x0006, 0x0006).rw(this, FUNC(tlcs870_device::port6_r), FUNC(tlcs870_device::port6_w));
-	map(0x0007, 0x0007).rw(this, FUNC(tlcs870_device::port7_r), FUNC(tlcs870_device::port7_w));
+	map(0x0000, 0x0000).rw(FUNC(tlcs870_device::port0_r), FUNC(tlcs870_device::port0_w));
+	map(0x0001, 0x0001).rw(FUNC(tlcs870_device::port1_r), FUNC(tlcs870_device::port1_w));
+	map(0x0002, 0x0002).rw(FUNC(tlcs870_device::port2_r), FUNC(tlcs870_device::port2_w));
+	map(0x0003, 0x0003).rw(FUNC(tlcs870_device::port3_r), FUNC(tlcs870_device::port3_w));
+	map(0x0004, 0x0004).rw(FUNC(tlcs870_device::port4_r), FUNC(tlcs870_device::port4_w));
+	map(0x0005, 0x0005).rw(FUNC(tlcs870_device::port5_r), FUNC(tlcs870_device::port5_w));
+	map(0x0006, 0x0006).rw(FUNC(tlcs870_device::port6_r), FUNC(tlcs870_device::port6_w));
+	map(0x0007, 0x0007).rw(FUNC(tlcs870_device::port7_r), FUNC(tlcs870_device::port7_w));
 	// 0x8 reserved
 	// 0x9 reserved
-	map(0x000a, 0x000a).w(this, FUNC(tlcs870_device::p0cr_w)); // Port 0 I/O control
-	map(0x000b, 0x000b).w(this, FUNC(tlcs870_device::p1cr_w)); // Port 1 I/O control
-	map(0x000c, 0x000c).w(this, FUNC(tlcs870_device::p6cr_w)); // Port 6 I/O control
-	map(0x000d, 0x000d).w(this, FUNC(tlcs870_device::p7cr_w)); // Port 7 I/O control
-	map(0x000e, 0x000e).rw(this, FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
-	map(0x000f, 0x000f).r(this, FUNC(tlcs870_device::adcdr_r)); // A/D converter result
+	map(0x000a, 0x000a).w(FUNC(tlcs870_device::p0cr_w)); // Port 0 I/O control
+	map(0x000b, 0x000b).w(FUNC(tlcs870_device::p1cr_w)); // Port 1 I/O control
+	map(0x000c, 0x000c).w(FUNC(tlcs870_device::p6cr_w)); // Port 6 I/O control
+	map(0x000d, 0x000d).w(FUNC(tlcs870_device::p7cr_w)); // Port 7 I/O control
+	map(0x000e, 0x000e).rw(FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
+	map(0x000f, 0x000f).r(FUNC(tlcs870_device::adcdr_r)); // A/D converter result
 
-	map(0x0010, 0x0010).w(this, FUNC(tlcs870_device::treg1a_l_w)); // Timer register 1A
-	map(0x0011, 0x0011).w(this, FUNC(tlcs870_device::treg1a_h_w)); //
-	map(0x0012, 0x0012).rw(this, FUNC(tlcs870_device::treg1b_l_r), FUNC(tlcs870_device::treg1b_l_w)); // Timer register 1B
-	map(0x0013, 0x0013).rw(this, FUNC(tlcs870_device::treg1b_h_r), FUNC(tlcs870_device::treg1b_h_w)); //
-	map(0x0014, 0x0014).w(this, FUNC(tlcs870_device::tc1cr_w)); // TC1 control
-	map(0x0015, 0x0015).w(this, FUNC(tlcs870_device::tc2cr_w)); // TC2 control
-	map(0x0016, 0x0016).w(this, FUNC(tlcs870_device::treg2_l_w)); // Timer register 2
-	map(0x0017, 0x0017).w(this, FUNC(tlcs870_device::treg2_h_w)); //
-	map(0x0018, 0x0018).rw(this, FUNC(tlcs870_device::treg3a_r), FUNC(tlcs870_device::treg3a_w)); // Timer register 3A
-	map(0x0019, 0x0019).r(this, FUNC(tlcs870_device::treg3b_r)); // Timer register 3B
-	map(0x001a, 0x001a).w(this, FUNC(tlcs870_device::tc3cr_w)); // TC3 control
-	map(0x001b, 0x001b).r(this, FUNC(tlcs870_device::treg4_r)); // Timer register 4
-	map(0x001c, 0x001c).w(this, FUNC(tlcs870_device::tc4cr_w)); // TC4 control
+	map(0x0010, 0x0010).w(FUNC(tlcs870_device::treg1a_l_w)); // Timer register 1A
+	map(0x0011, 0x0011).w(FUNC(tlcs870_device::treg1a_h_w)); //
+	map(0x0012, 0x0012).rw(FUNC(tlcs870_device::treg1b_l_r), FUNC(tlcs870_device::treg1b_l_w)); // Timer register 1B
+	map(0x0013, 0x0013).rw(FUNC(tlcs870_device::treg1b_h_r), FUNC(tlcs870_device::treg1b_h_w)); //
+	map(0x0014, 0x0014).w(FUNC(tlcs870_device::tc1cr_w)); // TC1 control
+	map(0x0015, 0x0015).w(FUNC(tlcs870_device::tc2cr_w)); // TC2 control
+	map(0x0016, 0x0016).w(FUNC(tlcs870_device::treg2_l_w)); // Timer register 2
+	map(0x0017, 0x0017).w(FUNC(tlcs870_device::treg2_h_w)); //
+	map(0x0018, 0x0018).rw(FUNC(tlcs870_device::treg3a_r), FUNC(tlcs870_device::treg3a_w)); // Timer register 3A
+	map(0x0019, 0x0019).r(FUNC(tlcs870_device::treg3b_r)); // Timer register 3B
+	map(0x001a, 0x001a).w(FUNC(tlcs870_device::tc3cr_w)); // TC3 control
+	map(0x001b, 0x001b).r(FUNC(tlcs870_device::treg4_r)); // Timer register 4
+	map(0x001c, 0x001c).w(FUNC(tlcs870_device::tc4cr_w)); // TC4 control
 	// 0x1d reserved
 	// 0x1e reserved
 	// 0x1f reserved
 
-	map(0x0020, 0x0020).rw(this, FUNC(tlcs870_device::sio1sr_r), FUNC(tlcs870_device::sio1cr1_w)); // SIO1 status / SIO1 control
-	map(0x0021, 0x0021).w(this, FUNC(tlcs870_device::sio1cr2_w)); // SIO1 control
-	map(0x0022, 0x0022).rw(this, FUNC(tlcs870_device::sio2sr_r), FUNC(tlcs870_device::sio2cr1_w)); // SIO2 status / SIO2 control
-	map(0x0023, 0x0023).w(this, FUNC(tlcs870_device::sio2cr2_w)); // SIO2 control
+	map(0x0020, 0x0020).rw(FUNC(tlcs870_device::sio1sr_r), FUNC(tlcs870_device::sio1cr1_w)); // SIO1 status / SIO1 control
+	map(0x0021, 0x0021).w(FUNC(tlcs870_device::sio1cr2_w)); // SIO1 control
+	map(0x0022, 0x0022).rw(FUNC(tlcs870_device::sio2sr_r), FUNC(tlcs870_device::sio2cr1_w)); // SIO2 status / SIO2 control
+	map(0x0023, 0x0023).w(FUNC(tlcs870_device::sio2cr2_w)); // SIO2 control
 	// 0x24 reserved
 	// 0x25 reserved
 	// 0x26 reserved
@@ -133,22 +133,22 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	// 0x31 reserved
 	// 0x32 reserved
 	// 0x33 reserved
-	map(0x0034, 0x0034).w(this, FUNC(tlcs870_device::wdtcr1_w)); // WDT control
-	map(0x0035, 0x0035).w(this, FUNC(tlcs870_device::wdtcr2_w)); //
+	map(0x0034, 0x0034).w(FUNC(tlcs870_device::wdtcr1_w)); // WDT control
+	map(0x0035, 0x0035).w(FUNC(tlcs870_device::wdtcr2_w)); //
 
-	map(0x0036, 0x0036).rw(this, FUNC(tlcs870_device::tbtcr_r), FUNC(tlcs870_device::tbtcr_w)); // TBT / TG / DVO control
-	map(0x0037, 0x0037).rw(this, FUNC(tlcs870_device::eintcr_r), FUNC(tlcs870_device::eintcr_w)); // External interrupt control
+	map(0x0036, 0x0036).rw(FUNC(tlcs870_device::tbtcr_r), FUNC(tlcs870_device::tbtcr_w)); // TBT / TG / DVO control
+	map(0x0037, 0x0037).rw(FUNC(tlcs870_device::eintcr_r), FUNC(tlcs870_device::eintcr_w)); // External interrupt control
 
-	map(0x0038, 0x0038).rw(this, FUNC(tlcs870_device::syscr1_r), FUNC(tlcs870_device::syscr1_w)); // System Control
-	map(0x0039, 0x0039).rw(this, FUNC(tlcs870_device::syscr2_r), FUNC(tlcs870_device::syscr2_w)); //
+	map(0x0038, 0x0038).rw(FUNC(tlcs870_device::syscr1_r), FUNC(tlcs870_device::syscr1_w)); // System Control
+	map(0x0039, 0x0039).rw(FUNC(tlcs870_device::syscr2_r), FUNC(tlcs870_device::syscr2_w)); //
 
-	map(0x003a, 0x003a).rw(this, FUNC(tlcs870_device::eir_l_r), FUNC(tlcs870_device::eir_l_w)); // Interrupt enable register
-	map(0x003b, 0x003b).rw(this, FUNC(tlcs870_device::eir_h_r), FUNC(tlcs870_device::eir_h_w)); //
+	map(0x003a, 0x003a).rw(FUNC(tlcs870_device::eir_l_r), FUNC(tlcs870_device::eir_l_w)); // Interrupt enable register
+	map(0x003b, 0x003b).rw(FUNC(tlcs870_device::eir_h_r), FUNC(tlcs870_device::eir_h_w)); //
 
-	map(0x003c, 0x003c).rw(this, FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
-	map(0x003d, 0x003d).rw(this, FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
+	map(0x003c, 0x003c).rw(FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
+	map(0x003d, 0x003d).rw(FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
 	// 0x3e reserved
-	map(0x003f, 0x003f).rw(this, FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
+	map(0x003f, 0x003f).rw(FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
 #endif
 
 	map(0x0040, 0x023f).ram().share("intram"); // register banks + internal RAM, not, code execution NOT allowed here

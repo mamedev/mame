@@ -76,6 +76,7 @@ quaquiz2 - no inputs, needs NVRAM
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -291,13 +292,13 @@ void statriv2_state::statriv2_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x48ff).ram().share("nvram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
 }
 
 void statriv2_state::statriv2_io_map(address_map &map)
 {
 	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x28, 0x2b).r(this, FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
+	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
 	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xb1, 0xb1).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));

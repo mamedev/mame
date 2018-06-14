@@ -39,6 +39,7 @@
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -192,9 +193,9 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ff2000, 0x00ff7fff).ram(); // Graphics Video RAM
 	map(0x00ff8001, 0x00ff8001).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x00ff8003, 0x00ff8003).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x00ff8004, 0x00ff8005).w(this, FUNC(dim68k_state::dim68k_video_high_w));
-	map(0x00ff8008, 0x00ff8009).w(this, FUNC(dim68k_state::dim68k_video_control_w));
-	map(0x00ff800a, 0x00ff800b).w(this, FUNC(dim68k_state::dim68k_video_reset_w));
+	map(0x00ff8004, 0x00ff8005).w(FUNC(dim68k_state::dim68k_video_high_w));
+	map(0x00ff8008, 0x00ff8009).w(FUNC(dim68k_state::dim68k_video_control_w));
+	map(0x00ff800a, 0x00ff800b).w(FUNC(dim68k_state::dim68k_video_reset_w));
 	map(0x00ff8800, 0x00ff8fff).rom().region("cop6512", 0); // slot 1 controller rom
 	map(0x00ff9000, 0x00ff97ff).rom().region("copz80", 0); // slot 2 controller rom
 	map(0x00ff9800, 0x00ff9fff).rom().region("cop8086", 0); // slot 3 controller rom
@@ -203,14 +204,14 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ffa800, 0x00ffafff).rom(); // slot 5 controller rom
 	map(0x00ffb000, 0x00ffb7ff).rom(); // slot 6 controller rom
 #endif
-	map(0x00ffc400, 0x00ffc41f).rw(this, FUNC(dim68k_state::dim68k_duart_r), FUNC(dim68k_state::dim68k_duart_w)); // Signetics SCN2681AC1N40 Dual UART
-	map(0x00ffc800, 0x00ffc801).rw(this, FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
-	map(0x00ffcc00, 0x00ffcc1f).rw(this, FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
+	map(0x00ffc400, 0x00ffc41f).rw(FUNC(dim68k_state::dim68k_duart_r), FUNC(dim68k_state::dim68k_duart_w)); // Signetics SCN2681AC1N40 Dual UART
+	map(0x00ffc800, 0x00ffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
+	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
-	map(0x00ffd004, 0x00ffd005).rw(this, FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
+	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
 	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
-	map(0x00ffd800, 0x00ffd801).w(this, FUNC(dim68k_state::dim68k_printer_strobe_w));
-	map(0x00ffdc00, 0x00ffdc01).w(this, FUNC(dim68k_state::dim68k_banksw_w));
+	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
+	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
 }
 
 /* Input ports */

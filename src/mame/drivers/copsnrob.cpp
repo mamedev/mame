@@ -102,8 +102,8 @@ void copsnrob_state::main_map(address_map &map)
 	map(0x0a00, 0x0a03).writeonly().share("cary");
 	map(0x0b00, 0x0bff).ram();
 	map(0x0c00, 0x0fff).ram().share("videoram");
-	map(0x1000, 0x1000).r(this, FUNC(copsnrob_state::copsnrob_misc_r));
-	map(0x1000, 0x1000).w(this, FUNC(copsnrob_state::copsnrob_misc2_w));
+	map(0x1000, 0x1000).r(FUNC(copsnrob_state::copsnrob_misc_r));
+	map(0x1000, 0x1000).w(FUNC(copsnrob_state::copsnrob_misc2_w));
 	map(0x1002, 0x1002).portr("CTRL1");
 	map(0x1006, 0x1006).portr("CTRL2");
 	map(0x100a, 0x100a).portr("CTRL3");

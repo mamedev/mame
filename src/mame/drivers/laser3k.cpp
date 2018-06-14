@@ -37,6 +37,7 @@
 #include "machine/kb3600.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -148,10 +149,10 @@ void laser3k_state::laser3k_map(address_map &map)
 
 void laser3k_state::banks_map(address_map &map)
 {
-	map(0x00000, 0x2ffff).rw(this, FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
+	map(0x00000, 0x2ffff).rw(FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
 	map(0x38000, 0x3bfff).rom().region("maincpu", 0);
-	map(0x3c000, 0x3c0ff).rw(this, FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
-	map(0x3c100, 0x3c1ff).r(this, FUNC(laser3k_state::io2_r));
+	map(0x3c000, 0x3c0ff).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
+	map(0x3c100, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
 	map(0x3c200, 0x3ffff).rom().region("maincpu", 0x4200);
 }
 
@@ -435,7 +436,7 @@ WRITE8_MEMBER( laser3k_state::io_w )
 			break;
 
 		case 0x68:  // SN76489 sound
-			m_sn->write(space, 0, data);
+			m_sn->write(data);
 			break;
 
 		case 0x78:  // called "SYSTEM" in the boot ROM listing, but unsure what it does

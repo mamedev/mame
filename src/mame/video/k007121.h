@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 class k007121_device : public device_t
 {

@@ -9,6 +9,7 @@
 
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VIDEO_CLOCK     XTAL(8'000'000)           /* video (pixel) clock */

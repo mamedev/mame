@@ -16,6 +16,7 @@
 #include "sound/ym2151.h"
 #include "video/hd44780.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

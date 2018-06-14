@@ -340,6 +340,7 @@ ecoinf1.cpp
 ecoinf2.cpp
 ecoinf3.cpp
 ecoinfr.cpp
+efdt.cpp
 egghunt.cpp
 electra.cpp
 embargo.cpp
@@ -831,6 +832,7 @@ neptunp2.cpp
 news.cpp
 nexus3d.cpp
 nibble.cpp
+nichild.cpp
 nightgal.cpp
 ninjakd2.cpp
 ninjaw.cpp

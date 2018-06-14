@@ -21,6 +21,7 @@ public:
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
+	void stop();
 
 	virtual int send(uint8_t *buf, int len);
 	virtual void set_mac(const char *mac);

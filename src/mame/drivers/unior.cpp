@@ -44,6 +44,7 @@ ToDo:
 #include "machine/i8257.h"
 #include "video/i8275.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -97,7 +98,7 @@ void unior_state::unior_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xf7ff).ram();
-	map(0xf800, 0xffff).rom().w(this, FUNC(unior_state::vram_w)); // main video
+	map(0xf800, 0xffff).rom().w(FUNC(unior_state::vram_w)); // main video
 }
 
 void unior_state::unior_io(address_map &map)
@@ -107,7 +108,7 @@ void unior_state::unior_io(address_map &map)
 	map(0x30, 0x38).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)); // dma data
 	map(0x3c, 0x3f).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // cassette player control
 	map(0x4c, 0x4f).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x50, 0x50).w(this, FUNC(unior_state::scroll_w));
+	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
 	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xec, 0xec).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));

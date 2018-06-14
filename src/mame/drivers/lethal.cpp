@@ -349,15 +349,15 @@ void lethal_state::le_main(address_map &map)
 	map(0x4000, 0x403f).w(m_k056832, FUNC(k056832_device::write));
 	map(0x4040, 0x404f).w(m_k056832, FUNC(k056832_device::b_w));
 	map(0x4080, 0x4080).nopr();     // watchdog
-	map(0x4090, 0x4090).rw(this, FUNC(lethal_state::sound_irq_r), FUNC(lethal_state::sound_irq_w));
+	map(0x4090, 0x4090).rw(FUNC(lethal_state::sound_irq_r), FUNC(lethal_state::sound_irq_w));
 	map(0x40a0, 0x40a0).nopr();
-	map(0x40c4, 0x40c4).w(this, FUNC(lethal_state::control2_w));
-	map(0x40c8, 0x40d0).w(this, FUNC(lethal_state::lethalen_palette_control)); // PCU1-PCU3 on the schematics
-	map(0x40d4, 0x40d7).r(this, FUNC(lethal_state::guns_r));
+	map(0x40c4, 0x40c4).w(FUNC(lethal_state::control2_w));
+	map(0x40c8, 0x40d0).w(FUNC(lethal_state::lethalen_palette_control)); // PCU1-PCU3 on the schematics
+	map(0x40d4, 0x40d7).r(FUNC(lethal_state::guns_r));
 	map(0x40d8, 0x40d8).portr("DSW");
 	map(0x40d9, 0x40d9).portr("INPUTS");
-	map(0x40db, 0x40db).r(this, FUNC(lethal_state::gunsaux_r));     // top X bit of guns
-	map(0x40dc, 0x40dc).w(this, FUNC(lethal_state::le_bankswitch_w));
+	map(0x40db, 0x40db).r(FUNC(lethal_state::gunsaux_r));     // top X bit of guns
+	map(0x40dc, 0x40dc).w(FUNC(lethal_state::le_bankswitch_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

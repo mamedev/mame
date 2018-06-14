@@ -29,6 +29,7 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
 #include "machine/mos6526.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -488,19 +489,19 @@ void c65_state::c65_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram().share("wram"); // TODO: bank
 	map(0x0c800, 0x0cfff).rom().region("maincpu", 0xc800);
-	map(0x0d000, 0x0d07f).rw(this, FUNC(c65_state::vic4567_dummy_r), FUNC(c65_state::vic4567_dummy_w)); // 0x0d000, 0x0d07f VIC-4567
-	map(0x0d080, 0x0d081).r(this, FUNC(c65_state::dummy_r)); // 0x0d080, 0x0d09f FDC
+	map(0x0d000, 0x0d07f).rw(FUNC(c65_state::vic4567_dummy_r), FUNC(c65_state::vic4567_dummy_w)); // 0x0d000, 0x0d07f VIC-4567
+	map(0x0d080, 0x0d081).r(FUNC(c65_state::dummy_r)); // 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	map(0x0d100, 0x0d1ff).ram().w(this, FUNC(c65_state::PalRed_w)).share("redpal");// 0x0d100, 0x0d1ff Red Palette
-	map(0x0d200, 0x0d2ff).ram().w(this, FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
-	map(0x0d300, 0x0d3ff).ram().w(this, FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
+	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::PalRed_w)).share("redpal");// 0x0d100, 0x0d1ff Red Palette
+	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
+	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
 	// 0x0d400, 0x0d4*f Right SID
 	// 0x0d440, 0x0d4*f Left  SID
-	map(0x0d600, 0x0d6ff).rw(this, FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
-	map(0x0d700, 0x0d702).w(this, FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
+	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
+	map(0x0d700, 0x0d702).w(FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
-	map(0x0d800, 0x0dfff).rw(this, FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
+	map(0x0d800, 0x0dfff).rw(FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1

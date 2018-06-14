@@ -26,6 +26,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tk80bs_state : public driver_device
@@ -114,7 +115,7 @@ void tk80bs_state::tk80bs_mem(address_map &map)
 	map(0x0000, 0x07ff).rom();
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	map(0x7df8, 0x7df9).noprw(); // i8251 sio
-	map(0x7dfc, 0x7dff).rw(this, FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
+	map(0x7dfc, 0x7dff).rw(FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
 	map(0x7e00, 0x7fff).ram().share("videoram"); // video ram
 	map(0x8000, 0xcfff).ram(); // RAM
 	map(0xd000, 0xefff).rom(); // BASIC

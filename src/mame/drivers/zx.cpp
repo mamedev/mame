@@ -65,28 +65,28 @@ void zx_state::zx81_map(address_map &map)
 
 void zx_state::ula_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(this, FUNC(zx_state::ula_low_r));
-	map(0x8000, 0xffff).r(this, FUNC(zx_state::ula_high_r));
+	map(0x0000, 0x7fff).r(FUNC(zx_state::ula_low_r));
+	map(0x8000, 0xffff).r(FUNC(zx_state::ula_high_r));
 }
 
 void zx_state::zx80_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::zx80_io_r), FUNC(zx_state::zx80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::zx80_io_r), FUNC(zx_state::zx80_io_w));
 }
 
 void zx_state::zx81_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::zx81_io_r), FUNC(zx_state::zx81_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::zx81_io_r), FUNC(zx_state::zx81_io_w));
 }
 
 void zx_state::pc8300_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::pc8300_io_r), FUNC(zx_state::zx81_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::pc8300_io_r), FUNC(zx_state::zx81_io_w));
 }
 
 void zx_state::pow3000_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::pow3000_io_r), FUNC(zx_state::zx81_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::pow3000_io_r), FUNC(zx_state::zx81_io_w));
 }
 
 

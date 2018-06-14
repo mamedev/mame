@@ -173,7 +173,7 @@ void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t valu
 	// Only if the sound chip has not been removed
 	if ((addr & 0xfc01)==0x8400)
 	{
-		if (m_sound != nullptr) m_sound->write(space, 0, value);
+		if (m_sound != nullptr) m_sound->write(value);
 	}
 
 	// Video

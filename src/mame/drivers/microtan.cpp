@@ -51,6 +51,7 @@
 /* Devices */
 #include "imagedev/cassette.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,7 +59,7 @@
 void microtan_state::microtan_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x03ff).ram().w(this, FUNC(microtan_state::microtan_videoram_w)).share("videoram");
+	map(0x0200, 0x03ff).ram().w(FUNC(microtan_state::microtan_videoram_w)).share("videoram");
 	map(0xbc00, 0xbc00).w("ay8910.1", FUNC(ay8910_device::address_w));
 	map(0xbc01, 0xbc01).rw("ay8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xbc02, 0xbc02).w("ay8910.2", FUNC(ay8910_device::address_w));
@@ -66,7 +67,7 @@ void microtan_state::microtan_map(address_map &map)
 	map(0xbfc0, 0xbfcf).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xbfd0, 0xbfd3).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xbfe0, 0xbfef).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xbff0, 0xbfff).rw(this, FUNC(microtan_state::microtan_bffx_r), FUNC(microtan_state::microtan_bffx_w));
+	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::microtan_bffx_r), FUNC(microtan_state::microtan_bffx_w));
 	map(0xc000, 0xe7ff).rom();
 	map(0xf000, 0xffff).rom();
 }

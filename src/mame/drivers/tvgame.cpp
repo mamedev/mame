@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

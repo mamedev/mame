@@ -478,7 +478,7 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 void abc800_state::abc800_m1(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(abc800_state::m1_r));
+	map(0x0000, 0xffff).r(FUNC(abc800_state::m1_r));
 }
 
 
@@ -510,9 +510,9 @@ void abc800_state::abc800c_io(address_map &map)
 	map(0x03, 0x03).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
 	map(0x04, 0x04).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
 	map(0x05, 0x05).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
-	map(0x05, 0x05).mirror(0x18).r(this, FUNC(abc800_state::pling_r));
-	map(0x06, 0x06).mirror(0x18).w(this, FUNC(abc800_state::hrs_w));
-	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(this, FUNC(abc800_state::hrc_w));
+	map(0x05, 0x05).mirror(0x18).r(FUNC(abc800_state::pling_r));
+	map(0x06, 0x06).mirror(0x18).w(FUNC(abc800_state::hrs_w));
+	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(FUNC(abc800_state::hrc_w));
 	map(0x20, 0x23).mirror(0x0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x40, 0x43).mirror(0x1c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x60, 0x63).mirror(0x1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -573,7 +573,7 @@ void abc802_state::abc802_io(address_map &map)
 	map(0x03, 0x03).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
 	map(0x04, 0x04).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
 	map(0x05, 0x05).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
-	map(0x05, 0x05).mirror(0x18).r(this, FUNC(abc800_state::pling_r));
+	map(0x05, 0x05).mirror(0x18).r(FUNC(abc800_state::pling_r));
 	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r));
 	map(0x20, 0x23).mirror(0x0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x31, 0x31).mirror(0x06).r(m_crtc, FUNC(mc6845_device::register_r));
@@ -590,7 +590,7 @@ void abc802_state::abc802_io(address_map &map)
 
 void abc806_state::abc806_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(abc806_state::read), FUNC(abc806_state::write));
+	map(0x0000, 0xffff).rw(FUNC(abc806_state::read), FUNC(abc806_state::write));
 }
 
 
@@ -607,15 +607,15 @@ void abc806_state::abc806_io(address_map &map)
 	map(0x03, 0x03).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
 	map(0x04, 0x04).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
 	map(0x05, 0x05).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
-	map(0x05, 0x05).mirror(0xff18).r(this, FUNC(abc800_state::pling_r));
-	map(0x06, 0x06).mirror(0xff18).w(this, FUNC(abc806_state::hrs_w));
-	map(0x07, 0x07).mirror(0xff18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(this, FUNC(abc806_state::hrc_w));
+	map(0x05, 0x05).mirror(0xff18).r(FUNC(abc800_state::pling_r));
+	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc806_state::hrs_w));
+	map(0x07, 0x07).mirror(0xff18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(FUNC(abc806_state::hrc_w));
 	map(0x20, 0x23).mirror(0xff0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x31, 0x31).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r));
-	map(0x34, 0x34).select(0xff00).rw(this, FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
-	map(0x35, 0x35).mirror(0xff00).rw(this, FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));
-	map(0x36, 0x36).mirror(0xff00).rw(this, FUNC(abc806_state::sti_r), FUNC(abc806_state::sto_w));
-	map(0x37, 0x37).select(0xff00).rw(this, FUNC(abc806_state::cli_r), FUNC(abc806_state::sso_w));
+	map(0x34, 0x34).select(0xff00).rw(FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
+	map(0x35, 0x35).mirror(0xff00).rw(FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));
+	map(0x36, 0x36).mirror(0xff00).rw(FUNC(abc806_state::sti_r), FUNC(abc806_state::sto_w));
+	map(0x37, 0x37).select(0xff00).rw(FUNC(abc806_state::cli_r), FUNC(abc806_state::sso_w));
 	map(0x38, 0x38).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x39, 0x39).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::register_w));
 	map(0x40, 0x43).mirror(0xff1c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));

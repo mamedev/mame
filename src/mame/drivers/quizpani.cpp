@@ -52,6 +52,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,15 +66,15 @@ void quizpani_state::quizpani_map(address_map &map)
 	map(0x10000a, 0x10000b).portr("DSW2");
 	map(0x100014, 0x100015).nopw(); /* screen flipping? */
 	map(0x100016, 0x100017).nopw(); /* IRQ enable? */
-	map(0x100018, 0x100019).w(this, FUNC(quizpani_state::tilesbank_w));
+	map(0x100018, 0x100019).w(FUNC(quizpani_state::tilesbank_w));
 	map(0x104001, 0x104001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x104020, 0x104027).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x108000, 0x1083ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108400, 0x1085ff).nopw();
 	map(0x10c000, 0x10c007).ram().share("scrollreg");
 	map(0x10c008, 0x10c403).nopw();
-	map(0x110000, 0x113fff).ram().w(this, FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
-	map(0x11c000, 0x11ffff).ram().w(this, FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
+	map(0x110000, 0x113fff).ram().w(FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
+	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
 	map(0x180000, 0x18ffff).ram();
 	map(0x200000, 0x33ffff).rom();
 }

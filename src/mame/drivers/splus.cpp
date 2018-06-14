@@ -26,6 +26,7 @@
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -590,32 +591,32 @@ void splus_state::splus_map(address_map &map)
 void splus_state::splus_iomap(address_map &map)
 {
 	// Serial I/O
-	map(0x0000, 0x0000).r(this, FUNC(splus_state::splus_serial_r)).w(this, FUNC(splus_state::splus_serial_w));
+	map(0x0000, 0x0000).r(FUNC(splus_state::splus_serial_r)).w(FUNC(splus_state::splus_serial_w));
 
 	// Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
 	map(0x1000, 0x1fff).ram().share("cmosl");
 
 	// Watchdog, 7-segment Display
-	map(0x2000, 0x2000).rw(this, FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
+	map(0x2000, 0x2000).rw(FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
 
 	// DUART
-	map(0x3000, 0x300f).rw(this, FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
+	map(0x3000, 0x300f).rw(FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
 
 	// Dip Switches, Sound
 	map(0x4000, 0x4000).portr("SW1").w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x4001, 0x4001).w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Reel Optics, EEPROM
-	map(0x5000, 0x5000).r(this, FUNC(splus_state::splus_reel_optics_r)).w(this, FUNC(splus_state::i2c_nvram_w));
+	map(0x5000, 0x5000).r(FUNC(splus_state::splus_reel_optics_r)).w(FUNC(splus_state::i2c_nvram_w));
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	map(0x6000, 0x6000).rw(this, FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
+	map(0x6000, 0x6000).rw(FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
 
 	// Battery-backed RAM (Upper 4K)
 	map(0x7000, 0x7fff).ram().share("cmosh");
 
 	// SSxxxx Reel Chip
-	map(0x8000, 0x9fff).r(this, FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
+	map(0x8000, 0x9fff).r(FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
 }
 
 /*************************

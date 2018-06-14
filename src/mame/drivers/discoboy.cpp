@@ -48,6 +48,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -279,7 +280,7 @@ void discoboy_state::discoboy_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc7ff).m(m_rambank1, FUNC(address_map_bank_device::amap8));
 	map(0xc800, 0xcfff).ram().share("att_ram");
-	map(0xd000, 0xdfff).rw(this, FUNC(discoboy_state::rambank2_r), FUNC(discoboy_state::rambank2_w));
+	map(0xd000, 0xdfff).rw(FUNC(discoboy_state::rambank2_r), FUNC(discoboy_state::rambank2_w));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram();
 }
@@ -299,13 +300,13 @@ READ8_MEMBER(discoboy_state::port_06_r)
 void discoboy_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSWA").w(this, FUNC(discoboy_state::port_00_w));
-	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(discoboy_state::port_01_w));
+	map(0x00, 0x00).portr("DSWA").w(FUNC(discoboy_state::port_00_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(discoboy_state::port_01_w));
 	map(0x02, 0x02).portr("P1");
 	map(0x03, 0x03).portr("P2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).portr("DSWB");
-	map(0x06, 0x06).rw(this, FUNC(discoboy_state::port_06_r), FUNC(discoboy_state::port_06_w)); // ???
-	map(0x07, 0x07).w(this, FUNC(discoboy_state::rambank_select_w)); // 0x20 is palette bank bit.. others?
+	map(0x06, 0x06).rw(FUNC(discoboy_state::port_06_r), FUNC(discoboy_state::port_06_w)); // ???
+	map(0x07, 0x07).w(FUNC(discoboy_state::rambank_select_w)); // 0x20 is palette bank bit.. others?
 }
 
 /* Sound */
@@ -325,7 +326,7 @@ void discoboy_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("sndbank");
-	map(0xe000, 0xe000).w(this, FUNC(discoboy_state::yunsung8_sound_bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(discoboy_state::yunsung8_sound_bankswitch_w));
 	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
 	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf000, 0xf7ff).ram();

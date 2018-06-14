@@ -101,7 +101,7 @@ void tank8_state::tank8_cpu_map(address_map &map)
 	map(0x0400, 0x17ff).rom();
 	map(0xf800, 0xffff).rom();
 
-	map(0x1c00, 0x1c00).r(this, FUNC(tank8_state::collision_r));
+	map(0x1c00, 0x1c00).r(FUNC(tank8_state::collision_r));
 
 	map(0x1c01, 0x1c01).portr("P1");
 	map(0x1c02, 0x1c02).portr("P2");
@@ -116,20 +116,20 @@ void tank8_state::tank8_cpu_map(address_map &map)
 	map(0x1c0b, 0x1c0b).portr("RC");
 	map(0x1c0f, 0x1c0f).portr("VBLANK");
 
-	map(0x1800, 0x1bff).w(this, FUNC(tank8_state::video_ram_w)).share("video_ram");
+	map(0x1800, 0x1bff).w(FUNC(tank8_state::video_ram_w)).share("video_ram");
 	map(0x1c00, 0x1c0f).writeonly().share("pos_h_ram");
 	map(0x1c10, 0x1c1f).writeonly().share("pos_v_ram");
 	map(0x1c20, 0x1c2f).writeonly().share("pos_d_ram");
 
-	map(0x1c30, 0x1c37).w(this, FUNC(tank8_state::lockout_w));
-	map(0x1d00, 0x1d00).w(this, FUNC(tank8_state::int_reset_w));
-	map(0x1d01, 0x1d01).w(this, FUNC(tank8_state::crash_w));
-	map(0x1d02, 0x1d02).w(this, FUNC(tank8_state::explosion_w));
-	map(0x1d03, 0x1d03).w(this, FUNC(tank8_state::bugle_w));
-	map(0x1d04, 0x1d04).w(this, FUNC(tank8_state::bug_w));
+	map(0x1c30, 0x1c37).w(FUNC(tank8_state::lockout_w));
+	map(0x1d00, 0x1d00).w(FUNC(tank8_state::int_reset_w));
+	map(0x1d01, 0x1d01).w(FUNC(tank8_state::crash_w));
+	map(0x1d02, 0x1d02).w(FUNC(tank8_state::explosion_w));
+	map(0x1d03, 0x1d03).w(FUNC(tank8_state::bugle_w));
+	map(0x1d04, 0x1d04).w(FUNC(tank8_state::bug_w));
 	map(0x1d05, 0x1d05).writeonly().share("team");
-	map(0x1d06, 0x1d06).w(this, FUNC(tank8_state::attract_w));
-	map(0x1e00, 0x1e07).w(this, FUNC(tank8_state::motor_w));
+	map(0x1d06, 0x1d06).w(FUNC(tank8_state::attract_w));
+	map(0x1e00, 0x1e07).w(FUNC(tank8_state::motor_w));
 
 }
 

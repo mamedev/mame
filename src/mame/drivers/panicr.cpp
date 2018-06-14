@@ -66,6 +66,7 @@ D.9B         [f99cac4b] /
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -433,21 +434,21 @@ void panicr_state::panicr_map(address_map &map)
 	map(0x00000, 0x01fff).ram().share("mainram");
 	map(0x02000, 0x03cff).ram().share("spriteram"); // how big is sprite ram, some places definitely have sprites at 3000+
 	map(0x03d00, 0x03fff).ram();
-	map(0x08000, 0x0bfff).r(this, FUNC(panicr_state::collision_r));
+	map(0x08000, 0x0bfff).r(FUNC(panicr_state::collision_r));
 	map(0x0c000, 0x0cfff).ram().share("textram");
 	map(0x0d000, 0x0d000).w(m_t5182, FUNC(t5182_device::sound_irq_w));
 	map(0x0d002, 0x0d002).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 	map(0x0d004, 0x0d004).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
 	map(0x0d006, 0x0d006).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
-	map(0x0d200, 0x0d2ff).rw(this, FUNC(panicr_state::t5182shared_r), FUNC(panicr_state::t5182shared_w));
+	map(0x0d200, 0x0d2ff).rw(FUNC(panicr_state::t5182shared_r), FUNC(panicr_state::t5182shared_w));
 	map(0x0d400, 0x0d400).portr("P1");
 	map(0x0d402, 0x0d402).portr("P2");
 	map(0x0d404, 0x0d404).portr("START");
 	map(0x0d406, 0x0d406).portr("DSW1");
 	map(0x0d407, 0x0d407).portr("DSW2");
-	map(0x0d802, 0x0d802).w(this, FUNC(panicr_state::scrollx_hi_w));
-	map(0x0d804, 0x0d804).w(this, FUNC(panicr_state::scrollx_lo_w));
-	map(0x0d80a, 0x0d80a).w(this, FUNC(panicr_state::output_w));
+	map(0x0d802, 0x0d802).w(FUNC(panicr_state::scrollx_hi_w));
+	map(0x0d804, 0x0d804).w(FUNC(panicr_state::scrollx_lo_w));
+	map(0x0d80a, 0x0d80a).w(FUNC(panicr_state::output_w));
 	map(0x0d80c, 0x0d80c).writeonly().share("spritebank");
 	map(0x0d818, 0x0d818).nopw(); // watchdog?
 	map(0xf0000, 0xfffff).rom();

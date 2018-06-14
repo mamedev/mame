@@ -73,13 +73,13 @@ void vcs80_state::vcs80_bd_mem(address_map &map)
 
 void vcs80_state::vcs80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(vcs80_state::mem_r), FUNC(vcs80_state::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(vcs80_state::mem_r), FUNC(vcs80_state::mem_w));
 }
 
 void vcs80_state::vcs80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(vcs80_state::io_r), FUNC(vcs80_state::io_w));
+	map(0x00, 0xff).rw(FUNC(vcs80_state::io_r), FUNC(vcs80_state::io_w));
 }
 
 /* Input Ports */

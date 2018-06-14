@@ -13,6 +13,7 @@
 #include "machine/i8251.h"
 #include "bus/epson_sio/pf10.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

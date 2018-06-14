@@ -34,13 +34,13 @@ void prehisle_state::prehisle_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x070000, 0x073fff).ram();
-	map(0x090000, 0x0907ff).ram().w(this, FUNC(prehisle_state::tx_vram_w)).share("tx_vram");
+	map(0x090000, 0x0907ff).ram().w(FUNC(prehisle_state::tx_vram_w)).share("tx_vram");
 	map(0x0a0000, 0x0a07ff).ram().share("spriteram");
-	map(0x0b0000, 0x0b3fff).ram().w(this, FUNC(prehisle_state::fg_vram_w)).share("fg_vram");
+	map(0x0b0000, 0x0b3fff).ram().w(FUNC(prehisle_state::fg_vram_w)).share("fg_vram");
 	map(0x0d0000, 0x0d07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0e0000, 0x0e00ff).r(this, FUNC(prehisle_state::control_r));
-	map(0x0f0000, 0x0ff0ff).w(this, FUNC(prehisle_state::control_w));
-	map(0x0f0070, 0x0ff071).w(this, FUNC(prehisle_state::soundcmd_w));
+	map(0x0e0000, 0x0e00ff).r(FUNC(prehisle_state::control_r));
+	map(0x0f0000, 0x0ff0ff).w(FUNC(prehisle_state::control_w));
+	map(0x0f0070, 0x0ff071).w(FUNC(prehisle_state::soundcmd_w));
 }
 
 /******************************************************************************/
@@ -70,8 +70,8 @@ void prehisle_state::prehisle_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x40, 0x40).w(this, FUNC(prehisle_state::D7759_write_port_0_w));
-	map(0x80, 0x80).w(this, FUNC(prehisle_state::D7759_upd_reset_w));
+	map(0x40, 0x40).w(FUNC(prehisle_state::D7759_write_port_0_w));
+	map(0x80, 0x80).w(FUNC(prehisle_state::D7759_upd_reset_w));
 }
 
 /******************************************************************************/

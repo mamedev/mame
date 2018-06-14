@@ -138,15 +138,15 @@ void galpanic_state::galpanic_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x400001, 0x400001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x500000, 0x51ffff).ram().share("fgvideoram");
-	map(0x520000, 0x53ffff).ram().w(this, FUNC(galpanic_state::bgvideoram_w)).share("bgvideoram");  /* + work RAM */
+	map(0x520000, 0x53ffff).ram().w(FUNC(galpanic_state::bgvideoram_w)).share("bgvideoram");  /* + work RAM */
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  /* 1024 colors, but only 512 seem to be used */
 	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
 	map(0x702000, 0x704fff).ram();
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900001).w(this, FUNC(galpanic_state::m6295_bankswitch_w));
-	map(0xa00000, 0xa00001).w(this, FUNC(galpanic_state::coin_w));  /* coin counters */
+	map(0x900000, 0x900001).w(FUNC(galpanic_state::m6295_bankswitch_w));
+	map(0xa00000, 0xa00001).w(FUNC(galpanic_state::coin_w));  /* coin counters */
 	map(0xb00000, 0xb00001).nopw();    /* ??? */
 	map(0xc00000, 0xc00001).nopw();    /* ??? */
 	map(0xd00000, 0xd00001).nopw();    /* ??? */

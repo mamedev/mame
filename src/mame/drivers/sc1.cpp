@@ -117,7 +117,7 @@ void sc1_state::sc1_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x80, 0x83).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xfc, 0xfc).w(this, FUNC(sc1_state::matrix_w));
+	map(0xfc, 0xfc).w(FUNC(sc1_state::matrix_w));
 }
 
 /* Input ports */

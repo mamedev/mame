@@ -359,7 +359,7 @@ void galpani2_state::galpani2_mem1(address_map &map)
 //  AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
 	map(0x310000, 0x3101ff).ram().w(m_bg8palette, FUNC(palette_device::write16)).share("bg8palette");    // ?
 	map(0x314000, 0x314001).nopw();                                        // ? flip backgrounds ?
-	map(0x318000, 0x318001).rw(this, FUNC(galpani2_state::galpani2_eeprom_r), FUNC(galpani2_state::galpani2_eeprom_w)); // EEPROM
+	map(0x318000, 0x318001).rw(FUNC(galpani2_state::galpani2_eeprom_r), FUNC(galpani2_state::galpani2_eeprom_w)); // EEPROM
 	map(0x380000, 0x387fff).ram();                                             // Palette?
 	map(0x388000, 0x38ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 //  AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
@@ -384,17 +384,17 @@ void galpani2_state::galpani2_mem1(address_map &map)
 	map(0x5405ca, 0x5405cb).nopr();                                         // ? galpani2 at F148
 
 	map(0x600000, 0x600001).noprw();                                        // Watchdog
-	map(0x640001, 0x640001).w(this, FUNC(galpani2_state::galpani2_mcu_init_w));   // ? 0 before resetting and at startup, Reset mcu ?
-	map(0x680001, 0x680001).w(this, FUNC(galpani2_state::galpani2_mcu_nmi1_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
-	map(0x6c0000, 0x6c0000).w(this, FUNC(galpani2_state::galpani2_coin_lockout_w));   // Coin + Card Lockout
+	map(0x640001, 0x640001).w(FUNC(galpani2_state::galpani2_mcu_init_w));   // ? 0 before resetting and at startup, Reset mcu ?
+	map(0x680001, 0x680001).w(FUNC(galpani2_state::galpani2_mcu_nmi1_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+	map(0x6c0000, 0x6c0000).w(FUNC(galpani2_state::galpani2_coin_lockout_w));   // Coin + Card Lockout
 	map(0x780000, 0x780001).portr("DSW1_P1");
 	map(0x780002, 0x780003).portr("DSW2_P2");
 	map(0x780004, 0x780005).portr("SPECIAL");
 	map(0x780006, 0x780007).portr("SERVICE");
 	map(0xc00001, 0xc00001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // 2 x OKIM6295
 	map(0xc40001, 0xc40001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   //
-	map(0xc80001, 0xc80001).w(this, FUNC(galpani2_state::galpani2_oki1_bank_w));   //
-	map(0xcc0001, 0xcc0001).w(this, FUNC(galpani2_state::galpani2_oki2_bank_w));   //
+	map(0xc80001, 0xc80001).w(FUNC(galpani2_state::galpani2_oki1_bank_w));   //
+	map(0xcc0001, 0xcc0001).w(FUNC(galpani2_state::galpani2_oki2_bank_w));   //
 }
 
 
@@ -427,8 +427,8 @@ void galpani2_state::galpani2_mem2(address_map &map)
 //  AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
 	map(0x700000, 0x700001).noprw();                                 // Watchdog
 //  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
-	map(0x780001, 0x780001).w(this, FUNC(galpani2_state::galpani2_mcu_nmi2_w));             // ? 0 -> 1 -> 0 (lev 5)
-	map(0x7c0000, 0x7c0001).w(this, FUNC(galpani2_state::subdatabank_select_w));   // Rom Bank
+	map(0x780001, 0x780001).w(FUNC(galpani2_state::galpani2_mcu_nmi2_w));             // ? 0 -> 1 -> 0 (lev 5)
+	map(0x7c0000, 0x7c0001).w(FUNC(galpani2_state::subdatabank_select_w));   // Rom Bank
 	map(0x800000, 0xffffff).bankr("subdatabank");
 }
 
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

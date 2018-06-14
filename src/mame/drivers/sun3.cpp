@@ -721,13 +721,13 @@ WRITE32_MEMBER(sun3_state::parity_w)
 
 void sun3_state::sun3_mem(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
 }
 
 // type 0 device space
 void sun3_state::vmetype0space_map(address_map &map)
 {
-	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 	map(0xfe400000, 0xfe41ffff).ram(); // not sure what's going on here (3/110)
 	map(0xff000000, 0xff03ffff).ram().share("bw2_vram");
 }
@@ -735,7 +735,7 @@ void sun3_state::vmetype0space_map(address_map &map)
 // type 0 without VRAM (3/50)
 void sun3_state::vmetype0space_novram_map(address_map &map)
 {
-	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 }
 
 // type 1 device space
@@ -744,11 +744,11 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
-	map(0x00060000, 0x0006ffff).rw(this, FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
-	map(0x00080000, 0x0008000f).rw(this, FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
-	map(0x000a0000, 0x000a0003).rw(this, FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
+	map(0x00060000, 0x0006ffff).rw(FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
+	map(0x00080000, 0x0008000f).rw(FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
+	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
-	map(0x001e0000, 0x001e00ff).rw(this, FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
+	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
 // type 2 device space

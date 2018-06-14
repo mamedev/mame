@@ -278,22 +278,22 @@ void exprraid_state::master_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram().share("main_ram");
 	map(0x0600, 0x07ff).ram().share("spriteram");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(exprraid_state::exprraid_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(exprraid_state::exprraid_colorram_w)).share("colorram");
+	map(0x0800, 0x0bff).ram().w(FUNC(exprraid_state::exprraid_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(exprraid_state::exprraid_colorram_w)).share("colorram");
 	map(0x1800, 0x1800).portr("DSW0");   /* DSW 0 */
 	map(0x1801, 0x1801).portr("IN1");    /* Controls */
 	map(0x1802, 0x1802).portr("IN2");    /* Coins */
 	map(0x1803, 0x1803).portr("DSW1");   /* DSW 1 */
-	map(0x2000, 0x2000).w(this, FUNC(exprraid_state::exprraid_int_clear_w));
+	map(0x2000, 0x2000).w(FUNC(exprraid_state::exprraid_int_clear_w));
 	map(0x2001, 0x2001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x2002, 0x2002).w(this, FUNC(exprraid_state::exprraid_flipscreen_w));
+	map(0x2002, 0x2002).w(FUNC(exprraid_state::exprraid_flipscreen_w));
 	map(0x2003, 0x2003).nopw(); // DMA SWAP - Allow writes to video and sprite RAM
-	map(0x2800, 0x2800).r(this, FUNC(exprraid_state::exprraid_prot_data_r));
-	map(0x2801, 0x2801).r(this, FUNC(exprraid_state::exprraid_prot_status_r));
-	map(0x2800, 0x2803).w(this, FUNC(exprraid_state::exprraid_bgselect_w));
-	map(0x2804, 0x2804).w(this, FUNC(exprraid_state::exprraid_scrolly_w));
-	map(0x2805, 0x2806).w(this, FUNC(exprraid_state::exprraid_scrollx_w));
-	map(0x2807, 0x2807).w(this, FUNC(exprraid_state::exprraid_prot_data_w));
+	map(0x2800, 0x2800).r(FUNC(exprraid_state::exprraid_prot_data_r));
+	map(0x2801, 0x2801).r(FUNC(exprraid_state::exprraid_prot_status_r));
+	map(0x2800, 0x2803).w(FUNC(exprraid_state::exprraid_bgselect_w));
+	map(0x2804, 0x2804).w(FUNC(exprraid_state::exprraid_scrolly_w));
+	map(0x2805, 0x2806).w(FUNC(exprraid_state::exprraid_scrollx_w));
+	map(0x2807, 0x2807).w(FUNC(exprraid_state::exprraid_prot_data_w));
 	map(0x4000, 0xffff).rom();
 }
 

@@ -108,8 +108,8 @@ void kchamp_state::kchampvs_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
 	map(0xd900, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
@@ -143,7 +143,7 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x04).w(m_adpcm_select, FUNC(ls157_device::ab_w));
-	map(0x05, 0x05).w(this, FUNC(kchamp_state::sound_control_w));
+	map(0x05, 0x05).w(FUNC(kchamp_state::sound_control_w));
 }
 
 
@@ -173,8 +173,8 @@ void kchamp_state::kchamp_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
 	map(0xea00, 0xeaff).ram().share("spriteram");
 	map(0xeb00, 0xffff).ram();
 }
@@ -187,7 +187,7 @@ void kchamp_state::kchamp_io_map(address_map &map)
 	map(0x90, 0x90).portr("P1");
 	map(0x98, 0x98).portr("P2");
 	map(0xa0, 0xa0).portr("SYSTEM");
-	map(0xa8, 0xa8).r(this, FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa8, 0xa8).r(FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void kchamp_state::kchamp_sound_map(address_map &map)
@@ -201,8 +201,8 @@ void kchamp_state::kchamp_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::write));
-	map(0x05, 0x05).w(this, FUNC(kchamp_state::kc_sound_control_w));
+	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x05, 0x05).w(FUNC(kchamp_state::kc_sound_control_w));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 

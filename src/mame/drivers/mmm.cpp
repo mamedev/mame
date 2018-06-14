@@ -66,7 +66,7 @@ void mmm_state::mem_map(address_map &map)
 void mmm_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(mmm_state::strobe_w));
+	map(0x00, 0x00).w(FUNC(mmm_state::strobe_w));
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x04, 0x04).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x05, 0x05).r("aysnd", FUNC(ay8910_device::data_r));
@@ -77,7 +77,7 @@ void mmm_state::io_map(address_map &map)
 									  [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 										  m_ctc->write(space, offset >> 4, data, mem_mask);
 									  });
-	map(0x07, 0x07).r(this, FUNC(mmm_state::inputs_r));
+	map(0x07, 0x07).r(FUNC(mmm_state::inputs_r));
 }
 
 

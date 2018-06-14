@@ -11,6 +11,7 @@
 #include "video/k051316.h"
 #include "video/k051733.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class chqflag_state : public driver_device
 {

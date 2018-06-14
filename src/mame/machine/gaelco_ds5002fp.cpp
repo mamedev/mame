@@ -16,7 +16,7 @@ void gaelco_ds5002fp_device::dallas_rom(address_map &map)
 
 void gaelco_ds5002fp_device::dallas_ram(address_map &map)
 {
-	map(0x00000, 0x0ffff).rw(this, FUNC(gaelco_ds5002fp_device::hostmem_r), FUNC(gaelco_ds5002fp_device::hostmem_w));
+	map(0x00000, 0x0ffff).rw(FUNC(gaelco_ds5002fp_device::hostmem_r), FUNC(gaelco_ds5002fp_device::hostmem_w));
 	map(0x10000, 0x17fff).ram().share("sram"); // yes, the games access it as data and use it for temporary storage!!
 }
 

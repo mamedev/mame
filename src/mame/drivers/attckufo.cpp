@@ -57,12 +57,12 @@ void attckufo_state::cpu_map(address_map &map)
 
 void attckufo_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(attckufo_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(attckufo_state::vic_videoram_r));
 }
 
 void attckufo_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(attckufo_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(attckufo_state::vic_colorram_r));
 }
 
 

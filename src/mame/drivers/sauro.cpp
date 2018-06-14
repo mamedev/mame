@@ -190,10 +190,10 @@ void sauro_state::sauro_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xebff).ram().share("spriteram");
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(sauro_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(this, FUNC(sauro_state::colorram_w)).share("colorram");
-	map(0xf800, 0xfbff).ram().w(this, FUNC(sauro_state::sauro_videoram2_w)).share("videoram2");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(sauro_state::sauro_colorram2_w)).share("colorram2");
+	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xf800, 0xfbff).ram().w(FUNC(sauro_state::sauro_videoram2_w)).share("videoram2");
+	map(0xfc00, 0xffff).ram().w(FUNC(sauro_state::sauro_colorram2_w)).share("colorram2");
 }
 
 void sauro_state::sauro_io_map(address_map &map)
@@ -203,9 +203,9 @@ void sauro_state::sauro_io_map(address_map &map)
 	map(0x20, 0x20).portr("DSW2");
 	map(0x40, 0x40).portr("P1");
 	map(0x60, 0x60).portr("P2");
-	map(0x80, 0x80).w(this, FUNC(sauro_state::sauro_sound_command_w));
-	map(0xa0, 0xa0).w(this, FUNC(sauro_state::scroll_bg_w));
-	map(0xa1, 0xa1).w(this, FUNC(sauro_state::sauro_scroll_fg_w));
+	map(0x80, 0x80).w(FUNC(sauro_state::sauro_sound_command_w));
+	map(0xa0, 0xa0).w(FUNC(sauro_state::scroll_bg_w));
+	map(0xa1, 0xa1).w(FUNC(sauro_state::sauro_scroll_fg_w));
 	map(0xc0, 0xcf).w("mainlatch", FUNC(ls259_device::write_a0));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
@@ -215,8 +215,8 @@ void sauro_state::sauro_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
-	map(0xa000, 0xa000).w(this, FUNC(sauro_state::adpcm_w));
-	map(0xe000, 0xe000).r(this, FUNC(sauro_state::sauro_sound_command_r));
+	map(0xa000, 0xa000).w(FUNC(sauro_state::adpcm_w));
+	map(0xe000, 0xe000).r(FUNC(sauro_state::sauro_sound_command_r));
 	map(0xe000, 0xe006).nopw();    /* echo from write to e0000 */
 	map(0xe00e, 0xe00f).nopw();
 }
@@ -228,7 +228,7 @@ void sauro_state::saurob_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xa000, 0xa000).nopw();
-	map(0xe000, 0xe000).r(this, FUNC(sauro_state::sauro_sound_command_r));
+	map(0xe000, 0xe000).r(FUNC(sauro_state::sauro_sound_command_r));
 	map(0xe000, 0xe006).nopw();    /* echo from write to e0000 */
 	map(0xe00e, 0xe00f).nopw();
 }
@@ -239,15 +239,15 @@ void sauro_state::trckydoc_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xebff).ram().mirror(0x400).share("spriteram");
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(sauro_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(this, FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::colorram_w)).share("colorram");
 	map(0xf800, 0xf800).portr("DSW1");
 	map(0xf808, 0xf808).portr("DSW2");
 	map(0xf810, 0xf810).portr("P1");
 	map(0xf818, 0xf818).portr("P2");
 	map(0xf820, 0xf821).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf828, 0xf828).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xf830, 0xf830).w(this, FUNC(sauro_state::scroll_bg_w));
+	map(0xf830, 0xf830).w(FUNC(sauro_state::scroll_bg_w));
 	map(0xf838, 0xf83f).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 

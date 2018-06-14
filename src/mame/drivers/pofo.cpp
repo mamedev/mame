@@ -43,6 +43,7 @@
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -783,7 +784,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 
 void portfolio_state::portfolio_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
 }
 
 
@@ -793,7 +794,7 @@ void portfolio_state::portfolio_mem(address_map &map)
 
 void portfolio_state::portfolio_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
 }
 
 

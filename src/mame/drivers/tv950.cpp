@@ -99,7 +99,7 @@ void tv950_state::tv950_mem(address_map &map)
 	map(0x2000, 0x3fff).ram().share("vram"); // VRAM
 	map(0x8100, 0x8100).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8101, 0x8101).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
-	map(0x9000, 0x9000).w(this, FUNC(tv950_state::row_addr_w));
+	map(0x9000, 0x9000).w(FUNC(tv950_state::row_addr_w));
 	map(0x9300, 0x9303).rw(ACIA1_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9500, 0x9503).rw(ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9900, 0x9903).rw(ACIA3_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));

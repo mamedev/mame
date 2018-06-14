@@ -198,9 +198,9 @@ void dauphin_state::dauphin_mem(address_map &map)
 void dauphin_state::dauphin_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x03).w(this, FUNC(dauphin_state::port00_w)); // 4-led display
-	map(0x06, 0x06).w(this, FUNC(dauphin_state::port06_w));  // speaker (NOT a keyclick)
-	map(0x07, 0x07).r(this, FUNC(dauphin_state::port07_r)); // pushbuttons
+	map(0x00, 0x03).w(FUNC(dauphin_state::port00_w)); // 4-led display
+	map(0x06, 0x06).w(FUNC(dauphin_state::port06_w));  // speaker (NOT a keyclick)
+	map(0x07, 0x07).r(FUNC(dauphin_state::port07_r)); // pushbuttons
 }
 
 /* Input ports */

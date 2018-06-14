@@ -198,7 +198,7 @@ void decodmd_type1_device::decodmd1_map(address_map &map)
 void decodmd_type1_device::decodmd1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(decodmd_type1_device::dmd_port_r), FUNC(decodmd_type1_device::dmd_port_w));
+	map(0x00, 0xff).rw(FUNC(decodmd_type1_device::dmd_port_r), FUNC(decodmd_type1_device::dmd_port_w));
 }
 
 MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)

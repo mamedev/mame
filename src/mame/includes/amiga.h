@@ -25,6 +25,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/i2cmem.h"
 #include "machine/8364_paula.h"
 #include "video/amigaaga.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -490,7 +491,7 @@ public:
 	uint16_t m_agnus_id;
 	uint16_t m_denise_id;
 
-	void custom_chip_w(uint16_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
+	void write_custom_chip(uint16_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		custom_chip_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
 	}

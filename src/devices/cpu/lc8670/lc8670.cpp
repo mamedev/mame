@@ -158,9 +158,9 @@ const uint16_t lc8670_cpu_device::s_irq_vectors[] =
 
 void lc8670_cpu_device::lc8670_internal_map(address_map &map)
 {
-	map(0x000, 0x0ff).rw(this, FUNC(lc8670_cpu_device::mram_r), FUNC(lc8670_cpu_device::mram_w));
-	map(0x100, 0x17f).rw(this, FUNC(lc8670_cpu_device::regs_r), FUNC(lc8670_cpu_device::regs_w));
-	map(0x180, 0x1ff).rw(this, FUNC(lc8670_cpu_device::xram_r), FUNC(lc8670_cpu_device::xram_w));
+	map(0x000, 0x0ff).rw(FUNC(lc8670_cpu_device::mram_r), FUNC(lc8670_cpu_device::mram_w));
+	map(0x100, 0x17f).rw(FUNC(lc8670_cpu_device::regs_r), FUNC(lc8670_cpu_device::regs_w));
+	map(0x180, 0x1ff).rw(FUNC(lc8670_cpu_device::xram_r), FUNC(lc8670_cpu_device::xram_w));
 }
 
 

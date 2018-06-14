@@ -57,16 +57,16 @@ public:
 	template <class Object> devcb_base &set_out_callback(Object &&cb) { return m_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data writes
-	DECLARE_WRITE8_MEMBER(a_w);
-	void a_w(u8 data);
-	DECLARE_WRITE8_MEMBER(b_w);
-	void b_w(u8 data);
-	DECLARE_WRITE8_MEMBER(ab_w);
-	void ab_w(u8 data);
-	DECLARE_WRITE8_MEMBER(ba_w);
-	void ba_w(u8 data);
-	DECLARE_WRITE8_MEMBER(interleave_w);
-	void interleave_w(u8 data);
+	DECLARE_WRITE8_MEMBER(a_w) { write_a(data); }
+	void write_a(u8 data);
+	DECLARE_WRITE8_MEMBER(b_w) { write_b(data); }
+	void write_b(u8 data);
+	DECLARE_WRITE8_MEMBER(ab_w) { write_ab(data); }
+	void write_ab(u8 data);
+	DECLARE_WRITE8_MEMBER(ba_w) { write_ba(data); }
+	void write_ba(u8 data);
+	DECLARE_WRITE8_MEMBER(interleave_w) { write_interleave(data); }
+	void write_interleave(u8 data);
 
 	// data line writes
 	DECLARE_WRITE_LINE_MEMBER(a0_w);

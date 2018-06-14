@@ -439,39 +439,39 @@ READ16_MEMBER(pcd_state::mem_r)
 
 void pcd_state::pcd_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
-	map(0x00000, 0x7ffff).rw(this, FUNC(pcd_state::mem_r), FUNC(pcd_state::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x00000, 0x7ffff).rw(FUNC(pcd_state::mem_r), FUNC(pcd_state::mem_w));
 	map(0xfc000, 0xfffff).rom().region("bios", 0);
 }
 
 void pcd_state::pcd_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xefff).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x0000, 0xefff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xf801).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf820, 0xf821).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf840, 0xf840).rw(this, FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
-	map(0xf841, 0xf841).rw(this, FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
-	map(0xf880, 0xf8bf).rw(this, FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
+	map(0xf840, 0xf840).rw(FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
+	map(0xf841, 0xf841).rw(FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
+	map(0xf880, 0xf8bf).rw(FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
 	map(0xf900, 0xf903).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0xf904, 0xf905).rw(this, FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
-	map(0xf940, 0xf943).rw(this, FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
+	map(0xf904, 0xf905).rw(FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
+	map(0xf940, 0xf943).rw(FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
 	map(0xf980, 0xf9bf).m("video", FUNC(pcdx_video_device::map));
 	map(0xf9c0, 0xf9c3).rw("usart1", FUNC(mc2661_device::read), FUNC(mc2661_device::write));  // UARTs
 	map(0xf9d0, 0xf9d3).rw("usart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9e0, 0xf9e3).rw("usart3", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 //  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
-	map(0xfb00, 0xfb00).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
-	map(0xfb02, 0xffff).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0xfb00, 0xfb00).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0xfb02, 0xffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }
 
 void pcd_state::pcx_io(address_map &map)
 {
 	map.unmap_value_high();
 	pcd_io(map);
-	map(0x8000, 0x8fff).rw(this, FUNC(pcd_state::mmu_r), FUNC(pcd_state::mmu_w));
-	map(0xfb01, 0xfb01).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x8000, 0x8fff).rw(FUNC(pcd_state::mmu_r), FUNC(pcd_state::mmu_w));
+	map(0xfb01, 0xfb01).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }
 
 //**************************************************************************

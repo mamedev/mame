@@ -69,23 +69,23 @@ void momoko_state::momoko_map(address_map &map)
 	map(0xc000, 0xcfff).ram();
 	map(0xd064, 0xd0ff).ram().share("spriteram");
 	map(0xd400, 0xd400).portr("IN0").nopw(); /* interrupt ack? */
-	map(0xd402, 0xd402).portr("IN1").w(this, FUNC(momoko_state::momoko_flipscreen_w));
+	map(0xd402, 0xd402).portr("IN1").w(FUNC(momoko_state::momoko_flipscreen_w));
 	map(0xd404, 0xd404).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xd406, 0xd406).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd407, 0xd407).portr("DSW1");
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xdc00, 0xdc00).w(this, FUNC(momoko_state::momoko_fg_scrolly_w));
-	map(0xdc01, 0xdc01).w(this, FUNC(momoko_state::momoko_fg_scrollx_w));
-	map(0xdc02, 0xdc02).w(this, FUNC(momoko_state::momoko_fg_select_w));
+	map(0xdc00, 0xdc00).w(FUNC(momoko_state::momoko_fg_scrolly_w));
+	map(0xdc01, 0xdc01).w(FUNC(momoko_state::momoko_fg_scrollx_w));
+	map(0xdc02, 0xdc02).w(FUNC(momoko_state::momoko_fg_select_w));
 	map(0xe000, 0xe3ff).ram().share("videoram");
-	map(0xe800, 0xe800).w(this, FUNC(momoko_state::momoko_text_scrolly_w));
-	map(0xe801, 0xe801).w(this, FUNC(momoko_state::momoko_text_mode_w));
+	map(0xe800, 0xe800).w(FUNC(momoko_state::momoko_text_scrolly_w));
+	map(0xe801, 0xe801).w(FUNC(momoko_state::momoko_text_mode_w));
 	map(0xf000, 0xffff).bankr("bank1");
-	map(0xf000, 0xf001).w(this, FUNC(momoko_state::momoko_bg_scrolly_w)).share("bg_scrolly");
-	map(0xf002, 0xf003).w(this, FUNC(momoko_state::momoko_bg_scrollx_w)).share("bg_scrollx");
-	map(0xf004, 0xf004).w(this, FUNC(momoko_state::momoko_bg_read_bank_w));
-	map(0xf006, 0xf006).w(this, FUNC(momoko_state::momoko_bg_select_w));
-	map(0xf007, 0xf007).w(this, FUNC(momoko_state::momoko_bg_priority_w));
+	map(0xf000, 0xf001).w(FUNC(momoko_state::momoko_bg_scrolly_w)).share("bg_scrolly");
+	map(0xf002, 0xf003).w(FUNC(momoko_state::momoko_bg_scrollx_w)).share("bg_scrollx");
+	map(0xf004, 0xf004).w(FUNC(momoko_state::momoko_bg_read_bank_w));
+	map(0xf006, 0xf006).w(FUNC(momoko_state::momoko_bg_select_w));
+	map(0xf007, 0xf007).w(FUNC(momoko_state::momoko_bg_priority_w));
 }
 
 void momoko_state::momoko_sound_map(address_map &map)

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class tumbleb_state : public driver_device
 {

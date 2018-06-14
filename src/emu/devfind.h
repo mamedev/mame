@@ -38,20 +38,15 @@ template <typename T, unsigned Count>
 class object_array_finder
 {
 private:
-	template <unsigned... V> struct indices { };
-	template <unsigned C, unsigned... V> struct range : public range<C - 1, C - 1, V...> { };
-	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
-	template <unsigned C> using index_range = typename range<C>::type;
-
 	template <typename F, typename... Param, unsigned... V>
-	object_array_finder(device_t &base, F const &fmt, unsigned start, indices<V...>, Param const &... arg)
+	object_array_finder(device_t &base, F const &fmt, unsigned start, std::integer_sequence<unsigned, V...>, Param const &... arg)
 		: m_tag{ util::string_format(fmt, start + V)... }
 		, m_array{ { base, m_tag[V].c_str(), arg... }... }
 	{
 	}
 
 	template <typename... Param, unsigned... V>
-	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, indices<V...>, Param const &... arg)
+	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, std::integer_sequence<unsigned, V...>, Param const &... arg)
 		: m_array{ { base, tags[V], arg... }... }
 	{
 	}
@@ -110,7 +105,7 @@ public:
 	/// \sa util::string_format
 	template <typename F, typename... Param>
 	object_array_finder(device_t &base, F const &fmt, unsigned start, Param const &... arg)
-		: object_array_finder(base, fmt, start, index_range<Count>(), arg...)
+		: object_array_finder(base, fmt, start, std::make_integer_sequence<unsigned, Count>(), arg...)
 	{
 	}
 
@@ -126,7 +121,7 @@ public:
 	///   all elements.
 	template <typename... Param>
 	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, Param const &... arg)
-		: object_array_finder(base, tags, index_range<Count>(), arg...)
+		: object_array_finder(base, tags, std::make_integer_sequence<unsigned, Count>(), arg...)
 	{
 	}
 
@@ -312,15 +307,6 @@ public:
 		assert(!m_resolved);
 		std::tie(m_base, m_tag) = finder.finder_target();
 	}
-
-	/// \brief Is the object to be resolved before memory maps?
-	///
-	/// Some objects must be resolved before memory maps are loaded
-	/// (devices for instance), some after (memory shares for
-	/// instance).
-	/// \return True if the target object has to be resolved before
-	///   memory maps are loaded
-	virtual bool is_pre_map() const { return false; }
 
 	/// \brief Dummy tag always treated as not found
 	constexpr static char DUMMY_TAG[17] = "finder_dummy_tag";
@@ -528,15 +514,6 @@ public:
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
 	device_finder(device_t &base, char const *tag) : object_finder_base<DeviceClass, Required>(base, tag) { }
-
-	/// \brief Is the object to be resolved before memory maps?
-	///
-	/// Some objects must be resolved before memory maps are loaded
-	/// (devices for instance), some after (memory shares for
-	/// instance).
-	/// \return True if the target object has to be resolved before
-	///   memory maps are loaded.
-	virtual bool is_pre_map() const override { return true; }
 
 	/// \brief Set target during configuration
 	///

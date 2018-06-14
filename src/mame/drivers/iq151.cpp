@@ -63,6 +63,7 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -216,7 +217,7 @@ WRITE8_MEMBER(iq151_state::cartslot_io_w)
 void iq151_state::iq151_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(iq151_state::cartslot_r), FUNC(iq151_state::cartslot_w));
+	map(0x0000, 0xffff).rw(FUNC(iq151_state::cartslot_r), FUNC(iq151_state::cartslot_w));
 
 	map(0x0000, 0x07ff).bankrw("boot");
 	map(0x0800, 0x7fff).ram();
@@ -227,9 +228,9 @@ void iq151_state::iq151_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(iq151_state::cartslot_io_r), FUNC(iq151_state::cartslot_io_w));
+	map(0x00, 0xff).rw(FUNC(iq151_state::cartslot_io_r), FUNC(iq151_state::cartslot_io_w));
 
-	map(0x80, 0x80).w(this, FUNC(iq151_state::boot_bank_w));
+	map(0x80, 0x80).w(FUNC(iq151_state::boot_bank_w));
 	map(0x84, 0x87).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x88, 0x89).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }

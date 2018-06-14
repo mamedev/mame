@@ -746,12 +746,12 @@ void intellec4_state::intellec4_rom_port_banks(address_map &map)
 	map.unmap_value_high();
 
 	// 0x0000...0x07ff MON
-	map(0x0000, 0x000f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
-	map(0x0010, 0x001f).mirror(0x1f00).w(this, FUNC(intellec4_state::rom1_out));
-	map(0x0020, 0x002f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
-	map(0x0030, 0x003f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
-	map(0x00e0, 0x00ef).mirror(0x1f00).rw(this, FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
-	map(0x00f0, 0x00ff).mirror(0x1f00).rw(this, FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
+	map(0x0000, 0x000f).mirror(0x1f00).rw(FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x1f00).w(FUNC(intellec4_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x1f00).rw(FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
+	map(0x0030, 0x003f).mirror(0x1f00).rw(FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
+	map(0x00e0, 0x00ef).mirror(0x1f00).rw(FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
+	map(0x00f0, 0x00ff).mirror(0x1f00).rw(FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
 
 	// 0x0800...0x0fff PROM
 
@@ -791,14 +791,14 @@ void intellec4_state::intellec4_ram_status(address_map &map)
 
 void intellec4_state::intellec4_ram_ports(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(intellec4_state::ram0_out));
-	map(0x01, 0x01).w(this, FUNC(intellec4_state::ram1_out));
+	map(0x00, 0x00).w(FUNC(intellec4_state::ram0_out));
+	map(0x01, 0x01).w(FUNC(intellec4_state::ram1_out));
 }
 
 void intellec4_state::intellec4_program_memory(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x01ff).rw(this, FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
+	map(0x0000, 0x01ff).rw(FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
 }
 
 
@@ -1123,13 +1123,14 @@ INPUT_CHANGED_MEMBER(mod4_state::sw_one_shot)
 
 MACHINE_CONFIG_START(mod4_state::mod4)
 	intellec4(config);
+
 	MCFG_DEVICE_ADD(m_cpu, I4004, 5.185_MHz_XTAL / 7)
-	MCFG_I4004_ROM_MAP(intellec4_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
-	MCFG_I4004_ROM_PORTS_MAP(intellec4_rom_ports)
-	MCFG_I4004_RAM_STATUS_MAP(intellec4_ram_status)
-	MCFG_I4004_RAM_PORTS_MAP(intellec4_ram_ports)
-	MCFG_I4004_PROGRAM_MEMORY_MAP(intellec4_program_memory)
+	m_cpu->set_rom_map(&mod4_state::intellec4_rom);
+	m_cpu->set_ram_memory_map(&mod4_state::intellec4_ram_memory);
+	m_cpu->set_rom_ports_map(&mod4_state::intellec4_rom_ports);
+	m_cpu->set_ram_status_map(&mod4_state::intellec4_ram_status);
+	m_cpu->set_ram_ports_map(&mod4_state::intellec4_ram_ports);
+	m_cpu->set_program_memory_map(&mod4_state::intellec4_program_memory);
 	MCFG_I4004_BUS_CYCLE_CB(BUSCYCLE(mod4_state, bus_cycle));
 	MCFG_I4004_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
 
@@ -1348,14 +1349,15 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_single_step)
 
 MACHINE_CONFIG_START(mod40_state::mod40)
 	intellec4(config);
+
 	MCFG_DEVICE_ADD(m_cpu, I4040, 5.185_MHz_XTAL / 7)
-	MCFG_I4040_ROM_MAP(intellec4_rom)
-	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
-	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)
-	MCFG_I4040_RAM_STATUS_MAP(intellec4_ram_status)
-	MCFG_I4040_RAM_PORTS_MAP(intellec4_ram_ports)
-	MCFG_I4040_PROGRAM_MEMORY_MAP(intellec4_program_memory)
-	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle));
+	m_cpu->set_rom_map(&mod40_state::intellec4_rom);
+	m_cpu->set_ram_memory_map(&mod40_state::intellec4_ram_memory);
+	m_cpu->set_rom_ports_map(&mod40_state::intellec4_rom_ports);
+	m_cpu->set_ram_status_map(&mod40_state::intellec4_ram_status);
+	m_cpu->set_ram_ports_map(&mod40_state::intellec4_ram_ports);
+	m_cpu->set_program_memory_map(&mod40_state::intellec4_program_memory);
+	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle))
 	MCFG_I4040_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
 	MCFG_I4040_STP_ACK_CB(WRITELINE(*this, mod40_state, stp_ack))
 

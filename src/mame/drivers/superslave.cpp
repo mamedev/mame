@@ -160,8 +160,8 @@ WRITE8_MEMBER( superslave_state::write )
 
 WRITE8_MEMBER( superslave_state::baud_w )
 {
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
+	m_dbrg->write_str(data & 0x0f);
+	m_dbrg->write_stt(data >> 4);
 }
 
 
@@ -259,7 +259,7 @@ WRITE8_MEMBER( superslave_state::cmd_w )
 
 void superslave_state::superslave_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(superslave_state::read), FUNC(superslave_state::write));
+	map(0x0000, 0xffff).rw(FUNC(superslave_state::read), FUNC(superslave_state::write));
 }
 
 
@@ -272,13 +272,13 @@ void superslave_state::superslave_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(Z80DART_0_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x0c, 0x0f).rw(Z80DART_1_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x10, 0x10).mirror(0x03).w(this, FUNC(superslave_state::baud_w));
+	map(0x10, 0x10).mirror(0x03).w(FUNC(superslave_state::baud_w));
 	map(0x14, 0x17).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x18, 0x18).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x19, 0x19).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
-	map(0x1d, 0x1d).w(this, FUNC(superslave_state::memctrl_w));
+	map(0x1d, 0x1d).w(FUNC(superslave_state::memctrl_w));
 	map(0x1e, 0x1e).noprw(); // master communications
-	map(0x1f, 0x1f).rw(this, FUNC(superslave_state::status_r), FUNC(superslave_state::cmd_w));
+	map(0x1f, 0x1f).rw(FUNC(superslave_state::status_r), FUNC(superslave_state::cmd_w));
 }
 
 

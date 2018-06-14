@@ -10,11 +10,13 @@
 
 #pragma once
 
-#include "sound/samples.h"
-#include "machine/segag80.h"
-#include "sound/sn76496.h"
+#include "audio/segag80r.h"
 #include "audio/segasnd.h"
 #include "machine/i8255.h"
+#include "machine/segag80.h"
+#include "sound/samples.h"
+#include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -36,6 +38,7 @@ public:
 		m_sn2(*this, "sn2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundbrd(*this, "soundbrd"),
 		m_samples(*this, "samples"),
 		m_speech(*this, "segaspeech"),
 		m_usbsnd(*this, "usbsnd"),
@@ -53,6 +56,7 @@ public:
 	optional_device<sn76496_device> m_sn2;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<monsterb_sound_device> m_soundbrd;
 	optional_device<samples_device> m_samples;
 	optional_device<speech_sound_device> m_speech;
 	optional_device<usb_sound_device> m_usbsnd;
@@ -73,8 +77,6 @@ public:
 	uint8_t m_sound_data;
 	uint8_t m_square_state;
 	uint8_t m_square_count;
-	uint8_t m_n7751_command;
-	uint8_t m_n7751_busy;
 	segag80_decrypt_func m_decrypt;
 	uint8_t m_background_pcb;
 	double m_rweights[3];
@@ -121,8 +123,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sindbadm_back_port_w);
 	DECLARE_WRITE8_MEMBER(astrob_sound_w);
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
-	DECLARE_READ8_MEMBER(n7751_rom_r);
-	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
 	DECLARE_READ8_MEMBER(sindbadm_sound_data_r);
@@ -148,12 +148,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
 	inline void sega005_update_sound_data();
-	DECLARE_WRITE8_MEMBER(monsterb_sound_a_w);
-	DECLARE_WRITE8_MEMBER(monsterb_sound_b_w);
-	DECLARE_READ8_MEMBER(n7751_status_r);
-	DECLARE_WRITE8_MEMBER(n7751_command_w);
-	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
-	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 	void vblank_latch_set();
 	void g80_set_palette_entry(int entry, uint8_t data);
 	void spaceod_bg_init_palette();

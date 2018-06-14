@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 
 class homedata_state : public driver_device
 {

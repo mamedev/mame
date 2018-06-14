@@ -59,6 +59,7 @@ Twenty four 8116 rams.
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -264,12 +265,12 @@ WRITE8_MEMBER(progolf_state::videoram_w)
 void progolf_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x5fff).ram();
-	map(0x6000, 0x7fff).ram().w(this, FUNC(progolf_state::charram_w)).share("fbram");
-	map(0x8000, 0x8fff).rw(this, FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
-	map(0x9000, 0x9000).portr("IN2").w(this, FUNC(progolf_state::char_vregs_w));
-	map(0x9200, 0x9200).portr("P1").w(this, FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
-	map(0x9400, 0x9400).portr("P2").w(this, FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
-	map(0x9600, 0x9600).portr("IN0").w(this, FUNC(progolf_state::flip_screen_w));   /* VBLANK */
+	map(0x6000, 0x7fff).ram().w(FUNC(progolf_state::charram_w)).share("fbram");
+	map(0x8000, 0x8fff).rw(FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9000).portr("IN2").w(FUNC(progolf_state::char_vregs_w));
+	map(0x9200, 0x9200).portr("P1").w(FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
+	map(0x9400, 0x9400).portr("P2").w(FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
+	map(0x9600, 0x9600).portr("IN0").w(FUNC(progolf_state::flip_screen_w));   /* VBLANK */
 	map(0x9800, 0x9800).portr("DSW1");
 	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));

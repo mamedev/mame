@@ -49,13 +49,13 @@ void gomoku_state::gomoku_map(address_map &map)
 {
 	map(0x0000, 0x47ff).rom();
 	map(0x4800, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().w(this, FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
-	map(0x5800, 0x58ff).ram().w(this, FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
+	map(0x5000, 0x53ff).ram().w(FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
+	map(0x5400, 0x57ff).ram().w(FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
+	map(0x5800, 0x58ff).ram().w(FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
 	map(0x6000, 0x601f).w("gomoku", FUNC(gomoku_sound_device::sound1_w));
 	map(0x6800, 0x681f).w("gomoku", FUNC(gomoku_sound_device::sound2_w));
 	map(0x7000, 0x7007).w("latch", FUNC(ls259_device::write_d1));
-	map(0x7800, 0x7807).r(this, FUNC(gomoku_state::input_port_r));
+	map(0x7800, 0x7807).r(FUNC(gomoku_state::input_port_r));
 	map(0x7800, 0x7800).nopw();
 }
 

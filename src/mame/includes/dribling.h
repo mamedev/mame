@@ -8,6 +8,7 @@
 
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 class dribling_state : public driver_device
 {

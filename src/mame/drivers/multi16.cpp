@@ -10,6 +10,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -117,8 +118,8 @@ void multi16_state::multi16_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x02, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // i8259
-	map(0x40, 0x40).w(this, FUNC(multi16_state::multi16_6845_address_w));
-	map(0x41, 0x41).w(this, FUNC(multi16_state::multi16_6845_data_w));
+	map(0x40, 0x40).w(FUNC(multi16_state::multi16_6845_address_w));
+	map(0x41, 0x41).w(FUNC(multi16_state::multi16_6845_data_w));
 }
 
 /* Input ports */

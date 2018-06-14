@@ -83,14 +83,14 @@ void tx1_state::tx1_main(address_map &map)
 	map(0x00000, 0x00fff).mirror(0x1000).ram();
 	map(0x02000, 0x02fff).mirror(0x1000).ram();
 	map(0x04000, 0x04fff).mirror(0x1000).ram().share("nvram");
-	map(0x06000, 0x06fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x06000, 0x06fff).rw(FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
 	map(0x08000, 0x09fff).ram().share("vram");
 	map(0x0a000, 0x0afff).ram().share("rcram");
 	map(0x0b000, 0x0b001).rw(m_sound, FUNC(tx1_sound_device::dipswitches_r), FUNC(tx1_sound_device::z80_busreq_w));
-	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::tx1_scolst_w));
-	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::tx1_slock_w));
-	map(0x0f000, 0x0f001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
+	map(0x0c000, 0x0c001).w(FUNC(tx1_state::tx1_scolst_w));
+	map(0x0d000, 0x0d003).w(FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(FUNC(tx1_state::tx1_slock_w));
+	map(0x0f000, 0x0f001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(FUNC(tx1_state::resume_math_w));
 	map(0x10000, 0x1ffff).rw(m_sound, FUNC(tx1_sound_device::z80_shared_r), FUNC(tx1_sound_device::z80_shared_w));
 	map(0x20000, 0x2ffff).mirror(0xd0000).rom();
 }
@@ -98,15 +98,15 @@ void tx1_state::tx1_main(address_map &map)
 void tx1_state::tx1_math(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("math_ram");
-	map(0x00800, 0x00fff).rw(this, FUNC(tx1_state::tx1_spcs_ram_r), FUNC(tx1_state::tx1_spcs_ram_w));
+	map(0x00800, 0x00fff).rw(FUNC(tx1_state::tx1_spcs_ram_r), FUNC(tx1_state::tx1_spcs_ram_w));
 	map(0x01000, 0x01fff).ram().share("rcram");
 	map(0x02000, 0x022ff).ram().share("objram");
-	map(0x02400, 0x027ff).w(this, FUNC(tx1_state::tx1_bankcs_w));
-	map(0x02800, 0x02bff).w(this, FUNC(tx1_state::halt_math_w));
-	map(0x02C00, 0x02fff).w(this, FUNC(tx1_state::tx1_flgcs_w));
-	map(0x03000, 0x03fff).rw(this, FUNC(tx1_state::tx1_math_r), FUNC(tx1_state::tx1_math_w));
+	map(0x02400, 0x027ff).w(FUNC(tx1_state::tx1_bankcs_w));
+	map(0x02800, 0x02bff).w(FUNC(tx1_state::halt_math_w));
+	map(0x02C00, 0x02fff).w(FUNC(tx1_state::tx1_flgcs_w));
+	map(0x03000, 0x03fff).rw(FUNC(tx1_state::tx1_math_r), FUNC(tx1_state::tx1_math_w));
 	map(0x04000, 0x07fff).mirror(0xf8000).rom();
-	map(0x05000, 0x07fff).r(this, FUNC(tx1_state::tx1_spcs_rom_r));
+	map(0x05000, 0x07fff).r(FUNC(tx1_state::tx1_spcs_rom_r));
 }
 
 
@@ -120,14 +120,14 @@ void tx1_state::tx1_math(address_map &map)
 void tx1_state::buggyboy_main(address_map &map)
 {
 	map(0x00000, 0x03fff).ram().share("nvram");
-	map(0x04000, 0x04fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x04000, 0x04fff).rw(FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
 	map(0x08000, 0x09fff).ram().share("vram");
 	map(0x0a000, 0x0afff).ram().share("rcram");
 	map(0x0b000, 0x0b001).rw(m_sound, FUNC(tx1_sound_device::dipswitches_r), FUNC(tx1_sound_device::z80_busreq_w));
-	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::buggyboy_scolst_w));
-	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::buggyboy_sky_w));
-	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
+	map(0x0c000, 0x0c001).w(FUNC(tx1_state::buggyboy_scolst_w));
+	map(0x0d000, 0x0d003).w(FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(FUNC(tx1_state::buggyboy_sky_w));
+	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(FUNC(tx1_state::resume_math_w));
 	map(0x10000, 0x1ffff).rw(m_sound, FUNC(tx1_sound_device::z80_shared_r), FUNC(tx1_sound_device::z80_shared_w));
 	map(0x20000, 0x2ffff).rom();
 	map(0xf0000, 0xfffff).rom();
@@ -136,14 +136,14 @@ void tx1_state::buggyboy_main(address_map &map)
 void tx1_state::buggybjr_main(address_map &map)
 {
 	map(0x00000, 0x03fff).ram().share("nvram");
-	map(0x04000, 0x04fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x04000, 0x04fff).rw(FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
 	map(0x08000, 0x08fff).ram().share("vram");
 	map(0x0a000, 0x0afff).ram().share("rcram");
 	map(0x0b000, 0x0b001).rw(m_sound, FUNC(tx1_sound_device::dipswitches_r), FUNC(tx1_sound_device::z80_busreq_w));
-	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::buggyboy_scolst_w));
-	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::buggyboy_sky_w));
-	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
+	map(0x0c000, 0x0c001).w(FUNC(tx1_state::buggyboy_scolst_w));
+	map(0x0d000, 0x0d003).w(FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(FUNC(tx1_state::buggyboy_sky_w));
+	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(FUNC(tx1_state::resume_math_w));
 	map(0x10000, 0x1ffff).rw(m_sound, FUNC(tx1_sound_device::z80_shared_r), FUNC(tx1_sound_device::z80_shared_w));
 	map(0x20000, 0x2ffff).rom();
 	map(0xf0000, 0xfffff).rom();
@@ -152,13 +152,13 @@ void tx1_state::buggybjr_main(address_map &map)
 void tx1_state::buggyboy_math(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("math_ram");
-	map(0x00800, 0x00fff).rw(this, FUNC(tx1_state::buggyboy_spcs_ram_r), FUNC(tx1_state::buggyboy_spcs_ram_w));
+	map(0x00800, 0x00fff).rw(FUNC(tx1_state::buggyboy_spcs_ram_r), FUNC(tx1_state::buggyboy_spcs_ram_w));
 	map(0x01000, 0x01fff).ram().share("rcram");
 	map(0x02000, 0x022ff).ram().share("objram");
-	map(0x02400, 0x024ff).w(this, FUNC(tx1_state::buggyboy_gas_w));
-	map(0x03000, 0x03fff).rw(this, FUNC(tx1_state::buggyboy_math_r), FUNC(tx1_state::buggyboy_math_w));
+	map(0x02400, 0x024ff).w(FUNC(tx1_state::buggyboy_gas_w));
+	map(0x03000, 0x03fff).rw(FUNC(tx1_state::buggyboy_math_r), FUNC(tx1_state::buggyboy_math_w));
 	map(0x04000, 0x07fff).mirror(0xf8000).rom();
-	map(0x05000, 0x07fff).r(this, FUNC(tx1_state::buggyboy_spcs_rom_r));
+	map(0x05000, 0x07fff).r(FUNC(tx1_state::buggyboy_spcs_rom_r));
 }
 
 /*************************************

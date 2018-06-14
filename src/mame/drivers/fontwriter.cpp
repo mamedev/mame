@@ -85,7 +85,7 @@ void fontwriter_state::main_map(address_map &map)
 
 void fontwriter_state::io_map(address_map &map)
 {
-	map(M37710_PORT6, M37710_PORT6).r(this, FUNC(fontwriter_state::vbl_r));
+	map(M37710_PORT6, M37710_PORT6).r(FUNC(fontwriter_state::vbl_r));
 }
 
 static INPUT_PORTS_START( fontwriter )

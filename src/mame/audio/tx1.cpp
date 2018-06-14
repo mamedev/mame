@@ -11,7 +11,6 @@
 #include "audio/tx1.h"
 #include "cpu/z80/z80.h"
 #include "includes/tx1.h"
-#include "machine/i8255.h"
 #include "video/resnet.h"
 #include "speaker.h"
 
@@ -68,6 +67,12 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		device_sound_interface(mconfig, *this),
 		m_audiocpu(*this, "audio_cpu"),
 		m_z80_ram(*this, "z80_ram"),
+		m_ppi(*this, "ppi8255"),
+		m_dsw(*this, "DSW"),
+		m_steering(*this, "AN_STEERING"),
+		m_accelerator(*this, "AN_ACCELERATOR"),
+		m_brake(*this, "AN_BRAKE"),
+		m_ppi_portd(*this, "PPI_PORTD"),
 		m_stream(nullptr),
 		m_freq_to_step(0),
 		m_step0(0),
@@ -86,6 +91,11 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		m_ym1_outputa(0),
 		m_ym2_outputa(0),
 		m_ym2_outputb(0)
+{
+}
+
+tx1j_sound_device::tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tx1_sound_device(mconfig, TX1J_SOUND, tag, owner, clock)
 {
 }
 
@@ -169,24 +179,24 @@ static uint8_t bit_reverse8(uint8_t val)
 
 READ16_MEMBER( tx1_sound_device::dipswitches_r )
 {
-	return (ioport("DSW")->read() & 0xfffe) | m_ts;
+	return (m_dsw->read() & 0xfffe) | m_ts;
 }
 
 // Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
 READ8_MEMBER( buggyboy_sound_device::bb_analog_r )
 {
 	if (offset == 0)
-		return bit_reverse8(((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read());
+		return bit_reverse8(((m_accelerator->read() & 0xf) << 4) | m_steering->read());
 	else
-		return bit_reverse8((ioport("AN_BRAKE")->read() & 0xf) << 4);
+		return bit_reverse8((m_brake->read() & 0xf) << 4);
 }
 
 READ8_MEMBER( buggyboyjr_sound_device::bbjr_analog_r )
 {
 	if (offset == 0)
-		return ((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read();
+		return ((m_accelerator->read() & 0xf) << 4) | m_steering->read();
 	else
-		return (ioport("AN_BRAKE")->read() & 0xf) << 4;
+		return (m_brake->read() & 0xf) << 4;
 }
 
 WRITE8_MEMBER( tx1_sound_device::tx1_coin_cnt_w )
@@ -205,8 +215,8 @@ WRITE8_MEMBER( buggyboy_sound_device::bb_coin_cnt_w )
 
 WRITE8_MEMBER( tx1_sound_device::tx1_ppi_latch_w )
 {
-	m_ppi_latch_a = ((ioport("AN_BRAKE")->read() & 0xf) << 4) | (ioport("AN_ACCELERATOR")->read() & 0xf);
-	m_ppi_latch_b = ioport("AN_STEERING")->read();
+	m_ppi_latch_a = ((m_brake->read() & 0xf) << 4) | (m_accelerator->read() & 0xf);
+	m_ppi_latch_b = m_steering->read();
 }
 
 READ8_MEMBER( tx1_sound_device::tx1_ppi_porta_r )
@@ -216,7 +226,7 @@ READ8_MEMBER( tx1_sound_device::tx1_ppi_porta_r )
 
 READ8_MEMBER( tx1_sound_device::tx1_ppi_portb_r )
 {
-	return ioport("PPI_PORTD")->read() | m_ppi_latch_b;
+	return m_ppi_portd->read() | m_ppi_latch_b;
 }
 
 WRITE8_MEMBER( tx1_sound_device::pit8253_w )
@@ -291,14 +301,13 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
 
 WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
 {
-	double gain;
-
 	m_stream->update();
+
 	/* Only B3-0 are inverted */
 	m_ay_outputb = data ^ 0xf;
 
 	/* It'll do until we get quadrophonic speaker support! */
-	gain = BIT(m_ay_outputb, 4) ? 1.5 : 2.0;
+	double gain = BIT(m_ay_outputb, 4) ? 1.5 : 2.0;
 	device_sound_interface *sound;
 	interface(sound);
 	sound->set_output_gain(0, gain);
@@ -408,11 +417,11 @@ void tx1_sound_device::tx1_sound_prg(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x3000, 0x37ff).ram().mirror(0x800).share("z80_ram");
-	map(0x4000, 0x4000).w(this, FUNC(tx1_sound_device::z80_intreq_w));
-	map(0x5000, 0x5003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6003).rw(this, FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
-	map(0x7000, 0x7fff).w(this, FUNC(tx1_sound_device::tx1_ppi_latch_w));
-	map(0xb000, 0xbfff).rw(this, FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+	map(0x4000, 0x4000).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0x5000, 0x5003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6003).rw(FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
+	map(0x7000, 0x7fff).w(FUNC(tx1_sound_device::tx1_ppi_latch_w));
+	map(0xb000, 0xbfff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
 }
 
 void tx1_sound_device::tx1_sound_io(address_map &map)
@@ -544,12 +553,12 @@ ioport_constructor tx1j_sound_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audio_cpu", Z80, TX1_PIXEL_CLOCK / 2)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, TX1_PIXEL_CLOCK / 2)
 	MCFG_DEVICE_PROGRAM_MAP(tx1_sound_prg)
 	MCFG_DEVICE_IO_MAP(tx1_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, tx1_sound_device, z80_irq,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, tx1_sound_device, tx1_ppi_porta_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, tx1_sound_device, tx1_ppi_portb_r))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
@@ -842,11 +851,11 @@ void buggyboy_sound_device::buggyboy_sound_prg(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("z80_ram");
-	map(0x6000, 0x6001).r(this, FUNC(buggyboy_sound_device::bb_analog_r));
-	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7000, 0x7003).rw(this, FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
-	map(0x7800, 0x7800).w(this, FUNC(tx1_sound_device::z80_intreq_w));
-	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+	map(0x6000, 0x6001).r(FUNC(buggyboy_sound_device::bb_analog_r));
+	map(0x6800, 0x6803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7000, 0x7003).rw(FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x7800, 0x7800).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
 }
 
 /* Buggy Boy Jr Sound PCB TC043 */
@@ -854,20 +863,20 @@ void buggyboyjr_sound_device::buggybjr_sound_prg(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("z80_ram");
-	map(0x5000, 0x5003).rw(this, FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
-	map(0x6000, 0x6001).r(this, FUNC(buggyboyjr_sound_device::bbjr_analog_r));
-	map(0x7000, 0x7000).w(this, FUNC(tx1_sound_device::z80_intreq_w));
-	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+	map(0x5000, 0x5003).rw(FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x6000, 0x6001).r(FUNC(buggyboyjr_sound_device::bbjr_analog_r));
+	map(0x7000, 0x7000).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
 }
 
 /* Common */
 void buggyboy_sound_device::buggyboy_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).r("ym1", FUNC(ay8910_device::data_r));
-	map(0x40, 0x41).w("ym1", FUNC(ay8910_device::data_address_w));
-	map(0x80, 0x80).r("ym2", FUNC(ay8910_device::data_r));
-	map(0x80, 0x81).w("ym2", FUNC(ay8910_device::data_address_w));
+	map(0x40, 0x40).r(m_ym[0], FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w(m_ym[0], FUNC(ay8910_device::data_address_w));
+	map(0x80, 0x80).r(m_ym[1], FUNC(ay8910_device::data_r));
+	map(0x80, 0x81).w(m_ym[1], FUNC(ay8910_device::data_address_w));
 }
 
 INPUT_PORTS_START( buggyboy_inputs )
@@ -1050,12 +1059,12 @@ ioport_constructor buggyboyjr_sound_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, BUGGYBOY_ZCLK / 2)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_sound_prg)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
 	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("PPI_PORTA"))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, buggyboy_sound_device, bb_coin_cnt_w))
@@ -1066,11 +1075,11 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 //  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
 //  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
+	MCFG_DEVICE_ADD(m_ym[0], YM2149, BUGGYBOY_ZCLK / 4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym1_a_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
-	MCFG_DEVICE_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
+	MCFG_DEVICE_ADD(m_ym[1], YM2149, BUGGYBOY_ZCLK / 4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
@@ -1080,7 +1089,7 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, BUGGYBOY_ZCLK / 2)
 	MCFG_DEVICE_PROGRAM_MAP(buggybjr_sound_prg)
 	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
@@ -1090,12 +1099,12 @@ MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
 //  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5);
 //  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
+	MCFG_DEVICE_ADD(m_ym[0], YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM2149_IC19_B"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
-	MCFG_DEVICE_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
+	MCFG_DEVICE_ADD(m_ym[1], YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)

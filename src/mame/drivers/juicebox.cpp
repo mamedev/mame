@@ -14,6 +14,7 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -291,7 +292,7 @@ void juicebox_state::machine_reset()
 void juicebox_state::juicebox_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rom();
-	map(0x04000000, 0x04ffffff).rw(this, FUNC(juicebox_state::juicebox_nand_r), FUNC(juicebox_state::juicebox_nand_w));
+	map(0x04000000, 0x04ffffff).rw(FUNC(juicebox_state::juicebox_nand_r), FUNC(juicebox_state::juicebox_nand_w));
 	map(0x0c000000, 0x0c1fffff).ram().mirror(0x00600000);
 }
 
@@ -327,7 +328,7 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
 	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(*this, juicebox_state, s3c44b0_gpio_port_r))
 	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(*this, juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, write))
+	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, data_w))
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

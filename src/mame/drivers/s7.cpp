@@ -147,7 +147,7 @@ void s7_state::s7_main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).ram().mirror(0x1000);
-	map(0x0100, 0x01ff).rw(this, FUNC(s7_state::nvram_r), FUNC(s7_state::nvram_w));
+	map(0x0100, 0x01ff).rw(FUNC(s7_state::nvram_r), FUNC(s7_state::nvram_w));
 	map(0x0200, 0x03ff).ram().mirror(0x1000);
 	map(0x1100, 0x11ff).ram();
 	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
@@ -417,7 +417,7 @@ void s7_state::machine_start()
 	m_digits.resolve();
 	m_memprotect = 0;
 	save_item(NAME(m_nvram));
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
 MACHINE_RESET_MEMBER( s7_state, s7 )
@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(s7_state::s7)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(*this, s7_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 	MCFG_PIA_READCA1_HANDLER(VCC)
 	MCFG_PIA_CA2_HANDLER(WRITELINE("hc55516", hc55516_device, digit_w))

@@ -1,79 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 #include "emu.h"
 #include "includes/tatsumi.h"
 #include "screen.h"
 
 
-/******************************************************************************/
-
-READ16_MEMBER(tatsumi_state::tatsumi_sprite_control_r)
-{
-	return m_sprite_control_ram[offset];
-}
-
-WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
-{
-	COMBINE_DATA(&m_sprite_control_ram[offset]);
-
-	/* 0xe0 is bank switch, others unknown */
-//  if ((offset==0xe0 && data&0xefff) || offset!=0xe0)
-//      logerror("%s:  Tatsumi TZB215 sprite control %04x %08x\n", m_maincpu->pc(), offset, data);
-}
-
-/******************************************************************************/
-
-WRITE16_MEMBER(apache3_state::apache3_road_z_w)
-{
-	m_apache3_road_z = data & 0xff;
-}
-
-WRITE8_MEMBER(apache3_state::apache3_road_x_w)
-{
-	// Note: Double buffered. Yes, this is correct :)
-	m_apache3_road_x_ram[data] = offset;
-}
-
-READ8_MEMBER(roundup5_state::gfxdata_r)
-{
-	if((m_control_word & 0x200) == 0x200)
-	{
-		offset += (m_control_word & 0x6000) << 2;
-
-		return m_bg_gfxram[offset];
-	}
-
-	offset+=((m_control_word&0x0c00)>>10) * 0x8000;
-	return m_tx_gfxram[offset];
-}
-
-WRITE8_MEMBER(roundup5_state::gfxdata_w)
-{
-	if((m_control_word & 0x200) == 0x200)
-	{	
-		offset += (m_control_word & 0x6000) << 2;		
-		m_bg_gfxram[offset] = data;
-		return;
-	}
-
-	offset+=((m_control_word&0x0c00)>>10) * 0x8000;
-
-	if (offset>=0x18000 && data)
-		logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,m_control_word);
-
-	m_tx_gfxram[offset] = data;
-
-	offset=offset%0x8000;
-	
-	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
-}
-
-WRITE16_MEMBER(tatsumi_state::text_w)
-{
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
-	m_tx_layer->mark_tile_dirty(offset);
-}
+/**********************************
+ *
+ * Common routines
+ *
+ *********************************/
 
 // TODO: move into device
 WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
@@ -105,7 +41,47 @@ WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
 	}
 }
 
-/********************************************************************/
+READ16_MEMBER(tatsumi_state::tatsumi_sprite_control_r)
+{
+	return m_sprite_control_ram[offset];
+}
+
+WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
+{
+	COMBINE_DATA(&m_sprite_control_ram[offset]);
+
+	/* 0xe0 is bank switch, others unknown */
+//  if ((offset==0xe0 && data&0xefff) || offset!=0xe0)
+//      logerror("%s:  Tatsumi TZB215 sprite control %04x %08x\n", m_maincpu->pc(), offset, data);
+}
+
+// apply shadowing to underlying layers
+// TODO: it might mix up with the lower palette bank instead (color bank 0x1400?)
+void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output)
+{
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		{
+			uint8_t shadow = shadow_bitmap.pix8(y, x);
+			// xor_output is enabled during Chen boss fight (where shadows have more brightness than everything else)
+			// TODO: transition before fighting him should also black out all the background tilemaps too!? 
+			//       (more evidence that we need to mix with color bank 0x1400 instead of doing true RGB mixing).
+			if(shadow ^ xor_output)
+			{
+				rgb_t shadow_pen = bitmap.pix32(y, x);
+				bitmap.pix32(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
+			}
+		}
+	}	
+}
+
+WRITE16_MEMBER(tatsumi_state::text_w)
+{
+	uint16_t *videoram = m_videoram;
+	COMBINE_DATA(&videoram[offset]);
+	m_tx_layer->mark_tile_dirty(offset);
+}
 
 TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 {
@@ -115,119 +91,6 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 			tile >> 12,
 			0);
 }
-
-template<int Bank>
-TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
-{
-	int tile=m_cyclwarr_videoram[Bank][(tile_index+0x400)&0x7fff];
-	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
-	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)|(bank<<10),(tile>>12)&0xf,0);
-	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
-}
-
-template<int Bank>
-TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
-{
-	int tile=m_cyclwarr_videoram[Bank][(tile_index+0x400)&0x7fff];
-	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
-	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)|(bank<<10),((tile>>12)&0xf) | m_cyclwarr_color_bank,0);
-	// TODO: enables transparent pen on sideways
-	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
-}
-
-
-/********************************************************************/
-
-void cyclwarr_state::tile_expand()
-{
-	/*
-	    Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
-	    from sets of 8 bit palettes!
-	*/
-	gfx_element *gx0 = m_gfxdecode->gfx(1);
-	m_mask.resize(gx0->elements() << 3,0);
-	uint8_t *srcdata, *dest;
-
-	// allocate memory for the assembled data
-	srcdata = auto_alloc_array(machine(), uint8_t, gx0->elements() * gx0->width() * gx0->height());
-
-	// loop over elements
-	dest = srcdata;
-	for (int c = 0; c < gx0->elements(); c++)
-	{
-		const uint8_t *c0base = gx0->get_data(c);
-
-		// loop over height
-		for (int y = 0; y < gx0->height(); y++)
-		{
-			const uint8_t *c0 = c0base;
-
-			for (int x = 0; x < gx0->width(); x++)
-			{
-				uint8_t pix = (*c0++ & 7);
-				uint8_t respix = m_cyclwarr_tileclut[(c << 3)|pix];
-				*dest++ = respix;
-				// Transparent pixels are set by both the tile pixel data==0 AND colour palette & 7 == 0
-				m_mask[(c << 3) | (y & 7)] |= ((pix&0x7)!=0 || ((pix&0x7)==0 && (respix&0x7)!=0)) ? (0x80 >> (x & 7)) : 0;
-			}
-			c0base += gx0->rowbytes();
-		}
-	}
-	
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
-	gx0->set_granularity(256);
-}
-
-/********************************************************************/
-
-VIDEO_START_MEMBER(apache3_state,apache3)
-{
-	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
-	m_temp_bitmap.allocate(512, 512);
-	m_apache3_road_x_ram = std::make_unique<uint8_t[]>(512);
-
-	m_tx_layer->set_transparent_pen(0);
-}
-
-VIDEO_START_MEMBER(roundup5_state,roundup5)
-{
-	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
-	m_tx_gfxram = std::make_unique<uint8_t[]>(0x20000);
-	m_bg_gfxram = std::make_unique<uint8_t[]>(0x20000);
-	
-	m_tx_layer->set_transparent_pen(0);
-
-	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
-	
-	save_pointer(NAME(m_tx_gfxram.get()),0x20000);
-	save_pointer(NAME(m_bg_gfxram.get()),0x20000);
-}
-
-VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
-{
-	tile_expand();
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
-	
-	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
-}
-
-VIDEO_START_MEMBER(cyclwarr_state,bigfight)
-{
-	tile_expand();
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-
-	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
-}
-
-/********************************************************************/
 
 template<class _BitmapClass>
 inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, const rectangle &clip,
@@ -679,6 +542,61 @@ void tatsumi_state::draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect
 	}
 }
 
+/* 
+ * Object palettes are build from a series of cluts stored in the object roms.
+ *
+ *  We update 'Mame palettes' from the clut here in order to simplify the
+ *  draw routines.  We also note down any uses of the 'shadow' pen (index 255).
+ */
+void tatsumi_state::update_cluts(int fake_palette_offset, int object_base, int length)
+{
+
+	int i;
+	const uint8_t* bank1 = m_rom_clut[0];
+	const uint8_t* bank2 = m_rom_clut[1];
+	for (i=0; i<length; i+=8) 
+	{
+		m_palette->set_pen_color(fake_palette_offset+i+0,m_palette->pen_color(bank1[1]+object_base));
+		m_shadow_pen_array[i+0]=(bank1[1]==255);
+		m_palette->set_pen_color(fake_palette_offset+i+1,m_palette->pen_color(bank1[0]+object_base));
+		m_shadow_pen_array[i+1]=(bank1[0]==255);
+		m_palette->set_pen_color(fake_palette_offset+i+2,m_palette->pen_color(bank1[3]+object_base));
+		m_shadow_pen_array[i+2]=(bank1[3]==255);
+		m_palette->set_pen_color(fake_palette_offset+i+3,m_palette->pen_color(bank1[2]+object_base));
+		m_shadow_pen_array[i+3]=(bank1[2]==255);
+
+		m_palette->set_pen_color(fake_palette_offset+i+4,m_palette->pen_color(bank2[1]+object_base));
+		m_shadow_pen_array[i+4]=(bank2[1]==255);
+		m_palette->set_pen_color(fake_palette_offset+i+5,m_palette->pen_color(bank2[0]+object_base));
+		m_shadow_pen_array[i+5]=(bank2[0]==255);
+		m_palette->set_pen_color(fake_palette_offset+i+6,m_palette->pen_color(bank2[3]+object_base));
+		m_shadow_pen_array[i+6]=(bank2[3]==255);
+		m_palette->set_pen_color(fake_palette_offset+i+7,m_palette->pen_color(bank2[2]+object_base));
+		m_shadow_pen_array[i+7]=(bank2[2]==255);
+
+		bank1+=4;
+		bank2+=4;
+	}
+}
+
+
+/**********************************
+ *
+ * Apache 3
+ *
+ *********************************/
+ 
+WRITE16_MEMBER(apache3_state::apache3_road_z_w)
+{
+	m_apache3_road_z = data & 0xff;
+}
+
+WRITE8_MEMBER(apache3_state::apache3_road_x_w)
+{
+	// Note: Double buffered. Yes, this is correct :)
+	m_apache3_road_x_ram[data] = offset;
+}
+
 void apache3_state::draw_sky(bitmap_rgb32 &bitmap,const rectangle &cliprect, int palette_base, int start_offset)
 {
 	// all todo
@@ -699,6 +617,154 @@ start_offset-=48;
 			bitmap.pix32(y, x) = m_palette->pen(col);
 		}
 	}
+}
+
+/* Draw the sky and ground, applying rotation (eventually). Experimental! */
+void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
+{
+	if (0) 
+	{
+		int x, y;
+
+		uint16_t gva = 0x180; // TODO
+		uint8_t sky_val = m_apache3_rotate_ctrl[1] & 0xff;
+
+		for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+		{
+			uint16_t rgdb = 0;//m_apache3_road_x_ram[gva & 0xff];
+			uint16_t gha = 0xf60; // test
+			int ln = (((m_apache3_prom[gva & 0x7f] & 0x7f) + (m_apache3_road_z & 0x7f)) >> 5) & 3;
+
+			if (gva & 0x100)
+			{
+				/* Sky */
+				for (x = cliprect.min_x; x <= cliprect.max_x; ++x)
+				{
+					dst.pix32(y, x) = m_palette->pen(0x100 + (sky_val & 0x7f));
+
+					/* Update horizontal counter? */
+					gha = (gha + 1) & 0xfff;
+				}
+			}
+			else
+			{
+				/* Ground */
+				for (x = cliprect.min_x; x <= cliprect.max_x; ++x)
+				{
+					uint8_t colour;
+					uint16_t hval;
+					uint8_t pixels;
+					int pix_sel;
+
+					hval = (rgdb + gha) & 0xfff; // Not quite
+
+					if (hval & 0x800)
+						hval ^= 0x1ff; // TEST
+					//else
+						//hval = hval;
+
+					pixels = m_apache3_g_ram[(((gva & 0xff) << 7) | ((hval >> 2) & 0x7f))];
+					pix_sel = hval & 3;
+
+					colour = (pixels >> (pix_sel << 1)) & 3;
+					colour = (BIT(hval, 11) << 4) | (colour << 2) | ln;
+
+					/* Draw the pixel */
+					dst.pix32(y, x) = m_palette->pen(0x200 + colour);
+
+					/* Update horizontal counter */
+					gha = (gha + 1) & 0xfff;
+				}
+			}
+
+			/* Update sky counter */
+			sky_val++;
+			gva = (gva + 1) & 0x1ff;
+		}
+	}
+}
+
+
+VIDEO_START_MEMBER(apache3_state,apache3)
+{
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
+	m_temp_bitmap.allocate(512, 512);
+	m_apache3_road_x_ram = std::make_unique<uint8_t[]>(512);
+
+	m_tx_layer->set_transparent_pen(0);
+}
+
+uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	update_cluts(1024, 0, 2048+2048);
+
+	m_tx_layer->set_scrollx(0,24);
+
+	bitmap.fill(m_palette->pen(0), cliprect);
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
+//  draw_ground(bitmap, cliprect);
+	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
+	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
+	return 0;
+}
+
+/**********************************
+ *
+ * Round Up 5
+ *
+ *********************************/
+
+READ8_MEMBER(roundup5_state::gfxdata_r)
+{
+	if((m_control_word & 0x200) == 0x200)
+	{
+		offset += (m_control_word & 0x6000) << 2;
+
+		return m_bg_gfxram[offset];
+	}
+
+	offset+=((m_control_word&0x0c00)>>10) * 0x8000;
+	return m_tx_gfxram[offset];
+}
+
+WRITE8_MEMBER(roundup5_state::gfxdata_w)
+{
+	if((m_control_word & 0x200) == 0x200)
+	{	
+		offset += (m_control_word & 0x6000) << 2;		
+		m_bg_gfxram[offset] = data;
+		return;
+	}
+
+	offset+=((m_control_word&0x0c00)>>10) * 0x8000;
+
+	if (offset>=0x18000 && data)
+		logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,m_control_word);
+
+	m_tx_gfxram[offset] = data;
+
+	offset=offset%0x8000;
+	
+	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
+}
+
+VIDEO_START_MEMBER(roundup5_state,roundup5)
+{
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
+	m_tx_gfxram = std::make_unique<uint8_t[]>(0x20000);
+	m_bg_gfxram = std::make_unique<uint8_t[]>(0x20000);
+	
+	m_tx_layer->set_transparent_pen(0);
+
+	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
+	
+	save_pointer(NAME(m_tx_gfxram.get()),0x20000);
+	save_pointer(NAME(m_bg_gfxram.get()),0x20000);
 }
 
 void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -778,6 +844,8 @@ pos is 11.5 fixed point
 	
 	for (/*y=0*/; y<cliprect.max_y+1; y++) 
 	{
+		// TODO: tunnels road drawing has a different format?
+		// shift is always 0x88** while data[3] is a variable argument with bit 15 always on
 		int shift=data[0];
 		int shift2=data[2];
 		int pal = 4; //(data[3]>>8)&0xf;
@@ -915,140 +983,6 @@ offset is from last pixel of first road segment?
 	}
 }
 
-void tatsumi_state::update_cluts(int fake_palette_offset, int object_base, int length)
-{
-	/* Object palettes are build from a series of cluts stored in the object roms.
-
-	    We update 'Mame palettes' from the clut here in order to simplify the
-	    draw routines.  We also note down any uses of the 'shadow' pen (index 255).
-	*/
-	int i;
-	const uint8_t* bank1=m_rom_clut[0];
-	const uint8_t* bank2=m_rom_clut[1];
-	for (i=0; i<length; i+=8) {
-		m_palette->set_pen_color(fake_palette_offset+i+0,m_palette->pen_color(bank1[1]+object_base));
-		m_shadow_pen_array[i+0]=(bank1[1]==255);
-		m_palette->set_pen_color(fake_palette_offset+i+1,m_palette->pen_color(bank1[0]+object_base));
-		m_shadow_pen_array[i+1]=(bank1[0]==255);
-		m_palette->set_pen_color(fake_palette_offset+i+2,m_palette->pen_color(bank1[3]+object_base));
-		m_shadow_pen_array[i+2]=(bank1[3]==255);
-		m_palette->set_pen_color(fake_palette_offset+i+3,m_palette->pen_color(bank1[2]+object_base));
-		m_shadow_pen_array[i+3]=(bank1[2]==255);
-
-		m_palette->set_pen_color(fake_palette_offset+i+4,m_palette->pen_color(bank2[1]+object_base));
-		m_shadow_pen_array[i+4]=(bank2[1]==255);
-		m_palette->set_pen_color(fake_palette_offset+i+5,m_palette->pen_color(bank2[0]+object_base));
-		m_shadow_pen_array[i+5]=(bank2[0]==255);
-		m_palette->set_pen_color(fake_palette_offset+i+6,m_palette->pen_color(bank2[3]+object_base));
-		m_shadow_pen_array[i+6]=(bank2[3]==255);
-		m_palette->set_pen_color(fake_palette_offset+i+7,m_palette->pen_color(bank2[2]+object_base));
-		m_shadow_pen_array[i+7]=(bank2[2]==255);
-
-		bank1+=4;
-		bank2+=4;
-	}
-}
-
-/**********************************************************************/
-
-void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool is_road, bool is_opaque)
-{
-	rectangle clip;
-	clip.min_x = cliprect.min_x;
-	clip.max_x = cliprect.max_x;
-	// TODO: both enabled when this occurs
-	bool rowscroll_enable = (scrollx[0] & 0x1000) == 0;
-	bool colscroll_enable = (scrollx[0] & 0x2000) == 0;
-
-	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
-	{
-		clip.min_y = clip.max_y = y;
-		int y_base = rowscroll_enable ? y : 0;
-		int x_base = colscroll_enable ? y : 0;
-		int src_y = (scrolly[y_base] & 0xfff) + yscroll_offset;
-		int src_x = (scrollx[x_base] & 0xfff) + xscroll_offset;
-
-		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
-		// additional tile color bank and per scanline.
-		if(is_road == true && scrolly[y_base] & 0x8000)
-		{
-			m_cyclwarr_color_bank = (scrolly[y_base] >> 13) & 3;
-			src->mark_all_dirty();
-			// TODO: road sidelines attempt, still not right (cuts off cyan color at intro and farmost road lines)
-			//if(m_cyclwarr_color_bank)
-			//	is_opaque = true;
-		}
-
-		src->set_scrollx(0,src_x);
-		src->set_scrolly(0,src_y);
-		src->draw(screen, bitmap, clip, is_opaque ? TILEMAP_DRAW_OPAQUE : 0, 0);
-	}
-}
-
-/* Draw the sky and ground, applying rotation (eventually). Experimental! */
-void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
-{
-if (0) {
-	int x, y;
-
-	uint16_t gva = 0x180; // TODO
-	uint8_t sky_val = m_apache3_rotate_ctrl[1] & 0xff;
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
-	{
-		uint16_t rgdb = 0;//m_apache3_road_x_ram[gva & 0xff];
-		uint16_t gha = 0xf60; // test
-		int ln = (((m_apache3_prom[gva & 0x7f] & 0x7f) + (m_apache3_road_z & 0x7f)) >> 5) & 3;
-
-		if (gva & 0x100)
-		{
-			/* Sky */
-			for (x = cliprect.min_x; x <= cliprect.max_x; ++x)
-			{
-				dst.pix32(y, x) = m_palette->pen(0x100 + (sky_val & 0x7f));
-
-				/* Update horizontal counter? */
-				gha = (gha + 1) & 0xfff;
-			}
-		}
-		else
-		{
-			/* Ground */
-			for (x = cliprect.min_x; x <= cliprect.max_x; ++x)
-			{
-				uint8_t colour;
-				uint16_t hval;
-				uint8_t pixels;
-				int pix_sel;
-
-				hval = (rgdb + gha) & 0xfff; // Not quite
-
-				if (hval & 0x800)
-					hval ^= 0x1ff; // TEST
-				//else
-					//hval = hval;
-
-				pixels = m_apache3_g_ram[(((gva & 0xff) << 7) | ((hval >> 2) & 0x7f))];
-				pix_sel = hval & 3;
-
-				colour = (pixels >> (pix_sel << 1)) & 3;
-				colour = (BIT(hval, 11) << 4) | (colour << 2) | ln;
-
-				/* Draw the pixel */
-				dst.pix32(y, x) = m_palette->pen(0x200 + colour);
-
-				/* Update horizontal counter */
-				gha = (gha + 1) & 0xfff;
-			}
-		}
-
-		/* Update sky counter */
-		sky_val++;
-		gva = (gva + 1) & 0x1ff;
-	}
-}
-}
-
 // background layer landscape for Round Up 5
 // two bitmap layers, back layer is 512 x 128, the other one is 512 x 64
 // it's safe to assume that three monitor version will have a different arrangement here ...
@@ -1089,25 +1023,6 @@ void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &clipr
 
 }
 
-/**********************************************************************/
-
-uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	update_cluts(1024, 0, 2048+2048);
-
-	m_tx_layer->set_scrollx(0,24);
-
-	bitmap.fill(m_palette->pen(0), cliprect);
-	screen.priority().fill(0, cliprect);
-	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
-//  draw_ground(bitmap, cliprect);
-	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
-	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
-}
-
 uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int tx_start_addr;
@@ -1126,7 +1041,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);
 	draw_road(bitmap,cliprect);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1140,20 +1055,242 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+/**********************************
+ *
+ * Cycle Warriors / Big Fight
+ *
+ *********************************/
+
+/*
+ * these video registers never changes 
+ * 
+ * Big Fight
+ * 72f2 5af2 3af2 22fa
+ *
+ * Cycle Warriors
+ * 5673 92c2 3673 267b
+ *
+ * Following is complete guesswork (since nothing changes it's very hard to pinpoint what these bits do :/)
+ * Layer order is 3-1-2-0 ?
+ * x--- -x-- ---- ---- one of these might be enable page select
+ * ---- ---- x--- ---- tilemap size 
+ * ---x ---- ---- x--- one these might be color bank
+ * 
+ */
+WRITE16_MEMBER(cyclwarr_state::video_config_w)
 {
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	COMBINE_DATA(&m_video_config[offset]);
+}
+
+// mixing control (seems to be available only for Big Fight and Cycle Warriors)
+// --x- ---- enabled in Big Fight, disabled in Cycle Warriors (unknown purpose)
+// ---- -x-- enable shadow mixing
+// ---- ---x if 1 invert shadows, i.e. shadows are drawn with original pen while non shadows are halved (Chen stage in Big Fight)
+WRITE16_MEMBER(cyclwarr_state::mixing_control_w)
+{
+	COMBINE_DATA(&m_mixing_control);
+}
+
+template<int Bank>
+TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
+{
+	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index&0x7fff];
+	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
+	uint16_t tileno = (tile&0x3ff)|(bank<<10);
+	// color is bits 12-13
+	uint8_t color = (tile >> 12) & 0x3;
+
+	// all layers but 0 wants this palette bank (fade in/out effects)
+	// a similar result is obtainable with priority bit, but then it's wrong for 
+	// Big Fight CRT test (dark red background) and character name bio in attract mode (reference shows it doesn't fade in like rest of text)
+	// TODO: likely an HW config sets this up
+	if(Bank != 0)
+		color |= 4;
+	// bit 14: ignore transparency on this tile
+	int opaque = ((tile >> 14) & 1) == 1;
+
+	SET_TILE_INFO_MEMBER(1,
+						 tileno,
+						 color,
+						opaque ? TILE_FORCE_LAYER0 : 0);
+
+	// bit 15: tile appears in front of sprites
+	tileinfo.category = (tile >> 15) & 1;
+	tileinfo.mask_data = &m_mask[tileno<<3];
+}
+
+// same as above but additionally apply per-scanline color banking
+// TODO: split for simplicity, need to merge with above
+template<int Bank>
+TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
+{
+	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index&0x7fff];
+	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
+	uint16_t tileno = (tile&0x3ff)|(bank<<10);
+	uint8_t color = (tile >> 12) & 0x3;
+//	if(Bank != 0)
+	color |= 4;
+	int opaque = ((tile >> 14) & 1) == 1;
+	
+	SET_TILE_INFO_MEMBER(1,
+	                     tileno,
+						 color | m_road_color_bank,
+						 opaque ? TILE_FORCE_LAYER0 : 0);
+
+	tileinfo.category = (tile >> 15) & 1;
+	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
+}
+
+void cyclwarr_state::tile_expand()
+{
+	/*
+	    Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
+	    from sets of 8 bit palettes!
+	*/
+	gfx_element *gx0 = m_gfxdecode->gfx(1);
+	m_mask.resize(gx0->elements() << 3,0);
+	uint8_t *srcdata, *dest;
+
+	// allocate memory for the assembled data
+	srcdata = auto_alloc_array(machine(), uint8_t, gx0->elements() * gx0->width() * gx0->height());
+
+	// loop over elements
+	dest = srcdata;
+	for (int c = 0; c < gx0->elements(); c++)
 	{
-		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		const uint8_t *c0base = gx0->get_data(c);
+
+		// loop over height
+		for (int y = 0; y < gx0->height(); y++)
 		{
-			uint8_t shadow = shadow_bitmap.pix8(y, x);
-			if(shadow)
+			const uint8_t *c0 = c0base;
+
+			for (int x = 0; x < gx0->width(); x++)
 			{
-				rgb_t shadow_pen = bitmap.pix32(y, x);
-				bitmap.pix32(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
+				uint8_t pix = (*c0++ & 7);
+				uint8_t respix = m_cyclwarr_tileclut[(c << 3)|pix];
+				*dest++ = respix;
+				// Transparent pixels are set by both the tile pixel data==0 AND colour palette & 7 == 0
+				m_mask[(c << 3) | (y & 7)] |= ((pix&0x7)!=0 || ((pix&0x7)==0 && (respix&0x7)!=0)) ? (0x80 >> (x & 7)) : 0;
+			}
+			c0base += gx0->rowbytes();
+		}
+	}
+	
+	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_granularity(256);
+}
+
+
+VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
+{
+	tile_expand();
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<2>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<3>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
+	
+	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
+
+	// set up scroll bases
+	// TODO: more HW configs
+	m_layer[3]->set_scrolldx(-8,-8);
+	m_layer_page_size[3] = 0x200;
+	m_layer[2]->set_scrolldx(-8,-8);
+	m_layer_page_size[2] = 0x200;
+	m_layer[1]->set_scrolldx(-8,-8);	
+	m_layer_page_size[1] = 0x200;
+	m_layer[0]->set_scrolldx(-0x10,-0x10);
+	m_layer_page_size[0] = 0x100;
+	
+	m_layer1_can_be_road = true;
+}
+
+VIDEO_START_MEMBER(cyclwarr_state,bigfight)
+{
+	tile_expand();
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<2>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<3>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+
+	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
+
+	// set up scroll bases
+	// TODO: more HW configs
+	m_layer[3]->set_scrolldx(-8,-8);
+	m_layer[2]->set_scrolldx(-8,-8);
+	m_layer[1]->set_scrolldx(-8,-8);
+	m_layer[0]->set_scrolldx(-0x10,-0x10);
+	for(int i=0;i<4;i++)
+		m_layer_page_size[i] = 0x200;
+
+	m_layer1_can_be_road = false;
+}
+
+
+void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority)
+{
+	rectangle clip;
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
+	// TODO: both always enabled when this occurs
+	bool rowscroll_enable = (scrollx[0] & 0x1000) == 0;
+	bool colscroll_enable = (scrollx[0] & 0x2000) == 0;
+	// this controls wraparound (tilemap can't go above a threshold)
+	// TODO: Actually scrolly registers 0xf0 to 0xff are used (can split the tilemap furthermore?)
+	uint16_t page_select = scrolly[0xff];
+	
+	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
+	{
+		clip.min_y = clip.max_y = y;
+		int y_base = rowscroll_enable ? y : 0;
+		int x_base = colscroll_enable ? y : 0;
+		int src_y = (scrolly[y_base] & 0x7ff);
+		int src_x = (scrollx[x_base] & 0x7ff);
+		// apparently if this is on disables wraparound target
+		int page_disable = scrolly[y_base] & 0x800;
+		int cur_page = src_y + y;
+				
+		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
+		// additional tile color bank and per scanline.
+		if(is_road == true)
+		{
+			if(scrolly[y_base] & 0x8000)
+			{
+				m_road_color_bank = (scrolly[y_base] >> 13) & 3;
+				// road mode disables page wraparound
+				page_disable = 1;
+			}
+			else
+				m_road_color_bank = 0;
+
+			if(m_road_color_bank != m_prev_road_bank)
+			{
+				m_prev_road_bank = m_road_color_bank;
+				src->mark_all_dirty();
 			}
 		}
-	}	
+
+		// apply wraparound, if enabled tilemaps can't go above a certain threshold
+		// cfr. Cycle Warriors scrolling text (ranking, ending), backgrounds when uphill,
+		// Big Fight vertical scrolling in the morning Funnel stage (not the one chosen at start),
+		// also Big Fight text garbage in the stage after Mevella joins you (forgot the name)
+		if((cur_page - page_select) >= layer_page_size && page_disable == 0)
+			src_y -= layer_page_size;
+		
+		src->set_scrollx(0,src_x);
+		src->set_scrolly(0,src_y);
+		src->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(hi_priority), 0);
+	}
+}
+
+void cyclwarr_state::draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority)
+{
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], m_layer_page_size[3], false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], m_layer_page_size[2],false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], m_layer_page_size[1],m_layer1_can_be_road, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], m_layer_page_size[0], false, hi_priority);
 }
 
 uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1172,54 +1309,20 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	#ifdef UNUSED_FUNCTION
-	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
-													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
-														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
-														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	popmessage("%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)"
+                                                        ,m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100],m_cyclwarr_videoram[1][0x1ff]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300],m_cyclwarr_videoram[1][0x3ff]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100],m_cyclwarr_videoram[0][0x1ff]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300],m_cyclwarr_videoram[0][0x3ff]);
 	#endif													
+
+//	popmessage("%04x %04x %04x %04x",m_video_config[0],m_video_config[1],m_video_config[2],m_video_config[3]);
 	
 	screen.priority().fill(0, cliprect);
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80, false, true);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80, false, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, true, false);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	draw_bg_layers(screen, bitmap, cliprect, 0);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), m_mixing_control & 1);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80, false, false);
-
-	return 0;
-}
-
-uint32_t cyclwarr_state::screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_bigfight_bank=m_bigfight_a40000[0];
-	if (m_bigfight_bank!=m_bigfight_last_bank)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			m_layer[i]->mark_all_dirty();
-		}
-		m_bigfight_last_bank=m_bigfight_bank;
-	}
-	update_cluts(8192, 4096, 8192);
-
-	#ifdef UNUSED_FUNCTION
-	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
-													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
-														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
-														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
-	#endif
-	
-	bitmap.fill(m_palette->pen(0), cliprect);
-	
-	screen.priority().fill(0, cliprect);
-	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x40, false, true);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x40, false, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, false, false);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
-	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x40, false, false);
-
+	draw_bg_layers(screen, bitmap, cliprect, 1);
 	return 0;
 }

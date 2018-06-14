@@ -526,7 +526,7 @@ void px8_state::px8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x0f);
-	map(0x00, 0x07).rw(this, FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
+	map(0x00, 0x07).rw(FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
 	map(0x0c, 0x0c).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x0d, 0x0d).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 //  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
@@ -540,9 +540,9 @@ void px8_state::px8_io(address_map &map)
 void px8_state::px8_slave_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0020, 0x0023).rw(this, FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
+	map(0x0020, 0x0023).rw(FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
-	map(0x0028, 0x0028).w(this, FUNC(px8_state::gah40s_ier_w));
+	map(0x0028, 0x0028).w(FUNC(px8_state::gah40s_ier_w));
 	map(0x8000, 0x97ff).ram().share("video_ram");
 	map(0x9800, 0xefff).noprw();
 	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */

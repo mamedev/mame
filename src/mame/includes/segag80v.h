@@ -5,10 +5,13 @@
     Sega vector hardware
 
 *************************************************************************/
-#include "sound/samples.h"
-#include "machine/segag80.h"
+
 #include "audio/segasnd.h"
+#include "machine/segag80.h"
+#include "sound/ay8910.h"
+#include "sound/samples.h"
 #include "video/vector.h"
+
 #include "screen.h"
 
 class segag80v_state : public segag80snd_common
@@ -22,6 +25,7 @@ public:
 		m_samples(*this, "samples"),
 		m_speech(*this, "segaspeech"),
 		m_usb(*this, "usbsnd"),
+		m_aysnd(*this, "aysnd"),
 		m_vector(*this, "vector"),
 		m_screen(*this, "screen"){ }
 
@@ -32,6 +36,7 @@ public:
 	optional_device<samples_device> m_samples;
 	optional_device<speech_sound_device> m_speech;
 	optional_device<usb_sound_device> m_usb;
+	optional_device<ay8912_device> m_aysnd;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
 

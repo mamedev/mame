@@ -53,11 +53,11 @@ class cops_state : public driver_device
 {
 public:
 	cops_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_sn(*this, "snsnd"),
-			m_ld(*this, "laserdisc"),
-			m_irq(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sn(*this, "snsnd")
+		, m_ld(*this, "laserdisc")
+		, m_irq(0)
 	{ }
 
 	// devices
@@ -764,7 +764,7 @@ WRITE8_MEMBER(cops_state::via1_b_w)
 	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
 	{
-		m_sn->write(space,0,m_sn_data);
+		m_sn->write(m_sn_data);
 	}
 }
 
@@ -806,11 +806,11 @@ void cops_state::cops_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x9fff).rom().region("program", 0);
-	map(0xa000, 0xafff).rw(this, FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
+	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
 	map(0xb000, 0xb00f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 1 */
 	map(0xb800, 0xb80f).rw("via6522_2", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 2 */
-	map(0xc000, 0xcfff).rw(this, FUNC(cops_state::io2_r), FUNC(cops_state::io2_w));
-	map(0xd000, 0xd007).rw(this, FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
+	map(0xc000, 0xcfff).rw(FUNC(cops_state::io2_r), FUNC(cops_state::io2_w));
+	map(0xd000, 0xd007).rw(FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
 	map(0xd800, 0xd80f).rw("via6522_3", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 3 */
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
@@ -819,10 +819,10 @@ void cops_state::revlatns_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x9fff).rom().region("program", 0);
-	map(0xa000, 0xafff).rw(this, FUNC(cops_state::io1_lm_r), FUNC(cops_state::io1_w));
+	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_lm_r), FUNC(cops_state::io1_w));
 	map(0xb000, 0xb00f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 1 */
 	map(0xc000, 0xc00f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xd000, 0xd007).rw(this, FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
+	map(0xd000, 0xd007).rw(FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
 

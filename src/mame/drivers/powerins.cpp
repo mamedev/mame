@@ -66,15 +66,15 @@ void powerins_state::powerins_map(address_map &map)
 	map(0x100002, 0x100003).portr("P1_P2");
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
-	map(0x100015, 0x100015).w(this, FUNC(powerins_state::flipscreen_w));
+	map(0x100015, 0x100015).w(FUNC(powerins_state::flipscreen_w));
 	map(0x100016, 0x100017).nopw();          // ? always 1
-	map(0x100019, 0x100019).w(this, FUNC(powerins_state::tilebank_w));
+	map(0x100019, 0x100019).w(FUNC(powerins_state::tilebank_w));
 	map(0x10001f, 0x10001f).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x120000, 0x120fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x130000, 0x130007).ram().share("vctrl_0");
-	map(0x140000, 0x143fff).ram().w(this, FUNC(powerins_state::vram_0_w)).share("vram_0");
-	map(0x170000, 0x170fff).ram().w(this, FUNC(powerins_state::vram_1_w)).share("vram_1");
-	map(0x171000, 0x171fff).w(this, FUNC(powerins_state::vram_1_w));
+	map(0x140000, 0x143fff).ram().w(FUNC(powerins_state::vram_0_w)).share("vram_0");
+	map(0x170000, 0x170fff).ram().w(FUNC(powerins_state::vram_1_w)).share("vram_1");
+	map(0x171000, 0x171fff).w(FUNC(powerins_state::vram_1_w));
 	map(0x180000, 0x18ffff).ram().share("spriteram");
 }
 
@@ -82,7 +82,7 @@ void powerins_state::powerins_map(address_map &map)
 void powerins_state::powerinsa_map(address_map &map)
 {
 	powerins_map(map);
-	map(0x100031, 0x100031).w(this, FUNC(powerins_state::powerinsa_okibank_w));
+	map(0x100031, 0x100031).w(FUNC(powerins_state::powerinsa_okibank_w));
 	map(0x10003f, 0x10003f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -107,7 +107,7 @@ void powerins_state::powerins_sound_io_map(address_map &map)
 void powerins_state::powerinsb_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(powerins_state::powerinsb_fake_ym2203_r)).nopw();
+	map(0x00, 0x00).r(FUNC(powerins_state::powerinsb_fake_ym2203_r)).nopw();
 	map(0x01, 0x01).noprw();
 	map(0x80, 0x80).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x88, 0x88).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));

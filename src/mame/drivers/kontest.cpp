@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -177,9 +178,9 @@ void kontest_state::kontest_map(address_map &map)
 void kontest_state::kontest_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn1", FUNC(sn76489a_device::write));
-	map(0x04, 0x04).w("sn2", FUNC(sn76489a_device::write));
-	map(0x08, 0x08).w(this, FUNC(kontest_state::control_w));
+	map(0x00, 0x00).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x04, 0x04).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x08, 0x08).w(FUNC(kontest_state::control_w));
 	map(0x0c, 0x0c).portr("IN0");
 	map(0x0d, 0x0d).portr("IN1");
 	map(0x0e, 0x0e).portr("IN2");

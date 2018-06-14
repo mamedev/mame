@@ -111,6 +111,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -444,15 +445,15 @@ WRITE16_MEMBER(mil4000_state::unk_w)
 void mil4000_state::mil4000_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x500000, 0x503fff).ram().w(this, FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // CY62256L-70, U77
-	map(0x504000, 0x507fff).ram().w(this, FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // CY62256L-70, U77
-	map(0x508000, 0x50bfff).ram().w(this, FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // CY62256L-70, U78
-	map(0x50c000, 0x50ffff).ram().w(this, FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // CY62256L-70, U78
+	map(0x500000, 0x503fff).ram().w(FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // CY62256L-70, U77
+	map(0x504000, 0x507fff).ram().w(FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // CY62256L-70, U77
+	map(0x508000, 0x50bfff).ram().w(FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // CY62256L-70, U78
+	map(0x50c000, 0x50ffff).ram().w(FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // CY62256L-70, U78
 	map(0x708000, 0x708001).portr("IN0");
 	map(0x708002, 0x708003).portr("IN1");
-	map(0x708004, 0x708005).r(this, FUNC(mil4000_state::hvretrace_r));
+	map(0x708004, 0x708005).r(FUNC(mil4000_state::hvretrace_r));
 	map(0x708006, 0x708007).portr("IN2");
-	map(0x708008, 0x708009).w(this, FUNC(mil4000_state::output_w));
+	map(0x708008, 0x708009).w(FUNC(mil4000_state::output_w));
 	map(0x708010, 0x708011).noprw(); //touch screen
 	map(0x70801f, 0x70801f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -464,20 +465,20 @@ void mil4000_state::mil4000_map(address_map &map)
 void mil4000_state::chewheel_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x500000, 0x503fff).ram().w(this, FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // V62C518256L-35P (U7).
-	map(0x504000, 0x507fff).ram().w(this, FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // V62C518256L-35P (U7).
-	map(0x508000, 0x50bfff).ram().w(this, FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // V62C518256L-35P (U8).
-	map(0x50c000, 0x50ffff).ram().w(this, FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // V62C518256L-35P (U8).
+	map(0x500000, 0x503fff).ram().w(FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // V62C518256L-35P (U7).
+	map(0x504000, 0x507fff).ram().w(FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // V62C518256L-35P (U7).
+	map(0x508000, 0x50bfff).ram().w(FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // V62C518256L-35P (U8).
+	map(0x50c000, 0x50ffff).ram().w(FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // V62C518256L-35P (U8).
 
-	map(0x51000c, 0x51000f).r(this, FUNC(mil4000_state::unk_r));     // no idea what's mapped here.
-	map(0x510000, 0x51000f).w(this, FUNC(mil4000_state::unk_w));    // no idea what's mapped here.
+	map(0x51000c, 0x51000f).r(FUNC(mil4000_state::unk_r));     // no idea what's mapped here.
+	map(0x510000, 0x51000f).w(FUNC(mil4000_state::unk_w));    // no idea what's mapped here.
 
 	map(0x708000, 0x708001).portr("IN0");
 	map(0x708002, 0x708003).portr("IN1");
-	map(0x708004, 0x708005).r(this, FUNC(mil4000_state::hvretrace_r));
+	map(0x708004, 0x708005).r(FUNC(mil4000_state::hvretrace_r));
 	map(0x708006, 0x708007).portr("IN2");
-	map(0x708008, 0x708009).w(this, FUNC(mil4000_state::output_w));
-	map(0x708010, 0x708011).rw(this, FUNC(mil4000_state::chewheel_mcu_r), FUNC(mil4000_state::chewheel_mcu_w));
+	map(0x708008, 0x708009).w(FUNC(mil4000_state::output_w));
+	map(0x708010, 0x708011).rw(FUNC(mil4000_state::chewheel_mcu_r), FUNC(mil4000_state::chewheel_mcu_w));
 	map(0x70801f, 0x70801f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x780000, 0x780fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");

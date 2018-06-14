@@ -33,6 +33,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/namco.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -364,9 +365,9 @@ void namcos16_state::namcos16_master_base_map(address_map &map)
 
 	// 0x6000 - 0x7fff i/o specific, guessing PAL controlled.
 
-	map(0x8000, 0x8fff).w(this, FUNC(namcos16_state::slave_halt_ctrl_w));
-	map(0x9000, 0x9fff).w(this, FUNC(namcos16_state::sound_halt_ctrl_w));
-	map(0xa000, 0xa001).w(this, FUNC(namcos16_state::pal_bank_w));
+	map(0x8000, 0x8fff).w(FUNC(namcos16_state::slave_halt_ctrl_w));
+	map(0x9000, 0x9fff).w(FUNC(namcos16_state::sound_halt_ctrl_w));
+	map(0xa000, 0xa001).w(FUNC(namcos16_state::pal_bank_w));
 	map(0x8000, 0xffff).rom().region("master_rom", 0);
 }
 
@@ -377,7 +378,7 @@ void namcos16_state::master_liblrabl_map(address_map &map)
 	map(0x6800, 0x680f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
 	map(0x6810, 0x681f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6820, 0x682f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
-	map(0x7000, 0x7fff).nopr().w(this, FUNC(namcos16_state::irq_ctrl_w));
+	map(0x7000, 0x7fff).nopr().w(FUNC(namcos16_state::irq_ctrl_w));
 }
 
 void namcos16_state::master_toypop_map(address_map &map)
@@ -387,17 +388,17 @@ void namcos16_state::master_toypop_map(address_map &map)
 	map(0x6010, 0x601f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6020, 0x602f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6800, 0x6bff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
-	map(0x7000, 0x7000).rw(this, FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
+	map(0x7000, 0x7000).rw(FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
 }
 
 void namcos16_state::slave_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("slave_rom", 0);
 	map(0x080000, 0x0bffff).ram();
-	map(0x100000, 0x100fff).rw(this, FUNC(namcos16_state::slave_shared_r), FUNC(namcos16_state::slave_shared_w)).umask16(0x00ff);
-	map(0x180000, 0x187fff).rw(this, FUNC(namcos16_state::bg_rmw_r), FUNC(namcos16_state::bg_rmw_w));
+	map(0x100000, 0x100fff).rw(FUNC(namcos16_state::slave_shared_r), FUNC(namcos16_state::slave_shared_w)).umask16(0x00ff);
+	map(0x180000, 0x187fff).rw(FUNC(namcos16_state::bg_rmw_r), FUNC(namcos16_state::bg_rmw_w));
 	map(0x190000, 0x1dffff).ram().share("bgvram");
-	map(0x300000, 0x3fffff).w(this, FUNC(namcos16_state::slave_irq_enable_w));
+	map(0x300000, 0x3fffff).w(FUNC(namcos16_state::slave_irq_enable_w));
 }
 
 void namcos16_state::sound_map(address_map &map)

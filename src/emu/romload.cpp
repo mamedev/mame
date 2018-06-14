@@ -68,7 +68,7 @@ std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *
 const rom_entry *rom_first_region(const device_t &device)
 {
 	const rom_entry *romp = &device.rom_region_vector().front();
-	while (ROMENTRY_ISPARAMETER(romp))
+	while (ROMENTRY_ISPARAMETER(romp) || ROMENTRY_ISSYSTEM_BIOS(romp) || ROMENTRY_ISDEFAULT_BIOS(romp))
 		romp++;
 	return !ROMENTRY_ISEND(romp) ? romp : nullptr;
 }

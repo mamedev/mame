@@ -35,6 +35,7 @@
 #include "sound/k053260.h"
 #include "sound/ym2151.h"
 #include "video/k053250.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "overdriv.lh"
@@ -172,16 +173,16 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::msb_w));
 	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x1e8000, 0x1e8001).w(this, FUNC(overdriv_state::overdriv_soundirq_w));
-	map(0x1f0000, 0x1f0001).w(this, FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
-	map(0x1f8000, 0x1f8001).w(this, FUNC(overdriv_state::eeprom_w));
+	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::overdriv_soundirq_w));
+	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
+	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
 	map(0x210000, 0x210fff).rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
 	map(0x218000, 0x218fff).rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
 	map(0x220000, 0x220fff).r(m_k051316_1, FUNC(k051316_device::rom_r)).umask16(0xff00);
 	map(0x228000, 0x228fff).r(m_k051316_2, FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x230000, 0x230001).w(this, FUNC(overdriv_state::slave_irq4_assert_w));
-	map(0x238000, 0x238001).w(this, FUNC(overdriv_state::slave_irq5_assert_w));
+	map(0x230000, 0x230001).w(FUNC(overdriv_state::slave_irq4_assert_w));
+	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -231,9 +232,9 @@ void overdriv_state::overdriv_slave_map(address_map &map)
 	map(0x108000, 0x10800f).rw("k053250_2", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x118000, 0x118fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w)); // data gets copied to sprite chip with DMA..
 	map(0x120000, 0x120001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
-	map(0x128000, 0x128001).rw(this, FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
+	map(0x128000, 0x128001).rw(FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
 	map(0x130000, 0x130007).rw(m_k053246, FUNC(k053247_device::k053246_r), FUNC(k053247_device::k053246_w));
-	map(0x130004, 0x130005).w(this, FUNC(overdriv_state::objdma_w));
+	map(0x130004, 0x130005).w(FUNC(overdriv_state::objdma_w));
 	//AM_RANGE(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
 	map(0x200000, 0x203fff).ram().share("share1");
 	map(0x208000, 0x20bfff).ram(); // sprite indirect table?
@@ -248,7 +249,7 @@ WRITE8_MEMBER(overdriv_state::sound_ack_w)
 
 void overdriv_state::overdriv_sound_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(overdriv_state::sound_ack_w));
+	map(0x0000, 0x0000).w(FUNC(overdriv_state::sound_ack_w));
 	// 0x012 read during explosions
 	// 0x180
 	map(0x0200, 0x0201).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -344,8 +345,8 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_EEPROM_SERIAL_ER5911_16BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(overdriv_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_16BIT)
+	MCFG_EEPROM_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

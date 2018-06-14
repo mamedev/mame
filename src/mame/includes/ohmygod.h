@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 class ohmygod_state : public driver_device
 {
 public:

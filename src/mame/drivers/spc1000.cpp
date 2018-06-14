@@ -269,12 +269,12 @@ void spc1000_state::spc1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("videoram");
-	map(0x2000, 0x3fff).rw(this, FUNC(spc1000_state::gmode_r), FUNC(spc1000_state::gmode_w));
+	map(0x2000, 0x3fff).rw(FUNC(spc1000_state::gmode_r), FUNC(spc1000_state::gmode_w));
 	map(0x4000, 0x4000).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0x4001, 0x4001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x6000, 0x6000).w(this, FUNC(spc1000_state::cass_w));
-	map(0x8000, 0x9fff).r(this, FUNC(spc1000_state::keyboard_r));
-	map(0xa000, 0xa000).rw(this, FUNC(spc1000_state::iplk_r), FUNC(spc1000_state::iplk_w));
+	map(0x6000, 0x6000).w(FUNC(spc1000_state::cass_w));
+	map(0x8000, 0x9fff).r(FUNC(spc1000_state::keyboard_r));
+	map(0xa000, 0xa000).rw(FUNC(spc1000_state::iplk_r), FUNC(spc1000_state::iplk_w));
 	map(0xc000, 0xdfff).rw("ext1", FUNC(spc1000_exp_device::read), FUNC(spc1000_exp_device::write));
 }
 
@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 1)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1000_state, porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 

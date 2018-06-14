@@ -52,8 +52,8 @@ void timelimt_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();     /* rom */
 	map(0x8000, 0x87ff).ram();     /* ram */
-	map(0x8800, 0x8bff).ram().w(this, FUNC(timelimt_state::videoram_w)).share("videoram"); /* video ram */
-	map(0x9000, 0x97ff).ram().w(this, FUNC(timelimt_state::bg_videoram_w)).share("bg_videoram");/* background ram */
+	map(0x8800, 0x8bff).ram().w(FUNC(timelimt_state::videoram_w)).share("videoram"); /* video ram */
+	map(0x9000, 0x97ff).ram().w(FUNC(timelimt_state::bg_videoram_w)).share("bg_videoram");/* background ram */
 	map(0x9800, 0x98ff).ram().share("spriteram");   /* sprite ram */
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xa800, 0xa800).portr("SYSTEM");
@@ -61,9 +61,9 @@ void timelimt_state::main_map(address_map &map)
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound write */
 	map(0xb800, 0xb800).nopr();     /* NMI ack? */
-	map(0xc800, 0xc800).w(this, FUNC(timelimt_state::scroll_x_lsb_w));
-	map(0xc801, 0xc801).w(this, FUNC(timelimt_state::scroll_x_msb_w));
-	map(0xc802, 0xc802).w(this, FUNC(timelimt_state::scroll_y_w));
+	map(0xc800, 0xc800).w(FUNC(timelimt_state::scroll_x_lsb_w));
+	map(0xc801, 0xc801).w(FUNC(timelimt_state::scroll_x_msb_w));
+	map(0xc802, 0xc802).w(FUNC(timelimt_state::scroll_y_w));
 	map(0xc803, 0xc803).nopw();        /* ???? bit 0 used only */
 	map(0xc804, 0xc804).nopw();        /* ???? not used */
 }

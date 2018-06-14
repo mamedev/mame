@@ -283,14 +283,14 @@ void lordgun_state::lordgun_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
-	map(0x300000, 0x30ffff).ram().w(this, FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // DISPLAY
-	map(0x310000, 0x313fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // DISPLAY
-	map(0x314000, 0x314fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // DISPLAY
+	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // DISPLAY
+	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // DISPLAY
+	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // DISPLAY
 	map(0x315000, 0x317fff).ram();                                                     //
-	map(0x318000, 0x319fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // DISPLAY
+	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // DISPLAY
 	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE
 	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATOR
-	map(0x500000, 0x500fff).ram().w(this, FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x500000, 0x500fff).ram().w(FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
 	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
 	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
 	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
@@ -299,15 +299,15 @@ void lordgun_state::lordgun_map(address_map &map)
 	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
 	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
 	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
-	map(0x503000, 0x503001).w(this, FUNC(lordgun_state::lordgun_priority_w));
-	map(0x503800, 0x503801).r(this, FUNC(lordgun_state::lordgun_gun_0_x_r));
-	map(0x503a00, 0x503a01).r(this, FUNC(lordgun_state::lordgun_gun_1_x_r));
-	map(0x503c00, 0x503c01).r(this, FUNC(lordgun_state::lordgun_gun_0_y_r));
-	map(0x503e00, 0x503e01).r(this, FUNC(lordgun_state::lordgun_gun_1_y_r));
-	map(0x504000, 0x504001).w(this, FUNC(lordgun_state::lordgun_soundlatch_w));
+	map(0x503000, 0x503001).w(FUNC(lordgun_state::lordgun_priority_w));
+	map(0x503800, 0x503801).r(FUNC(lordgun_state::lordgun_gun_0_x_r));
+	map(0x503a00, 0x503a01).r(FUNC(lordgun_state::lordgun_gun_1_x_r));
+	map(0x503c00, 0x503c01).r(FUNC(lordgun_state::lordgun_gun_0_y_r));
+	map(0x503e00, 0x503e01).r(FUNC(lordgun_state::lordgun_gun_1_y_r));
+	map(0x504000, 0x504001).w(FUNC(lordgun_state::lordgun_soundlatch_w));
 	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x50a900, 0x50a9ff).rw(this, FUNC(lordgun_state::lordgun_protection_r), FUNC(lordgun_state::lordgun_protection_w));
+	map(0x50a900, 0x50a9ff).rw(FUNC(lordgun_state::lordgun_protection_r), FUNC(lordgun_state::lordgun_protection_w));
 }
 
 
@@ -316,14 +316,14 @@ void lordgun_state::aliencha_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
-	map(0x300000, 0x30ffff).ram().w(this, FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // BACKGROUND 1
-	map(0x310000, 0x313fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // BACKGROUND 2
-	map(0x314000, 0x314fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // BACKGROUND 3
+	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // BACKGROUND 1
+	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // BACKGROUND 2
+	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // BACKGROUND 3
 	map(0x315000, 0x317fff).ram();                                                     //
-	map(0x318000, 0x319fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // TEXT
+	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // TEXT
 	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE OFFSET
 	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATE
-	map(0x500000, 0x500fff).ram().w(this, FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x500000, 0x500fff).ram().w(FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
 	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
 	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
 	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
@@ -332,11 +332,11 @@ void lordgun_state::aliencha_map(address_map &map)
 	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
 	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
 	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
-	map(0x503000, 0x503001).w(this, FUNC(lordgun_state::lordgun_priority_w));
-	map(0x504000, 0x504001).w(this, FUNC(lordgun_state::lordgun_soundlatch_w));
+	map(0x503000, 0x503001).w(FUNC(lordgun_state::lordgun_priority_w));
+	map(0x504000, 0x504001).w(FUNC(lordgun_state::lordgun_soundlatch_w));
 	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x50b900, 0x50b9ff).rw(this, FUNC(lordgun_state::aliencha_protection_r), FUNC(lordgun_state::aliencha_protection_w));
+	map(0x50b900, 0x50b9ff).rw(FUNC(lordgun_state::aliencha_protection_r), FUNC(lordgun_state::aliencha_protection_w));
 }
 
 void lordgun_state::ymf278_map(address_map &map)
@@ -370,7 +370,7 @@ void lordgun_state::lordgun_soundio_map(address_map &map)
 	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x5000, 0x5000).nopr();
-	map(0x6000, 0x6000).w(this, FUNC(lordgun_state::lordgun_okibank_w));
+	map(0x6000, 0x6000).w(FUNC(lordgun_state::lordgun_okibank_w));
 }
 
 
@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

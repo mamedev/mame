@@ -89,8 +89,8 @@ void dynduke_state::master_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw();
-	map(0x0b006, 0x0b007).w(this, FUNC(dynduke_state::control_w));
-	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(dynduke_state::text_w)).share("videoram");
+	map(0x0b006, 0x0b007).w(FUNC(dynduke_state::control_w));
+	map(0x0c000, 0x0c7ff).ram().w(FUNC(dynduke_state::text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xa0000, 0xfffff).rom();
 }
@@ -98,11 +98,11 @@ void dynduke_state::master_map(address_map &map)
 void dynduke_state::slave_map(address_map &map)
 {
 	map(0x00000, 0x05fff).ram();
-	map(0x06000, 0x067ff).ram().w(this, FUNC(dynduke_state::background_w)).share("back_data");
-	map(0x06800, 0x06fff).ram().w(this, FUNC(dynduke_state::foreground_w)).share("fore_data");
+	map(0x06000, 0x067ff).ram().w(FUNC(dynduke_state::background_w)).share("back_data");
+	map(0x06800, 0x06fff).ram().w(FUNC(dynduke_state::foreground_w)).share("fore_data");
 	map(0x07000, 0x07fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08000, 0x08fff).ram().share("share1");
-	map(0x0a000, 0x0a001).w(this, FUNC(dynduke_state::gfxbank_w));
+	map(0x0a000, 0x0a001).w(FUNC(dynduke_state::gfxbank_w));
 	map(0x0c000, 0x0c001).nopw();
 	map(0xc0000, 0xfffff).rom();
 }
@@ -112,14 +112,14 @@ void dynduke_state::masterj_map(address_map &map)
 {
 	map(0x00000, 0x06fff).ram();
 	map(0x07000, 0x07fff).ram().share("spriteram");
-	map(0x08000, 0x087ff).ram().w(this, FUNC(dynduke_state::text_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(FUNC(dynduke_state::text_w)).share("videoram");
 	map(0x09000, 0x0900d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x0c000, 0x0c0ff).ram().share("scroll_ram");
 	map(0x0e000, 0x0efff).ram().share("share1");
 	map(0x0f000, 0x0f001).portr("P1_P2");
 	map(0x0f002, 0x0f003).portr("DSW");
 	map(0x0f004, 0x0f005).nopw();
-	map(0x0f006, 0x0f007).w(this, FUNC(dynduke_state::control_w));
+	map(0x0f006, 0x0f007).w(FUNC(dynduke_state::control_w));
 	map(0xa0000, 0xfffff).rom();
 }
 

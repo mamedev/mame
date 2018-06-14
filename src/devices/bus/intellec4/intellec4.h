@@ -114,10 +114,6 @@ to implement the card in both systems.
 #pragma once
 
 
-#define MCFG_INTELLEC4_UNIV_SLOT_REMOVE(slot_tag) \
-		MCFG_DEVICE_REMOVE(slot_tag)
-
-
 #define MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE(tag, space) \
 		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_space(tag, space);
 

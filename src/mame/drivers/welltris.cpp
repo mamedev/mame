@@ -319,6 +319,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "video/vsystem_gga.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -339,14 +340,14 @@ void welltris_state::main_map(address_map &map)
 	map(0x800000, 0x81ffff).ram().share("pixelram");    /* Graph_1 & 2*/
 	map(0xff8000, 0xffbfff).ram();                             /* work */
 	map(0xffc000, 0xffc3ff).ram().share("spriteram");           /* Sprite */
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
+	map(0xffd000, 0xffdfff).ram().w(FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
 	map(0xffe000, 0xffefff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0xfff000, 0xfff001).portr("P1");                 /* Bottom Controls */
-	map(0xfff000, 0xfff001).w(this, FUNC(welltris_state::palette_bank_w));
+	map(0xfff000, 0xfff001).w(FUNC(welltris_state::palette_bank_w));
 	map(0xfff002, 0xfff003).portr("P2");                 /* Top Controls */
-	map(0xfff002, 0xfff003).w(this, FUNC(welltris_state::gfxbank_w));
+	map(0xfff002, 0xfff003).w(FUNC(welltris_state::gfxbank_w));
 	map(0xfff004, 0xfff005).portr("P3");                 /* Left Side Ctrls */
-	map(0xfff004, 0xfff007).w(this, FUNC(welltris_state::scrollreg_w));
+	map(0xfff004, 0xfff007).w(FUNC(welltris_state::scrollreg_w));
 	map(0xfff006, 0xfff007).portr("P4");                 /* Right Side Ctrls */
 	map(0xfff008, 0xfff009).portr("SYSTEM");             /* Bit 5 Tested at start of irq 1 */
 	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -366,7 +367,7 @@ void welltris_state::sound_map(address_map &map)
 void welltris_state::sound_port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(welltris_state::sound_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(welltris_state::sound_bankswitch_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x18, 0x18).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));

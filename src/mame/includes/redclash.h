@@ -11,6 +11,7 @@
 #pragma once
 
 #include "video/ladybug.h"
+#include "emupal.h"
 
 
 // redclash/zerohour

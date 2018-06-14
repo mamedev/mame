@@ -50,6 +50,7 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -304,18 +305,18 @@ void m14_state::m14_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(m14_state::m14_vram_w)).share("video_ram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(m14_state::m14_cram_w)).share("color_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(m14_state::m14_vram_w)).share("video_ram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m14_state::m14_cram_w)).share("color_ram");
 }
 
 void m14_state::m14_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).portr("AN_PADDLE").w(this, FUNC(m14_state::ball_x_w));
-	map(0xf9, 0xf9).portr("IN0").w(this, FUNC(m14_state::ball_y_w));
-	map(0xfa, 0xfa).r(this, FUNC(m14_state::m14_rng_r)).w(this, FUNC(m14_state::paddle_x_w));
-	map(0xfb, 0xfb).portr("DSW").w(this, FUNC(m14_state::output_w));
-	map(0xfc, 0xfc).w(this, FUNC(m14_state::sound_w));
+	map(0xf8, 0xf8).portr("AN_PADDLE").w(FUNC(m14_state::ball_x_w));
+	map(0xf9, 0xf9).portr("IN0").w(FUNC(m14_state::ball_y_w));
+	map(0xfa, 0xfa).r(FUNC(m14_state::m14_rng_r)).w(FUNC(m14_state::paddle_x_w));
+	map(0xfb, 0xfb).portr("DSW").w(FUNC(m14_state::output_w));
+	map(0xfc, 0xfc).w(FUNC(m14_state::sound_w));
 }
 
 /*************************************

@@ -123,24 +123,24 @@ DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Contr
 void vrc5074_device::config_map(address_map &map)
 {
 	pci_bridge_device::config_map(map);
-	map(0x00000018, 0x00000027).rw(this, FUNC(vrc5074_device::sdram_addr_r), FUNC(vrc5074_device::sdram_addr_w));
+	map(0x00000018, 0x00000027).rw(FUNC(vrc5074_device::sdram_addr_r), FUNC(vrc5074_device::sdram_addr_w));
 }
 
 // cpu i/f map
 void vrc5074_device::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x000001ff).rw(this, FUNC(vrc5074_device::cpu_reg_r), FUNC(vrc5074_device::cpu_reg_w));
+	map(0x00000000, 0x000001ff).rw(FUNC(vrc5074_device::cpu_reg_r), FUNC(vrc5074_device::cpu_reg_w));
 }
 
 void vrc5074_device::serial_map(address_map &map)
 {
-	map(0x00000000, 0x0000003f).rw(this, FUNC(vrc5074_device::serial_r), FUNC(vrc5074_device::serial_w));
+	map(0x00000000, 0x0000003f).rw(FUNC(vrc5074_device::serial_r), FUNC(vrc5074_device::serial_w));
 }
 
 // Target Window 1 map
 void vrc5074_device::target1_map(address_map &map)
 {
-	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
+	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
 }
 
 MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)

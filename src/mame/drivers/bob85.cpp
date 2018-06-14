@@ -157,8 +157,8 @@ void bob85_state::bob85_mem(address_map &map)
 void bob85_state::bob85_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0a, 0x0a).r(this, FUNC(bob85_state::bob85_keyboard_r));
-	map(0x0a, 0x0f).w(this, FUNC(bob85_state::bob85_7seg_w));
+	map(0x0a, 0x0a).r(FUNC(bob85_state::bob85_keyboard_r));
+	map(0x0a, 0x0f).w(FUNC(bob85_state::bob85_7seg_w));
 }
 
 /* Input ports */

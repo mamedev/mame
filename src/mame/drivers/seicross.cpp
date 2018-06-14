@@ -115,10 +115,10 @@ void seicross_state::main_map(address_map &map)
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram().share("share1");
 	map(0x8820, 0x887f).ram().share("spriteram");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(seicross_state::videoram_w)).share("videoram"); /* video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(seicross_state::videoram_w)).share("videoram"); /* video RAM */
 	map(0x9800, 0x981f).ram().share("row_scroll");
 	map(0x9880, 0x989f).writeonly().share("spriteram2");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(seicross_state::colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(seicross_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");        /* IN0 */
 	map(0xa800, 0xa800).portr("IN1");        /* IN1 */
 	map(0xb000, 0xb000).portr("TEST");       /* test */
@@ -137,7 +137,7 @@ void seicross_state::mcu_nvram_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x10ff).ram().share("nvram");
-	map(0x2000, 0x2000).w(this, FUNC(seicross_state::dac_w));
+	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
 	map(0xf800, 0xffff).ram().share("share1");
 }
@@ -148,7 +148,7 @@ void seicross_state::mcu_no_nvram_map(address_map &map)
 	map(0x1003, 0x1003).portr("DSW1");       /* DSW1 */
 	map(0x1005, 0x1005).portr("DSW2");       /* DSW2 */
 	map(0x1006, 0x1006).portr("DSW3");       /* DSW3 */
-	map(0x2000, 0x2000).w(this, FUNC(seicross_state::dac_w));
+	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
 	map(0xf800, 0xffff).ram().share("share1");
 }

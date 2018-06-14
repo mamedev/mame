@@ -219,10 +219,13 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 void legionna_state::common_video_allocate_ptr()
 {
 	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	m_mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	m_textram =  make_unique_clear<uint16_t[]>(0x1000/2);
+	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_mid_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_textram = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_scrollram16 = std::make_unique<uint16_t[]>(0x60/2);
+	m_paletteram = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_palette->basemem().set(m_paletteram.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_BIG, 2);
+
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -231,6 +234,7 @@ void legionna_state::common_video_allocate_ptr()
 	save_pointer(NAME(m_mid_data.get()), 0x800/2);
 	save_pointer(NAME(m_textram.get()), 0x1000/2);
 	save_pointer(NAME(m_scrollram16.get()), 0x60/2);
+	save_pointer(NAME(m_paletteram.get()), 0x1000/2);
 
 	save_item(NAME(m_back_gfx_bank));
 	save_item(NAME(m_mid_gfx_bank));

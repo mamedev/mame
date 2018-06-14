@@ -184,6 +184,7 @@ Notes:
 #include "cpu/mips/mips3.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -278,6 +279,28 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+	uint16_t *identify_device = hdd->identify_device_buffer();
+
+	if (strncmp(machine().system().name, "kinst2", 6) != 0)
+	{
+		/* kinst: tweak the model number so we pass the check */
+		identify_device[27] = ('S' << 8) | 'T';
+		identify_device[28] = ('9' << 8) | '1';
+		identify_device[29] = ('5' << 8) | '0';
+		identify_device[30] = ('A' << 8) | 'G';
+		identify_device[31] = (' ' << 8) | ' ';
+	}
+	else
+	{
+		/* kinst2: tweak the model number so we pass the check */
+		identify_device[10] = ('0' << 8) | '0';
+		identify_device[11] = ('S' << 8) | 'T';
+		identify_device[12] = ('9' << 8) | '1';
+		identify_device[13] = ('5' << 8) | '0';
+		identify_device[14] = ('A' << 8) | 'G';
+	}
+
 	/* set a safe base location for video */
 	m_video_base = &m_rambase[0x30000/4];
 }
@@ -454,9 +477,9 @@ void kinst_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("rambase");
 	map(0x08000000, 0x087fffff).ram().share("rambase2");
-	map(0x10000080, 0x100000ff).rw(this, FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
-	map(0x10000100, 0x1000013f).rw(this, FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
-	map(0x10000170, 0x10000173).rw(this, FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
+	map(0x10000080, 0x100000ff).rw(FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
+	map(0x10000100, 0x1000013f).rw(FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
+	map(0x10000170, 0x10000173).rw(FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0).share("rombase");
 }
 
@@ -826,16 +849,6 @@ void kinst_state::init_kinst()
 
 	/* set up the control register mapping */
 	m_control_map = kinst_control_map;
-
-	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	uint16_t *identify_device = hdd->identify_device_buffer();
-
-	/* kinst: tweak the model number so we pass the check */
-	identify_device[27] = ('S' << 8) | 'T';
-	identify_device[28] = ('9' << 8) | '1';
-	identify_device[29] = ('5' << 8) | '0';
-	identify_device[30] = ('A' << 8) | 'G';
-	identify_device[31] = (' ' << 8) | ' ';
 }
 
 
@@ -852,16 +865,6 @@ void kinst_state::init_kinst2()
 
 	/* set up the control register mapping */
 	m_control_map = kinst2_control_map;
-
-	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	uint16_t *identify_device = hdd->identify_device_buffer();
-
-	/* kinst2: tweak the model number so we pass the check */
-	identify_device[10] = ('0' << 8) | '0';
-	identify_device[11] = ('S' << 8) | 'T';
-	identify_device[12] = ('9' << 8) | '1';
-	identify_device[13] = ('5' << 8) | '0';
-	identify_device[14] = ('A' << 8) | 'G';
 }
 
 

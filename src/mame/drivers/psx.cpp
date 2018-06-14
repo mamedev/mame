@@ -505,7 +505,7 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 
 void psx1_state::psx_map(address_map &map)
 {
-	map(0x1f000000, 0x1f07ffff).rw(this, FUNC(psx1_state::parallel_r), FUNC(psx1_state::parallel_w));
+	map(0x1f000000, 0x1f07ffff).rw(FUNC(psx1_state::parallel_r), FUNC(psx1_state::parallel_w));
 }
 
 void psx1_state::subcpu_map(address_map &map)

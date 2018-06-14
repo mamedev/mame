@@ -295,7 +295,7 @@ WRITE8_MEMBER( comx35_state::io_w )
 void comx35_state::comx35_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
 }
 
 
@@ -306,7 +306,7 @@ void comx35_state::comx35_mem(address_map &map)
 void comx35_state::comx35_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(this, FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
+	map(0x00, 0x07).rw(FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
 }
 
 

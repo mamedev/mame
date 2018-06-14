@@ -148,14 +148,14 @@ WRITE16_MEMBER ( ti68k_state::flash_w )
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
-		m_flash->write(offset, data);
+		m_flash->write(space, offset, data);
 }
 
 READ16_MEMBER ( ti68k_state::flash_r )
 {
 	if (m_flash_mem)
 	{
-		return m_flash->read(offset);
+		return m_flash->read(space, offset);
 	}
 	else
 	{
@@ -201,7 +201,7 @@ void ti68k_state::ti92_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
 	map(0x200000, 0x5fffff).unmaprw();   // ROM
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
 }
 
 
@@ -209,10 +209,10 @@ void ti68k_state::ti89_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
-	map(0x200000, 0x3fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x200000, 0x3fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
 	map(0x400000, 0x5fffff).noprw();
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x7fffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x7fffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
 
 
@@ -221,9 +221,9 @@ void ti68k_state::ti92p_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
 	map(0x200000, 0x3fffff).noprw();
-	map(0x400000, 0x5fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x7fffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x400000, 0x5fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x7fffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
 
 
@@ -231,9 +231,9 @@ void ti68k_state::v200_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
-	map(0x200000, 0x5fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x70ffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x200000, 0x5fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x70ffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
 
 
@@ -241,9 +241,9 @@ void ti68k_state::ti89t_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().mirror(0x200000).share("nvram");
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x70ffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
-	map(0x800000, 0xbfffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x70ffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x800000, 0xbfffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
 	map(0xc00000, 0xffffff).noprw();
 }
 

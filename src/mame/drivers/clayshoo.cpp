@@ -221,7 +221,7 @@ void clayshoo_state::main_map(address_map &map)
 	map(0x4000, 0x47ff).rom();
 	map(0x8000, 0x97ff).ram().share("videoram");    /* 6k of video ram according to readme */
 	map(0x9800, 0xa800).nopw();      /* not really mapped, but cleared */
-	map(0xc800, 0xc800).rw(this, FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
+	map(0xc800, 0xc800).rw(FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
 }
 
 

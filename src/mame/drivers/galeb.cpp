@@ -67,10 +67,10 @@ READ8_MEMBER(galeb_state::tape_data_r)
 void galeb_state::galeb_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();  // RAM
-	map(0xbfe0, 0xbfe7).r(this, FUNC(galeb_state::keyboard_r));
-	map(0xbfe0, 0xbfe0).w(this, FUNC(galeb_state::dac_w));
-	map(0xbffe, 0xbffe).r(this, FUNC(galeb_state::tape_status_r));
-	map(0xbfff, 0xbfff).rw(this, FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
+	map(0xbfe0, 0xbfe7).r(FUNC(galeb_state::keyboard_r));
+	map(0xbfe0, 0xbfe0).w(FUNC(galeb_state::dac_w));
+	map(0xbffe, 0xbffe).r(FUNC(galeb_state::tape_status_r));
+	map(0xbfff, 0xbfff).rw(FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
 	map(0xb000, 0xb3ff).ram().share("video_ram"); // video ram
 	map(0xc000, 0xc7ff).rom();  // BASIC 01 ROM
 	map(0xc800, 0xcfff).rom();  // BASIC 02 ROM

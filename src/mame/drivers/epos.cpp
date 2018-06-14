@@ -95,7 +95,7 @@ void epos_state::epos_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(epos_state::port_1_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(epos_state::port_1_w));
 	map(0x02, 0x02).portr("INPUTS").w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x03, 0x03).portr("UNK");
 	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
@@ -104,9 +104,9 @@ void epos_state::epos_io_map(address_map &map)
 void epos_state::dealer_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w(this, FUNC(epos_state::dealer_pal_w));
+	map(0x00, 0x0f).w(FUNC(epos_state::dealer_pal_w));
 	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x24).w(this, FUNC(epos_state::dealer_decrypt_rom));
+	map(0x20, 0x24).w(FUNC(epos_state::dealer_decrypt_rom));
 	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x38, 0x38).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x3c, 0x3c).w("aysnd", FUNC(ay8910_device::address_w));

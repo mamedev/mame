@@ -45,6 +45,7 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 //**************************************************************************
@@ -474,7 +475,7 @@ WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
 void can09t_state::can09t_map(address_map &map)
 {
 // Everything is dynamically and asymetrically mapped through the PAL decoded by read/write
-	map(0x0000, 0xffff).rw(this, FUNC(can09t_state::read), FUNC(can09t_state::write));
+	map(0x0000, 0xffff).rw(FUNC(can09t_state::read), FUNC(can09t_state::write));
 }
 
 static INPUT_PORTS_START( can09t )

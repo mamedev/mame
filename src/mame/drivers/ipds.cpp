@@ -12,6 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -74,9 +75,9 @@ void ipds_state::ipds_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xb0, 0xb0).r(this, FUNC(ipds_state::ipds_b0_r));
-	map(0xb1, 0xb1).rw(this, FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
-	map(0xc0, 0xc0).r(this, FUNC(ipds_state::ipds_c0_r));
+	map(0xb0, 0xb0).r(FUNC(ipds_state::ipds_b0_r));
+	map(0xb1, 0xb1).rw(FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
+	map(0xc0, 0xc0).r(FUNC(ipds_state::ipds_c0_r));
 }
 
 /* Input ports */

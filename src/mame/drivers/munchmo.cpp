@@ -110,7 +110,7 @@ void munchmo_state::mnchmobl_map(address_map &map)
 										   });
 	map(0xbe02, 0xbe02).portr("DSW1");
 	map(0xbe03, 0xbe03).portr("DSW2");
-	map(0xbf00, 0xbf00).w(this, FUNC(munchmo_state::nmi_ack_w)); // CNI 1-8C
+	map(0xbf00, 0xbf00).w(FUNC(munchmo_state::nmi_ack_w)); // CNI 1-8C
 	map(0xbf01, 0xbf01).portr("SYSTEM");
 	map(0xbf02, 0xbf02).portr("P1");
 	map(0xbf03, 0xbf03).portr("P2");
@@ -126,9 +126,9 @@ void munchmo_state::sound_map(address_map &map)
 	map(0x5000, 0x5fff).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6fff).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x7000, 0x7fff).w("ay2", FUNC(ay8910_device::address_w));
-	map(0x8000, 0x9fff).r(this, FUNC(munchmo_state::ay1reset_r)).w("ay1", FUNC(ay8910_device::reset_w));
-	map(0xa000, 0xbfff).r(this, FUNC(munchmo_state::ay2reset_r)).w("ay2", FUNC(ay8910_device::reset_w));
-	map(0xc000, 0xdfff).w(this, FUNC(munchmo_state::sound_nmi_ack_w)); // NCL 1-8H
+	map(0x8000, 0x9fff).r(FUNC(munchmo_state::ay1reset_r)).w("ay1", FUNC(ay8910_device::reset_w));
+	map(0xa000, 0xbfff).r(FUNC(munchmo_state::ay2reset_r)).w("ay2", FUNC(ay8910_device::reset_w));
+	map(0xc000, 0xdfff).w(FUNC(munchmo_state::sound_nmi_ack_w)); // NCL 1-8H
 	map(0xe000, 0xe7ff).mirror(0x1800).ram(); // is mirror ok?
 }
 

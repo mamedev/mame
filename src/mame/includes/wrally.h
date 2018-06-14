@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "emupal.h"
 
 class wrally_state : public driver_device
 {

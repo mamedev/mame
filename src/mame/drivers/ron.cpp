@@ -21,6 +21,7 @@ Debug cheats:
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"
@@ -210,11 +211,11 @@ void ron_state::ron_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x01).r(this, FUNC(ron_state::p1_mux_r));
-	map(0x02, 0x03).r(this, FUNC(ron_state::p2_mux_r));
-	map(0x03, 0x03).w(this, FUNC(ron_state::mux_w));
-	map(0x07, 0x07).w(this, FUNC(ron_state::sound_cmd_w));
-	map(0x0a, 0x0a).w(this, FUNC(ron_state::output_w));
+	map(0x00, 0x01).r(FUNC(ron_state::p1_mux_r));
+	map(0x02, 0x03).r(FUNC(ron_state::p2_mux_r));
+	map(0x03, 0x03).w(FUNC(ron_state::mux_w));
+	map(0x07, 0x07).w(FUNC(ron_state::sound_cmd_w));
+	map(0x0a, 0x0a).w(FUNC(ron_state::output_w));
 }
 
 void ron_state::ron_audio_map(address_map &map)

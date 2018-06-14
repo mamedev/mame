@@ -1111,48 +1111,48 @@ void seattle_state::seattle_cs0_map(address_map &map)
 
 void seattle_state::seattle_cs1_map(address_map &map)
 {
-	map(0x01000000, 0x01000003).w(this, FUNC(seattle_state::asic_fifo_w));
+	map(0x01000000, 0x01000003).w(FUNC(seattle_state::asic_fifo_w));
 }
 
 void seattle_state::seattle_cs2_map(address_map &map)
 {
-	map(0x00000000, 0x00000003).rw(this, FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
+	map(0x00000000, 0x00000003).rw(FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
 }
 
 // This map shares the PHOENIX, SEATTLE, and SEATTLE_WIDGET calls
 void seattle_state::seattle_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
-	map(0x00800000, 0x0080001f).rw(this, FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
-	map(0x00c00000, 0x00c0001f).rw(this, FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
-	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
-	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
-	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
-	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
-	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
-	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
-	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x00100000, 0x0011ffff).rw(FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00800000, 0x0080001f).rw(FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
+	map(0x00c00000, 0x00c0001f).rw(FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
+	map(0x01000000, 0x01000003).rw(FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(FUNC(seattle_state::vblank_clear_w));
 	map(0x01800000, 0x01800003).noprw();
-	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
-	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+	map(0x01900000, 0x01900003).rw(FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
 }
 
 void seattle_state::seattle_flagstaff_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
-	map(0x00c00000, 0x00c0003f).rw(this, FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
-	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
-	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
-	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
-	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
-	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
-	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
-	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x00100000, 0x0011ffff).rw(FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00c00000, 0x00c0003f).rw(FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
+	map(0x01000000, 0x01000003).rw(FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(FUNC(seattle_state::vblank_clear_w));
 	map(0x01800000, 0x01800003).noprw();
-	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
-	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+	map(0x01900000, 0x01900003).rw(FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
 }
 
 /*************************************

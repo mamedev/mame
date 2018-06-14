@@ -101,7 +101,7 @@ void c8280_device::c8280_fdc_mem(address_map &map)
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
 	map(0x1000, 0x13ff).ram().share("share4");
-	map(0x1400, 0x1400).mirror(0x3ff).rw(this, FUNC(c8280_device::fk5_r), FUNC(c8280_device::fk5_w));
+	map(0x1400, 0x1400).mirror(0x3ff).rw(FUNC(c8280_device::fk5_r), FUNC(c8280_device::fk5_w));
 	map(0x1800, 0x1fff).rom().region(M6502_FDC_TAG, 0);
 }
 
@@ -127,7 +127,7 @@ READ8_MEMBER( c8280_device::dio_r )
 
 	*/
 
-	return m_bus->dio_r();
+	return m_bus->read_dio();
 }
 
 WRITE8_MEMBER( c8280_device::dio_w )

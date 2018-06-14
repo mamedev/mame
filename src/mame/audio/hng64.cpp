@@ -306,15 +306,15 @@ void hng64_state::hng_sound_io(address_map &map)
 {
 	map(0x0000, 0x0007).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 
-	map(0x0008, 0x0009).rw(this, FUNC(hng64_state::hng64_sound_port_0008_r), FUNC(hng64_state::hng64_sound_port_0008_w));
-	map(0x000a, 0x000b).w(this, FUNC(hng64_state::hng64_sound_port_000a_w));
-	map(0x000c, 0x000d).w(this, FUNC(hng64_state::hng64_sound_port_000c_w));
+	map(0x0008, 0x0009).rw(FUNC(hng64_state::hng64_sound_port_0008_r), FUNC(hng64_state::hng64_sound_port_0008_w));
+	map(0x000a, 0x000b).w(FUNC(hng64_state::hng64_sound_port_000a_w));
+	map(0x000c, 0x000d).w(FUNC(hng64_state::hng64_sound_port_000c_w));
 
-	map(0x0080, 0x0081).w(this, FUNC(hng64_state::hng64_sound_port_0080_w));
+	map(0x0080, 0x0081).w(FUNC(hng64_state::hng64_sound_port_0080_w));
 
-	map(0x0100, 0x010f).rw(this, FUNC(hng64_state::sound_comms_r), FUNC(hng64_state::sound_comms_w));
+	map(0x0100, 0x010f).rw(FUNC(hng64_state::sound_comms_r), FUNC(hng64_state::sound_comms_w));
 
-	map(0x0200, 0x021f).w(this, FUNC(hng64_state::hng64_sound_bank_w)); // ??
+	map(0x0200, 0x021f).w(FUNC(hng64_state::hng64_sound_bank_w)); // ??
 
 }
 

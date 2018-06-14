@@ -42,6 +42,7 @@ RAM = 4116 (x11)
 #include "machine/rescap.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -332,8 +333,8 @@ void r2dtank_state::r2dtank_main_map(address_map &map)
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x5fff).ram().share("colorram");
 	map(0x6000, 0x7fff).ram();
-	map(0x8000, 0x8003).r("pia_main", FUNC(pia6821_device::read)).w(this, FUNC(r2dtank_state::pia_comp_w));
-	map(0x8004, 0x8004).rw(this, FUNC(r2dtank_state::audio_answer_r), FUNC(r2dtank_state::audio_command_w));
+	map(0x8000, 0x8003).r("pia_main", FUNC(pia6821_device::read)).w(FUNC(r2dtank_state::pia_comp_w));
+	map(0x8004, 0x8004).rw(FUNC(r2dtank_state::audio_answer_r), FUNC(r2dtank_state::audio_command_w));
 	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xc000, 0xc007).ram().share("nvram");
@@ -345,7 +346,7 @@ void r2dtank_state::r2dtank_audio_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0xd000, 0xd003).rw("pia_audio", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xf000, 0xf000).rw(this, FUNC(r2dtank_state::audio_command_r), FUNC(r2dtank_state::audio_answer_w));
+	map(0xf000, 0xf000).rw(FUNC(r2dtank_state::audio_command_r), FUNC(r2dtank_state::audio_answer_w));
 	map(0xf800, 0xffff).rom();
 }
 

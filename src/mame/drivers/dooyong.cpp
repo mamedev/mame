@@ -83,6 +83,7 @@ are almost identical, except for much darker BG layer colors).
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -777,19 +778,19 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc007).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc008, 0xc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc010, 0xc010).portr("SYSTEM");
-	map(0xc010, 0xc010).w(this, FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
+	map(0xc010, 0xc010).w(FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
 	map(0xc011, 0xc011).portr("P1");
-	map(0xc011, 0xc011).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xc011, 0xc011).w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xc012, 0xc012).portr("P2");
 	map(0xc012, 0xc012).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc013, 0xc013).portr("DSWA");
 	map(0xc014, 0xc014).portr("DSWB");
 	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xd000, 0xdfff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
@@ -797,36 +798,36 @@ void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
-	map(0xf000, 0xf000).portr("DSWA").w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xf000, 0xf000).portr("DSWA").w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xf001, 0xf001).portr("DSWB");
 	map(0xf002, 0xf002).portr("P1");
 	map(0xf003, 0xf003).portr("P2");
 	map(0xf004, 0xf004).portr("SYSTEM");
-	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf008, 0xf008).w(FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
 	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf018, 0xf01f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xf020, 0xf027).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf800, 0xffff).rw(this, FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
+	map(0xf800, 0xffff).rw(FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
 }
 
 void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
 	map(0xf000, 0xf000).portr("DSWA");
-	map(0xf000, 0xf000).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xf000, 0xf000).w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xf001, 0xf001).portr("DSWB");
 	map(0xf002, 0xf002).portr("P2");
 	map(0xf003, 0xf003).portr("P1");
 	map(0xf004, 0xf004).portr("SYSTEM");
-	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf008, 0xf008).w(FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
 	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf018, 0xf01f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xf020, 0xf027).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
@@ -836,20 +837,20 @@ void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 void dooyong_z80_state::bluehawk_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("DSWA");
-	map(0xc000, 0xc000).w(this, FUNC(dooyong_z80_state::flip_screen_w));
+	map(0xc000, 0xc000).w(FUNC(dooyong_z80_state::flip_screen_w));
 	map(0xc001, 0xc001).portr("DSWB");
 	map(0xc002, 0xc002).portr("P1");
 	map(0xc003, 0xc003).portr("P2");
 	map(0xc004, 0xc004).portr("SYSTEM");
-	map(0xc008, 0xc008).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xc008, 0xc008).w(FUNC(dooyong_z80_state::bankswitch_w));
 	map(0xc010, 0xc010).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc018, 0xc01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc040, 0xc047).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc048, 0xc04f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xd000, 0xdfff).rw(FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
 	map(0xe000, 0xefff).ram().share("spriteram");
 	map(0xf000, 0xffff).ram();
 }
@@ -857,33 +858,33 @@ void dooyong_z80_state::bluehawk_map(address_map &map)
 void dooyong_z80_state::flytiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram().share("spriteram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("P1");
-	map(0xe000, 0xe000).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(dooyong_z80_state::bankswitch_w));
 	map(0xe002, 0xe002).portr("P2");
 	map(0xe004, 0xe004).portr("SYSTEM");
 	map(0xe006, 0xe006).portr("DSWA");
 	map(0xe008, 0xe008).portr("DSWB");
-	map(0xe010, 0xe010).w(this, FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
+	map(0xe010, 0xe010).w(FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
 	map(0xe020, 0xe020).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe030, 0xe037).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xe040, 0xe047).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xe800, 0xefff).rw(this, FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
-	map(0xf000, 0xffff).rw(this, FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
+	map(0xe800, 0xefff).rw(FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
+	map(0xf000, 0xffff).rw(FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
 }
 
 void dooyong_z80_state::primella_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram(); /* what is this? looks like a palette? scratchpad RAM maybe? */
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
 	map(0xf000, 0xf7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf800).portr("DSWA");
-	map(0xf800, 0xf800).w(this, FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
+	map(0xf800, 0xf800).w(FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
 	map(0xf810, 0xf810).portr("DSWB");
 	map(0xf810, 0xf810).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf820, 0xf820).portr("P1");
@@ -907,7 +908,7 @@ void rshark_state::rshark_map(address_map &map)
 	map(0x0c4010, 0x0c401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x0c0014, 0x0c0015).w(FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
 	map(0x0cc000, 0x0cc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0cc010, 0x0cc01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 }
@@ -926,7 +927,7 @@ void rshark_state::superx_map(address_map &map)
 	map(0x084010, 0x08401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x088000, 0x088fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x080013, 0x080013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x080014, 0x080015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x080014, 0x080015).w(FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
 	map(0x08c000, 0x08c00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x08c010, 0x08c01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 }
@@ -942,7 +943,7 @@ void popbingo_state::popbingo_map(address_map &map)
 	map(0x0c0004, 0x0c0005).portr("P1_P2");
 	map(0x0c0006, 0x0c0007).portr("SYSTEM");
 	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(popbingo_state::ctrl_w));
+	map(0x0c0014, 0x0c0015).w(FUNC(popbingo_state::ctrl_w));
 	map(0x0c0018, 0x0c001b).nopw(); // ?
 	map(0x0c4000, 0x0c400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c4010, 0x0c401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
@@ -1487,7 +1488,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1495,7 +1496,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_lastday)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
@@ -1540,7 +1541,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1548,7 +1549,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_gulfstrm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
@@ -1578,7 +1579,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1586,7 +1587,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_pollux)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
@@ -1616,7 +1617,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1624,7 +1625,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_bluehawk)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bluehawk)
@@ -1656,7 +1657,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1664,7 +1665,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_flytiger)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flytiger)
@@ -1742,7 +1743,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1750,7 +1751,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rshark_state, screen_update_rshark)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
@@ -1794,7 +1795,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1802,7 +1803,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popbingo_state, screen_update_popbingo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
