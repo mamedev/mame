@@ -62,6 +62,7 @@ public:
 	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void enable(bool enable);
 	void set_flip(uint32_t attributes);
+	void set_tilebank(uint8_t bank);
 
 protected:
 	// device-level overrides
@@ -86,6 +87,7 @@ private:
 	uint16_t m_scrollx;
 	uint16_t m_scrolly;
 	uint16_t m_scroll_flag;
+	uint16_t m_tile_bank;
 	tilemap_t *m_tmap;
 	tilemap_t *m_tilemap[2][4];
 
