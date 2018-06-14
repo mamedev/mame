@@ -20,7 +20,9 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8251.h"
 #include "machine/pit8253.h"
+#include "machine/pic8259.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
@@ -80,6 +82,10 @@ void vta2000_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x00).w(FUNC(vta2000_state::output_00));
+	map(0x20, 0x21).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xc0, 0xc0).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc3, 0xc3).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc8, 0xcb).w("brgpit", FUNC(pit8253_device::write));
 	map(0xe0, 0xe3).rw("mainpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
@@ -187,10 +193,24 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(4'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mainpit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(500'000)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vta2000_state, speaker_w))
+
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("usart", I8251, XTAL(4'000'000) / 4)
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic", pic8259_device, ir4_w))
+
+	MCFG_DEVICE_ADD("brgpit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(1228800) // maybe
+	MCFG_PIT8253_CLK1(1228800)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("usart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("usart", i8251_device, write_txc)) // or vice versa?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
