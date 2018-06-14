@@ -4842,6 +4842,7 @@ ROM_START( joyman )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
 ROM_END
 
+/* There is a 10 page Service Manual with basic wiring schematics for Titan in Germain claiming copyright by NSM - Apparatebau GmbH & Co. */
 ROM_START( titanpac ) /* GDP-01 main PCB with GDP-02 auxiliary card (same as Piranha) */
 	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "t101.7e", 0x0000, 0x0800, CRC(5538c288) SHA1(12d97dbaa000e85d4601e4d2c5a19821f7a4da09) )
@@ -4894,7 +4895,7 @@ ROM_START( piranha ) /* GDP-01 main PCB with GDP-02 auxiliary card */
 	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
 ROM_END
 
-ROM_START( piranhao )
+ROM_START( piranhao ) /* GDP-01 main PCB with GDP-02 auxiliary card */
 	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "p1.7e",   0x0000, 0x0800, CRC(c6ce1bfc) SHA1(da145d67331cee292654a185fb09e773dd9d40cd) )
 	ROM_LOAD( "p5.6e",   0x0800, 0x0800, CRC(a2655a33) SHA1(2253dcf5c8cbe278118aa1569cf456b13d8cf029) )
