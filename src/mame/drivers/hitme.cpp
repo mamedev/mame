@@ -21,6 +21,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "barricad.lh"

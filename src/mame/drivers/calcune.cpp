@@ -21,6 +21,7 @@
 #include "sound/ymz280b.h"
 #include "video/315_5313.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK_NTSC 53693175

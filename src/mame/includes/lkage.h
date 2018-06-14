@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class lkage_state : public driver_device
 {

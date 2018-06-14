@@ -37,6 +37,7 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 //**************************************************************************

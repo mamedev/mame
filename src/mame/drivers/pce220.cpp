@@ -33,6 +33,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

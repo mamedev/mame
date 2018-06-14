@@ -20,6 +20,7 @@
 #include "machine/nvram.h"
 #include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define COP421_TAG      "u9f"

@@ -25,6 +25,7 @@
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -884,7 +885,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
 	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", G65816_LINE_NMI))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, accomm_state, econet_clk_w))

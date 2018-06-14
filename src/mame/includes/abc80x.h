@@ -23,6 +23,7 @@
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "speaker.h"
 

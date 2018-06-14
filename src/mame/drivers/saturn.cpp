@@ -458,6 +458,7 @@ public:
 		, m_stvcd(*this, "stvcd")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
+		, m_scsp(*this, "scsp")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
@@ -493,6 +494,8 @@ public:
 
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
+
+	required_device<scsp_device> m_scsp;
 
 	void saturn(machine_config &config);
 	void saturnjp(machine_config &config);
@@ -534,7 +537,7 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
 	/* Sound */
 	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::saturn_soundram_r), FUNC(sat_console_state::saturn_soundram_w));
-	map(0x05b00000, 0x05b00fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x05b00000, 0x05b00fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
 	map(0x05c00000, 0x05c7ffff).rw(FUNC(sat_console_state::saturn_vdp1_vram_r), FUNC(sat_console_state::saturn_vdp1_vram_w));
 	map(0x05c80000, 0x05cbffff).rw(FUNC(sat_console_state::saturn_vdp1_framebuffer0_r), FUNC(sat_console_state::saturn_vdp1_framebuffer0_w));
@@ -552,7 +555,7 @@ void sat_console_state::saturn_mem(address_map &map)
 void sat_console_state::sound_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram().share("sound_ram");
-	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
 
@@ -597,7 +600,7 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
+	m_scsp->set_ram_base(m_sound_ram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
@@ -839,7 +842,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADD(m_scsp, SCSP)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))

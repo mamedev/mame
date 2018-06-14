@@ -622,7 +622,7 @@ void midway_sounds_good_device::device_reset()
 
 void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia->portb_w((param >> 1) & 0x0f);
+	m_pia->write_portb((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
@@ -777,7 +777,7 @@ void midway_turbo_cheap_squeak_device::device_reset()
 
 void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia->portb_w((param >> 1) & 0x0f);
+	m_pia->write_portb((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
@@ -880,7 +880,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->porta_w(m_tms5200->status_r(space, offset));
+		m_pia1->write_porta(m_tms5200->status_r(space, offset));
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -989,6 +989,6 @@ void midway_squawk_n_talk_device::device_reset()
 
 void midway_squawk_n_talk_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia0->porta_w(~param & 0x0f);
-	m_pia0->cb1_w(~param & 0x10);
+	m_pia0->write_porta(~param & 0x0f);
+	m_pia0->cb1_w(BIT(~param, 4));
 }

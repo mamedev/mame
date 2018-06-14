@@ -8,6 +8,7 @@
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sprint8_state : public driver_device

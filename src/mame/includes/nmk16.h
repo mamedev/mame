@@ -8,6 +8,7 @@
 #include "machine/nmk004.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class nmk16_state : public driver_device, protected seibu_sound_common
 {

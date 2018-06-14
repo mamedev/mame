@@ -277,6 +277,7 @@ MH86171 Color Palette RAMDAC
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

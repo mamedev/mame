@@ -31,6 +31,7 @@ into the weeds (jumps to 00000).
 //#include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 #include "machine/z8536.h"
+#include "emupal.h"
 
 
 class c900_state : public driver_device

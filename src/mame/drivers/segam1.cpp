@@ -41,6 +41,7 @@ uses s24 style tilemaps (ram based?)
 #include "machine/mb8421.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

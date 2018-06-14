@@ -10,6 +10,7 @@
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "emupal.h"
 
 class darkseal_state : public driver_device
 {

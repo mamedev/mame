@@ -221,7 +221,7 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 
 TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 {
-	m_pia_2->portb_w(param);
+	m_pia_2->write_portb(param);
 	m_pia_2->cb1_w((param == 0xff) ? 0 : 1);
 }
 
@@ -238,7 +238,7 @@ WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
 
 TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
 {
-	m_pia_2->porta_w(param);
+	m_pia_2->write_porta(param);
 }
 
 WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
@@ -485,8 +485,8 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 	uint8_t l_data = param | 0x80;
 	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
-	m_pia_2->portb_w(l_data); m_pia_2->cb1_w((l_data == 0xff) ? 0 : 1);
-	m_pia_2b->portb_w(r_data); m_pia_2b->cb1_w((r_data == 0xff) ? 0 : 1);
+	m_pia_2->write_portb(l_data); m_pia_2->cb1_w((l_data == 0xff) ? 0 : 1);
+	m_pia_2b->write_portb(r_data); m_pia_2b->cb1_w((r_data == 0xff) ? 0 : 1);
 }
 
 
@@ -565,7 +565,7 @@ MACHINE_RESET_MEMBER(joust2_state,joust2)
 
 TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 {
-	m_pia_2->porta_w(param & 0xff);
+	m_pia_2->write_porta(param & 0xff);
 }
 
 

@@ -8,6 +8,7 @@
 
 #include "machine/pic8259.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mrflea_state : public driver_device

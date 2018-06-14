@@ -76,6 +76,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */

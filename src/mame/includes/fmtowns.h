@@ -29,6 +29,8 @@
 
 #include "formats/fmtowns_dsk.h"
 
+#include "emupal.h"
+
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity
 

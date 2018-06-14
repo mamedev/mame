@@ -24,7 +24,7 @@
 #include "sound/ym2151.h"
 #include "video/kaneko_spr.h"
 #include "video/kaneko_tmap.h"
-
+#include "emupal.h"
 #include "screen.h"
 
 class kaneko16_state : public driver_device

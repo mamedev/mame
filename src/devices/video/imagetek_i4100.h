@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 

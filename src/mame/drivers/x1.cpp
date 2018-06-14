@@ -1069,12 +1069,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		machine().device<mc6845_device>("crtc")->address_w(space, offset, data);
+		m_crtc->address_w(space, offset, data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		machine().device<mc6845_device>("crtc")->register_w(space, offset, data);
+		m_crtc->register_w(space, offset, data);
 	}
 }
 
@@ -1547,9 +1547,9 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 
 READ8_MEMBER(x1_state::ym_r)
 {
-	uint8_t result = machine().device<ym2151_device>("ym")->read(space, offset);
+	uint8_t result = m_ym->read(space, offset);
 	if (!BIT(offset, 0))
-		result = (result & 0x7f) | (ioport("SOUND_SW")->read() & 0x80);
+		result = (result & 0x7f) | (m_sound_sw->read() & 0x80);
 	return result;
 }
 

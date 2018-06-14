@@ -23,6 +23,7 @@ Sanma - 3nin-uchi Mahjong is another ANES game confirmed running on the same har
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "cpu/z80/z80.h"

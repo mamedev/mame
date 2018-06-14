@@ -54,6 +54,7 @@
 #include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

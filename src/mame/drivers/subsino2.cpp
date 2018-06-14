@@ -50,6 +50,7 @@ To do:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

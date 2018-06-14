@@ -20,6 +20,7 @@ The asp ctc needs at least 2 triggers. The purpose of the zve pio is unknown.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"

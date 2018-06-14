@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "emupal.h"
 
 class fantasy_sound_device;
 

@@ -25,6 +25,7 @@
 #include "sound/beep.h"
 #include "video/hd44352.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"

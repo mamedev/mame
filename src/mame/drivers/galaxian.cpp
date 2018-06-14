@@ -2241,8 +2241,8 @@ void galaxian_state::kingball_sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
-	map(0x0000, 0x1fff).rom();
 	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x0000, 0x1fff).rom();
 }
 
 void galaxian_state::kingball_sound_portmap(address_map &map)

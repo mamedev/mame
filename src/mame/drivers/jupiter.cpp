@@ -33,6 +33,7 @@ ToDo: (both)
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MCM6571AP_TAG   "vid125_6c"

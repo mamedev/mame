@@ -14,6 +14,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 #define Z8400A_TAG      "5f"
 #define FDC1797_TAG     "5n"

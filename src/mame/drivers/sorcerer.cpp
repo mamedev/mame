@@ -163,6 +163,7 @@ NOTES (2016-06-06)
 
 #include "emu.h"
 #include "includes/sorcerer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

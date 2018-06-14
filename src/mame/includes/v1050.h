@@ -23,6 +23,7 @@
 #include "machine/v1050kb.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #define SCREEN_TAG              "screen"
 

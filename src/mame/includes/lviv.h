@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 class lviv_state : public driver_device

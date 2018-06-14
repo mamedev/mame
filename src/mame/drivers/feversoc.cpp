@@ -73,6 +73,7 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/rtc4543.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -12,6 +12,7 @@
 #include "video/k052109.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class vendetta_state : public driver_device
 {

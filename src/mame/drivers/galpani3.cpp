@@ -72,6 +72,7 @@ Dumped by Uki
 #include "sound/ymz280b.h"
 #include "video/kaneko_grap2.h"
 #include "video/sknsspr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

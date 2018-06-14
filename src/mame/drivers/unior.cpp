@@ -44,6 +44,7 @@ ToDo:
 #include "machine/i8257.h"
 #include "video/i8275.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

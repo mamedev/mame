@@ -15,6 +15,7 @@
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

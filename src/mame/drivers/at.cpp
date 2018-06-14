@@ -96,6 +96,7 @@ Mass storage: Floppy: 5.25" 1.2Mb, HDD: 40Mb
 #include "machine/ram.h"
 #include "machine/vt82c496.h"
 #include "machine/wd7600.h"
+#include "emupal.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 

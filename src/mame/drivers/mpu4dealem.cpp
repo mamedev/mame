@@ -18,6 +18,7 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 #include "video/resnet.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -11,6 +11,7 @@
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define M81_B_B_JUMPER_J3_S \

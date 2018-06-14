@@ -19,6 +19,7 @@
 #include "video/pcd8544.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 

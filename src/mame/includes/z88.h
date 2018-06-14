@@ -19,6 +19,7 @@
 #include "bus/z88/rom.h"
 #include "bus/z88/z88.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

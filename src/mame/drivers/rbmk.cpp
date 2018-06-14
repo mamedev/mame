@@ -61,6 +61,7 @@ Keep pressed 9 and press reset to enter service mode.
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

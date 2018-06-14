@@ -17,6 +17,7 @@
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "video/t6a04.h"
+#include "emupal.h"
 
 
 /* model */

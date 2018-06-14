@@ -3,6 +3,7 @@
 
 #include "machine/nb1413m3.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class nbmj8991_state : public driver_device

@@ -32,8 +32,6 @@ public:
 		, m_bios(*this, "bios")
 	{ }
 
-	DECLARE_PALETTE_INIT(gamate);
-
 	DECLARE_READ8_MEMBER(card_available_check);
 	DECLARE_READ8_MEMBER(card_available_set);
 	DECLARE_WRITE8_MEMBER(card_reset);
@@ -45,8 +43,6 @@ public:
 	DECLARE_READ8_MEMBER(read_cart);
 
 	void init_gamate();
-
-	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);

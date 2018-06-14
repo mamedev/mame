@@ -17,6 +17,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

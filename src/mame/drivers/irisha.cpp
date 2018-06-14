@@ -23,6 +23,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

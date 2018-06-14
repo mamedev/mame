@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+
+#include "emupal.h"
+
 class m57_state : public driver_device
 {
 public:

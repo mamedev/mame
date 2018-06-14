@@ -27,6 +27,7 @@
 #include "bus/tvc/tvc.h"
 #include "bus/tvc/hbf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

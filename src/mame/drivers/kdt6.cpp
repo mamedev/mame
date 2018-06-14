@@ -27,6 +27,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/psi_kbd/psi_kbd.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"

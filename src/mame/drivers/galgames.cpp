@@ -41,6 +41,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

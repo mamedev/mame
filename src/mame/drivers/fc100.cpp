@@ -46,6 +46,7 @@ TODO:
 #include "sound/wave.h"
 #include "video/mc6847.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 #include "formats/fc100_cas.h"

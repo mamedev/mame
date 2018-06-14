@@ -964,7 +964,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
 	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
@@ -1425,7 +1425,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
 	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))

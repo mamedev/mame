@@ -53,6 +53,7 @@
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

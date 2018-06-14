@@ -16,6 +16,7 @@
 #include "cpu/nec/nec.h"
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 
 #define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 

@@ -40,6 +40,7 @@ K051649 (sound)
 #include "video/k054156_k054157_k056832.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/beep.h"
+#include "emupal.h"
 
 #define vdt911_chr_region ":gfx1"
 

@@ -165,6 +165,7 @@ From JP manual
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

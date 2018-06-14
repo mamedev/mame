@@ -16,6 +16,7 @@
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

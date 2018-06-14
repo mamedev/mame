@@ -11,6 +11,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class kchamp_state : public driver_device
 {

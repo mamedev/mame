@@ -19,6 +19,7 @@
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

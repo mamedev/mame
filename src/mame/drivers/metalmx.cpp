@@ -257,6 +257,7 @@ Logic:
 
 #include "emu.h"
 #include "includes/metalmx.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

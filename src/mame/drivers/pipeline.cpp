@@ -76,6 +76,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -97,6 +97,7 @@ c0   8 data bits, Rx disabled
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

@@ -38,6 +38,7 @@
 #include "machine/ram.h"
 //#include "machine/x2212.h"
 //#include "video/crt9007.h"
+#include "emupal.h"
 #include "screen.h"
 
 

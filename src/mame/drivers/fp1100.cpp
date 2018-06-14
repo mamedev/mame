@@ -45,6 +45,7 @@
 #include "sound/beep.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

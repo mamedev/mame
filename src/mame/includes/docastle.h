@@ -9,6 +9,7 @@
 #include "machine/tms1024.h"
 #include "video/mc6845.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class docastle_state : public driver_device
 {

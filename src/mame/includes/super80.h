@@ -19,6 +19,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 /* Bits in m_portf0 variable:

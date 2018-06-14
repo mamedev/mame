@@ -47,6 +47,7 @@
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -84,6 +84,7 @@
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

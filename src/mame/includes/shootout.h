@@ -2,6 +2,7 @@
 // copyright-holders:Ernesto Corvi, Phil Stroffolino, Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class shootout_state : public driver_device
 {

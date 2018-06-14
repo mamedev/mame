@@ -399,6 +399,7 @@
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

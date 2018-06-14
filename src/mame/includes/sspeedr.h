@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
+
+#include "emupal.h"
+
 class sspeedr_state : public driver_device
 {
 public:

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "audio/m72.h"
+#include "emupal.h"
 
 struct M90_pf_layer_info
 {

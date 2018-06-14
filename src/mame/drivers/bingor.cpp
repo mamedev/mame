@@ -513,6 +513,7 @@
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

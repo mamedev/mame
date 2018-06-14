@@ -111,6 +111,7 @@ Interrupts:
 
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -96,6 +96,7 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 #include "machine/ram.h"
 #include "machine/upd765.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #include "ibm6580.lh"

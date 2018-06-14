@@ -163,6 +163,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "video/sknsspr.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

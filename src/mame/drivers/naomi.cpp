@@ -1593,6 +1593,7 @@ Premier Eleven
 #include "emu.h"
 #include "includes/naomi.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

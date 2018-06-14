@@ -13,6 +13,7 @@
 #include "machine/x2212.h"
 #include "machine/74259.h"
 #include "sound/cem3394.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define BALSENTE_MASTER_CLOCK   (20000000)
