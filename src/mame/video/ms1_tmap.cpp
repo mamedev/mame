@@ -129,6 +129,16 @@ void megasys1_tilemap_device::device_start()
 	save_item(NAME(m_scroll_flag));
 }
 
+void megasys1_tilemap_device::device_reset()
+{
+	// Big Run never sets up scrollram past 0x1000
+	// this causes its opaque pen to show up when the game scrolls vertically after a bump.
+	// we initialize the device VRAM to a sane default so that this doesn't occur.
+	// TODO: might be something else (smaller VRAM size?)
+	for(int i=0;i<m_scrollram.bytes()/2;i++)
+		m_scrollram[i] = 0xffff;
+}
+
 void megasys1_tilemap_device::device_post_load()
 {
 	m_tmap = m_tilemap[(m_scroll_flag >> 4) & 1][m_scroll_flag & 3];
