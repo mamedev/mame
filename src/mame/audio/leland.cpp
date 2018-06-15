@@ -328,13 +328,13 @@ void leland_80186_sound_device::ataxx_80186_map_io(address_map &map)
 
 void redline_80186_sound_device::redline_80186_map_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(redline_80186_sound_device::redline_dac_w));
+	map(0x0000, 0xffff).w(FUNC(redline_80186_sound_device::redline_dac_w));
 }
 
 
 void leland_80186_sound_device::leland_80186_map_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(leland_80186_sound_device::dac_w));
+	map(0x0000, 0xffff).w(FUNC(leland_80186_sound_device::dac_w));
 }
 
 /*************************************

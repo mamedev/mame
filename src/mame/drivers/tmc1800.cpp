@@ -261,8 +261,8 @@ void tmc1800_state::tmc1800_map(address_map &map)
 
 void tmc1800_state::tmc1800_io_map(address_map &map)
 {
-	map(0x01, 0x01).rw(this, FUNC(tmc1800_state::dispon_r), FUNC(tmc1800_state::dispoff_w));
-	map(0x02, 0x02).w(this, FUNC(tmc1800_state::keylatch_w));
+	map(0x01, 0x01).rw(FUNC(tmc1800_state::dispon_r), FUNC(tmc1800_state::dispoff_w));
+	map(0x02, 0x02).w(FUNC(tmc1800_state::keylatch_w));
 }
 
 // OSCOM 1000B
@@ -275,7 +275,7 @@ void osc1000b_state::osc1000b_map(address_map &map)
 
 void osc1000b_state::osc1000b_io_map(address_map &map)
 {
-	map(0x02, 0x02).w(this, FUNC(osc1000b_state::keylatch_w));
+	map(0x02, 0x02).w(FUNC(osc1000b_state::keylatch_w));
 }
 
 // Telmac 2000
@@ -291,8 +291,8 @@ void tmc2000_state::tmc2000_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x02, 0x02).w(this, FUNC(tmc2000_state::keylatch_w));
-	map(0x04, 0x04).r(m_cti, FUNC(cdp1864_device::dispoff_r)).w(this, FUNC(tmc2000_state::bankswitch_w));
+	map(0x02, 0x02).w(FUNC(tmc2000_state::keylatch_w));
+	map(0x04, 0x04).r(m_cti, FUNC(cdp1864_device::dispoff_r)).w(FUNC(tmc2000_state::bankswitch_w));
 }
 
 // OSCOM Nano
@@ -306,8 +306,8 @@ void nano_state::nano_map(address_map &map)
 void nano_state::nano_io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x02, 0x02).w(this, FUNC(nano_state::keylatch_w));
-	map(0x04, 0x04).r(m_cti, FUNC(cdp1864_device::dispoff_r)).w(this, FUNC(nano_state::bankswitch_w));
+	map(0x02, 0x02).w(FUNC(nano_state::keylatch_w));
+	map(0x04, 0x04).r(m_cti, FUNC(cdp1864_device::dispoff_r)).w(FUNC(nano_state::bankswitch_w));
 }
 
 /* Input Ports */
@@ -847,11 +847,11 @@ ROM_END
 ROM_START( tmc2000 )
 	ROM_REGION( 0x800, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "prom200", "PROM N:o 200" )
-	ROMX_LOAD( "200.m5",    0x000, 0x200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
+	ROMX_LOAD( "200.m5",    0x000, 0x200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(0) ) // typed in from the manual
 	ROM_SYSTEM_BIOS( 1, "prom202", "PROM N:o 202" )
-	ROMX_LOAD( "202.m5",    0x000, 0x200, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "202.m5",    0x000, 0x200, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tool2000", "TOOL-2000" )
-	ROMX_LOAD( "tool2000",  0x000, 0x800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "tool2000",  0x000, 0x800, NO_DUMP, ROM_BIOS(2) )
 ROM_END
 
 ROM_START( nano )

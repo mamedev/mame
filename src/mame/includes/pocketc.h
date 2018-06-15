@@ -9,6 +9,8 @@
 #ifndef MAME_INCLUDES_POCKETC_H
 #define MAME_INCLUDES_POCKETC_H
 
+#include "emupal.h"
+
 typedef const char *POCKETC_FIGURE[];
 
 class pocketc_state : public driver_device

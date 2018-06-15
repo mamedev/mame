@@ -7,6 +7,7 @@
 
 #include "machine/i8255.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 

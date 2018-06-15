@@ -70,6 +70,7 @@ zooming might be wrong
 #include "cpu/m68000/m68000.h"
 #include "machine/vs9209.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -99,7 +100,7 @@ WRITE8_MEMBER(taotaido_state::unknown_output_w)
 void taotaido_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x800000, 0x803fff).ram().w(this, FUNC(taotaido_state::bgvideoram_w)).share("bgram");  // bg ram?
+	map(0x800000, 0x803fff).ram().w(FUNC(taotaido_state::bgvideoram_w)).share("bgram");  // bg ram?
 	map(0xa00000, 0xa01fff).ram().share("spriteram");       // sprite ram
 	map(0xc00000, 0xc0ffff).ram().share("spriteram2");      // sprite tile lookup ram
 	map(0xfe0000, 0xfeffff).ram();                                     // main ram
@@ -107,12 +108,12 @@ void taotaido_state::main_map(address_map &map)
 	map(0xffe000, 0xffe3ff).ram().share("scrollram");       // rowscroll / rowselect / scroll ram
 	map(0xffff80, 0xffff9f).rw("io1", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 	map(0xffffa0, 0xffffbf).rw("io2", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
-	map(0xffff00, 0xffff0f).w(this, FUNC(taotaido_state::tileregs_w));
+	map(0xffff00, 0xffff0f).w(FUNC(taotaido_state::tileregs_w));
 	map(0xffff10, 0xffff11).nopw();                        // unknown
 	map(0xffff20, 0xffff21).nopw();                        // unknown - flip screen related
-	map(0xffff40, 0xffff47).w(this, FUNC(taotaido_state::sprite_character_bank_select_w));
+	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::sprite_character_bank_select_w));
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write));        // seems right
-	map(0xffffe0, 0xffffe1).r(this, FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
+	map(0xffffe0, 0xffffe1).r(FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
 }
 
 /* sound cpu - same as aerofgt */
@@ -134,7 +135,7 @@ void taotaido_state::sound_port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x04, 0x04).w(this, FUNC(taotaido_state::sh_bankswitch_w));
+	map(0x04, 0x04).w(FUNC(taotaido_state::sh_bankswitch_w));
 	map(0x08, 0x08).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x0c, 0x0c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

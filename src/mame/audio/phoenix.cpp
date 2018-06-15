@@ -53,6 +53,8 @@ DEFINE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device, "phoenix_sound", "Phoeni
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PHOENIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_discrete(*this, ":discrete")
+	, m_tms(*this, ":tms")
 {
 }
 
@@ -69,9 +71,6 @@ void phoenix_sound_device::device_start()
 	memset(&m_c24_state, 0, sizeof(m_c24_state));
 	memset(&m_c25_state, 0, sizeof(m_c25_state));
 	memset(&m_noise_state, 0, sizeof(m_noise_state));
-
-	m_discrete = machine().device<discrete_device>("discrete");
-	m_tms = machine().device<tms36xx_device>("tms");
 
 	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 

@@ -34,6 +34,7 @@ ft5_v6_c4.u58 /
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -154,15 +155,15 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x220000, 0x22ffff).ram().share("main_ram");
 
-	map(0x260000, 0x260fff).w(this, FUNC(koftball_state::bmc_1_videoram_w)).share("bmc_1_videoram");
-	map(0x261000, 0x261fff).w(this, FUNC(koftball_state::bmc_2_videoram_w)).share("bmc_2_videoram");
+	map(0x260000, 0x260fff).w(FUNC(koftball_state::bmc_1_videoram_w)).share("bmc_1_videoram");
+	map(0x261000, 0x261fff).w(FUNC(koftball_state::bmc_2_videoram_w)).share("bmc_2_videoram");
 	map(0x262000, 0x26ffff).ram();
 
 	map(0x280000, 0x28ffff).ram(); /* unused ? */
 	map(0x2a0000, 0x2a001f).nopw();
-	map(0x2a0000, 0x2a001f).r(this, FUNC(koftball_state::random_number_r));
-	map(0x2b0000, 0x2b0003).r(this, FUNC(koftball_state::random_number_r));
-	map(0x2d8000, 0x2d8001).r(this, FUNC(koftball_state::random_number_r));
+	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
+	map(0x2b0000, 0x2b0003).r(FUNC(koftball_state::random_number_r));
+	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
 	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
 	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
@@ -173,8 +174,8 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x2f0000, 0x2f0003).portr("INPUTS");
 	map(0x300000, 0x300001).nopw();
 	map(0x320000, 0x320001).nopw();
-	map(0x340000, 0x340001).r(this, FUNC(koftball_state::prot_r));
-	map(0x360000, 0x360001).w(this, FUNC(koftball_state::prot_w));
+	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
+	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 }
 
 void koftball_state::ramdac_map(address_map &map)

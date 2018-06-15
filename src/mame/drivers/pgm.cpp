@@ -307,7 +307,7 @@ void pgm_state::pgm_z80_mem(address_map &map)
 void pgm_state::pgm_z80_io(address_map &map)
 {
 	map(0x8000, 0x8003).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write));
-	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(this, FUNC(pgm_state::z80_l3_w));
+	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::z80_l3_w));
 	map(0x8200, 0x82ff).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x84ff).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 }
@@ -320,24 +320,24 @@ void pgm_state::pgm_base_mem(address_map &map)
 
 	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
 
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(this, FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
+	map(0x900000, 0x907fff).mirror(0x0f8000).rw(FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
 	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb0ffff).ram().share("videoregs"); /* Video Regs inc. Zoom Table */
 
 	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc00002, 0xc00003).w(this, FUNC(pgm_state::m68k_l1_w));
+	map(0xc00002, 0xc00003).w(FUNC(pgm_state::m68k_l1_w));
 	map(0xc00005, 0xc00005).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0xc00007, 0xc00007).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
-	map(0xc00008, 0xc00009).w(this, FUNC(pgm_state::z80_reset_w));
-	map(0xc0000a, 0xc0000b).w(this, FUNC(pgm_state::z80_ctrl_w));
+	map(0xc00008, 0xc00009).w(FUNC(pgm_state::z80_reset_w));
+	map(0xc0000a, 0xc0000b).w(FUNC(pgm_state::z80_ctrl_w));
 	map(0xc0000d, 0xc0000d).rw(m_soundlatch3, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 
 	map(0xc08000, 0xc08001).portr("P1P2");
 	map(0xc08002, 0xc08003).portr("P3P4");
 	map(0xc08004, 0xc08005).portr("Service");
-	map(0xc08006, 0xc08007).portr("DSW").w(this, FUNC(pgm_state::pgm_coin_counter_w));
+	map(0xc08006, 0xc08007).portr("DSW").w(FUNC(pgm_state::pgm_coin_counter_w));
 
-	map(0xc10000, 0xc1ffff).rw(this, FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
+	map(0xc10000, 0xc1ffff).rw(FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
 }
 
 void pgm_state::pgm_mem(address_map &map)
@@ -563,7 +563,7 @@ MACHINE_CONFIG_END
 /* take note of "sprmask" needed for expanding the Sprite Colour Data */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define PGM_68K_BIOS \
 	ROM_SYSTEM_BIOS( 0, "v2",     "PGM Bios V2" ) \
@@ -2703,6 +2703,37 @@ ROM_START( kov2p202 )
 	ROM_LOAD( "m1200.rom",    0x800000, 0x800000, CRC(b0d88720) SHA1(44ab137e3f8e15b7cb5697ffbd9b1143d8210c4f) )
 ROM_END
 
+ROM_START( kov2p200 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "v200_32m.ic8",    0x100000, 0x400000, CRC(9a09fd61) SHA1(690a0b323e1f275a08ba84febf93bf8edc2d0802) ) // 06/18/01  22:59:12 M200XX
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
+	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t1200.rom",    0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
+
+	ROM_REGION( 0x2800000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a1200.rom",    0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
+	ROM_LOAD( "a1201.rom",    0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
+	ROM_LOAD( "a1202.rom",    0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
+	ROM_LOAD( "a1203.rom",    0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
+	ROM_LOAD( "a1204.rom",    0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b1200.rom",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
+	ROM_LOAD( "b1201.rom",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m1200.rom",    0x800000, 0x800000, CRC(b0d88720) SHA1(44ab137e3f8e15b7cb5697ffbd9b1143d8210c4f) )
+ROM_END
+
 /*
 
 Do Donpachi II
@@ -4763,6 +4794,7 @@ GAME( 2000, kov2100,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_s
 GAME( 2001, kov2p,        pgm,       pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M205XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 04/25/02  17:48:27 M205XX
 GAME( 2001, kov2p204,     kov2p,     pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M204XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 08/28/01  09:11:49 M204XX
 GAME( 2001, kov2p202,     kov2p,     pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M202XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 07/09/01  11:03:50 M202XX
+GAME( 2001, kov2p200,     kov2p,     pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M200XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 06/18/01  22:59:12 M200XX
 
 //形意拳/Xíng yì quán/Sin ī ken(Japanese label)
 // region provided by internal ARM rom

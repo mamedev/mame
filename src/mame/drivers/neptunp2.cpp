@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -63,9 +64,9 @@ void neptunp2_state::neptunp2_map(address_map &map)
 	map(0xdb004, 0xdb007).ram();
 	map(0xdb00c, 0xdb00f).ram();
 
-	map(0xff806, 0xff806).r(this, FUNC(neptunp2_state::test_r));
-	map(0xff810, 0xff810).r(this, FUNC(neptunp2_state::test_r));
-	map(0xff812, 0xff812).r(this, FUNC(neptunp2_state::test_r));
+	map(0xff806, 0xff806).r(FUNC(neptunp2_state::test_r));
+	map(0xff810, 0xff810).r(FUNC(neptunp2_state::test_r));
+	map(0xff812, 0xff812).r(FUNC(neptunp2_state::test_r));
 
 	map(0xff980, 0xff980).nopw();
 

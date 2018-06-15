@@ -101,9 +101,9 @@ void mrflea_state::mrflea_master_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(mrflea_state::mrflea_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(mrflea_state::mrflea_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xec00, 0xecff).ram().w(this, FUNC(mrflea_state::mrflea_spriteram_w)).share("spriteram");
+	map(0xec00, 0xecff).ram().w(FUNC(mrflea_state::mrflea_spriteram_w)).share("spriteram");
 }
 
 void mrflea_state::mrflea_master_io_map(address_map &map)
@@ -111,7 +111,7 @@ void mrflea_state::mrflea_master_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw(); /* watchdog? */
 	map(0x40, 0x43).rw("mainppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x60, 0x60).w(this, FUNC(mrflea_state::mrflea_gfx_bank_w));
+	map(0x60, 0x60).w(FUNC(mrflea_state::mrflea_gfx_bank_w));
 }
 
 

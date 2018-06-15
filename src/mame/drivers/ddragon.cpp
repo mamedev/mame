@@ -494,19 +494,19 @@ void ddragon_state::ddragon_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("rambase");
 	map(0x1000, 0x11ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x1200, 0x13ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1fff).ram().w(this, FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
-	map(0x2000, 0x21ff).rw(this, FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
+	map(0x1800, 0x1fff).ram().w(FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
+	map(0x2000, 0x21ff).rw(FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
 	map(0x2800, 0x2fff).ram().share("spriteram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
+	map(0x3000, 0x37ff).ram().w(FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3800, 0x3800).portr("P1");
 	map(0x3801, 0x3801).portr("P2");
 	map(0x3802, 0x3802).portr("EXTRA");
 	map(0x3803, 0x3803).portr("DSW0");
 	map(0x3804, 0x3804).portr("DSW1");
-	map(0x3808, 0x3808).w(this, FUNC(ddragon_state::ddragon_bankswitch_w));
+	map(0x3808, 0x3808).w(FUNC(ddragon_state::ddragon_bankswitch_w));
 	map(0x3809, 0x3809).writeonly().share("scrollx_lo");
 	map(0x380a, 0x380a).writeonly().share("scrolly_lo");
-	map(0x380b, 0x380f).rw(this, FUNC(ddragon_state::ddragon_interrupt_r), FUNC(ddragon_state::ddragon_interrupt_w));
+	map(0x380b, 0x380f).rw(FUNC(ddragon_state::ddragon_interrupt_r), FUNC(ddragon_state::ddragon_interrupt_w));
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }
@@ -515,19 +515,19 @@ void ddragon_state::ddragon_map(address_map &map)
 void ddragon_state::dd2_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(this, FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
-	map(0x2000, 0x21ff).rw(this, FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
+	map(0x1800, 0x1fff).ram().w(FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
+	map(0x2000, 0x21ff).rw(FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
 	map(0x2800, 0x2fff).ram().share("spriteram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
+	map(0x3000, 0x37ff).ram().w(FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3800, 0x3800).portr("P1");
 	map(0x3801, 0x3801).portr("P2");
 	map(0x3802, 0x3802).portr("EXTRA");
 	map(0x3803, 0x3803).portr("DSW0");
 	map(0x3804, 0x3804).portr("DSW1");
-	map(0x3808, 0x3808).w(this, FUNC(ddragon_state::ddragon_bankswitch_w));
+	map(0x3808, 0x3808).w(FUNC(ddragon_state::ddragon_bankswitch_w));
 	map(0x3809, 0x3809).writeonly().share("scrollx_lo");
 	map(0x380a, 0x380a).writeonly().share("scrolly_lo");
-	map(0x380b, 0x380f).rw(this, FUNC(ddragon_state::ddragon_interrupt_r), FUNC(ddragon_state::ddragon_interrupt_w));
+	map(0x380b, 0x380f).rw(FUNC(ddragon_state::ddragon_interrupt_r), FUNC(ddragon_state::ddragon_interrupt_w));
 	map(0x3c00, 0x3dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3e00, 0x3fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x4000, 0x7fff).bankr("bank1");
@@ -544,7 +544,7 @@ void ddragon_state::dd2_map(address_map &map)
 
 void ddragon_state::sub_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(ddragon_state::ddragon_hd63701_internal_registers_r), FUNC(ddragon_state::ddragon_hd63701_internal_registers_w));
+	map(0x0000, 0x001f).rw(FUNC(ddragon_state::ddragon_hd63701_internal_registers_r), FUNC(ddragon_state::ddragon_hd63701_internal_registers_w));
 	map(0x0020, 0x0fff).ram();
 	map(0x8000, 0x81ff).ram().share("comram");
 	map(0xc000, 0xffff).rom();
@@ -563,14 +563,14 @@ void ddragon_state::dd2_sub_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc3ff).ram().share("comram");
-	map(0xd000, 0xd000).w(this, FUNC(ddragon_state::ddragon2_sub_irq_ack_w));
-	map(0xe000, 0xe000).w(this, FUNC(ddragon_state::ddragon2_sub_irq_w));
+	map(0xd000, 0xd000).w(FUNC(ddragon_state::ddragon2_sub_irq_ack_w));
+	map(0xe000, 0xe000).w(FUNC(ddragon_state::ddragon2_sub_irq_w));
 }
 
 
 void ddragon_state::ddragonba_sub_portmap(address_map &map)
 {
-	map(0x0000, 0x01ff).w(this, FUNC(ddragon_state::ddragonba_port_w));
+	map(0x0000, 0x01ff).w(FUNC(ddragon_state::ddragonba_port_w));
 }
 
 
@@ -585,9 +585,9 @@ void ddragon_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1800, 0x1800).r(this, FUNC(ddragon_state::dd_adpcm_status_r));
+	map(0x1800, 0x1800).r(FUNC(ddragon_state::dd_adpcm_status_r));
 	map(0x2800, 0x2801).rw("fmsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x3800, 0x3807).w(this, FUNC(ddragon_state::dd_adpcm_w));
+	map(0x3800, 0x3807).w(FUNC(ddragon_state::dd_adpcm_w));
 	map(0x8000, 0xffff).rom();
 }
 

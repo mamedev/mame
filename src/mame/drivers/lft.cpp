@@ -50,7 +50,7 @@ void lft_state::lft_io(address_map &map)
 	map.global_mask(0xff);
 	// screen 1
 	map(0x00, 0x01).nopr();
-	map(0x04, 0x05).rw(this, FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
+	map(0x04, 0x05).rw(FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
 	// screen 2
 	map(0x02, 0x03).nopr();
 	map(0x06, 0x07).nopw();

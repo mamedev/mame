@@ -93,6 +93,7 @@ Detailed list of bugs:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -1020,12 +1021,12 @@ void spg2xx_game_state::vii_mem(address_map &map)
 	map(0x000000, 0x3fffff).bankr("cart");
 
 	map(0x000000, 0x0027ff).ram().share("p_ram");
-	map(0x002800, 0x0028ff).rw(this, FUNC(spg2xx_game_state::video_r), FUNC(spg2xx_game_state::video_w));
+	map(0x002800, 0x0028ff).rw(FUNC(spg2xx_game_state::video_r), FUNC(spg2xx_game_state::video_w));
 	map(0x002900, 0x002aff).ram().share("p_rowscroll");
 	map(0x002b00, 0x002bff).ram().share("p_palette");
 	map(0x002c00, 0x002fff).ram().share("p_spriteram");
-	map(0x003000, 0x0037ff).rw(this, FUNC(spg2xx_game_state::audio_r), FUNC(spg2xx_game_state::audio_w));
-	map(0x003d00, 0x003eff).rw(this, FUNC(spg2xx_game_state::io_r), FUNC(spg2xx_game_state::io_w));
+	map(0x003000, 0x0037ff).rw(FUNC(spg2xx_game_state::audio_r), FUNC(spg2xx_game_state::audio_w));
+	map(0x003d00, 0x003eff).rw(FUNC(spg2xx_game_state::io_r), FUNC(spg2xx_game_state::io_w));
 }
 
 static INPUT_PORTS_START( vii )

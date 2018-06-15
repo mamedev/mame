@@ -740,13 +740,13 @@ void savquest_state::savquest_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw(this, FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(this, FUNC(savquest_state::bios_f0000_ram_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(this, FUNC(savquest_state::bios_e0000_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_e4000").w(this, FUNC(savquest_state::bios_e4000_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(this, FUNC(savquest_state::bios_e8000_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(this, FUNC(savquest_state::bios_ec000_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(FUNC(savquest_state::bios_f0000_ram_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(FUNC(savquest_state::bios_e0000_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_e4000").w(FUNC(savquest_state::bios_e4000_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
 	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
 	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
@@ -759,14 +759,14 @@ void savquest_state::savquest_io(address_map &map)
 
 	map(0x00e8, 0x00ef).noprw();
 
-	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x0378, 0x037b).rw(this, FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0378, 0x037b).rw(FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
 	map(0x03b0, 0x03bf).rw(m_vga, FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw(m_vga, FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw(m_vga, FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 

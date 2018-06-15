@@ -8,6 +8,7 @@
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000

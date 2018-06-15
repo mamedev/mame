@@ -672,7 +672,7 @@ READ8_MEMBER( c128_state::vic_colorram_r )
 
 void c128_state::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::z80_r), FUNC(c128_state::z80_w));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::z80_r), FUNC(c128_state::z80_w));
 }
 
 
@@ -682,7 +682,7 @@ void c128_state::z80_mem(address_map &map)
 
 void c128_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::z80_io_r), FUNC(c128_state::z80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::z80_io_r), FUNC(c128_state::z80_io_w));
 }
 
 
@@ -692,7 +692,7 @@ void c128_state::z80_io(address_map &map)
 
 void c128_state::m8502_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::read), FUNC(c128_state::write));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::read), FUNC(c128_state::write));
 }
 
 
@@ -702,7 +702,7 @@ void c128_state::m8502_mem(address_map &map)
 
 void c128_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(c128_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(c128_state::vic_videoram_r));
 }
 
 
@@ -712,7 +712,7 @@ void c128_state::vic_videoram_map(address_map &map)
 
 void c128_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(c128_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(c128_state::vic_colorram_r));
 }
 
 
@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8564_TAG, mos8564_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG, gfx_c128)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8566_TAG, mos8566_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG, gfx_c128)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -2036,21 +2036,21 @@ ROM_START( c128 )
 	ROM_DEFAULT_BIOS("r4")
 	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
 	ROM_SYSTEM_BIOS( 0, "r2", "Revision 2" )
-	ROMX_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(1) )
-	ROMX_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(1) )
-	ROMX_LOAD( "318020-03.u35", 0xc000, 0x4000, CRC(1e94bb02) SHA1(e80ffbafae068cc0e42698ec5c5c39af46ac612a), ROM_BIOS(1) )
+	ROMX_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(0) )
+	ROMX_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(0) )
+	ROMX_LOAD( "318020-03.u35", 0xc000, 0x4000, CRC(1e94bb02) SHA1(e80ffbafae068cc0e42698ec5c5c39af46ac612a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(1) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(1) )
+	ROMX_LOAD( "318020-05.u35", 0xc000, 0x4000, CRC(ba456b8e) SHA1(ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(2) )
 	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )
-	ROMX_LOAD( "318020-05.u35", 0xc000, 0x4000, CRC(ba456b8e) SHA1(ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos c128.u35", 0xc000, 0x4000, CRC(4b7964de) SHA1(7d1898f32beae4b2ae610d469ce578a588efaa7c), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "quikslvr", "QuickSilver 128" ) // requires add-on cartridge
 	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(3) )
 	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(3) )
-	ROMX_LOAD( "jiffydos c128.u35", 0xc000, 0x4000, CRC(4b7964de) SHA1(7d1898f32beae4b2ae610d469ce578a588efaa7c), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "quikslvr", "QuickSilver 128" ) // requires add-on cartridge
-	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(4) )
-	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(4) )
-	ROMX_LOAD( "quicksilver128.u35", 0xc000, 0x4000, CRC(c2e74338) SHA1(916cdcc62eb631073aa7f096815dcf33b3229ca8), ROM_BIOS(4) )
+	ROMX_LOAD( "quicksilver128.u35", 0xc000, 0x4000, CRC(c2e74338) SHA1(916cdcc62eb631073aa7f096815dcf33b3229ca8), ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
@@ -2076,13 +2076,13 @@ ROM_START( c128_de )
 	ROM_DEFAULT_BIOS("r4")
 	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
 	ROM_SYSTEM_BIOS( 0, "r2", "Revision 2" )
-	ROMX_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(1) )
-	ROMX_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(1) )
-	ROMX_LOAD( "315078-01.u35", 0xc000, 0x4000, CRC(a51e2168) SHA1(bcf82a89a8fc5d086bec2ff3bcbdecc8af2be3af), ROM_BIOS(1) )
+	ROMX_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(0) )
+	ROMX_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(0) )
+	ROMX_LOAD( "315078-01.u35", 0xc000, 0x4000, CRC(a51e2168) SHA1(bcf82a89a8fc5d086bec2ff3bcbdecc8af2be3af), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(2) )
-	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )
-	ROMX_LOAD( "315078-02.u35", 0xc000, 0x4000, CRC(b275bb2e) SHA1(78ac5dcdd840b092ba1ee6d19b33af079613291f), ROM_BIOS(2) )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(1) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(1) )
+	ROMX_LOAD( "315078-02.u35", 0xc000, 0x4000, CRC(b275bb2e) SHA1(78ac5dcdd840b092ba1ee6d19b33af079613291f), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "315079-01.u18", 0x00000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )

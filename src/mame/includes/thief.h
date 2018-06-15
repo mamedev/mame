@@ -2,6 +2,7 @@
 // copyright-holders:Victor Trucco, Mike Balfour, Phil Stroffolino
 #include "sound/samples.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 
 struct coprocessor_t {
 	std::unique_ptr<uint8_t[]> context_ram;

@@ -67,7 +67,7 @@ void mpf1_state::mpf1_map(address_map &map)
 
 void mpf1_state::mpf1_step(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(mpf1_state::step_r));
+	map(0x0000, 0xffff).r(FUNC(mpf1_state::step_r));
 }
 
 void mpf1_state::mpf1b_map(address_map &map)

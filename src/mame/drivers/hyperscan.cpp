@@ -589,7 +589,7 @@ void hyperscan_state::spg290_mem(address_map &map)
 {
 	map.global_mask(0x1fffffff);
 	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
-	map(0x08000000, 0x09ffffff).rw(this, FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
+	map(0x08000000, 0x09ffffff).rw(FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
 	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
 	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
 	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);

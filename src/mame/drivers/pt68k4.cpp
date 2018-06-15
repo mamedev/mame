@@ -260,11 +260,11 @@ void pt68k4_state::pt68k2_mem(address_map &map)
 	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
 	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0xfe0080, 0xfe00bf).r(this, FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
-	map(0xfe00c0, 0xfe00ff).w(this, FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
+	map(0xfe0080, 0xfe00bf).r(FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
+	map(0xfe00c0, 0xfe00ff).w(FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
 	map(0xfe0100, 0xfe013f).rw(m_wdfdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
-	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xfe01c0, 0xfe01c3).rw(FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
 	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 }
 
@@ -277,8 +277,8 @@ void pt68k4_state::pt68k4_mem(address_map &map)
 	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
 	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
-	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xfe01c0, 0xfe01c3).rw(FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
 	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 }
 
@@ -404,23 +404,23 @@ void pt68k4_isa8_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(16'000'000)/2)    // 68k2 came in 8, 10, and 12 MHz versions
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, 16_MHz_XTAL / 2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_DEVICE_PROGRAM_MAP(pt68k2_mem)
 
-	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart1", MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, pt68k4_state, duart1_irq))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, pt68k4_state, duart1_out))
 
-	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart2", MC68681, 3.6864_MHz_XTAL)
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, pt68k4_state, keyboard_clock_w))
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, pt68k4_state, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
-	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
+	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
-	MCFG_WD1772_ADD(WDFDC_TAG, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_ADD(WDFDC_TAG, WD1772, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":0", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":1", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, pt68k4_state, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
-	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
+	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
 	MCFG_ISA8_CPU(M68K_TAG)
@@ -492,11 +492,11 @@ ROM_END
 ROM_START( pt68k4 )
 	ROM_REGION16_BE( 0x10000, "roms", 0 )
 	ROM_SYSTEM_BIOS( 0, "humbug", "Humbug" )
-	ROMX_LOAD( "humpta40.bin", 0x0000, 0x8000, CRC(af67ff64) SHA1(da9fa31338c6847bb0e66118679b1ec01f6dc30b), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "humpta41.bin", 0x0001, 0x8000, CRC(a8b16e27) SHA1(218802f6e20d14cff736bb7423f06ce2f66e074c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "humpta40.bin", 0x0000, 0x8000, CRC(af67ff64) SHA1(da9fa31338c6847bb0e66118679b1ec01f6dc30b), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "humpta41.bin", 0x0001, 0x8000, CRC(a8b16e27) SHA1(218802f6e20d14cff736bb7423f06ce2f66e074c), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "monk", "Monk" )
-	ROMX_LOAD( "monk_0.bin", 0x0000, 0x8000, CRC(420d6a4b) SHA1(fca8c53c9c3c8ebd09370499cf34f4cc75ed9463), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "monk_1.bin", 0x0001, 0x8000, CRC(fc495e82) SHA1(f7b720d87db4d72a23e6c42d2cdd03216db04b60), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "monk_0.bin", 0x0000, 0x8000, CRC(420d6a4b) SHA1(fca8c53c9c3c8ebd09370499cf34f4cc75ed9463), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "monk_1.bin", 0x0001, 0x8000, CRC(fc495e82) SHA1(f7b720d87db4d72a23e6c42d2cdd03216db04b60), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	ROM_REGION(0x800, TIMEKEEPER_TAG, 0)
 	ROM_LOAD( "u21_ds1220_k4.bin", 0x000000, 0x000800, CRC(753472e6) SHA1(58dc8bcc86191e4a4429fe6a9b4fdd7788abb0cd) )

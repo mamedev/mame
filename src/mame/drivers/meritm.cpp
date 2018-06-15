@@ -546,9 +546,9 @@ void meritm_state::meritm_crt250_map(address_map &map)
 void meritm_state::meritm_crt250_questions_map(address_map &map)
 {
 	map(0x0000, 0xdfff).bankr("bank1");
-	map(0x0000, 0x0000).w(this, FUNC(meritm_state::meritm_crt250_questions_lo_w));
-	map(0x0001, 0x0001).w(this, FUNC(meritm_state::meritm_crt250_questions_hi_w));
-	map(0x0002, 0x0002).w(this, FUNC(meritm_state::meritm_crt250_questions_bank_w));
+	map(0x0000, 0x0000).w(FUNC(meritm_state::meritm_crt250_questions_lo_w));
+	map(0x0001, 0x0001).w(FUNC(meritm_state::meritm_crt250_questions_hi_w));
+	map(0x0002, 0x0002).w(FUNC(meritm_state::meritm_crt250_questions_bank_w));
 	map(0xe000, 0xffff).ram().share("nvram");
 }
 
@@ -562,7 +562,7 @@ void meritm_state::meritm_crt250_io_map(address_map &map)
 	map(0x50, 0x53).rw(m_z80pio_1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x80, 0x80).r("aysnd", FUNC(ay8930_device::data_r));
 	map(0x80, 0x81).w("aysnd", FUNC(ay8930_device::address_data_w));
-	map(0xff, 0xff).w(this, FUNC(meritm_state::meritm_crt250_bank_w));
+	map(0xff, 0xff).w(FUNC(meritm_state::meritm_crt250_bank_w));
 }
 
 void meritm_state::meritm_crt250_crt258_io_map(address_map &map)
@@ -576,7 +576,7 @@ void meritm_state::meritm_crt250_crt258_io_map(address_map &map)
 	map(0x60, 0x67).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80, 0x80).r("aysnd", FUNC(ay8930_device::data_r));
 	map(0x80, 0x81).w("aysnd", FUNC(ay8930_device::address_data_w));
-	map(0xff, 0xff).w(this, FUNC(meritm_state::meritm_crt250_bank_w));
+	map(0xff, 0xff).w(FUNC(meritm_state::meritm_crt250_bank_w));
 }
 
 void meritm_state::meritm_map(address_map &map)
@@ -589,7 +589,7 @@ void meritm_state::meritm_map(address_map &map)
 void meritm_state::meritm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(meritm_state::meritm_psd_a15_w));
+	map(0x00, 0x00).w(FUNC(meritm_state::meritm_psd_a15_w));
 	map(0x01, 0x01).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x10, 0x13).rw(m_v9938_0, FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x20, 0x23).rw(m_v9938_1, FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -599,7 +599,7 @@ void meritm_state::meritm_io_map(address_map &map)
 	map(0x60, 0x67).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80, 0x80).r("aysnd", FUNC(ay8930_device::data_r));
 	map(0x80, 0x81).w("aysnd", FUNC(ay8930_device::address_data_w));
-	map(0xff, 0xff).w(this, FUNC(meritm_state::meritm_bank_w));
+	map(0xff, 0xff).w(FUNC(meritm_state::meritm_bank_w));
 }
 
 /*************************************
@@ -1075,7 +1075,7 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 {
 	m_ram = std::make_unique<uint8_t[]>( 0x8000 );
-	machine().device<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
+	subdevice<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
 	memset(m_ram.get(), 0x00, 0x8000);
 	m_bank1->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);
 	m_bank2->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);

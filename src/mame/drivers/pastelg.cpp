@@ -65,12 +65,12 @@ void pastelg_state::pastelg_io_map(address_map &map)
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x90, 0x90).portr("SYSTEM");
-	map(0x90, 0x96).w(this, FUNC(pastelg_state::pastelg_blitter_w));
+	map(0x90, 0x96).w(FUNC(pastelg_state::pastelg_blitter_w));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
-	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(this, FUNC(pastelg_state::pastelg_romsel_w));
-	map(0xc0, 0xc0).r(this, FUNC(pastelg_state::pastelg_sndrom_r));
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(pastelg_state::pastelg_romsel_w));
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::pastelg_sndrom_r));
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xd0, 0xd0).r(this, FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::write));
+	map(0xd0, 0xd0).r(FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).portr("DSWC");
 }
 
@@ -118,13 +118,13 @@ void pastelg_state::threeds_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x90, 0x90).portr("SYSTEM").w(this, FUNC(pastelg_state::threeds_romsel_w));
-	map(0xf0, 0xf6).w(this, FUNC(pastelg_state::pastelg_blitter_w));
-	map(0xa0, 0xa0).rw(this, FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
-	map(0xb0, 0xb0).r(this, FUNC(pastelg_state::threeds_inputport2_r)).w(this, FUNC(pastelg_state::threeds_output_w));//writes: bit 3 is coin lockout, bit 1 is coin counter
+	map(0x90, 0x90).portr("SYSTEM").w(FUNC(pastelg_state::threeds_romsel_w));
+	map(0xf0, 0xf6).w(FUNC(pastelg_state::pastelg_blitter_w));
+	map(0xa0, 0xa0).rw(FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
+	map(0xb0, 0xb0).r(FUNC(pastelg_state::threeds_inputport2_r)).w(FUNC(pastelg_state::threeds_output_w));//writes: bit 3 is coin lockout, bit 1 is coin counter
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xc0, 0xc0).r(this, FUNC(pastelg_state::threeds_rom_readback_r));
-	map(0xd0, 0xd0).r(this, FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::write));
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::threeds_rom_readback_r));
+	map(0xd0, 0xd0).r(FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( pastelg )

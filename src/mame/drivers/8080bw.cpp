@@ -374,9 +374,9 @@ void _8080bw_state::invadpt2_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -445,9 +445,9 @@ void _8080bw_state::spacerng_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::spacerng_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::spacerng_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -472,9 +472,9 @@ void _8080bw_state::spcewars_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::spcewars_sh_port_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::spcewars_sh_port_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 }
 
 
@@ -531,8 +531,8 @@ void _8080bw_state::spcewarla_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-	map(0x04, 0x04).w(this, FUNC(_8080bw_state::spcewars_sh_port_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x04, 0x04).w(FUNC(_8080bw_state::spcewars_sh_port_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 	map(0x06, 0x06).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x08, 0x08).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x0c, 0x0c).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
@@ -565,8 +565,8 @@ void _8080bw_state::astropal_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).portr("IN3");
 
-	map(0x03, 0x03).w(this, FUNC(_8080bw_state::invaders_audio_1_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x03, 0x03).w(FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invaders_audio_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -637,8 +637,8 @@ void _8080bw_state::cosmo_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0").nopw();
 	map(0x01, 0x01).portr("IN1").nopw();
 	map(0x02, 0x02).portr("IN2").nopw();
-	map(0x03, 0x03).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::cosmo_sh_port_2_w));
+	map(0x03, 0x03).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmo_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).nopw();
 }
@@ -816,8 +816,8 @@ void _8080bw_state::spacecom_map(address_map &map)
 void _8080bw_state::spacecom_io_map(address_map &map)
 {
 	map(0x41, 0x41).portr("IN0");
-	map(0x42, 0x42).portr("IN1").w(this, FUNC(_8080bw_state::invaders_audio_1_w));
-	map(0x44, 0x44).portr("IN2").w(this, FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x42, 0x42).portr("IN1").w(FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x44, 0x44).portr("IN2").w(FUNC(_8080bw_state::invaders_audio_2_w));
 }
 
 MACHINE_CONFIG_START(_8080bw_state::spacecom)
@@ -872,10 +872,10 @@ void _8080bw_state::invrvnge_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(this, FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invrvnge_sh_port_1_w));
+	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invrvnge_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invrvnge_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invrvnge_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1068,8 +1068,8 @@ void _8080bw_state::starw1_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).nopw();    /* writes 9B at boot */
-	map(0x04, 0x04).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x04, 0x04).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).nopw();    /* writes 89 at boot */
 }
@@ -1098,9 +1098,9 @@ void _8080bw_state::lrescue_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::lrescue_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::lrescue_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::lrescue_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::lrescue_sh_port_2_w));
 }
 
 
@@ -1235,13 +1235,13 @@ void _8080bw_state::cosmicmo_io_map(address_map &map)
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
-	map(0x02, 0x02).mirror(0x04).r(this, FUNC(_8080bw_state::invrvnge_02_r));
+	map(0x02, 0x02).mirror(0x04).r(FUNC(_8080bw_state::invrvnge_02_r));
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(this, FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x03, 0x03).w(FUNC(_8080bw_state::invaders_audio_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::cosmicmo_05_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmicmo_05_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1357,19 +1357,19 @@ void _8080bw_state::rollingc_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
 	map(0x4000, 0x5fff).rom();
-	map(0xa000, 0xbfff).rw(this, FUNC(_8080bw_state::rollingc_scattered_colorram_r), FUNC(_8080bw_state::rollingc_scattered_colorram_w));
-	map(0xe000, 0xffff).rw(this, FUNC(_8080bw_state::rollingc_scattered_colorram2_r), FUNC(_8080bw_state::rollingc_scattered_colorram2_w));
+	map(0xa000, 0xbfff).rw(FUNC(_8080bw_state::rollingc_scattered_colorram_r), FUNC(_8080bw_state::rollingc_scattered_colorram_w));
+	map(0xe000, 0xffff).rw(FUNC(_8080bw_state::rollingc_scattered_colorram2_r), FUNC(_8080bw_state::rollingc_scattered_colorram2_w));
 }
 
 
 void _8080bw_state::rollingc_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(_8080bw_state::rollingc_sh_port_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(_8080bw_state::rollingc_sh_port_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 }
 
 
@@ -1446,7 +1446,7 @@ void _8080bw_state::schaser_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
 	map(0x4000, 0x5fff).rom();
-	map(0xc000, 0xdfff).rw(this, FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
+	map(0xc000, 0xdfff).rw(FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
 }
 
 
@@ -1455,9 +1455,9 @@ void _8080bw_state::schaser_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::schaser_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::schaser_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::schaser_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::schaser_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1609,10 +1609,10 @@ void _8080bw_state::schasercv_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(this, FUNC(_8080bw_state::schasercv_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::schasercv_sh_port_1_w));
+	map(0x02, 0x02).r(FUNC(_8080bw_state::schasercv_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::schasercv_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::schasercv_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::schasercv_sh_port_2_w));
 	//map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1620,9 +1620,9 @@ void _8080bw_state::crashrd_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::crashrd_port03_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::crashrd_port03_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::crashrd_port05_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::crashrd_port05_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1734,7 +1734,7 @@ void _8080bw_state::sflush_map(address_map &map)
 	map(0x801a, 0x801a).nopw();
 	map(0x801c, 0x801c).nopw();
 	map(0x801d, 0x801d).nopw();
-	map(0xa000, 0xbfff).rw(this, FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
+	map(0xa000, 0xbfff).rw(FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
 	map(0xd800, 0xffff).rom();
 }
 
@@ -1817,12 +1817,12 @@ MACHINE_CONFIG_END
 
 void _8080bw_state::lupin3_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(_8080bw_state::lupin3_00_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(_8080bw_state::lupin3_00_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::lupin3_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::lupin3_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::lupin3_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::lupin3_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1983,13 +1983,13 @@ READ8_MEMBER(_8080bw_state::polaris_port00_r)
 // Probably an unfinished feature.
 void _8080bw_state::polaris_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(_8080bw_state::polaris_port00_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x00, 0x00).r(FUNC(_8080bw_state::polaris_port00_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("IN2").w(this, FUNC(_8080bw_state::polaris_sh_port_1_w));
+	map(0x02, 0x02).portr("IN2").w(FUNC(_8080bw_state::polaris_sh_port_1_w));
 	map(0x03, 0x03).rw(m_mb14241, FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w));
-	map(0x04, 0x04).w(this, FUNC(_8080bw_state::polaris_sh_port_2_w));
+	map(0x04, 0x04).w(FUNC(_8080bw_state::polaris_sh_port_2_w));
 	map(0x05, 0x05).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x06, 0x06).w(this, FUNC(_8080bw_state::polaris_sh_port_3_w));
+	map(0x06, 0x06).w(FUNC(_8080bw_state::polaris_sh_port_3_w));
 }
 
 
@@ -2161,11 +2161,11 @@ INPUT_PORTS_END
 void _8080bw_state::ballbomb_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(_8080bw_state::ballbomb_01_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(_8080bw_state::ballbomb_01_w));
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::ballbomb_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::ballbomb_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::ballbomb_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::ballbomb_sh_port_2_w));
 }
 
 
@@ -2223,8 +2223,8 @@ void _8080bw_state::yosakdon_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN0");
 	map(0x02, 0x02).portr("IN1");
-	map(0x03, 0x03).w(this, FUNC(_8080bw_state::yosakdon_sh_port_1_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::yosakdon_sh_port_2_w));
+	map(0x03, 0x03).w(FUNC(_8080bw_state::yosakdon_sh_port_1_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::yosakdon_sh_port_2_w));
 	map(0x06, 0x06).nopw(); /* character numbers */
 }
 
@@ -2405,24 +2405,24 @@ READ8_MEMBER(_8080bw_state::indianbtbr_01_r)
 
 void _8080bw_state::indianbt_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(_8080bw_state::indianbt_r));
+	map(0x00, 0x00).r(FUNC(_8080bw_state::indianbt_r));
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(this, FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::indianbt_sh_port_1_w));
+	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::indianbt_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::indianbt_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::indianbt_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(this, FUNC(_8080bw_state::indianbt_sh_port_3_w));
+	map(0x07, 0x07).w(FUNC(_8080bw_state::indianbt_sh_port_3_w));
 }
 
 void _8080bw_state::indianbtbr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).r(this, FUNC(_8080bw_state::indianbtbr_01_r));
+	map(0x01, 0x01).r(FUNC(_8080bw_state::indianbtbr_01_r));
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::indianbtbr_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::indianbtbr_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::indianbtbr_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::indianbtbr_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).nopw();
 }
@@ -2492,11 +2492,11 @@ WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
 void _8080bw_state::steelwkr_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(this, FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
-	map(0x06, 0x06).w(this, FUNC(_8080bw_state::steelwkr_sh_port_3_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x06, 0x06).w(FUNC(_8080bw_state::steelwkr_sh_port_3_w));
 }
 
 static INPUT_PORTS_START( steelwkr )
@@ -2744,9 +2744,9 @@ void _8080bw_state::shuttlei_map(address_map &map)
 void _8080bw_state::shuttlei_io_map(address_map &map)
 {
 	map(0xfc, 0xfc).nopw(); /* game writes 0xAA every so often (perhaps when base hit?) */
-	map(0xfd, 0xfd).w(this, FUNC(_8080bw_state::shuttlei_sh_port_1_w));
-	map(0xfe, 0xfe).portr("DSW").w(this, FUNC(_8080bw_state::shuttlei_sh_port_2_w));
-	map(0xff, 0xff).rw(this, FUNC(_8080bw_state::shuttlei_ff_r), FUNC(_8080bw_state::shuttlei_ff_w));
+	map(0xfd, 0xfd).w(FUNC(_8080bw_state::shuttlei_sh_port_1_w));
+	map(0xfe, 0xfe).portr("DSW").w(FUNC(_8080bw_state::shuttlei_sh_port_2_w));
+	map(0xff, 0xff).rw(FUNC(_8080bw_state::shuttlei_ff_r), FUNC(_8080bw_state::shuttlei_ff_w));
 }
 
 
@@ -2829,11 +2829,11 @@ void _8080bw_state::darthvdr_map(address_map &map)
 void _8080bw_state::darthvdr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("P1");
-	map(0x01, 0x01).r(this, FUNC(_8080bw_state::darthvdr_01_r));
+	map(0x01, 0x01).r(FUNC(_8080bw_state::darthvdr_01_r));
 
-	map(0x00, 0x00).w(this, FUNC(_8080bw_state::darthvdr_00_w)); // flipscreen
+	map(0x00, 0x00).w(FUNC(_8080bw_state::darthvdr_00_w)); // flipscreen
 	map(0x04, 0x04).nopw();
-	map(0x08, 0x08).w(this, FUNC(_8080bw_state::darthvdr_08_w)); // sound
+	map(0x08, 0x08).w(FUNC(_8080bw_state::darthvdr_08_w)); // sound
 }
 
 
@@ -2920,9 +2920,9 @@ void _8080bw_state::vortex_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x00, 0x00).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x01, 0x01).w(this, FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x01, 0x01).w(FUNC(_8080bw_state::invaders_audio_1_w));
 	map(0x06, 0x06).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x07, 0x07).w(this, FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x07, 0x07).w(FUNC(_8080bw_state::invaders_audio_2_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -3202,11 +3202,11 @@ void _8080bw_state::claybust_io_map(address_map &map)
 {
 	//AM_RANGE(0x00, 0x00) AM_WRITENOP // ?
 	map(0x01, 0x01).portr("IN1").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x02, 0x02).r(this, FUNC(_8080bw_state::claybust_gun_lo_r)).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x02, 0x02).r(FUNC(_8080bw_state::claybust_gun_lo_r)).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)); //AM_WRITENOP // port3 write looks sound-related
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	//AM_RANGE(0x05, 0x05) AM_WRITENOP // ?
-	map(0x06, 0x06).r(this, FUNC(_8080bw_state::claybust_gun_hi_r));
+	map(0x06, 0x06).r(FUNC(_8080bw_state::claybust_gun_hi_r));
 }
 
 
@@ -3488,8 +3488,8 @@ void _8080bw_state::invmulti_map(address_map &map)
 	map(0x0000, 0x1fff).mirror(0x8000).bankr("bank1");
 	map(0x2000, 0x3fff).mirror(0x8000).ram().share("main_ram");
 	map(0x4000, 0x5fff).mirror(0x8000).bankr("bank2");
-	map(0x6000, 0x6000).mirror(0x1fff).rw(this, FUNC(_8080bw_state::invmulti_eeprom_r), FUNC(_8080bw_state::invmulti_eeprom_w));
-	map(0xe000, 0xe000).mirror(0x1fff).w(this, FUNC(_8080bw_state::invmulti_bank_w));
+	map(0x6000, 0x6000).mirror(0x1fff).rw(FUNC(_8080bw_state::invmulti_eeprom_r), FUNC(_8080bw_state::invmulti_eeprom_w));
+	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(_8080bw_state::invmulti_bank_w));
 }
 
 READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
@@ -3524,7 +3524,7 @@ MACHINE_CONFIG_START(_8080bw_state::invmulti)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(invmulti_map)
 
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 MACHINE_CONFIG_END

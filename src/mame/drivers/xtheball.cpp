@@ -195,7 +195,7 @@ void xtheball_state::main_map(address_map &map)
 	map(0x03040000, 0x0304007f).w("latch1", FUNC(hc259_device::write_d0)).umask16(0x00ff);
 	map(0x03040080, 0x0304008f).portr("DSW");
 	map(0x03040080, 0x030400ff).w("latch2", FUNC(hc259_device::write_d0)).umask16(0x00ff);
-	map(0x03040100, 0x0304010f).r(this, FUNC(xtheball_state::analogx_r));
+	map(0x03040100, 0x0304010f).r(FUNC(xtheball_state::analogx_r));
 	map(0x03040110, 0x0304011f).portr("COIN1");
 	map(0x03040130, 0x0304013f).portr("SERVICE2");
 	map(0x03040140, 0x0304014f).portr("COIN3");
@@ -203,8 +203,8 @@ void xtheball_state::main_map(address_map &map)
 	map(0x03040160, 0x0304016f).portr("SERVICE");
 	map(0x03040170, 0x0304017f).portr("SERVICE1");
 	map(0x03040100, 0x0304017f).w("latch3", FUNC(hc259_device::write_d0)).umask16(0x00ff);
-	map(0x03040180, 0x0304018f).r(this, FUNC(xtheball_state::analogy_watchdog_r)).nopw();
-	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::write)).umask16(0xff00);
+	map(0x03040180, 0x0304018f).r(FUNC(xtheball_state::analogy_watchdog_r)).nopw();
+	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::data_w)).umask16(0xff00);
 	map(0x04000000, 0x057fffff).rom().region("user2", 0);
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfff80000, 0xffffffff).rom().region("user1", 0);

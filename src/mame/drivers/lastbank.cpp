@@ -19,6 +19,7 @@
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -231,16 +232,16 @@ void lastbank_state::tc0091lvc_map(address_map &map)
 
 	map(0x8000, 0x9fff).ram().share("nvram");
 
-	map(0xc000, 0xcfff).rw(this, FUNC(lastbank_state::ram_r<0>), FUNC(lastbank_state::ram_w<0>));
-	map(0xd000, 0xdfff).rw(this, FUNC(lastbank_state::ram_r<1>), FUNC(lastbank_state::ram_w<1>));
-	map(0xe000, 0xefff).rw(this, FUNC(lastbank_state::ram_r<2>), FUNC(lastbank_state::ram_w<2>));
-	map(0xf000, 0xfdff).rw(this, FUNC(lastbank_state::ram_r<3>), FUNC(lastbank_state::ram_w<3>));
+	map(0xc000, 0xcfff).rw(FUNC(lastbank_state::ram_r<0>), FUNC(lastbank_state::ram_w<0>));
+	map(0xd000, 0xdfff).rw(FUNC(lastbank_state::ram_r<1>), FUNC(lastbank_state::ram_w<1>));
+	map(0xe000, 0xefff).rw(FUNC(lastbank_state::ram_r<2>), FUNC(lastbank_state::ram_w<2>));
+	map(0xf000, 0xfdff).rw(FUNC(lastbank_state::ram_r<3>), FUNC(lastbank_state::ram_w<3>));
 
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(this, FUNC(lastbank_state::irq_vector_r), FUNC(lastbank_state::irq_vector_w));
-	map(0xff03, 0xff03).rw(this, FUNC(lastbank_state::irq_enable_r), FUNC(lastbank_state::irq_enable_w));
-	map(0xff04, 0xff07).rw(this, FUNC(lastbank_state::ram_bank_r), FUNC(lastbank_state::ram_bank_w));
-	map(0xff08, 0xff08).rw(this, FUNC(lastbank_state::rom_bank_r), FUNC(lastbank_state::rom_bank_w));
+	map(0xff00, 0xff02).rw(FUNC(lastbank_state::irq_vector_r), FUNC(lastbank_state::irq_vector_w));
+	map(0xff03, 0xff03).rw(FUNC(lastbank_state::irq_enable_r), FUNC(lastbank_state::irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(lastbank_state::ram_bank_r), FUNC(lastbank_state::ram_bank_w));
+	map(0xff08, 0xff08).rw(FUNC(lastbank_state::rom_bank_r), FUNC(lastbank_state::rom_bank_w));
 }
 
 void lastbank_state::lastbank_map(address_map &map)
@@ -248,14 +249,14 @@ void lastbank_state::lastbank_map(address_map &map)
 	tc0091lvc_map(map);
 	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
 	map(0xa800, 0xa800).portr("COINS");
-	map(0xa800, 0xa802).w(this, FUNC(lastbank_state::output_w));
-	map(0xa803, 0xa803).w(this, FUNC(lastbank_state::mux_w)); // mux for $a808 / $a80c
+	map(0xa800, 0xa802).w(FUNC(lastbank_state::output_w));
+	map(0xa803, 0xa803).w(FUNC(lastbank_state::mux_w)); // mux for $a808 / $a80c
 	map(0xa804, 0xa804).portr("SPECIAL");
 	map(0xa805, 0xa805).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa806, 0xa806).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0xa807, 0xa807).nopw(); // hopper?
-	map(0xa808, 0xa808).r(this, FUNC(lastbank_state::mux_0_r));
-	map(0xa80c, 0xa80c).r(this, FUNC(lastbank_state::mux_0_r));
+	map(0xa808, 0xa808).r(FUNC(lastbank_state::mux_0_r));
+	map(0xa80c, 0xa80c).r(FUNC(lastbank_state::mux_0_r));
 	map(0xa81c, 0xa81c).portr("DSW0");
 	map(0xa81d, 0xa81d).portr("DSW1");
 	map(0xa81e, 0xa81e).portr("DSW2");
@@ -274,7 +275,7 @@ void lastbank_state::lastbank_audio_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x06).rw(m_essnd, FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x80, 0x80).w(this, FUNC(lastbank_state::sound_flags_w));
+	map(0x80, 0x80).w(FUNC(lastbank_state::sound_flags_w));
 	map(0x80, 0x80).r("soundlatch1", FUNC(generic_latch_8_device::read));
 	map(0xc0, 0xc0).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }

@@ -67,23 +67,23 @@ WRITE8_MEMBER(lasso_state::sound_select_w)
 	uint8_t to_write = bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)   /* chip #0 */
-		m_sn_1->write(space, 0, to_write);
+		m_sn_1->write(to_write);
 
 	if (~data & 0x02)   /* chip #1 */
-		m_sn_2->write(space, 0, to_write);
+		m_sn_2->write(to_write);
 }
 
 
 void lasso_state::lasso_main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(lasso_state::lasso_videoram_w)).share("videoram");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x0c00, 0x0c7f).ram().share("spriteram");
 	map(0x1000, 0x17ff).ram().share("share1");
-	map(0x1800, 0x1800).w(this, FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(this, FUNC(lasso_state::lasso_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806").nopw();   /* game uses 'lsr' to read port */
@@ -97,8 +97,8 @@ void lasso_state::lasso_audio_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x5000, 0x7fff).rom();
 	map(0xb000, 0xb000).writeonly().share("chip_data");
-	map(0xb001, 0xb001).w(this, FUNC(lasso_state::sound_select_w));
-	map(0xb004, 0xb004).r(this, FUNC(lasso_state::sound_status_r));
+	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
+	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
 	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xf000, 0xffff).rom().region("audiocpu", 0x7000);
 }
@@ -115,14 +115,14 @@ void lasso_state::lasso_coprocessor_map(address_map &map)
 void lasso_state::chameleo_main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(lasso_state::lasso_videoram_w)).share("videoram");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x0c00, 0x0fff).ram();
 	map(0x1000, 0x107f).ram().share("spriteram");
 	map(0x1080, 0x10ff).ram();
-	map(0x1800, 0x1800).w(this, FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(this, FUNC(lasso_state::lasso_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806");
@@ -138,8 +138,8 @@ void lasso_state::chameleo_audio_map(address_map &map)
 	map(0x1000, 0x1fff).rom();
 	map(0x6000, 0x7fff).rom();
 	map(0xb000, 0xb000).writeonly().share("chip_data");
-	map(0xb001, 0xb001).w(this, FUNC(lasso_state::sound_select_w));
-	map(0xb004, 0xb004).r(this, FUNC(lasso_state::sound_status_r));
+	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
+	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
 	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xf000, 0xffff).rom().region("audiocpu", 0x7000);
 }
@@ -148,12 +148,12 @@ void lasso_state::chameleo_audio_map(address_map &map)
 void lasso_state::wwjgtin_main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(this, FUNC(lasso_state::lasso_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x1800).w(this, FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(this, FUNC(lasso_state::wwjgtin_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::wwjgtin_video_control_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806");
@@ -170,9 +170,9 @@ void lasso_state::wwjgtin_audio_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x4000, 0x7fff).mirror(0x8000).rom();
 	map(0xb000, 0xb000).writeonly().share("chip_data");
-	map(0xb001, 0xb001).w(this, FUNC(lasso_state::sound_select_w));
-	map(0xb003, 0xb003).w("dac", FUNC(dac_byte_interface::write));
-	map(0xb004, 0xb004).r(this, FUNC(lasso_state::sound_status_r));
+	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
+	map(0xb003, 0xb003).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
 	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -180,12 +180,12 @@ void lasso_state::wwjgtin_audio_map(address_map &map)
 void lasso_state::pinbo_main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(lasso_state::lasso_videoram_w)).share("videoram");
-	map(0x0800, 0x0bff).ram().w(this, FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x1800).w(this, FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(this, FUNC(lasso_state::pinbo_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::pinbo_video_control_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806");

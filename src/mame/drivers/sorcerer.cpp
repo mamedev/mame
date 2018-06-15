@@ -163,6 +163,7 @@ NOTES (2016-06-06)
 
 #include "emu.h"
 #include "includes/sorcerer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -199,10 +200,10 @@ void sorcerer_state::sorcerer_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xfc, 0xfc).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xfd, 0xfd).rw(this, FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
-	map(0xfe, 0xfe).rw(this, FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
-	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xff, 0xff).w(this, FUNC(sorcerer_state::sorcerer_ff_w));
+	map(0xfd, 0xfd).rw(FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
+	map(0xfe, 0xfe).rw(FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
+	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xff, 0xff).w(FUNC(sorcerer_state::sorcerer_ff_w));
 }
 
 static INPUT_PORTS_START(sorcerer)
@@ -448,7 +449,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")
 
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */
@@ -532,11 +533,11 @@ ROM_START(sorcerer2)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("exchr-1.20d",  0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
 	ROM_SYSTEM_BIOS(0, "standard", "Standard")
-	ROMX_LOAD("exm011-1.1e", 0xe000, 0x0800, CRC(af9394dc) SHA1(d7e0ada64d72d33e0790690be86a36020b41fd0d), ROM_BIOS(1) )
-	ROMX_LOAD("exm011-2.2e", 0xe800, 0x0800, CRC(49978d6c) SHA1(b94127bfe99e5dc1cf5dbbb7d1b099b0ca036cd0), ROM_BIOS(1) )
+	ROMX_LOAD("exm011-1.1e", 0xe000, 0x0800, CRC(af9394dc) SHA1(d7e0ada64d72d33e0790690be86a36020b41fd0d), ROM_BIOS(0) )
+	ROMX_LOAD("exm011-2.2e", 0xe800, 0x0800, CRC(49978d6c) SHA1(b94127bfe99e5dc1cf5dbbb7d1b099b0ca036cd0), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "tvc", "TVI-MON-C-V1.5")
-	ROMX_LOAD("tvc-1.1e",    0xe000, 0x0800, CRC(efc15a18) SHA1(3dee821270a0d83453b18baed88a024dfd0d7a6c), ROM_BIOS(2) )
-	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(2) )
+	ROMX_LOAD("tvc-1.1e",    0xe000, 0x0800, CRC(efc15a18) SHA1(3dee821270a0d83453b18baed88a024dfd0d7a6c), ROM_BIOS(1) )
+	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(1) )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

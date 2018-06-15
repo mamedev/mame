@@ -82,24 +82,24 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
 void aeroboto_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("mainram"); // main  RAM
-	map(0x01a2, 0x01a2).w(this, FUNC(aeroboto_state::aeroboto_1a2_w));           // affects IRQ line (more protection?)
+	map(0x01a2, 0x01a2).w(FUNC(aeroboto_state::aeroboto_1a2_w));           // affects IRQ line (more protection?)
 	map(0x0800, 0x08ff).ram();                             // tile color buffer; copied to 0x2000
 	map(0x0900, 0x09ff).writeonly();                       // a backup of default tile colors
-	map(0x1000, 0x17ff).ram().w(this, FUNC(aeroboto_state::aeroboto_videoram_w)).share("videoram");     // tile RAM
+	map(0x1000, 0x17ff).ram().w(FUNC(aeroboto_state::aeroboto_videoram_w)).share("videoram");     // tile RAM
 	map(0x1800, 0x183f).ram().share("hscroll"); // horizontal scroll regs
 	map(0x1840, 0x27ff).nopw();                    // cleared during custom LSI test
-	map(0x2000, 0x20ff).ram().w(this, FUNC(aeroboto_state::aeroboto_tilecolor_w)).share("tilecolor");   // tile color RAM
+	map(0x2000, 0x20ff).ram().w(FUNC(aeroboto_state::aeroboto_tilecolor_w)).share("tilecolor");   // tile color RAM
 	map(0x2800, 0x28ff).ram().share("spriteram");   // sprite RAM
 	map(0x2900, 0x2fff).nopw();                    // cleared along with sprite RAM
-	map(0x2973, 0x2973).r(this, FUNC(aeroboto_state::aeroboto_2973_r));           // protection read
-	map(0x3000, 0x3000).rw(this, FUNC(aeroboto_state::aeroboto_in0_r), FUNC(aeroboto_state::aeroboto_3000_w));
+	map(0x2973, 0x2973).r(FUNC(aeroboto_state::aeroboto_2973_r));           // protection read
+	map(0x3000, 0x3000).rw(FUNC(aeroboto_state::aeroboto_in0_r), FUNC(aeroboto_state::aeroboto_3000_w));
 	map(0x3001, 0x3001).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3002, 0x3002).portr("DSW2").w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x3003, 0x3003).writeonly().share("vscroll");
-	map(0x3004, 0x3004).r(this, FUNC(aeroboto_state::aeroboto_201_r)).writeonly().share("starx");
+	map(0x3004, 0x3004).r(FUNC(aeroboto_state::aeroboto_201_r)).writeonly().share("starx");
 	map(0x3005, 0x3005).writeonly().share("stary"); // usable but probably wrong
 	map(0x3006, 0x3006).writeonly().share("bgcolor");
-	map(0x3800, 0x3800).r(this, FUNC(aeroboto_state::aeroboto_irq_ack_r));        // watchdog or IRQ ack
+	map(0x3800, 0x3800).r(FUNC(aeroboto_state::aeroboto_irq_ack_r));        // watchdog or IRQ ack
 	map(0x4000, 0xffff).rom();                             // main ROM
 }
 

@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(A2BUS_THEMILL, a2bus_themill_device, "a2themill", "Stellation
 
 void a2bus_themill_device::m6809_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(a2bus_themill_device::dma_r), FUNC(a2bus_themill_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(a2bus_themill_device::dma_r), FUNC(a2bus_themill_device::dma_w));
 }
 
 /***************************************************************************

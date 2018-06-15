@@ -186,7 +186,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define BAUDGEN_CLOCK XTAL(19'660'800) /* Raltron */
+#define BAUDGEN_CLOCK 19.6608_MHz_XTAL /* Raltron */
 #define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
 
 class hk68v10_state : public driver_device
@@ -225,8 +225,8 @@ required_device<scc8530_device> m_sccterm;
 void hk68v10_state::hk68v10_mem(address_map &map)
 {
 map.unmap_value_high();
-map(0x000000, 0x000007).ram().w(this, FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
-map(0x000000, 0x000007).rom().r(this, FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
+map(0x000000, 0x000007).ram().w(FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
+map(0x000000, 0x000007).rom().r(FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
 map(0x000008, 0x1fffff).ram(); /* 2 Mb RAM */
 map(0xFC0000, 0xFC3fff).rom(); /* System EPROM Area 16Kb HBUG */
 map(0xFC4000, 0xFDffff).rom(); /* System EPROM Area an additional 112Kb for System ROM */
@@ -339,23 +339,23 @@ static void hk68_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68010, 10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP (hk68v10_mem)
 
 	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)
 
 	/* Terminal Port config */
-	MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("scc", SCC8530N, SCC_CLOCK)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
 	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
 
-	MCFG_DEVICE_ADD ("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsa_w))
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, hk68_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */

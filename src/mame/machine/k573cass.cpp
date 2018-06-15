@@ -121,8 +121,8 @@ konami573_cassette_xi_device::konami573_cassette_xi_device(const machine_config 
 }
 
 MACHINE_CONFIG_START(konami573_cassette_xi_device::device_add_mconfig)
-	MCFG_X76F041_ADD( "eeprom" )
-	MCFG_DS2401_ADD( "id" )
+	MCFG_X76F041_ADD( "eeprom" );
+	DS2401( config, "id" );
 	MCFG_DEVICE_ADD( "adc0838", ADC0838, 0 )
 MACHINE_CONFIG_END
 
@@ -266,7 +266,7 @@ konami573_cassette_yi_device::konami573_cassette_yi_device(const machine_config 
 
 MACHINE_CONFIG_START(konami573_cassette_yi_device::device_add_mconfig)
 	MCFG_X76F100_ADD( "eeprom" )
-	MCFG_DS2401_ADD( "id" )
+	DS2401( config, "id" );
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(konami573_cassette_yi_device::write_line_d4)
@@ -293,9 +293,8 @@ konami573_cassette_zi_device::konami573_cassette_zi_device(const machine_config 
 }
 
 MACHINE_CONFIG_START(konami573_cassette_zi_device::device_add_mconfig)
-	MCFG_DS2401_ADD( "id" )
-	MCFG_ZS01_ADD( "eeprom" )
-	MCFG_ZS01_DS2401( "id" )
+	DS2401( config, "id" );
+	ZS01( config, "eeprom" ).set_ds2401_tag( "id" );
 MACHINE_CONFIG_END
 
 void konami573_cassette_zi_device::device_start()

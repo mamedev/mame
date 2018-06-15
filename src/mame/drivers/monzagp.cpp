@@ -35,6 +35,7 @@ Lower board (MGP_01):
 #include "machine/timer.h"
 //#include "video/dp8350.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "monzagp.lh"
@@ -412,7 +413,7 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 
 void monzagp_state::monzagp_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(monzagp_state::port_r), FUNC(monzagp_state::port_w));
+	map(0x00, 0xff).rw(FUNC(monzagp_state::port_r), FUNC(monzagp_state::port_w));
 }
 
 static INPUT_PORTS_START( monzagp )

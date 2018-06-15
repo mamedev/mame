@@ -183,21 +183,21 @@ WRITE16_MEMBER(rungun_state::palette_write)
 void rungun_state::rungun_map(address_map &map)
 {
 	map(0x000000, 0x2fffff).rom();                                         // main program + data
-	map(0x300000, 0x3007ff).rw(this, FUNC(rungun_state::palette_read), FUNC(rungun_state::palette_write));
+	map(0x300000, 0x3007ff).rw(FUNC(rungun_state::palette_read), FUNC(rungun_state::palette_write));
 	map(0x380000, 0x39ffff).ram();                                         // work RAM
-	map(0x400000, 0x43ffff).r(this, FUNC(rungun_state::k53936_rom_r)).umask16(0x00ff);               // '936 ROM readback window
-	map(0x480000, 0x48001f).rw(this, FUNC(rungun_state::sysregs_r), FUNC(rungun_state::sysregs_w)).share("sysreg");
+	map(0x400000, 0x43ffff).r(FUNC(rungun_state::k53936_rom_r)).umask16(0x00ff);               // '936 ROM readback window
+	map(0x480000, 0x48001f).rw(FUNC(rungun_state::sysregs_r), FUNC(rungun_state::sysregs_w)).share("sysreg");
 	map(0x4c0000, 0x4c001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                        // CCU (for scanline and vblank polling)
-	map(0x540000, 0x540001).w(this, FUNC(rungun_state::sound_irq_w));
+	map(0x540000, 0x540001).w(FUNC(rungun_state::sound_irq_w));
 	map(0x580000, 0x58001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x5c0000, 0x5c000f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));                       // 246A ROM readback window
 	map(0x5c0010, 0x5c001f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
 	map(0x600000, 0x601fff).bankrw("spriteram_bank");                                                // OBJ RAM
 	map(0x640000, 0x640007).w(m_k055673, FUNC(k055673_device::k053246_word_w));                      // '246A registers
 	map(0x680000, 0x68001f).w(m_k053936, FUNC(k053936_device::ctrl_w));          // '936 registers
-	map(0x6c0000, 0x6cffff).rw(this, FUNC(rungun_state::psac2_videoram_r), FUNC(rungun_state::psac2_videoram_w)); // PSAC2 ('936) RAM (34v + 35v)
+	map(0x6c0000, 0x6cffff).rw(FUNC(rungun_state::psac2_videoram_r), FUNC(rungun_state::psac2_videoram_w)); // PSAC2 ('936) RAM (34v + 35v)
 	map(0x700000, 0x7007ff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));          // PSAC "Line RAM"
-	map(0x740000, 0x741fff).rw(this, FUNC(rungun_state::ttl_ram_r), FUNC(rungun_state::ttl_ram_w));     // text plane RAM
+	map(0x740000, 0x741fff).rw(FUNC(rungun_state::ttl_ram_r), FUNC(rungun_state::ttl_ram_w));     // text plane RAM
 	map(0x7c0000, 0x7c0001).nopw();                                    // watchdog
 }
 
@@ -251,7 +251,7 @@ void rungun_state::rungun_sound_map(address_map &map)
 	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(rungun_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(rungun_state::sound_ctrl_w));
 	map(0xfff0, 0xfff3).nopw();
 }
 
@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(rungun_state::rng)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rungun)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

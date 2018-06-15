@@ -12,6 +12,7 @@
 #include "video/k053936.h"
 #include "video/k054000.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class tmnt_state : public driver_device
 {

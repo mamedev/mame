@@ -16,6 +16,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

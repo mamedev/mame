@@ -72,6 +72,7 @@ Dumped by Uki
 #include "sound/ymz280b.h"
 #include "video/kaneko_grap2.h"
 #include "video/sknsspr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -397,8 +398,8 @@ void galpani3_state::galpani3_map(address_map &map)
 	map(0x200000, 0x20ffff).ram(); // area [B] - Work RAM
 	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // area [A] - palette for sprites
 
-	map(0x300000, 0x303fff).ram().w(this, FUNC(galpani3_state::galpani3_suprnova_sprite32_w)).share("spriteram");
-	map(0x380000, 0x38003f).ram().w(this, FUNC(galpani3_state::galpani3_suprnova_sprite32regs_w)).share("sprregs");
+	map(0x300000, 0x303fff).ram().w(FUNC(galpani3_state::galpani3_suprnova_sprite32_w)).share("spriteram");
+	map(0x380000, 0x38003f).ram().w(FUNC(galpani3_state::galpani3_suprnova_sprite32regs_w)).share("sprregs");
 
 	map(0x400000, 0x40ffff).ram().share("mcuram"); // area [C]
 
@@ -414,8 +415,8 @@ void galpani3_state::galpani3_map(address_map &map)
 
 	// ?? priority / alpha buffer?
 	map(0xe00000, 0xe7ffff).ram().share("priority_buffer"); // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
-	map(0xe80000, 0xe80001).w(this, FUNC(galpani3_state::galpani3_priority_buffer_scrollx_w)); // scroll?
-	map(0xe80002, 0xe80003).w(this, FUNC(galpani3_state::galpani3_priority_buffer_scrolly_w)); // scroll?
+	map(0xe80000, 0xe80001).w(FUNC(galpani3_state::galpani3_priority_buffer_scrollx_w)); // scroll?
+	map(0xe80002, 0xe80003).w(FUNC(galpani3_state::galpani3_priority_buffer_scrolly_w)); // scroll?
 
 
 	map(0xf00000, 0xf00001).noprw(); // ? written once (2nd opcode, $1.b)
@@ -442,11 +443,11 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani3_state, screen_update_galpani3)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)

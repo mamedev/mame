@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
+#include "emupal.h"
 
 class munchmo_state : public driver_device
 {

@@ -4,6 +4,7 @@
 #include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class armedf_state : public driver_device
 {

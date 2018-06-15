@@ -88,13 +88,13 @@ void orbit_state::orbit_map(address_map &map)
 	map(0x1800, 0x1800).mirror(0x07ff).portr("DSW1");
 	map(0x2000, 0x2000).mirror(0x07ff).portr("DSW2");
 	map(0x2800, 0x2800).mirror(0x07ff).portr("BUTTONS");
-	map(0x3000, 0x33bf).mirror(0x0400).ram().w(this, FUNC(orbit_state::orbit_playfield_w)).share("playfield_ram");
+	map(0x3000, 0x33bf).mirror(0x0400).ram().w(FUNC(orbit_state::orbit_playfield_w)).share("playfield_ram");
 	map(0x33c0, 0x33ff).mirror(0x0400).ram().share("sprite_ram");
-	map(0x3800, 0x3800).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_w));
-	map(0x3900, 0x3900).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_amp_w));
-	map(0x3a00, 0x3a00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_amp_w));
+	map(0x3800, 0x3800).mirror(0x00ff).w(FUNC(orbit_state::orbit_note_w));
+	map(0x3900, 0x3900).mirror(0x00ff).w(FUNC(orbit_state::orbit_noise_amp_w));
+	map(0x3a00, 0x3a00).mirror(0x00ff).w(FUNC(orbit_state::orbit_note_amp_w));
 	map(0x3c00, 0x3c0f).mirror(0x00f0).w(m_latch, FUNC(f9334_device::write_a0));
-	map(0x3e00, 0x3e00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_rst_w));
+	map(0x3e00, 0x3e00).mirror(0x00ff).w(FUNC(orbit_state::orbit_noise_rst_w));
 	map(0x3f00, 0x3f00).mirror(0x00ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x6000, 0x7fff).rom();
 }

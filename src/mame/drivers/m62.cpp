@@ -176,12 +176,12 @@ WRITE8_MEMBER(m62_state::youjyudn_bankswitch_w)
 void m62_state::kungfum_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).w(this, FUNC(m62_state::m62_hscroll_low_w));
-	map(0xb000, 0xb000).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0xa000, 0xa000).w(FUNC(m62_state::m62_hscroll_low_w));
+	map(0xb000, 0xb000).w(FUNC(m62_state::m62_hscroll_high_w));
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
 	/* Kung Fu Master is the only game in this driver to have separated (but */
 	/* contiguous) videoram and colorram. They are interleaved in all the others. */
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::kungfum_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::kungfum_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -189,7 +189,7 @@ void m62_state::kungfum_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
@@ -200,8 +200,8 @@ void m62_state::battroad_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc800, 0xcfff).ram().w(FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -209,21 +209,21 @@ void m62_state::battroad_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x80, 0x80).w(this, FUNC(m62_state::m62_vscroll_low_w));
-	map(0x81, 0x81).w(this, FUNC(m62_state::m62_hscroll_high_w));
-	map(0x82, 0x82).w(this, FUNC(m62_state::m62_hscroll_low_w));
-	map(0x83, 0x83).w(this, FUNC(m62_state::battroad_bankswitch_w));
+	map(0x80, 0x80).w(FUNC(m62_state::m62_vscroll_low_w));
+	map(0x81, 0x81).w(FUNC(m62_state::m62_hscroll_high_w));
+	map(0x82, 0x82).w(FUNC(m62_state::m62_hscroll_low_w));
+	map(0x83, 0x83).w(FUNC(m62_state::battroad_bankswitch_w));
 }
 
 void m62_state::ldrun_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -232,7 +232,7 @@ void m62_state::ldrun2_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -240,35 +240,35 @@ void m62_state::ldrun2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x80, 0x80).r(this, FUNC(m62_state::ldrun2_bankswitch_r));
-	map(0x80, 0x81).w(this, FUNC(m62_state::ldrun2_bankswitch_w));
+	map(0x80, 0x80).r(FUNC(m62_state::ldrun2_bankswitch_r));
+	map(0x80, 0x81).w(FUNC(m62_state::ldrun2_bankswitch_w));
 }
 
 void m62_state::ldrun3_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc800, 0xc800).r(this, FUNC(m62_state::ldrun3_prot_5_r));
-	map(0xcc00, 0xcc00).r(this, FUNC(m62_state::ldrun3_prot_7_r));
-	map(0xcfff, 0xcfff).r(this, FUNC(m62_state::ldrun3_prot_7_r));
+	map(0xc800, 0xc800).r(FUNC(m62_state::ldrun3_prot_5_r));
+	map(0xcc00, 0xcc00).r(FUNC(m62_state::ldrun3_prot_7_r));
+	map(0xcfff, 0xcfff).r(FUNC(m62_state::ldrun3_prot_7_r));
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
 	map(0xd000, 0xefff).ram();
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 }
 
 void m62_state::ldrun3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x80, 0x80).w(this, FUNC(m62_state::m62_vscroll_low_w));
-	map(0x81, 0x81).w(this, FUNC(m62_state::ldrun3_topbottom_mask_w));
+	map(0x80, 0x80).w(FUNC(m62_state::m62_vscroll_low_w));
+	map(0x81, 0x81).w(FUNC(m62_state::ldrun3_topbottom_mask_w));
 }
 
 void m62_state::ldrun4_map(address_map &map)
@@ -276,8 +276,8 @@ void m62_state::ldrun4_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xc800, 0xc800).w(this, FUNC(m62_state::ldrun4_bankswitch_w));
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc800, 0xc800).w(FUNC(m62_state::ldrun4_bankswitch_w));
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -285,20 +285,20 @@ void m62_state::ldrun4_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x82, 0x82).w(this, FUNC(m62_state::m62_hscroll_high_w));
-	map(0x83, 0x83).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0x82, 0x82).w(FUNC(m62_state::m62_hscroll_high_w));
+	map(0x83, 0x83).w(FUNC(m62_state::m62_hscroll_low_w));
 }
 
 void m62_state::lotlot_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xafff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xa000, 0xafff).ram().w(FUNC(m62_state::m62_textram_w)).share("m62_textram");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -306,9 +306,9 @@ void m62_state::kidniki_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa000, 0xafff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xa000, 0xafff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_textram_w)).share("m62_textram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -316,31 +316,31 @@ void m62_state::kidniki_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x80, 0x80).w(this, FUNC(m62_state::m62_hscroll_low_w));
-	map(0x81, 0x81).w(this, FUNC(m62_state::m62_hscroll_high_w));
-	map(0x82, 0x82).w(this, FUNC(m62_state::kidniki_text_vscroll_low_w));
-	map(0x83, 0x83).w(this, FUNC(m62_state::kidniki_text_vscroll_high_w));
-	map(0x84, 0x84).w(this, FUNC(m62_state::kidniki_background_bank_w));
-	map(0x85, 0x85).w(this, FUNC(m62_state::kidniki_bankswitch_w));
+	map(0x80, 0x80).w(FUNC(m62_state::m62_hscroll_low_w));
+	map(0x81, 0x81).w(FUNC(m62_state::m62_hscroll_high_w));
+	map(0x82, 0x82).w(FUNC(m62_state::kidniki_text_vscroll_low_w));
+	map(0x83, 0x83).w(FUNC(m62_state::kidniki_text_vscroll_high_w));
+	map(0x84, 0x84).w(FUNC(m62_state::kidniki_background_bank_w));
+	map(0x85, 0x85).w(FUNC(m62_state::kidniki_bankswitch_w));
 }
 
 void m62_state::spelunkr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa000, 0xbfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xa000, 0xbfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
-	map(0xd000, 0xd000).w(this, FUNC(m62_state::m62_vscroll_low_w));
-	map(0xd001, 0xd001).w(this, FUNC(m62_state::m62_vscroll_high_w));
-	map(0xd002, 0xd002).w(this, FUNC(m62_state::m62_hscroll_low_w));
-	map(0xd003, 0xd003).w(this, FUNC(m62_state::m62_hscroll_high_w));
-	map(0xd004, 0xd004).w(this, FUNC(m62_state::spelunkr_bankswitch_w));
-	map(0xd005, 0xd005).w(this, FUNC(m62_state::spelunkr_palbank_w));
+	map(0xc800, 0xcfff).ram().w(FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xd000).w(FUNC(m62_state::m62_vscroll_low_w));
+	map(0xd001, 0xd001).w(FUNC(m62_state::m62_vscroll_high_w));
+	map(0xd002, 0xd002).w(FUNC(m62_state::m62_hscroll_low_w));
+	map(0xd003, 0xd003).w(FUNC(m62_state::m62_hscroll_high_w));
+	map(0xd004, 0xd004).w(FUNC(m62_state::spelunkr_bankswitch_w));
+	map(0xd005, 0xd005).w(FUNC(m62_state::spelunkr_palbank_w));
 	map(0xe000, 0xefff).ram();
 }
 
@@ -349,13 +349,13 @@ void m62_state::spelunk2_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).bankr("bank1");
 	map(0x9000, 0x9fff).bankr("bank2");
-	map(0xa000, 0xbfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xa000, 0xbfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
-	map(0xd000, 0xd000).w(this, FUNC(m62_state::m62_vscroll_low_w));
-	map(0xd001, 0xd001).w(this, FUNC(m62_state::m62_hscroll_low_w));
-	map(0xd002, 0xd002).w(this, FUNC(m62_state::spelunk2_gfxport_w));
-	map(0xd003, 0xd003).w(this, FUNC(m62_state::spelunk2_bankswitch_w));
+	map(0xc800, 0xcfff).ram().w(FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xd000).w(FUNC(m62_state::m62_vscroll_low_w));
+	map(0xd001, 0xd001).w(FUNC(m62_state::m62_hscroll_low_w));
+	map(0xd002, 0xd002).w(FUNC(m62_state::spelunk2_gfxport_w));
+	map(0xd003, 0xd003).w(FUNC(m62_state::spelunk2_bankswitch_w));
 	map(0xe000, 0xefff).ram();
 }
 
@@ -364,8 +364,8 @@ void m62_state::youjyudn_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc800, 0xcfff).ram().w(FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -373,21 +373,21 @@ void m62_state::youjyudn_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
 	map(0x02, 0x02).portr("P2");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x80, 0x80).w(this, FUNC(m62_state::m62_hscroll_high_w));
-	map(0x81, 0x81).w(this, FUNC(m62_state::m62_hscroll_low_w));
-	map(0x83, 0x83).w(this, FUNC(m62_state::youjyudn_bankswitch_w));
+	map(0x80, 0x80).w(FUNC(m62_state::m62_hscroll_high_w));
+	map(0x81, 0x81).w(FUNC(m62_state::m62_hscroll_low_w));
+	map(0x83, 0x83).w(FUNC(m62_state::youjyudn_bankswitch_w));
 }
 
 void m62_state::horizon_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc1ff).ram().share("spriteram");
-	map(0xc800, 0xc83f).ram().w(this, FUNC(m62_state::horizon_scrollram_w)).share("scrollram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc800, 0xc83f).ram().w(FUNC(m62_state::horizon_scrollram_w)).share("scrollram");
+	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
 	map(0xe000, 0xefff).ram();
 }
 

@@ -62,24 +62,24 @@ WRITE8_MEMBER(ironhors_state::filter_w)
 void ironhors_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0002).ram();
-	map(0x0003, 0x0003).ram().w(this, FUNC(ironhors_state::charbank_w));
+	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
 	map(0x0004, 0x0004).ram().share("int_enable");
 	map(0x0005, 0x001f).ram();
 	map(0x0020, 0x003f).ram().share("scroll");
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00df).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900).portr("DSW3").w(this, FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2").w(this, FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
+	map(0x0900, 0x0900).portr("DSW3").w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2").w(FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
 	map(0x0b01, 0x0b01).portr("P2");
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 	map(0x1800, 0x1800).nopw(); // ???
 	map(0x1a00, 0x1a01).nopw(); // ???
 	map(0x1c00, 0x1dff).nopw(); // ???
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x3000, 0x30ff).ram().share("spriteram2");
 	map(0x3100, 0x37ff).ram();
@@ -112,22 +112,22 @@ void ironhors_state::farwest_master_map(address_map &map)
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00ff).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(this, FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
-	map(0x0b01, 0x0b01).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 
 
 
-	map(0x1800, 0x1800).w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x1800, 0x1800).w(FUNC(ironhors_state::sh_irqtrigger_w));
 	map(0x1a00, 0x1a00).ram().share("int_enable");
-	map(0x1a01, 0x1a01).ram().w(this, FUNC(ironhors_state::charbank_w));
-	map(0x1a02, 0x1a02).w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x1a01, 0x1a01).ram().w(FUNC(ironhors_state::charbank_w));
+	map(0x1a02, 0x1a02).w(FUNC(ironhors_state::palettebank_w));
 //  map(0x1c00, 0x1fff).ram();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x1c00, 0x1dff).ram().share("spriteram2");
 	map(0x3000, 0x38ff).ram();

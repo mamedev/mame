@@ -53,7 +53,7 @@ void dual68_state::dual68_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000ffff).ram().share("ram");
 	map(0x00080000, 0x00081fff).rom().region("user1", 0);
-	map(0x007f0000, 0x007f0001).w(this, FUNC(dual68_state::terminal_w));
+	map(0x007f0000, 0x007f0001).w(FUNC(dual68_state::terminal_w));
 	map(0x00800000, 0x00801fff).rom().region("user1", 0);
 }
 
@@ -119,15 +119,15 @@ MACHINE_CONFIG_END
 ROM_START( dual68 )
 	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "2 * 4KB" )
-	ROMX_LOAD( "dual_cpu68000_1.bin", 0x0001, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f),ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "dual_cpu68000_2.bin", 0x0000, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("dual_cpu68000_1.bin", 0x0001, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f),ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("dual_cpu68000_2.bin", 0x0000, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec),ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "v2", "2 * 2KB" )
-	ROMX_LOAD( "dual.u2.bin", 0x0001, 0x0800, CRC(e9c44fcd) SHA1(d5cc609d6f5e6745d5f0af1aa6dc66012333ed60),ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "dual.u3.bin", 0x0000, 0x0800, CRC(827b049f) SHA1(8209f8ab3d1068e5bab51e7eb12be46d4ea28354),ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("dual.u2.bin", 0x0001, 0x0800, CRC(e9c44fcd) SHA1(d5cc609d6f5e6745d5f0af1aa6dc66012333ed60),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("dual.u3.bin", 0x0000, 0x0800, CRC(827b049f) SHA1(8209f8ab3d1068e5bab51e7eb12be46d4ea28354),ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION( 0x10000, "siocpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "dual_sio4.bin", 0x0000, 0x0800, CRC(6b0a1965) SHA1(5d2dc6c6a315293ded4b9fc95c8ac1599bf31dd3))
+	ROM_LOAD("dual_sio4.bin", 0x0000, 0x0800, CRC(6b0a1965) SHA1(5d2dc6c6a315293ded4b9fc95c8ac1599bf31dd3))
 ROM_END
 
 /* Driver */

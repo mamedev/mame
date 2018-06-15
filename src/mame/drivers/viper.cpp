@@ -357,6 +357,7 @@ some other components. It will be documented at a later date.
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "video/voodoo.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -2077,28 +2078,28 @@ void viper_state::viper_map(address_map &map)
 {
 //  ADDRESS_MAP_UNMAP_HIGH
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
-	map(0x80000000, 0x800fffff).rw(this, FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
-	map(0x82000000, 0x83ffffff).rw(this, FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
-	map(0x84000000, 0x85ffffff).rw(this, FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
-	map(0xfe800000, 0xfe8000ff).rw(this, FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
-	map(0xfec00000, 0xfedfffff).rw(this, FUNC(viper_state::pci_config_addr_r), FUNC(viper_state::pci_config_addr_w));
-	map(0xfee00000, 0xfeefffff).rw(this, FUNC(viper_state::pci_config_data_r), FUNC(viper_state::pci_config_data_w));
+	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
+	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
+	map(0x84000000, 0x85ffffff).rw(FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
+	map(0xfe800000, 0xfe8000ff).rw(FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
+	map(0xfec00000, 0xfedfffff).rw(FUNC(viper_state::pci_config_addr_r), FUNC(viper_state::pci_config_addr_w));
+	map(0xfee00000, 0xfeefffff).rw(FUNC(viper_state::pci_config_data_r), FUNC(viper_state::pci_config_data_w));
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
 //  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
-	map(0xffe00000, 0xffe00007).r(this, FUNC(viper_state::e00000_r));
-	map(0xffe00008, 0xffe0000f).rw(this, FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
+	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
+	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
 	map(0xffe08000, 0xffe08007).noprw();
-	map(0xffe10000, 0xffe10007).r(this, FUNC(viper_state::input_r));
+	map(0xffe10000, 0xffe10007).r(FUNC(viper_state::input_r));
 	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd lamps
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe4000f).noprw();
-	map(0xffe50000, 0xffe50007).w(this, FUNC(viper_state::unk2_w));
+	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
 	map(0xffe60000, 0xffe60007).noprw();
-	map(0xffe70000, 0xffe7000f).rw(this, FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w));
-	map(0xffe80000, 0xffe80007).w(this, FUNC(viper_state::unk1a_w));
-	map(0xffe88000, 0xffe88007).w(this, FUNC(viper_state::unk1b_w));
+	map(0xffe70000, 0xffe7000f).rw(FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w));
+	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
+	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
 	map(0xffe98000, 0xffe98007).noprw();
 	map(0xffe9a000, 0xffe9bfff).ram();                             // World Combat uses this
 	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
@@ -2416,7 +2417,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -2447,7 +2448,7 @@ void viper_state::init_vipercf()
 /*****************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define VIPER_BIOS \
 	ROM_REGION64_BE(0x40000, "user1", 0)    /* Boot ROM */ \

@@ -6,9 +6,12 @@
 
 #pragma once
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh2.h"
 #include "cpu/sh/sh2comn.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class sega_32x_device : public device_t
 {
@@ -107,6 +110,7 @@ public:
 
 	void sh2_main_map(address_map &map);
 	void sh2_slave_map(address_map &map);
+
 protected:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -118,10 +122,12 @@ protected:
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	/* our main vblank handler resets this */
+	required_device<m68000_base_device> m_main_cpu;
 	required_device<sh2_device> m_master_cpu;
 	required_device<sh2_device> m_slave_cpu;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
+	required_device<timer_device> m_scan_timer;
 
 	int m_32x_hcount_compare_val;
 	int m_32x_vblank_flag;
@@ -202,6 +208,14 @@ private:
 class sega_32x_ntsc_device : public sega_32x_device
 {
 public:
+	template <typename T, typename U>
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&main_cpu_tag, U &&timer_tag)
+		: sega_32x_ntsc_device(mconfig, tag, owner, clock)
+	{
+		m_main_cpu.set_tag(std::forward<T>(main_cpu_tag));
+		m_scan_timer.set_tag(std::forward<U>(timer_tag));
+	}
+
 	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -212,6 +226,14 @@ protected:
 class sega_32x_pal_device : public sega_32x_device
 {
 public:
+	template <typename T, typename U>
+	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&main_cpu_tag, U &&timer_tag)
+		: sega_32x_pal_device(mconfig, tag, owner, clock)
+	{
+		m_main_cpu.set_tag(std::forward<T>(main_cpu_tag));
+		m_scan_timer.set_tag(std::forward<U>(timer_tag));
+	}
+
 	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

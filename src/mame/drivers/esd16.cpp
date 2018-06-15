@@ -72,6 +72,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -129,9 +130,9 @@ void esd16_state::esd16_io_area_dsw(address_map &map, u32 base)
 	map(base + 0x2, base + 0x3).portr("P1_P2");
 	map(base + 0x4, base + 0x5).portr("SYSTEM");
 	map(base + 0x6, base + 0x7).portr("DSW");
-	map(base + 0x8, base + 0x9).w(this, FUNC(esd16_state::esd16_tilemap0_color_w));
+	map(base + 0x8, base + 0x9).w(FUNC(esd16_state::esd16_tilemap0_color_w));
 	map(base + 0xa, base + 0xb).nopw(); /* Unknown */
-	map(base + 0xc, base + 0xd).w(this, FUNC(esd16_state::esd16_sound_command_w));
+	map(base + 0xc, base + 0xd).w(FUNC(esd16_state::esd16_sound_command_w));
 	map(base + 0xe, base + 0xf).nopw(); /* n/c */
 }
 
@@ -140,11 +141,11 @@ void esd16_state::esd16_io_area_eeprom(address_map &map, u32 base)
 	map(base + 0x0, base + 0x1).nopw(); /* Irq Ack */
 	map(base + 0x2, base + 0x3).portr("P1_P2");
 	map(base + 0x4, base + 0x5).portr("SYSTEM");
-	map(base + 0x6, base + 0x7).r(this, FUNC(esd16_state::esd_eeprom_r));
-	map(base + 0x8, base + 0x9).w(this, FUNC(esd16_state::esd16_tilemap0_color_w));
+	map(base + 0x6, base + 0x7).r(FUNC(esd16_state::esd_eeprom_r));
+	map(base + 0x8, base + 0x9).w(FUNC(esd16_state::esd16_tilemap0_color_w));
 	map(base + 0xa, base + 0xb).nopw(); /* Unknown */
-	map(base + 0xc, base + 0xd).w(this, FUNC(esd16_state::esd16_sound_command_w));
-	map(base + 0xe, base + 0xf).w(this, FUNC(esd16_state::esd_eeprom_w));
+	map(base + 0xc, base + 0xd).w(FUNC(esd16_state::esd16_sound_command_w));
+	map(base + 0xe, base + 0xf).w(FUNC(esd16_state::esd_eeprom_w));
 }
 
 void esd16_state::esd16_vid_attr_area(address_map &map, u32 base)
@@ -169,8 +170,8 @@ void esd16_state::esd16_sprite_area(address_map &map, u32 base)
 
 void esd16_state::esd16_vram_area(address_map &map, u32 base)
 {
-	map(base + 0x00000, base + 0x03fff).w(this, FUNC(esd16_state::esd16_vram_0_w)).share("vram_0").mirror(0x4000);
-	map(base + 0x20000, base + 0x23fff).w(this, FUNC(esd16_state::esd16_vram_1_w)).share("vram_1").mirror(0x4000);
+	map(base + 0x00000, base + 0x03fff).w(FUNC(esd16_state::esd16_vram_0_w)).share("vram_0").mirror(0x4000);
+	map(base + 0x20000, base + 0x23fff).w(FUNC(esd16_state::esd16_vram_1_w)).share("vram_1").mirror(0x4000);
 }
 
 /*** Memory Maps ***/
@@ -195,13 +196,13 @@ void esd16_state::jumppop_map(address_map &map)
 	map(0x120000, 0x123fff).ram();
 	map(0x1a0000, 0x1a7fff).ram();
 
-	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
-
 	esd16_palette_area(map, 0x140000);
 	esd16_sprite_area(map, 0x160000);
 	esd16_io_area_dsw(map, 0x180000);
 	esd16_vram_area(map, 0x300000);
 	esd16_vid_attr_area(map, 0x380000);
+
+	map(0x180008, 0x180009).w(FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
 }
 
 void esd16_state::hedpanic_map(address_map &map)
@@ -215,7 +216,7 @@ void esd16_state::hedpanic_map(address_map &map)
 	esd16_vid_attr_area(map, 0xb00000);
 	esd16_io_area_eeprom(map, 0xc00000);
 
-	map(0xd00008, 0xd00009).w(this, FUNC(esd16_state::hedpanic_platform_w)); // protection
+	map(0xd00008, 0xd00009).w(FUNC(esd16_state::hedpanic_platform_w)); // protection
 }
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
@@ -231,7 +232,7 @@ void esd16_state::mchampdx_map(address_map &map)
 	esd16_sprite_area(map, 0x600000);
 	esd16_vid_attr_area(map, 0x700000);
 
-	map(0xd00008, 0xd00009).w(this, FUNC(esd16_state::hedpanic_platform_w));                      // not used in mchampdx?
+	map(0xd00008, 0xd00009).w(FUNC(esd16_state::hedpanic_platform_w));                      // not used in mchampdx?
 }
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
@@ -246,7 +247,7 @@ void esd16_state::tangtang_map(address_map &map)
 	esd16_vram_area(map, 0x300000);
 	esd16_vid_attr_area(map, 0x400000);
 	esd16_io_area_eeprom(map, 0x500000);
-	map(0x600008, 0x600009).w(this, FUNC(esd16_state::hedpanic_platform_w));
+	map(0x600008, 0x600009).w(FUNC(esd16_state::hedpanic_platform_w));
 }
 
 
@@ -283,9 +284,9 @@ void esd16_state::multchmp_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ymsnd", FUNC(ym3812_device::write));          // YM3812
 	map(0x02, 0x02).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
-	map(0x03, 0x03).r(this, FUNC(esd16_state::esd16_sound_command_r));             // From Main CPU
+	map(0x03, 0x03).r(FUNC(esd16_state::esd16_sound_command_r));             // From Main CPU
 	map(0x04, 0x04).nopw();                        // ? $00, $30
-	map(0x05, 0x05).w(this, FUNC(esd16_state::esd16_sound_rombank_w));                // ROM Bank
+	map(0x05, 0x05).w(FUNC(esd16_state::esd16_sound_rombank_w));                // ROM Bank
 	map(0x06, 0x06).noprw();                         // ? At the start / ? 1 (End of NMI routine)
 }
 
@@ -705,7 +706,7 @@ MACHINE_CONFIG_START(esd16_state::hedpanio)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hedpanic_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */

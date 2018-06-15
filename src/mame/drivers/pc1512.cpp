@@ -512,7 +512,7 @@ WRITE8_MEMBER( pc1512_base_state::printer_w )
 	{
 	case 0:
 		m_printer_data = data;
-		m_cent_data_out->write(space, 0, data);
+		m_cent_data_out->write(data);
 		break;
 
 	case 2:
@@ -610,7 +610,7 @@ READ8_MEMBER( pc1640_state::io_r )
 void pc1512_state::pc1512_mem(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
-	map(0xb8000, 0xbbfff).rw(this, FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
+	map(0xb8000, 0xbbfff).rw(FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
 	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 
@@ -629,13 +629,13 @@ void pc1512_state::pc1512_io(address_map &map)
 	map(0x000, 0x00f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x060, 0x06f).rw(this, FUNC(pc1512_state::system_r), FUNC(pc1512_state::system_w));
+	map(0x060, 0x06f).rw(FUNC(pc1512_state::system_r), FUNC(pc1512_state::system_w));
 	map(0x070, 0x071).mirror(0x02).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	map(0x078, 0x07f).rw(this, FUNC(pc1512_state::mouse_r), FUNC(pc1512_state::mouse_w));
-	map(0x080, 0x083).w(this, FUNC(pc1512_state::dma_page_w));
-	map(0x0a1, 0x0a1).w(this, FUNC(pc1512_state::nmi_mask_w));
-	map(0x378, 0x37b).rw(this, FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
-	map(0x3d0, 0x3df).rw(this, FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
+	map(0x078, 0x07f).rw(FUNC(pc1512_state::mouse_r), FUNC(pc1512_state::mouse_w));
+	map(0x080, 0x083).w(FUNC(pc1512_state::dma_page_w));
+	map(0x0a1, 0x0a1).w(FUNC(pc1512_state::nmi_mask_w));
+	map(0x378, 0x37b).rw(FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
+	map(0x3d0, 0x3df).rw(FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
 	map(0x3f0, 0x3f7).m(m_fdc, FUNC(pc_fdc_xt_device::map));
 	map(0x3f8, 0x3ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
@@ -658,17 +658,17 @@ void pc1640_state::pc1640_mem(address_map &map)
 
 void pc1640_state::pc1640_io(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(pc1640_state::io_r));
+	map(0x0000, 0xffff).r(FUNC(pc1640_state::io_r));
 
 	map(0x000, 0x00f).w(m_dmac, FUNC(am9517a_device::write));
 	map(0x020, 0x021).w(m_pic, FUNC(pic8259_device::write));
 	map(0x040, 0x043).w(m_pit, FUNC(pit8253_device::write));
-	map(0x060, 0x06f).w(this, FUNC(pc1640_state::system_w));
+	map(0x060, 0x06f).w(FUNC(pc1640_state::system_w));
 	map(0x070, 0x071).mirror(0x02).w(m_rtc, FUNC(mc146818_device::write));
-	map(0x078, 0x07f).w(this, FUNC(pc1640_state::mouse_w));
-	map(0x080, 0x083).w(this, FUNC(pc1640_state::dma_page_w));
-	map(0x0a1, 0x0a1).w(this, FUNC(pc1640_state::nmi_mask_w));
-	map(0x378, 0x37b).w(this, FUNC(pc1640_state::printer_w));
+	map(0x078, 0x07f).w(FUNC(pc1640_state::mouse_w));
+	map(0x080, 0x083).w(FUNC(pc1640_state::dma_page_w));
+	map(0x0a1, 0x0a1).w(FUNC(pc1640_state::nmi_mask_w));
+	map(0x378, 0x37b).w(FUNC(pc1640_state::printer_w));
 	map(0x3f2, 0x3f2).w(m_fdc, FUNC(pc_fdc_xt_device::dor_w));
 	map(0x3f5, 0x3f5).w(PC_FDC_XT_TAG ":upd765", FUNC(upd765_family_device::fifo_w));
 	map(0x3f8, 0x3ff).w(m_uart, FUNC(ins8250_device::ins8250_w));
@@ -1156,7 +1156,7 @@ void pc1640_state::machine_start()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc1512_state::pc1512)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, XTAL(24'000'000)/3)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(pc1512_mem)
 	MCFG_DEVICE_IO_MAP(pc1512_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
 	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
-	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL(24'000'000)/6)
+	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, 24_MHz_XTAL / 6)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pc1512_state, hrq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pc1512_state, eop_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, pc1512_state, memr_r))
@@ -1201,14 +1201,14 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(28'636'363)/24)
+	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(28'636'363)/24)
+	MCFG_PIT8253_CLK1(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pc1512_state, pit1_w))
-	MCFG_PIT8253_CLK2(XTAL(28'636'363)/24)
+	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_state, pit2_w))
 
-	MCFG_MC146818_ADD(MC146818_TAG, XTAL(32'768))
+	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
@@ -1217,13 +1217,13 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(1'843'200))
+	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, 1.8432_MHz_XTAL)
 	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_perror))
@@ -1293,7 +1293,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc1640_state::pc1640)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, XTAL(24'000'000)/3)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(pc1640_mem)
 	MCFG_DEVICE_IO_MAP(pc1640_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
@@ -1314,7 +1314,7 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
 	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
-	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL(24'000'000)/6)
+	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, 24_MHz_XTAL / 6)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pc1512_base_state, hrq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pc1512_base_state, eop_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, pc1512_base_state, memr_r))
@@ -1335,14 +1335,14 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(28'636'363)/24)
+	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(28'636'363)/24)
+	MCFG_PIT8253_CLK1(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pc1512_base_state, pit1_w))
-	MCFG_PIT8253_CLK2(XTAL(28'636'363)/24)
+	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_base_state, pit2_w))
 
-	MCFG_MC146818_ADD(MC146818_TAG, XTAL(32'768))
+	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
@@ -1351,13 +1351,13 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(1'843'200))
+	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, 1.8432_MHz_XTAL)
 	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_perror))
@@ -1435,19 +1435,19 @@ MACHINE_CONFIG_END
 ROM_START( pc1512 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "40044.ic132", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "40043.ic129", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "40044.ic132", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "40043.ic129", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "40044v2.ic132", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "40043v2.ic129", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "40044v2.ic132", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "40043v2.ic129", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v3", "Version 3" )
-	ROMX_LOAD( "40044-2.ic132", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220), ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "40043-2.ic129", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "40044-2.ic132", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "40043-2.ic129", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda), ROM_SKIP(1) | ROM_BIOS(2) )
 
 	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
-	ROMX_LOAD( "40045.ic127", 0x0000, 0x2000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7), ROM_BIOS(1) )
+	ROMX_LOAD( "40045.ic127", 0x0000, 0x2000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7), ROM_BIOS(0) )
+	ROMX_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd), ROM_BIOS(1) )
 	ROMX_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd), ROM_BIOS(2) )
-	ROMX_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd), ROM_BIOS(3) )
 ROM_END
 
 #define rom_pc1512dd    rom_pc1512
@@ -1462,14 +1462,14 @@ ROM_END
 ROM_START( pc1640 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
 	ROM_SYSTEM_BIOS( 0, "8809", "Week 9/1988" )
-	ROMX_LOAD( "40044-1 8809.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952), ROM_SKIP(1) | ROM_BIOS(1) ) // 8809 B
-	ROMX_LOAD( "40043-1 8809.ic129", 0x0001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8), ROM_SKIP(1) | ROM_BIOS(1) ) // 8809 B
+	ROMX_LOAD( "40044-1 8809.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952), ROM_SKIP(1) | ROM_BIOS(0) ) // 8809 B
+	ROMX_LOAD( "40043-1 8809.ic129", 0x0001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8), ROM_SKIP(1) | ROM_BIOS(0) ) // 8809 B
 	ROM_SYSTEM_BIOS( 1, "8738", "Week 38/1987" )
-	ROMX_LOAD( "40044 8738.ic132", 0x0000, 0x2000, CRC(43832ea7) SHA1(eea4a8836f966940a88c88de6c5cc14852545f7d), ROM_SKIP(1) | ROM_BIOS(2) ) // 8738 D F
-	ROMX_LOAD( "40043 8738.ic129", 0x0001, 0x2000, CRC(768498f9) SHA1(ac48cb892417d7998d604f3b79756140c554f476), ROM_SKIP(1) | ROM_BIOS(2) ) // 8738 D F
+	ROMX_LOAD( "40044 8738.ic132", 0x0000, 0x2000, CRC(43832ea7) SHA1(eea4a8836f966940a88c88de6c5cc14852545f7d), ROM_SKIP(1) | ROM_BIOS(1) ) // 8738 D F
+	ROMX_LOAD( "40043 8738.ic129", 0x0001, 0x2000, CRC(768498f9) SHA1(ac48cb892417d7998d604f3b79756140c554f476), ROM_SKIP(1) | ROM_BIOS(1) ) // 8738 D F
 	ROM_SYSTEM_BIOS( 2, "88xx", "Week ?/1988" )
-	ROMX_LOAD( "40044 88xx.ic132", 0x0000, 0x2000, CRC(6090f782) SHA1(e21ae524d5b4d00696d293dbd4fe4d7bca22e277), ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "40044 88xx.ic132", 0x0000, 0x2000, CRC(6090f782) SHA1(e21ae524d5b4d00696d293dbd4fe4d7bca22e277), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
 #define rom_pc1640dd    rom_pc1640

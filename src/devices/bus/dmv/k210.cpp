@@ -82,7 +82,7 @@ MACHINE_CONFIG_START(dmv_k210_device::device_add_mconfig)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dmv_k210_device, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dmv_k210_device, portc_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, dmv_k210_device, cent_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, dmv_k210_device, cent_busy_w))

@@ -31,6 +31,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
@@ -493,13 +494,13 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5008, 0x5008).nopw(); // startup
 	map(0x5009, 0x5009).noprw();
 	map(0x500a, 0x500a).nopw(); // startup
-	map(0x500b, 0x500b).r(this, FUNC(radica_eu3a14_state::radicasi_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(this, FUNC(radica_eu3a14_state::radicasi_rombank_hi_w));
-	map(0x500d, 0x500d).rw(this, FUNC(radica_eu3a14_state::radicasi_rombank_lo_r), FUNC(radica_eu3a14_state::radicasi_rombank_lo_w));
+	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::radicasi_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(FUNC(radica_eu3a14_state::radicasi_rombank_hi_w));
+	map(0x500d, 0x500d).rw(FUNC(radica_eu3a14_state::radicasi_rombank_lo_r), FUNC(radica_eu3a14_state::radicasi_rombank_lo_w));
 
 	// DMA is similar to, but not the same as eu3a05
 	map(0x500f, 0x5017).ram().share("dmaparams");
-	map(0x5018, 0x5018).rw(this, FUNC(radica_eu3a14_state::dma_trigger_r), FUNC(radica_eu3a14_state::dma_trigger_w));
+	map(0x5018, 0x5018).rw(FUNC(radica_eu3a14_state::dma_trigger_r), FUNC(radica_eu3a14_state::dma_trigger_w));
 
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
 	map(0x5040, 0x5040).nopw();
@@ -540,7 +541,7 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 
-	map(0xfffe, 0xffff).r(this, FUNC(radica_eu3a14_state::irq_vector_r));
+	map(0xfffe, 0xffff).r(FUNC(radica_eu3a14_state::irq_vector_r));
 }
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)

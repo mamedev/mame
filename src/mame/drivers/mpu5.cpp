@@ -532,7 +532,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 void mpu5_state::mpu5_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(mpu5_state::mpu5_mem_r), FUNC(mpu5_state::mpu5_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(mpu5_state::mpu5_mem_r), FUNC(mpu5_state::mpu5_mem_w));
 }
 
 INPUT_PORTS_START(  mpu5 )

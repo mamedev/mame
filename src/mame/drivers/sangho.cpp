@@ -49,6 +49,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -313,11 +314,11 @@ void pzlestar_state::pzlestar_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x91, 0x91).w(this, FUNC(pzlestar_state::pzlestar_bank_w));
+	map(0x91, 0x91).w(FUNC(pzlestar_state::pzlestar_bank_w));
 	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
-	map(0xa8, 0xa8).rw(this, FUNC(pzlestar_state::pzlestar_mem_bank_r), FUNC(pzlestar_state::pzlestar_mem_bank_w));
+	map(0xa8, 0xa8).rw(FUNC(pzlestar_state::pzlestar_mem_bank_r), FUNC(pzlestar_state::pzlestar_mem_bank_w));
 	map(0xf7, 0xf7).portr("DSW");
 }
 
@@ -331,7 +332,7 @@ void sexyboom_state::sexyboom_io_map(address_map &map)
 	map(0xa1, 0xa1).portr("P2");
 	map(0xf0, 0xf3).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xf7, 0xf7).portr("DSW");
-	map(0xf8, 0xff).w(this, FUNC(sexyboom_state::sexyboom_bank_w));
+	map(0xf8, 0xff).w(FUNC(sexyboom_state::sexyboom_bank_w));
 }
 
 static INPUT_PORTS_START( sexyboom )

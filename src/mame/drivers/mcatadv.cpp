@@ -187,8 +187,8 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0x200000, 0x200005).ram().share("scroll1");
 	map(0x300000, 0x300005).ram().share("scroll2");
 
-	map(0x400000, 0x401fff).ram().w(this, FUNC(mcatadv_state::vram_w<0>)).share("vram_1"); // Tilemap 0
-	map(0x500000, 0x501fff).ram().w(this, FUNC(mcatadv_state::vram_w<1>)).share("vram_2"); // Tilemap 1
+	map(0x400000, 0x401fff).ram().w(FUNC(mcatadv_state::vram_w<0>)).share("vram_1"); // Tilemap 0
+	map(0x500000, 0x501fff).ram().w(FUNC(mcatadv_state::vram_w<1>)).share("vram_2"); // Tilemap 1
 
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x602000, 0x602fff).ram(); // Bigger than needs to be?
@@ -205,7 +205,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0xb00000, 0xb0000f).ram().share("vidregs");
 
 	map(0xb00018, 0xb00019).w(m_watchdog, FUNC(watchdog_timer_device::reset16_w)); // NOST Only
-	map(0xb0001e, 0xb0001f).r(this, FUNC(mcatadv_state::mcat_wd_r)); // MCAT Only
+	map(0xb0001e, 0xb0001f).r(FUNC(mcatadv_state::mcat_wd_r)); // MCAT Only
 	map(0xc00001, 0xc00001).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0xc00000, 0xc00001).w("soundlatch", FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
 }
@@ -224,7 +224,7 @@ void mcatadv_state::mcatadv_sound_map(address_map &map)
 	map(0x4000, 0xbfff).bankr("soundbank");                // ROM
 	map(0xc000, 0xdfff).ram();                     // RAM
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0xf000, 0xf000).w(this, FUNC(mcatadv_state::mcatadv_sound_bw_w));
+	map(0xf000, 0xf000).w(FUNC(mcatadv_state::mcatadv_sound_bw_w));
 }
 
 void mcatadv_state::mcatadv_sound_io_map(address_map &map)
@@ -246,7 +246,7 @@ void mcatadv_state::nost_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).w("ymsnd", FUNC(ym2610_device::write));
 	map(0x04, 0x07).r("ymsnd", FUNC(ym2610_device::read));
-	map(0x40, 0x40).w(this, FUNC(mcatadv_state::mcatadv_sound_bw_w));
+	map(0x40, 0x40).w(FUNC(mcatadv_state::mcatadv_sound_bw_w));
 	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 

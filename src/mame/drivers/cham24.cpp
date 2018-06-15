@@ -223,10 +223,10 @@ void cham24_state::cham24_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(cham24_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(cham24_state::cham24_IN0_r), FUNC(cham24_state::cham24_IN0_w));            /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(cham24_state::cham24_IN1_r));    /* IN1 - input port 2 / PSG second control register */
-	map(0x8000, 0xffff).rom().w(this, FUNC(cham24_state::cham24_mapper_w));
+	map(0x4014, 0x4014).w(FUNC(cham24_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(cham24_state::cham24_IN0_r), FUNC(cham24_state::cham24_IN0_w));            /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(cham24_state::cham24_IN1_r));    /* IN1 - input port 2 / PSG second control register */
+	map(0x8000, 0xffff).rom().w(FUNC(cham24_state::cham24_mapper_w));
 }
 
 static INPUT_PORTS_START( cham24 )

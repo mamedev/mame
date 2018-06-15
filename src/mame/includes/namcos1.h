@@ -6,6 +6,7 @@
 #include "sound/namco.h"
 #include "video/namco_c116.h"
 #include "machine/74157.h"
+#include "emupal.h"
 
 class namcos1_state : public driver_device
 {

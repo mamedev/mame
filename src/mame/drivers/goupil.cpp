@@ -33,12 +33,13 @@
 #include "video/ef9364.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
 #include "logmacro.h"
 
-#define MAIN_CLOCK           XTAL(4'000'000)
+#define MAIN_CLOCK           4_MHz_XTAL
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 1 Mhz */
 
@@ -196,7 +197,7 @@ void goupil_g2_state::goupil_g2_mem(address_map &map)
 	map(0xE871, 0xE871).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
 	map(0xE8F0, 0xE8FF).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-	map(0xEC00, 0xF3FF).rw(this, FUNC(goupil_g2_state::visu24x80_ram_r), FUNC(goupil_g2_state::visu24x80_ram_w));
+	map(0xEC00, 0xF3FF).rw(FUNC(goupil_g2_state::visu24x80_ram_r), FUNC(goupil_g2_state::visu24x80_ram_w));
 	map(0xF400, 0xF7FF).rom().region("maincpu", 0xF400); // Monitor (MON 1)
 	map(0xF800, 0xFFFF).rom().region("maincpu", 0xF800); // Monitor (MON 2)
 }
@@ -562,7 +563,7 @@ MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
+	MCFG_DEVICE_ADD("fd1791", FD1791, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -606,7 +607,7 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (24*(8+4))-1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(goupil_g2_state, crtc_update_row)
@@ -624,7 +625,7 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
+	MCFG_DEVICE_ADD("fd1791", FD1791, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -649,20 +650,20 @@ ROM_START( goupilg1 )
 	ROM_DEFAULT_BIOS("v1_0")
 
 	ROM_SYSTEM_BIOS(0, "v1_0", "Version 1.0")
-	ROMX_LOAD( "smt_goupil_g1_mon_1.bin", 0xF800, 0x0400, CRC(98b7be69) SHA1(69e83fe78a43fcf2b08fb0bcefb0d217a57b1ecb), ROM_BIOS(1) )
+	ROMX_LOAD( "smt_goupil_g1_mon_1.bin", 0xF800, 0x0400, CRC(98b7be69) SHA1(69e83fe78a43fcf2b08fb0bcefb0d217a57b1ecb), ROM_BIOS(0) )
 	ROM_LOAD ( "smt_goupil_g1_mon_2.bin", 0xFC00, 0x0400, CRC(19386b81) SHA1(e52f63fd29d374319781e9677de6d3fd61a3684c) )
 
 	ROM_LOAD ( "smt_goupil_g1_mod_3.bin", 0xF400, 0x0400, CRC(e662f152) SHA1(11b91c5737e7572a2c18472b66bbd16b485132d5) )
 
-	ROMX_LOAD( "smt_goupil_g1_basic_1.bin", 0xC000, 0x0400, CRC(ad105b12) SHA1(631cd4b997f76b57bf2509e4bff30b1595c8bd13), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_2.bin", 0xC400, 0x0400, CRC(0c5c309c) SHA1(f1cab4b0f9191e53113790a95f1ab7108f9406a1), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_3.bin", 0xC800, 0x0400, CRC(1f1eb127) SHA1(dbbb880c79d515acbfcb2be9a4c96962f3e4edea), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_4.bin", 0xCC00, 0x0400, CRC(09be48e4) SHA1(86cae0d159583c1d572a5754f3bb6b4a2e479359), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_5.bin", 0xD000, 0x0400, CRC(bdeb395c) SHA1(32a50468f1ca772ee45a1f5c61c66f3ecc774074), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_6.bin", 0xD400, 0x0400, CRC(850a4000) SHA1(720f0bb3e45877835219b7e1d943ef4f19b9977d), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_7.bin", 0xD800, 0x0400, CRC(586c7670) SHA1(13e2e96b9f1a53555ce0d55f657cf3c6b96f10a0), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_8.bin", 0xDC00, 0x0400, CRC(33281300) SHA1(ce631fa8157a3f8869c5fefe24b7f40e06696df9), ROM_BIOS(1) )
-	ROMX_LOAD( "smt_goupil_g1_basic_9.bin", 0xE000, 0x0400, CRC(a3911201) SHA1(8623a0a2d83eb3a27a795030643c5c05a4350a9f), ROM_BIOS(1) )
+	ROMX_LOAD( "smt_goupil_g1_basic_1.bin", 0xC000, 0x0400, CRC(ad105b12) SHA1(631cd4b997f76b57bf2509e4bff30b1595c8bd13), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_2.bin", 0xC400, 0x0400, CRC(0c5c309c) SHA1(f1cab4b0f9191e53113790a95f1ab7108f9406a1), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_3.bin", 0xC800, 0x0400, CRC(1f1eb127) SHA1(dbbb880c79d515acbfcb2be9a4c96962f3e4edea), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_4.bin", 0xCC00, 0x0400, CRC(09be48e4) SHA1(86cae0d159583c1d572a5754f3bb6b4a2e479359), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_5.bin", 0xD000, 0x0400, CRC(bdeb395c) SHA1(32a50468f1ca772ee45a1f5c61c66f3ecc774074), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_6.bin", 0xD400, 0x0400, CRC(850a4000) SHA1(720f0bb3e45877835219b7e1d943ef4f19b9977d), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_7.bin", 0xD800, 0x0400, CRC(586c7670) SHA1(13e2e96b9f1a53555ce0d55f657cf3c6b96f10a0), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_8.bin", 0xDC00, 0x0400, CRC(33281300) SHA1(ce631fa8157a3f8869c5fefe24b7f40e06696df9), ROM_BIOS(0) )
+	ROMX_LOAD( "smt_goupil_g1_basic_9.bin", 0xE000, 0x0400, CRC(a3911201) SHA1(8623a0a2d83eb3a27a795030643c5c05a4350a9f), ROM_BIOS(0) )
 
 	ROM_REGION( 0x400, "ef9364", 0 )
 	ROM_LOAD( "smt_goupil_g1_charset.bin", 0x0000, 0x0400, CRC(8b6da54b) SHA1(ac2204600f45c6dd0df1e759b62ed25928f02a12) )
@@ -674,7 +675,7 @@ ROM_START( goupilg2 )
 	ROM_DEFAULT_BIOS("v1_4")
 
 	ROM_SYSTEM_BIOS(0, "v1_4", "Version 1.4")
-	ROMX_LOAD( "smt_goupil_g2_mon_1.bin", 0xF000, 0x0800, CRC(91A4F256) SHA1(ECE3B47A17E47FC87E2262BE806CE8015F5F5DB6), ROM_BIOS(1) )
+	ROMX_LOAD( "smt_goupil_g2_mon_1.bin", 0xF000, 0x0800, CRC(91A4F256) SHA1(ECE3B47A17E47FC87E2262BE806CE8015F5F5DB6), ROM_BIOS(0) )
 	ROM_LOAD ( "smt_goupil_g2_mon_2.bin", 0xF800, 0x0800, CRC(F7783A32) SHA1(7368FC0BD86B48E6727367BD7D1922F219741015) )
 
 	ROM_LOAD ( "smt_goupil_g2_mod_1.bin", 0xC000, 0x0400, CRC(4D585E40) SHA1(7558F89DB52299C4C305755259D5C908B3F66AC7) )

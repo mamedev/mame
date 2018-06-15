@@ -59,6 +59,7 @@ Infinite loop is reached at address 0x7699
 #include "cpu/mcs51/mcs51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

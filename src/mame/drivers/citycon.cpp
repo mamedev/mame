@@ -46,14 +46,14 @@ READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 void citycon_state::citycon_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(citycon_state::citycon_videoram_w)).share("videoram");
-	map(0x2000, 0x20ff).ram().w(this, FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
+	map(0x1000, 0x1fff).ram().w(FUNC(citycon_state::citycon_videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).ram().w(FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
 	map(0x2800, 0x28ff).ram().share("spriteram").mirror(0x0700); //0x2900-0x2fff cleared at post but unused
-	map(0x3000, 0x3000).r(this, FUNC(citycon_state::citycon_in_r)).w(this, FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
+	map(0x3000, 0x3000).r(FUNC(citycon_state::citycon_in_r)).w(FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
 	map(0x3001, 0x3001).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3002, 0x3002).portr("DSW2").w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x3004, 0x3005).nopr().writeonly().share("scroll");
-	map(0x3007, 0x3007).r(this, FUNC(citycon_state::citycon_irq_ack_r));
+	map(0x3007, 0x3007).r(FUNC(citycon_state::citycon_irq_ack_r));
 	map(0x3800, 0x3cff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x4000, 0xffff).rom();
 }

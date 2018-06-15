@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "video/segaic24.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #include <glm/vec3.hpp>

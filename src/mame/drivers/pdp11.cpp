@@ -166,7 +166,7 @@ void pdp11_state::pdp11_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();  // RAM
 	map(0xea00, 0xfeff).rom();
-	map(0xff70, 0xff77).rw(this, FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
+	map(0xff70, 0xff77).rw(FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
 
 	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
 }

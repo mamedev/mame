@@ -2699,8 +2699,8 @@ void apple2e_state::apple2e_map(address_map &map)
 	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
+	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
@@ -2716,8 +2716,8 @@ void apple2e_state::apple2c_map(address_map &map)
 	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(IIC_ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
@@ -2735,11 +2735,11 @@ void apple2e_state::apple2c_memexp_map(address_map &map)
 	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(IIC_ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0c0, 0xc0c3).rw(this, FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
+	map(0xc0c0, 0xc0c3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
@@ -2755,12 +2755,12 @@ void apple2e_state::laser128_map(address_map &map)
 	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
+	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 //  AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
 //  AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
-	map(0xc0d0, 0xc0d3).rw(this, FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
-	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
+	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
+	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::bus_r), FUNC(applefdc_base_device::bus_w));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
@@ -2770,103 +2770,103 @@ void apple2e_state::laser128_map(address_map &map)
 
 void apple2e_state::r0000bank_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(apple2e_state::ram0000_r), FUNC(apple2e_state::ram0000_w));
-	map(0x0200, 0x03ff).rw(this, FUNC(apple2e_state::auxram0000_r), FUNC(apple2e_state::auxram0000_w));
+	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::ram0000_r), FUNC(apple2e_state::ram0000_w));
+	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0000_r), FUNC(apple2e_state::auxram0000_w));
 }
 
 void apple2e_state::r0200bank_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 0
-	map(0x0200, 0x03ff).rw(this, FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 1
-	map(0x0400, 0x05ff).rw(this, FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 0
-	map(0x0600, 0x07ff).rw(this, FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 1
+	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 0
+	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 1
+	map(0x0400, 0x05ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 0
+	map(0x0600, 0x07ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 1
 }
 
 void apple2e_state::r0400bank_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rw(this, FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w)); // wr 0 rd 0
-	map(0x0400, 0x07ff).rw(this, FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));  // wr 0 rd 1
-	map(0x0800, 0x0bff).rw(this, FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));  // wr 1 rd 0
-	map(0x0c00, 0x0fff).rw(this, FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::auxram0400_w)); // wr 1 rd 1
+	map(0x0000, 0x03ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w)); // wr 0 rd 0
+	map(0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));  // wr 0 rd 1
+	map(0x0800, 0x0bff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));  // wr 1 rd 0
+	map(0x0c00, 0x0fff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::auxram0400_w)); // wr 1 rd 1
 }
 
 void apple2e_state::r0800bank_map(address_map &map)
 {
-	map(0x0000, 0x17ff).rw(this, FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::ram0800_w));
-	map(0x2000, 0x37ff).rw(this, FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::ram0800_w));
-	map(0x4000, 0x57ff).rw(this, FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::auxram0800_w));
-	map(0x6000, 0x77ff).rw(this, FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::auxram0800_w));
+	map(0x0000, 0x17ff).rw(FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::ram0800_w));
+	map(0x2000, 0x37ff).rw(FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::ram0800_w));
+	map(0x4000, 0x57ff).rw(FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::auxram0800_w));
+	map(0x6000, 0x77ff).rw(FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::auxram0800_w));
 }
 
 void apple2e_state::r2000bank_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::ram2000_w));
-	map(0x2000, 0x3fff).rw(this, FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::ram2000_w));
-	map(0x4000, 0x5fff).rw(this, FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::auxram2000_w));
-	map(0x6000, 0x7fff).rw(this, FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::auxram2000_w));
+	map(0x0000, 0x1fff).rw(FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::ram2000_w));
+	map(0x2000, 0x3fff).rw(FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::ram2000_w));
+	map(0x4000, 0x5fff).rw(FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::auxram2000_w));
+	map(0x6000, 0x7fff).rw(FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::auxram2000_w));
 }
 
 void apple2e_state::r4000bank_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rw(this, FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::ram4000_w));
-	map(0x08000, 0x0ffff).rw(this, FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
-	map(0x10000, 0x17fff).rw(this, FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
-	map(0x18000, 0x1ffff).rw(this, FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
-	map(0x20000, 0x23fff).rw(this, FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
-	map(0x24000, 0x27fff).rw(this, FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
+	map(0x00000, 0x07fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x08000, 0x0ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x10000, 0x17fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
+	map(0x18000, 0x1ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
+	map(0x20000, 0x23fff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x24000, 0x27fff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
 }
 
 void apple2e_state::c100bank_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
-	map(0x0200, 0x03ff).r(this, FUNC(apple2e_state::c100_int_r)).nopw();
-	map(0x0400, 0x05ff).r(this, FUNC(apple2e_state::c100_int_bank_r)).nopw();
-	map(0x0600, 0x07ff).r(this, FUNC(apple2e_state::c100_cec_r)).nopw();
-	map(0x0800, 0x09ff).r(this, FUNC(apple2e_state::c100_cec_bank_r)).nopw();
+	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
+	map(0x0200, 0x03ff).r(FUNC(apple2e_state::c100_int_r)).nopw();
+	map(0x0400, 0x05ff).r(FUNC(apple2e_state::c100_int_bank_r)).nopw();
+	map(0x0600, 0x07ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
+	map(0x0800, 0x09ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
 
 }
 
 void apple2e_state::c300bank_map(address_map &map)
 {
-	map(0x0000, 0x00ff).rw(this, FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
-	map(0x0100, 0x01ff).r(this, FUNC(apple2e_state::c300_int_r)).nopw();
-	map(0x0200, 0x02ff).r(this, FUNC(apple2e_state::c300_int_bank_r)).nopw();
-	map(0x0300, 0x03ff).r(this, FUNC(apple2e_state::c300_cec_r)).nopw();
-	map(0x0400, 0x04ff).r(this, FUNC(apple2e_state::c300_cec_bank_r)).nopw();
+	map(0x0000, 0x00ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
+	map(0x0100, 0x01ff).r(FUNC(apple2e_state::c300_int_r)).nopw();
+	map(0x0200, 0x02ff).r(FUNC(apple2e_state::c300_int_bank_r)).nopw();
+	map(0x0300, 0x03ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
+	map(0x0400, 0x04ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
 }
 
 void apple2e_state::c400bank_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rw(this, FUNC(apple2e_state::c400_r), FUNC(apple2e_state::c400_w));
-	map(0x0400, 0x07ff).rw(this, FUNC(apple2e_state::c400_int_r), FUNC(apple2e_state::c400_w));
-	map(0x0800, 0x0bff).rw(this, FUNC(apple2e_state::c400_int_bank_r), FUNC(apple2e_state::c400_w));
-	map(0x0c00, 0x0fff).r(this, FUNC(apple2e_state::c400_cec_r)).nopw();
-	map(0x1000, 0x13ff).r(this, FUNC(apple2e_state::c400_cec_bank_r)).nopw();
+	map(0x0000, 0x03ff).rw(FUNC(apple2e_state::c400_r), FUNC(apple2e_state::c400_w));
+	map(0x0400, 0x07ff).rw(FUNC(apple2e_state::c400_int_r), FUNC(apple2e_state::c400_w));
+	map(0x0800, 0x0bff).rw(FUNC(apple2e_state::c400_int_bank_r), FUNC(apple2e_state::c400_w));
+	map(0x0c00, 0x0fff).r(FUNC(apple2e_state::c400_cec_r)).nopw();
+	map(0x1000, 0x13ff).r(FUNC(apple2e_state::c400_cec_bank_r)).nopw();
 }
 
 void apple2e_state::c800bank_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rw(this, FUNC(apple2e_state::c800_r), FUNC(apple2e_state::c800_w));
-	map(0x0800, 0x0fff).rw(this, FUNC(apple2e_state::c800_int_r), FUNC(apple2e_state::c800_w));
-	map(0x1000, 0x17ff).rw(this, FUNC(apple2e_state::c800_b2_int_r), FUNC(apple2e_state::c800_w));
-	map(0x1800, 0x1fff).r(this, FUNC(apple2e_state::c800_cec_r)).nopw();
-	map(0x2000, 0x27ff).r(this, FUNC(apple2e_state::c800_cec_bank_r)).nopw();
+	map(0x0000, 0x07ff).rw(FUNC(apple2e_state::c800_r), FUNC(apple2e_state::c800_w));
+	map(0x0800, 0x0fff).rw(FUNC(apple2e_state::c800_int_r), FUNC(apple2e_state::c800_w));
+	map(0x1000, 0x17ff).rw(FUNC(apple2e_state::c800_b2_int_r), FUNC(apple2e_state::c800_w));
+	map(0x1800, 0x1fff).r(FUNC(apple2e_state::c800_cec_r)).nopw();
+	map(0x2000, 0x27ff).r(FUNC(apple2e_state::c800_cec_bank_r)).nopw();
 }
 
 void apple2e_state::inhbank_map(address_map &map)
 {
 	map(0x0000, 0x2fff).m(m_lcbank, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(this, FUNC(apple2e_state::inh_r), FUNC(apple2e_state::inh_w));
+	map(0x3000, 0x5fff).rw(FUNC(apple2e_state::inh_r), FUNC(apple2e_state::inh_w));
 }
 
 void apple2e_state::lcbank_map(address_map &map)
 {
-	map(0x00000, 0x02fff).rom().region("maincpu", 0x1000).w(this, FUNC(apple2e_state::lc_w));
-	map(0x03000, 0x05fff).rw(this, FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
-	map(0x06000, 0x08fff).rw(this, FUNC(apple2e_state::lc_romswitch_r), FUNC(apple2e_state::lc_romswitch_w));
-	map(0x09000, 0x0bfff).rom().region("maincpu", 0x5000).w(this, FUNC(apple2e_state::lc_w));
-	map(0x0c000, 0x0efff).rw(this, FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
-	map(0x0f000, 0x11fff).rom().region("maincpu", 0xd000).w(this, FUNC(apple2e_state::lc_w));
+	map(0x00000, 0x02fff).rom().region("maincpu", 0x1000).w(FUNC(apple2e_state::lc_w));
+	map(0x03000, 0x05fff).rw(FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
+	map(0x06000, 0x08fff).rw(FUNC(apple2e_state::lc_romswitch_r), FUNC(apple2e_state::lc_romswitch_w));
+	map(0x09000, 0x0bfff).rom().region("maincpu", 0x5000).w(FUNC(apple2e_state::lc_w));
+	map(0x0c000, 0x0efff).rw(FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
+	map(0x0f000, 0x11fff).rom().region("maincpu", 0xd000).w(FUNC(apple2e_state::lc_w));
 }
 
 void apple2e_state::spectred_keyb_map(address_map &map)
@@ -4515,16 +4515,16 @@ ROM_START(ceci)
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "default", "ver 1.21")
-	ROMX_LOAD( "u7.alt", 0x000000, 0x008000, CRC(23c87b3b) SHA1(ff9673f628390e9b0fb60732acc72b580200b5ae), ROM_BIOS(1) )
-	ROMX_LOAD( "u35.alt", 0x008000, 0x008000, CRC(a4f40181) SHA1(db1ed69b2ed3280b1c90f76dbd637370d5bc11b0), ROM_BIOS(1) )
+	ROMX_LOAD( "u7.alt", 0x000000, 0x008000, CRC(23c87b3b) SHA1(ff9673f628390e9b0fb60732acc72b580200b5ae), ROM_BIOS(0) )
+	ROMX_LOAD( "u35.alt", 0x008000, 0x008000, CRC(a4f40181) SHA1(db1ed69b2ed3280b1c90f76dbd637370d5bc11b0), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "older", "ver 1.1")
-	ROMX_LOAD( "u7.tmm24256ap.bin", 0x000000, 0x008000, CRC(2e3f73b0) SHA1(a2967b3a9a040a1c47eb0fea9a632b833cd1c060), ROM_BIOS(2) )
-	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(2) )
+	ROMX_LOAD( "u7.tmm24256ap.bin", 0x000000, 0x008000, CRC(2e3f73b0) SHA1(a2967b3a9a040a1c47eb0fea9a632b833cd1c060), ROM_BIOS(1) )
+	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "diag", "self test")
-	ROMX_LOAD( "u7.selftest.bin", 0x000000, 0x008000, CRC(4b045a44) SHA1(d2c716d0eb9f1c70e108d16c6a88d44b894e39fd), ROM_BIOS(3) )
-	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(3) )
+	ROMX_LOAD( "u7.selftest.bin", 0x000000, 0x008000, CRC(4b045a44) SHA1(d2c716d0eb9f1c70e108d16c6a88d44b894e39fd), ROM_BIOS(2) )
+	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(2) )
 
 	ROM_REGION(0x40000,"cecexp",0)
 	ROM_LOAD16_BYTE( "u33.mx231024-0059.bin", 0x000000, 0x020000, CRC(a2a59f35) SHA1(01c787e150bf1378088a9333ec9338387aae0f50) )

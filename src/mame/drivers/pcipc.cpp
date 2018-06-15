@@ -493,7 +493,8 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD(      ":pci:07.0", I82371SB_ISA, 0)
 	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(*this, pcipc_state, boot_state_phoenix_ver40_rev6_w))
 	MCFG_I82371SB_SMI_CB(INPUTLINE(":maincpu", INPUT_LINE_SMI))
-//  MCFG_DEVICE_ADD(      ":pci:07.1", IDE_PCI, 0, 0x80867010, 0x03, 0x00000000)
+	MCFG_DEVICE_ADD(      ":pci:07.1", I82371SB_IDE, 0)
+	MCFG_I82371SB_IDE_INTERRUPTS(":pci:07.0:pic8259_slave", pic8259_device, ir6_w, ir7_w)
 //  MCFG_DEVICE_ADD(      ":pci:12.0", MGA2064W, 0)
 
 	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true)
@@ -519,14 +520,14 @@ MACHINE_CONFIG_END
 
 ROM_START(pcipc)
 	ROM_REGION32_LE(0x40000, ":pci:07.0", 0) /* PC bios */
-	ROM_SYSTEM_BIOS(0, "n7ns04", "Version 21/01/98, without integrated sound")
-	ROMX_LOAD("m7ns04.rom", 0x00000, 0x40000, CRC(9c1f656b) SHA1(f4a0a522d8c47b6ddb6c01fe9a34ddf5b1977f8d), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "n7s04", "Version 21/01/98, with integrated sound")
-	ROMX_LOAD("m7s04.rom",  0x00000, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "m55s04", "m55s04") // with sound
+	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "crisis", "Version 07/01/98, for flash recovery")
-	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29") \
-	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(4) )
+	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29")
+	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(3) )
 	ROM_REGION(0x8000,"ibm_vga", 0)
 	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
@@ -534,13 +535,14 @@ ROM_END
 ROM_START(pcipctx)
 	ROM_REGION32_LE(0x40000, ":pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "ga586t2", "Gigabyte GA-586T2") // ITE 8679 I/O
-	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(1))
+	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(0))
 
 	ROM_REGION(0x8000,"ibm_vga", 0)
 	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 static INPUT_PORTS_START(pcipc)
+	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)

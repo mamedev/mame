@@ -145,7 +145,7 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x10045a, 0x10045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
 	map(0x10045c, 0x10045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 
-//  map(0x100470, 0x100471).rw(this, FUNC(legionna_state::cop_tile_bank_2_r), FUNC(legionna_state::cop_tile_bank_2_w));
+//  map(0x100470, 0x100471).rw(FUNC(legionna_state::cop_tile_bank_2_r), FUNC(legionna_state::cop_tile_bank_2_w));
 //  map(0x100474, 0x100475).w(m_raiden2cop, FUNC(raiden2cop_device::...)); // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
 	map(0x100476, 0x100477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
 	map(0x100478, 0x100479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
@@ -159,7 +159,7 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x1004a0, 0x1004ad).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_high_r), FUNC(raiden2cop_device::cop_reg_high_w));
 	map(0x1004c0, 0x1004cd).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_low_r), FUNC(raiden2cop_device::cop_reg_low_w));
 
-//  map(0x100500, 0x100505).w(this, FUNC(legionna_state::cop_cmd_w)); // ADD ME
+//  map(0x100500, 0x100505).w(FUNC(legionna_state::cop_cmd_w)); // ADD ME
 	map(0x100500, 0x100505).w(m_raiden2cop, FUNC(raiden2cop_device::LEGACY_cop_cmd_w)); // REMOVE ME
 
 	map(0x100580, 0x100581).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_r));
@@ -199,10 +199,10 @@ void legionna_state::legionna_map(address_map &map)
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");    /* palette xRRRRxGGGGxBBBBx ? */
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x107fff).ram();
@@ -215,7 +215,7 @@ void legionna_state::heatbrl_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(this, FUNC(legionna_state::heatbrl_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::heatbrl_setgfxbank));
 	map(0x100600, 0x100601).nopw(); // irq ack?
 	map(0x100640, 0x10068f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100740, 0x100741).portr("DSW1");
@@ -229,10 +229,10 @@ void legionna_state::heatbrl_map(address_map &map)
 								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
 								 }).umask16(0x00ff);
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram().share("spriteram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x108000, 0x11ffff).ram();
@@ -243,7 +243,7 @@ void legionna_state::godzilla_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(this, FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::denjinmk_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
@@ -258,10 +258,10 @@ void legionna_state::godzilla_map(address_map &map)
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103800, 0x103fff).ram(); // check?
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x105000, 0x105fff).ram().share("spriteram");
@@ -286,7 +286,7 @@ WRITE8_MEMBER(legionna_state::godzilla_oki_bank_w)
 void legionna_state::godzilla_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(legionna_state::godzilla_oki_bank_w));
+	map(0x00, 0x00).w(FUNC(legionna_state::godzilla_oki_bank_w));
 }
 
 // Denjin Makai: Looks like they specifically swapped address line A1 in this range?
@@ -302,10 +302,10 @@ void legionna_state::denjinmk_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(this, FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::denjinmk_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).r(this, FUNC(legionna_state::denjinmk_sound_comms_r))
+	map(0x100700, 0x10071f).r(FUNC(legionna_state::denjinmk_sound_comms_r))
 		.lw8("seibu_sound_w",
 			 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 				 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
@@ -316,11 +316,11 @@ void legionna_state::denjinmk_map(address_map &map)
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
 	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
-	map(0x104000, 0x104fff).ram().w(this, FUNC(legionna_state::palette_swap_w)).share("swappal");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x104000, 0x104fff).ram().w(FUNC(legionna_state::palette_swap_w)).share("swappal");
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x107fff).ram();
 	map(0x108000, 0x11dfff).ram();
@@ -333,7 +333,7 @@ void legionna_state::grainbow_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100480, 0x100487).w(this, FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
+	map(0x100480, 0x100487).w(FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
@@ -348,12 +348,12 @@ void legionna_state::grainbow_map(address_map &map)
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
-	map(0x104000, 0x104fff).ram(); // .w(this, FUNC(legionna_state::paletteram_xBBBBBGGGGGRRRRR_word_w)).share("paletteram");
+	map(0x104000, 0x104fff).ram(); // .w(FUNC(legionna_state::paletteram_xBBBBBGGGGGRRRRR_word_w)).share("paletteram");
 	map(0x105000, 0x105fff).ram();
 	map(0x106000, 0x106fff).ram();
 	map(0x107000, 0x107fff).ram().share("spriteram");
@@ -379,10 +379,10 @@ void legionna_state::cupsoc_map(address_map &map)
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram();
 	map(0x105000, 0x106fff).ram();
@@ -419,10 +419,10 @@ void legionna_state::cupsocs_map(address_map &map)
 								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
 								 }).umask16(0x00ff);
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram();
 	map(0x105000, 0x106fff).ram();
@@ -1236,6 +1236,8 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1253,7 +1255,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
@@ -1287,6 +1289,8 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1306,7 +1310,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
@@ -1340,6 +1344,8 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1360,7 +1366,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
@@ -1394,6 +1400,8 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1413,7 +1421,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
@@ -1447,6 +1455,8 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1466,7 +1476,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
@@ -1501,6 +1511,8 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1520,7 +1532,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 

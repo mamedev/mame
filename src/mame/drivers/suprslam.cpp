@@ -108,15 +108,15 @@ void suprslam_state::suprslam_map(address_map &map)
 	map(0xfb0000, 0xfb1fff).ram().share("spriteram");
 	map(0xfc0000, 0xfcffff).ram().share("sp_videoram");
 	map(0xfd0000, 0xfdffff).ram();
-	map(0xfe0000, 0xfe0fff).ram().w(this, FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
-	map(0xff0000, 0xff1fff).ram().w(this, FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
+	map(0xfe0000, 0xfe0fff).ram().w(FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
+	map(0xff0000, 0xff1fff).ram().w(FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
 	map(0xff2000, 0xff203f).ram().share("screen_vregs");
 	map(0xff3000, 0xff3001).nopw(); // sprite buffer trigger?
 	map(0xff8000, 0xff8fff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0xff9001, 0xff9001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xffa000, 0xffafff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffd000, 0xffd01f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xffe000, 0xffe001).w(this, FUNC(suprslam_state::suprslam_bank_w));
+	map(0xffe000, 0xffe001).w(FUNC(suprslam_state::suprslam_bank_w));
 	map(0xfff000, 0xfff01f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 }
 
@@ -130,7 +130,7 @@ void suprslam_state::sound_map(address_map &map)
 void suprslam_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(suprslam_state::suprslam_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(suprslam_state::suprslam_sh_bankswitch_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }

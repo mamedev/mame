@@ -69,7 +69,6 @@
 #include "includes/vtech2.h"
 
 #include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
 #include "sound/wave.h"
 
 #include "screen.h"
@@ -90,10 +89,10 @@ void vtech2_state::vtech2_mem(address_map &map)
 void vtech2_state::vtech2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x1f).rw(this, FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
-	map(0x40, 0x43).w(this, FUNC(vtech2_state::laser_bank_select_w));
-	map(0x44, 0x44).w(this, FUNC(vtech2_state::laser_bg_mode_w));
-	map(0x45, 0x45).w(this, FUNC(vtech2_state::laser_two_color_w));
+	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
+	map(0x40, 0x43).w(FUNC(vtech2_state::laser_bank_select_w));
+	map(0x44, 0x44).w(FUNC(vtech2_state::laser_bg_mode_w));
+	map(0x45, 0x45).w(FUNC(vtech2_state::laser_two_color_w));
 }
 
 /* 2008-05 FP:

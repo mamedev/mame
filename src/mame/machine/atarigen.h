@@ -13,6 +13,7 @@
 
 #include "includes/slapstic.h"
 #include "cpu/m6502/m6502.h"
+#include "emupal.h"
 #include "screen.h"
 
 

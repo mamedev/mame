@@ -35,6 +35,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -284,16 +285,16 @@ void thedealr_state::thedealr(address_map &map)
 
 	map(0x2000, 0x2000).ram(); // w ff at boot (after clearing commram)
 
-	map(0x2400, 0x2400).r(this, FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
-	map(0x2400, 0x2400).w(this, FUNC(thedealr_state::unk_w));    // w = ?
+	map(0x2400, 0x2400).r(FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
+	map(0x2400, 0x2400).w(FUNC(thedealr_state::unk_w));    // w = ?
 
 	map(0x2800, 0x2800).portr("COINS").nopw();  // rw
 
 	map(0x2801, 0x2801).portr("DSW4");
 	map(0x2c00, 0x2c00).portr("DSW3");
 
-	map(0x3400, 0x3400).rw(this, FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
-	map(0x3401, 0x3401).r(this, FUNC(thedealr_state::iox_status_r));
+	map(0x3400, 0x3400).rw(FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
+	map(0x3401, 0x3401).r(FUNC(thedealr_state::iox_status_r));
 
 	map(0x3000, 0x3000).ram(); // rw, comm in test mode
 	map(0x3001, 0x3001).ram(); // rw, ""

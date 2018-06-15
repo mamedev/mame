@@ -6,6 +6,8 @@
 #include "video/mc6845.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
+#include "machine/pic8259.h"
+#include "emupal.h"
 
 #define T1000_SCREEN_NAME   "screen"
 #define T1000_MC6845_NAME   "mc6845_t1000"
@@ -132,6 +134,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
+	required_device<pic8259_device> m_pic8259;
 	uint8_t   *m_jxkanji;
 
 private:

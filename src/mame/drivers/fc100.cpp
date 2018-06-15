@@ -46,6 +46,7 @@ TODO:
 #include "sound/wave.h"
 #include "video/mc6847.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 #include "formats/fc100_cas.h"
@@ -132,19 +133,19 @@ void fc100_state::fc100_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x0F).r(this, FUNC(fc100_state::port00_r));
+	map(0x00, 0x0F).r(FUNC(fc100_state::port00_r));
 	// AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)  // vdg, unknown effects
 	map(0x21, 0x21).w("psg", FUNC(ay8910_device::data_w));
 	map(0x22, 0x22).r("psg", FUNC(ay8910_device::data_r));
 	map(0x23, 0x23).w("psg", FUNC(ay8910_device::address_w));
-	map(0x31, 0x31).w(this, FUNC(fc100_state::port31_w));
-	map(0x33, 0x33).w(this, FUNC(fc100_state::port33_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x31, 0x31).w(FUNC(fc100_state::port31_w));
+	map(0x33, 0x33).w(FUNC(fc100_state::port33_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x42, 0x42).nopw(); // bit 0 could be printer select
-	map(0x43, 0x43).w(this, FUNC(fc100_state::port43_w));
-	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0x60, 0x61).w(this, FUNC(fc100_state::port60_w));
-	map(0x70, 0x71).w(this, FUNC(fc100_state::port70_w));
+	map(0x43, 0x43).w(FUNC(fc100_state::port43_w));
+	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x60, 0x61).w(FUNC(fc100_state::port60_w));
+	map(0x70, 0x71).w(FUNC(fc100_state::port70_w));
 	map(0xb0, 0xb0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xb8, 0xb8).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }
@@ -555,7 +556,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

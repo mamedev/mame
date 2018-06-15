@@ -478,25 +478,25 @@ void rc759_state::rc759_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x020, 0x020).r(this, FUNC(rc759_state::keyboard_r));
+	map(0x020, 0x020).r(FUNC(rc759_state::keyboard_r));
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
-	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
-	map(0x05c, 0x05c).rw(this, FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
+	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::command_w));
+	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
 //  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
 	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x080, 0x0ff).rw(this, FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
+	map(0x080, 0x0ff).rw(FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
 //  AM_RANGE(0x100, 0x101) net
-	map(0x180, 0x1bf).rw(this, FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
-	map(0x230, 0x231).w(this, FUNC(rc759_state::txt_irst_w));
-	map(0x240, 0x241).w(this, FUNC(rc759_state::txt_ca_w));
-	map(0x250, 0x250).rw(this, FUNC(rc759_state::centronics_data_r), FUNC(rc759_state::centronics_data_w));
-	map(0x260, 0x260).rw(this, FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
+	map(0x180, 0x1bf).rw(FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
+	map(0x230, 0x231).w(FUNC(rc759_state::txt_irst_w));
+	map(0x240, 0x241).w(FUNC(rc759_state::txt_ca_w));
+	map(0x250, 0x250).rw(FUNC(rc759_state::centronics_data_r), FUNC(rc759_state::centronics_data_w));
+	map(0x260, 0x260).rw(FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
 	map(0x280, 0x287).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
-	map(0x288, 0x288).w(this, FUNC(rc759_state::floppy_control_w));
+	map(0x288, 0x288).w(FUNC(rc759_state::floppy_control_w));
 //  AM_RANGE(0x28a, 0x28b) external printer data
 //  AM_RANGE(0x28d, 0x28d) external printer control
-	map(0x28e, 0x28e).rw(this, FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
-	map(0x290, 0x290).w(this, FUNC(rc759_state::floppy_release_w));
+	map(0x28e, 0x28e).rw(FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
+	map(0x290, 0x290).w(FUNC(rc759_state::floppy_release_w));
 //  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
 //  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
 	map(0x300, 0x30f).rw(m_isbx, FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, rc759_state, ppi_portc_w))
 
 	// rtc
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir3_w))
 
 	// video
@@ -577,11 +577,11 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("snd", SN76489A, XTAL(20'000'000) / 10)
+	MCFG_DEVICE_ADD("snd", SN76489A, 20_MHz_XTAL / 10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal centronics
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, rc759_state, centronics_busy_w))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, rc759_state, centronics_ack_w))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, rc759_state, centronics_fault_w))
@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 
 	// floppy disk controller
-	MCFG_WD2797_ADD("fdc", 1000000)
+	MCFG_DEVICE_ADD("fdc", WD2797, 1000000)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir0_w))
 //  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 
@@ -612,13 +612,13 @@ MACHINE_CONFIG_END
 ROM_START( rc759 )
 	ROM_REGION(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "1-21", "1? Version 2.1")
-	ROMX_LOAD("rc759-1-2.1.rom", 0x0000, 0x8000, CRC(3a777d56) SHA1(a8592d61d5e1f92651a6f5e41c4ba14c9b6cc39b), ROM_BIOS(1))
+	ROMX_LOAD("rc759-1-2.1.rom", 0x0000, 0x8000, CRC(3a777d56) SHA1(a8592d61d5e1f92651a6f5e41c4ba14c9b6cc39b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "1-51", "1? Version 5.1")
-	ROMX_LOAD("rc759-1-5.1.rom", 0x0000, 0x8000, CRC(e1d53845) SHA1(902dc5ce28efd26b4f9c631933e197c2c187a7f1), ROM_BIOS(2))
+	ROMX_LOAD("rc759-1-5.1.rom", 0x0000, 0x8000, CRC(e1d53845) SHA1(902dc5ce28efd26b4f9c631933e197c2c187a7f1), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "2-40", "2? Version 4.0")
-	ROMX_LOAD("rc759-2-4.0.rom", 0x0000, 0x8000, CRC(d3cb752a) SHA1(f50afe5dfa1b33a36a665d32d57c8c41d6685005), ROM_BIOS(3))
+	ROMX_LOAD("rc759-2-4.0.rom", 0x0000, 0x8000, CRC(d3cb752a) SHA1(f50afe5dfa1b33a36a665d32d57c8c41d6685005), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "2-51", "2? Version 5.1")
-	ROMX_LOAD("rc759-2-5.1.rom", 0x0000, 0x8000, CRC(00a31948) SHA1(23c4473c641606a56473791773270411d1019248), ROM_BIOS(4))
+	ROMX_LOAD("rc759-2-5.1.rom", 0x0000, 0x8000, CRC(00a31948) SHA1(23c4473c641606a56473791773270411d1019248), ROM_BIOS(3))
 ROM_END
 
 

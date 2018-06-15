@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
+
+#include "emupal.h"
+
 class wiping_state : public driver_device
 {
 public:

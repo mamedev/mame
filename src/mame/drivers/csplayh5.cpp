@@ -136,7 +136,7 @@ void csplayh5_state::csplayh5_map(address_map &map)
 
 	map(0x200000, 0x200001).portr("DSW");
 	map(0x200000, 0x200000).w(m_nichisnd, FUNC(nichisnd_device::sound_host_command_w));
-	map(0x200200, 0x200201).rw(this, FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
+	map(0x200200, 0x200201).rw(FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
 	map(0x200400, 0x200401).portr("SYSTEM");
 
 	map(0x200600, 0x200607).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
@@ -158,12 +158,12 @@ void csplayh5_state::csplayh5_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	map(0x02000a, 0x02000b).r(this, FUNC(csplayh5_state::test_r));
-//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x02000a, 0x02000b).r(FUNC(csplayh5_state::test_r));
+//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 
-	map(0x040018, 0x040019).r(this, FUNC(csplayh5_state::test_r));
-	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0)); // correct?
-	map(0x040036, 0x040037).r(this, FUNC(csplayh5_state::test_r));
+	map(0x040018, 0x040019).r(FUNC(csplayh5_state::test_r));
+	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w)); // correct?
+	map(0x040036, 0x040037).r(FUNC(csplayh5_state::test_r));
 
 	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
 }
@@ -171,7 +171,7 @@ void csplayh5_state::csplayh5_sub_map(address_map &map)
 
 void csplayh5_state::csplayh5_sub_io_map(address_map &map)
 {
-	map(0x0a, 0x0b).r(this, FUNC(csplayh5_state::test_r));
+	map(0x0a, 0x0b).r(FUNC(csplayh5_state::test_r));
 }
 #endif
 
@@ -446,7 +446,7 @@ void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
  */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define DVD_BIOS \
 	ROM_REGION( 0x20000, "subcpu", 0 ) \

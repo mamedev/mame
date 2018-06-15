@@ -26,6 +26,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -131,13 +132,13 @@ void cesclassic_state::cesclassic_map(address_map &map)
 	map(0x400000, 0x40cfff).ram();
 	map(0x40d000, 0x40ffff).ram().share("vram");
 	map(0x410000, 0x410001).portr("VBLANK"); //probably m68681 lies there instead
-	map(0x410004, 0x410005).w(this, FUNC(cesclassic_state::irq3_ack_w));
-	map(0x410006, 0x410007).w(this, FUNC(cesclassic_state::irq2_ack_w));
+	map(0x410004, 0x410005).w(FUNC(cesclassic_state::irq3_ack_w));
+	map(0x410006, 0x410007).w(FUNC(cesclassic_state::irq2_ack_w));
 	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
 	map(0x600000, 0x600001).portr("SYSTEM");
-	map(0x610000, 0x610001).w(this, FUNC(cesclassic_state::outputs_w));
+	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
 //  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
-	map(0x640040, 0x640041).w(this, FUNC(cesclassic_state::lamps_w));
+	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
 	map(0x670000, 0x670001).portr("DSW");
 	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
 	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...

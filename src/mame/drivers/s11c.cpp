@@ -18,7 +18,7 @@ void s11c_state::s11c_main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).mirror(0x01ff).w(this, FUNC(s11c_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).mirror(0x01ff).w(FUNC(s11c_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -30,7 +30,7 @@ void s11c_state::s11c_main_map(address_map &map)
 void s11c_state::s11c_audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x1000, 0x1fff).w(this, FUNC(s11c_state::bank_w));
+	map(0x1000, 0x1fff).w(FUNC(s11c_state::bank_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw("pias", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xbfff).bankr("bank0");
 	map(0xc000, 0xffff).bankr("bank1");
@@ -41,9 +41,9 @@ void s11c_state::s11c_bg_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x67ff).w(this, FUNC(s11c_state::bg_speech_digit_w));
-	map(0x6800, 0x6fff).w(this, FUNC(s11c_state::bg_speech_clock_w));
-	map(0x7800, 0x7fff).w(this, FUNC(s11c_state::bgbank_w));
+	map(0x6000, 0x67ff).w(FUNC(s11c_state::bg_speech_digit_w));
+	map(0x6800, 0x6fff).w(FUNC(s11c_state::bg_speech_clock_w));
+	map(0x7800, 0x7fff).w(FUNC(s11c_state::bgbank_w));
 	map(0x8000, 0xffff).bankr("bgbank");
 }
 

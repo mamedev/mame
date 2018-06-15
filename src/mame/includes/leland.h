@@ -13,6 +13,7 @@
 #include "machine/eepromser.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000
@@ -37,7 +38,6 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_battery_ram(*this, "battery")
 		, m_eeprom(*this, "eeprom")
-		, m_sound(*this, "custom")
 		, m_dac(*this, "dac%u", 0U)
 		, m_ay8910(*this, "ay8910")
 		, m_ay8912(*this, "ay8912")
@@ -57,7 +57,6 @@ public:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_battery_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<leland_80186_sound_device> m_sound;
 	optional_device_array<dac_byte_interface, 2> m_dac;
 	optional_device<ay8910_device> m_ay8910;
 	optional_device<ay8912_device> m_ay8912;
@@ -107,13 +106,6 @@ public:
 	DECLARE_READ8_MEMBER(dangerz_input_y_r);
 	DECLARE_READ8_MEMBER(dangerz_input_x_r);
 	DECLARE_READ8_MEMBER(dangerz_input_upper_r);
-	DECLARE_READ8_MEMBER(redline_pedal_1_r);
-	DECLARE_READ8_MEMBER(redline_pedal_2_r);
-	DECLARE_READ8_MEMBER(redline_wheel_1_r);
-	DECLARE_READ8_MEMBER(redline_wheel_2_r);
-	DECLARE_READ8_MEMBER(offroad_wheel_1_r);
-	DECLARE_READ8_MEMBER(offroad_wheel_2_r);
-	DECLARE_READ8_MEMBER(offroad_wheel_3_r);
 	DECLARE_WRITE8_MEMBER(leland_master_alt_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(leland_battery_ram_w);
 	DECLARE_READ8_MEMBER(leland_master_analog_key_r);
@@ -138,25 +130,15 @@ public:
 	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
 
 	void init_dblplay();
-	void init_viper();
-	void init_quarterb();
-	void init_aafb();
-	void init_redlin2p();
-	void init_aafbb();
 	void init_dangerz();
 	void init_mayhem();
-	void init_offroad();
-	void init_pigout();
 	void init_alleymas();
-	void init_offroadt();
-	void init_teamqb();
 	void init_strkzone();
 	void init_wseries();
 	void init_powrplay();
 	void init_basebal2();
 	void init_upyoural();
 	void init_cerberus();
-	void init_aafbd2p();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -191,18 +173,55 @@ public:
 	void keycard_w(int data);
 	void leland_rotate_memory(const char *cpuname);
 	void init_master_ports(uint8_t mvram_base, uint8_t io_base);
-	void redline(machine_config &config);
-	void lelandi(machine_config &config);
 	void leland(machine_config &config);
-	void quarterb(machine_config &config);
 	void leland_video(machine_config &config);
 	void master_map_io(address_map &map);
 	void master_map_program(address_map &map);
-	void master_redline_map_io(address_map &map);
-	void slave_large_map_program(address_map &map);
 	void slave_map_io(address_map &map);
 	void slave_map_program(address_map &map);
 	void slave_small_map_program(address_map &map);
+};
+
+
+class redline_state : public leland_state
+{
+public:
+	redline_state(const machine_config &mconfig, device_type type, const char *tag)
+		: leland_state(mconfig, type, tag)
+		, m_sound(*this, "custom")
+	{
+	}
+
+	void init_redlin2p();
+	void init_quarterb();
+	void init_viper();
+	void init_teamqb();
+	void init_aafb();
+	void init_aafbb();
+	void init_aafbd2p();
+	void init_offroad();
+	void init_offroadt();
+	void init_pigout();
+
+	void redline(machine_config &config);
+	void quarterb(machine_config &config);
+	void lelandi(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(redline_pedal_1_r);
+	DECLARE_READ8_MEMBER(redline_pedal_2_r);
+	DECLARE_READ8_MEMBER(redline_wheel_1_r);
+	DECLARE_READ8_MEMBER(redline_wheel_2_r);
+	DECLARE_READ8_MEMBER(offroad_wheel_1_r);
+	DECLARE_READ8_MEMBER(offroad_wheel_2_r);
+	DECLARE_READ8_MEMBER(offroad_wheel_3_r);
+	DECLARE_WRITE8_MEMBER(redline_master_alt_bankswitch_w);
+
+	void master_redline_map_io(address_map &map);
+	void slave_large_map_program(address_map &map);
+
+private:
+	required_device<leland_80186_sound_device> m_sound;
 };
 
 
@@ -211,6 +230,8 @@ class ataxx_state : public leland_state
 public:
 	ataxx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: leland_state(mconfig, type, tag)
+		, m_sound(*this, "custom")
+		, m_track_axes(*this, "AN%u", 0U)
 		, m_xrom_base(*this, "xrom")
 	{
 	}
@@ -227,7 +248,6 @@ public:
 
 protected:
 	DECLARE_READ8_MEMBER(ataxx_trackball_r);
-	DECLARE_READ8_MEMBER(indyheat_wheel_r);
 	DECLARE_READ8_MEMBER(indyheat_analog_r);
 	DECLARE_WRITE8_MEMBER(indyheat_analog_w);
 
@@ -259,6 +279,10 @@ protected:
 	void slave_map_io_2(address_map &map);
 
 private:
+	required_device<leland_80186_sound_device> m_sound;
+
+	optional_ioport_array<4> m_track_axes;
+
 	required_region_ptr<uint8_t> m_xrom_base;
 
 	std::unique_ptr<uint8_t[]> m_ataxx_qram;

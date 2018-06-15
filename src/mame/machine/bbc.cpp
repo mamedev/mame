@@ -715,7 +715,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 	if (m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+		if (m_sn) m_sn->write(m_via_system_porta);
 	}
 	if (m_b1_speech_read == 0)
 	{
@@ -834,7 +834,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			if (m_b0_sound == 1)
 			{
 				m_b0_sound = 0;
-				if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+				if (m_sn) m_sn->write(m_via_system_porta);
 			}
 			break;
 		case 1:

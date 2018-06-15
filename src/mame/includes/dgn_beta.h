@@ -13,6 +13,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 /* Tags */
 

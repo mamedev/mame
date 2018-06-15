@@ -9,6 +9,7 @@
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galaga_state : public driver_device

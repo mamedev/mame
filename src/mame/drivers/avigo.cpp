@@ -174,7 +174,7 @@ void avigo_state::avigo_banked_map(address_map &map)
 	map(0x1400000, 0x14fffff).mirror(0x0300000).rw("flash2", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x1c00000, 0x1cfffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 
-	map(0x1800000, 0x1803fff).mirror(0x03fc000).rw(this, FUNC(avigo_state::vid_memory_r), FUNC(avigo_state::vid_memory_w));
+	map(0x1800000, 0x1803fff).mirror(0x03fc000).rw(FUNC(avigo_state::vid_memory_r), FUNC(avigo_state::vid_memory_w));
 }
 
 void avigo_state::avigo_mem(address_map &map)
@@ -502,16 +502,16 @@ void avigo_state::avigo_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x001, 0x001).rw(this, FUNC(avigo_state::key_data_read_r), FUNC(avigo_state::set_key_line_w));
-	map(0x002, 0x002).w(this, FUNC(avigo_state::port2_w));
-	map(0x003, 0x003).rw(this, FUNC(avigo_state::irq_r), FUNC(avigo_state::irq_w));
-	map(0x004, 0x004).r(this, FUNC(avigo_state::port_04_r));
-	map(0x005, 0x006).rw(this, FUNC(avigo_state::bank1_r), FUNC(avigo_state::bank1_w));
-	map(0x007, 0x008).rw(this, FUNC(avigo_state::bank2_r), FUNC(avigo_state::bank2_w));
-	map(0x009, 0x009).rw(this, FUNC(avigo_state::ad_control_status_r), FUNC(avigo_state::ad_control_status_w));
+	map(0x001, 0x001).rw(FUNC(avigo_state::key_data_read_r), FUNC(avigo_state::set_key_line_w));
+	map(0x002, 0x002).w(FUNC(avigo_state::port2_w));
+	map(0x003, 0x003).rw(FUNC(avigo_state::irq_r), FUNC(avigo_state::irq_w));
+	map(0x004, 0x004).r(FUNC(avigo_state::port_04_r));
+	map(0x005, 0x006).rw(FUNC(avigo_state::bank1_r), FUNC(avigo_state::bank1_w));
+	map(0x007, 0x008).rw(FUNC(avigo_state::bank2_r), FUNC(avigo_state::bank2_w));
+	map(0x009, 0x009).rw(FUNC(avigo_state::ad_control_status_r), FUNC(avigo_state::ad_control_status_w));
 	map(0x010, 0x01f).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
-	map(0x028, 0x028).w(this, FUNC(avigo_state::speaker_w));
-	map(0x02d, 0x02d).r(this, FUNC(avigo_state::ad_data_r));
+	map(0x028, 0x028).w(FUNC(avigo_state::speaker_w));
+	map(0x02d, 0x02d).r(FUNC(avigo_state::ad_data_r));
 	map(0x030, 0x037).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 }
 
@@ -835,76 +835,81 @@ MACHINE_CONFIG_END
 ROM_START(avigo)
 	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
-	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
-	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
-	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
+
+	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(0))
+	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(1))
+	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(2))
 
 	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
-	ROMX_LOAD("english_1004.rom", 0x000000, 0x050000, CRC(c9c3a225) SHA1(7939993a5615ca59ff2047e69b6d85122d437dca), ROM_BIOS(1))
-	ROMX_LOAD("english_1002.rom", 0x000000, 0x050000, CRC(31cab0ac) SHA1(87d337830506a12514a4beb9a8502a0de94816f2), ROM_BIOS(2))
-	ROMX_LOAD("english_100.rom",  0x000000, 0x050000, CRC(e2824b44) SHA1(3252454b05c3d3a4d7df1cb48dc3441ae82f2b1c), ROM_BIOS(3))
+	ROMX_LOAD("english_1004.rom", 0x000000, 0x050000, CRC(c9c3a225) SHA1(7939993a5615ca59ff2047e69b6d85122d437dca), ROM_BIOS(0))
+	ROMX_LOAD("english_1002.rom", 0x000000, 0x050000, CRC(31cab0ac) SHA1(87d337830506a12514a4beb9a8502a0de94816f2), ROM_BIOS(1))
+	ROMX_LOAD("english_100.rom",  0x000000, 0x050000, CRC(e2824b44) SHA1(3252454b05c3d3a4d7df1cb48dc3441ae82f2b1c), ROM_BIOS(2))
 ROM_END
 
 ROM_START(avigo_de)
 	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
-	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
-	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
-	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
+
+	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(0))
+	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(1))
+	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(2))
 
 	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
-	ROMX_LOAD("german_1004.rom", 0x000000, 0x060000, CRC(0fa437b3) SHA1(e9352aa8fee6d93b898412bd129452b82baa9a21), ROM_BIOS(1))
-	ROMX_LOAD("german_1002.rom", 0x000000, 0x060000, CRC(c6bf07ba) SHA1(d3185687aa510f6c3b3ab3baaabe7e8ce1a79e3b), ROM_BIOS(2))
-	ROMX_LOAD("german_100.rom",  0x000000, 0x060000, CRC(117d9189) SHA1(7e959ab1381ba831821fcf87973b25d87f12d34e), ROM_BIOS(3))
+	ROMX_LOAD("german_1004.rom", 0x000000, 0x060000, CRC(0fa437b3) SHA1(e9352aa8fee6d93b898412bd129452b82baa9a21), ROM_BIOS(0))
+	ROMX_LOAD("german_1002.rom", 0x000000, 0x060000, CRC(c6bf07ba) SHA1(d3185687aa510f6c3b3ab3baaabe7e8ce1a79e3b), ROM_BIOS(1))
+	ROMX_LOAD("german_100.rom",  0x000000, 0x060000, CRC(117d9189) SHA1(7e959ab1381ba831821fcf87973b25d87f12d34e), ROM_BIOS(2))
 ROM_END
 
 ROM_START(avigo_fr)
 	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
-	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
-	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
-	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
+
+	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(0))
+	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(1))
+	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(2))
 
 	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
-	ROMX_LOAD("french_1004.rom", 0x000000, 0x050000, CRC(5e4d90f7) SHA1(07df3af8a431ba65e079d6c987fb5d544f6541d8), ROM_BIOS(1))
-	ROMX_LOAD("french_1002.rom", 0x000000, 0x050000,CRC(caa3eb91) SHA1(ab199986de301d933f069a5e1f5150967e1d7f59), ROM_BIOS(2))
-	ROMX_LOAD("french_100.rom",  0x000000, 0x050000, CRC(fffa2345) SHA1(399447cede3cdd0be768952cb24f7e4431147e3d), ROM_BIOS(3))
+	ROMX_LOAD("french_1004.rom", 0x000000, 0x050000, CRC(5e4d90f7) SHA1(07df3af8a431ba65e079d6c987fb5d544f6541d8), ROM_BIOS(0))
+	ROMX_LOAD("french_1002.rom", 0x000000, 0x050000,CRC(caa3eb91) SHA1(ab199986de301d933f069a5e1f5150967e1d7f59), ROM_BIOS(1))
+	ROMX_LOAD("french_100.rom",  0x000000, 0x050000, CRC(fffa2345) SHA1(399447cede3cdd0be768952cb24f7e4431147e3d), ROM_BIOS(2))
 ROM_END
 
 ROM_START(avigo_es)
 	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
-	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
-	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
-	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
+
+	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(0))
+	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(1))
+	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(2))
 
 	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
-	ROMX_LOAD("spanish_1004.rom", 0x000000, 0x060000, CRC(235a7f8d) SHA1(94da4ecafb54dcd5d80bc5063cb4024e66e6a21f), ROM_BIOS(1))
-	ROMX_LOAD("spanish_1002.rom", 0x000000, 0x060000, CRC(a6e80cc4) SHA1(e741657558c11f7bce646ba3d7b5f845bfa275b7), ROM_BIOS(2))
-	ROMX_LOAD("spanish_100.rom",  0x000000, 0x060000, CRC(953a5276) SHA1(b9ba1dbdc2127b1ef419c911ef66313024a7351a), ROM_BIOS(3))
+	ROMX_LOAD("spanish_1004.rom", 0x000000, 0x060000, CRC(235a7f8d) SHA1(94da4ecafb54dcd5d80bc5063cb4024e66e6a21f), ROM_BIOS(0))
+	ROMX_LOAD("spanish_1002.rom", 0x000000, 0x060000, CRC(a6e80cc4) SHA1(e741657558c11f7bce646ba3d7b5f845bfa275b7), ROM_BIOS(1))
+	ROMX_LOAD("spanish_100.rom",  0x000000, 0x060000, CRC(953a5276) SHA1(b9ba1dbdc2127b1ef419c911ef66313024a7351a), ROM_BIOS(2))
 ROM_END
 
 ROM_START(avigo_it)
 	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
-	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
-	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
-	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
+
+	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(0))
+	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(1))
+	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(2))
 
 	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
-	ROMX_LOAD("italian_1004.rom", 0x000000, 0x050000, CRC(fb7941ec) SHA1(230e8346a3b0da1ee24568ec090ce6860ebfe995), ROM_BIOS(1))
-	ROMX_LOAD("italian_1002.rom", 0x000000, 0x050000, CRC(093bc032) SHA1(2c75d950d356a7fd1d058808e5f0be8e15b8ea2a), ROM_BIOS(2))
-	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(3))
+	ROMX_LOAD("italian_1004.rom", 0x000000, 0x050000, CRC(fb7941ec) SHA1(230e8346a3b0da1ee24568ec090ce6860ebfe995), ROM_BIOS(0))
+	ROMX_LOAD("italian_1002.rom", 0x000000, 0x050000, CRC(093bc032) SHA1(2c75d950d356a7fd1d058808e5f0be8e15b8ea2a), ROM_BIOS(1))
+	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(2))
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME                     FLAGS

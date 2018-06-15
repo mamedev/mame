@@ -16,6 +16,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "destroyr.lh"
@@ -280,16 +281,16 @@ void destroyr_state::destroyr_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).mirror(0xf00).ram();
-	map(0x1000, 0x1001).mirror(0xffe).r(this, FUNC(destroyr_state::input_r));
+	map(0x1000, 0x1001).mirror(0xffe).r(FUNC(destroyr_state::input_r));
 	map(0x1000, 0x1007).mirror(0xff0).w("outlatch", FUNC(f9334_device::write_d0));
-	map(0x1008, 0x1008).mirror(0xff7).w(this, FUNC(destroyr_state::misc_w));
+	map(0x1008, 0x1008).mirror(0xff7).w(FUNC(destroyr_state::misc_w));
 	map(0x2000, 0x2000).mirror(0xfff).portr("IN2");
 	map(0x3000, 0x30ff).mirror(0xf00).writeonly().share("alpha_nuram");
 	map(0x4000, 0x401f).mirror(0xfe0).writeonly().share("major_obj_ram");
-	map(0x5000, 0x5000).mirror(0xff8).w(this, FUNC(destroyr_state::cursor_load_w));
-	map(0x5001, 0x5001).mirror(0xff8).w(this, FUNC(destroyr_state::interrupt_ack_w));
+	map(0x5000, 0x5000).mirror(0xff8).w(FUNC(destroyr_state::cursor_load_w));
+	map(0x5001, 0x5001).mirror(0xff8).w(FUNC(destroyr_state::interrupt_ack_w));
 	map(0x5002, 0x5007).mirror(0xff8).writeonly().share("minor_obj_ram");
-	map(0x6000, 0x6000).mirror(0xfff).r(this, FUNC(destroyr_state::scanline_r));
+	map(0x6000, 0x6000).mirror(0xfff).r(FUNC(destroyr_state::scanline_r));
 	map(0x7000, 0x7fff).rom();
 }
 

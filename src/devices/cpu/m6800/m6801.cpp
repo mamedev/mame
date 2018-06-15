@@ -256,7 +256,7 @@ const m6800_cpu_device::op_func m6801_cpu_device::hd63701_insn[0x100] = {
 
 void m6801_cpu_device::m6803_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).rw(FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
 	map(0x0020, 0x007f).noprw();        /* unused */
 	map(0x0080, 0x00ff).ram();        /* 6803 internal RAM */
 }

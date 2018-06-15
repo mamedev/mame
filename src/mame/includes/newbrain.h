@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "409"

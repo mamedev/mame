@@ -14,6 +14,7 @@
 
 #include "sound/samples.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -113,7 +114,7 @@ private:
 
 	/* sound streaming variables */
 	sound_stream *m_stream;
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	double m_freq_to_step;
 	uint8_t m_sound_data[24];
 };

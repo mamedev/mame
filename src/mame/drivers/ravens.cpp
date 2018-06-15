@@ -220,17 +220,17 @@ void ravens_state::ravens_mem(address_map &map)
 void ravens_state::ravens_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x09, 0x09).w(this, FUNC(ravens_state::leds_w)); // LED output port
-	map(0x10, 0x15).w(this, FUNC(ravens_state::display_w)); // 6-led display
-	map(0x17, 0x17).r(this, FUNC(ravens_state::port17_r)); // pushbuttons
+	map(0x09, 0x09).w(FUNC(ravens_state::leds_w)); // LED output port
+	map(0x10, 0x15).w(FUNC(ravens_state::display_w)); // 6-led display
+	map(0x17, 0x17).r(FUNC(ravens_state::port17_r)); // pushbuttons
 }
 
 void ravens_state::ravens2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x07, 0x07).r(this, FUNC(ravens_state::port07_r));
-	map(0x1b, 0x1b).w(this, FUNC(ravens_state::port1b_w));
-	map(0x1c, 0x1c).w(this, FUNC(ravens_state::port1c_w));
+	map(0x07, 0x07).r(FUNC(ravens_state::port07_r));
+	map(0x1b, 0x1b).w(FUNC(ravens_state::port1b_w));
+	map(0x1c, 0x1c).w(FUNC(ravens_state::port1c_w));
 }
 
 /* Input ports */
@@ -383,9 +383,9 @@ MACHINE_CONFIG_END
 ROM_START( ravens )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v1.0", "V1.0" )
-	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(1))
+	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v0.9", "V0.9" )
-	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(2))
+	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(1))
 ROM_END
 
 ROM_START( ravens2 )

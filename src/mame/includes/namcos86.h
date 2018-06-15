@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "machine/watchdog.h"
 #include "sound/namco.h"
+#include "emupal.h"
 
 class namcos86_state : public driver_device
 {

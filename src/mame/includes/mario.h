@@ -6,6 +6,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/z80dma.h"
+#include "emupal.h"
 
 #define OLD_SOUND   (0)
 

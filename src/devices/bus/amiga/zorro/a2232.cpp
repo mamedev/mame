@@ -33,16 +33,16 @@ DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
 void a2232_device::iocpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("shared");
-	map(0x4000, 0x47ff).rw(this, FUNC(a2232_device::acia_0_r), FUNC(a2232_device::acia_0_w));
-	map(0x4800, 0x4fff).rw(this, FUNC(a2232_device::acia_1_r), FUNC(a2232_device::acia_1_w));
-	map(0x5000, 0x57ff).rw(this, FUNC(a2232_device::acia_2_r), FUNC(a2232_device::acia_2_w));
-	map(0x5800, 0x5fff).rw(this, FUNC(a2232_device::acia_3_r), FUNC(a2232_device::acia_3_w));
-	map(0x6000, 0x67ff).rw(this, FUNC(a2232_device::acia_4_r), FUNC(a2232_device::acia_4_w));
-	map(0x6800, 0x6fff).rw(this, FUNC(a2232_device::acia_5_r), FUNC(a2232_device::acia_5_w));
-	map(0x7000, 0x73ff).w(this, FUNC(a2232_device::int2_w));
-	map(0x7400, 0x77ff).rw(this, FUNC(a2232_device::acia_6_r), FUNC(a2232_device::acia_6_w));
-	map(0x7800, 0x7fff).rw(this, FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
-	map(0x8000, 0x8000).w(this, FUNC(a2232_device::irq_ack8_w));
+	map(0x4000, 0x47ff).rw(FUNC(a2232_device::acia_0_r), FUNC(a2232_device::acia_0_w));
+	map(0x4800, 0x4fff).rw(FUNC(a2232_device::acia_1_r), FUNC(a2232_device::acia_1_w));
+	map(0x5000, 0x57ff).rw(FUNC(a2232_device::acia_2_r), FUNC(a2232_device::acia_2_w));
+	map(0x5800, 0x5fff).rw(FUNC(a2232_device::acia_3_r), FUNC(a2232_device::acia_3_w));
+	map(0x6000, 0x67ff).rw(FUNC(a2232_device::acia_4_r), FUNC(a2232_device::acia_4_w));
+	map(0x6800, 0x6fff).rw(FUNC(a2232_device::acia_5_r), FUNC(a2232_device::acia_5_w));
+	map(0x7000, 0x73ff).w(FUNC(a2232_device::int2_w));
+	map(0x7400, 0x77ff).rw(FUNC(a2232_device::acia_6_r), FUNC(a2232_device::acia_6_w));
+	map(0x7800, 0x7fff).rw(FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
+	map(0x8000, 0x8000).w(FUNC(a2232_device::irq_ack8_w));
 	map(0xc000, 0xffff).ram().share("shared");
 }
 

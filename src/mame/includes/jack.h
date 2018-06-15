@@ -8,6 +8,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class jack_state : public driver_device
 {

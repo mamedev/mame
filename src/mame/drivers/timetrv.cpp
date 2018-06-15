@@ -31,6 +31,7 @@ CPU is an Intel 80188
 #include "machine/eeprompar.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
+#include "emupal.h"
 #include "screen.h"
 
 

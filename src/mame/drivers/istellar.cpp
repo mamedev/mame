@@ -25,6 +25,7 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -154,7 +155,7 @@ void istellar_state::z80_2_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0x1800, 0x1fff).ram();
-	map(0xc000, 0xc000).r(this, FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
+	map(0xc000, 0xc000).r(FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
 }
 
 
@@ -180,7 +181,7 @@ void istellar_state::z80_1_io(address_map &map)
 void istellar_state::z80_2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
+	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
 	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
 /*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/

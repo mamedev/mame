@@ -189,10 +189,10 @@ void jack_state::jack_map(address_map &map)
 	map(0xb503, 0xb503).portr("IN1");
 	map(0xb504, 0xb504).portr("IN2");
 	map(0xb505, 0xb505).portr("IN3");
-	map(0xb506, 0xb507).rw(this, FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
+	map(0xb506, 0xb507).rw(FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
 	map(0xb600, 0xb61f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xb800, 0xbbff).ram().w(this, FUNC(jack_state::jack_videoram_w)).share("videoram");
-	map(0xbc00, 0xbfff).ram().w(this, FUNC(jack_state::jack_colorram_w)).share("colorram");
+	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::jack_videoram_w)).share("videoram");
+	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::jack_colorram_w)).share("colorram");
 	map(0xc000, 0xffff).rom();
 }
 
@@ -205,7 +205,7 @@ void jack_state::striv_map(address_map &map)
 {
 	jack_map(map);
 	map(0xb000, 0xb0ff).nopw();
-	map(0xc000, 0xcfff).r(this, FUNC(jack_state::striv_question_r));
+	map(0xc000, 0xcfff).r(FUNC(jack_state::striv_question_r));
 }
 
 
@@ -214,17 +214,17 @@ void jack_state::joinem_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
 	map(0xb000, 0xb07f).ram().share("spriteram");
-	map(0xb080, 0xb0ff).ram().w(this, FUNC(jack_state::joinem_scroll_w)).share("scrollram");
+	map(0xb080, 0xb0ff).ram().w(FUNC(jack_state::joinem_scroll_w)).share("scrollram");
 	map(0xb400, 0xb400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb500, 0xb500).portr("DSW1");
 	map(0xb501, 0xb501).portr("DSW2");
 	map(0xb502, 0xb502).portr("IN0");
 	map(0xb503, 0xb503).portr("IN1");
 	map(0xb504, 0xb504).portr("IN2");
-	map(0xb506, 0xb507).rw(this, FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
-	map(0xb700, 0xb700).w(this, FUNC(jack_state::joinem_control_w));
-	map(0xb800, 0xbbff).ram().w(this, FUNC(jack_state::jack_videoram_w)).share("videoram");
-	map(0xbc00, 0xbfff).ram().w(this, FUNC(jack_state::jack_colorram_w)).share("colorram");
+	map(0xb506, 0xb507).rw(FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
+	map(0xb700, 0xb700).w(FUNC(jack_state::joinem_control_w));
+	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::jack_videoram_w)).share("videoram");
+	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::jack_colorram_w)).share("colorram");
 }
 
 void jack_state::unclepoo_map(address_map &map)

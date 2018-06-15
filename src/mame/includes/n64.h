@@ -174,8 +174,8 @@ protected:
 private:
 	n64_state* m_n64;
 	address_space *m_mem_map;
-	mips3_device *m_vr4300;
-	rsp_device *m_rsp;
+	required_device<mips3_device> m_vr4300;
+	required_device<rsp_device> m_rsp;
 
 	uint32_t *m_rdram;
 	uint32_t *m_sram;
@@ -200,7 +200,7 @@ private:
 	void ai_fifo_pop();
 	bool ai_delayed_carry;
 
-	dmadac_sound_device *ai_dac[2];
+	required_device_array<dmadac_sound_device, 2> ai_dac;
 	uint32_t ai_dram_addr;
 	uint32_t ai_len;
 	uint32_t ai_control;

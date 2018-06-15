@@ -845,18 +845,18 @@ void nc100_state::nc100_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x0f).w(this, FUNC(nc100_state::nc100_display_memory_start_w));
-	map(0x10, 0x13).rw(this, FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
-	map(0x20, 0x20).w(this, FUNC(nc100_state::nc100_memory_card_wait_state_w));
-	map(0x30, 0x30).w(this, FUNC(nc100_state::nc100_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x53).w(this, FUNC(nc100_state::nc_sound_w));
-	map(0x60, 0x60).w(this, FUNC(nc100_state::nc_irq_mask_w));
-	map(0x70, 0x70).w(this, FUNC(nc100_state::nc100_poweroff_control_w));
-	map(0x90, 0x90).rw(this, FUNC(nc100_state::nc_irq_status_r), FUNC(nc100_state::nc_irq_status_w));
-	map(0x91, 0x9f).r(this, FUNC(nc100_state::nc_irq_status_r));
-	map(0xa0, 0xaf).r(this, FUNC(nc100_state::nc100_card_battery_status_r));
-	map(0xb0, 0xb9).r(this, FUNC(nc100_state::nc_key_data_in_r));
+	map(0x00, 0x0f).w(FUNC(nc100_state::nc100_display_memory_start_w));
+	map(0x10, 0x13).rw(FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
+	map(0x20, 0x20).w(FUNC(nc100_state::nc100_memory_card_wait_state_w));
+	map(0x30, 0x30).w(FUNC(nc100_state::nc100_uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x53).w(FUNC(nc100_state::nc_sound_w));
+	map(0x60, 0x60).w(FUNC(nc100_state::nc_irq_mask_w));
+	map(0x70, 0x70).w(FUNC(nc100_state::nc100_poweroff_control_w));
+	map(0x90, 0x90).rw(FUNC(nc100_state::nc_irq_status_r), FUNC(nc100_state::nc_irq_status_w));
+	map(0x91, 0x9f).r(FUNC(nc100_state::nc_irq_status_r));
+	map(0xa0, 0xaf).r(FUNC(nc100_state::nc100_card_battery_status_r));
+	map(0xb0, 0xb9).r(FUNC(nc100_state::nc_key_data_in_r));
 	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
@@ -1250,18 +1250,18 @@ WRITE8_MEMBER(nc200_state::nc200_poweroff_control_w)
 void nc200_state::nc200_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w(this, FUNC(nc200_state::nc100_display_memory_start_w));
-	map(0x10, 0x13).rw(this, FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
-	map(0x20, 0x20).w(this, FUNC(nc200_state::nc200_memory_card_wait_state_w));
-	map(0x30, 0x30).w(this, FUNC(nc200_state::nc200_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x53).w(this, FUNC(nc200_state::nc_sound_w));
-	map(0x60, 0x60).w(this, FUNC(nc200_state::nc_irq_mask_w));
-	map(0x70, 0x70).w(this, FUNC(nc200_state::nc200_poweroff_control_w));
-	map(0x80, 0x80).r(this, FUNC(nc200_state::nc200_printer_status_r));
-	map(0x90, 0x90).rw(this, FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
-	map(0xa0, 0xa0).r(this, FUNC(nc200_state::nc200_card_battery_status_r));
-	map(0xb0, 0xb9).r(this, FUNC(nc200_state::nc_key_data_in_r));
+	map(0x00, 0x0f).w(FUNC(nc200_state::nc100_display_memory_start_w));
+	map(0x10, 0x13).rw(FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
+	map(0x20, 0x20).w(FUNC(nc200_state::nc200_memory_card_wait_state_w));
+	map(0x30, 0x30).w(FUNC(nc200_state::nc200_uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x53).w(FUNC(nc200_state::nc_sound_w));
+	map(0x60, 0x60).w(FUNC(nc200_state::nc_irq_mask_w));
+	map(0x70, 0x70).w(FUNC(nc200_state::nc200_poweroff_control_w));
+	map(0x80, 0x80).r(FUNC(nc200_state::nc200_printer_status_r));
+	map(0x90, 0x90).rw(FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
+	map(0xa0, 0xa0).r(FUNC(nc200_state::nc200_card_battery_status_r));
+	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
 	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
@@ -1405,7 +1405,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, nc_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1452,7 +1452,7 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc100_state, nc100_txrdy_callback))
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", TC8521, 32.768_kHz_XTAL)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, nc100_state, nc100_tc8521_alarm_callback))
 MACHINE_CONFIG_END
 
@@ -1497,7 +1497,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
-	MCFG_MC146818_ADD( "mc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1514,13 +1514,13 @@ MACHINE_CONFIG_END
 ROM_START(nc100)
 	ROM_REGION(((64*1024)+(256*1024)), "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "106", "ROM v1.06")
-	ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(1))
+	ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "102dk", "ROM v1.02 Danish")
-	ROMX_LOAD("nc100_dk_a1.rom", 0x010000, 0x040000, CRC(ebb54923) SHA1(30321011384c5e10204b9a837430c36fc63580d2), ROM_BIOS(2))
+	ROMX_LOAD("nc100_dk_a1.rom", 0x010000, 0x040000, CRC(ebb54923) SHA1(30321011384c5e10204b9a837430c36fc63580d2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "102de", "ROM v1.02 German")
-	ROMX_LOAD("nc100_de_a1.rom", 0x010000, 0x040000, CRC(bd9ce223) SHA1(2efb26911832bf1456d76d2508e24c0733dc216d), ROM_BIOS(3))
+	ROMX_LOAD("nc100_de_a1.rom", 0x010000, 0x040000, CRC(bd9ce223) SHA1(2efb26911832bf1456d76d2508e24c0733dc216d), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "100", "ROM v1.00")
-	ROMX_LOAD("nc100.rom",  0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(4))
+	ROMX_LOAD("nc100.rom",  0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(3))
 ROM_END
 
 
@@ -1533,9 +1533,9 @@ ROM_END
 ROM_START(nc150)
 	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "b2", "French B2")
-	ROMX_LOAD("nc150_fr_b2.rom", 0x010000, 0x080000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8), ROM_BIOS(1)) /* French */
+	ROMX_LOAD("nc150_fr_b2.rom", 0x010000, 0x080000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8), ROM_BIOS(0)) // French
 	ROM_SYSTEM_BIOS(1, "b1", "Italian B1")
-	ROMX_LOAD("nc150_it_b1.rom", 0x010000, 0x080000, CRC(1b2fe2fd) SHA1(67eb6bce0b0d4668401d9c8f5a900dc6bd135c21), ROM_BIOS(2)) /* Italian */
+	ROMX_LOAD("nc150_it_b1.rom", 0x010000, 0x080000, CRC(1b2fe2fd) SHA1(67eb6bce0b0d4668401d9c8f5a900dc6bd135c21), ROM_BIOS(1)) // Italian
 ROM_END
 
 

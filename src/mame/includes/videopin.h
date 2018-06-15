@@ -11,6 +11,7 @@
 #pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */

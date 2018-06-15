@@ -61,6 +61,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "emu.h"
 #include "includes/supbtime.h"
+#include "emupal.h"
 
 #define TUMBLEP_HACK 0
 
@@ -80,7 +81,7 @@ void supbtime_state::supbtime_map(address_map &map)
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("SYSTEM");
-	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
@@ -99,7 +100,7 @@ void supbtime_state::chinatwn_map(address_map &map)
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("SYSTEM");
-	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a3fff).ram();
 	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
@@ -121,7 +122,7 @@ void supbtime_state::tumblep_map(address_map &map)
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("SYSTEM");
-	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a07ff).ram().share("spriteram");
 	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));

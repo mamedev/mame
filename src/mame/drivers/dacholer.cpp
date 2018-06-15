@@ -38,6 +38,7 @@
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -245,8 +246,8 @@ void dacholer_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8800, 0x97ff).ram();
-	map(0xc000, 0xc3ff).mirror(0x400).ram().w(this, FUNC(dacholer_state::background_w)).share("bgvideoram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(dacholer_state::foreground_w)).share("fgvideoram");
+	map(0xc000, 0xc3ff).mirror(0x400).ram().w(FUNC(dacholer_state::background_w)).share("bgvideoram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(dacholer_state::foreground_w)).share("fgvideoram");
 	map(0xe000, 0xe0ff).ram().share("spriteram");
 }
 
@@ -266,11 +267,11 @@ void dacholer_state::main_io_map(address_map &map)
 	map(0x03, 0x03).portr("DSWA");
 	map(0x04, 0x04).portr("DSWB");
 	map(0x05, 0x05).nopr(); // watchdog in itaten
-	map(0x20, 0x20).w(this, FUNC(dacholer_state::coins_w));
-	map(0x21, 0x21).w(this, FUNC(dacholer_state::bg_bank_w));
-	map(0x22, 0x22).w(this, FUNC(dacholer_state::bg_scroll_x_w));
-	map(0x23, 0x23).w(this, FUNC(dacholer_state::bg_scroll_y_w));
-	map(0x24, 0x24).w(this, FUNC(dacholer_state::main_irq_ack_w));
+	map(0x20, 0x20).w(FUNC(dacholer_state::coins_w));
+	map(0x21, 0x21).w(FUNC(dacholer_state::bg_bank_w));
+	map(0x22, 0x22).w(FUNC(dacholer_state::bg_scroll_x_w));
+	map(0x23, 0x23).w(FUNC(dacholer_state::bg_scroll_y_w));
+	map(0x24, 0x24).w(FUNC(dacholer_state::main_irq_ack_w));
 	map(0x27, 0x27).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -319,10 +320,10 @@ void dacholer_state::snd_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x04, 0x04).w(this, FUNC(dacholer_state::music_irq_w));
-	map(0x08, 0x08).w(this, FUNC(dacholer_state::snd_irq_w));
-	map(0x0c, 0x0c).w(this, FUNC(dacholer_state::snd_ack_w));
-	map(0x80, 0x80).w(this, FUNC(dacholer_state::adpcm_w));
+	map(0x04, 0x04).w(FUNC(dacholer_state::music_irq_w));
+	map(0x08, 0x08).w(FUNC(dacholer_state::snd_irq_w));
+	map(0x0c, 0x0c).w(FUNC(dacholer_state::snd_ack_w));
+	map(0x80, 0x80).w(FUNC(dacholer_state::adpcm_w));
 	map(0x86, 0x87).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x8a, 0x8b).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x8e, 0x8f).w("ay3", FUNC(ay8910_device::data_address_w));

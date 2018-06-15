@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/hd61830.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -113,14 +114,14 @@ void hunter2_state::hunter2_io(address_map &map)
 	map(0x21, 0x21).rw("lcdc", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 	map(0x3e, 0x3e).r("lcdc", FUNC(hd61830_device::data_r));
 	map(0x40, 0x4f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
-	map(0x60, 0x60).w(this, FUNC(hunter2_state::display_ctrl_w));
-	map(0x80, 0x80).w(this, FUNC(hunter2_state::port80_w));
-	map(0x81, 0x81).w(this, FUNC(hunter2_state::serial_tx_w));
-	map(0x82, 0x82).w(this, FUNC(hunter2_state::serial_dtr_w));
-	map(0x84, 0x84).w(this, FUNC(hunter2_state::serial_rts_w));
-	map(0x86, 0x86).w(this, FUNC(hunter2_state::speaker_w));
-	map(0xbb, 0xbb).w(this, FUNC(hunter2_state::irqctrl_w));
-	map(0xe0, 0xe0).w(this, FUNC(hunter2_state::memmap_w));
+	map(0x60, 0x60).w(FUNC(hunter2_state::display_ctrl_w));
+	map(0x80, 0x80).w(FUNC(hunter2_state::port80_w));
+	map(0x81, 0x81).w(FUNC(hunter2_state::serial_tx_w));
+	map(0x82, 0x82).w(FUNC(hunter2_state::serial_dtr_w));
+	map(0x84, 0x84).w(FUNC(hunter2_state::serial_rts_w));
+	map(0x86, 0x86).w(FUNC(hunter2_state::speaker_w));
+	map(0xbb, 0xbb).w(FUNC(hunter2_state::irqctrl_w));
+	map(0xe0, 0xe0).w(FUNC(hunter2_state::memmap_w));
 }
 
 

@@ -220,7 +220,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					ea = GetEA(modrm,1);
 				}
 				WRITE16(ea, m_gdtr.limit);
-				WRITE32(ea + 2, m_gdtr.base & 0xffffff);
+				WRITE32(ea + 2, m_gdtr.base);
 				CYCLES(CYCLES_SGDT);
 				break;
 			}
@@ -236,7 +236,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					ea = GetEA(modrm,1);
 				}
 				WRITE16(ea, m_idtr.limit);
-				WRITE32(ea + 2, m_idtr.base & 0xffffff);
+				WRITE32(ea + 2, m_idtr.base);
 				CYCLES(CYCLES_SIDT);
 				break;
 			}

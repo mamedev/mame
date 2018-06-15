@@ -1749,7 +1749,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     C389? (Cyber Cycles)
 	 *     C392? (Ace Driver Victory Lap)
 	 */
-	map(0x20000000, 0x2000000f).rw(this, FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
+	map(0x20000000, 0x2000000f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
 
 	/**
 	 * C139 SCI Buffer
@@ -1792,13 +1792,13 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     2002000c  2  R/W RX FIFO Pointer (0x0000 - 0x0fff)
 	 *     2002000e  2  W   TX FIFO Pointer (0x0000 - 0x1fff)
 	 */
-	map(0x20020000, 0x2002000f).r(this, FUNC(namcos22_state::namcos22_sci_r)).writeonly();
+	map(0x20020000, 0x2002000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly();
 
 	/**
 	 * System Controller: Interrupt Control, Peripheral Control
 	 *
 	 */
-	map(0x40000000, 0x4000001f).rw(this, FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22_system_controller_w));
+	map(0x40000000, 0x4000001f).rw(FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22_system_controller_w));
 
 	/**
 	 * Unknown Device (optional for diagnostics?)
@@ -1813,8 +1813,8 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     0x50000000 - DIPSW3
 	 *     0x50000001 - DIPSW2
 	 */
-	map(0x50000000, 0x50000003).rw(this, FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
-	map(0x50000008, 0x5000000b).rw(this, FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
+	map(0x50000000, 0x50000003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x50000008, 0x5000000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 
 	/**
 	 * EEPROM
@@ -1873,7 +1873,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 * Known chip type: TC55328P-25, N341256P-15
 	 * Notes: connected bits = 0x00ffffff (24bit)
 	 */
-	map(0x70000000, 0x7001ffff).rw(this, FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
+	map(0x70000000, 0x7001ffff).rw(FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
 
 	/**
 	 * LED on PCB(?)
@@ -1898,7 +1898,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 * Mounted position: VIDEO 6B, 7B, 8B (near C305)
 	 * Note: 0xff00-0xffff are for Tilemap (16 x 16)
 	 */
-	map(0x90028000, 0x9003ffff).ram().w(this, FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
+	map(0x90028000, 0x9003ffff).ram().w(FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
 
 	/**
 	 * unknown (option)
@@ -1909,7 +1909,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	/**
 	 * Tilemap PCG Memory
 	 */
-	map(0x90080000, 0x9009dfff).ram().w(this, FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
+	map(0x90080000, 0x9009dfff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
 
 	/**
 	 * Tilemap Memory (64 x 64)
@@ -1917,13 +1917,13 @@ void namcos22_state::namcos22_am(address_map &map)
 	 * Known chip type: HM511664 (64k x 16bit SRAM)
 	 * Note: Self test: 90084000 - 9009ffff
 	 */
-	map(0x9009e000, 0x9009ffff).ram().w(this, FUNC(namcos22_state::namcos22_textram_w)).share("textram");
+	map(0x9009e000, 0x9009ffff).ram().w(FUNC(namcos22_state::namcos22_textram_w)).share("textram");
 
 	/**
 	 * Tilemap Register
 	 * Mounted position: unknown
 	 */
-	map(0x900a0000, 0x900a000f).rw(this, FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
+	map(0x900a0000, 0x900a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
 }
 
 
@@ -1931,28 +1931,28 @@ void namcos22_state::namcos22_am(address_map &map)
 void namcos22_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x400000, 0x40001f).rw(this, FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
+	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
 	map(0x410000, 0x413fff).ram(); /* C139 SCI buffer */
-	map(0x420000, 0x42000f).r(this, FUNC(namcos22_state::namcos22_sci_r)).writeonly(); /* C139 SCI registers */
-	map(0x440000, 0x440003).rw(this, FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
-	map(0x450008, 0x45000b).rw(this, FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
+	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); /* C139 SCI registers */
+	map(0x440000, 0x440003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
-	map(0x700000, 0x70001f).rw(this, FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22s_system_controller_w));
-	map(0x800000, 0x800003).w(this, FUNC(namcos22_state::namcos22s_chipselect_w));
+	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22s_system_controller_w));
+	map(0x800000, 0x800003).w(FUNC(namcos22_state::namcos22s_chipselect_w));
 	map(0x810000, 0x81000f).ram().share("czattr");
-	map(0x810200, 0x8103ff).rw(this, FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
+	map(0x810200, 0x8103ff).rw(FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
 	map(0x820000, 0x8202ff).nopw(); /* leftover of old (non-super) video mixer device */
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
-	map(0x828000, 0x83ffff).ram().w(this, FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
-	map(0x860000, 0x860007).rw(this, FUNC(namcos22_state::namcos22s_spotram_r), FUNC(namcos22_state::namcos22s_spotram_w));
-	map(0x880000, 0x89dfff).ram().w(this, FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
-	map(0x89e000, 0x89ffff).ram().w(this, FUNC(namcos22_state::namcos22_textram_w)).share("textram");
-	map(0x8a0000, 0x8a000f).rw(this, FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
+	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
+	map(0x860000, 0x860007).rw(FUNC(namcos22_state::namcos22s_spotram_r), FUNC(namcos22_state::namcos22s_spotram_w));
+	map(0x880000, 0x89dfff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
+	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22_state::namcos22_textram_w)).share("textram");
+	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
 	map(0x900000, 0x90ffff).ram().share("vics_data");
-	map(0x940000, 0x94007f).rw(this, FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
+	map(0x940000, 0x94007f).rw(FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
 	map(0x980000, 0x9affff).ram().share("spriteram"); /* C374 */
 	map(0xa04000, 0xa0bfff).ram().share("shareram"); /* COM RAM */
-	map(0xc00000, 0xc1ffff).rw(this, FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
+	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
 	map(0xe00000, 0xe3ffff).ram(); /* workram */
 }
 
@@ -1981,7 +1981,7 @@ READ32_MEMBER(namcos22_state::namcos22_gun_r)
 void namcos22_state::timecris_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x430000, 0x43000f).r(this, FUNC(namcos22_state::namcos22_gun_r));
+	map(0x430000, 0x43000f).r(FUNC(namcos22_state::namcos22_gun_r));
 }
 
 
@@ -2015,8 +2015,8 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 void namcos22_state::alpinesa_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x200000, 0x200003).r(this, FUNC(namcos22_state::alpinesa_prot_r));
-	map(0x300000, 0x300003).w(this, FUNC(namcos22_state::alpinesa_prot_w));
+	map(0x200000, 0x200003).r(FUNC(namcos22_state::alpinesa_prot_r));
+	map(0x300000, 0x300003).w(FUNC(namcos22_state::alpinesa_prot_w));
 }
 
 
@@ -2552,26 +2552,26 @@ void namcos22_state::master_dsp_program(address_map &map)
 void namcos22_state::master_dsp_data(address_map &map)
 {
 	map(0x1000, 0x3fff).ram();
-	map(0x4000, 0x7fff).r(this, FUNC(namcos22_state::master_external_ram_r)).w(this, FUNC(namcos22_state::master_external_ram_w));
-	map(0x8000, 0xffff).r(this, FUNC(namcos22_state::namcos22_dspram16_r)).w(this, FUNC(namcos22_state::namcos22_dspram16_w));
+	map(0x4000, 0x7fff).r(FUNC(namcos22_state::master_external_ram_r)).w(FUNC(namcos22_state::master_external_ram_w));
+	map(0x8000, 0xffff).r(FUNC(namcos22_state::namcos22_dspram16_r)).w(FUNC(namcos22_state::namcos22_dspram16_w));
 }
 
 void namcos22_state::master_dsp_io(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(namcos22_state::point_loword_r), FUNC(namcos22_state::point_loword_iw));
-	map(0x1, 0x1).rw(this, FUNC(namcos22_state::point_hiword_ir), FUNC(namcos22_state::point_hiword_w));
-	map(0x2, 0x2).rw(this, FUNC(namcos22_state::pdp_begin_r), FUNC(namcos22_state::dsp_unk2_w));
-	map(0x3, 0x3).rw(this, FUNC(namcos22_state::dsp_unk_port3_r), FUNC(namcos22_state::point_address_w));
+	map(0x0, 0x0).rw(FUNC(namcos22_state::point_loword_r), FUNC(namcos22_state::point_loword_iw));
+	map(0x1, 0x1).rw(FUNC(namcos22_state::point_hiword_ir), FUNC(namcos22_state::point_hiword_w));
+	map(0x2, 0x2).rw(FUNC(namcos22_state::pdp_begin_r), FUNC(namcos22_state::dsp_unk2_w));
+	map(0x3, 0x3).rw(FUNC(namcos22_state::dsp_unk_port3_r), FUNC(namcos22_state::point_address_w));
 	map(0x4, 0x4).nopw(); /* unknown */
-	map(0x7, 0x7).w(this, FUNC(namcos22_state::upload_code_to_slave_dsp_w));
-	map(0x8, 0x8).rw(this, FUNC(namcos22_state::dsp_unk8_r), FUNC(namcos22_state::dsp_unk8_w)); /* trigger irq? */
-	map(0x9, 0x9).r(this, FUNC(namcos22_state::custom_ic_status_r)).nopw(); /* trigger irq? */
-	map(0xa, 0xa).w(this, FUNC(namcos22_state::dsp_unk_porta_w));
+	map(0x7, 0x7).w(FUNC(namcos22_state::upload_code_to_slave_dsp_w));
+	map(0x8, 0x8).rw(FUNC(namcos22_state::dsp_unk8_r), FUNC(namcos22_state::dsp_unk8_w)); /* trigger irq? */
+	map(0x9, 0x9).r(FUNC(namcos22_state::custom_ic_status_r)).nopw(); /* trigger irq? */
+	map(0xa, 0xa).w(FUNC(namcos22_state::dsp_unk_porta_w));
 	map(0xb, 0xb).nopw(); /* RINT-related? */
-	map(0xc, 0xc).w(this, FUNC(namcos22_state::master_render_device_w));
-	map(0xd, 0xd).w(this, FUNC(namcos22_state::namcos22_dspram16_bank_w));
-	map(0xe, 0xe).w(this, FUNC(namcos22_state::dsp_led_w));
-	map(0xf, 0xf).r(this, FUNC(namcos22_state::dsp_upload_status_r)).nopw();
+	map(0xc, 0xc).w(FUNC(namcos22_state::master_render_device_w));
+	map(0xd, 0xd).w(FUNC(namcos22_state::namcos22_dspram16_bank_w));
+	map(0xe, 0xe).w(FUNC(namcos22_state::dsp_led_w));
+	map(0xf, 0xf).r(FUNC(namcos22_state::dsp_upload_status_r)).nopw();
 }
 
 
@@ -2640,25 +2640,25 @@ void namcos22_state::slave_dsp_program(address_map &map)
 
 void namcos22_state::slave_dsp_data(address_map &map)
 {
-	map(0x8000, 0x9fff).rw(this, FUNC(namcos22_state::slave_external_ram_r), FUNC(namcos22_state::slave_external_ram_w));
+	map(0x8000, 0x9fff).rw(FUNC(namcos22_state::slave_external_ram_r), FUNC(namcos22_state::slave_external_ram_w));
 }
 
 void namcos22_state::slave_dsp_io(address_map &map)
 {
 	/* unknown signal */
-	map(0x3, 0x3).r(this, FUNC(namcos22_state::dsp_slave_port3_r));
+	map(0x3, 0x3).r(FUNC(namcos22_state::dsp_slave_port3_r));
 
-	map(0x4, 0x4).r(this, FUNC(namcos22_state::dsp_slave_port4_r));
-	map(0x5, 0x5).r(this, FUNC(namcos22_state::dsp_slave_port5_r));
-	map(0x6, 0x6).r(this, FUNC(namcos22_state::dsp_slave_port6_r)).nopw();
+	map(0x4, 0x4).r(FUNC(namcos22_state::dsp_slave_port4_r));
+	map(0x5, 0x5).r(FUNC(namcos22_state::dsp_slave_port5_r));
+	map(0x6, 0x6).r(FUNC(namcos22_state::dsp_slave_port6_r)).nopw();
 
 	/* render device state */
-	map(0x8, 0x8).r(this, FUNC(namcos22_state::dsp_slave_port8_r)).nopw();
+	map(0x8, 0x8).r(FUNC(namcos22_state::dsp_slave_port8_r)).nopw();
 
 	/* render device */
-	map(0xb, 0xb).rw(this, FUNC(namcos22_state::dsp_slave_portb_r), FUNC(namcos22_state::dsp_slave_portb_w));
+	map(0xb, 0xb).rw(FUNC(namcos22_state::dsp_slave_portb_r), FUNC(namcos22_state::dsp_slave_portb_w));
 
-	map(0xc, 0xc).w(this, FUNC(namcos22_state::dsp_slave_portc_w));
+	map(0xc, 0xc).w(FUNC(namcos22_state::dsp_slave_portc_w));
 }
 
 
@@ -2718,7 +2718,7 @@ READ8_MEMBER(namcos22_state::iomcu_port4_s22_r)
 void namcos22_state::mcu_s22_program(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).rw(this, FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
+	map(0x004000, 0x00bfff).rw(FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
 	map(0x080000, 0x0fffff).rom().region("mcu", 0);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
 	map(0x280000, 0x2fffff).rom().region("mcu", 0);
@@ -2733,12 +2733,12 @@ void namcos22_state::iomcu_s22_program(address_map &map)
 
 void namcos22_state::mcu_s22_io(address_map &map)
 {
-	map(M37710_PORT4, M37710_PORT4).r(this, FUNC(namcos22_state::mcu_port4_s22_r));
+	map(M37710_PORT4, M37710_PORT4).r(FUNC(namcos22_state::mcu_port4_s22_r));
 }
 
 void namcos22_state::iomcu_s22_io(address_map &map)
 {
-	map(M37710_PORT4, M37710_PORT4).r(this, FUNC(namcos22_state::iomcu_port4_s22_r));
+	map(M37710_PORT4, M37710_PORT4).r(FUNC(namcos22_state::iomcu_port4_s22_r));
 	map(0x00, 0xff).noprw();
 }
 
@@ -2811,7 +2811,7 @@ READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 void namcos22_state::mcu_program(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).rw(this, FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
+	map(0x004000, 0x00bfff).rw(FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
 	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
 	map(0x080000, 0x0fffff).rom().region("mcu", 0);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
@@ -2822,11 +2822,11 @@ void namcos22_state::mcu_program(address_map &map)
 
 void namcos22_state::mcu_io(address_map &map)
 {
-	map(M37710_PORT4, M37710_PORT4).rw(this, FUNC(namcos22_state::mcu_port4_r), FUNC(namcos22_state::mcu_port4_w));
-	map(M37710_PORT5, M37710_PORT5).rw(this, FUNC(namcos22_state::mcu_port5_r), FUNC(namcos22_state::mcu_port5_w));
-	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namcos22_state::mcu_port6_r), FUNC(namcos22_state::mcu_port6_w));
-	map(M37710_PORT7, M37710_PORT7).rw(this, FUNC(namcos22_state::mcu_port7_r), FUNC(namcos22_state::mcu_port7_w));
-	map(M37710_ADC0_L, M37710_ADC7_H).r(this, FUNC(namcos22_state::namcos22s_mcu_adc_r));
+	map(M37710_PORT4, M37710_PORT4).rw(FUNC(namcos22_state::mcu_port4_r), FUNC(namcos22_state::mcu_port4_w));
+	map(M37710_PORT5, M37710_PORT5).rw(FUNC(namcos22_state::mcu_port5_r), FUNC(namcos22_state::mcu_port5_w));
+	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcos22_state::mcu_port6_r), FUNC(namcos22_state::mcu_port6_w));
+	map(M37710_PORT7, M37710_PORT7).rw(FUNC(namcos22_state::mcu_port7_r), FUNC(namcos22_state::mcu_port7_w));
+	map(M37710_ADC0_L, M37710_ADC7_H).r(FUNC(namcos22_state::namcos22s_mcu_adc_r));
 }
 
 /*********************************************************************************************/
@@ -2973,7 +2973,7 @@ WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 void namcos22_state::alpine_io_map(address_map &map)
 {
 	mcu_io(map);
-	map(M37710_PORT5, M37710_PORT5).w(this, FUNC(namcos22_state::alpine_mcu_port5_w));
+	map(M37710_PORT5, M37710_PORT5).w(FUNC(namcos22_state::alpine_mcu_port5_w));
 }
 
 
@@ -2991,7 +2991,7 @@ WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 void namcos22_state::propcycl_io_map(address_map &map)
 {
 	mcu_io(map);
-	map(M37710_PORT5, M37710_PORT5).w(this, FUNC(namcos22_state::propcycle_mcu_port5_w));
+	map(M37710_PORT5, M37710_PORT5).w(FUNC(namcos22_state::propcycle_mcu_port5_w));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
@@ -3804,7 +3804,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -3872,7 +3872,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END

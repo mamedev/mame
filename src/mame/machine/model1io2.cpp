@@ -71,7 +71,7 @@ void model1io2_device::mem_map(address_map &map)
 	map(0x8000, 0x800f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
 	map(0x8040, 0x8040).portr("board");
 	map(0x8080, 0x8080).portr("dsw1");
-	map(0x8100, 0x810f).rw(this, FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
+	map(0x8100, 0x810f).rw(FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
 //  map(0x8180, 0x8183).nopr(); // displayed as 4 byte values in the diagnostic screen
 //  map(0x81a0, 0x81af).nopw(); // the (reserved) test in the diagnostic screen sets these
 	map(0x8200, 0x8203).mirror(0x04).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::address_w));
@@ -114,15 +114,15 @@ ROM_START( model1io2 )
 
 	// Wing War (taken from R360 version, is it the same for the regular version?)
 	ROM_SYSTEM_BIOS(0, "epr16891", "EPR-16891")
-	ROMX_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0), ROM_BIOS(1))
+	ROMX_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0), ROM_BIOS(0))
 
 	// NetMerc
 	ROM_SYSTEM_BIOS(1, "epr18021", "EPR-18021")
-	ROMX_LOAD("epr-18021.6", 0x00000, 0x10000, CRC(5551837e) SHA1(bf5b9aad99c0f8f5e262e0855796f39119d11a97), ROM_BIOS(2))
+	ROMX_LOAD("epr-18021.6", 0x00000, 0x10000, CRC(5551837e) SHA1(bf5b9aad99c0f8f5e262e0855796f39119d11a97), ROM_BIOS(1))
 
 	// Virtua Cop
 	ROM_SYSTEM_BIOS(2, "epr17181", "EPR-17181")
-	ROMX_LOAD("epr-17181.6", 0x00000, 0x10000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede), ROM_BIOS(3))
+	ROMX_LOAD("epr-17181.6", 0x00000, 0x10000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede), ROM_BIOS(2))
 ROM_END
 
 const tiny_rom_entry *model1io2_device::device_rom_region() const
@@ -177,7 +177,7 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, model1io2_device, io_pf_w))
 	MCFG_315_5338A_OUT_PG_CB(WRITE8(*this, model1io2_device, io_pg_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // 93C45
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // 93C45
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

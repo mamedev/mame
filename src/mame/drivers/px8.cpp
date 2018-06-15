@@ -526,7 +526,7 @@ void px8_state::px8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x0f);
-	map(0x00, 0x07).rw(this, FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
+	map(0x00, 0x07).rw(FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
 	map(0x0c, 0x0c).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x0d, 0x0d).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 //  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
@@ -540,9 +540,9 @@ void px8_state::px8_io(address_map &map)
 void px8_state::px8_slave_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0020, 0x0023).rw(this, FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
+	map(0x0020, 0x0023).rw(FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
-	map(0x0028, 0x0028).w(this, FUNC(px8_state::gah40s_ier_w));
+	map(0x0028, 0x0028).w(FUNC(px8_state::gah40s_ier_w));
 	map(0x8000, 0x97ff).ram().share("video_ram");
 	map(0x9800, 0xefff).noprw();
 	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */
@@ -812,9 +812,9 @@ ROM_START( px8 )
 	ROM_REGION( 0x10000, UPD70008_TAG, 0 )
 	ROM_DEFAULT_BIOS("052884")
 	ROM_SYSTEM_BIOS( 0, "091383", "9/13/83" )
-	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(1) )
+	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "052884", "5/28/84" )
-	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(2) )
+	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(1) )
 
 	ROM_REGION( 0x0800, SED1320_TAG, 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )

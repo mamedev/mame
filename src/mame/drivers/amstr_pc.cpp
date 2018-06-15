@@ -110,13 +110,13 @@ void amstrad_pc_state::pc2086_map(address_map &map)
 void amstrad_pc_state::pc200_io(address_map &map)
 {
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0065).rw(this, FUNC(amstrad_pc_state::pc1640_port60_r), FUNC(amstrad_pc_state::pc1640_port60_w));
-	map(0x0078, 0x0079).rw(this, FUNC(amstrad_pc_state::pc1640_mouse_x_r), FUNC(amstrad_pc_state::pc1640_mouse_x_w));
-	map(0x007a, 0x007b).rw(this, FUNC(amstrad_pc_state::pc1640_mouse_y_r), FUNC(amstrad_pc_state::pc1640_mouse_y_w));
+	map(0x0060, 0x0065).rw(FUNC(amstrad_pc_state::pc1640_port60_r), FUNC(amstrad_pc_state::pc1640_port60_w));
+	map(0x0078, 0x0079).rw(FUNC(amstrad_pc_state::pc1640_mouse_x_r), FUNC(amstrad_pc_state::pc1640_mouse_x_w));
+	map(0x007a, 0x007b).rw(FUNC(amstrad_pc_state::pc1640_mouse_y_r), FUNC(amstrad_pc_state::pc1640_mouse_y_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0278, 0x027b).r(this, FUNC(amstrad_pc_state::pc200_port278_r));
+	map(0x0278, 0x027b).r(FUNC(amstrad_pc_state::pc200_port278_r));
 	map(0x0278, 0x027b).w(m_lpt2, FUNC(pc_lpt_device::write)).umask16(0x00ff);
-	map(0x0378, 0x037b).r(this, FUNC(amstrad_pc_state::pc200_port378_r));
+	map(0x0378, 0x037b).r(FUNC(amstrad_pc_state::pc200_port378_r));
 	map(0x0378, 0x037b).w(m_lpt1, FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03bc, 0x03bf).rw("lpt_0", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 }
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
 	MCFG_DEVICE_REMOVE("isa1")
 	MCFG_DEVICE_REMOVE("isa2")
 
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::ppc512)
@@ -570,14 +570,14 @@ ROM_START( pc200 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	// special bios at 0xe0000 !?
 	ROM_SYSTEM_BIOS(0, "v15", "v1.5")
-	ROMX_LOAD("40185-2.ic129", 0xc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932), ROM_SKIP(1) | ROM_BIOS(1)) // v2
-	ROMX_LOAD("40184-2.ic132", 0xc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24), ROM_SKIP(1) | ROM_BIOS(1)) // v2
+	ROMX_LOAD("40185-2.ic129", 0xc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932), ROM_SKIP(1) | ROM_BIOS(0)) // v2
+	ROMX_LOAD("40184-2.ic132", 0xc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24), ROM_SKIP(1) | ROM_BIOS(0)) // v2
 	ROM_SYSTEM_BIOS(1, "v13", "v1.3")
-	ROMX_LOAD("40185v13.ic129", 0xc001, 0x2000, CRC(f082f08e) SHA1(b332db419033588a7380bfecdf46104974347341), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("40184v13.ic132", 0xc000, 0x2000, CRC(5daf6068) SHA1(93a2ccfb0e29c8f2c98f06c64bb0ea0b3acafb13), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("40185v13.ic129", 0xc001, 0x2000, CRC(f082f08e) SHA1(b332db419033588a7380bfecdf46104974347341), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("40184v13.ic132", 0xc000, 0x2000, CRC(5daf6068) SHA1(93a2ccfb0e29c8f2c98f06c64bb0ea0b3acafb13), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v12", "v1.2")
-	ROMX_LOAD("40185.ic129", 0xc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("40184.ic132", 0xc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("40185.ic129", 0xc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("40184.ic132", 0xc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(2))
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "40112.ic801", 0x000, 0x800, CRC(842a954c) SHA1(93ca6badf20e0215025fe109959eddead8c52f38) )

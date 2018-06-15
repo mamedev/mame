@@ -71,7 +71,7 @@ void gameplan_state::cpu_map(address_map &map)
 	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?
-	map(0x8000, 0x9fff).r(this, FUNC(gameplan_state::trvquest_question_r));
+	map(0x8000, 0x9fff).r(FUNC(gameplan_state::trvquest_question_r));
 	map(0xa000, 0xa000).writeonly().share("trvquest_q");
 	map(0xa000, 0xa000).nopr(); // bogus read from the game code when reads question roms
 	map(0xb000, 0xffff).rom();

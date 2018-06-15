@@ -24,6 +24,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
+
 
 class intv_state : public driver_device
 {

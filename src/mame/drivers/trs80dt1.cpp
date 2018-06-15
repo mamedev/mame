@@ -34,6 +34,7 @@ You can get into the setup menu by pressing Ctrl+Shift+Enter.
 #include "machine/7474.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 //#include "logmacro.h"
@@ -146,7 +147,7 @@ WRITE8_MEMBER( trs80dt1_state::port3_w )
 void trs80dt1_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x27ff).r(this, FUNC(trs80dt1_state::dma_r));
+	map(0x2000, 0x27ff).r(FUNC(trs80dt1_state::dma_r));
 }
 
 void trs80dt1_state::io_map(address_map &map)
@@ -154,9 +155,9 @@ void trs80dt1_state::io_map(address_map &map)
 	map.global_mask(0xbfff); // A14 not used
 	map(0xa000, 0xa7ff).ram().share("videoram");
 	map(0xa800, 0xa83f).mirror(0x3c0).rw(m_nvram, FUNC(x2210_device::read), FUNC(x2210_device::write)); // X2210
-	map(0xac00, 0xafff).r(this, FUNC(trs80dt1_state::key_r));
+	map(0xac00, 0xafff).r(FUNC(trs80dt1_state::key_r));
 	map(0xb000, 0xb3ff).portr("X9"); // also reads some RS232 inputs
-	map(0xb400, 0xb7ff).w(this, FUNC(trs80dt1_state::store_w));
+	map(0xb400, 0xb7ff).w(FUNC(trs80dt1_state::store_w));
 	map(0xbc00, 0xbc01).mirror(0x3fe).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)); // i8276
 }
 

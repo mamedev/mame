@@ -39,6 +39,7 @@
 #include "machine/z80dart.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -55,7 +56,6 @@
 #define M6522_3_TAG     "14l"
 #define DAC0808_0_TAG   "5b"
 #define DAC0808_1_TAG   "5c"
-#define CENTRONICS_TAG  "centronics"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
@@ -80,7 +80,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, FDC_TAG),
-		m_centronics(*this, CENTRONICS_TAG),
+		m_centronics(*this, "centronics"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_palette(*this, "palette"),
@@ -395,7 +395,7 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 
 	// IEEE-488
-	m_ieee488->dio_w(data);
+	m_ieee488->write_dio(data);
 }
 
 DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
@@ -431,14 +431,14 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 	m_centronics->write_strobe(BIT(data, 0));
 
 	// IEEE-488
-	m_ieee488->dav_w(BIT(data, 0));
-	m_ieee488->eoi_w(BIT(data, 1));
-	m_ieee488->ren_w(BIT(data, 2));
-	m_ieee488->atn_w(BIT(data, 3));
-	m_ieee488->ifc_w(BIT(data, 4));
-	m_ieee488->srq_w(BIT(data, 5));
-	m_ieee488->nrfd_w(BIT(data, 6));
-	m_ieee488->ndac_w(BIT(data, 7));
+	m_ieee488->host_dav_w(BIT(data, 0));
+	m_ieee488->host_eoi_w(BIT(data, 1));
+	m_ieee488->host_ren_w(BIT(data, 2));
+	m_ieee488->host_atn_w(BIT(data, 3));
+	m_ieee488->host_ifc_w(BIT(data, 4));
+	m_ieee488->host_srq_w(BIT(data, 5));
+	m_ieee488->host_nrfd_w(BIT(data, 6));
+	m_ieee488->host_ndac_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::codec_vol_w )
@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(victor9k_state::victor9k)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, victor9k_state, via3_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, victor9k_state, via3_irq_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb5))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb6))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb7))
@@ -807,11 +807,11 @@ ROM_START( victor9k )
 	ROM_REGION( 0x2000, I8088_TAG, 0 )
 	ROM_DEFAULT_BIOS( "univ" )
 	ROM_SYSTEM_BIOS( 0, "old", "Older" )
-	ROMX_LOAD( "102320.7j", 0x0000, 0x1000, CRC(3d615fd7) SHA1(b22f7e5d66404185395d8effbf57efded0079a92), ROM_BIOS(1) )
-	ROMX_LOAD( "102322.8j", 0x1000, 0x1000, CRC(9209df0e) SHA1(3ee8e0c15186bbd5768b550ecc1fa3b6b1dbb928), ROM_BIOS(1) )
+	ROMX_LOAD( "102320.7j", 0x0000, 0x1000, CRC(3d615fd7) SHA1(b22f7e5d66404185395d8effbf57efded0079a92), ROM_BIOS(0) )
+	ROMX_LOAD( "102322.8j", 0x1000, 0x1000, CRC(9209df0e) SHA1(3ee8e0c15186bbd5768b550ecc1fa3b6b1dbb928), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "univ", "Universal" )
-	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(2) )
-	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(2) )
+	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(1) )
+	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(1) )
 ROM_END
 
 

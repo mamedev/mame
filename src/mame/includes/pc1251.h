@@ -14,6 +14,7 @@
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define PC1251_CONTRAST (ioport("DSW0")->read() & 0x07)
 
@@ -30,7 +31,9 @@ public:
 		: pocketc_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_cpu_nvram(*this, "cpu_nvram"),
+		m_ram_nvram(*this, "ram_nvram") { }
 
 	uint8_t m_outa;
 	uint8_t m_outb;
@@ -65,8 +68,12 @@ public:
 	void pc1255_mem(address_map &map);
 	void pc1260_mem(address_map &map);
 	void pc1261_mem(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_device<nvram_device> m_cpu_nvram;
+	required_device<nvram_device> m_ram_nvram;
 };
 
 #endif // MAME_INCLUDES_PC1251_H

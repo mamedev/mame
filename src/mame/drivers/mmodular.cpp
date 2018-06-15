@@ -176,7 +176,7 @@ void berlinp_state::berlinp_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x800000, 0x800000).r(this, FUNC(berlinp_state::berlinp_input_r));
+	map(0x800000, 0x800000).r(FUNC(berlinp_state::berlinp_input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
@@ -339,9 +339,9 @@ ROM_END
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v41", "V4.1" )
-	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(1))
+	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v40", "V4.0" )
-	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(2))
+	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(1))
 ROM_END
 
 ROM_START( van16 )

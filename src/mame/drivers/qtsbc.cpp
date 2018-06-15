@@ -222,13 +222,13 @@ void qtsbc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0000, 0xffff).rw(this, FUNC(qtsbc_state::memory_r), FUNC(qtsbc_state::memory_w));
+	map(0x0000, 0xffff).rw(FUNC(qtsbc_state::memory_r), FUNC(qtsbc_state::memory_w));
 }
 
 void qtsbc_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(qtsbc_state::io_r), FUNC(qtsbc_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(qtsbc_state::io_r), FUNC(qtsbc_state::io_w));
 }
 
 /* Input ports */

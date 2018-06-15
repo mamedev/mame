@@ -91,35 +91,35 @@ void dambustr_state::dambustr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0x8000, 0x8000).w(this, FUNC(dambustr_state::dambustr_bg_color_w));
-	map(0x8001, 0x8001).w(this, FUNC(dambustr_state::dambustr_bg_split_line_w));
+	map(0x8000, 0x8000).w(FUNC(dambustr_state::dambustr_bg_color_w));
+	map(0x8001, 0x8001).w(FUNC(dambustr_state::dambustr_bg_split_line_w));
 
 	map(0xc000, 0xc7ff).ram();
 
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(dambustr_state::galaxold_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).r(this, FUNC(dambustr_state::galaxold_videoram_r));
-	map(0xd800, 0xd83f).ram().w(this, FUNC(dambustr_state::galaxold_attributesram_w)).share("attributesram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(dambustr_state::galaxold_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).r(FUNC(dambustr_state::galaxold_videoram_r));
+	map(0xd800, 0xd83f).ram().w(FUNC(dambustr_state::galaxold_attributesram_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xd87f).ram().share("bulletsram");
 
 	map(0xd880, 0xd8ff).ram();
 
 	map(0xe000, 0xe000).portr("IN0");
-	map(0xe002, 0xe003).w(this, FUNC(dambustr_state::galaxold_coin_counter_w));
+	map(0xe002, 0xe003).w(FUNC(dambustr_state::galaxold_coin_counter_w));
 	map(0xe004, 0xe007).w(m_custom, FUNC(galaxian_sound_device::lfo_freq_w));
 
 	map(0xe800, 0xefff).portr("IN1");
 	map(0xe800, 0xe802).w(m_custom, FUNC(galaxian_sound_device::background_enable_w));
-	map(0xe803, 0xe803).w(this, FUNC(dambustr_state::dambustr_noise_enable_w));
+	map(0xe803, 0xe803).w(FUNC(dambustr_state::dambustr_noise_enable_w));
 	map(0xe804, 0xe804).w(m_custom, FUNC(galaxian_sound_device::fire_enable_w)); // probably louder than normal shot
 	map(0xe805, 0xe805).w(m_custom, FUNC(galaxian_sound_device::fire_enable_w)); // normal shot (like Galaxian)
 	map(0xe806, 0xe807).w(m_custom, FUNC(galaxian_sound_device::vol_w));
 
 	map(0xf000, 0xf7ff).portr("DSW");
-	map(0xf001, 0xf001).w(this, FUNC(dambustr_state::galaxold_nmi_enable_w));
-	map(0xf004, 0xf004).w(this, FUNC(dambustr_state::galaxold_stars_enable_w));
-	map(0xf006, 0xf006).w(this, FUNC(dambustr_state::galaxold_flip_screen_x_w));
-	map(0xf007, 0xf007).w(this, FUNC(dambustr_state::galaxold_flip_screen_y_w));
+	map(0xf001, 0xf001).w(FUNC(dambustr_state::galaxold_nmi_enable_w));
+	map(0xf004, 0xf004).w(FUNC(dambustr_state::galaxold_stars_enable_w));
+	map(0xf006, 0xf006).w(FUNC(dambustr_state::galaxold_flip_screen_x_w));
+	map(0xf007, 0xf007).w(FUNC(dambustr_state::galaxold_flip_screen_y_w));
 
 	map(0xf800, 0xf800).w(m_custom, FUNC(galaxian_sound_device::pitch_w));
 	map(0xf800, 0xffff).r("watchdog", FUNC(watchdog_timer_device::reset_r));

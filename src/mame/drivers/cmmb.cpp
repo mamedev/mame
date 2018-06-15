@@ -52,6 +52,7 @@ OSC @ 72.576MHz
 #include "emu.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/at29x.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAIN_CLOCK XTAL(72'576'000)
@@ -214,15 +215,15 @@ void cmmb_state::cmmb_map(address_map &map)
 	map(0x2001, 0x2001).portr("IN4");
 	map(0x2011, 0x2011).portr("IN5");
 	map(0x2480, 0x249f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2505, 0x2505).w(this, FUNC(cmmb_state::irq_enable_w));
-	map(0x2600, 0x2600).w(this, FUNC(cmmb_state::irq_ack_w));
+	map(0x2505, 0x2505).w(FUNC(cmmb_state::irq_enable_w));
+	map(0x2600, 0x2600).w(FUNC(cmmb_state::irq_ack_w));
 	//AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
 	//AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0x9fff).rom().region("maincpu", 0x18000);
 	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).rw(this, FUNC(cmmb_state::cmmb_charram_r), FUNC(cmmb_state::cmmb_charram_w));
-	map(0xc000, 0xc00f).rw(this, FUNC(cmmb_state::cmmb_input_r), FUNC(cmmb_state::cmmb_output_w));
+	map(0xb000, 0xbfff).rw(FUNC(cmmb_state::cmmb_charram_r), FUNC(cmmb_state::cmmb_charram_w));
+	map(0xc000, 0xc00f).rw(FUNC(cmmb_state::cmmb_input_r), FUNC(cmmb_state::cmmb_output_w));
 	// debugging, to be removed
 //  AM_RANGE(0x2aaa, 0x2aaa) AM_WRITE(flash_dbg_0_w)
 //  AM_RANGE(0x5555, 0x5555) AM_WRITE(flash_dbg_1_w)

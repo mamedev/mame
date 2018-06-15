@@ -233,14 +233,14 @@ void dm7000_state::dm7000_mem(address_map &map)
 	map(0x00000000, 0x01ffffff).ram();                                     // RAM page 0 - 32MB
 	map(0x20000000, 0x21ffffff).ram();                                     // RAM page 1 - 32MB
 
-	map(0x40030000, 0x4003000f).rw(this, FUNC(dm7000_state::dm7000_iic0_r), FUNC(dm7000_state::dm7000_iic0_w));
-	map(0x40040000, 0x40040007).rw(this, FUNC(dm7000_state::dm7000_scc0_r), FUNC(dm7000_state::dm7000_scc0_w));
-	map(0x40060000, 0x40060047).rw(this, FUNC(dm7000_state::dm7000_gpio0_r), FUNC(dm7000_state::dm7000_gpio0_w));
-	map(0x400b0000, 0x400b000f).rw(this, FUNC(dm7000_state::dm7000_iic1_r), FUNC(dm7000_state::dm7000_iic1_w));
-	map(0x400c0000, 0x400c0007).rw(this, FUNC(dm7000_state::dm7000_scp0_r), FUNC(dm7000_state::dm7000_scp0_w));
+	map(0x40030000, 0x4003000f).rw(FUNC(dm7000_state::dm7000_iic0_r), FUNC(dm7000_state::dm7000_iic0_w));
+	map(0x40040000, 0x40040007).rw(FUNC(dm7000_state::dm7000_scc0_r), FUNC(dm7000_state::dm7000_scc0_w));
+	map(0x40060000, 0x40060047).rw(FUNC(dm7000_state::dm7000_gpio0_r), FUNC(dm7000_state::dm7000_gpio0_w));
+	map(0x400b0000, 0x400b000f).rw(FUNC(dm7000_state::dm7000_iic1_r), FUNC(dm7000_state::dm7000_iic1_w));
+	map(0x400c0000, 0x400c0007).rw(FUNC(dm7000_state::dm7000_scp0_r), FUNC(dm7000_state::dm7000_scp0_w));
 
 	/* ENET - ASIX AX88796 */
-	map(0x72000300, 0x720003ff).rw(this, FUNC(dm7000_state::dm7000_enet_r), FUNC(dm7000_state::dm7000_enet_w));
+	map(0x72000300, 0x720003ff).rw(FUNC(dm7000_state::dm7000_enet_r), FUNC(dm7000_state::dm7000_enet_w));
 
 	map(0x7f800000, 0x7ffdffff).rom().region("user2", 0);
 	map(0x7ffe0000, 0x7fffffff).rom().region("user1", 0);
@@ -325,26 +325,26 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( dm7000 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
-	ROMX_LOAD( "dm7000.bin", 0x0000, 0x20000, CRC(8a410f67) SHA1(9d6c9e4f5b05b28453d3558e69a207f05c766f54), ROM_GROUPWORD )
+	ROMX_LOAD("dm7000.bin", 0x0000, 0x20000, CRC(8a410f67) SHA1(9d6c9e4f5b05b28453d3558e69a207f05c766f54), ROM_GROUPWORD)
 	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
-	ROM_LOAD( "rel108_dm7000.img", 0x0000, 0x5e0000, CRC(e78b6407) SHA1(aaa786d341c629eec92fcf04bfafc1de43f6dabf))
+	ROM_LOAD("rel108_dm7000.img", 0x0000, 0x5e0000, CRC(e78b6407) SHA1(aaa786d341c629eec92fcf04bfafc1de43f6dabf))
 ROM_END
 
 ROM_START( dm5620 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
-	ROMX_LOAD( "dm5620.bin", 0x0000, 0x20000, CRC(ccddb822) SHA1(3ecf553ced0671599438368f59d8d30df4d13ade), ROM_GROUPWORD )
+	ROMX_LOAD("dm5620.bin", 0x0000, 0x20000, CRC(ccddb822) SHA1(3ecf553ced0671599438368f59d8d30df4d13ade), ROM_GROUPWORD)
 	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
-	ROM_LOAD( "rel106_dm5620.img", 0x0000, 0x57b000, CRC(2313d71d) SHA1(0d3d99ab3b3266624f237b7b67e045d7910c44a5))
+	ROM_LOAD("rel106_dm5620.img", 0x0000, 0x57b000, CRC(2313d71d) SHA1(0d3d99ab3b3266624f237b7b67e045d7910c44a5))
 ROM_END
 
 ROM_START( dm500 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE )
 	ROM_SYSTEM_BIOS( 0, "alps", "Alps" )
-	ROMX_LOAD( "dm500-alps-boot.bin",   0x0000, 0x20000, CRC(daf2da34) SHA1(68f3734b4589fcb3e73372e258040bc8b83fd739), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROMX_LOAD("dm500-alps-boot.bin",   0x0000, 0x20000, CRC(daf2da34) SHA1(68f3734b4589fcb3e73372e258040bc8b83fd739), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "phil", "Philips" )
-	ROMX_LOAD( "dm500-philps-boot.bin", 0x0000, 0x20000, CRC(af3477c7) SHA1(9ac918f6984e6927f55bea68d6daaf008787136e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROMX_LOAD("dm500-philps-boot.bin", 0x0000, 0x20000, CRC(af3477c7) SHA1(9ac918f6984e6927f55bea68d6daaf008787136e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
-	ROM_LOAD( "rel108_dm500.img", 0x0000, 0x5aa000, CRC(44be2376) SHA1(1f360572998b1bc4dc10c5210a2aed573a75e2fa))
+	ROM_LOAD("rel108_dm500.img", 0x0000, 0x5aa000, CRC(44be2376) SHA1(1f360572998b1bc4dc10c5210a2aed573a75e2fa))
 ROM_END
 /* Driver */
 

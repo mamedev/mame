@@ -101,23 +101,23 @@ void badlandsbl_state::bootleg_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x400000, 0x400005).rw(this, FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
-	map(0x400006, 0x400006).r(this, FUNC(badlandsbl_state::sound_response_r));
+	map(0x400000, 0x400005).rw(FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
+	map(0x400006, 0x400006).r(FUNC(badlandsbl_state::sound_response_r));
 	map(0x400008, 0x40000f).ram(); // breaks tilemap gfxs otherwise?
 	map(0x400010, 0x4000ff).ram().share("spriteram");
 
 	// sound comms?
-	map(0xfc0000, 0xfc0001).r(this, FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
+	map(0xfc0000, 0xfc0001).r(FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
 
 	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	map(0xfe2000, 0xfe3fff).w(this, FUNC(badlandsbl_state::video_int_ack_w));
+	map(0xfe2000, 0xfe3fff).w(FUNC(badlandsbl_state::video_int_ack_w));
 
 	map(0xfe0000, 0xfe0001).nopw();
 	map(0xfe4000, 0xfe4001).portr("FE4000");
 	map(0xfe4004, 0xfe4005).portr("P1");
 	map(0xfe4006, 0xfe4007).portr("P2");
-	map(0xfe4008, 0xfe4009).w(this, FUNC(badlandsbl_state::badlands_pf_bank_w));
+	map(0xfe4008, 0xfe4009).w(FUNC(badlandsbl_state::badlands_pf_bank_w));
 	map(0xfe400c, 0xfe400d).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 
 	map(0xffc000, 0xffc3ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
@@ -138,7 +138,7 @@ void badlandsbl_state::bootleg_audio_map(address_map &map)
 	map(0x2000, 0x2005).ram().share("b_sharedram");
 	map(0x2006, 0x3fff).ram();
 	map(0x4000, 0xcfff).rom().region("audiorom", 0x4000);
-	map(0xd400, 0xd400).w(this, FUNC(badlandsbl_state::bootleg_main_irq_w));
+	map(0xd400, 0xd400).w(FUNC(badlandsbl_state::bootleg_main_irq_w));
 	map(0xd800, 0xd801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe000, 0xffff).noprw(); // either RAM mirror or left-over
 }

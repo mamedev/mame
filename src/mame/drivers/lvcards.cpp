@@ -152,19 +152,19 @@ void lvcards_state::ponttehk_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x8000, 0x83ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(this, FUNC(lvcards_state::payout_r)).w(this, FUNC(lvcards_state::control_port_2a_w));//AM_WRITENOP // ???
+	map(0xa002, 0xa002).r(FUNC(lvcards_state::payout_r)).w(FUNC(lvcards_state::control_port_2a_w));//AM_WRITENOP // ???
 }
 
 void lvcards_state::lvcards_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw();
 	map(0xa002, 0xa002).portr("IN2").nopw();
@@ -182,11 +182,11 @@ void lvcards_state::lvpoker_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(this, FUNC(lvcards_state::payout_r)).w(this, FUNC(lvcards_state::control_port_2_w));
+	map(0xa002, 0xa002).r(FUNC(lvcards_state::payout_r)).w(FUNC(lvcards_state::control_port_2_w));
 	map(0xc000, 0xdfff).rom();
 }
 

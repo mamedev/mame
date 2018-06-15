@@ -112,7 +112,7 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0x16000, 0x16000).w(this, FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x16000, 0x16000).w(FUNC(mephisto_pinball_state::shift_load_w));
 	map(0x17000, 0x17001).nopw(); //???
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -126,8 +126,8 @@ void mephisto_pinball_state::mephisto_8051_map(address_map &map)
 void mephisto_pinball_state::mephisto_8051_io(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(this, FUNC(mephisto_pinball_state::sound_rombank_w));
-	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::write));
+	map(0x0800, 0x0800).w(FUNC(mephisto_pinball_state::sound_rombank_w));
+	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::data_w));
 }
 
 #ifdef UNUSED_DEFINITION

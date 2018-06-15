@@ -59,7 +59,7 @@ void ft68m_state::mem_map(address_map &map)
 	map(0x800000, 0x800003).mirror(0x1ffffc).rw("stc", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0xa00000, 0xbfffff).ram(); //Page Map
 	map(0xc00000, 0xdfffff).ram(); //Segment Map
-	map(0xe00000, 0xffffff).r(this, FUNC(ft68m_state::switches_r)); //Context Register
+	map(0xe00000, 0xffffff).r(FUNC(ft68m_state::switches_r)); //Context Register
 }
 
 

@@ -427,14 +427,14 @@ void compis_state::compis_io(address_map &map)
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
 	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(I80130_TAG, FUNC(i80130_device::io_map));
-	map(0x0300, 0x030f).rw(this, FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
-	map(0x0310, 0x031f).rw(this, FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
-	map(0x0320, 0x032f).rw(this, FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
-	map(0x0330, 0x033f).rw(this, FUNC(compis_state::pcs6_6_7_r), FUNC(compis_state::pcs6_6_7_w));
-	map(0x0340, 0x034f).rw(this, FUNC(compis_state::pcs6_8_9_r), FUNC(compis_state::pcs6_8_9_w));
-	map(0x0350, 0x035f).rw(this, FUNC(compis_state::pcs6_10_11_r), FUNC(compis_state::pcs6_10_11_w));
-	map(0x0360, 0x036f).rw(this, FUNC(compis_state::pcs6_12_13_r), FUNC(compis_state::pcs6_12_13_w));
-	map(0x0370, 0x037f).rw(this, FUNC(compis_state::pcs6_14_15_r), FUNC(compis_state::pcs6_14_15_w));
+	map(0x0300, 0x030f).rw(FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
+	map(0x0310, 0x031f).rw(FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
+	map(0x0320, 0x032f).rw(FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
+	map(0x0330, 0x033f).rw(FUNC(compis_state::pcs6_6_7_r), FUNC(compis_state::pcs6_6_7_w));
+	map(0x0340, 0x034f).rw(FUNC(compis_state::pcs6_8_9_r), FUNC(compis_state::pcs6_8_9_w));
+	map(0x0350, 0x035f).rw(FUNC(compis_state::pcs6_10_11_r), FUNC(compis_state::pcs6_10_11_w));
+	map(0x0360, 0x036f).rw(FUNC(compis_state::pcs6_12_13_r), FUNC(compis_state::pcs6_12_13_w));
+	map(0x0370, 0x037f).rw(FUNC(compis_state::pcs6_14_15_r), FUNC(compis_state::pcs6_14_15_w));
 }
 
 
@@ -775,7 +775,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, compis_state, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, compis_state, ppi_pc_w))
 
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(I8274_TAG, z80dart_device, ctsb_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, compis_state, write_centronics_select))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
@@ -873,18 +873,18 @@ ROM_START( compis )
 	ROM_DEFAULT_BIOS( "v303" )
 
 	ROM_SYSTEM_BIOS( 0, "v20", "Compis v2.0 (1985-05-15)" )
-	ROMX_LOAD( "sa883003.u40", 0x0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef), ROM_BIOS(1) | ROM_SKIP(1) )
-	ROMX_LOAD( "sa883003.u36", 0x0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761), ROM_BIOS(1) | ROM_SKIP(1) )
-	ROMX_LOAD( "sa883003.u39", 0x8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f), ROM_BIOS(1) | ROM_SKIP(1) )
-	ROMX_LOAD( "sa883003.u35", 0x8001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u40", 0x0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u36", 0x0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u39", 0x8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u35", 0x8001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104), ROM_BIOS(0) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 1, "v302", "Compis II v3.02 (1986-09-09)" )
-	ROMX_LOAD( "comp302.u39", 0x0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(2) | ROM_SKIP(1) )
-	ROMX_LOAD( "comp302.u35", 0x0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD( "comp302.u39", 0x0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "comp302.u35", 0x0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(1) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 2, "v303", "Compis II v3.03 (1987-03-09)" )
-	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(3) | ROM_SKIP(1) )
-	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(3) | ROM_SKIP(1) )
+	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(2) | ROM_SKIP(1) )
 ROM_END
 
 #define rom_compis2 rom_compis

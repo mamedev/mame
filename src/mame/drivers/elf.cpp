@@ -84,8 +84,8 @@ void elf2_state::elf2_mem(address_map &map)
 void elf2_state::elf2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).r(this, FUNC(elf2_state::dispon_r));
-	map(0x04, 0x04).rw(this, FUNC(elf2_state::data_r), FUNC(elf2_state::data_w));
+	map(0x01, 0x01).r(FUNC(elf2_state::dispon_r));
+	map(0x04, 0x04).rw(FUNC(elf2_state::data_r), FUNC(elf2_state::data_w));
 }
 
 /* Input Ports */

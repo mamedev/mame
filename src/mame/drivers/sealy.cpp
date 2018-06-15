@@ -30,6 +30,7 @@ Notes:
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

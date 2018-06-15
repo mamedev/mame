@@ -29,6 +29,8 @@
 
 #include "formats/fmtowns_dsk.h"
 
+#include "emupal.h"
+
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity
 
@@ -99,13 +101,16 @@ class towns_state : public driver_device
 		, m_palette16(*this, "palette16_%u", 0U)
 		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "fdc")
-		, m_flop0(*this, "fdc:0")
-		, m_flop1(*this, "fdc:1")
+		, m_flop(*this, "fdc:%u", 0U)
 		, m_icmemcard(*this, "icmemcard")
 		, m_i8251(*this, "i8251")
 		, m_rs232(*this, "rs232c")
 		, m_screen(*this, "screen")
 		, m_rtc(*this, "rtc58321")
+		, m_dma_1(*this, "dma_1")
+		, m_cdrom(*this, "cdrom")
+		, m_cdda(*this, "cdda")
+		, m_scsi(*this, "fmscsi")
 		, m_bank_cb000_r(*this, "bank_cb000_r")
 		, m_bank_cb000_w(*this, "bank_cb000_w")
 		, m_bank_f8000_r(*this, "bank_f8000_r")
@@ -140,23 +145,21 @@ class towns_state : public driver_device
 	required_device_array<palette_device, 2> m_palette16;
 	required_device<ram_device> m_ram;
 	required_device<mb8877_device> m_fdc;
-	required_device<floppy_connector> m_flop0;
-	required_device<floppy_connector> m_flop1;
+	required_device_array<floppy_connector, 2> m_flop;
 	required_device<fmt_icmem_device> m_icmemcard;
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
 	required_device<msm58321_device> m_rtc;
+	required_device<upd71071_device> m_dma_1;
+	required_device<cdrom_image_device> m_cdrom;
+	required_device<cdda_device> m_cdda;
+	required_device<fmscsi_device> m_scsi;
 
 	required_memory_bank m_bank_cb000_r;
 	required_memory_bank m_bank_cb000_w;
 	required_memory_bank m_bank_f8000_r;
 	required_memory_bank m_bank_f8000_w;
-
-	ram_device* m_messram;
-	cdrom_image_device* m_cdrom;
-	cdda_device* m_cdda;
-	class fmscsi_device* m_scsi;
 
 	uint16_t m_ftimer;
 	uint16_t m_freerun_timer;

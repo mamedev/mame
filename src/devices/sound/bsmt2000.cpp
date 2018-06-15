@@ -36,11 +36,11 @@ void bsmt2000_device::tms_program_map(address_map &map)
 // I/O map for the DSP
 void bsmt2000_device::tms_io_map(address_map &map)
 {
-	map(0, 0).rw(this, FUNC(bsmt2000_device::tms_register_r), FUNC(bsmt2000_device::tms_rom_addr_w));
-	map(1, 1).rw(this, FUNC(bsmt2000_device::tms_data_r), FUNC(bsmt2000_device::tms_rom_bank_w));
-	map(2, 2).r(this, FUNC(bsmt2000_device::tms_rom_r));
-	map(3, 3).w(this, FUNC(bsmt2000_device::tms_left_w));
-	map(7, 7).w(this, FUNC(bsmt2000_device::tms_right_w));
+	map(0, 0).rw(FUNC(bsmt2000_device::tms_register_r), FUNC(bsmt2000_device::tms_rom_addr_w));
+	map(1, 1).rw(FUNC(bsmt2000_device::tms_data_r), FUNC(bsmt2000_device::tms_rom_bank_w));
+	map(2, 2).r(FUNC(bsmt2000_device::tms_rom_r));
+	map(3, 3).w(FUNC(bsmt2000_device::tms_left_w));
+	map(7, 7).w(FUNC(bsmt2000_device::tms_right_w));
 }
 
 

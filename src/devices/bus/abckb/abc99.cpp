@@ -79,16 +79,17 @@ DEFINE_DEVICE_TYPE(ABC99, abc99_device, "abc99", "Luxor ABC 99")
 //-------------------------------------------------
 
 ROM_START( abc99 )
-	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
-	ROM_DEFAULT_BIOS("107268")
 	ROM_SYSTEM_BIOS( 0, "107268", "107268-17" )
-	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "106819", "106819-09" )
-	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(2) ) // ABC 99 6490423-01
+	ROM_DEFAULT_BIOS("107268")
+
+	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
+	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(0) )
+	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(1) ) // ABC 99 6490423-01
 
 	ROM_REGION( 0x800, I8035_Z5_TAG, 0 )
-	ROMX_LOAD( "107268-16.z6", 0x0000, 0x0800, CRC(785ec0c6) SHA1(0b261beae20dbc06fdfccc50b19ea48b5b6e22eb), ROM_BIOS(1) )
-	ROMX_LOAD( "107268-64.z6", 0x0000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), ROM_BIOS(2) )
+	ROMX_LOAD( "107268-16.z6", 0x0000, 0x0800, CRC(785ec0c6) SHA1(0b261beae20dbc06fdfccc50b19ea48b5b6e22eb), ROM_BIOS(0) )
+	ROMX_LOAD( "107268-64.z6", 0x0000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), ROM_BIOS(1) )
 ROM_END
 
 
@@ -118,7 +119,7 @@ void abc99_device::abc99_z2_mem(address_map &map)
 
 void abc99_device::abc99_z2_io(address_map &map)
 {
-	map(0x21, 0x21).w(this, FUNC(abc99_device::z2_led_w));
+	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
 	map(0x30, 0x30).portr("X0").nopw();
 	map(0x31, 0x31).portr("X1").nopw();
 	map(0x32, 0x32).portr("X2").nopw();

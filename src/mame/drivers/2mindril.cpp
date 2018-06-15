@@ -199,21 +199,21 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x3000ff).ram();
-	map(0x400000, 0x40ffff).rw(this, FUNC(_2mindril_state::f3_spriteram_r), FUNC(_2mindril_state::f3_spriteram_w));
-	map(0x410000, 0x41bfff).rw(this, FUNC(_2mindril_state::f3_pf_data_r), FUNC(_2mindril_state::f3_pf_data_w));
-	map(0x41c000, 0x41dfff).rw(this, FUNC(_2mindril_state::f3_videoram_r), FUNC(_2mindril_state::f3_videoram_w));
-	map(0x41e000, 0x41ffff).rw(this, FUNC(_2mindril_state::f3_vram_r), FUNC(_2mindril_state::f3_vram_w));
-	map(0x420000, 0x42ffff).rw(this, FUNC(_2mindril_state::f3_lineram_r), FUNC(_2mindril_state::f3_lineram_w));
-	map(0x430000, 0x43ffff).rw(this, FUNC(_2mindril_state::f3_pivot_r), FUNC(_2mindril_state::f3_pivot_w));
-	map(0x460000, 0x46000f).w(this, FUNC(_2mindril_state::f3_control_0_w));
-	map(0x460010, 0x46001f).w(this, FUNC(_2mindril_state::f3_control_1_w));
+	map(0x400000, 0x40ffff).rw(FUNC(_2mindril_state::f3_spriteram_r), FUNC(_2mindril_state::f3_spriteram_w));
+	map(0x410000, 0x41bfff).rw(FUNC(_2mindril_state::f3_pf_data_r), FUNC(_2mindril_state::f3_pf_data_w));
+	map(0x41c000, 0x41dfff).rw(FUNC(_2mindril_state::f3_videoram_r), FUNC(_2mindril_state::f3_videoram_w));
+	map(0x41e000, 0x41ffff).rw(FUNC(_2mindril_state::f3_vram_r), FUNC(_2mindril_state::f3_vram_w));
+	map(0x420000, 0x42ffff).rw(FUNC(_2mindril_state::f3_lineram_r), FUNC(_2mindril_state::f3_lineram_w));
+	map(0x430000, 0x43ffff).rw(FUNC(_2mindril_state::f3_pivot_r), FUNC(_2mindril_state::f3_pivot_w));
+	map(0x460000, 0x46000f).w(FUNC(_2mindril_state::f3_control_0_w));
+	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::f3_control_1_w));
 	map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
-	map(0x60000c, 0x60000d).rw(this, FUNC(_2mindril_state::drill_irq_r), FUNC(_2mindril_state::drill_irq_w));
+	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::drill_irq_r), FUNC(_2mindril_state::drill_irq_w));
 	map(0x60000e, 0x60000f).ram(); // unknown purpose, zeroed at start-up and nothing else
 	map(0x700000, 0x70000f).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0xff00);
-	map(0x800000, 0x800001).w(this, FUNC(_2mindril_state::sensors_w));
+	map(0x800000, 0x800001).w(FUNC(_2mindril_state::sensors_w));
 }
 
 static INPUT_PORTS_START( drill )
@@ -381,8 +381,6 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-
-	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -31,6 +31,7 @@ MZ80B
 #include "emu.h"
 #include "includes/mz80.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -253,7 +254,7 @@ void mz80_state::mz80k_mem(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("videoram"); // Video RAM
 	map(0xe000, 0xe003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)); /* PPIA 8255 */
 	map(0xe004, 0xe007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  /* PIT 8253  */
-	map(0xe008, 0xe00b).rw(this, FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
+	map(0xe008, 0xe00b).rw(FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
 	map(0xf000, 0xf3ff).rom();
 }
 
@@ -339,11 +340,11 @@ MACHINE_CONFIG_END
 ROM_START( mz80k )
 	ROM_REGION( 0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "sp1002", "sp1002" )
-	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1) )
+	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tc", "tc" )
-	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2) )
+	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v44", "v44" )
-	ROMX_LOAD( "80kv44.rom",    0x0000, 0x1000, CRC(d66af028) SHA1(718904c011dfcfcfabbb7dbdaaa35b9f3ac41baf), ROM_BIOS(3) )
+	ROMX_LOAD( "80kv44.rom",    0x0000, 0x1000, CRC(d66af028) SHA1(718904c011dfcfcfabbb7dbdaaa35b9f3ac41baf), ROM_BIOS(2) )
 	ROM_LOAD( "mz80kfdif.rom",  0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )

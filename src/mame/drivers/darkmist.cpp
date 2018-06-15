@@ -51,7 +51,7 @@ void darkmist_state::memmap(address_map &map)
 	map(0xc801, 0xc801).portr("P1");
 	map(0xc802, 0xc802).portr("P2");
 	map(0xc803, 0xc803).portr("START");
-	map(0xc804, 0xc804).w(this, FUNC(darkmist_state::hw_w));
+	map(0xc804, 0xc804).w(FUNC(darkmist_state::hw_w));
 	map(0xc805, 0xc805).writeonly().share("spritebank");
 	map(0xc806, 0xc806).portr("DSW1");
 	map(0xc807, 0xc807).portr("DSW2");
@@ -64,7 +64,7 @@ void darkmist_state::memmap(address_map &map)
 	map(0xd681, 0xd681).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
 	map(0xd682, 0xd682).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 	map(0xd683, 0xd683).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
-	map(0xd800, 0xdfff).ram().w(this, FUNC(darkmist_state::tx_vram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(darkmist_state::tx_vram_w)).share("videoram");
 	map(0xe000, 0xefff).ram().share("workram");
 	map(0xf000, 0xffff).ram().share("spriteram");
 }

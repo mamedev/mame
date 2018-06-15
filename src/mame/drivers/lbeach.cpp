@@ -26,6 +26,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "lbeach.lh"
@@ -219,11 +220,11 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 void lbeach_state::lbeach_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().share("nvram");
-	map(0x4000, 0x41ff).ram().w(this, FUNC(lbeach_state::lbeach_bg_vram_w)).share("bg_vram");
-	map(0x4000, 0x4000).r(this, FUNC(lbeach_state::lbeach_in1_r));
+	map(0x4000, 0x41ff).ram().w(FUNC(lbeach_state::lbeach_bg_vram_w)).share("bg_vram");
+	map(0x4000, 0x4000).r(FUNC(lbeach_state::lbeach_in1_r));
 	map(0x4200, 0x43ff).ram();
-	map(0x4400, 0x47ff).ram().w(this, FUNC(lbeach_state::lbeach_fg_vram_w)).share("fg_vram");
-	map(0x8000, 0x8000).r(this, FUNC(lbeach_state::lbeach_in2_r));
+	map(0x4400, 0x47ff).ram().w(FUNC(lbeach_state::lbeach_fg_vram_w)).share("fg_vram");
+	map(0x8000, 0x8000).r(FUNC(lbeach_state::lbeach_in2_r));
 	map(0x8000, 0x8000).writeonly().share("scroll_y");
 	map(0x8001, 0x8001).writeonly().share("sprite_x");
 	map(0x8002, 0x8002).writeonly().share("sprite_code");

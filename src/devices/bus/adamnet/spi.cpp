@@ -67,7 +67,7 @@ void adam_spi_device::adam_spi_mem(address_map &map)
 
 void adam_spi_device::adam_spi_io(address_map &map)
 {
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_spi_device::p2_r), FUNC(adam_spi_device::p2_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_spi_device::p2_r), FUNC(adam_spi_device::p2_w));
 }
 
 
@@ -85,7 +85,7 @@ MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

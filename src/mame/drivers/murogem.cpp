@@ -111,6 +111,7 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -162,7 +163,7 @@ void murogem_state::murogem_map(address_map &map)
 	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x5000, 0x5000).portr("IN0");
 	map(0x5800, 0x5800).portr("IN1");
-	map(0x7000, 0x7000).w(this, FUNC(murogem_state::outport_w));    /* output port */
+	map(0x7000, 0x7000).w(FUNC(murogem_state::outport_w));    /* output port */
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0xf000, 0xffff).rom();
 }

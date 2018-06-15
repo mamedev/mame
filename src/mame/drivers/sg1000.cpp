@@ -136,10 +136,10 @@ void sg1000_state::sg1000_map(address_map &map)
 void sg1000_state::sg1000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-	map(0xdc, 0xdf).rw(this, FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
 /*-------------------------------------------------
@@ -148,7 +148,7 @@ void sg1000_state::sg1000_io_map(address_map &map)
 
 void sg1000_state::omv_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(sg1000_state::omv_r), FUNC(sg1000_state::omv_w));
+	map(0x0000, 0xbfff).rw(FUNC(sg1000_state::omv_r), FUNC(sg1000_state::omv_w));
 	map(0xc000, 0xc7ff).mirror(0x3800).ram();
 }
 
@@ -159,9 +159,9 @@ void sg1000_state::omv_map(address_map &map)
 void sg1000_state::omv_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
 	map(0xc0, 0xc0).mirror(0x38).portr("C0");
 	map(0xc1, 0xc1).mirror(0x38).portr("C1");
 	map(0xc2, 0xc2).mirror(0x38).portr("C2");
@@ -187,10 +187,10 @@ void sg1000_state::sc3000_map(address_map &map)
 void sg1000_state::sc3000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-	map(0xdc, 0xdf).rw(this, FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
@@ -198,10 +198,10 @@ void sg1000_state::sc3000_io_map(address_map &map)
 {
     map.global_mask(0xff);
     map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-    map(0x60, 0x60).mirror(0x9f).r(this, FUNC(sg1000_state::sc3000_r_r));
+    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+    map(0x60, 0x60).mirror(0x9f).r(FUNC(sg1000_state::sc3000_r_r));
 }
 */
 
@@ -222,10 +222,10 @@ void sf7000_state::sf7000_map(address_map &map)
 void sf7000_state::sf7000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-	map(0xdc, 0xdf).rw(this, FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe8, 0xe8).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	/* devices */
 	MCFG_DEVICE_ADD(UPD9255_1_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, sf7000_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sf7000_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

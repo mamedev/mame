@@ -431,8 +431,8 @@ void cubo_state::cubo_mem(address_map &map)
 	map(0x800010, 0x800013).portr("DIPSW2");
 	map(0xa80000, 0xb7ffff).noprw();
 	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
-	map(0xbf0000, 0xbfffff).rw(this, FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
-	map(0xc00000, 0xdfffff).rw(this, FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
+	map(0xbf0000, 0xbfffff).rw(FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
 	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
 	map(0xe80000, 0xf7ffff).noprw();
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_END
 
 
 
-#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
+#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CD32_BIOS \
 	ROM_REGION32_BE(0x100000, "kickstart", 0 ) \

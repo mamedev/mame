@@ -19,6 +19,7 @@
 #include "machine/z80pio.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 #define Z80_TAG         "z80"
 #define Z80DART_TAG     "z80dart"

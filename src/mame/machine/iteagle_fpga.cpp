@@ -19,18 +19,18 @@ DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle F
 
 void iteagle_fpga_device::fpga_map(address_map &map)
 {
-	map(0x000, 0x01f).rw(this, FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
+	map(0x000, 0x01f).rw(FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
 }
 
 void iteagle_fpga_device::rtc_map(address_map &map)
 {
-	map(0x000, 0x7ff).rw(this, FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
+	map(0x000, 0x7ff).rw(FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
 }
 
 void iteagle_fpga_device::ram_map(address_map &map)
 {
-	map(0x00000, 0x3f).rw(this, FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
-	map(0x10000, 0x1ffff).rw(this, FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
+	map(0x00000, 0x3f).rw(FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
+	map(0x10000, 0x1ffff).rw(FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
 }
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -46,7 +46,8 @@ MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
-	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL(7'372'800).value(), XTAL(7'372'800).value(), 0, XTAL(7'372'800).value(), 0)
+	MCFG_DEVICE_ADD(AM85C30_TAG, SCC85C30, 7.3728_MHz_XTAL)
+	MCFG_Z80SCC_OFFSETS((7.3728_MHz_XTAL).value(), 0, (7.3728_MHz_XTAL).value(), 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, iteagle_fpga_device, serial_interrupt))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(COM2_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(COM1_TAG, rs232_port_device, write_txd))
@@ -646,11 +647,11 @@ DEFINE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device, "iteagle_eeprom", "ITE
 
 void iteagle_eeprom_device::eeprom_map(address_map &map)
 {
-	map(0x0000, 0x000F).rw(this, FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
+	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
 }
 
 MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -773,7 +774,7 @@ DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITE
 
 void iteagle_periph_device::ctrl_map(address_map &map)
 {
-	map(0x000, 0x0cf).rw(this, FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
+	map(0x000, 0x0cf).rw(FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
 }
 
 iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

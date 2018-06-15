@@ -772,11 +772,11 @@ void snookr10_state::snookr10_map(address_map &map)
 	map(0x3001, 0x3001).portr("IN1");        /* IN1 */
 	map(0x3002, 0x3002).portr("IN2");        /* IN2 */
 	map(0x3003, 0x3003).portr("SW1");        /* DS1 */
-	map(0x3004, 0x3004).r(this, FUNC(snookr10_state::dsw_port_1_r));      /* complement of DS1, bit 7 */
-	map(0x5000, 0x5000).w(this, FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
-	map(0x5001, 0x5001).w(this, FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
-	map(0x6000, 0x6fff).ram().w(this, FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
+	map(0x3004, 0x3004).r(FUNC(snookr10_state::dsw_port_1_r));      /* complement of DS1, bit 7 */
+	map(0x5000, 0x5000).w(FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
+	map(0x5001, 0x5001).w(FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x6000, 0x6fff).ram().w(FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -788,26 +788,26 @@ void snookr10_state::tenballs_map(address_map &map)
 	map(0x4001, 0x4001).portr("IN1");        /* IN1 */
 	map(0x4002, 0x4002).portr("IN2");        /* IN2 */
 	map(0x4003, 0x4003).portr("SW1");        /* DS1 */
-	map(0x5000, 0x5000).w(this, FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
-	map(0x5001, 0x5001).w(this, FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
-	map(0x6000, 0x6fff).ram().w(this, FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
+	map(0x5000, 0x5000).w(FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
+	map(0x5001, 0x5001).w(FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x6000, 0x6fff).ram().w(FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
 void snookr10_state::crystalc_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
-	map(0x1000, 0x1000).w(this, FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
-	map(0x1001, 0x1001).w(this, FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
-	map(0x2000, 0x2008).r(this, FUNC(snookr10_state::port2000_8_r));      /* unknown... protection or data channels? */
+	map(0x1000, 0x1000).w(FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
+	map(0x1001, 0x1001).w(FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x2000, 0x2008).r(FUNC(snookr10_state::port2000_8_r));      /* unknown... protection or data channels? */
 	map(0x3000, 0x3000).portr("IN0");        /* IN0 */
 	map(0x3001, 0x3001).portr("IN1");        /* IN1 */
 	map(0x3002, 0x3002).portr("IN2");        /* IN2 */
 	map(0x3003, 0x3003).portr("SW1");        /* DS1 */
 	map(0x5000, 0x5000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x6000, 0x6fff).ram().w(this, FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
+	map(0x6000, 0x6fff).ram().w(FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
