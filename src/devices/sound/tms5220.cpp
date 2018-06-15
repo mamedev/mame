@@ -1630,6 +1630,7 @@ void tms5220_device::device_start()
 	m_io_ready = true;
 	m_true_timing = false;
 	m_rs_ws = 0x03; // rs and ws are assumed to be inactive on device startup
+	m_write_latch = 0; // assume on start that nothing is driving the data bus
 
 	register_for_save_states();
 }
@@ -1749,7 +1750,6 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 		}
 
-		m_io_ready = param;
 		update_ready_state();
 		break;
 	}
