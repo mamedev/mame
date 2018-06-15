@@ -235,14 +235,14 @@ protected:
 	virtual void video_start() override;
 	
 private:
-	required_shared_ptr_array<uint16_t, 3> m_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	
-	uint16_t m_vreg[4][3];
-	tilemap_t *m_layer[4];
+	uint16_t m_vreg[2][0x800];
+	tilemap_t *m_layer[2];
 	
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
-	TILEMAP_MAPPER_MEMBER(range2_8x8);
+	TILEMAP_MAPPER_MEMBER(range3_8x8);
 };
 
 /******************************************************************************************
@@ -277,10 +277,9 @@ TILEMAP_MAPPER_MEMBER(urashima_state::range0_16x16)
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-TILEMAP_MAPPER_MEMBER(urashima_state::range2_8x8)
+TILEMAP_MAPPER_MEMBER(urashima_state::range3_8x8)
 {
-	/* logical (col,row) -> memory offset */
-	return (row & 0x1f) + ((col & 0x7f) * 0x20) + ((row & 0x20) * 0x80);
+	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x60) * 0x40);
 }
 
 void urashima_state::video_start()
@@ -288,10 +287,10 @@ void urashima_state::video_start()
 	jalmah_state::video_start();
 	
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<2>),this),tilemap_mapper_delegate(FUNC(urashima_state::range2_8x8),this),8,8,128,64);
+	// range confirmed with title screen transition in attract mode
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,128);
 
-	for(int i=0;i<3;i++)
+	for(int i=0;i<2;i++)
 		m_layer[i]->set_transparent_pen(15);
 }
 
@@ -347,17 +346,55 @@ uint32_t jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 
 
 uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(0x1ff), cliprect);//selectable by a ram address?
-	m_layer[1]->draw(screen,bitmap,cliprect,0,0);
-	if(m_pri & 1)
+	rectangle clip;
+	uint16_t sx[2],sy[2];
+
+	// reset scroll latches
+	sx[0] = sx[1] = sy[0] = sy[1] = 0;
+	
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
+	
+	bitmap.fill(m_palette->pen(0x1ff), cliprect); //selectable by a ram address?
+	
+	for(int y = cliprect.min_y; y < cliprect.max_y; y++)
 	{
-		m_layer[0]->draw(screen,bitmap,cliprect,0,0);
-		m_layer[2]->draw(screen,bitmap,cliprect,0,0);		
-	}
-	else
-	{
-		m_layer[2]->draw(screen,bitmap,cliprect,0,0);
-		m_layer[0]->draw(screen,bitmap,cliprect,0,0);
+		clip.min_y = clip.max_y = y;
+		
+		// Urashima tilemaps interrogate the video register area to make row and column scrolling
+		// for every scanline the format is:
+		// ---- ---- ---- ---- [0] unused?
+		// ---- ---- ---- ---x [1] latches new scroll values
+		// ---- xxxx xxxx xxxx [2] new scroll x value
+		// ---- yyyy yyyy yyyy [3] new scroll y value
+		// this is notably used by the big puntos winning animations.
+		for(int layer_num=0;layer_num<2;layer_num++)
+		{
+			// latches fetch go in reverse order when flip screen is enabled
+			int y_base = flip_screen() ? 0x3fc-(y*4) : y*4;
+			
+			// is there a new latch?
+			if(m_vreg[layer_num][1+y_base] & 1)
+			{
+				sx[layer_num] = m_vreg[layer_num][2+y_base];
+				sy[layer_num] = m_vreg[layer_num][3+y_base];
+			}
+			
+			// set scroll values for this layer
+			m_layer[layer_num]->set_scrollx(0,sx[layer_num]);
+			m_layer[layer_num]->set_scrolly(0,sy[layer_num]);
+		}
+
+		if(m_pri & 1)
+		{
+			m_layer[0]->draw(screen,bitmap,clip,0,0);
+			m_layer[1]->draw(screen,bitmap,clip,0,0);		
+		}
+		else
+		{
+			m_layer[1]->draw(screen,bitmap,clip,0,0);
+			m_layer[0]->draw(screen,bitmap,clip,0,0);
+		}
 	}
 	return 0;
 }
@@ -410,25 +447,8 @@ READ16_MEMBER(urashima_state::urashima_vregs_r)
 
 template<int TileChip>
 WRITE16_MEMBER(urashima_state::urashima_vregs_w)
-{
+{	
 	COMBINE_DATA(&m_vreg[TileChip][offset]);
-	uint16_t res = m_vreg[TileChip][offset];
-	
-	switch(offset)
-	{
-		case 0:
-			m_layer[TileChip]->enable(res & 1);
-			if(res & 0xfffe)
-				popmessage("vreg 0 = %04x contact MAMEdev",res);
-			break;
-		case 1:
-			m_layer[TileChip]->set_scrollx(0,res);
-			break;
-		case 2:
-			m_layer[TileChip]->set_scrolly(0,res);
-			break;
-
-	}
 }
 
 // Urashima Mahjong uses a bigger video register area (mostly mirrored?)
@@ -744,7 +764,7 @@ void jalmah_state::jalmah_map(address_map &map)
 	map(0x080030, 0x080035).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x080038, 0x08003d).rw("scroll3", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//       0x084000, 0x084001  ?
+//      0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0"); // Scroll RAM 0
 	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1"); // Scroll RAM 1
@@ -771,21 +791,13 @@ void urashima_state::urashima_map(address_map &map)
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //      0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x090000, 0x093fff).rw(FUNC(urashima_state::urashima_vram_r<0>),FUNC(urashima_state::urashima_vram_w<0>)).share("videoram0");
-	map(0x094000, 0x097fff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
-//	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2"); // Scroll RAM 2 (unused?)
-	map(0x09c000, 0x09dfff).nopr().w(FUNC(urashima_state::urashima_vreg_log_w));
-	map(0x09c082, 0x09c087).mirror(0x300).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>));
-	map(0x09c402, 0x09c407).mirror(0x380).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>));
-//	map(0x09c77a, 0x09c77b).noprw();
-	map(0x09c882, 0x09c887).rw(FUNC(urashima_state::urashima_vregs_r<2>), FUNC(urashima_state::urashima_vregs_w<2>));
+	map(0x090000, 0x093fff).mirror(0x4000).rw(FUNC(urashima_state::urashima_vram_r<0>),FUNC(urashima_state::urashima_vram_w<0>)).share("videoram0");
+//	map(0x098000, 0x09bfff) unused mirror?
+	map(0x09c000, 0x09c7ff).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>));
+	map(0x09c800, 0x09cfff).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>));
+	map(0x09d000, 0x09dfff).nopr().w(FUNC(urashima_state::urashima_vreg_log_w)); // cleared at POST then unused
 
-	// flip screen versions (!!!)
-//	map(0x09c07a, 0x09c07f).mirror(0x300).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>));
-//	map(0x09c47a, 0x09c47f).mirror(0x300).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>));
-	map(0x09cf7a, 0x09cf7f).rw(FUNC(urashima_state::urashima_vregs_r<2>), FUNC(urashima_state::urashima_vregs_w<2>));
-	
-	map(0x09e000, 0x0a1fff).rw(FUNC(urashima_state::urashima_vram_r<2>),FUNC(urashima_state::urashima_vram_w<2>)).share("videoram2");
+	map(0x09e000, 0x0a1fff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
 	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
@@ -1160,8 +1172,8 @@ static const gfx_layout tilelayout =
 
 static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "scroll0", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll1", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "scroll3", 0, charlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "scroll1", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "scroll2", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
 
@@ -1172,7 +1184,7 @@ MACHINE_CONFIG_START(urashima_state::urashima)
 	MCFG_DEVICE_PROGRAM_MAP(urashima_map)
 	
 	// Urashima seems to use an earlier version of the Jaleco tilemaps (without range etc.)
-	// TODO: maybe MCU controls it? Area 0x9c000-0x9dfff might be used as sharedram instead
+	// and with per-scanline video registers
 	MCFG_DEVICE_REMOVE("scroll0")
 	MCFG_DEVICE_REMOVE("scroll1")
 	MCFG_DEVICE_REMOVE("scroll2")	
@@ -2210,7 +2222,7 @@ void jalmah_state::init_suchiesp()
 }
 
 /*First version of the MCU*/
-GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL )
+GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
