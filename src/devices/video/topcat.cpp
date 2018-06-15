@@ -88,7 +88,7 @@ TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 	m_cursor_timer->adjust(attotime::from_hz(5));
 	m_cursor_state ^= true;
 
-	if (m_cursor_ctrl & m_plane_mask) {
+	if ((m_cursor_ctrl >> 8) & m_plane_mask) {
 		for(int i = 0; i < m_cursor_width; i++) {
 			modify_vram(m_cursor_x_pos+i, m_cursor_y_pos, m_cursor_state);
 			modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-1, m_cursor_state);
@@ -166,7 +166,7 @@ void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool &dst)
 
 void topcat_device::window_move(void)
 {
-	if (!m_fb_write_enable)
+	if (!((m_fb_write_enable >> 8) & m_plane_mask))
 		return;
 
 	for(int line = 0; line < m_block_mover_pixel_height; line++) {
@@ -175,7 +175,6 @@ void topcat_device::window_move(void)
 						  m_source_y_pixel + line);
 			bool dst = get_vram_pixel(m_dst_x_pixel + column,
 						  m_dst_y_pixel + line);
-//			execute_rule(src, (replacement_rule_t)((m_move_replacement_rule >> 4) & 0x0f), &dst);
 			execute_rule(src, (replacement_rule_t)(m_move_replacement_rule & 0x0f), dst);
 			modify_vram(m_dst_x_pixel + column, m_dst_y_pixel + line, dst);
 		}
@@ -260,27 +259,20 @@ READ16_MEMBER(topcat_device::ctrl_r)
 
 WRITE16_MEMBER(topcat_device::ctrl_w)
 {
-	if (mem_mask == 0xff00)
-		data >>= 8;
+	data &= mem_mask;
 
-	if (mem_mask == 0x00ff) {
-		logerror("%s: write ignored: %d\n", __FUNCTION__, offset);
-		return;
-	}
-
-	if (offset == TOPCAT_REG_WRITE_ENABLE_PLANE && ((mem_mask & 0xff) == 0xff)) {
-		m_write_enable = !(data & m_plane_mask);
+	if (offset == TOPCAT_REG_WRITE_ENABLE_PLANE) {
+		m_write_enable = (data >> 8) & m_plane_mask;
 		return;
 	}
 
 	if (offset == TOPCAT_REG_READ_ENABLE_PLANE) {
-		m_read_enable = !(data & m_plane_mask);
+		m_read_enable = (data >> 8) & m_plane_mask;
 		return;
 	}
 
-	if (!m_write_enable) {
+	if (!m_write_enable)
 		return;
-	}
 
 	switch(offset) {
 	case TOPCAT_REG_VBLANK:
@@ -298,8 +290,9 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		m_display_enable_planes = data;
 		break;
 	case TOPCAT_REG_FB_WRITE_ENABLE:
-		m_fb_write_enable = data & m_plane_mask;
+		m_fb_write_enable = data;
 		break;
+
 	case TOPCAT_REG_START_WMOVE:
 		window_move();
 		break;
@@ -313,7 +306,6 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		m_pixel_replacement_rule = data;
 		break;
 	case TOPCAT_REG_MOVE_REPLACE_RULE:
-
 		m_move_replacement_rule = data;
 		break;
 	case TOPCAT_REG_SOURCE_X_PIXEL:

@@ -114,12 +114,12 @@ private:
 	uint8_t m_display_enable_planes;
 	bool m_write_enable_plane;
 	bool m_read_enable_plane;
-	bool m_fb_write_enable;
-	uint8_t m_enable_blink_planes;
-	uint8_t m_enable_alt_frame;
-	uint8_t m_cursor_ctrl;
-	uint8_t m_move_replacement_rule;
-	uint8_t m_pixel_replacement_rule;
+	uint16_t m_fb_write_enable;
+	uint16_t m_enable_blink_planes;
+	uint16_t m_enable_alt_frame;
+	uint16_t m_cursor_ctrl;
+	uint16_t m_move_replacement_rule;
+	uint16_t m_pixel_replacement_rule;
 	uint16_t m_source_x_pixel;
 	uint16_t m_source_y_pixel;
 	uint16_t m_dst_x_pixel;
