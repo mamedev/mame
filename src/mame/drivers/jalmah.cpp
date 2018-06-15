@@ -279,7 +279,7 @@ TILEMAP_MAPPER_MEMBER(urashima_state::range0_16x16)
 
 TILEMAP_MAPPER_MEMBER(urashima_state::range3_8x8)
 {
-	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x60) * 0x40);
+	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x20) * 0x40);
 }
 
 void urashima_state::video_start()
@@ -288,7 +288,8 @@ void urashima_state::video_start()
 	
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
 	// range confirmed with title screen transition in attract mode
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,128);
+	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,64);
 
 	for(int i=0;i<2;i++)
 		m_layer[i]->set_transparent_pen(15);
@@ -787,6 +788,7 @@ void urashima_state::urashima_map(address_map &map)
 	map(0x09c800, 0x09cfff).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>));
 	map(0x09d000, 0x09dfff).nopr().w(FUNC(urashima_state::urashima_vreg_log_w)); // cleared at POST then unused
 
+	// likely only 0x9e000-0x9ffff is connected (0xa0000-0xa1fff cleared at POST and nowhere else)
 	map(0x09e000, 0x0a1fff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
