@@ -78,7 +78,7 @@ void mouser_state::mouser_sound_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4000).w(this, FUNC(mouser_state::mouser_sound_nmi_clear_w));
+	map(0x4000, 0x4000).w(FUNC(mouser_state::mouser_sound_nmi_clear_w));
 }
 
 void mouser_state::mouser_sound_io_map(address_map &map)

@@ -59,9 +59,9 @@ void tr175_state::mem_map(address_map &map)
 	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
 	map(0xffe800, 0xffe805).unmaprw(); //AM_DEVREADWRITE8("pai", um82c11_device, read, write, 0xff00)
-	map(0xffec01, 0xffec01).w(this, FUNC(tr175_state::ffec01_w));
-	map(0xfff000, 0xfff000).w(this, FUNC(tr175_state::fff000_w));
-	map(0xfff400, 0xfff400).r(this, FUNC(tr175_state::fff400_r));
+	map(0xffec01, 0xffec01).w(FUNC(tr175_state::ffec01_w));
+	map(0xfff000, 0xfff000).w(FUNC(tr175_state::fff000_w));
+	map(0xfff400, 0xfff400).r(FUNC(tr175_state::fff400_r));
 	map(0xfffc01, 0xfffc01).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0xfffc03, 0xfffc03).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0xfffc05, 0xfffc05).w("ramdac", FUNC(ramdac_device::mask_w));

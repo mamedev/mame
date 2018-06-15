@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Paul Priest
+
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class oneshot_state : public driver_device
 {

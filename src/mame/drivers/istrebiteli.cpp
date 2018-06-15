@@ -24,6 +24,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -380,20 +381,20 @@ void istrebiteli_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xb0, 0xbf).w(this, FUNC(istrebiteli_state::tileram_w));
-	map(0xc0, 0xc3).rw(this, FUNC(istrebiteli_state::ppi0_r), FUNC(istrebiteli_state::ppi0_w));
-	map(0xc4, 0xc7).rw(this, FUNC(istrebiteli_state::ppi1_r), FUNC(istrebiteli_state::ppi1_w));
-	map(0xc8, 0xcf).w(this, FUNC(istrebiteli_state::spr_xy_w));
+	map(0xb0, 0xbf).w(FUNC(istrebiteli_state::tileram_w));
+	map(0xc0, 0xc3).rw(FUNC(istrebiteli_state::ppi0_r), FUNC(istrebiteli_state::ppi0_w));
+	map(0xc4, 0xc7).rw(FUNC(istrebiteli_state::ppi1_r), FUNC(istrebiteli_state::ppi1_w));
+	map(0xc8, 0xcf).w(FUNC(istrebiteli_state::spr_xy_w));
 }
 
 void istrebiteli_state::moto_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x30, 0x37).w(this, FUNC(istrebiteli_state::moto_spr_xy_w));
+	map(0x30, 0x37).w(FUNC(istrebiteli_state::moto_spr_xy_w));
 	map(0x38, 0x3b).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3c, 0x3f).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x40, 0x4f).w(this, FUNC(istrebiteli_state::moto_tileram_w));
+	map(0x40, 0x4f).w(FUNC(istrebiteli_state::moto_tileram_w));
 }
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)

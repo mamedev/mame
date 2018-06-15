@@ -51,8 +51,8 @@ public:
 	template <class Object> devcb_base &set_floating_bus_rd_callback(Object &&cb) { return m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( read ) { return read(offset); }
-	DECLARE_WRITE8_MEMBER( write ) { write(offset, data); }
+	DECLARE_READ8_MEMBER( bus_r ) { return read(offset); }
+	DECLARE_WRITE8_MEMBER( bus_w ) { write(offset, data); }
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
@@ -185,7 +185,8 @@ protected:
 	required_device<cococart_slot_device> m_cart_device;
 	memory_bank *               m_read_banks[9];
 	memory_bank *               m_write_banks[9];
-	required_memory_region      m_rom;
+    uint8_t *                   m_rom;
+	required_memory_region      m_rom_region;
 	uint8_t *                   m_cart_rom;
 	uint32_t                    m_cart_size;
 	pixel_t                     m_composite_palette[64];
@@ -289,9 +290,10 @@ public:
 		: gime_ntsc_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_ram.set_tag(std::forward<U>(ram_tag));
+        m_cpu.set_tag(std::forward<T>(cpu_tag));
+        m_ram.set_tag(std::forward<U>(ram_tag));
 		m_cart_device.set_tag(std::forward<V>(ext_tag));
-		m_rom.set_tag(std::forward<W>(region_tag));
+		m_rom_region.set_tag(std::forward<W>(region_tag));
 	}
 
 	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -305,9 +307,10 @@ public:
 		: gime_pal_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_ram.set_tag(std::forward<U>(ram_tag));
+        m_cpu.set_tag(std::forward<T>(cpu_tag));
+        m_ram.set_tag(std::forward<U>(ram_tag));
 		m_cart_device.set_tag(std::forward<V>(ext_tag));
-		m_rom.set_tag(std::forward<W>(region_tag));
+		m_rom_region.set_tag(std::forward<W>(region_tag));
 	}
 
 	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

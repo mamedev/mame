@@ -81,6 +81,7 @@ ________________________|___________________________
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -312,11 +313,11 @@ void flipjack_state::flipjack_main_map(address_map &map)
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7000, 0x7000).w(this, FUNC(flipjack_state::flipjack_soundlatch_w));
+	map(0x7000, 0x7000).w(FUNC(flipjack_state::flipjack_soundlatch_w));
 	map(0x7010, 0x7010).w(m_crtc, FUNC(hd6845_device::address_w));
 	map(0x7011, 0x7011).w(m_crtc, FUNC(hd6845_device::register_w));
 	map(0x7020, 0x7020).portr("DSW");
-	map(0x7800, 0x7800).w(this, FUNC(flipjack_state::flipjack_layer_w));
+	map(0x7800, 0x7800).w(FUNC(flipjack_state::flipjack_layer_w));
 	map(0x8000, 0x9fff).rom();
 	map(0xa000, 0xbfff).ram().share("cram");
 	map(0xc000, 0xdfff).ram().share("vram");
@@ -326,7 +327,7 @@ void flipjack_state::flipjack_main_map(address_map &map)
 void flipjack_state::flipjack_main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xff, 0xff).w(this, FUNC(flipjack_state::flipjack_bank_w));
+	map(0xff, 0xff).w(FUNC(flipjack_state::flipjack_bank_w));
 }
 
 void flipjack_state::flipjack_sound_map(address_map &map)
@@ -342,7 +343,7 @@ void flipjack_state::flipjack_sound_map(address_map &map)
 void flipjack_state::flipjack_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(flipjack_state::flipjack_sound_nmi_ack_w));
+	map(0x00, 0x00).w(FUNC(flipjack_state::flipjack_sound_nmi_ack_w));
 }
 
 

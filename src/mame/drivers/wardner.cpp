@@ -177,7 +177,7 @@ void wardner_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x8fff).w(this, FUNC(wardner_state::wardner_sprite_w));                     // AM_SHARE("spriteram8")
+	map(0x8000, 0x8fff).w(FUNC(wardner_state::wardner_sprite_w));                     // AM_SHARE("spriteram8")
 	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // AM_SHARE("palette")
 	map(0xc000, 0xc7ff).writeonly().share("sharedram");
 	map(0x8000, 0xffff).r(m_membank, FUNC(address_map_bank_device::read8));
@@ -187,7 +187,7 @@ void wardner_state::main_program_map(address_map &map)
 // Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
 void wardner_state::main_bank_map(address_map &map)
 {
-	map(0x00000, 0x00fff).r(this, FUNC(wardner_state::wardner_sprite_r)).share("spriteram8");
+	map(0x00000, 0x00fff).r(FUNC(wardner_state::wardner_sprite_r)).share("spriteram8");
 	map(0x01000, 0x01fff).rom().region("maincpu", 0x1000);
 	map(0x02000, 0x02fff).readonly().share("palette");
 	map(0x03000, 0x03fff).rom().region("maincpu", 0x3000);
@@ -200,13 +200,13 @@ void wardner_state::main_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x02, 0x02).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x10, 0x13).w(this, FUNC(wardner_state::wardner_txscroll_w));       /* scroll text layer */
-	map(0x14, 0x15).w(this, FUNC(wardner_state::wardner_txlayer_w));        /* offset in text video RAM */
-	map(0x20, 0x23).w(this, FUNC(wardner_state::wardner_bgscroll_w));       /* scroll bg layer */
-	map(0x24, 0x25).w(this, FUNC(wardner_state::wardner_bglayer_w));        /* offset in bg video RAM */
-	map(0x30, 0x33).w(this, FUNC(wardner_state::wardner_fgscroll_w));       /* scroll fg layer */
-	map(0x34, 0x35).w(this, FUNC(wardner_state::wardner_fglayer_w));        /* offset in fg video RAM */
-	map(0x40, 0x43).w(this, FUNC(wardner_state::wardner_exscroll_w));       /* scroll extra layer (not used) */
+	map(0x10, 0x13).w(FUNC(wardner_state::wardner_txscroll_w));       /* scroll text layer */
+	map(0x14, 0x15).w(FUNC(wardner_state::wardner_txlayer_w));        /* offset in text video RAM */
+	map(0x20, 0x23).w(FUNC(wardner_state::wardner_bgscroll_w));       /* scroll bg layer */
+	map(0x24, 0x25).w(FUNC(wardner_state::wardner_bglayer_w));        /* offset in bg video RAM */
+	map(0x30, 0x33).w(FUNC(wardner_state::wardner_fgscroll_w));       /* scroll fg layer */
+	map(0x34, 0x35).w(FUNC(wardner_state::wardner_fglayer_w));        /* offset in fg video RAM */
+	map(0x40, 0x43).w(FUNC(wardner_state::wardner_exscroll_w));       /* scroll extra layer (not used) */
 	map(0x50, 0x50).portr("DSWA");
 	map(0x52, 0x52).portr("DSWB");
 	map(0x54, 0x54).portr("P1");
@@ -214,8 +214,8 @@ void wardner_state::main_io_map(address_map &map)
 	map(0x58, 0x58).portr("SYSTEM");
 	map(0x5a, 0x5a).w("coinlatch", FUNC(ls259_device::write_nibble_d0));
 	map(0x5c, 0x5c).w("mainlatch", FUNC(ls259_device::write_nibble_d0));
-	map(0x60, 0x65).rw(this, FUNC(wardner_state::wardner_videoram_r), FUNC(wardner_state::wardner_videoram_w));
-	map(0x70, 0x70).w(this, FUNC(wardner_state::wardner_bank_w));
+	map(0x60, 0x65).rw(FUNC(wardner_state::wardner_videoram_r), FUNC(wardner_state::wardner_videoram_w));
+	map(0x70, 0x70).w(FUNC(wardner_state::wardner_bank_w));
 }
 
 
@@ -247,9 +247,9 @@ void wardner_state::DSP_program_map(address_map &map)
 
 void wardner_state::DSP_io_map(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(wardner_state::wardner_dsp_addrsel_w));
-	map(0x01, 0x01).rw(this, FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
-	map(0x03, 0x03).w(this, FUNC(wardner_state::twincobr_dsp_bio_w));
+	map(0x00, 0x00).w(FUNC(wardner_state::wardner_dsp_addrsel_w));
+	map(0x01, 0x01).rw(FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
+	map(0x03, 0x03).w(FUNC(wardner_state::twincobr_dsp_bio_w));
 }
 
 

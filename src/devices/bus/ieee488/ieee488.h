@@ -110,7 +110,7 @@ public:
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
-	uint8_t dio_r() { return get_data(); }
+	uint8_t read_dio() { return get_data(); }
 	DECLARE_READ8_MEMBER( dio_r ) { return get_data(); }
 	DECLARE_READ_LINE_MEMBER( eoi_r ) { return get_signal(EOI); }
 	DECLARE_READ_LINE_MEMBER( dav_r ) { return get_signal(DAV); }
@@ -122,16 +122,16 @@ public:
 	DECLARE_READ_LINE_MEMBER( ren_r ) { return get_signal(REN); }
 
 	// writes for host (driver_device)
-	void dio_w(uint8_t data) { return set_data(this, data); }
-	DECLARE_WRITE8_MEMBER( dio_w ) { set_data(this, data); }
-	DECLARE_WRITE_LINE_MEMBER( eoi_w ) { set_signal(this, EOI, state); }
-	DECLARE_WRITE_LINE_MEMBER( dav_w ) { set_signal(this, DAV, state); }
-	DECLARE_WRITE_LINE_MEMBER( nrfd_w ) { set_signal(this, NRFD, state); }
-	DECLARE_WRITE_LINE_MEMBER( ndac_w ) { set_signal(this, NDAC, state); }
-	DECLARE_WRITE_LINE_MEMBER( ifc_w ) { set_signal(this, IFC, state); }
-	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
-	DECLARE_WRITE_LINE_MEMBER( ren_w ) { set_signal(this, REN, state); }
+	void write_dio(uint8_t data) { set_data(this, data); }
+	DECLARE_WRITE8_MEMBER( host_dio_w ) { set_data(this, data); }
+	DECLARE_WRITE_LINE_MEMBER( host_eoi_w ) { set_signal(this, EOI, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_dav_w ) { set_signal(this, DAV, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_nrfd_w ) { set_signal(this, NRFD, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_ndac_w ) { set_signal(this, NDAC, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_ifc_w ) { set_signal(this, IFC, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_srq_w ) { set_signal(this, SRQ, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_atn_w ) { set_signal(this, ATN, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_ren_w ) { set_signal(this, REN, state); }
 
 	// writes for peripherals (device_t)
 	void dio_w(device_t *device, uint8_t data) { set_data(device, data); }

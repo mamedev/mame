@@ -935,7 +935,7 @@ void hp48_state::base_machine_start(hp48_models model)
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
 	uint8_t *ram = auto_alloc_array(machine(), uint8_t, 2 * ram_size);
-	machine().device<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
+	subdevice<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
 
 
 	/* ROM load */

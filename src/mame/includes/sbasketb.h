@@ -1,18 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_SBASKETB_H
+#define MAME_INCLUDES_SBASKETB_H
+
+#pragma once
 
 #include "audio/trackfld.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class sbasketb_state : public driver_device
 {
 public:
-	sbasketb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sbasketb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -26,7 +31,8 @@ public:
 		m_vlm(*this, "vlm"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
@@ -63,7 +69,7 @@ public:
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbasketb);
@@ -75,3 +81,5 @@ public:
 	void sbasketb_map(address_map &map);
 	void sbasketb_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SBASKETB_H

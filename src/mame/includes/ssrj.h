@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+
+#include "emupal.h"
+
 class ssrj_state : public driver_device
 {
 public:

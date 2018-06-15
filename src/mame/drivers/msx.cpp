@@ -541,8 +541,8 @@ PCB Layouts missing
 
 void msx_state::msx_memory_map(address_map &map)
 {
-	map(0x0000, 0xfffe).rw(this, FUNC(msx_state::msx_mem_read), FUNC(msx_state::msx_mem_write));
-	map(0xffff, 0xffff).rw(this, FUNC(msx_state::msx_sec_slot_r), FUNC(msx_state::msx_sec_slot_w));
+	map(0x0000, 0xfffe).rw(FUNC(msx_state::msx_mem_read), FUNC(msx_state::msx_mem_write));
+	map(0xffff, 0xffff).rw(FUNC(msx_state::msx_sec_slot_r), FUNC(msx_state::msx_sec_slot_w));
 }
 
 
@@ -560,14 +560,14 @@ void msx_state::msx_io_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(this, FUNC(msx_state::msx_ay8910_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(FUNC(msx_state::msx_ay8910_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0xd8, 0xd9).rw(this, FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
+	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xd8, 0xd9).rw(FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
@@ -576,17 +576,17 @@ void msx_state::msx2_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x4f).rw(this, FUNC(msx_state::msx_switched_r), FUNC(msx_state::msx_switched_w));
+	map(0x40, 0x4f).rw(FUNC(msx_state::msx_switched_r), FUNC(msx_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(this, FUNC(msx_state::msx_ay8910_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(FUNC(msx_state::msx_ay8910_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0xb4, 0xb4).w(this, FUNC(msx_state::msx_rtc_latch_w));
-	map(0xb5, 0xb5).rw(this, FUNC(msx_state::msx_rtc_reg_r), FUNC(msx_state::msx_rtc_reg_w));
-	map(0xd8, 0xd9).rw(this, FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
+	map(0xb4, 0xb4).w(FUNC(msx_state::msx_rtc_latch_w));
+	map(0xb5, 0xb5).rw(FUNC(msx_state::msx_rtc_reg_r), FUNC(msx_state::msx_rtc_reg_w));
+	map(0xd8, 0xd9).rw(FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
@@ -595,17 +595,17 @@ void msx_state::msx2p_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x4f).rw(this, FUNC(msx_state::msx_switched_r), FUNC(msx_state::msx_switched_w));
+	map(0x40, 0x4f).rw(FUNC(msx_state::msx_switched_r), FUNC(msx_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(this, FUNC(msx_state::msx_ay8910_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(FUNC(msx_state::msx_ay8910_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
-	map(0xb4, 0xb4).w(this, FUNC(msx_state::msx_rtc_latch_w));
-	map(0xb5, 0xb5).rw(this, FUNC(msx_state::msx_rtc_reg_r), FUNC(msx_state::msx_rtc_reg_w));
-	map(0xd8, 0xd9).rw(this, FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
+	map(0xb4, 0xb4).w(FUNC(msx_state::msx_rtc_latch_w));
+	map(0xb5, 0xb5).rw(FUNC(msx_state::msx_rtc_reg_r), FUNC(msx_state::msx_rtc_reg_w));
+	map(0xd8, 0xd9).rw(FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
@@ -1374,7 +1374,7 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1526,7 +1526,7 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1583,7 +1583,7 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

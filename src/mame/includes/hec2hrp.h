@@ -43,11 +43,14 @@
 
 #pragma once
 
-#include "machine/upd765.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/upd765.h"
+#include "machine/wd_fdc.h"
+#include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "sound/sn76477.h"   /* for sn sound*/
+#include "emupal.h"
 
 /* Enum status for high memory bank (c000 - ffff)*/
 enum
@@ -83,20 +86,62 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_disc2cpu(*this, "disc2cpu"),
 		m_cassette(*this, "cassette"),
+		m_discrete(*this, "discrete"),
 		m_sn(*this, "sn76477"),
 		m_palette(*this, "palette"),
 		m_videoram(*this,"videoram"),
 		m_hector_videoram(*this,"hector_videoram") ,
 		m_keyboard(*this, "KEY.%u", 0),
 		m_minidisc_fdc(*this, "wd179x"),
-		m_floppy0(*this, "wd179x:0")
+		m_floppy0(*this, "wd179x:0"),
+		m_upd_fdc(*this, "upd765"),
+		m_upd_connector(*this, "upd765:%u", 0U),
+		m_printer(*this, "printer")
 	{}
 
+	DECLARE_WRITE8_MEMBER(minidisc_control_w);
+
+	DECLARE_WRITE8_MEMBER(switch_bank_w);
+	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(sn_2000_w);
+	DECLARE_WRITE8_MEMBER(sn_2800_w);
+	DECLARE_READ8_MEMBER(cassette_r);
+	DECLARE_WRITE8_MEMBER(sn_3000_w);
+	DECLARE_WRITE8_MEMBER(color_a_w);
+	DECLARE_WRITE8_MEMBER(color_b_w);
+	DECLARE_READ8_MEMBER(io_8255_r);
+	DECLARE_WRITE8_MEMBER(io_8255_w);
+	DECLARE_WRITE8_MEMBER(mx40_io_port_w);
+	DECLARE_WRITE8_MEMBER(mx80_io_port_w);
+
+	// disc2 handling
+	DECLARE_READ8_MEMBER(  disc2_io00_port_r);
+	DECLARE_WRITE8_MEMBER( disc2_io00_port_w);
+	DECLARE_READ8_MEMBER(  disc2_io20_port_r);
+	DECLARE_WRITE8_MEMBER( disc2_io20_port_w);
+	DECLARE_READ8_MEMBER(  disc2_io30_port_r);
+	DECLARE_WRITE8_MEMBER( disc2_io30_port_w);
+	DECLARE_READ8_MEMBER(  disc2_io40_port_r);
+	DECLARE_WRITE8_MEMBER( disc2_io40_port_w);
+	DECLARE_READ8_MEMBER(  disc2_io50_port_r);
+	DECLARE_WRITE8_MEMBER( disc2_io50_port_w);
+
+	void hec2mx80(machine_config &config);
+	void hec2hrp(machine_config &config);
+	void hec2hrx(machine_config &config);
+	void hec2mx40(machine_config &config);
+	void hec2mdhrx(machine_config &config);
+	void hec2hr(machine_config &config);
+	void hector_audio(machine_config &config);
+
+protected:
 	DECLARE_FLOPPY_FORMATS(minidisc_formats);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<discrete_device> m_discrete;
 	required_device<sn76477_device> m_sn;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -105,6 +150,11 @@ public:
 
 	optional_device<fd1793_device> m_minidisc_fdc;
 	optional_device<floppy_connector> m_floppy0;
+
+	optional_device<upd765a_device> m_upd_fdc;
+	optional_device_array<floppy_connector, 2> m_upd_connector;
+
+	optional_device<printer_image_device> m_printer;
 
 	uint8_t m_hector_flag_hr;
 	uint8_t m_hector_flag_80c;
@@ -144,21 +194,6 @@ public:
 	int m_print;
 	uint8_t m_hector_videoram_hrx[0x04000];
 
-	DECLARE_WRITE8_MEMBER(minidisc_control_w);
-
-	DECLARE_WRITE8_MEMBER(hector_switch_bank_w);
-	DECLARE_WRITE8_MEMBER(hector_keyboard_w);
-	DECLARE_READ8_MEMBER(hector_keyboard_r);
-	DECLARE_WRITE8_MEMBER(hector_sn_2000_w);
-	DECLARE_WRITE8_MEMBER(hector_sn_2800_w);
-	DECLARE_READ8_MEMBER(hector_cassette_r);
-	DECLARE_WRITE8_MEMBER(hector_sn_3000_w);
-	DECLARE_WRITE8_MEMBER(hector_color_a_w);
-	DECLARE_WRITE8_MEMBER(hector_color_b_w);
-	DECLARE_READ8_MEMBER(hector_io_8255_r);
-	DECLARE_WRITE8_MEMBER(hector_io_8255_w);
-	DECLARE_WRITE8_MEMBER(hector_mx40_io_port_w);
-	DECLARE_WRITE8_MEMBER(hector_mx80_io_port_w);
 	DECLARE_MACHINE_START(hec2hrp);
 	DECLARE_MACHINE_RESET(hec2hrp);
 	DECLARE_VIDEO_START(hec2hrp);
@@ -185,26 +220,8 @@ public:
 	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	/*----------- defined in machine/hecdisk2.c -----------*/
 
-	// disc2 handling
-	DECLARE_READ8_MEMBER(  hector_disc2_io00_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io00_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io20_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io20_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io30_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io30_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io40_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io40_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io50_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io50_port_w);
-
 	void hector_disc2_reset();
-	void hec2mx80(machine_config &config);
-	void hec2hrp(machine_config &config);
-	void hec2hrx(machine_config &config);
-	void hec2mx40(machine_config &config);
-	void hec2mdhrx(machine_config &config);
-	void hec2hr(machine_config &config);
-	void hector_audio(machine_config &config);
+
 	void hec2hrp_io(address_map &map);
 	void hec2hrp_mem(address_map &map);
 	void hec2hrx_io(address_map &map);

@@ -58,17 +58,17 @@ void sh4_base_device::sh4_internal_map(address_map &map)
 	map(0x1E000000, 0x1E000FFF).ram().mirror(0x01FFF000);
 	map(0xE0000000, 0xE000003F).ram().mirror(0x03FFFFC0); // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
 
-	map(0xF6000000, 0xF6FFFFFF).rw(this, FUNC(sh4_base_device::sh4_utlb_address_array_r), FUNC(sh4_base_device::sh4_utlb_address_array_w));
-	map(0xF7000000, 0xF77FFFFF).rw(this, FUNC(sh4_base_device::sh4_utlb_data_array1_r), FUNC(sh4_base_device::sh4_utlb_data_array1_w));
-	map(0xF7800000, 0xF7FFFFFF).rw(this, FUNC(sh4_base_device::sh4_utlb_data_array2_r), FUNC(sh4_base_device::sh4_utlb_data_array2_w));
+	map(0xF6000000, 0xF6FFFFFF).rw(FUNC(sh4_base_device::sh4_utlb_address_array_r), FUNC(sh4_base_device::sh4_utlb_address_array_w));
+	map(0xF7000000, 0xF77FFFFF).rw(FUNC(sh4_base_device::sh4_utlb_data_array1_r), FUNC(sh4_base_device::sh4_utlb_data_array1_w));
+	map(0xF7800000, 0xF7FFFFFF).rw(FUNC(sh4_base_device::sh4_utlb_data_array2_r), FUNC(sh4_base_device::sh4_utlb_data_array2_w));
 
-	map(0xFE000000, 0xFFFFFFFF).rw(this, FUNC(sh4_base_device::sh4_internal_r), FUNC(sh4_base_device::sh4_internal_w)).umask32(0xffffffff);
+	map(0xFE000000, 0xFFFFFFFF).rw(FUNC(sh4_base_device::sh4_internal_r), FUNC(sh4_base_device::sh4_internal_w)).umask32(0xffffffff);
 }
 
 void sh3_base_device::sh3_internal_map(address_map &map)
 {
-	map(SH3_LOWER_REGBASE, SH3_LOWER_REGEND).rw(this, FUNC(sh3_base_device::sh3_internal_r), FUNC(sh3_base_device::sh3_internal_w));
-	map(SH3_UPPER_REGBASE, SH3_UPPER_REGEND).rw(this, FUNC(sh3_base_device::sh3_internal_high_r), FUNC(sh3_base_device::sh3_internal_high_w));
+	map(SH3_LOWER_REGBASE, SH3_LOWER_REGEND).rw(FUNC(sh3_base_device::sh3_internal_r), FUNC(sh3_base_device::sh3_internal_w));
+	map(SH3_UPPER_REGBASE, SH3_UPPER_REGEND).rw(FUNC(sh3_base_device::sh3_internal_high_r), FUNC(sh3_base_device::sh3_internal_high_w));
 }
 
 

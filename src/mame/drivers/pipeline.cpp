@@ -76,6 +76,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -226,8 +227,8 @@ void pipeline_state::cpu0_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x97ff).ram().w(this, FUNC(pipeline_state::vram1_w)).share("vram1");
-	map(0x9800, 0xa7ff).ram().w(this, FUNC(pipeline_state::vram2_w)).share("vram2");
+	map(0x8800, 0x97ff).ram().w(FUNC(pipeline_state::vram1_w)).share("vram1");
+	map(0x9800, 0xa7ff).ram().w(FUNC(pipeline_state::vram2_w)).share("vram2");
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb830, 0xb830).noprw();

@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -236,17 +237,17 @@ CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 void pzletime_state::pzletime_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x700000, 0x700005).ram().w(this, FUNC(pzletime_state::video_regs_w)).share("video_regs");
+	map(0x700000, 0x700005).ram().w(FUNC(pzletime_state::video_regs_w)).share("video_regs");
 	map(0x800001, 0x800001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x900000, 0x9005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00007).ram().share("tilemap_regs");
 	map(0xb00000, 0xb3ffff).ram().share("bg_videoram");
-	map(0xc00000, 0xc00fff).ram().w(this, FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
-	map(0xc01000, 0xc01fff).ram().w(this, FUNC(pzletime_state::txt_videoram_w)).share("txt_videoram");
+	map(0xc00000, 0xc00fff).ram().w(FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(FUNC(pzletime_state::txt_videoram_w)).share("txt_videoram");
 	map(0xd00000, 0xd01fff).ram().share("spriteram");
-	map(0xe00000, 0xe00001).portr("INPUT").w(this, FUNC(pzletime_state::eeprom_w));
-	map(0xe00002, 0xe00003).portr("SYSTEM").w(this, FUNC(pzletime_state::ticket_w));
-	map(0xe00004, 0xe00005).w(this, FUNC(pzletime_state::oki_bank_w));
+	map(0xe00000, 0xe00001).portr("INPUT").w(FUNC(pzletime_state::eeprom_w));
+	map(0xe00002, 0xe00003).portr("SYSTEM").w(FUNC(pzletime_state::ticket_w));
+	map(0xe00004, 0xe00005).w(FUNC(pzletime_state::oki_bank_w));
 	map(0xf00000, 0xf0ffff).ram();
 }
 
@@ -353,7 +354,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 
 	/* sound hardware */

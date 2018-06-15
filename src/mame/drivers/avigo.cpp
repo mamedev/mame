@@ -174,7 +174,7 @@ void avigo_state::avigo_banked_map(address_map &map)
 	map(0x1400000, 0x14fffff).mirror(0x0300000).rw("flash2", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x1c00000, 0x1cfffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 
-	map(0x1800000, 0x1803fff).mirror(0x03fc000).rw(this, FUNC(avigo_state::vid_memory_r), FUNC(avigo_state::vid_memory_w));
+	map(0x1800000, 0x1803fff).mirror(0x03fc000).rw(FUNC(avigo_state::vid_memory_r), FUNC(avigo_state::vid_memory_w));
 }
 
 void avigo_state::avigo_mem(address_map &map)
@@ -502,16 +502,16 @@ void avigo_state::avigo_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x001, 0x001).rw(this, FUNC(avigo_state::key_data_read_r), FUNC(avigo_state::set_key_line_w));
-	map(0x002, 0x002).w(this, FUNC(avigo_state::port2_w));
-	map(0x003, 0x003).rw(this, FUNC(avigo_state::irq_r), FUNC(avigo_state::irq_w));
-	map(0x004, 0x004).r(this, FUNC(avigo_state::port_04_r));
-	map(0x005, 0x006).rw(this, FUNC(avigo_state::bank1_r), FUNC(avigo_state::bank1_w));
-	map(0x007, 0x008).rw(this, FUNC(avigo_state::bank2_r), FUNC(avigo_state::bank2_w));
-	map(0x009, 0x009).rw(this, FUNC(avigo_state::ad_control_status_r), FUNC(avigo_state::ad_control_status_w));
+	map(0x001, 0x001).rw(FUNC(avigo_state::key_data_read_r), FUNC(avigo_state::set_key_line_w));
+	map(0x002, 0x002).w(FUNC(avigo_state::port2_w));
+	map(0x003, 0x003).rw(FUNC(avigo_state::irq_r), FUNC(avigo_state::irq_w));
+	map(0x004, 0x004).r(FUNC(avigo_state::port_04_r));
+	map(0x005, 0x006).rw(FUNC(avigo_state::bank1_r), FUNC(avigo_state::bank1_w));
+	map(0x007, 0x008).rw(FUNC(avigo_state::bank2_r), FUNC(avigo_state::bank2_w));
+	map(0x009, 0x009).rw(FUNC(avigo_state::ad_control_status_r), FUNC(avigo_state::ad_control_status_w));
 	map(0x010, 0x01f).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
-	map(0x028, 0x028).w(this, FUNC(avigo_state::speaker_w));
-	map(0x02d, 0x02d).r(this, FUNC(avigo_state::ad_data_r));
+	map(0x028, 0x028).w(FUNC(avigo_state::speaker_w));
+	map(0x02d, 0x02d).r(FUNC(avigo_state::ad_data_r));
 	map(0x030, 0x037).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 }
 

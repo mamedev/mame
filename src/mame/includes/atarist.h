@@ -20,6 +20,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define M68000_TAG      "m68000"

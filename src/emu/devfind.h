@@ -308,15 +308,6 @@ public:
 		std::tie(m_base, m_tag) = finder.finder_target();
 	}
 
-	/// \brief Is the object to be resolved before memory maps?
-	///
-	/// Some objects must be resolved before memory maps are loaded
-	/// (devices for instance), some after (memory shares for
-	/// instance).
-	/// \return True if the target object has to be resolved before
-	///   memory maps are loaded
-	virtual bool is_pre_map() const { return false; }
-
 	/// \brief Dummy tag always treated as not found
 	constexpr static char DUMMY_TAG[17] = "finder_dummy_tag";
 
@@ -523,15 +514,6 @@ public:
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
 	device_finder(device_t &base, char const *tag) : object_finder_base<DeviceClass, Required>(base, tag) { }
-
-	/// \brief Is the object to be resolved before memory maps?
-	///
-	/// Some objects must be resolved before memory maps are loaded
-	/// (devices for instance), some after (memory shares for
-	/// instance).
-	/// \return True if the target object has to be resolved before
-	///   memory maps are loaded.
-	virtual bool is_pre_map() const override { return true; }
 
 	/// \brief Set target during configuration
 	///

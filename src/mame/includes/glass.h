@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/74259.h"
+#include "emupal.h"
 
 class glass_state : public driver_device
 {

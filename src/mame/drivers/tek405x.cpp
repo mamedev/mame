@@ -179,7 +179,7 @@ void tek4051_state::tek4051_mem(address_map &map)
 	map(0x8798, 0x879b).rw(MC6820_TAPE_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87a8, 0x87ab).rw(MC6820_KB_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87b0, 0x87b3).rw(m_gpib_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x87c0, 0x87c0).mirror(0x03).w(this, FUNC(tek4051_state::lbs_w));
+	map(0x87c0, 0x87c0).mirror(0x03).w(FUNC(tek4051_state::lbs_w));
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
 //  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
@@ -627,13 +627,13 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
-	m_gpib->eoi_w(!BIT(data, 4));
+	m_gpib->host_eoi_w(!BIT(data, 4));
 
 	// speaker
 	m_speaker->level_w(!BIT(data, 7));
 
 	// remote enable
-	m_gpib->ren_w(!BIT(data, 7));
+	m_gpib->host_ren_w(!BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
@@ -741,7 +741,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 
 	if (m_talk)
 	{
-		m_gpib->dio_w(data);
+		m_gpib->write_dio(data);
 	}
 }
 
@@ -800,21 +800,21 @@ WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
 	*/
 
 	// end or identify
-	m_gpib->eoi_w(!BIT(data, 0));
+	m_gpib->host_eoi_w(!BIT(data, 0));
 
 	// interface clear
-	m_gpib->ifc_w(!BIT(data, 1));
+	m_gpib->host_ifc_w(!BIT(data, 1));
 
 	// attention
-	m_gpib->atn_w(BIT(data, 3));
+	m_gpib->host_atn_w(BIT(data, 3));
 
 	if (m_talk)
 	{
 		// not ready for data
-		m_gpib->nrfd_w(!BIT(data, 4));
+		m_gpib->host_nrfd_w(!BIT(data, 4));
 
 		// not data acknowledged
-		m_gpib->ndac_w(!BIT(data, 7));
+		m_gpib->host_ndac_w(!BIT(data, 7));
 	}
 }
 
@@ -824,9 +824,9 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 
 	if (!m_talk)
 	{
-		m_gpib->dio_w(0xff);
-		m_gpib->nrfd_w(1);
-		m_gpib->ndac_w(1);
+		m_gpib->write_dio(0xff);
+		m_gpib->host_nrfd_w(1);
+		m_gpib->host_ndac_w(1);
 	}
 }
 

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "sound/flt_rc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tp84_state : public driver_device

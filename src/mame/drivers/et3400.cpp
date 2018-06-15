@@ -143,8 +143,8 @@ void et3400_state::mem_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1003).mirror(0x03fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1400, 0x23ff).rom().region("roms", 0);
-	map(0xc000, 0xc0ff).r(this, FUNC(et3400_state::keypad_r));
-	map(0xc100, 0xc1ff).w(this, FUNC(et3400_state::display_w));
+	map(0xc000, 0xc0ff).r(FUNC(et3400_state::keypad_r));
+	map(0xc100, 0xc1ff).w(FUNC(et3400_state::display_w));
 	map(0xfc00, 0xffff).rom().region("roms", 0x1000);
 }
 

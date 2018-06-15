@@ -168,26 +168,27 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "emu.h"
 #include "includes/rm380z.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
 void rm380z_state::rm380z_mem(address_map &map)
 {
 	map(0xe000, 0xefff).rom().region(RM380Z_MAINCPU_TAG, 0);
-	map(0xf000, 0xf5ff).rw(this, FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
+	map(0xf000, 0xf5ff).rw(FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
 	map(0xf600, 0xf9ff).rom().region(RM380Z_MAINCPU_TAG, 0x1000);     /* Extra ROM space for COS4.0 */
 	map(0xfa00, 0xfaff).ram();
-	map(0xfb00, 0xfbff).rw(this, FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
-	map(0xfc00, 0xffff).rw(this, FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
+	map(0xfb00, 0xfbff).rw(FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
+	map(0xfc00, 0xffff).rw(FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
 }
 
 void rm380z_state::rm380z_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xbf).rw(this, FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
+	map(0x00, 0xbf).rw(FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
 	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0xc4, 0xc4).w(this, FUNC(rm380z_state::disk_0_control));
-	map(0xc5, 0xff).rw(this, FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
+	map(0xc4, 0xc4).w(FUNC(rm380z_state::disk_0_control));
+	map(0xc5, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
 }
 
 void rm380z_state::rm480z_mem(address_map &map)

@@ -9,6 +9,7 @@
 #include "machine/ripple_counter.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mermaid_state : public driver_device

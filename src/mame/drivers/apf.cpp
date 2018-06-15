@@ -329,9 +329,9 @@ void apf_state::apfimag_map(address_map &map)
 	apfm1000_map(map);
 	map(0x6000, 0x6003).mirror(0x03fc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	// These need to be confirmed, disk does not work
-	map(0x6400, 0x64ff).rw(this, FUNC(apf_state::serial_r), FUNC(apf_state::serial_w));
+	map(0x6400, 0x64ff).rw(FUNC(apf_state::serial_r), FUNC(apf_state::serial_w));
 	map(0x6500, 0x6503).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0x6600, 0x6600).w(this, FUNC(apf_state::apf_dischw_w));
+	map(0x6600, 0x6600).w(FUNC(apf_state::apf_dischw_w));
 	map(0xa000, 0xbfff).ram(); // standard
 	map(0xc000, 0xdfff).ram(); // expansion
 }

@@ -235,11 +235,11 @@ void decwriter_state::la120_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x27ff).rom();
-	map(0x3000, 0x301f).rw(this, FUNC(decwriter_state::la120_KBD_r), FUNC(decwriter_state::la120_LED_w)).mirror(0xFE0); // keyboard read, write to status and 7seg LEDS
+	map(0x3000, 0x301f).rw(FUNC(decwriter_state::la120_KBD_r), FUNC(decwriter_state::la120_LED_w)).mirror(0xFE0); // keyboard read, write to status and 7seg LEDS
 	map(0x4000, 0x43ff).mirror(0x0c00).ram(); // 1k 'low ram'
 	map(0x5000, 0x53ff).mirror(0x0c00).ram(); // 1k 'high ram'
-	map(0x6000, 0x67ff) /*.mirror(0x08fe)*/ .mirror(0x800).rw(this, FUNC(decwriter_state::la120_NVR_r), FUNC(decwriter_state::la120_NVR_w)); // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
-	map(0x7000, 0x7003).mirror(0x0ffc).rw(this, FUNC(decwriter_state::la120_DC305_r), FUNC(decwriter_state::la120_DC305_w)); // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
+	map(0x6000, 0x67ff) /*.mirror(0x08fe)*/ .mirror(0x800).rw(FUNC(decwriter_state::la120_NVR_r), FUNC(decwriter_state::la120_NVR_w)); // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
+	map(0x7000, 0x7003).mirror(0x0ffc).rw(FUNC(decwriter_state::la120_DC305_r), FUNC(decwriter_state::la120_DC305_w)); // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
 	// 8000-ffff is reserved for expansion (i.e. unused, open bus)
 }
 

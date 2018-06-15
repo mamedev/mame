@@ -341,11 +341,11 @@ void notechan_state::notechan_port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xf0, 0xf0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xf8, 0xf8).portr("IN0").w(this, FUNC(notechan_state::out_f8_w));
-	map(0xf9, 0xf9).portr("IN1").w(this, FUNC(notechan_state::out_f9_w));
-	map(0xfa, 0xfa).portr("IN2").w(this, FUNC(notechan_state::out_fa_w));
+	map(0xf8, 0xf8).portr("IN0").w(FUNC(notechan_state::out_f8_w));
+	map(0xf9, 0xf9).portr("IN1").w(FUNC(notechan_state::out_f9_w));
+	map(0xfa, 0xfa).portr("IN2").w(FUNC(notechan_state::out_fa_w));
 	map(0xfb, 0xfb).portr("IN3");
-	map(0xff, 0xff).w(this, FUNC(notechan_state::out_ff_w));  // watchdog reset? (written immediately upon reset, INT and NMI)
+	map(0xff, 0xff).w(FUNC(notechan_state::out_ff_w));  // watchdog reset? (written immediately upon reset, INT and NMI)
 }
 
 

@@ -185,7 +185,7 @@ void champbas_state::champbas_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x7000, 0x7001).mirror(0x0ffe).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0x8000, 0x87ff).ram().w(this, FUNC(champbas_state::tilemap_w)).share("vram");
+	map(0x8000, 0x87ff).ram().w(FUNC(champbas_state::tilemap_w)).share("vram");
 	map(0x8800, 0x8fff).ram().share("mainram");
 
 	map(0xa000, 0xa000).portr("P1");
@@ -212,7 +212,7 @@ void champbas_state::champbasja_map(address_map &map)
 {
 	champbas_map(map);
 	map(0x6000, 0x63ff).ram();
-	map(0x6800, 0x68ff).r(this, FUNC(champbas_state::champbja_protection_r));
+	map(0x6800, 0x68ff).r(FUNC(champbas_state::champbja_protection_r));
 }
 
 // champbasjb appears to have no protection
@@ -268,7 +268,7 @@ void champbas_state::champbas_sound_map(address_map &map)
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).mirror(0x1fff).nopw(); // 4-bit return code to main CPU (not used)
 	map(0xa000, 0xa000).mirror(0x1fff).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
-	map(0xc000, 0xc000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::write));
+	map(0xc000, 0xc000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe000, 0xe3ff).mirror(0x1c00).ram();
 }
 
@@ -277,8 +277,8 @@ void exctsccr_state::exctsccr_sound_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom();
 	map(0xa000, 0xa7ff).ram();
-	map(0xc008, 0xc008).w("dac1", FUNC(dac_byte_interface::write));
-	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::write));
+	map(0xc008, 0xc008).w("dac1", FUNC(dac_byte_interface::data_w));
+	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0xc00c, 0xc00c).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0xc00d, 0xc00d).r("soundlatch", FUNC(generic_latch_8_device::read));
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?

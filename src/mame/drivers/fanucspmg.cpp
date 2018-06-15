@@ -735,12 +735,12 @@ void fanucspmg_state::maincpu_mem(address_map &map)
 	map(0xf001c, 0xf001c).rw(m_usart3, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf001e, 0xf001e).rw(m_usart3, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0xf0042, 0xf0043).r(this, FUNC(fanucspmg_state::magic_r));
-	map(0xf0046, 0xf0046).w(this, FUNC(fanucspmg_state::dma_page_w));
+	map(0xf0042, 0xf0043).r(FUNC(fanucspmg_state::magic_r));
+	map(0xf0046, 0xf0046).w(FUNC(fanucspmg_state::dma_page_w));
 	map(0xf0048, 0xf004f).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xf2000, 0xf2003).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 
-	map(0xf8000, 0xf9fff).rw(this, FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
+	map(0xf8000, 0xf9fff).rw(FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
 	map(0xfc000, 0xfffff).rom().region(MAINCPU_TAG, 0);
 }
 
@@ -823,18 +823,18 @@ void fanucspmg_state::subcpu_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region(SUBCPU_TAG, 0);
 
-	map(0x4000, 0x45ff).rw(this, FUNC(fanucspmg_state::vram1_r), FUNC(fanucspmg_state::vram1_w));
-	map(0x4800, 0x4dff).rw(this, FUNC(fanucspmg_state::vram2_r), FUNC(fanucspmg_state::vram2_w));
+	map(0x4000, 0x45ff).rw(FUNC(fanucspmg_state::vram1_r), FUNC(fanucspmg_state::vram1_w));
+	map(0x4800, 0x4dff).rw(FUNC(fanucspmg_state::vram2_r), FUNC(fanucspmg_state::vram2_w));
 
 	map(0x5000, 0x5000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x5001, 0x5001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x5008, 0x5008).w(this, FUNC(fanucspmg_state::keyboard_row_w));
-	map(0x5009, 0x5009).r(this, FUNC(fanucspmg_state::keyboard_r));
+	map(0x5008, 0x5008).w(FUNC(fanucspmg_state::keyboard_row_w));
+	map(0x5009, 0x5009).r(FUNC(fanucspmg_state::keyboard_r));
 	map(0x500a, 0x500b).nopw();    // keyboard rows 2 and 3 control what's written here.  dip switches?
-	map(0x500c, 0x500c).w(this, FUNC(fanucspmg_state::vbl_ctrl_w));
-	map(0x500d, 0x500d).w(this, FUNC(fanucspmg_state::vram_bank_w));
-	map(0x500e, 0x500e).r(this, FUNC(fanucspmg_state::vblank_ack_r));
-	map(0x5018, 0x5018).w(this, FUNC(fanucspmg_state::video_ctrl_w));
+	map(0x500c, 0x500c).w(FUNC(fanucspmg_state::vbl_ctrl_w));
+	map(0x500d, 0x500d).w(FUNC(fanucspmg_state::vram_bank_w));
+	map(0x500e, 0x500e).r(FUNC(fanucspmg_state::vblank_ack_r));
+	map(0x5018, 0x5018).w(FUNC(fanucspmg_state::video_ctrl_w));
 
 	map(0xe000, 0xffff).ram().share(SHARED_TAG); // shared RAM
 }

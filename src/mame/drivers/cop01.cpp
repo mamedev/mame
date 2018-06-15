@@ -129,9 +129,9 @@ void cop01_state::cop01_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram(); /* c000-c7ff in cop01 */
-	map(0xd000, 0xdfff).ram().w(this, FUNC(cop01_state::cop01_background_w)).share("bgvideoram");
+	map(0xd000, 0xdfff).ram().w(FUNC(cop01_state::cop01_background_w)).share("bgvideoram");
 	map(0xe000, 0xe0ff).writeonly().share("spriteram");
-	map(0xf000, 0xf3ff).w(this, FUNC(cop01_state::cop01_foreground_w)).share("fgvideoram");
+	map(0xf000, 0xf3ff).w(FUNC(cop01_state::cop01_foreground_w)).share("fgvideoram");
 }
 
 void cop01_state::io_map(address_map &map)
@@ -142,9 +142,9 @@ void cop01_state::io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x40, 0x43).w(this, FUNC(cop01_state::cop01_vreg_w));
-	map(0x44, 0x44).w(this, FUNC(cop01_state::cop01_sound_command_w));
-	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
+	map(0x40, 0x43).w(FUNC(cop01_state::cop01_vreg_w));
+	map(0x44, 0x44).w(FUNC(cop01_state::cop01_sound_command_w));
+	map(0x45, 0x45).w(FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
 }
 
 void mightguy_state::mightguy_io_map(address_map &map)
@@ -155,15 +155,15 @@ void mightguy_state::mightguy_io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x40, 0x43).w(this, FUNC(cop01_state::cop01_vreg_w));
-	map(0x44, 0x44).w(this, FUNC(cop01_state::cop01_sound_command_w));
-	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
+	map(0x40, 0x43).w(FUNC(cop01_state::cop01_vreg_w));
+	map(0x44, 0x44).w(FUNC(cop01_state::cop01_sound_command_w));
+	map(0x45, 0x45).w(FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
 }
 
 void cop01_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).r(this, FUNC(cop01_state::cop01_sound_irq_ack_w));
+	map(0x8000, 0x8000).r(FUNC(cop01_state::cop01_sound_irq_ack_w));
 	map(0xc000, 0xc7ff).ram();
 }
 
@@ -173,7 +173,7 @@ void cop01_state::audio_io_map(address_map &map)
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
+	map(0x06, 0x06).r(FUNC(cop01_state::cop01_sound_command_r));
 }
 
 void mightguy_state::mightguy_audio_io_map(address_map &map)
@@ -182,7 +182,7 @@ void mightguy_state::mightguy_audio_io_map(address_map &map)
 	map(0x00, 0x01).w("ymsnd", FUNC(ym3526_device::write));
 	map(0x02, 0x02).w("prot_chip", FUNC(nb1412m2_device::command_w));
 	map(0x03, 0x03).rw("prot_chip", FUNC(nb1412m2_device::data_r), FUNC(nb1412m2_device::data_w));
-	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
+	map(0x06, 0x06).r(FUNC(cop01_state::cop01_sound_command_r));
 }
 
 
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
 
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
-	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, data_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

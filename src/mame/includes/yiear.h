@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 // thanks-to:Enrique Sanchez
-#ifndef MAME_INCLUDES_YIEAR
-#define MAME_INCLUDES_YIEAR
+#ifndef MAME_INCLUDES_YIEAR_H
+#define MAME_INCLUDES_YIEAR_H
 
 #pragma once
 
@@ -10,13 +10,14 @@
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class yiear_state : public driver_device
 {
 public:
-	yiear_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	yiear_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_videoram(*this, "videoram"),
@@ -26,7 +27,8 @@ public:
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -54,7 +56,7 @@ public:
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -69,4 +71,4 @@ public:
 	void vlm_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_YIEAR
+#endif // MAME_INCLUDES_YIEAR_H

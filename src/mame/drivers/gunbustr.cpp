@@ -120,10 +120,10 @@ void gunbustr_state::gunbustr_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x21ffff).ram().share("ram");                                     /* main CPUA ram */
 	map(0x300000, 0x301fff).ram().share("spriteram");               /* Sprite ram */
-	map(0x380000, 0x380003).w(this, FUNC(gunbustr_state::motor_control_w));                                          /* motor, lamps etc. */
+	map(0x380000, 0x380003).w(FUNC(gunbustr_state::motor_control_w));                                          /* motor, lamps etc. */
 	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x500000, 0x500003).rw(this, FUNC(gunbustr_state::gunbustr_gun_r), FUNC(gunbustr_state::gunbustr_gun_w));                       /* gun coord read */
+	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gunbustr_gun_r), FUNC(gunbustr_state::gunbustr_gun_w));                       /* gun coord read */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
 	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
@@ -235,7 +235,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_DEVICE_PROGRAM_MAP(gunbustr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("EXTRA"))

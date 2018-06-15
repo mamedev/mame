@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "audio/seibu.h"
+#include "emupal.h"
 
 class dcon_state : public driver_device, protected seibu_sound_common
 {

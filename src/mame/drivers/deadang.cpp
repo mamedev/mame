@@ -75,7 +75,7 @@ void deadang_state::main_map(address_map &map)
 	map(0x05000, 0x05fff).writeonly();
 	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x06010, 0x07fff).writeonly();
-	map(0x08000, 0x087ff).w(this, FUNC(deadang_state::text_w)).share("videoram");
+	map(0x08000, 0x087ff).w(FUNC(deadang_state::text_w)).share("videoram");
 	map(0x08800, 0x0bfff).writeonly();
 	map(0x0a000, 0x0a001).portr("P1_P2");
 	map(0x0a002, 0x0a003).portr("DSW");
@@ -92,23 +92,23 @@ void popnrun_state::popnrun_main_map(address_map &map)
 	map(0x00000, 0x03bff).ram();
 	map(0x03c00, 0x03dff).ram().share("spriteram");
 	map(0x03e00, 0x03fff).ram();
-	map(0x08000, 0x08fff).ram().w(this, FUNC(popnrun_state::popnrun_text_w)).share("videoram");
+	map(0x08000, 0x08fff).ram().w(FUNC(popnrun_state::popnrun_text_w)).share("videoram");
 	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
 }
 
 void deadang_state::sub_map(address_map &map)
 {
 	map(0x00000, 0x037ff).ram();
-	map(0x03800, 0x03fff).ram().w(this, FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x03800, 0x03fff).ram().w(FUNC(deadang_state::foreground_w)).share("video_data");
 	map(0x04000, 0x04fff).ram().share("share1");
-	map(0x08000, 0x08001).w(this, FUNC(deadang_state::bank_w));
+	map(0x08000, 0x08001).w(FUNC(deadang_state::bank_w));
 	map(0x0c000, 0x0c001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xe0000, 0xfffff).rom();
 }
 
 void popnrun_state::popnrun_sub_map(address_map &map)
 {
-	map(0x00000, 0x003ff).ram().w(this, FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x00000, 0x003ff).ram().w(FUNC(deadang_state::foreground_w)).share("video_data");
 	map(0x00400, 0x03fff).ram();
 	map(0x04000, 0x04fff).ram().share("share1");
 	map(0xe0000, 0xfffff).rom();

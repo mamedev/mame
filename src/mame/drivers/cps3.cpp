@@ -1415,22 +1415,22 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1));
-		result |= chip0->read( (offset<<1) ) << 24;
+		result |= chip0->read(space, (offset<<1)) << 24;
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1));
-		result |= chip1->read( (offset<<1) ) << 16;
+		result |= chip1->read(space, (offset<<1)) << 16;
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1)+1);
-		result |= chip0->read( (offset<<1)+0x1 ) << 8;
+		result |= chip0->read(space, (offset<<1)+0x1) << 8;
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1)+1);
-		result |= chip1->read( (offset<<1)+0x1 ) << 0;
+		result |= chip1->read(space, (offset<<1)+0x1) << 0;
 	}
 
 	//printf("read GFX flash chips addr %02x returning %08x mem_mask %08x crambank %08x gfxbank %08x\n", offset*2, result,mem_mask,  m_cram_bank, m_cram_gfxflash_bank  );
@@ -1455,25 +1455,25 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 	{
 		command = (data >> 24) & 0xff;
 		//logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1), command);
-		chip0->write( (offset<<1), command);
+		chip0->write(space, (offset<<1), command);
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		//logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1), command);
-		chip1->write( (offset<<1), command);
+		chip1->write(space, (offset<<1), command);
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
 		//logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1)+1, command);
-		chip0->write( (offset<<1)+0x1, command);
+		chip0->write(space, (offset<<1)+0x1, command);
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//if ( ((offset<<1)+1) != 0x555) printf("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1)+1, command);
-		chip1->write( (offset<<1)+0x1, command);
+		chip1->write(space, (offset<<1)+0x1, command);
 	}
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
@@ -1506,22 +1506,22 @@ uint32_t cps3_state::cps3_flashmain_r(int which, uint32_t offset, uint32_t mem_m
 	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+0, offset*4 );
-		result |= (m_simm[which][0]->read(offset)<<24);
+		result |= (m_simm[which][0]->read(machine().dummy_space(), offset)<<24);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+1, offset*4 );
-		result |= (m_simm[which][1]->read(offset)<<16);
+		result |= (m_simm[which][1]->read(machine().dummy_space(), offset)<<16);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+2, offset*4 );
-		result |= (m_simm[which][2]->read(offset)<<8);
+		result |= (m_simm[which][2]->read(machine().dummy_space(), offset)<<8);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+3, offset*4 );
-		result |= (m_simm[which][3]->read(offset)<<0);
+		result |= (m_simm[which][3]->read(machine().dummy_space(), offset)<<0);
 	}
 
 //  if (base==4) logerror("read flash chips addr %02x returning %08x\n", offset*4, result );
@@ -1562,25 +1562,25 @@ void cps3_state::cps3_flashmain_w(int which, uint32_t offset, uint32_t data, uin
 	{
 		command = (data >> 24) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag(), offset, command);
-		m_simm[which][0]->write(offset, command);
+		m_simm[which][0]->write(machine().dummy_space(), offset, command);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag(), offset, command);
-		m_simm[which][1]->write(offset, command);
+		m_simm[which][1]->write(machine().dummy_space(), offset, command);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 2
 	{
 		command = (data >> 8) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag(), offset, command);
-		m_simm[which][2]->write(offset, command);
+		m_simm[which][2]->write(machine().dummy_space(), offset, command);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag(), offset, command);
-		m_simm[which][3]->write(offset, command);
+		m_simm[which][3]->write(machine().dummy_space(), offset, command);
 	}
 
 	/* copy data into regions to execute from */
@@ -2152,15 +2152,15 @@ void cps3_state::cps3_map(address_map &map)
 //  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
 	map(0x04000000, 0x0407ffff).ram().share("spriteram");//AM_WRITEONLY // Sprite RAM
 
-	map(0x04080000, 0x040bffff).rw(this, FUNC(cps3_state::cps3_colourram_r), FUNC(cps3_state::cps3_colourram_w)).share("colourram");  // Colour RAM (jojoba tests this size) 0x20000 colours?!
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::cps3_colourram_r), FUNC(cps3_state::cps3_colourram_w)).share("colourram");  // Colour RAM (jojoba tests this size) 0x20000 colours?!
 
 	// video registers of some kind probably
-	map(0x040C0000, 0x040C0003).r(this, FUNC(cps3_state::cps3_40C0000_r));//?? every frame
-	map(0x040C0004, 0x040C0007).r(this, FUNC(cps3_state::cps3_40C0004_r));//AM_READ(cps3_40C0004_r) // warzard reads this!
+	map(0x040C0000, 0x040C0003).r(FUNC(cps3_state::cps3_40C0000_r));//?? every frame
+	map(0x040C0004, 0x040C0007).r(FUNC(cps3_state::cps3_40C0004_r));//AM_READ(cps3_40C0004_r) // warzard reads this!
 //  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITENOP//??
-	map(0x040C000c, 0x040C000f).r(this, FUNC(cps3_state::cps3_vbl_r));// AM_WRITENOP/
+	map(0x040C000c, 0x040C000f).r(FUNC(cps3_state::cps3_vbl_r));// AM_WRITENOP/
 
-	map(0x040C0000, 0x040C001f).w(this, FUNC(cps3_state::cps3_unk_vidregs_w));
+	map(0x040C0000, 0x040C001f).w(FUNC(cps3_state::cps3_unk_vidregs_w));
 	map(0x040C0020, 0x040C002b).writeonly().share("tmap20_regs");
 	map(0x040C0030, 0x040C003b).writeonly().share("tmap30_regs");
 	map(0x040C0040, 0x040C004b).writeonly().share("tmap40_regs");
@@ -2169,44 +2169,44 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x040C0060, 0x040C007f).ram().share("fullscreenzoom");
 
 
-	map(0x040C0094, 0x040C009b).w(this, FUNC(cps3_state::cps3_characterdma_w));
+	map(0x040C0094, 0x040C009b).w(FUNC(cps3_state::cps3_characterdma_w));
 
 
-	map(0x040C00a0, 0x040C00af).w(this, FUNC(cps3_state::cps3_palettedma_w));
+	map(0x040C00a0, 0x040C00af).w(FUNC(cps3_state::cps3_palettedma_w));
 
 
-	map(0x040C0084, 0x040C0087).w(this, FUNC(cps3_state::cram_bank_w));
-	map(0x040C0088, 0x040C008b).w(this, FUNC(cps3_state::cram_gfxflash_bank_w));
+	map(0x040C0084, 0x040C0087).w(FUNC(cps3_state::cram_bank_w));
+	map(0x040C0088, 0x040C008b).w(FUNC(cps3_state::cram_gfxflash_bank_w));
 
 	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::cps3_sound_r), FUNC(cps3_sound_device::cps3_sound_w));
 
-	map(0x04100000, 0x041fffff).rw(this, FUNC(cps3_state::cram_data_r), FUNC(cps3_state::cram_data_w));
-	map(0x04200000, 0x043fffff).rw(this, FUNC(cps3_state::cps3_gfxflash_r), FUNC(cps3_state::cps3_gfxflash_w)); // GFX Flash ROMS
+	map(0x04100000, 0x041fffff).rw(FUNC(cps3_state::cram_data_r), FUNC(cps3_state::cram_data_w));
+	map(0x04200000, 0x043fffff).rw(FUNC(cps3_state::cps3_gfxflash_r), FUNC(cps3_state::cps3_gfxflash_w)); // GFX Flash ROMS
 
 	map(0x05000000, 0x05000003).portr("INPUTS");
 	map(0x05000004, 0x05000007).portr("EXTRA");
 
 	map(0x05000008, 0x0500000b).nopw(); // ?? every frame
 
-	map(0x05000a00, 0x05000a1f).r(this, FUNC(cps3_state::cps3_unk_io_r)); // ?? every frame
+	map(0x05000a00, 0x05000a1f).r(FUNC(cps3_state::cps3_unk_io_r)); // ?? every frame
 
-	map(0x05001000, 0x05001203).rw(this, FUNC(cps3_state::cps3_eeprom_r), FUNC(cps3_state::cps3_eeprom_w));
+	map(0x05001000, 0x05001203).rw(FUNC(cps3_state::cps3_eeprom_r), FUNC(cps3_state::cps3_eeprom_w));
 
-	map(0x05040000, 0x0504ffff).rw(this, FUNC(cps3_state::cps3_ssram_r), FUNC(cps3_state::cps3_ssram_w)); // 'SS' RAM (Score Screen) (text tilemap + toles)
+	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::cps3_ssram_r), FUNC(cps3_state::cps3_ssram_w)); // 'SS' RAM (Score Screen) (text tilemap + toles)
 	//0x25050020
-	map(0x05050020, 0x05050023).w(this, FUNC(cps3_state::cps3_ss_bank_base_w));
-	map(0x05050024, 0x05050027).w(this, FUNC(cps3_state::cps3_ss_pal_base_w));
+	map(0x05050020, 0x05050023).w(FUNC(cps3_state::cps3_ss_bank_base_w));
+	map(0x05050024, 0x05050027).w(FUNC(cps3_state::cps3_ss_pal_base_w));
 
-	map(0x05100000, 0x05100003).w(this, FUNC(cps3_state::cps3_irq12_ack_w));
-	map(0x05110000, 0x05110003).w(this, FUNC(cps3_state::cps3_irq10_ack_w));
+	map(0x05100000, 0x05100003).w(FUNC(cps3_state::cps3_irq12_ack_w));
+	map(0x05110000, 0x05110003).w(FUNC(cps3_state::cps3_irq10_ack_w));
 
 	map(0x05140000, 0x05140003).rw("wd33c93", FUNC(wd33c93_device::read), FUNC(wd33c93_device::write)).umask32(0x00ff00ff);
 
-	map(0x06000000, 0x067fffff).rw(this, FUNC(cps3_state::cps3_flash1_r), FUNC(cps3_state::cps3_flash1_w)); /* Flash ROMs simm 1 */
-	map(0x06800000, 0x06ffffff).rw(this, FUNC(cps3_state::cps3_flash2_r), FUNC(cps3_state::cps3_flash2_w)); /* Flash ROMs simm 2 */
+	map(0x06000000, 0x067fffff).rw(FUNC(cps3_state::cps3_flash1_r), FUNC(cps3_state::cps3_flash1_w)); /* Flash ROMs simm 1 */
+	map(0x06800000, 0x06ffffff).rw(FUNC(cps3_state::cps3_flash2_r), FUNC(cps3_state::cps3_flash2_w)); /* Flash ROMs simm 2 */
 
 	map(0x07ff0048, 0x07ff004b).nopw(); // bit 0 toggles during programming
-	map(0xc0000000, 0xc00003ff).ram().w(this, FUNC(cps3_state::cps3_0xc0000000_ram_w)).share("0xc0000000_ram"); /* Executes code from here */
+	map(0xc0000000, 0xc00003ff).ram().w(FUNC(cps3_state::cps3_0xc0000000_ram_w)).share("0xc0000000_ram"); /* Executes code from here */
 }
 
 void cps3_state::decrypted_opcodes_map(address_map &map)

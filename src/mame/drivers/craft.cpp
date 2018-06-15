@@ -12,6 +12,7 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -197,7 +198,7 @@ void craft_state::craft_data_map(address_map &map)
 
 void craft_state::craft_io_map(address_map &map)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(this, FUNC(craft_state::port_r), FUNC(craft_state::port_w));
+	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(FUNC(craft_state::port_r), FUNC(craft_state::port_w));
 }
 
 /****************************************************\

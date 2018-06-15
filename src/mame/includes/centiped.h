@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 class centiped_state : public driver_device

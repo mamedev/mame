@@ -17,6 +17,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/serflash.h"
+#include "emupal.h"
 #include "screen.h"
 
 //#include "machine/i2cmem.h"
@@ -95,7 +96,7 @@ void nexus3d_state::nexus3d_map(address_map &map)
 //  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
 //  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
-	map(0xE0000014, 0xE0000017).r(this, FUNC(nexus3d_state::nexus3d_unk_r)); // sits waiting for this
+	map(0xE0000014, 0xE0000017).r(FUNC(nexus3d_state::nexus3d_unk_r)); // sits waiting for this
 
 
 }

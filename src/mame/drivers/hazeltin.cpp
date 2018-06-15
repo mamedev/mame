@@ -35,6 +35,7 @@ References:
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -478,18 +479,18 @@ void hazl1500_state::hazl1500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-	map(0x3000, 0x377f).rw(this, FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
+	map(0x3000, 0x377f).rw(FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
 	map(0x3780, 0x37ff).ram();
 }
 
 void hazl1500_state::hazl1500_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).rw(this, FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
-	map(0xbf, 0xbf).rw(this, FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
-	map(0xdf, 0xdf).r(this, FUNC(hazl1500_state::kbd_encoder_r));
-	map(0xef, 0xef).rw(this, FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
-	map(0xf7, 0xf7).r(this, FUNC(hazl1500_state::kbd_status_latch_r));
+	map(0x7f, 0x7f).rw(FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
+	map(0xbf, 0xbf).rw(FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
+	map(0xdf, 0xdf).r(FUNC(hazl1500_state::kbd_encoder_r));
+	map(0xef, 0xef).rw(FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
+	map(0xf7, 0xf7).r(FUNC(hazl1500_state::kbd_status_latch_r));
 }
 
 	/*

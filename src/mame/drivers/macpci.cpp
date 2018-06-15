@@ -41,6 +41,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -72,10 +73,10 @@ void macpci_state::pippin_mem(address_map &map)
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
 
-	map(0xf00dfff8, 0xf00dffff).r(this, FUNC(macpci_state::unk2_r));
-	map(0xf3008800, 0xf3008807).r(this, FUNC(macpci_state::unk1_r));
+	map(0xf00dfff8, 0xf00dffff).r(FUNC(macpci_state::unk2_r));
+	map(0xf3008800, 0xf3008807).r(FUNC(macpci_state::unk1_r));
 
-	map(0xf3016000, 0xf3017fff).rw(this, FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
+	map(0xf3016000, 0xf3017fff).rw(FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }

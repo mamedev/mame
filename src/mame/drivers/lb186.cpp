@@ -104,8 +104,8 @@ void lb186_state::lb186_io(address_map &map)
 	map(0x1000, 0x101f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0x1100, 0x1107).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0x1180, 0x1180).rw(this, FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
-	map(0x1200, 0x1200).w(this, FUNC(lb186_state::drive_sel_w));
+	map(0x1180, 0x1180).rw(FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
+	map(0x1200, 0x1200).w(FUNC(lb186_state::drive_sel_w));
 }
 
 static void lb186_floppies(device_slot_interface &device)

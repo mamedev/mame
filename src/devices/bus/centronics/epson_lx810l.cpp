@@ -99,7 +99,7 @@ void epson_lx810l_device::lx810l_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* 32k firmware */
 	map(0x8000, 0x9fff).ram(); /* 8k external RAM */
-	map(0xa000, 0xbfff).rw(this, FUNC(epson_lx810l_device::fakemem_r), FUNC(epson_lx810l_device::fakemem_w)); /* fake memory, write one, set all */
+	map(0xa000, 0xbfff).rw(FUNC(epson_lx810l_device::fakemem_r), FUNC(epson_lx810l_device::fakemem_w)); /* fake memory, write one, set all */
 	map(0xc000, 0xc00f).mirror(0x1ff0).rw("e05a30", FUNC(e05a30_device::read), FUNC(e05a30_device::write));
 	map(0xe000, 0xfeff).noprw(); /* not used */
 }
@@ -159,16 +159,10 @@ MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
 	MCFG_E05A30_CENTRONICS_SELECT_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_select))
 
 	/* 256-bit eeprom */
-	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C06_16BIT)
 
-	/* steppers */
-	MCFG_STEPPER_ADD("pf_stepper")
-	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
-	MCFG_STEPPER_INIT_PHASE(4)
-
-	MCFG_STEPPER_ADD("cr_stepper")
-	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
-	MCFG_STEPPER_INIT_PHASE(2)
+	STEPPER(config, "pf_stepper", (uint8_t)4);
+	STEPPER(config, "cr_stepper", (uint8_t)2);
 
 MACHINE_CONFIG_END
 

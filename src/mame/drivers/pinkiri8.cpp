@@ -41,6 +41,7 @@ Dumped by Chackn
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -477,13 +478,13 @@ void pinkiri8_state::pinkiri8_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).ram(); //Z180 internal I/O
-	map(0x60, 0x60).w(this, FUNC(pinkiri8_state::output_regs_w));
-	map(0x80, 0x83).w(this, FUNC(pinkiri8_state::pinkiri8_vram_w));
+	map(0x60, 0x60).w(FUNC(pinkiri8_state::output_regs_w));
+	map(0x80, 0x83).w(FUNC(pinkiri8_state::pinkiri8_vram_w));
 
 	map(0xa0, 0xa0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); //correct?
-	map(0xb0, 0xb0).w(this, FUNC(pinkiri8_state::mux_w)); //mux
-	map(0xb0, 0xb0).r(this, FUNC(pinkiri8_state::mux_p2_r)); // mux inputs
-	map(0xb1, 0xb1).r(this, FUNC(pinkiri8_state::mux_p1_r)); // mux inputs
+	map(0xb0, 0xb0).w(FUNC(pinkiri8_state::mux_w)); //mux
+	map(0xb0, 0xb0).r(FUNC(pinkiri8_state::mux_p2_r)); // mux inputs
+	map(0xb1, 0xb1).r(FUNC(pinkiri8_state::mux_p1_r)); // mux inputs
 	map(0xb2, 0xb2).portr("SYSTEM");
 	map(0xf8, 0xf8).portr("DSW1");
 	map(0xf9, 0xf9).portr("DSW2");

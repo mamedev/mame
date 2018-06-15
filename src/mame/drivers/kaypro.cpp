@@ -92,11 +92,11 @@ void kaypro_state::kaypro484_io(address_map &map)
 	map(0x08, 0x0b).w("brg", FUNC(com8116_device::stt_w));
 	map(0x0c, 0x0f).rw("sio_2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x14, 0x17).rw(this, FUNC(kaypro_state::kaypro484_system_port_r), FUNC(kaypro_state::kaypro484_system_port_w));
-	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x1c, 0x1c).rw(this, FUNC(kaypro_state::kaypro484_status_r), FUNC(kaypro_state::kaypro484_index_w));
-	map(0x1d, 0x1d).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(kaypro_state::kaypro484_register_w));
-	map(0x1f, 0x1f).rw(this, FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
+	map(0x14, 0x17).rw(FUNC(kaypro_state::kaypro484_system_port_r), FUNC(kaypro_state::kaypro484_system_port_w));
+	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x1c, 0x1c).rw(FUNC(kaypro_state::kaypro484_status_r), FUNC(kaypro_state::kaypro484_index_w));
+	map(0x1d, 0x1d).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(kaypro_state::kaypro484_register_w));
+	map(0x1f, 0x1f).rw(FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
 
 	/* The below are not emulated */
 /*  map(0x20, 0x23).rw("z80pio", FUNC(z80pio_device::kaypro484_pio_r), FUNC(z80pio_device::kaypro484_pio_w)) - for RTC and Modem
@@ -110,7 +110,7 @@ void kaypro_state::kaypro484_io(address_map &map)
     map(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
     map(0x87, 0x87) Hard Drive READ status register, WRITE command register */
 	map(0x20, 0x86).noprw();
-	map(0x87, 0x87).r(this, FUNC(kaypro_state::kaypro484_87_r));
+	map(0x87, 0x87).r(FUNC(kaypro_state::kaypro484_87_r));
 }
 
 
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_KAYPRO10KBD_RXD_CB(WRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, syncb_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 
 	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
 	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_CLOCK_ADD("kbdtxrxc", 4800)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio_1", z80sio_device, rxtxcb_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

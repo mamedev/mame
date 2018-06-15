@@ -211,7 +211,7 @@ void rotaryf_state::rotaryf_io_map(address_map &map)
 	map(0x21, 0x21).portr("COIN").nopw();
 	map(0x26, 0x26).portr("DSW");
 	map(0x28, 0x2b).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).w(this, FUNC(rotaryf_state::port30_w));
+	map(0x30, 0x30).w(FUNC(rotaryf_state::port30_w));
 }
 
 

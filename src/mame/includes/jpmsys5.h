@@ -17,6 +17,7 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+#include "emupal.h"
 
 class jpmsys5_state : public driver_device
 {

@@ -79,6 +79,7 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -136,7 +137,7 @@ READ8_MEMBER(wms_state::test_r)
 
 void wms_state::wms_io(address_map &map)
 {
-	map(0x1207, 0x1207).r(this, FUNC(wms_state::test_r));
+	map(0x1207, 0x1207).r(FUNC(wms_state::test_r));
 }
 
 

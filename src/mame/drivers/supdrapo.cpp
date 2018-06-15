@@ -62,6 +62,7 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -287,16 +288,16 @@ void supdrapo_state::sdpoker_mem(address_map &map)
 	map(0x6800, 0x6bff).ram().share("videoram");
 	map(0x6c00, 0x6fff).ram().share("char_bank");
 	map(0x7000, 0x7bff).ram(); //$7600 seems watchdog
-	map(0x7c00, 0x7c00).w(this, FUNC(supdrapo_state::debug7c00_w));
-	map(0x8000, 0x8000).portr("IN4").w(this, FUNC(supdrapo_state::wdog8000_w));
+	map(0x7c00, 0x7c00).w(FUNC(supdrapo_state::debug7c00_w));
+	map(0x8000, 0x8000).portr("IN4").w(FUNC(supdrapo_state::wdog8000_w));
 	map(0x8001, 0x8001).portr("IN0");
-	map(0x8002, 0x8002).portr("IN1").w(this, FUNC(supdrapo_state::payout_w));
-	map(0x8003, 0x8003).portr("IN2").w(this, FUNC(supdrapo_state::coinin_w));
-	map(0x8004, 0x8004).portr("IN3").w(this, FUNC(supdrapo_state::debug8004_w));
+	map(0x8002, 0x8002).portr("IN1").w(FUNC(supdrapo_state::payout_w));
+	map(0x8003, 0x8003).portr("IN2").w(FUNC(supdrapo_state::coinin_w));
+	map(0x8004, 0x8004).portr("IN3").w(FUNC(supdrapo_state::debug8004_w));
 	map(0x8005, 0x8005).portr("SW1");
 	map(0x8006, 0x8006).portr("SW2");
 	map(0x9000, 0x90ff).ram().share("nvram");
-	map(0x9400, 0x9400).r(this, FUNC(supdrapo_state::rng_r));
+	map(0x9400, 0x9400).r(FUNC(supdrapo_state::rng_r));
 	map(0x9800, 0x9801).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 

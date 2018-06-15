@@ -267,6 +267,7 @@
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1172,7 +1173,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 
 void pc8801_state::pc8801_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pc8801_state::pc8801_mem_r), FUNC(pc8801_state::pc8801_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(pc8801_state::pc8801_mem_r), FUNC(pc8801_state::pc8801_mem_w));
 }
 
 READ8_MEMBER(pc8801_state::pc8801_ctrl_r)
@@ -1792,55 +1793,55 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x0d, 0x0d).portr("KEY13");
 	map(0x0e, 0x0e).portr("KEY14");
 	map(0x0f, 0x0f).portr("KEY15");
-	map(0x00, 0x02).w(this, FUNC(pc8801_state::pc8801_pcg8100_w));
-	map(0x10, 0x10).w(this, FUNC(pc8801_state::pc8801_rtc_w));
+	map(0x00, 0x02).w(FUNC(pc8801_state::pc8801_pcg8100_w));
+	map(0x10, 0x10).w(FUNC(pc8801_state::pc8801_rtc_w));
 	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)); /* RS-232C and CMT */
 	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x30, 0x30).portr("DSW1").w(this, FUNC(pc8801_state::pc8801_txt_cmt_ctrl_w));
-	map(0x31, 0x31).portr("DSW2").w(this, FUNC(pc8801_state::pc8801_gfx_ctrl_w));
-	map(0x32, 0x32).rw(this, FUNC(pc8801_state::pc8801_misc_ctrl_r), FUNC(pc8801_state::pc8801_misc_ctrl_w));
-	map(0x33, 0x33).rw(this, FUNC(pc8801_state::pc8801_unk_r), FUNC(pc8801_state::pc8801_unk_w));
-	map(0x34, 0x34).w(this, FUNC(pc8801_state::pc8801_alu_ctrl1_w));
-	map(0x35, 0x35).w(this, FUNC(pc8801_state::pc8801_alu_ctrl2_w));
-	map(0x40, 0x40).rw(this, FUNC(pc8801_state::pc8801_ctrl_r), FUNC(pc8801_state::pc8801_ctrl_w));
-	map(0x44, 0x47).rw(this, FUNC(pc8801_state::pc8801_sound_board_r), FUNC(pc8801_state::pc8801_sound_board_w)); /* OPN / OPNA ports */
-	map(0x50, 0x50).rw(this, FUNC(pc8801_state::pc8801_crtc_param_r), FUNC(pc8801_state::pc88_crtc_param_w));
-	map(0x51, 0x51).rw(this, FUNC(pc8801_state::pc8801_crtc_status_r), FUNC(pc8801_state::pc88_crtc_cmd_w));
-	map(0x52, 0x52).w(this, FUNC(pc8801_state::pc8801_bgpal_w));
-	map(0x53, 0x53).w(this, FUNC(pc8801_state::pc8801_layer_masking_w));
-	map(0x54, 0x5b).w(this, FUNC(pc8801_state::pc8801_palram_w));
-	map(0x5c, 0x5c).r(this, FUNC(pc8801_state::pc8801_vram_select_r));
-	map(0x5c, 0x5f).w(this, FUNC(pc8801_state::pc8801_vram_select_w));
-	map(0x60, 0x67).rw(this, FUNC(pc8801_state::pc8801_dmac_r), FUNC(pc8801_state::pc8801_dmac_w));
-	map(0x68, 0x68).rw(this, FUNC(pc8801_state::pc8801_dmac_status_r), FUNC(pc8801_state::pc8801_dmac_mode_w));
-	map(0x6e, 0x6e).r(this, FUNC(pc8801_state::pc8801_cpuclock_r));
-	map(0x6f, 0x6f).rw(this, FUNC(pc8801_state::pc8801_baudrate_r), FUNC(pc8801_state::pc8801_baudrate_w));
-	map(0x70, 0x70).rw(this, FUNC(pc8801_state::pc8801_window_bank_r), FUNC(pc8801_state::pc8801_window_bank_w));
-	map(0x71, 0x71).rw(this, FUNC(pc8801_state::pc8801_ext_rom_bank_r), FUNC(pc8801_state::pc8801_ext_rom_bank_w));
-	map(0x78, 0x78).w(this, FUNC(pc8801_state::pc8801_window_bank_inc_w));
-	map(0x90, 0x9f).rw(this, FUNC(pc8801_state::pc8801_cdrom_r), FUNC(pc8801_state::pc8801_cdrom_w));
+	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::pc8801_txt_cmt_ctrl_w));
+	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::pc8801_gfx_ctrl_w));
+	map(0x32, 0x32).rw(FUNC(pc8801_state::pc8801_misc_ctrl_r), FUNC(pc8801_state::pc8801_misc_ctrl_w));
+	map(0x33, 0x33).rw(FUNC(pc8801_state::pc8801_unk_r), FUNC(pc8801_state::pc8801_unk_w));
+	map(0x34, 0x34).w(FUNC(pc8801_state::pc8801_alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801_state::pc8801_alu_ctrl2_w));
+	map(0x40, 0x40).rw(FUNC(pc8801_state::pc8801_ctrl_r), FUNC(pc8801_state::pc8801_ctrl_w));
+	map(0x44, 0x47).rw(FUNC(pc8801_state::pc8801_sound_board_r), FUNC(pc8801_state::pc8801_sound_board_w)); /* OPN / OPNA ports */
+	map(0x50, 0x50).rw(FUNC(pc8801_state::pc8801_crtc_param_r), FUNC(pc8801_state::pc88_crtc_param_w));
+	map(0x51, 0x51).rw(FUNC(pc8801_state::pc8801_crtc_status_r), FUNC(pc8801_state::pc88_crtc_cmd_w));
+	map(0x52, 0x52).w(FUNC(pc8801_state::pc8801_bgpal_w));
+	map(0x53, 0x53).w(FUNC(pc8801_state::pc8801_layer_masking_w));
+	map(0x54, 0x5b).w(FUNC(pc8801_state::pc8801_palram_w));
+	map(0x5c, 0x5c).r(FUNC(pc8801_state::pc8801_vram_select_r));
+	map(0x5c, 0x5f).w(FUNC(pc8801_state::pc8801_vram_select_w));
+	map(0x60, 0x67).rw(FUNC(pc8801_state::pc8801_dmac_r), FUNC(pc8801_state::pc8801_dmac_w));
+	map(0x68, 0x68).rw(FUNC(pc8801_state::pc8801_dmac_status_r), FUNC(pc8801_state::pc8801_dmac_mode_w));
+	map(0x6e, 0x6e).r(FUNC(pc8801_state::pc8801_cpuclock_r));
+	map(0x6f, 0x6f).rw(FUNC(pc8801_state::pc8801_baudrate_r), FUNC(pc8801_state::pc8801_baudrate_w));
+	map(0x70, 0x70).rw(FUNC(pc8801_state::pc8801_window_bank_r), FUNC(pc8801_state::pc8801_window_bank_w));
+	map(0x71, 0x71).rw(FUNC(pc8801_state::pc8801_ext_rom_bank_r), FUNC(pc8801_state::pc8801_ext_rom_bank_w));
+	map(0x78, 0x78).w(FUNC(pc8801_state::pc8801_window_bank_inc_w));
+	map(0x90, 0x9f).rw(FUNC(pc8801_state::pc8801_cdrom_r), FUNC(pc8801_state::pc8801_cdrom_w));
 //  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
-	map(0xa8, 0xad).rw(this, FUNC(pc8801_state::pc8801_opna_r), FUNC(pc8801_state::pc8801_opna_w));  /* second sound board */
+	map(0xa8, 0xad).rw(FUNC(pc8801_state::pc8801_opna_r), FUNC(pc8801_state::pc8801_opna_w));  /* second sound board */
 //  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board */
 //  AM_RANGE(0xc1, 0xc1) AM_NOP                                     /* (unknown) */
 //  AM_RANGE(0xc2, 0xcf) AM_NOP                                     /* music */
 //  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
-	map(0xe2, 0xe2).rw(this, FUNC(pc8801_state::pc8801_extram_mode_r), FUNC(pc8801_state::pc8801_extram_mode_w));            /* expand RAM mode */
-	map(0xe3, 0xe3).rw(this, FUNC(pc8801_state::pc8801_extram_bank_r), FUNC(pc8801_state::pc8801_extram_bank_w));            /* expand RAM bank */
+	map(0xe2, 0xe2).rw(FUNC(pc8801_state::pc8801_extram_mode_r), FUNC(pc8801_state::pc8801_extram_mode_w));            /* expand RAM mode */
+	map(0xe3, 0xe3).rw(FUNC(pc8801_state::pc8801_extram_bank_r), FUNC(pc8801_state::pc8801_extram_bank_w));            /* expand RAM bank */
 #ifdef USE_PROPER_I8214
-	map(0xe4, 0xe4).w(this, FUNC(pc8801_state::i8214_irq_level_w));
-	map(0xe6, 0xe6).w(this, FUNC(pc8801_state::i8214_irq_mask_w));
+	map(0xe4, 0xe4).w(FUNC(pc8801_state::i8214_irq_level_w));
+	map(0xe6, 0xe6).w(FUNC(pc8801_state::i8214_irq_mask_w));
 #else
-	map(0xe4, 0xe4).w(this, FUNC(pc8801_state::pc8801_irq_level_w));
-	map(0xe6, 0xe6).w(this, FUNC(pc8801_state::pc8801_irq_mask_w));
+	map(0xe4, 0xe4).w(FUNC(pc8801_state::pc8801_irq_level_w));
+	map(0xe6, 0xe6).w(FUNC(pc8801_state::pc8801_irq_mask_w));
 #endif
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* Arcus writes here, almost likely to be a mirror of above */
-	map(0xe8, 0xeb).rw(this, FUNC(pc8801_state::pc8801_kanji_r), FUNC(pc8801_state::pc8801_kanji_w));
-	map(0xec, 0xef).rw(this, FUNC(pc8801_state::pc8801_kanji_lv2_r), FUNC(pc8801_state::pc8801_kanji_lv2_w));
-	map(0xf0, 0xf0).w(this, FUNC(pc8801_state::pc8801_dic_bank_w));
-	map(0xf1, 0xf1).w(this, FUNC(pc8801_state::pc8801_dic_ctrl_w));
+	map(0xe8, 0xeb).rw(FUNC(pc8801_state::pc8801_kanji_r), FUNC(pc8801_state::pc8801_kanji_w));
+	map(0xec, 0xef).rw(FUNC(pc8801_state::pc8801_kanji_lv2_r), FUNC(pc8801_state::pc8801_kanji_lv2_w));
+	map(0xf0, 0xf0).w(FUNC(pc8801_state::pc8801_dic_bank_w));
+	map(0xf1, 0xf1).w(FUNC(pc8801_state::pc8801_dic_ctrl_w));
 //  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
 //  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
 //  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown) */
@@ -1923,10 +1924,10 @@ WRITE8_MEMBER(pc8801_state::fdc_drive_mode_w)
 void pc8801_state::pc8801fdc_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
-	map(0xf4, 0xf4).w(this, FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
+	map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
+	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
 	map(0xf7, 0xf7).nopw(); // printer port output
-	map(0xf8, 0xf8).rw(this, FUNC(pc8801_state::upd765_tc_r), FUNC(pc8801_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
+	map(0xf8, 0xf8).rw(FUNC(pc8801_state::upd765_tc_r), FUNC(pc8801_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
 	map(0xfa, 0xfb).m("upd765", FUNC(upd765a_device::map));
 	map(0xfc, 0xff).rw("d8255_slave", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }

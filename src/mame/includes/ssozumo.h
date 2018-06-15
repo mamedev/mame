@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
+#include "emupal.h"
+
 class ssozumo_state : public driver_device
 {
 public:

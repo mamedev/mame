@@ -21,6 +21,7 @@
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 
@@ -483,9 +484,9 @@ void nascom1_state::nascom1_mem(address_map &map)
 void nascom1_state::nascom1_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x00, 0x00).rw(this, FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
-	map(0x01, 0x01).rw(this, FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
-	map(0x02, 0x02).r(this, FUNC(nascom1_state::nascom1_port_02_r));
+	map(0x00, 0x00).rw(FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(FUNC(nascom1_state::nascom1_port_02_r));
 	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -500,9 +501,9 @@ void nascom2_state::nascom2_mem(address_map &map)
 void nascom2_state::nascom2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
-	map(0x01, 0x01).rw(this, FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
-	map(0x02, 0x02).r(this, FUNC(nascom2_state::nascom1_port_02_r));
+	map(0x00, 0x00).rw(FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(FUNC(nascom2_state::nascom1_port_02_r));
 	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 

@@ -442,11 +442,11 @@ void psychic5_state::psychic5_main_map(address_map &map)
 	map(0xc000, 0xdfff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf001, 0xf001).nopr().w(this, FUNC(psychic5_state::psychic5_coin_counter_w));
-	map(0xf002, 0xf002).rw(this, FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::psychic5_bankselect_w));
-	map(0xf003, 0xf003).rw(this, FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
+	map(0xf001, 0xf001).nopr().w(FUNC(psychic5_state::psychic5_coin_counter_w));
+	map(0xf002, 0xf002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::psychic5_bankselect_w));
+	map(0xf003, 0xf003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
 	map(0xf004, 0xf004).noprw(); // ???
-	map(0xf005, 0xf005).nopr().w(this, FUNC(psychic5_state::psychic5_title_screen_w));
+	map(0xf005, 0xf005).nopr().w(FUNC(psychic5_state::psychic5_title_screen_w));
 	map(0xf006, 0xf1ff).noprw();
 	map(0xf200, 0xf7ff).ram().share("spriteram");
 	map(0xf800, 0xffff).ram();
@@ -455,7 +455,7 @@ void psychic5_state::psychic5_main_map(address_map &map)
 
 void psychic5_state::psychic5_vrambank_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x0000, 0x0fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
 	map(0x1000, 0x1fff).ram();
 
 	map(0x2000, 0x2000).portr("SYSTEM");
@@ -466,11 +466,11 @@ void psychic5_state::psychic5_vrambank_map(address_map &map)
 
 	map(0x2308, 0x230c).ram().share("bg_control");
 
-	map(0x2400, 0x25ff).ram().w(this, FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
-	map(0x2800, 0x29ff).ram().w(this, FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
-	map(0x2a00, 0x2bff).ram().w(this, FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
+	map(0x2400, 0x25ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
+	map(0x2800, 0x29ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
+	map(0x2a00, 0x2bff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
 
-	map(0x3000, 0x37ff).ram().w(this, FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x3000, 0x37ff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
 
 }
 
@@ -499,10 +499,10 @@ void psychic5_state::bombsa_main_map(address_map &map)
 	/* ports look like the other games */
 	map(0xd000, 0xd1ff).ram();
 	map(0xd000, 0xd000).w("soundlatch", FUNC(generic_latch_8_device::write)); // confirmed
-	map(0xd001, 0xd001).w(this, FUNC(psychic5_state::bombsa_flipscreen_w));
-	map(0xd002, 0xd002).rw(this, FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bombsa_bankselect_w));
-	map(0xd003, 0xd003).rw(this, FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
-	map(0xd005, 0xd005).w(this, FUNC(psychic5_state::bombsa_unknown_w)); // ?
+	map(0xd001, 0xd001).w(FUNC(psychic5_state::bombsa_flipscreen_w));
+	map(0xd002, 0xd002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bombsa_bankselect_w));
+	map(0xd003, 0xd003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
+	map(0xd005, 0xd005).w(FUNC(psychic5_state::bombsa_unknown_w)); // ?
 
 	map(0xd200, 0xd7ff).ram().share("spriteram");
 	map(0xd800, 0xdfff).ram();
@@ -527,7 +527,7 @@ void psychic5_state::bombsa_soundport_map(address_map &map)
 
 void psychic5_state::bombsa_vrambank_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(this, FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x0000, 0x1fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
 
 	map(0x2000, 0x2000).portr("SYSTEM");
 	map(0x2001, 0x2001).portr("P1");
@@ -537,11 +537,11 @@ void psychic5_state::bombsa_vrambank_map(address_map &map)
 
 	map(0x2308, 0x230c).ram().share("bg_control");
 
-	map(0x3000, 0x31ff).ram().w(this, FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
-	map(0x3200, 0x33ff).ram().w(this, FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
-	map(0x3400, 0x35ff).ram().w(this, FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
+	map(0x3000, 0x31ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
+	map(0x3200, 0x33ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
+	map(0x3400, 0x35ff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
 
-	map(0x2800, 0x2fff).ram().w(this, FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
 }
 
 

@@ -95,10 +95,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
-	DECLARE_READ8_MEMBER( register_read );
-	DECLARE_WRITE8_MEMBER( register_write );
+	DECLARE_READ8_MEMBER( vram_r ) { return vram_read(); }
+	DECLARE_WRITE8_MEMBER( vram_w ) { vram_write(data); }
+	DECLARE_READ8_MEMBER( register_r ) { return register_read(); }
+	DECLARE_WRITE8_MEMBER( register_w ) { register_write(data); }
 
 	u8 vram_read();
 	void vram_write(u8 data);

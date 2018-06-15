@@ -41,6 +41,7 @@ Tomasz Slanina 20050225
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -155,10 +156,10 @@ void vroulet_state::vroulet_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
 	map(0x8000, 0x8000).noprw();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(vroulet_state::videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(vroulet_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(vroulet_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(vroulet_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa001).ram().share("ball");
-	map(0xb000, 0xb0ff).w(this, FUNC(vroulet_state::paletteram_w)).share("paletteram");
+	map(0xb000, 0xb0ff).w(FUNC(vroulet_state::paletteram_w)).share("paletteram");
 	map(0xc000, 0xc000).noprw();
 }
 

@@ -8,6 +8,7 @@
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class alpha68k_state : public driver_device
 {

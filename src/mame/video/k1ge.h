@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 #define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \

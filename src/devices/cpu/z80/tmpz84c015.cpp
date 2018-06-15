@@ -22,7 +22,7 @@ void tmpz84c015_device::tmpz84c015_internal_io_map(address_map &map)
 	map(0x10, 0x13).mirror(0xff00).rw("tmpz84c015_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x18, 0x1b).mirror(0xff00).rw("tmpz84c015_sio", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x1c, 0x1f).mirror(0xff00).rw("tmpz84c015_pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xf4, 0xf4).mirror(0xff00).w(this, FUNC(tmpz84c015_device::irq_priority_w));
+	map(0xf4, 0xf4).mirror(0xff00).w(FUNC(tmpz84c015_device::irq_priority_w));
 }
 
 

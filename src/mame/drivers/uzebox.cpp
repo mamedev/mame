@@ -211,10 +211,10 @@ void uzebox_state::uzebox_data_map(address_map &map)
 
 void uzebox_state::uzebox_io_map(address_map &map)
 {
-	map(AVR8_REG_A, AVR8_REG_A).rw(this, FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
-	map(AVR8_REG_B, AVR8_REG_B).rw(this, FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
-	map(AVR8_REG_C, AVR8_REG_C).rw(this, FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
-	map(AVR8_REG_D, AVR8_REG_D).rw(this, FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
+	map(AVR8_REG_A, AVR8_REG_A).rw(FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
+	map(AVR8_REG_B, AVR8_REG_B).rw(FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
+	map(AVR8_REG_C, AVR8_REG_C).rw(FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
+	map(AVR8_REG_D, AVR8_REG_D).rw(FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
 }
 
 /****************************************************\

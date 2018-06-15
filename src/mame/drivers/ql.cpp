@@ -498,7 +498,7 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 void ql_state::ql_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).rw(this, FUNC(ql_state::read), FUNC(ql_state::write));
+	map(0x000000, 0x0fffff).rw(FUNC(ql_state::read), FUNC(ql_state::write));
 }
 
 
@@ -508,7 +508,7 @@ void ql_state::ql_mem(address_map &map)
 
 void ql_state::ipc_io(address_map &map)
 {
-	map(0x00, 0x7f).w(this, FUNC(ql_state::ipc_w));
+	map(0x00, 0x7f).w(FUNC(ql_state::ipc_w));
 	map(0x27, 0x28).nopr(); // IPC reads these to set P0 (bus) to Hi-Z mode
 }
 

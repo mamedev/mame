@@ -22,6 +22,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -150,16 +151,16 @@ WRITE8_MEMBER(konblands_state::firq_enable_w)
 void konblands_state::konblands_map(address_map &map)
 {
 	map(0x0000, 0x0000).portr("DSW1").nopw(); // sn latch
-	map(0x0800, 0x0800).portr("DSW2").w(this, FUNC(konblands_state::ldp_w));
-	map(0x1000, 0x1000).nopw().r(this, FUNC(konblands_state::ldp_r)); // led
+	map(0x0800, 0x0800).portr("DSW2").w(FUNC(konblands_state::ldp_w));
+	map(0x1000, 0x1000).nopw().r(FUNC(konblands_state::ldp_r)); // led
 	map(0x1001, 0x1001).nopw(); // coin counter 2
 	map(0x1002, 0x1002).nopw(); // coin counter 1
 	map(0x1003, 0x1003).nopw(); // enable overlay transparency
-	map(0x1004, 0x1004).w(this, FUNC(konblands_state::nmi_enable_w));
+	map(0x1004, 0x1004).w(FUNC(konblands_state::nmi_enable_w));
 	map(0x1005, 0x1005).nopw(); // enable audio
-	map(0x1006, 0x1006).w(this, FUNC(konblands_state::irq_enable_w));
-	map(0x1007, 0x1007).w(this, FUNC(konblands_state::firq_enable_w));
-	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::write));
+	map(0x1006, 0x1006).w(FUNC(konblands_state::irq_enable_w));
+	map(0x1007, 0x1007).w(FUNC(konblands_state::firq_enable_w));
+	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::command_w));
 	map(0x4000, 0x47ff).ram().share("vram");
 	map(0x4800, 0x4bff).ram();
 	map(0x5800, 0x5800).nopw(); // watchdog
@@ -169,15 +170,15 @@ void konblands_state::konblands_map(address_map &map)
 
 void konblands_state::konblandsh_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(konblands_state::ldp_r));
-	map(0x0400, 0x0400).w(this, FUNC(konblands_state::ldp_w));
+	map(0x0000, 0x0000).r(FUNC(konblands_state::ldp_r));
+	map(0x0400, 0x0400).w(FUNC(konblands_state::ldp_w));
 	map(0x0802, 0x0802).nopw(); // led
 	map(0x0803, 0x0803).nopw(); // enable overlay transparency
-	map(0x0806, 0x0806).nopr().w(this, FUNC(konblands_state::irq_enable_w));
-	map(0x0807, 0x0807).nopr().w(this, FUNC(konblands_state::firq_enable_w));
+	map(0x0806, 0x0806).nopr().w(FUNC(konblands_state::irq_enable_w));
+	map(0x0807, 0x0807).nopr().w(FUNC(konblands_state::firq_enable_w));
 	map(0x0c00, 0x0c00).portr("INPUTS");
 	map(0x1000, 0x1000).portr("DSW1");
-	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::write));
+	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::command_w));
 	map(0x1800, 0x1800).nopw(); // sn latch
 	map(0x2000, 0x27ff).ram().share("vram");
 	map(0x2800, 0x2fff).ram();

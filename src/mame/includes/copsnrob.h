@@ -12,6 +12,7 @@
 
 #include "machine/74259.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 

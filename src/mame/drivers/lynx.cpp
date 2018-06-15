@@ -25,19 +25,19 @@ void lynx_state::lynx_mem(address_map &map)
 	map(0xfd00, 0xfdff).m(m_bank_fd00, FUNC(address_map_bank_device::amap8));
 	map(0xfe00, 0xfff7).bankr("bank_fe00").writeonly().share("mem_fe00");
 	map(0xfff8, 0xfff8).ram();
-	map(0xfff9, 0xfff9).rw(this, FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
+	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
 	map(0xfffa, 0xffff).bankr("bank_fffa").writeonly().share("mem_fffa");
 }
 
 void lynx_state::lynx_fc00_mem(address_map &map)
 {
-	map(0x000, 0x0ff).rw(this, FUNC(lynx_state::suzy_read), FUNC(lynx_state::suzy_write));
+	map(0x000, 0x0ff).rw(FUNC(lynx_state::suzy_read), FUNC(lynx_state::suzy_write));
 	map(0x100, 0x1ff).ram().share("mem_fc00");
 }
 
 void lynx_state::lynx_fd00_mem(address_map &map)
 {
-	map(0x000, 0x0ff).rw(this, FUNC(lynx_state::mikey_read), FUNC(lynx_state::mikey_write));
+	map(0x000, 0x0ff).rw(FUNC(lynx_state::mikey_read), FUNC(lynx_state::mikey_write));
 	map(0x100, 0x1ff).ram().share("mem_fd00");
 }
 

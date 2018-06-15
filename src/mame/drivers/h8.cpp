@@ -193,8 +193,8 @@ void h8_state::h8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).rw(this, FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
-	map(0xf1, 0xf1).w(this, FUNC(h8_state::portf1_w));
+	map(0xf0, 0xf0).rw(FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
+	map(0xf1, 0xf1).w(FUNC(h8_state::portf1_w));
 	map(0xf8, 0xf8).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9, 0xf9).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// optional connection to a serial terminal @ 600 baud

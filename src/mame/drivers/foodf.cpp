@@ -199,9 +199,9 @@ void foodf_state::main_map(address_map &map)
 	map(0x940001, 0x940001).mirror(0x023ffe).r("adc", FUNC(adc0809_device::data_r));
 	map(0x944000, 0x944007).mirror(0x023ff8).w("adc", FUNC(adc0809_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x948000, 0x948001).mirror(0x023ffe).portr("SYSTEM");
-	map(0x948001, 0x948001).mirror(0x023ffe).w(this, FUNC(foodf_state::digital_w));
-	map(0x950000, 0x9501ff).mirror(0x023e00).w(this, FUNC(foodf_state::foodf_paletteram_w)).share("paletteram");
-	map(0x954000, 0x954001).mirror(0x023ffe).w(this, FUNC(foodf_state::nvram_recall_w));
+	map(0x948001, 0x948001).mirror(0x023ffe).w(FUNC(foodf_state::digital_w));
+	map(0x950000, 0x9501ff).mirror(0x023e00).w(FUNC(foodf_state::foodf_paletteram_w)).share("paletteram");
+	map(0x954000, 0x954001).mirror(0x023ffe).w(FUNC(foodf_state::nvram_recall_w));
 	map(0x958000, 0x958001).mirror(0x023ffe).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0xa40000, 0xa4001f).mirror(0x03ffe0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0xa80000, 0xa8001f).mirror(0x03ffe0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);

@@ -43,13 +43,13 @@ void dcon_state::dcon_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0x8bfff).ram();
 
-	map(0x8c000, 0x8c7ff).ram().w(this, FUNC(dcon_state::background_w)).share("back_data");
-	map(0x8c800, 0x8cfff).ram().w(this, FUNC(dcon_state::foreground_w)).share("fore_data");
-	map(0x8d000, 0x8d7ff).ram().w(this, FUNC(dcon_state::midground_w)).share("mid_data");
-	map(0x8d800, 0x8e7ff).ram().w(this, FUNC(dcon_state::text_w)).share("textram");
+	map(0x8c000, 0x8c7ff).ram().w(FUNC(dcon_state::background_w)).share("back_data");
+	map(0x8c800, 0x8cfff).ram().w(FUNC(dcon_state::foreground_w)).share("fore_data");
+	map(0x8d000, 0x8d7ff).ram().w(FUNC(dcon_state::midground_w)).share("mid_data");
+	map(0x8d800, 0x8e7ff).ram().w(FUNC(dcon_state::text_w)).share("textram");
 	map(0x8e800, 0x8f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x8f800, 0x8ffff).ram().share("spriteram");
-	map(0x9d000, 0x9d7ff).w(this, FUNC(dcon_state::gfxbank_w));
+	map(0x9d000, 0x9d7ff).w(FUNC(dcon_state::gfxbank_w));
 
 	map(0xa0000, 0xa000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
@@ -63,7 +63,7 @@ void dcon_state::dcon_map(address_map &map)
 void dcon_state::sdgndmps_map(address_map &map)
 {
 	dcon_map(map);
-	map(0xa0000, 0xa000d).r(this, FUNC(dcon_state::sdgndmps_sound_comms_r)).umask16(0x00ff);
+	map(0xa0000, 0xa000d).r(FUNC(dcon_state::sdgndmps_sound_comms_r)).umask16(0x00ff);
 }
 
 /******************************************************************************/

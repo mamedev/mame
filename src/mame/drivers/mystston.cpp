@@ -108,11 +108,11 @@ void mystston_state::main_map(address_map &map)
 	map(0x07e0, 0x0fff).ram();
 	map(0x1000, 0x17ff).ram().share("fg_videoram");
 	map(0x1800, 0x1fff).ram().share("bg_videoram");
-	map(0x2000, 0x2000).mirror(0x1f8f).portr("IN0").w(this, FUNC(mystston_state::mystston_video_control_w)).share("video_control");
-	map(0x2010, 0x2010).mirror(0x1f8f).portr("IN1").w(this, FUNC(mystston_state::irq_clear_w));
+	map(0x2000, 0x2000).mirror(0x1f8f).portr("IN0").w(FUNC(mystston_state::mystston_video_control_w)).share("video_control");
+	map(0x2010, 0x2010).mirror(0x1f8f).portr("IN1").w(FUNC(mystston_state::irq_clear_w));
 	map(0x2020, 0x2020).mirror(0x1f8f).portr("DSW0").writeonly().share("scroll");
 	map(0x2030, 0x2030).mirror(0x1f8f).portr("DSW1").writeonly().share("ay8910_data");
-	map(0x2040, 0x2040).mirror(0x1f8f).nopr().w(this, FUNC(mystston_state::mystston_ay8910_select_w)).share("ay8910_select");
+	map(0x2040, 0x2040).mirror(0x1f8f).nopr().w(FUNC(mystston_state::mystston_ay8910_select_w)).share("ay8910_select");
 	map(0x2050, 0x2050).mirror(0x1f8f).noprw();
 	map(0x2060, 0x207f).mirror(0x1f80).ram().share("paletteram");
 	map(0x4000, 0xffff).rom();

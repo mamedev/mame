@@ -8,6 +8,7 @@
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 #define BW_DEBUG 0
 

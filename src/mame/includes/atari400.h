@@ -19,6 +19,7 @@
 #include "video/antic.h"
 #include "video/gtia.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #include <algorithm>

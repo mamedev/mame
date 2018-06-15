@@ -17,6 +17,7 @@
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 
 class imds2_state : public driver_device
 {

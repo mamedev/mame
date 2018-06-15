@@ -109,18 +109,18 @@ void espial_state::espial_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN1");
 	map(0x6084, 0x6084).portr("IN2");
-	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(this, FUNC(espial_state::espial_master_soundlatch_w));
+	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(FUNC(espial_state::espial_master_soundlatch_w));
 	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0x7100, 0x7100).w(this, FUNC(espial_state::espial_master_interrupt_mask_w));
-	map(0x7200, 0x7200).w(this, FUNC(espial_state::espial_flipscreen_w));
+	map(0x7100, 0x7100).w(FUNC(espial_state::espial_master_interrupt_mask_w));
+	map(0x7200, 0x7200).w(FUNC(espial_state::espial_flipscreen_w));
 	map(0x8000, 0x801f).ram().share("spriteram_1");
 	map(0x8020, 0x803f).readonly();
-	map(0x8400, 0x87ff).ram().w(this, FUNC(espial_state::espial_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(espial_state::espial_videoram_w)).share("videoram");
 	map(0x8800, 0x880f).writeonly().share("spriteram_3");
-	map(0x8c00, 0x8fff).ram().w(this, FUNC(espial_state::espial_attributeram_w)).share("attributeram");
+	map(0x8c00, 0x8fff).ram().w(FUNC(espial_state::espial_attributeram_w)).share("attributeram");
 	map(0x9000, 0x901f).ram().share("spriteram_2");
-	map(0x9020, 0x903f).ram().w(this, FUNC(espial_state::espial_scrollram_w)).share("scrollram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(espial_state::espial_colorram_w)).share("colorram");
+	map(0x9020, 0x903f).ram().w(FUNC(espial_state::espial_scrollram_w)).share("scrollram");
+	map(0x9400, 0x97ff).ram().w(FUNC(espial_state::espial_colorram_w)).share("colorram");
 	map(0xc000, 0xcfff).rom();
 }
 
@@ -135,17 +135,17 @@ void espial_state::netwars_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN1");
 	map(0x6084, 0x6084).portr("IN2");
-	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(this, FUNC(espial_state::espial_master_soundlatch_w));
+	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(FUNC(espial_state::espial_master_soundlatch_w));
 	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0x7100, 0x7100).w(this, FUNC(espial_state::espial_master_interrupt_mask_w));
-	map(0x7200, 0x7200).w(this, FUNC(espial_state::espial_flipscreen_w));
-	map(0x8000, 0x87ff).ram().w(this, FUNC(espial_state::espial_videoram_w)).share("videoram");
+	map(0x7100, 0x7100).w(FUNC(espial_state::espial_master_interrupt_mask_w));
+	map(0x7200, 0x7200).w(FUNC(espial_state::espial_flipscreen_w));
+	map(0x8000, 0x87ff).ram().w(FUNC(espial_state::espial_videoram_w)).share("videoram");
 	map(0x8000, 0x801f).ram().share("spriteram_1");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(espial_state::espial_attributeram_w)).share("attributeram");
+	map(0x8800, 0x8fff).ram().w(FUNC(espial_state::espial_attributeram_w)).share("attributeram");
 	map(0x8800, 0x880f).ram().share("spriteram_3");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(espial_state::espial_colorram_w)).share("colorram");
+	map(0x9000, 0x97ff).ram().w(FUNC(espial_state::espial_colorram_w)).share("colorram");
 	map(0x9000, 0x901f).ram().share("spriteram_2");
-	map(0x9020, 0x903f).ram().w(this, FUNC(espial_state::espial_scrollram_w)).share("scrollram");
+	map(0x9020, 0x903f).ram().w(FUNC(espial_state::espial_scrollram_w)).share("scrollram");
 }
 
 
@@ -153,7 +153,7 @@ void espial_state::espial_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x4000).w(this, FUNC(espial_state::espial_sound_nmi_mask_w));
+	map(0x4000, 0x4000).w(FUNC(espial_state::espial_sound_nmi_mask_w));
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 

@@ -107,8 +107,8 @@ void exzisus_state::cpua_map(address_map &map)
 	map(0xc000, 0xc5ff).ram().share("objectram1");
 	map(0xc600, 0xdfff).ram().share("videoram1");
 	map(0xe000, 0xefff).ram().share("sharedram_ac");
-	map(0xf400, 0xf400).w(this, FUNC(exzisus_state::cpua_bankswitch_w));
-	map(0xf404, 0xf404).w(this, FUNC(exzisus_state::cpub_reset_w)); // ??
+	map(0xf400, 0xf400).w(FUNC(exzisus_state::cpua_bankswitch_w));
+	map(0xf404, 0xf404).w(FUNC(exzisus_state::cpub_reset_w)); // ??
 	map(0xf800, 0xffff).ram().share("sharedram_ab");
 }
 
@@ -122,10 +122,10 @@ void exzisus_state::cpub_map(address_map &map)
 	map(0xf000, 0xf000).nopr().w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xf001, 0xf001).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0xf400, 0xf400).portr("P1");
-	map(0xf400, 0xf400).w(this, FUNC(exzisus_state::cpub_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(exzisus_state::cpub_bankswitch_w));
 	map(0xf401, 0xf401).portr("P2");
 	map(0xf402, 0xf402).portr("SYSTEM");
-	map(0xf402, 0xf402).w(this, FUNC(exzisus_state::coincounter_w));
+	map(0xf402, 0xf402).w(FUNC(exzisus_state::coincounter_w));
 	map(0xf404, 0xf404).portr("DSWA");
 	map(0xf404, 0xf404).nopw(); // ??
 	map(0xf405, 0xf405).portr("DSWB");

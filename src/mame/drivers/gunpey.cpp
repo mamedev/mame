@@ -197,6 +197,7 @@ Release:                         November 1999
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1093,21 +1094,21 @@ void gunpey_state::mem_map(address_map &map)
 
 void gunpey_state::io_map(address_map &map)
 {
-	map(0x7f40, 0x7f45).r(this, FUNC(gunpey_state::inputs_r));
+	map(0x7f40, 0x7f45).r(FUNC(gunpey_state::inputs_r));
 
-	map(0x7f48, 0x7f48).w(this, FUNC(gunpey_state::output_w));
+	map(0x7f48, 0x7f48).w(FUNC(gunpey_state::output_w));
 	map(0x7f80, 0x7f81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
 	map(0x7f88, 0x7f88).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x7fc8, 0x7fc9).rw(this, FUNC(gunpey_state::status_r), FUNC(gunpey_state::status_w));
-	map(0x7fd0, 0x7fdf).w(this, FUNC(gunpey_state::blitter_w));
-	map(0x7fe0, 0x7fe5).w(this, FUNC(gunpey_state::blitter_upper_w));
-	map(0x7ff0, 0x7ff5).w(this, FUNC(gunpey_state::blitter_upper2_w));
+	map(0x7fc8, 0x7fc9).rw(FUNC(gunpey_state::status_r), FUNC(gunpey_state::status_w));
+	map(0x7fd0, 0x7fdf).w(FUNC(gunpey_state::blitter_w));
+	map(0x7fe0, 0x7fe5).w(FUNC(gunpey_state::blitter_upper_w));
+	map(0x7ff0, 0x7ff5).w(FUNC(gunpey_state::blitter_upper2_w));
 
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
-	map(0x7fec, 0x7fed).w(this, FUNC(gunpey_state::vregs_addr_w));
-	map(0x7fee, 0x7fef).w(this, FUNC(gunpey_state::vram_bank_w));
+	map(0x7fec, 0x7fed).w(FUNC(gunpey_state::vregs_addr_w));
+	map(0x7fee, 0x7fef).w(FUNC(gunpey_state::vram_bank_w));
 
 }
 

@@ -80,7 +80,7 @@ DEFINE_DEVICE_TYPE(ES1373, es1373_device, "es1373", "Creative Labs Ensoniq Audio
 
 void es1373_device::map(address_map &map)
 {
-	map(0x00, 0x3f).rw(this, FUNC(es1373_device::reg_r), FUNC(es1373_device::reg_w));
+	map(0x00, 0x3f).rw(FUNC(es1373_device::reg_r), FUNC(es1373_device::reg_w));
 }
 
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

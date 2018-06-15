@@ -1162,7 +1162,7 @@ void fidelz80_state::bcc_map(address_map &map)
 void fidelz80_state::bcc_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x07).rw(this, FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bcc_control_w));
+	map(0x00, 0x07).rw(FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bcc_control_w));
 }
 
 
@@ -1177,7 +1177,7 @@ void fidelz80_state::scc_map(address_map &map)
 void fidelz80_state::scc_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x07).rw(this, FUNC(fidelz80_state::scc_input_r), FUNC(fidelz80_state::scc_control_w));
+	map(0x00, 0x07).rw(FUNC(fidelz80_state::scc_input_r), FUNC(fidelz80_state::scc_control_w));
 }
 
 
@@ -1214,7 +1214,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 void fidelz80_state::vsc_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x00, 0x0f).rw(this, FUNC(fidelz80_state::vsc_io_trampoline_r), FUNC(fidelz80_state::vsc_io_trampoline_w));
+	map(0x00, 0x0f).rw(FUNC(fidelz80_state::vsc_io_trampoline_r), FUNC(fidelz80_state::vsc_io_trampoline_w));
 }
 
 
@@ -1225,7 +1225,7 @@ void fidelz80_state::vbrc_main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
-	map(0xe000, 0xe000).mirror(0x1fff).w(this, FUNC(fidelz80_state::vbrc_speech_w));
+	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(fidelz80_state::vbrc_speech_w));
 }
 
 void fidelz80_state::vbrc_main_io(address_map &map)
@@ -1241,9 +1241,9 @@ void fidelz80_state::dsc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x4000).mirror(0x1fff).w(this, FUNC(fidelz80_state::dsc_control_w));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidelz80_state::dsc_select_w));
-	map(0x8000, 0x8000).mirror(0x1fff).r(this, FUNC(fidelz80_state::dsc_input_r));
+	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(fidelz80_state::dsc_control_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidelz80_state::dsc_select_w));
+	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(fidelz80_state::dsc_input_r));
 	map(0xa000, 0xa3ff).mirror(0x1c00).ram();
 }
 

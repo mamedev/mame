@@ -1,11 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_INCLUDES_HYPERSPT_H
+#define MAME_INCLUDES_HYPERSPT_H
+
+#pragma once
 
 #include "audio/trackfld.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class hyperspt_state : public driver_device
@@ -57,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(space, offset, m_SN76496_latch); };
+	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(m_SN76496_latch); };
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -81,3 +86,5 @@ public:
 	void soundb_map(address_map &map);
 	void hyprolyb_adpcm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HYPERSPT_H

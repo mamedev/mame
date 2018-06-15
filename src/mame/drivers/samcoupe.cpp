@@ -84,15 +84,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	switch (offset & 0x03)
-	{
-	case 0: return m_fdc->status_r();
-	case 1: return m_fdc->track_r();
-	case 2: return m_fdc->sector_r();
-	case 3: return m_fdc->data_r();
-	}
-
-	return 0xff;
+	return m_fdc->gen_r(offset & 0x03);
 }
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
@@ -106,13 +98,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	switch (offset & 0x03)
-	{
-	case 0: m_fdc->cmd_w(data);     break;
-	case 1: m_fdc->track_w(data);   break;
-	case 2: m_fdc->sector_w(data);  break;
-	case 3: m_fdc->data_w(data);    break;
-	}
+	return m_fdc->gen_w(offset & 0x03, data);
 }
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
@@ -305,28 +291,28 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
 
 void samcoupe_state::samcoupe_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().rw(this, FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
-	map(0x4000, 0x7fff).ram().rw(this, FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
-	map(0x8000, 0xbfff).ram().rw(this, FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
-	map(0xc000, 0xffff).ram().rw(this, FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
+	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
+	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
+	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
+	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
 }
 
 void samcoupe_state::samcoupe_io(address_map &map)
 {
-	map(0x0080, 0x0081).select(0xff00).w(this, FUNC(samcoupe_state::samcoupe_ext_mem_w));
-	map(0x00e0, 0x00e7).select(0xff10).rw(this, FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
-	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::write));
-	map(0x00e9, 0x00e9).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
-	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::write));
-	map(0x00eb, 0x00eb).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
-	map(0x00f8, 0x00f8).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
-	map(0x00f9, 0x00f9).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));
-	map(0x00fa, 0x00fa).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lmpr_r), FUNC(samcoupe_state::samcoupe_lmpr_w));
-	map(0x00fb, 0x00fb).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_hmpr_r), FUNC(samcoupe_state::samcoupe_hmpr_w));
-	map(0x00fc, 0x00fc).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_vmpr_r), FUNC(samcoupe_state::samcoupe_vmpr_w));
-	map(0x00fd, 0x00fd).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_midi_r), FUNC(samcoupe_state::samcoupe_midi_w));
-	map(0x00fe, 0x00fe).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_keyboard_r), FUNC(samcoupe_state::samcoupe_border_w));
-	map(0x00ff, 0x00ff).select(0xff00).r(this, FUNC(samcoupe_state::samcoupe_attributes_r));
+	map(0x0080, 0x0081).select(0xff00).w(FUNC(samcoupe_state::samcoupe_ext_mem_w));
+	map(0x00e0, 0x00e7).select(0xff10).rw(FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
+	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00e9, 0x00e9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
+	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00eb, 0x00eb).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
+	map(0x00f8, 0x00f8).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
+	map(0x00f9, 0x00f9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));
+	map(0x00fa, 0x00fa).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lmpr_r), FUNC(samcoupe_state::samcoupe_lmpr_w));
+	map(0x00fb, 0x00fb).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_hmpr_r), FUNC(samcoupe_state::samcoupe_hmpr_w));
+	map(0x00fc, 0x00fc).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_vmpr_r), FUNC(samcoupe_state::samcoupe_vmpr_w));
+	map(0x00fd, 0x00fd).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_midi_r), FUNC(samcoupe_state::samcoupe_midi_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_keyboard_r), FUNC(samcoupe_state::samcoupe_border_w));
+	map(0x00ff, 0x00ff).select(0xff00).r(FUNC(samcoupe_state::samcoupe_attributes_r));
 	map(0x00ff, 0x00ff).select(0xfe00).w("saa1099", FUNC(saa1099_device::data_w));
 	map(0x01ff, 0x01ff).select(0xfe00).w("saa1099", FUNC(saa1099_device::control_w));
 }
@@ -537,12 +523,12 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
 
 	/* devices */
-	MCFG_CENTRONICS_ADD("lpt1", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_lpt1, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt1_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt1_data_out", "lpt1")
 
-	MCFG_CENTRONICS_ADD("lpt2", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_lpt2, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt2_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")

@@ -21,6 +21,7 @@
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -79,20 +80,20 @@ READ8_MEMBER(rollerg_state::pip_r)
 
 void rollerg_state::rollerg_map(address_map &map)
 {
-	map(0x0010, 0x0010).w(this, FUNC(rollerg_state::rollerg_0010_w));
+	map(0x0010, 0x0010).w(FUNC(rollerg_state::rollerg_0010_w));
 	map(0x0020, 0x0020).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x0030, 0x0031).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
-	map(0x0040, 0x0040).w(this, FUNC(rollerg_state::soundirq_w));
+	map(0x0040, 0x0040).w(FUNC(rollerg_state::soundirq_w));
 	map(0x0050, 0x0050).portr("P1");
 	map(0x0051, 0x0051).portr("P2");
 	map(0x0052, 0x0052).portr("DSW3");
 	map(0x0053, 0x0053).portr("DSW1");
 	map(0x0060, 0x0060).portr("DSW2");
-	map(0x0061, 0x0061).r(this, FUNC(rollerg_state::pip_r));             /* ????? */
+	map(0x0061, 0x0061).r(FUNC(rollerg_state::pip_r));             /* ????? */
 	map(0x0100, 0x010f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));      /* 053252? */
 	map(0x0200, 0x020f).w(m_k051316, FUNC(k051316_device::ctrl_w));
 	map(0x0300, 0x030f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
-	map(0x0800, 0x0fff).r(this, FUNC(rollerg_state::rollerg_k051316_r)).w(m_k051316, FUNC(k051316_device::write));
+	map(0x0800, 0x0fff).r(FUNC(rollerg_state::rollerg_k051316_r)).w(m_k051316, FUNC(k051316_device::write));
 	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
 	map(0x1800, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x3aff).ram();
@@ -106,7 +107,7 @@ void rollerg_state::rollerg_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa02f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
-	map(0xfc00, 0xfc00).w(this, FUNC(rollerg_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc00).w(FUNC(rollerg_state::sound_arm_nmi_w));
 }
 
 /***************************************************************************

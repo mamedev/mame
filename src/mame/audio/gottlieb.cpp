@@ -116,7 +116,7 @@ MACHINE_CONFIG_START(gottlieb_sound_r0_device::device_add_mconfig)
 
 	// I/O configuration
 	MCFG_DEVICE_ADD("r6530", MOS6530, SOUND1_CLOCK/4) // unknown - same as cpu
-	MCFG_MOS6530_OUT_PA_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MOS6530_OUT_PA_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MOS6530_IN_PB_CB(READ8(*this, gottlieb_sound_r0_device, r6530b_r))
 
 	// sound devices
@@ -272,9 +272,9 @@ void gottlieb_sound_r1_device::gottlieb_sound_r1_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x007f).mirror(0x0d80).ram();
 	map(0x0200, 0x021f).mirror(0x0de0).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x1000, 0x1000).mirror(0x0fff).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2000, 0x2000).mirror(0x0fff).w(this, FUNC(gottlieb_sound_r1_device::votrax_data_w));
-	map(0x3000, 0x3000).mirror(0x0fff).w(this, FUNC(gottlieb_sound_r1_device::speech_clock_dac_w));
+	map(0x1000, 0x1000).mirror(0x0fff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_device::votrax_data_w));
+	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_device::speech_clock_dac_w));
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -609,9 +609,9 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::sp0250_latch_w )
 void gottlieb_sound_r2_device::gottlieb_sound_r2_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x3c00).ram();
-	map(0x4000, 0x4000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::write));
-	map(0x4001, 0x4001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::write));
-	map(0x8000, 0x8000).mirror(0x3fff).r(this, FUNC(gottlieb_sound_r2_device::audio_data_r));
+	map(0x4000, 0x4000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::data_w));
+	map(0x4001, 0x4001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x8000, 0x8000).mirror(0x3fff).r(FUNC(gottlieb_sound_r2_device::audio_data_r));
 	map(0xc000, 0xdfff).mirror(0x2000).rom();
 }
 
@@ -623,13 +623,13 @@ void gottlieb_sound_r2_device::gottlieb_sound_r2_map(address_map &map)
 void gottlieb_sound_r2_device::gottlieb_speech_r2_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x1c00).ram();
-	map(0x2000, 0x2000).mirror(0x1fff).w(this, FUNC(gottlieb_sound_r2_device::sp0250_latch_w));
-	map(0x4000, 0x4000).mirror(0x1fff).w(this, FUNC(gottlieb_sound_r2_device::speech_control_w));
+	map(0x2000, 0x2000).mirror(0x1fff).w(FUNC(gottlieb_sound_r2_device::sp0250_latch_w));
+	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(gottlieb_sound_r2_device::speech_control_w));
 	map(0x6000, 0x6000).mirror(0x1fff).portr("SB2");
-	map(0x8000, 0x8000).mirror(0x1fff).w(this, FUNC(gottlieb_sound_r2_device::psg_latch_w));
-	map(0xa000, 0xa000).mirror(0x07ff).w(this, FUNC(gottlieb_sound_r2_device::nmi_rate_w));
-	map(0xa800, 0xa800).mirror(0x07ff).r(this, FUNC(gottlieb_sound_r2_device::speech_data_r));
-	map(0xb000, 0xb000).mirror(0x07ff).w(this, FUNC(gottlieb_sound_r2_device::signal_audio_nmi_w));
+	map(0x8000, 0x8000).mirror(0x1fff).w(FUNC(gottlieb_sound_r2_device::psg_latch_w));
+	map(0xa000, 0xa000).mirror(0x07ff).w(FUNC(gottlieb_sound_r2_device::nmi_rate_w));
+	map(0xa800, 0xa800).mirror(0x07ff).r(FUNC(gottlieb_sound_r2_device::speech_data_r));
+	map(0xb000, 0xb000).mirror(0x07ff).w(FUNC(gottlieb_sound_r2_device::signal_audio_nmi_w));
 	map(0xc000, 0xffff).rom();
 }
 

@@ -21,10 +21,10 @@ DEFINE_DEVICE_TYPE(VTECH_FLOPPY_CONTROLLER, vtech_floppy_controller_device, "vte
 
 void vtech_floppy_controller_device::map(address_map &map)
 {
-	map(0, 0).w(this, FUNC(vtech_floppy_controller_device::latch_w));
-	map(1, 1).r(this, FUNC(vtech_floppy_controller_device::shifter_r));
-	map(2, 2).r(this, FUNC(vtech_floppy_controller_device::rd_r));
-	map(3, 3).r(this, FUNC(vtech_floppy_controller_device::wpt_r));
+	map(0, 0).w(FUNC(vtech_floppy_controller_device::latch_w));
+	map(1, 1).r(FUNC(vtech_floppy_controller_device::shifter_r));
+	map(2, 2).r(FUNC(vtech_floppy_controller_device::rd_r));
+	map(3, 3).r(FUNC(vtech_floppy_controller_device::wpt_r));
 }
 
 //-------------------------------------------------

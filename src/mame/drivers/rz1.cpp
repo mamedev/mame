@@ -28,6 +28,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "cpu/upd7810/upd7811.h"
 #include "video/hd44780.h"
@@ -99,11 +100,11 @@ void rz1_state::map(address_map &map)
 //  map(0x0000, 0x0fff).rom().region("maincpu", 0);
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x7fff).rom().region("program", 0);
-	map(0x8000, 0x8fff).w(this, FUNC(rz1_state::upd934g_c_w));
-	map(0x9000, 0x9fff).rw(this, FUNC(rz1_state::key_r), FUNC(rz1_state::upd934g_b_w));
+	map(0x8000, 0x8fff).w(FUNC(rz1_state::upd934g_c_w));
+	map(0x9000, 0x9fff).rw(FUNC(rz1_state::key_r), FUNC(rz1_state::upd934g_b_w));
 	map(0xa000, 0xbfff).ram(); // sample ram 1
 	map(0xc000, 0xdfff).ram(); // sample ram 2
-	map(0xe000, 0xe001).w(this, FUNC(rz1_state::leds_w));
+	map(0xe000, 0xe001).w(FUNC(rz1_state::leds_w));
 }
 
 

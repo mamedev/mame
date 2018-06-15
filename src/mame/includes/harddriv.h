@@ -30,6 +30,7 @@
 
 #include "sound/dac.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL(32'000'000)

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 #include "audio/lynx.h"
 #include "imagedev/snapquik.h"

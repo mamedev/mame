@@ -24,6 +24,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -215,12 +216,12 @@ void pc2000_state::pc2000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(pc2000_state::rombank0_w));
-	map(0x01, 0x01).w(this, FUNC(pc2000_state::rombank1_w));
-	map(0x03, 0x03).w(this, FUNC(pc2000_state::rombank2_w));
+	map(0x00, 0x00).w(FUNC(pc2000_state::rombank0_w));
+	map(0x01, 0x01).w(FUNC(pc2000_state::rombank1_w));
+	map(0x03, 0x03).w(FUNC(pc2000_state::rombank2_w));
 	map(0x0a, 0x0b).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
-	map(0x10, 0x11).rw(this, FUNC(pc2000_state::key_matrix_r), FUNC(pc2000_state::key_matrix_w));
-	map(0x12, 0x12).rw(this, FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
+	map(0x10, 0x11).rw(FUNC(pc2000_state::key_matrix_r), FUNC(pc2000_state::key_matrix_w));
+	map(0x12, 0x12).rw(FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
 }
 
 
@@ -336,11 +337,11 @@ void gl3000s_state::gl3000s_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(this, FUNC(gl3000s_state::rombank1_w));
-	map(0x03, 0x03).w(this, FUNC(gl3000s_state::rombank2_w));
+	map(0x01, 0x01).w(FUNC(gl3000s_state::rombank1_w));
+	map(0x03, 0x03).w(FUNC(gl3000s_state::rombank2_w));
 	map(0x08, 0x09).rw(m_lcdc_r, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
 	map(0x0a, 0x0b).rw(m_lcdc_l, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
-	map(0x10, 0x11).rw(this, FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
+	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
 }
 
 READ8_MEMBER( pc1000_state::kb_r )
@@ -409,9 +410,9 @@ void pc1000_state::pc1000_mem(address_map &map)
 
 void pc1000_state::pc1000_io(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(pc1000_state::kb_r));
-	map(0x4000, 0x4000).mirror(0xfe).rw(this, FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
-	map(0x4100, 0x4100).mirror(0xfe).rw(this, FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
+	map(0x0000, 0x01ff).r(FUNC(pc1000_state::kb_r));
+	map(0x4000, 0x4000).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
+	map(0x4100, 0x4100).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
 }
 
 /* Input ports */

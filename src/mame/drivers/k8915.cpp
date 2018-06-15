@@ -16,6 +16,7 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 class k8915_state : public driver_device
@@ -66,7 +67,7 @@ void k8915_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x50, 0x53).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x58, 0x5b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xa8, 0xa8).w(this, FUNC(k8915_state::k8915_a8_w));
+	map(0xa8, 0xa8).w(FUNC(k8915_state::k8915_a8_w));
 }
 
 /* Input ports */

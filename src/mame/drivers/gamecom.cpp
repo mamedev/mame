@@ -37,9 +37,9 @@ Game Status:
 void gamecom_state::gamecom_mem_map(address_map &map)
 {
 	map(0x0000, 0x0013).ram().region("maincpu", 0x00);
-	map(0x0014, 0x0017).rw(this, FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
+	map(0x0014, 0x0017).rw(FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
 	map(0x0018, 0x001F).ram().region("maincpu", 0x18);
-	map(0x0020, 0x007F).rw(this, FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
+	map(0x0020, 0x007F).rw(FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
 	map(0x0080, 0x03FF).ram().region("maincpu", 0x80);                     /* RAM */
 	map(0x0400, 0x0FFF).noprw();                                                /* Nothing */
 	map(0x1000, 0x1FFF).rom();                                                /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */

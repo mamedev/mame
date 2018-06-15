@@ -59,7 +59,7 @@ DEFINE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device, "abc1600mac", "ABC 1600 MAC"
 
 void abc1600_mac_device::map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(abc1600_mac_device::read), FUNC(abc1600_mac_device::write));
+	map(0x00000, 0xfffff).rw(FUNC(abc1600_mac_device::read), FUNC(abc1600_mac_device::write));
 }
 
 

@@ -211,13 +211,13 @@ void megasys1_state::megasys1Z_map(address_map &map)
 	map(0x080006, 0x080007).portr("DSW");
 	map(0x084200, 0x084205).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084208, 0x08420d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084300, 0x084301).w(this, FUNC(megasys1_state::screen_flag_w));
-	map(0x084308, 0x084309).w(this, FUNC(megasys1_state::soundlatch_z_w));
+	map(0x084300, 0x084301).w(FUNC(megasys1_state::screen_flag_w));
+	map(0x084308, 0x084309).w(FUNC(megasys1_state::soundlatch_z_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08e000, 0x08ffff).ram().share("objectram");
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
-	map(0x0f0000, 0x0fffff).ram().w(this, FUNC(megasys1_state::ram_w)).share("ram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
 }
 
 void megasys1_state::megasys1A_map(address_map &map)
@@ -225,10 +225,10 @@ void megasys1_state::megasys1A_map(address_map &map)
 	map.global_mask(0xfffff);
 	megasys1Z_map(map);
 	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));    /* from sound cpu */
-	map(0x084000, 0x084001).w(this, FUNC(megasys1_state::active_layers_w));
+	map(0x084000, 0x084001).w(FUNC(megasys1_state::active_layers_w));
 	map(0x084008, 0x08400d).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084100, 0x084101).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x084308, 0x084309).w(this, FUNC(megasys1_state::soundlatch_w));
+	map(0x084100, 0x084101).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x084308, 0x084309).w(FUNC(megasys1_state::soundlatch_w));
 	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 }
 
@@ -305,21 +305,21 @@ void megasys1_state::megasys1B_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x044000, 0x044001).w(this, FUNC(megasys1_state::active_layers_w));
+	map(0x044000, 0x044001).w(FUNC(megasys1_state::active_layers_w));
 	map(0x044008, 0x04400d).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x044100, 0x044101).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x044100, 0x044101).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
 	map(0x044200, 0x044205).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x044208, 0x04420d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x044300, 0x044301).w(this, FUNC(megasys1_state::screen_flag_w));
-	map(0x044308, 0x044309).w(this, FUNC(megasys1_state::soundlatch_w));
+	map(0x044300, 0x044301).w(FUNC(megasys1_state::screen_flag_w));
+	map(0x044308, 0x044309).w(FUNC(megasys1_state::soundlatch_w));
 	map(0x048000, 0x0487ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x04e000, 0x04ffff).ram().share("objectram");
 	map(0x050000, 0x053fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x054000, 0x057fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x058000, 0x05bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
-	map(0x060000, 0x07ffff).ram().w(this, FUNC(megasys1_state::ram_w)).share("ram");
+	map(0x060000, 0x07ffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
 	map(0x080000, 0x0bffff).rom();
-	map(0x0e0000, 0x0e0001).rw(this, FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
+	map(0x0e0000, 0x0e0001).rw(FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
 }
 
 void megasys1_state::megasys1B_edfbl_map(address_map &map)
@@ -338,8 +338,8 @@ void megasys1_state::megasys1B_monkelf_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	megasys1B_map(map);
-	map(0x044200, 0x044205).w(this, FUNC(megasys1_state::monkelf_scroll0_w));
-	map(0x044208, 0x04420d).w(this, FUNC(megasys1_state::monkelf_scroll1_w));
+	map(0x044200, 0x044205).w(FUNC(megasys1_state::monkelf_scroll0_w));
+	map(0x044208, 0x04420d).w(FUNC(megasys1_state::monkelf_scroll1_w));
 	map(0x0e0002, 0x0e0003).portr("P1");
 	map(0x0e0004, 0x0e0005).portr("P2");
 	map(0x0e0006, 0x0e0007).portr("DSW1");
@@ -376,19 +376,19 @@ void megasys1_state::megasys1C_map(address_map &map)
 	map(0x0c2000, 0x0c2005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2100, 0x0c2105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2108, 0x0c2109).w(this, FUNC(megasys1_state::sprite_bank_w));
-	map(0x0c2200, 0x0c2201).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x0c2208, 0x0c2209).w(this, FUNC(megasys1_state::active_layers_w));
-	map(0x0c2308, 0x0c2309).w(this, FUNC(megasys1_state::screen_flag_w));
-	map(0x0c8000, 0x0c8001).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(this, FUNC(megasys1_state::soundlatch_c_w));
+	map(0x0c2108, 0x0c2109).w(FUNC(megasys1_state::sprite_bank_w));
+	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
+	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
+	map(0x0c8000, 0x0c8001).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(FUNC(megasys1_state::soundlatch_c_w));
 	map(0x0d2000, 0x0d3fff).ram().share("objectram");
-	map(0x0d8000, 0x0d8001).rw(this, FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
+	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
 	// 64th Street actively uses 0xe4*** for breakable objects.
 	map(0x0e0000, 0x0e3fff).mirror(0x4000).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x0e8000, 0x0ebfff).mirror(0x4000).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0f0000, 0x0f3fff).mirror(0x4000).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1c0000, 0x1cffff).mirror(0x30000).ram().w(this, FUNC(megasys1_state::ram_w)).share("ram"); //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	map(0x1c0000, 0x1cffff).mirror(0x30000).ram().w(FUNC(megasys1_state::ram_w)).share("ram"); //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 }
 
 
@@ -407,9 +407,9 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x0c2000, 0x0c2005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2108, 0x0c2109).nopw(); //AM_WRITE(sprite_bank_w)
-	map(0x0c2200, 0x0c2201).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x0c2208, 0x0c2209).w(this, FUNC(megasys1_state::active_layers_w));
-	map(0x0c2308, 0x0c2309).w(this, FUNC(megasys1_state::screen_flag_w));
+	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
+	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
 	map(0x0ca000, 0x0cbfff).ram().share("objectram");
 	map(0x0d0000, 0x0d3fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0d8000, 0x0d87ff).mirror(0x3000).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -418,7 +418,7 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x0f0000, 0x0f0001).portr("SYSTEM");
 	map(0x0f8001, 0x0f8001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x100000, 0x100001); // protection
-	map(0x1f0000, 0x1fffff).ram() /*.w(this, FUNC(megasys1_state::ram_w))*/ .share("ram");
+	map(0x1f0000, 0x1fffff).ram() /*.w(FUNC(megasys1_state::ram_w))*/ .share("ram");
 }
 
 void megasys1_state::megasys1D_oki_map(address_map &map)
@@ -517,9 +517,9 @@ void megasys1_state::megasys1A_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_1_r));
 	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_2_r));
+	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_2_r));
 	map(0x0c0000, 0x0c0003).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
@@ -530,7 +530,7 @@ void megasys1_state::kickoffb_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_1_r));
 	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
@@ -547,9 +547,9 @@ void megasys1_state::megasys1B_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write)); /* from/to main cpu */
 	map(0x060000, 0x060001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write)); /* from/to main cpu */
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_1_r));
 	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_2_r));
+	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_2_r));
 	map(0x0c0000, 0x0c0003).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0effff).ram();
 }

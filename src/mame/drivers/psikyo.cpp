@@ -253,8 +253,8 @@ void psikyo_state::psikyo_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();                                                     // ROM (not all used)
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(this, FUNC(psikyo_state::vram_w<0>)).share("vram_0");       // Layer 0
-	map(0x802000, 0x803fff).ram().w(this, FUNC(psikyo_state::vram_w<1>)).share("vram_1");       // Layer 1
+	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");       // Layer 0
+	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");       // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                           // RAM + Vregs
 //  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404
@@ -309,12 +309,12 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(this, FUNC(psikyo_state::vram_w<0>)).share("vram_0");       // Layer 0
-	map(0x802000, 0x803fff).ram().w(this, FUNC(psikyo_state::vram_w<1>)).share("vram_1");       // Layer 1
+	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");       // Layer 0
+	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");       // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                               // RAM + Vregs
-	map(0xc00000, 0xc0000b).r(this, FUNC(psikyo_state::gunbird_input_r));                               // input ports
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                               // input ports
 
-	map(0xc00018, 0xc0001b).rw(this, FUNC(psikyo_state::s1945bl_oki_r), FUNC(psikyo_state::s1945bl_oki_w));
+	map(0xc00018, 0xc0001b).rw(FUNC(psikyo_state::s1945bl_oki_r), FUNC(psikyo_state::s1945bl_oki_w));
 
 	map(0xfe0000, 0xffffff).ram();                                                     // RAM
 
@@ -339,7 +339,7 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 void psikyo_state::sngkace_map(address_map &map)
 {
 	psikyo_map(map);
-	map(0xc00000, 0xc0000b).r(this, FUNC(psikyo_state::sngkace_input_r));
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::sngkace_input_r));
 	map(0xc00013, 0xc00013).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -354,7 +354,7 @@ void psikyo_state::sngkace_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x04, 0x04).w(this, FUNC(psikyo_state::sound_bankswitch_w<0>));
+	map(0x04, 0x04).w(FUNC(psikyo_state::sound_bankswitch_w<0>));
 	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0c, 0x0c).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
@@ -378,14 +378,14 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 void psikyo_state::gunbird_map(address_map &map)
 {
 	psikyo_map(map);
-	map(0xc00000, 0xc0000b).r(this, FUNC(psikyo_state::gunbird_input_r));
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));
 	map(0xc00013, 0xc00013).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void psikyo_state::s1945jn_map(address_map &map)
 {
 	psikyo_map(map);
-	map(0xc00000, 0xc0000b).r(this, FUNC(psikyo_state::gunbird_input_r));
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));
 	map(0xc00011, 0xc00011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -399,7 +399,7 @@ void psikyo_state::gunbird_sound_map(address_map &map)
 void psikyo_state::gunbird_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(psikyo_state::sound_bankswitch_w<4>));
+	map(0x00, 0x00).w(FUNC(psikyo_state::sound_bankswitch_w<4>));
 	map(0x04, 0x07).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0c, 0x0c).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
@@ -424,15 +424,15 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 void psikyo_state::s1945_map(address_map &map)
 {
 	psikyo_map(map);
-	map(0xc00000, 0xc0000b).r(this, FUNC(psikyo_state::s1945_input_r)); // input ports
-	map(0xc00004, 0xc0000b).w(this, FUNC(psikyo_state::s1945_mcu_w)); // protection and tile bank switching
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::s1945_input_r)); // input ports
+	map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w)); // protection and tile bank switching
 	map(0xc00011, 0xc00011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void psikyo_state::s1945_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(psikyo_state::sound_bankswitch_w<4>));
+	map(0x00, 0x00).w(FUNC(psikyo_state::sound_bankswitch_w<4>));
 	map(0x02, 0x03).nopw();
 	map(0x08, 0x0d).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));

@@ -301,6 +301,7 @@ uPC1352C @ N3
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -412,13 +413,13 @@ READ8_MEMBER(dwarfd_state::qc_b8_r)
 void dwarfd_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+	map(0x4000, 0x4fff).rw(FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
 }
 
 void dwarfd_state::pokeresp_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x3fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+	map(0x3000, 0x3fff).rw(FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
 }
 
 void dwarfd_state::io_map(address_map &map)
@@ -429,8 +430,8 @@ void dwarfd_state::io_map(address_map &map)
 
 	map(0x20, 0x21).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x40, 0x40).nopw(); // unknown
-	map(0x60, 0x60).w(this, FUNC(dwarfd_state::output1_w));
-	map(0x80, 0x80).w(this, FUNC(dwarfd_state::output2_w));
+	map(0x60, 0x60).w(FUNC(dwarfd_state::output1_w));
+	map(0x80, 0x80).w(FUNC(dwarfd_state::output2_w));
 	map(0xc0, 0xc0).portr("DSW1");
 	map(0xc1, 0xc1).portr("DSW2");
 }
@@ -438,14 +439,14 @@ void dwarfd_state::io_map(address_map &map)
 void dwarfd_state::qc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+	map(0x8000, 0x8fff).rw(FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
 }
 
 void dwarfd_state::qc_io_map(address_map &map)
 {
 	io_map(map);
 	map.global_mask(0xff);
-	map(0xb8, 0xb8).r(this, FUNC(dwarfd_state::qc_b8_r));
+	map(0xb8, 0xb8).r(FUNC(dwarfd_state::qc_b8_r));
 }
 
 static INPUT_PORTS_START( dwarfd )

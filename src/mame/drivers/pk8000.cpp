@@ -198,14 +198,14 @@ void pk8000_state::pk8000_io(address_map &map)
 	map.unmap_value_high();
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x84, 0x87).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x88, 0x88).rw(this, FUNC(pk8000_state::video_color_r), FUNC(pk8000_state::video_color_w));
-	map(0x8c, 0x8c).r(this, FUNC(pk8000_state::joy_1_r));
-	map(0x8d, 0x8d).r(this, FUNC(pk8000_state::joy_2_r));
-	map(0x90, 0x90).rw(this, FUNC(pk8000_state::text_start_r), FUNC(pk8000_state::text_start_w));
-	map(0x91, 0x91).rw(this, FUNC(pk8000_state::chargen_start_r), FUNC(pk8000_state::chargen_start_w));
-	map(0x92, 0x92).rw(this, FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
-	map(0x93, 0x93).rw(this, FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
-	map(0xa0, 0xbf).rw(this, FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
+	map(0x88, 0x88).rw(FUNC(pk8000_state::video_color_r), FUNC(pk8000_state::video_color_w));
+	map(0x8c, 0x8c).r(FUNC(pk8000_state::joy_1_r));
+	map(0x8d, 0x8d).r(FUNC(pk8000_state::joy_2_r));
+	map(0x90, 0x90).rw(FUNC(pk8000_state::text_start_r), FUNC(pk8000_state::text_start_w));
+	map(0x91, 0x91).rw(FUNC(pk8000_state::chargen_start_r), FUNC(pk8000_state::chargen_start_w));
+	map(0x92, 0x92).rw(FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
+	map(0x93, 0x93).rw(FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
+	map(0xa0, 0xbf).rw(FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
 }
 
 /*   Input ports */

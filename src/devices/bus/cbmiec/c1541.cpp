@@ -544,7 +544,7 @@ void c1541_device_base::c1541pd_mem(address_map &map)
 
 void c1541_prologic_dos_classic_device::c1541pdc_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c1541_prologic_dos_classic_device::read), FUNC(c1541_prologic_dos_classic_device::write));
+	map(0x0000, 0xffff).rw(FUNC(c1541_prologic_dos_classic_device::read), FUNC(c1541_prologic_dos_classic_device::write));
 /*  AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
     AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
     AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
@@ -807,7 +807,7 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 {
 	m_parallel_data = data;
 
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }
 
 
@@ -877,9 +877,9 @@ MACHINE_CONFIG_START(c1541_prologic_dos_classic_device::device_add_mconfig)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1541_prologic_dos_classic_device, pia_pb_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(MC6821_TAG, pia6821_device, ca1_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
 

@@ -39,6 +39,7 @@ dy_6.bin (near Z80)
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -127,7 +128,7 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 void dynadice_state::dynadice_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(dynadice_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(dynadice_state::videoram_w)).share("videoram");
 	map(0x4000, 0x40ff).ram().share("nvram");
 }
 
@@ -152,8 +153,8 @@ void dynadice_state::dynadice_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x01, 0x01).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).w(this, FUNC(dynadice_state::sound_data_w));
-	map(0x03, 0x03).w(this, FUNC(dynadice_state::sound_control_w));
+	map(0x02, 0x02).w(FUNC(dynadice_state::sound_data_w));
+	map(0x03, 0x03).w(FUNC(dynadice_state::sound_control_w));
 }
 
 static INPUT_PORTS_START( dynadice )

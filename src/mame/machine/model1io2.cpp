@@ -71,7 +71,7 @@ void model1io2_device::mem_map(address_map &map)
 	map(0x8000, 0x800f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
 	map(0x8040, 0x8040).portr("board");
 	map(0x8080, 0x8080).portr("dsw1");
-	map(0x8100, 0x810f).rw(this, FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
+	map(0x8100, 0x810f).rw(FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
 //  map(0x8180, 0x8183).nopr(); // displayed as 4 byte values in the diagnostic screen
 //  map(0x81a0, 0x81af).nopw(); // the (reserved) test in the diagnostic screen sets these
 	map(0x8200, 0x8203).mirror(0x04).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::address_w));
@@ -177,7 +177,7 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, model1io2_device, io_pf_w))
 	MCFG_315_5338A_OUT_PG_CB(WRITE8(*this, model1io2_device, io_pg_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // 93C45
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // 93C45
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

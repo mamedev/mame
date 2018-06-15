@@ -16,6 +16,7 @@
 #include "audio/midway.h"
 #include "audio/csd.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I      XTAL(19'968'000)

@@ -316,7 +316,7 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 void c1551_device::c1551_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(c1551_device::tpi0_r), FUNC(c1551_device::tpi0_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(c1551_device::tpi0_r), FUNC(c1551_device::tpi0_w));
 	map(0xc000, 0xffff).rom().region(M6510T_TAG, 0);
 }
 

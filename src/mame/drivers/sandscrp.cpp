@@ -82,6 +82,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
 #include "video/kaneko_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -278,7 +279,7 @@ WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 void sandscrp_state::sandscrp(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
-	map(0x100000, 0x100001).w(this, FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
+	map(0x100000, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
 
 	map(0x700000, 0x70ffff).ram();     // RAM
 	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
@@ -286,15 +287,15 @@ void sandscrp_state::sandscrp(address_map &map)
 	map(0x400000, 0x403fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
 	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
 	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xa00000, 0xa00001).w(this, FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
+	map(0xa00000, 0xa00001).w(FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
 	map(0xb00000, 0xb00001).portr("P1");
 	map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("UNK");
 	map(0xec0000, 0xec0001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x800000, 0x800001).r(this, FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
-	map(0xe00001, 0xe00001).rw(this, FUNC(sandscrp_state::soundlatch_r<1>), FUNC(sandscrp_state::soundlatch_w<0>));   // From/To Sound CPU
-	map(0xe40000, 0xe40001).rw(this, FUNC(sandscrp_state::latchstatus_word_r), FUNC(sandscrp_state::latchstatus_word_w)); //
+	map(0x800000, 0x800001).r(FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
+	map(0xe00001, 0xe00001).rw(FUNC(sandscrp_state::soundlatch_r<1>), FUNC(sandscrp_state::soundlatch_w<0>));   // From/To Sound CPU
+	map(0xe40000, 0xe40001).rw(FUNC(sandscrp_state::latchstatus_word_r), FUNC(sandscrp_state::latchstatus_word_w)); //
 }
 
 
@@ -324,12 +325,12 @@ void sandscrp_state::sandscrp_soundmem(address_map &map)
 void sandscrp_state::sandscrp_soundport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sandscrp_state::bankswitch_w));    // ROM Bank
+	map(0x00, 0x00).w(FUNC(sandscrp_state::bankswitch_w));    // ROM Bank
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));        // PORTA/B read
 	map(0x04, 0x04).w("oki", FUNC(okim6295_device::write));     // OKIM6295
-	map(0x06, 0x06).w(this, FUNC(sandscrp_state::soundlatch_w<1>));    //
-	map(0x07, 0x07).r(this, FUNC(sandscrp_state::soundlatch_r<0>));     //
-	map(0x08, 0x08).r(this, FUNC(sandscrp_state::latchstatus_r));    //
+	map(0x06, 0x06).w(FUNC(sandscrp_state::soundlatch_w<1>));    //
+	map(0x07, 0x07).r(FUNC(sandscrp_state::soundlatch_r<0>));     //
+	map(0x08, 0x08).r(FUNC(sandscrp_state::latchstatus_r));    //
 }
 
 

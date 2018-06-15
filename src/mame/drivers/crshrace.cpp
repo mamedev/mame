@@ -152,13 +152,13 @@ void crshrace_state::crshrace_map(address_map &map)
 	map(0x300000, 0x3fffff).rom().region("user1", 0);
 	map(0x400000, 0x4fffff).rom().region("user2", 0).mirror(0x100000);
 	map(0xa00000, 0xa0ffff).ram().share("spriteram2");
-	map(0xd00000, 0xd01fff).ram().w(this, FUNC(crshrace_state::crshrace_videoram1_w)).share("videoram1");
+	map(0xd00000, 0xd01fff).ram().w(FUNC(crshrace_state::crshrace_videoram1_w)).share("videoram1");
 	map(0xe00000, 0xe01fff).ram().share("spriteram");
 	map(0xfe0000, 0xfeffff).ram();
-	map(0xffc000, 0xffc001).w(this, FUNC(crshrace_state::crshrace_roz_bank_w));
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(crshrace_state::crshrace_videoram2_w)).share("videoram2");
+	map(0xffc000, 0xffc001).w(FUNC(crshrace_state::crshrace_roz_bank_w));
+	map(0xffd000, 0xffdfff).ram().w(FUNC(crshrace_state::crshrace_videoram2_w)).share("videoram2");
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xfff000, 0xfff001).portr("P1").w(this, FUNC(crshrace_state::crshrace_gfxctrl_w));
+	map(0xfff000, 0xfff001).portr("P1").w(FUNC(crshrace_state::crshrace_gfxctrl_w));
 	map(0xfff002, 0xfff003).portr("P2");
 	map(0xfff004, 0xfff005).portr("DSW0");
 	map(0xfff006, 0xfff007).portr("DSW2");
@@ -179,7 +179,7 @@ void crshrace_state::sound_map(address_map &map)
 void crshrace_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(crshrace_state::crshrace_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(crshrace_state::crshrace_sh_bankswitch_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }

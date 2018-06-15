@@ -220,10 +220,10 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
 void route16_state::route16_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x3001).r(this, FUNC(route16_state::route16_prot_read));
-	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x3000, 0x3001).r(FUNC(route16_state::route16_prot_read));
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
@@ -232,11 +232,11 @@ void route16_state::route16_cpu1_map(address_map &map)
 void route16_state::routex_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
-	map(0x6400, 0x6400).r(this, FUNC(route16_state::routex_prot_read));
+	map(0x6400, 0x6400).r(FUNC(route16_state::routex_prot_read));
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
@@ -245,8 +245,8 @@ void route16_state::stratvox_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
@@ -256,10 +256,10 @@ void route16_state::speakres_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).portr("P2").w(this, FUNC(route16_state::speakres_out2_w));
-	map(0x6000, 0x6000).r(this, FUNC(route16_state::speakres_in3_r));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2").w(FUNC(route16_state::speakres_out2_w));
+	map(0x6000, 0x6000).r(FUNC(route16_state::speakres_in3_r));
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
@@ -268,9 +268,9 @@ void route16_state::ttmahjng_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).r(this, FUNC(route16_state::ttmahjng_p2_matrix_r)).w(this, FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).rw(this, FUNC(route16_state::ttmahjng_p1_matrix_r), FUNC(route16_state::ttmahjng_input_port_matrix_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).r(FUNC(route16_state::ttmahjng_p2_matrix_r)).w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).rw(FUNC(route16_state::ttmahjng_p1_matrix_r), FUNC(route16_state::ttmahjng_input_port_matrix_w));
 	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0x8000, 0xbfff).ram().share("videoram1");
@@ -280,7 +280,7 @@ void route16_state::ttmahjng_cpu1_map(address_map &map)
 void route16_state::route16_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<false>)).share("sharedram");
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<false>)).share("sharedram");
 	map(0x8000, 0xbfff).ram().share("videoram2");
 }
 
@@ -288,7 +288,7 @@ void route16_state::route16_cpu2_map(address_map &map)
 void route16_state::stratvox_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x4000, 0x43ff).ram().share("sharedram");
 	map(0x8000, 0xbfff).ram().share("videoram2");
 }

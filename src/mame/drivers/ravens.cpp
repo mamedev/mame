@@ -220,17 +220,17 @@ void ravens_state::ravens_mem(address_map &map)
 void ravens_state::ravens_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x09, 0x09).w(this, FUNC(ravens_state::leds_w)); // LED output port
-	map(0x10, 0x15).w(this, FUNC(ravens_state::display_w)); // 6-led display
-	map(0x17, 0x17).r(this, FUNC(ravens_state::port17_r)); // pushbuttons
+	map(0x09, 0x09).w(FUNC(ravens_state::leds_w)); // LED output port
+	map(0x10, 0x15).w(FUNC(ravens_state::display_w)); // 6-led display
+	map(0x17, 0x17).r(FUNC(ravens_state::port17_r)); // pushbuttons
 }
 
 void ravens_state::ravens2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x07, 0x07).r(this, FUNC(ravens_state::port07_r));
-	map(0x1b, 0x1b).w(this, FUNC(ravens_state::port1b_w));
-	map(0x1c, 0x1c).w(this, FUNC(ravens_state::port1c_w));
+	map(0x07, 0x07).r(FUNC(ravens_state::port07_r));
+	map(0x1b, 0x1b).w(FUNC(ravens_state::port1b_w));
+	map(0x1c, 0x1c).w(FUNC(ravens_state::port1c_w));
 }
 
 /* Input ports */

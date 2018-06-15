@@ -90,11 +90,11 @@ void daruma_state::mem_prg(address_map &map)
 
 void daruma_state::mem_io(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(daruma_state::dev0_r));
-	map(0x1000, 0x1000).w(this, FUNC(daruma_state::dev1_w));
+	map(0x0000, 0x0000).r(FUNC(daruma_state::dev0_r));
+	map(0x1000, 0x1000).w(FUNC(daruma_state::dev1_w));
 //    AM_RANGE(0x2000, 0x2000) AM_WRITE(dev2_w)
 //    AM_RANGE(0x3000, 0x3000) AM_WRITE(dev3_w)
-	map(0x4000, 0x4000).r(this, FUNC(daruma_state::dev4_r));
+	map(0x4000, 0x4000).r(FUNC(daruma_state::dev4_r));
 	map(0x8000, 0xffff).ram(); /* 32K CMOS SRAM (HYUNDAY hy62256a) */
 }
 

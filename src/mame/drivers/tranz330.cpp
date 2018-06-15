@@ -143,8 +143,8 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 void tranz330_state::tranz330(machine_config &config)
 {
 	Z80(config, m_cpu, XTAL(7'159'090)/2); //*
-	m_cpu->set_addrmap(AS_PROGRAM, address_map_constructor(&tranz330_state::tranz330_mem, tag(), this));
-	m_cpu->set_addrmap(AS_IO, address_map_constructor(&tranz330_state::tranz330_io, tag(), this));
+	m_cpu->set_addrmap(AS_PROGRAM, &tranz330_state::tranz330_mem);
+	m_cpu->set_addrmap(AS_IO, &tranz330_state::tranz330_io);
 	m_cpu->set_daisy_config(tranz330_daisy_chain);
 
 	CLOCK(config, "ctc_clock", XTAL(7'159'090)/4) // ?

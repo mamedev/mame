@@ -116,10 +116,10 @@ void thunderj_state::main_map(address_map &map)
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x260011).portr("260010");
-	map(0x260012, 0x260013).r(this, FUNC(thunderj_state::special_port2_r));
+	map(0x260012, 0x260013).r(FUNC(thunderj_state::special_port2_r));
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360010, 0x360011).w(this, FUNC(thunderj_state::latch_w));
+	map(0x360010, 0x360011).w(FUNC(thunderj_state::latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -149,9 +149,9 @@ void thunderj_state::extra_map(address_map &map)
 	map(0x160000, 0x16ffff).ram().share("share1");
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x260011).portr("260010");
-	map(0x260012, 0x260013).r(this, FUNC(thunderj_state::special_port2_r));
+	map(0x260012, 0x260013).r(FUNC(thunderj_state::special_port2_r));
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
-	map(0x360010, 0x360011).w(this, FUNC(thunderj_state::latch_w));
+	map(0x360010, 0x360011).w(FUNC(thunderj_state::latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 }

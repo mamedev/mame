@@ -35,8 +35,8 @@
 class alg_state : public amiga_state
 {
 public:
-	alg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag),
+	alg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		amiga_state(mconfig, type, tag),
 		m_laserdisc(*this, "laserdisc"),
 		m_gun1x(*this, "GUN1X"),
 		m_gun1y(*this, "GUN1Y"),
@@ -186,12 +186,12 @@ void alg_state::a500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(alg_state::cia_r), FUNC(alg_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(this, FUNC(alg_state::custom_chip_r), FUNC(alg_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(alg_state::cia_r), FUNC(alg_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(alg_state::custom_chip_r), FUNC(alg_state::custom_chip_w));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(alg_state::custom_chip_r), FUNC(alg_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(alg_state::custom_chip_r), FUNC(alg_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(alg_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(alg_state::custom_chip_r), FUNC(alg_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(alg_state::custom_chip_r), FUNC(alg_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(alg_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }

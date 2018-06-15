@@ -154,6 +154,7 @@ Notes:
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -327,18 +328,18 @@ READ32_MEMBER(dgpix_state::vblank_r)
 void dgpix_state::cpu_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram();
-	map(0x40000000, 0x4003ffff).rw(this, FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
-	map(0xe0000000, 0xe1ffffff).rw(this, FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
-	map(0xe2000000, 0xe3ffffff).rw(this, FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
+	map(0x40000000, 0x4003ffff).rw(FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
+	map(0xe0000000, 0xe1ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
+	map(0xe2000000, 0xe3ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
 	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000).share("nvram");
 }
 
 void dgpix_state::io_map(address_map &map)
 {
 	map(0x0200, 0x0203).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
-	map(0x0400, 0x0403).rw(this, FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
+	map(0x0400, 0x0403).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
 	map(0x0a10, 0x0a13).portr("INPUTS");
-	map(0x0200, 0x0203).w(this, FUNC(dgpix_state::coin_w));
+	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
 	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
 	map(0x0c80, 0x0c83).nopw(); // sound commands / latches
 	map(0x0c80, 0x0c83).nopr(); //read at startup -> cmp 0xFE

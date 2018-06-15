@@ -23,6 +23,7 @@
 #include "cpu/arm/arm.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -262,28 +263,28 @@ void backfire_state::backfire_map(address_map &map)
 	map(0x100000, 0x10001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
 	map(0x110000, 0x111fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
 	map(0x114000, 0x115fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x120000, 0x120fff).rw(this, FUNC(backfire_state::pf1_rowscroll_r), FUNC(backfire_state::pf1_rowscroll_w));
-	map(0x124000, 0x124fff).rw(this, FUNC(backfire_state::pf2_rowscroll_r), FUNC(backfire_state::pf2_rowscroll_w));
+	map(0x120000, 0x120fff).rw(FUNC(backfire_state::pf1_rowscroll_r), FUNC(backfire_state::pf1_rowscroll_w));
+	map(0x124000, 0x124fff).rw(FUNC(backfire_state::pf2_rowscroll_r), FUNC(backfire_state::pf2_rowscroll_w));
 	map(0x130000, 0x13001f).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
 	map(0x140000, 0x141fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
 	map(0x144000, 0x145fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x150000, 0x150fff).rw(this, FUNC(backfire_state::pf3_rowscroll_r), FUNC(backfire_state::pf3_rowscroll_w));
-	map(0x154000, 0x154fff).rw(this, FUNC(backfire_state::pf4_rowscroll_r), FUNC(backfire_state::pf4_rowscroll_w));
+	map(0x150000, 0x150fff).rw(FUNC(backfire_state::pf3_rowscroll_r), FUNC(backfire_state::pf3_rowscroll_w));
+	map(0x154000, 0x154fff).rw(FUNC(backfire_state::pf4_rowscroll_r), FUNC(backfire_state::pf4_rowscroll_w));
 	map(0x160000, 0x161fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x170000, 0x177fff).ram().share("mainram");// main ram
 	map(0x180010, 0x180013).nopw(); // always 180010 ?
-	map(0x184000, 0x185fff).rw(this, FUNC(backfire_state::spriteram1_r), FUNC(backfire_state::spriteram1_w));
+	map(0x184000, 0x185fff).rw(FUNC(backfire_state::spriteram1_r), FUNC(backfire_state::spriteram1_w));
 	map(0x188010, 0x188013).nopw(); // always 188010 ?
-	map(0x18c000, 0x18dfff).rw(this, FUNC(backfire_state::spriteram2_r), FUNC(backfire_state::spriteram2_w));
+	map(0x18c000, 0x18dfff).rw(FUNC(backfire_state::spriteram2_r), FUNC(backfire_state::spriteram2_w));
 	map(0x190000, 0x190003).portr("IN0");
 	map(0x194000, 0x194003).portr("IN1");
-	map(0x1a4000, 0x1a4000).w(this, FUNC(backfire_state::eeprom_w));
+	map(0x1a4000, 0x1a4000).w(FUNC(backfire_state::eeprom_w));
 	map(0x1a8000, 0x1a8003).ram().share("left_priority");
 	map(0x1ac000, 0x1ac003).ram().share("right_priority");
-	map(0x1b0000, 0x1b0003).w(this, FUNC(backfire_state::irq_ack_w));
+	map(0x1b0000, 0x1b0003).w(FUNC(backfire_state::irq_ack_w));
 	map(0x1c0000, 0x1c0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
 	map(0x1e4000, 0x1e4000).r("adc", FUNC(adc0808_device::data_r));
-	map(0x1e8000, 0x1e8007).r(this, FUNC(backfire_state::pot_select_r));
+	map(0x1e8000, 0x1e8007).r(FUNC(backfire_state::pot_select_r));
 }
 
 
@@ -425,7 +426,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MCFG_DEVICE_PROGRAM_MAP(backfire_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 1000000) // unknown clock
 	MCFG_ADC0808_IN0_CB(IOPORT("PADDLE0"))

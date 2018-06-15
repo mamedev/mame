@@ -40,19 +40,19 @@ void tail2nos_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x27ffff).rom().region("user1", 0);    /* extra ROM */
 	map(0x2c0000, 0x2dffff).rom().region("user2", 0);
-	map(0x400000, 0x41ffff).ram().w(this, FUNC(tail2nos_state::tail2nos_zoomdata_w)).share("k051316");
+	map(0x400000, 0x41ffff).ram().w(FUNC(tail2nos_state::tail2nos_zoomdata_w)).share("k051316");
 	map(0x500000, 0x500fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff);
 	map(0x510000, 0x51001f).w(m_k051316, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);
 	map(0xff8000, 0xffbfff).ram();                             /* work RAM */
 	map(0xffc000, 0xffc2ff).ram().share("spriteram");
 	map(0xffc300, 0xffcfff).ram();
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(tail2nos_state::tail2nos_txvideoram_w)).share("txvideoram");
+	map(0xffd000, 0xffdfff).ram().w(FUNC(tail2nos_state::tail2nos_txvideoram_w)).share("txvideoram");
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(this, FUNC(tail2nos_state::tail2nos_gfxbank_w));
+	map(0xfff001, 0xfff001).w(FUNC(tail2nos_state::tail2nos_gfxbank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff004, 0xfff005).portr("DSW");
-	map(0xfff009, 0xfff009).r(this, FUNC(tail2nos_state::sound_semaphore_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff009, 0xfff009).r(FUNC(tail2nos_state::sound_semaphore_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 }

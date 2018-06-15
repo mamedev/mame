@@ -44,6 +44,7 @@
 #include "machine/vt100_kbd.h"
 #include "video/i8275.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define LOG_GENERAL (1U <<  0)
@@ -139,10 +140,10 @@ void ms6102_state::ms6102_io(address_map &map)
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
+	map(0x40, 0x41).rw(FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
 	map(0x50, 0x5f).noprw(); // video disable?
-	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
-	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_status_r));
+	map(0x60, 0x6f).w(FUNC(ms6102_state::pic_w));
+	map(0x70, 0x7f).r(FUNC(ms6102_state::misc_status_r));
 }
 
 static const gfx_layout ms6102_charlayout =

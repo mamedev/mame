@@ -54,6 +54,7 @@
 #include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1229,14 +1230,14 @@ WRITE8_MEMBER(mz2500_state::floppy_side_w)
 
 void mz2500_state::mz2500_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(mz2500_state::bank0_r), FUNC(mz2500_state::bank0_w));
-	map(0x2000, 0x3fff).rw(this, FUNC(mz2500_state::bank1_r), FUNC(mz2500_state::bank1_w));
-	map(0x4000, 0x5fff).rw(this, FUNC(mz2500_state::bank2_r), FUNC(mz2500_state::bank2_w));
-	map(0x6000, 0x7fff).rw(this, FUNC(mz2500_state::bank3_r), FUNC(mz2500_state::bank3_w));
-	map(0x8000, 0x9fff).rw(this, FUNC(mz2500_state::bank4_r), FUNC(mz2500_state::bank4_w));
-	map(0xa000, 0xbfff).rw(this, FUNC(mz2500_state::bank5_r), FUNC(mz2500_state::bank5_w));
-	map(0xc000, 0xdfff).rw(this, FUNC(mz2500_state::bank6_r), FUNC(mz2500_state::bank6_w));
-	map(0xe000, 0xffff).rw(this, FUNC(mz2500_state::bank7_r), FUNC(mz2500_state::bank7_w));
+	map(0x0000, 0x1fff).rw(FUNC(mz2500_state::bank0_r), FUNC(mz2500_state::bank0_w));
+	map(0x2000, 0x3fff).rw(FUNC(mz2500_state::bank1_r), FUNC(mz2500_state::bank1_w));
+	map(0x4000, 0x5fff).rw(FUNC(mz2500_state::bank2_r), FUNC(mz2500_state::bank2_w));
+	map(0x6000, 0x7fff).rw(FUNC(mz2500_state::bank3_r), FUNC(mz2500_state::bank3_w));
+	map(0x8000, 0x9fff).rw(FUNC(mz2500_state::bank4_r), FUNC(mz2500_state::bank4_w));
+	map(0xa000, 0xbfff).rw(FUNC(mz2500_state::bank5_r), FUNC(mz2500_state::bank5_w));
+	map(0xc000, 0xdfff).rw(FUNC(mz2500_state::bank6_r), FUNC(mz2500_state::bank6_w));
+	map(0xe000, 0xffff).rw(FUNC(mz2500_state::bank7_r), FUNC(mz2500_state::bank7_w));
 }
 
 
@@ -1520,37 +1521,37 @@ void mz2500_state::mz2500_io(address_map &map)
 //  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
 	map(0xa0, 0xa3).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
-	map(0xa8, 0xa8).w(this, FUNC(mz2500_state::mz2500_rom_w));
-	map(0xa9, 0xa9).r(this, FUNC(mz2500_state::mz2500_rom_r));
-	map(0xac, 0xac).w(this, FUNC(mz2500_state::mz2500_emm_addr_w));
-	map(0xad, 0xad).r(this, FUNC(mz2500_state::mz2500_emm_data_r)).w(this, FUNC(mz2500_state::mz2500_emm_data_w));
-	map(0xae, 0xae).w(this, FUNC(mz2500_state::palette4096_io_w));
+	map(0xa8, 0xa8).w(FUNC(mz2500_state::mz2500_rom_w));
+	map(0xa9, 0xa9).r(FUNC(mz2500_state::mz2500_rom_r));
+	map(0xac, 0xac).w(FUNC(mz2500_state::mz2500_emm_addr_w));
+	map(0xad, 0xad).r(FUNC(mz2500_state::mz2500_emm_data_r)).w(FUNC(mz2500_state::mz2500_emm_data_w));
+	map(0xae, 0xae).w(FUNC(mz2500_state::palette4096_io_w));
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
-	map(0xb4, 0xb4).rw(this, FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
-	map(0xb5, 0xb5).rw(this, FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
+	map(0xb4, 0xb4).rw(FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
+	map(0xb5, 0xb5).rw(FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
 	map(0xb7, 0xb7).nopw();
-	map(0xb8, 0xb9).rw(this, FUNC(mz2500_state::mz2500_kanji_r), FUNC(mz2500_state::mz2500_kanji_w));
-	map(0xbc, 0xbc).r(this, FUNC(mz2500_state::mz2500_bplane_latch_r)).w(this, FUNC(mz2500_state::mz2500_cg_addr_w));
-	map(0xbd, 0xbd).r(this, FUNC(mz2500_state::mz2500_rplane_latch_r)).w(this, FUNC(mz2500_state::mz2500_cg_data_w));
-	map(0xbe, 0xbe).r(this, FUNC(mz2500_state::mz2500_gplane_latch_r));
-	map(0xbf, 0xbf).r(this, FUNC(mz2500_state::mz2500_iplane_latch_r));
-	map(0xc6, 0xc6).w(this, FUNC(mz2500_state::mz2500_irq_sel_w));
-	map(0xc7, 0xc7).w(this, FUNC(mz2500_state::mz2500_irq_data_w));
+	map(0xb8, 0xb9).rw(FUNC(mz2500_state::mz2500_kanji_r), FUNC(mz2500_state::mz2500_kanji_w));
+	map(0xbc, 0xbc).r(FUNC(mz2500_state::mz2500_bplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_addr_w));
+	map(0xbd, 0xbd).r(FUNC(mz2500_state::mz2500_rplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_data_w));
+	map(0xbe, 0xbe).r(FUNC(mz2500_state::mz2500_gplane_latch_r));
+	map(0xbf, 0xbf).r(FUNC(mz2500_state::mz2500_iplane_latch_r));
+	map(0xc6, 0xc6).w(FUNC(mz2500_state::mz2500_irq_sel_w));
+	map(0xc7, 0xc7).w(FUNC(mz2500_state::mz2500_irq_data_w));
 	map(0xc8, 0xc9).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
-	map(0xcc, 0xcc).rw(this, FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
-	map(0xce, 0xce).w(this, FUNC(mz2500_state::mz2500_dictionary_bank_w));
-	map(0xcf, 0xcf).w(this, FUNC(mz2500_state::mz2500_kanji_bank_w));
-	map(0xd8, 0xdb).rw(this, FUNC(mz2500_state::fdc_r), FUNC(mz2500_state::fdc_w));
-	map(0xdc, 0xdc).w(this, FUNC(mz2500_state::floppy_select_w));
-	map(0xdd, 0xdd).w(this, FUNC(mz2500_state::floppy_side_w));
+	map(0xcc, 0xcc).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
+	map(0xce, 0xce).w(FUNC(mz2500_state::mz2500_dictionary_bank_w));
+	map(0xcf, 0xcf).w(FUNC(mz2500_state::mz2500_kanji_bank_w));
+	map(0xd8, 0xdb).rw(FUNC(mz2500_state::fdc_r), FUNC(mz2500_state::fdc_w));
+	map(0xdc, 0xdc).w(FUNC(mz2500_state::floppy_select_w));
+	map(0xdd, 0xdd).w(FUNC(mz2500_state::floppy_side_w));
 	map(0xde, 0xde).nopw();
 	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xef, 0xef).rw(this, FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
-	map(0xf0, 0xf3).w(this, FUNC(mz2500_state::timer_w));
-	map(0xf4, 0xf7).r(this, FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(this, FUNC(mz2500_state::mz2500_tv_crtc_w));
+	map(0xef, 0xef).rw(FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
+	map(0xf0, 0xf3).w(FUNC(mz2500_state::timer_w));
+	map(0xf4, 0xf7).r(FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(FUNC(mz2500_state::mz2500_tv_crtc_w));
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 }
 

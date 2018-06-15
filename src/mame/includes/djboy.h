@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8
 

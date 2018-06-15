@@ -403,7 +403,7 @@ MACHINE_CONFIG_END
 
 void coco_state::coco_floating_map(address_map &map)
 {
-	map(0x0000, 0xFFFF).r(this, FUNC(coco_state::floating_bus_read));
+	map(0x0000, 0xFFFF).r(FUNC(coco_state::floating_bus_r));
 }
 
 
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'318'181), MAINCPU_TAG, AS_PROGRAM)
+	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, XTAL(14'318'181), MAINCPU_TAG)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, coco12_state, sam_read))
 
 	// Becker Port device

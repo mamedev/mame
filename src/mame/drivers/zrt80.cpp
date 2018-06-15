@@ -22,6 +22,7 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -118,11 +119,11 @@ void zrt80_state::io_map(address_map &map)
 	map(0x00, 0x07).rw(m_8250, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x10, 0x17).r(this, FUNC(zrt80_state::zrt80_10_r));
+	map(0x10, 0x17).r(FUNC(zrt80_state::zrt80_10_r));
 	map(0x18, 0x1F).portr("DIPSW2");
 	map(0x20, 0x27).portr("DIPSW3");
-	map(0x30, 0x37).w(this, FUNC(zrt80_state::zrt80_30_w));
-	map(0x38, 0x3F).w(this, FUNC(zrt80_state::zrt80_38_w));
+	map(0x30, 0x37).w(FUNC(zrt80_state::zrt80_30_w));
+	map(0x38, 0x3F).w(FUNC(zrt80_state::zrt80_38_w));
 }
 
 /* Input ports */

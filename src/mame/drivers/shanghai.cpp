@@ -26,6 +26,7 @@ displayed.
 #include "video/hd63484.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -123,7 +124,7 @@ void shanghai_state::shanghai_portmap(address_map &map)
 	map(0x40, 0x41).portr("P1");
 	map(0x44, 0x45).portr("P2");
 	map(0x48, 0x49).portr("SYSTEM");
-	map(0x4c, 0x4c).w(this, FUNC(shanghai_state::shanghai_coin_w));
+	map(0x4c, 0x4c).w(FUNC(shanghai_state::shanghai_coin_w));
 }
 
 
@@ -135,7 +136,7 @@ void shanghai_state::shangha2_portmap(address_map &map)
 	map(0x30, 0x31).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x32, 0x33).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 	map(0x40, 0x43).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x50, 0x50).w(this, FUNC(shanghai_state::shanghai_coin_w));
+	map(0x50, 0x50).w(FUNC(shanghai_state::shanghai_coin_w));
 }
 
 void shanghai_state::kothello_map(address_map &map)

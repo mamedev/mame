@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+
+#include "emupal.h"
+
 class rocnrope_state : public driver_device
 {
 public:

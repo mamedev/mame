@@ -32,6 +32,7 @@ A sticker on the back panel says: GenRad, Culver City CA, Model 2301-9001
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -918,8 +918,8 @@ WRITE16_MEMBER( sega315_5313_device::vdp_w )
 		{
 			// accessed by either segapsg_device or sn76496_device
 			sn76496_base_device *sn = machine().device<sn76496_base_device>(":snsnd");
-			if (ACCESSING_BITS_0_7) sn->write(space, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn->write(space, 0, (data>>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn->write(data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn->write((data>>8) & 0xff);
 			break;
 		}
 

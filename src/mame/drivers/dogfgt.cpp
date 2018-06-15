@@ -52,19 +52,19 @@ void dogfgt_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0f80, 0x0fdf).writeonly().share("spriteram");
-	map(0x1000, 0x17ff).w(this, FUNC(dogfgt_state::bgvideoram_w)).share("bgvideoram");
+	map(0x1000, 0x17ff).w(FUNC(dogfgt_state::bgvideoram_w)).share("bgvideoram");
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1800, 0x1800).w(this, FUNC(dogfgt_state::_1800_w));    /* text color, flip screen & coin counters */
+	map(0x1800, 0x1800).w(FUNC(dogfgt_state::_1800_w));    /* text color, flip screen & coin counters */
 	map(0x1810, 0x1810).portr("P2");
-	map(0x1810, 0x1810).w(this, FUNC(dogfgt_state::subirqtrigger_w));
+	map(0x1810, 0x1810).w(FUNC(dogfgt_state::subirqtrigger_w));
 	map(0x1820, 0x1820).portr("DSW1");
-	map(0x1820, 0x1823).w(this, FUNC(dogfgt_state::scroll_w));
-	map(0x1824, 0x1824).w(this, FUNC(dogfgt_state::plane_select_w));
+	map(0x1820, 0x1823).w(FUNC(dogfgt_state::scroll_w));
+	map(0x1824, 0x1824).w(FUNC(dogfgt_state::plane_select_w));
 	map(0x1830, 0x1830).portr("DSW2");
-	map(0x1830, 0x1830).w(this, FUNC(dogfgt_state::soundlatch_w));
-	map(0x1840, 0x1840).w(this, FUNC(dogfgt_state::soundcontrol_w));
+	map(0x1830, 0x1830).w(FUNC(dogfgt_state::soundlatch_w));
+	map(0x1840, 0x1840).w(FUNC(dogfgt_state::soundcontrol_w));
 	map(0x1870, 0x187f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2000, 0x3fff).rw(this, FUNC(dogfgt_state::bitmapram_r), FUNC(dogfgt_state::bitmapram_w));
+	map(0x2000, 0x3fff).rw(FUNC(dogfgt_state::bitmapram_r), FUNC(dogfgt_state::bitmapram_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -72,7 +72,7 @@ void dogfgt_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x27ff).ram().share("sharedram");
-	map(0x4000, 0x4000).w(this, FUNC(dogfgt_state::sub_irqack_w));
+	map(0x4000, 0x4000).w(FUNC(dogfgt_state::sub_irqack_w));
 	map(0x8000, 0xffff).rom();
 }
 

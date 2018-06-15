@@ -35,8 +35,8 @@ public:
 	uint32_t read_config(offs_t offset);
 	void write_config(offs_t offset, uint32_t data);
 
-	DECLARE_READ32_MEMBER(read_config);
-	DECLARE_WRITE32_MEMBER(write_config);
+	DECLARE_READ32_MEMBER(config_r) { return read_config(offset); }
+	DECLARE_WRITE32_MEMBER(config_w) { write_config(offset, data); }
 
 protected:
 	virtual void device_start() override;

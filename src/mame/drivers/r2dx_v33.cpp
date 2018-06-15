@@ -373,7 +373,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	{
 		uint16_t palval = space.read_word(src);
 		src += 2;
-		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+		m_palette->write16(space, i, palval, 0xffff);
 	}
 }
 
@@ -387,50 +387,50 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); // vectors copied here
 
-	map(0x00400, 0x00401).w(this, FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
-	map(0x00402, 0x00403).w(this, FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
+	map(0x00400, 0x00401).w(FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
+	map(0x00402, 0x00403).w(FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
 
 
-	map(0x00404, 0x00405).w(this, FUNC(r2dx_v33_state::r2dx_rom_bank_w));
-	map(0x00406, 0x00407).w(this, FUNC(r2dx_v33_state::tile_bank_w));
+	map(0x00404, 0x00405).w(FUNC(r2dx_v33_state::r2dx_rom_bank_w));
+	map(0x00406, 0x00407).w(FUNC(r2dx_v33_state::tile_bank_w));
 
-	map(0x00420, 0x00421).w(this, FUNC(r2dx_v33_state::r2dx_dx_w));
-	map(0x00422, 0x00423).w(this, FUNC(r2dx_v33_state::r2dx_dy_w));
-	map(0x00424, 0x00425).w(this, FUNC(r2dx_v33_state::r2dx_sdistl_w));
-	map(0x00426, 0x00427).w(this, FUNC(r2dx_v33_state::r2dx_sdisth_w));
-	map(0x00428, 0x00429).w(this, FUNC(r2dx_v33_state::r2dx_angle_w));
+	map(0x00420, 0x00421).w(FUNC(r2dx_v33_state::r2dx_dx_w));
+	map(0x00422, 0x00423).w(FUNC(r2dx_v33_state::r2dx_dy_w));
+	map(0x00424, 0x00425).w(FUNC(r2dx_v33_state::r2dx_sdistl_w));
+	map(0x00426, 0x00427).w(FUNC(r2dx_v33_state::r2dx_sdisth_w));
+	map(0x00428, 0x00429).w(FUNC(r2dx_v33_state::r2dx_angle_w));
 
-	map(0x00430, 0x00431).r(this, FUNC(r2dx_v33_state::r2dx_angle_r));
-	map(0x00432, 0x00433).r(this, FUNC(r2dx_v33_state::r2dx_dist_r));
-	map(0x00434, 0x00435).r(this, FUNC(r2dx_v33_state::r2dx_sin_r));
-	map(0x00436, 0x00437).r(this, FUNC(r2dx_v33_state::r2dx_cos_r));
+	map(0x00430, 0x00431).r(FUNC(r2dx_v33_state::r2dx_angle_r));
+	map(0x00432, 0x00433).r(FUNC(r2dx_v33_state::r2dx_dist_r));
+	map(0x00434, 0x00435).r(FUNC(r2dx_v33_state::r2dx_sin_r));
+	map(0x00436, 0x00437).r(FUNC(r2dx_v33_state::r2dx_cos_r));
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
 	map(0x0068e, 0x0068f).nopw(); // sprite buffering
-	map(0x006b0, 0x006b1).w(this, FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
-	map(0x006b2, 0x006b3).w(this, FUNC(r2dx_v33_state::mcu_prog_w2));
+	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
+	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	map(0x006bc, 0x006bd).w(this, FUNC(r2dx_v33_state::mcu_prog_offs_w));
+	map(0x006bc, 0x006bd).w(FUNC(r2dx_v33_state::mcu_prog_offs_w));
 //  AM_RANGE(0x006be, 0x006bf) AM_WRITENOP
 
 	// sprite protection not 100% verified as the same
-	map(0x006c0, 0x006c1).rw(this, FUNC(r2dx_v33_state::sprite_prot_off_r), FUNC(r2dx_v33_state::sprite_prot_off_w));
-	map(0x006c2, 0x006c3).rw(this, FUNC(r2dx_v33_state::sprite_prot_src_seg_r), FUNC(r2dx_v33_state::sprite_prot_src_seg_w));
-	map(0x006c6, 0x006c7).w(this, FUNC(r2dx_v33_state::sprite_prot_dst1_w));
+	map(0x006c0, 0x006c1).rw(FUNC(r2dx_v33_state::sprite_prot_off_r), FUNC(r2dx_v33_state::sprite_prot_off_w));
+	map(0x006c2, 0x006c3).rw(FUNC(r2dx_v33_state::sprite_prot_src_seg_r), FUNC(r2dx_v33_state::sprite_prot_src_seg_w));
+	map(0x006c6, 0x006c7).w(FUNC(r2dx_v33_state::sprite_prot_dst1_w));
 
-	map(0x006d8, 0x006d9).w(this, FUNC(r2dx_v33_state::sprite_prot_x_w));
-	map(0x006da, 0x006db).w(this, FUNC(r2dx_v33_state::sprite_prot_y_w));
-	map(0x006dc, 0x006dd).rw(this, FUNC(r2dx_v33_state::sprite_prot_maxx_r), FUNC(r2dx_v33_state::sprite_prot_maxx_w));
-	map(0x006de, 0x006df).w(this, FUNC(r2dx_v33_state::sprite_prot_src_w));
+	map(0x006d8, 0x006d9).w(FUNC(r2dx_v33_state::sprite_prot_x_w));
+	map(0x006da, 0x006db).w(FUNC(r2dx_v33_state::sprite_prot_y_w));
+	map(0x006dc, 0x006dd).rw(FUNC(r2dx_v33_state::sprite_prot_maxx_r), FUNC(r2dx_v33_state::sprite_prot_maxx_w));
+	map(0x006de, 0x006df).w(FUNC(r2dx_v33_state::sprite_prot_src_w));
 
 
-	map(0x00700, 0x00701).w(this, FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
-	map(0x00740, 0x00741).r(this, FUNC(r2dx_v33_state::r2dx_debug_r));
+	map(0x00700, 0x00701).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
+	map(0x00740, 0x00741).r(FUNC(r2dx_v33_state::r2dx_debug_r));
 	map(0x00744, 0x00745).portr("INPUT");
 	map(0x0074c, 0x0074d).portr("SYSTEM");
-	map(0x00762, 0x00763).r(this, FUNC(r2dx_v33_state::sprite_prot_dst1_r));
+	map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::sprite_prot_dst1_r));
 
 	map(0x00780, 0x00780).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // single OKI chip on this version
 
@@ -456,38 +456,38 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); //stack area
 
-	map(0x00400, 0x00401).w(this, FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
-	map(0x00402, 0x00403).w(this, FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
+	map(0x00400, 0x00401).w(FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
+	map(0x00402, 0x00403).w(FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
 	// 0x404 is bank on r2dx, this doesn't need it
 	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
 	map(0x00406, 0x00407).noprw(); // always 6022, supposed to be the tile bank but ignores the actual value???
 
-	map(0x00420, 0x00421).w(this, FUNC(r2dx_v33_state::r2dx_dx_w));
-	map(0x00422, 0x00423).w(this, FUNC(r2dx_v33_state::r2dx_dy_w));
-	map(0x00424, 0x00425).w(this, FUNC(r2dx_v33_state::r2dx_sdistl_w));
-	map(0x00426, 0x00427).w(this, FUNC(r2dx_v33_state::r2dx_sdisth_w));
-	map(0x00428, 0x00429).w(this, FUNC(r2dx_v33_state::r2dx_angle_w));
+	map(0x00420, 0x00421).w(FUNC(r2dx_v33_state::r2dx_dx_w));
+	map(0x00422, 0x00423).w(FUNC(r2dx_v33_state::r2dx_dy_w));
+	map(0x00424, 0x00425).w(FUNC(r2dx_v33_state::r2dx_sdistl_w));
+	map(0x00426, 0x00427).w(FUNC(r2dx_v33_state::r2dx_sdisth_w));
+	map(0x00428, 0x00429).w(FUNC(r2dx_v33_state::r2dx_angle_w));
 
-	map(0x00430, 0x00431).r(this, FUNC(r2dx_v33_state::r2dx_angle_r));
-	map(0x00432, 0x00433).r(this, FUNC(r2dx_v33_state::r2dx_dist_r));
-	map(0x00434, 0x00435).r(this, FUNC(r2dx_v33_state::r2dx_sin_r));
-	map(0x00436, 0x00437).r(this, FUNC(r2dx_v33_state::r2dx_cos_r));
+	map(0x00430, 0x00431).r(FUNC(r2dx_v33_state::r2dx_angle_r));
+	map(0x00432, 0x00433).r(FUNC(r2dx_v33_state::r2dx_dist_r));
+	map(0x00434, 0x00435).r(FUNC(r2dx_v33_state::r2dx_sin_r));
+	map(0x00436, 0x00437).r(FUNC(r2dx_v33_state::r2dx_cos_r));
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf)rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x0068e, 0x0068f).nopw(); // sprite buffering
-	map(0x006b0, 0x006b1).w(this, FUNC(r2dx_v33_state::mcu_prog_w));
-	map(0x006b2, 0x006b3).w(this, FUNC(r2dx_v33_state::mcu_prog_w2));
+	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w));
+	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  map(0x006b4, 0x006b5).nopw();
 //  map(0x006b6, 0x006b7).nopw();
-	map(0x006bc, 0x006bd).w(this, FUNC(r2dx_v33_state::mcu_prog_offs_w));
-//  map(0x006d8, 0x006d9).w(this, FUNC(r2dx_v33_state::bbbbll_w)); // scroll?
-//  map(0x006dc, 0x006dd).r(this, FUNC(r2dx_v33_state::nzerotea_unknown_r));
-//  map(0x006de, 0x006df).w(this, FUNC(r2dx_v33_state::mcu_unkaa_w)); // mcu command related?
-//  map(0x00700, 0x00701).w(this, FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
+	map(0x006bc, 0x006bd).w(FUNC(r2dx_v33_state::mcu_prog_offs_w));
+//  map(0x006d8, 0x006d9).w(FUNC(r2dx_v33_state::bbbbll_w)); // scroll?
+//  map(0x006dc, 0x006dd).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
+//  map(0x006de, 0x006df).w(FUNC(r2dx_v33_state::mcu_unkaa_w)); // mcu command related?
+//  map(0x00700, 0x00701).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
 
-//  map(0x00762, 0x00763).r(this, FUNC(r2dx_v33_state::nzerotea_unknown_r));
+//  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
 	map(0x00780, 0x0079f).lrw8("seibu_sound_rw",
 							   [this](address_space &space, offs_t offset, u8 mem_mask) {
@@ -502,10 +502,10 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 
 	map(0x0c000, 0x0c7ff).ram().share("sprites");
 	map(0x0c800, 0x0cfff).ram();
-	map(0x0d000, 0x0d7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_background_w)).share("back_data");
-	map(0x0d800, 0x0dfff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_foreground_w)).share("fore_data");
-	map(0x0e000, 0x0e7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_midground_w)).share("mid_data");
-	map(0x0e800, 0x0f7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_text_w)).share("text_data");
+	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_foreground_w)).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_midground_w)).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_text_w)).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 	map(0x10000, 0x1efff).ram();
 	map(0x1f000, 0x1ffff).ram(); //.w("palette", FUNC(palette_device::write)).share("palette");
@@ -536,7 +536,7 @@ void r2dx_v33_state::zerotm2k_map(address_map &map)
 	map(0x00740, 0x00741).portr("P3_P4");
 	map(0x00744, 0x00745).portr("INPUT");
 	map(0x0074c, 0x0074d).portr("SYSTEM");
-	map(0x00748, 0x00749).w(this, FUNC(r2dx_v33_state::zerotm2k_eeprom_w));
+	map(0x00748, 0x00749).w(FUNC(r2dx_v33_state::zerotm2k_eeprom_w));
 }
 
 
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -873,7 +873,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zerotm2k_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 void r2dx_v33_state::init_rdx_v33()
