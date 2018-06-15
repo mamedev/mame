@@ -252,7 +252,7 @@ private:
 	tilemap_t *m_layer[2];
 	
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
-	TILEMAP_MAPPER_MEMBER(range1_8x8);
+	TILEMAP_MAPPER_MEMBER(range3_8x8);
 };
 
 /******************************************************************************************
@@ -291,7 +291,7 @@ TILEMAP_MAPPER_MEMBER(urashima_state::range0_16x16)
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-TILEMAP_MAPPER_MEMBER(urashima_state::range1_8x8)
+TILEMAP_MAPPER_MEMBER(urashima_state::range3_8x8)
 {
 	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x20) * 0x40);
 }
@@ -303,15 +303,15 @@ void urashima_state::video_start()
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
 	// range confirmed with title screen transition in attract mode
 	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range1_8x8),this),8,8,64,64);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,64);
 
 	for(int i=0;i<2;i++)
 		m_layer[i]->set_transparent_pen(15);
 
 	for (int layer = 0; layer < 2; layer++)
 	{
-		m_vreg[layer] = make_unique_clear<uint16_t[]>(0x800);
-		save_pointer(NAME(m_vreg[layer].get()), 0x800, layer);
+		m_vreg[layer] = make_unique_clear<uint16_t[]>(0x800/2);
+		save_pointer(NAME(m_vreg[layer].get()), 0x800/2, layer);
 	}
 }
 
