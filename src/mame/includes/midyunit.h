@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 /* protection data types */
 struct protection_data

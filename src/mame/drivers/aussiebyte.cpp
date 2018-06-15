@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, aussiebyte_state, write_centronics_busy))
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_INVERT
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(m_centronics, centronics_device, write_strobe)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("pio2", Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

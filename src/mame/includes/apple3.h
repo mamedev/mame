@@ -23,6 +23,7 @@
 #include "machine/wozfdc.h"
 #include "imagedev/floppy.h"
 #include "formats/flopimg.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VAR_VM0         0x0001

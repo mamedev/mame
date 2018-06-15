@@ -84,6 +84,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/segacrp2_device.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

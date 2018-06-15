@@ -5,6 +5,7 @@
 #include "screen.h"
 #include "audio/nichisnd.h"
 #include "machine/nb1413m3.h"
+#include "emupal.h"
 
 #define VRAM_MAX    3
 

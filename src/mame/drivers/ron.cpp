@@ -21,6 +21,7 @@ Debug cheats:
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"

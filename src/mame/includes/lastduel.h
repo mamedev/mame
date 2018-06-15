@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class lastduel_state : public driver_device
 {

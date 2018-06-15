@@ -3,6 +3,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class truco_state : public driver_device
 {

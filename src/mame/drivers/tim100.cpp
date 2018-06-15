@@ -21,6 +21,7 @@ Notes:
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tim100_state : public driver_device

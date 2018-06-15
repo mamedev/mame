@@ -132,6 +132,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

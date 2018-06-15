@@ -16,6 +16,7 @@
 #include "machine/nvram.h"
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"

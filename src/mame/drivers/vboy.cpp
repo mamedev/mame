@@ -33,6 +33,7 @@
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

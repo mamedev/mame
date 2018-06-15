@@ -1,4 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders: ElSemi, Roberto Fresca.
 
+#include "emupal.h"
 
 
 class efdt_state : public driver_device

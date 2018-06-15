@@ -197,6 +197,7 @@ Release:                         November 1999
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

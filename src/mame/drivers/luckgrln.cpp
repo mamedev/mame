@@ -79,6 +79,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/msm6242.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

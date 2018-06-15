@@ -22,6 +22,7 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

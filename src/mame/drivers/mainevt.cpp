@@ -31,6 +31,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

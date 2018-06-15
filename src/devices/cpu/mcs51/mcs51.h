@@ -101,10 +101,8 @@ public:
 	template<class Object> devcb_base &set_serial_rx_cb(Object &&cb) { return m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_serial_tx_cb(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
 
-	void data_7bit(address_map &map);
-	void data_8bit(address_map &map);
-	void program_12bit(address_map &map);
-	void program_13bit(address_map &map);
+	void program_internal(address_map &map);
+	void data_internal(address_map &map);
 protected:
 	// construction/destruction
 	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
@@ -143,6 +141,7 @@ protected:
 	uint8_t   m_rwm;            //Signals that the current instruction is a read/write/modify instruction
 
 	int     m_inst_cycles;        /* cycles for the current instruction */
+	const uint32_t m_rom_size;    /* size (in bytes) of internal program ROM/EPROM */
 	int     m_ram_mask;           /* second ram bank for indirect access available ? */
 	int     m_num_interrupts;     /* number of interrupts supported */
 	int     m_recalc_parity;      /* recalculate parity before next instruction */

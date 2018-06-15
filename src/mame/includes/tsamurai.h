@@ -2,6 +2,7 @@
 // copyright-holders:Phil Stroffolino
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tsamurai_state : public driver_device
 {

@@ -3,6 +3,7 @@
 
 #include "machine/timer.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class srumbler_state : public driver_device
 {

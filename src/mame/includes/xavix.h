@@ -6,6 +6,7 @@
 #include "cpu/m6502/xavix.h"
 #include "cpu/m6502/xavix2000.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"

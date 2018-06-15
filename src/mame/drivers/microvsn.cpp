@@ -22,6 +22,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "softlist.h"
 #include "screen.h"

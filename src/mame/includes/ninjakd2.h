@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_NINJAKD2_H
 
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ninjakd2_state : public driver_device

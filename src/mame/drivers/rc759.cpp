@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal centronics
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, rc759_state, centronics_busy_w))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, rc759_state, centronics_ack_w))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, rc759_state, centronics_fault_w))

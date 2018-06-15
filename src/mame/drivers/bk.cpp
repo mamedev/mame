@@ -16,6 +16,7 @@
 #include "sound/wave.h"
 #include "formats/rk_cas.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

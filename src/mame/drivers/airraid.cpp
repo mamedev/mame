@@ -155,6 +155,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

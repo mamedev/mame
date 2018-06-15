@@ -23,6 +23,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

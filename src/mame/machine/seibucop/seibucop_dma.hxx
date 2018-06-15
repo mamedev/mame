@@ -22,7 +22,8 @@ void raiden2cop_device::dma_palette_buffer()
 	{
 		uint16_t palval = m_host_space->read_word(src);
 		src += 2;
-		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+		m_paletteramout_cb(i, palval, 0xffff);
+		//m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
 	}
 }
 

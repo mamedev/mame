@@ -53,6 +53,7 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

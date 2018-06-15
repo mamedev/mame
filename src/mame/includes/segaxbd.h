@@ -21,6 +21,7 @@
 #include "machine/mb3773.h"
 #include "machine/watchdog.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 
 // ======================> segaxbd_state

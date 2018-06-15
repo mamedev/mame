@@ -39,6 +39,7 @@
 #include "bus/a2bus/corvfdc01.h"
 #include "bus/a2bus/corvfdc02.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -212,7 +213,7 @@ void concept_a2_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(concept_state::concept)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 8182000)        /* 16.364 MHz / 2 */
 	MCFG_DEVICE_PROGRAM_MAP(concept_memmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -240,7 +241,7 @@ MACHINE_CONFIG_START(concept_state::concept)
 	MCFG_MM58274C_DAY1(1)   // monday
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1022750)
+	MCFG_DEVICE_ADD(m_via0, VIA6522, 1022750)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, concept_state, via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, concept_state, via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, concept_state, via_out_a))
@@ -249,15 +250,15 @@ MACHINE_CONFIG_START(concept_state::concept)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, concept_state, via_irq_func))
 
 	/* ACIAs */
-	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, 0)
+	MCFG_DEVICE_ADD(m_acia0, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, 0)
+	MCFG_DEVICE_ADD(m_acia1, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KBD_ACIA_TAG, MOS6551, 0)
+	MCFG_DEVICE_ADD(m_kbdacia, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* Apple II bus */

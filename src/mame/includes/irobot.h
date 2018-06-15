@@ -13,6 +13,7 @@
 #include "machine/timer.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define IR_TIMING               1       /* try to emulate MB and VG running time */

@@ -1497,17 +1497,17 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
+	MCFG_DEVICE_ADD(m_pia_0, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
+	MCFG_DEVICE_ADD(m_pia_1, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, williams_snd_cmd_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
+	MCFG_DEVICE_ADD(m_pia_2, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))

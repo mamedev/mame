@@ -45,6 +45,7 @@
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 #include "screen.h"
 #include "softlist.h"

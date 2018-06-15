@@ -43,6 +43,7 @@ Notes:
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

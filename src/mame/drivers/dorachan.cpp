@@ -19,6 +19,7 @@ It appears that unused bits in port 03 are to operate the discrete sound channel
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 

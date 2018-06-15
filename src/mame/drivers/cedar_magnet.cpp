@@ -120,6 +120,7 @@ I suspect the additional memory was an afterthought.
 #include "machine/cedar_magnet_sprite.h"
 #include "machine/cedar_magnet_flop.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

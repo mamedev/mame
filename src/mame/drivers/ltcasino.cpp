@@ -57,6 +57,7 @@ Other: Hitatchi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -4,6 +4,7 @@
 
 #include "emu.h"
 #include "st0016.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

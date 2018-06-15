@@ -24,6 +24,7 @@ ToDo:
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

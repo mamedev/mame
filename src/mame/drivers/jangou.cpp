@@ -35,6 +35,7 @@ $c088-$c095 player tiles
 #include "sound/msm5205.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

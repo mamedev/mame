@@ -92,10 +92,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_EMUPAL_H
 #define MAME_EMU_EMUPAL_H
 
@@ -289,6 +285,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class palette_device;
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
 

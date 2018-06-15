@@ -70,7 +70,10 @@ flagrall                        // ?
 3do                             // 3DO consoles
 3do_pal                         //
 3dobios                         //
+alg3do							//
+md23do                          //
 orbatak                         //
+sht3do							//
 
 @source:3x3puzzl.cpp
 3x3puzzl                        // (c) 199? Ace
@@ -1025,6 +1028,7 @@ zortonbr                        // (c) 1993 Web Picmatic
 alien                           // (c) 2005 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
 dkbanana                        // (c) 2007 Capcom
+dkbanans                        // (c) 2007 Capcom
 
 @source:aliens.cpp
 aliens                          // GX875 (c) 1990 (World)
@@ -12604,7 +12608,8 @@ flyboy                          // (c) 1982 Kaneko
 flyboyb                         // bootleg
 imago                           // (c) 1984 Acom
 imagoa                          // (c) 1983 Acom
-jumpcoas                        // (c) 1983 Kaneko
+jumpcoas                        // (c) 1983 Kaneko Elc. Co.
+jumpcoasa                       // (c) 1983 Kaneko
 jumpcoast                       // (c) 1983 Taito
 redrobin                        // (c) 1986 Elettronolo
 
@@ -30587,6 +30592,7 @@ sprglobp                        // (c) 1983 Epos Corporation
 superabc                        // hack
 superabco                       // hack
 theglobp                        // (c) 1983 Epos Corporation
+titanpac                        // hack
 vanvan                          // (c) 1983 Sanritsu
 vanvanb                         // (c) 1983 Karateco (bootleg?)
 vanvank                         // (c) 1983 Karateco (bootleg?)
@@ -31170,6 +31176,7 @@ pepp0455                        // (c) 1987 IGT - International Game Technology
 pepp0458                        // (c) 1987 IGT - International Game Technology
 pepp0459                        // (c) 1987 IGT - International Game Technology
 pepp0467                        // (c) 1987 IGT - International Game Technology
+pepp0472                        // (c) 1987 IGT - International Game Technology
 pepp0488                        // (c) 1987 IGT - International Game Technology
 pepp0508                        // (c) 1987 IGT - International Game Technology
 pepp0509                        // (c) 1987 IGT - International Game Technology
@@ -31381,6 +31388,7 @@ pex2121p                        // (c) 1995 IGT - International Game Technology
 pex2121pa                       // (c) 1995 IGT - International Game Technology
 pex2127p                        // (c) 1995 IGT - International Game Technology
 pex2134p                        // (c) 1995 IGT - International Game Technology
+pex2149p                        // (c) 1995 IGT - International Game Technology
 pex2150p                        // (c) 1995 IGT - International Game Technology
 pex2152p                        // (c) 1995 IGT - International Game Technology
 pex2172p                        // (c) 1995 IGT - International Game Technology
@@ -32109,6 +32117,7 @@ pokemini                        // Nintendo Pokemon Mini
 poker72                         //
 
 @source:polepos.cpp
+grally                          // bootleg
 polepos                         // (c) 1982
 polepos2                        // (c) 1983
 polepos2a                       // 136014   (c) 1983 + Atari license

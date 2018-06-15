@@ -373,7 +373,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	{
 		uint16_t palval = space.read_word(src);
 		src += 2;
-		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+		m_palette->write16(space, i, palval, 0xffff);
 	}
 }
 
@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

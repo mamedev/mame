@@ -197,6 +197,7 @@
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */

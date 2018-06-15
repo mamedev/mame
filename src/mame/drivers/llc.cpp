@@ -51,6 +51,7 @@
 #include "includes/llc.h"
 
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

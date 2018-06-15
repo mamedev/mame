@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
+
+#include "emupal.h"
+
 class rollrace_state : public driver_device
 {
 public:

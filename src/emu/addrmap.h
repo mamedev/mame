@@ -66,54 +66,10 @@ class address_map_entry
 	friend class address_map;
 
 	template <typename T, typename Ret, typename... Params>
-	struct is_read8_method { static constexpr bool value = std::is_constructible<read8_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-	template <typename T, typename Ret, typename... Params>
-	struct is_read16_method { static constexpr bool value = std::is_constructible<read16_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-	template <typename T, typename Ret, typename... Params>
-	struct is_read32_method { static constexpr bool value = std::is_constructible<read32_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-	template <typename T, typename Ret, typename... Params>
-	struct is_read64_method { static constexpr bool value = std::is_constructible<read64_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-
-	template <typename T, typename Ret, typename... Params>
-	struct is_write8_method { static constexpr bool value = std::is_constructible<write8_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-	template <typename T, typename Ret, typename... Params>
-	struct is_write16_method { static constexpr bool value = std::is_constructible<write16_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-	template <typename T, typename Ret, typename... Params>
-	struct is_write32_method { static constexpr bool value = std::is_constructible<write32_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-	template <typename T, typename Ret, typename... Params>
-	struct is_write64_method { static constexpr bool value = std::is_constructible<write64_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-
-	template <typename T, typename Ret, typename... Params>
 	struct is_addrmap_method { static constexpr bool value = std::is_constructible<address_map_constructor, Ret (T::*)(Params...), const char *, T*>::value; };
 
 	template <typename T, typename Ret, typename... Params>
 	struct is_setoffset_method { static constexpr bool value = std::is_constructible<setoffset_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_read8_method<T, Ret, Params...>::value, read8_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return read8_delegate(func, name, tag, obj); }
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_read16_method<T, Ret, Params...>::value, read16_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return read16_delegate(func, name, tag, obj); }
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_read32_method<T, Ret, Params...>::value, read32_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return read32_delegate(func, name, tag, obj); }
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_read64_method<T, Ret, Params...>::value, read64_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return read64_delegate(func, name, tag, obj); }
-
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_write8_method<T, Ret, Params...>::value, write8_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return write8_delegate(func, name, tag, obj); }
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_write16_method<T, Ret, Params...>::value, write16_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return write16_delegate(func, name, tag, obj); }
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_write32_method<T, Ret, Params...>::value, write32_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return write32_delegate(func, name, tag, obj); }
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_write64_method<T, Ret, Params...>::value, write64_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return write64_delegate(func, name, tag, obj); }
 
 	template <typename T, typename Ret, typename... Params>
 	static std::enable_if_t<is_addrmap_method<T, Ret, Params...>::value, address_map_constructor> make_delegate(Ret (T::*func)(Params...), const char *name, T *obj)
@@ -226,15 +182,15 @@ public:
 	// implicit base -> delegate converter
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &r(Ret (T::*read)(Params...), const char *read_name)
-	{ return r(make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
+	{ return r(emu::detail::make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &w(Ret (T::*write)(Params...), const char *write_name)
-	{ return w(make_delegate(write, write_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
+	{ return w(emu::detail::make_delegate(write, write_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
 
 	template <typename T, typename RetR, typename... ParamsR, typename U, typename RetW, typename... ParamsW>
 	address_map_entry &rw(RetR (T::*read)(ParamsR...), const char *read_name, RetW (U::*write)(ParamsW...), const char *write_name)
-	{ return rw(make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase)), make_delegate(write, write_name, m_devbase.tag(), make_pointer<U>(m_devbase))); }
+	{ return rw(emu::detail::make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase)), emu::detail::make_delegate(write, write_name, m_devbase.tag(), make_pointer<U>(m_devbase))); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &m(Ret (T::*map)(Params...), const char *map_name)
@@ -248,15 +204,15 @@ public:
 	// device tag -> delegate converter
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &r(const char *tag, Ret (T::*read)(Params...), const char *read_name)
-	{ return r(make_delegate(read, read_name, tag, static_cast<T *>(nullptr))); }
+	{ return r(emu::detail::make_delegate(read, read_name, tag, nullptr)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &w(const char *tag, Ret (T::*write)(Params...), const char *write_name)
-	{ return w(make_delegate(write, write_name, tag, static_cast<T *>(nullptr))); }
+	{ return w(emu::detail::make_delegate(write, write_name, tag, nullptr)); }
 
 	template <typename T, typename RetR, typename... ParamsR, typename U, typename RetW, typename... ParamsW>
 	address_map_entry &rw(const char *tag, RetR (T::*read)(ParamsR...), const char *read_name, RetW (U::*write)(ParamsW...), const char *write_name)
-	{ return rw(make_delegate(read, read_name, tag, static_cast<T *>(nullptr)), make_delegate(write, write_name, tag, static_cast<U *>(nullptr))); }
+	{ return rw(emu::detail::make_delegate(read, read_name, tag, nullptr), emu::detail::make_delegate(write, write_name, tag, nullptr)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &m(const char *tag, Ret (T::*map)(Params...), const char *map_name)
@@ -270,15 +226,15 @@ public:
 	// device reference -> delegate converter
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &r(T &obj, Ret (U::*read)(Params...), const char *read_name)
-	{ return r(make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj))); }
+	{ return r(emu::detail::make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj))); }
 
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &w(T &obj, Ret (U::*write)(Params...), const char *write_name)
-	{ return w(make_delegate(write, write_name, get_tag(obj), make_pointer<U>(obj))); }
+	{ return w(emu::detail::make_delegate(write, write_name, get_tag(obj), make_pointer<U>(obj))); }
 
 	template <typename T, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(T &obj, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ return rw(make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj)), make_delegate(write, write_name, get_tag(obj), make_pointer<V>(obj))); }
+	{ return rw(emu::detail::make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj)), emu::detail::make_delegate(write, write_name, get_tag(obj), make_pointer<V>(obj))); }
 
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &m(T &obj, Ret (U::*map)(Params...), const char *map_name)
@@ -292,27 +248,27 @@ public:
 	// device finder -> delegate converter
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &r(device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(make_delegate(read, read_name, device.tag(), make_pointer<U>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &r(const device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(make_delegate(read, read_name, device.tag(), make_pointer<U>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &w(device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return w(make_delegate(write, write_name, device.tag(), make_pointer<U>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<U>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &w(const device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return w(make_delegate(write, write_name, device.tag(), make_pointer<U>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<U>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return rw(make_delegate(read, read_name, device.tag(), make_pointer<U>(device)), make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return rw(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)), emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(const device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return rw(make_delegate(read, read_name, device.tag(), make_pointer<U>(device)), make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return rw(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)), emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &m(device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)

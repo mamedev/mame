@@ -14,6 +14,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
+#include "emupal.h"
 #include "screen.h"
 
 

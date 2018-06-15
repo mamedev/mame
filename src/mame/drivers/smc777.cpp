@@ -27,6 +27,7 @@
 #include "sound/beep.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "imagedev/snapquik.h"

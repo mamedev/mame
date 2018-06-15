@@ -2,6 +2,7 @@
 // copyright-holders:Carlos A. Lozano
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
 
 class bloodbro_state : public driver_device, protected seibu_sound_common
 {

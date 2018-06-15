@@ -61,6 +61,7 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 

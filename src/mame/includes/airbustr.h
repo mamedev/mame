@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 
 class airbustr_state : public driver_device

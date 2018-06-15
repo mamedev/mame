@@ -128,6 +128,7 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/i2cmem.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

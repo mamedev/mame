@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 class tunhunt_state : public driver_device

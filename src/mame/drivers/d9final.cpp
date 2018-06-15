@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

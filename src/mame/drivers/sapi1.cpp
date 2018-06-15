@@ -38,6 +38,7 @@ Unable to proceed due to no info available (& in English).
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sapi1_state : public driver_device

@@ -328,6 +328,7 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

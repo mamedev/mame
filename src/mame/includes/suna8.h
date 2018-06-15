@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define TILEMAPS 0

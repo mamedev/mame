@@ -25,6 +25,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

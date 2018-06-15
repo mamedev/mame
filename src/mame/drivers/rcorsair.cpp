@@ -58,6 +58,7 @@ Notes added 2014-09-10:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 

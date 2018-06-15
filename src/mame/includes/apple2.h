@@ -28,6 +28,7 @@
 #include "bus/a2bus/a2eauxslot.h"
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

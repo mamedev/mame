@@ -198,11 +198,11 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	// IEEE488 interface
 	MCFG_DEVICE_ADD(m_pia1, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(m_ieee, ieee488_device, dio_r)) // TODO: gated with PB1
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, dio_w)) // TODO: gated with PB1
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, host_dio_w)) // TODO: gated with PB1
 	MCFG_PIA_READPB_HANDLER(READ8(*this, zorba_state, pia1_portb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, zorba_state, pia1_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, ifc_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, ren_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ifc_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE("irq1", input_merger_device, in_w<0>))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("irq1", input_merger_device, in_w<1>))
 
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// J3 Parallel printer
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
-	MCFG_CENTRONICS_ADD("parprn", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("parprn", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_uart1, i8251_device, write_cts))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart1, i8251_device, write_dsr)) // TODO: shared with serial CTS
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, zorba_state, printer_fault_w))
@@ -489,11 +489,11 @@ WRITE8_MEMBER( zorba_state::pia1_portb_w )
 	// 6  NDAC  gated with PB1 (active low)
 	// 7  NRFD  gated with PB1 (active low)
 
-	m_ieee->eoi_w(BIT(data, 3) & BIT(~data, 2));
-	m_ieee->atn_w(BIT(data, 4));
-	m_ieee->dav_w(BIT(data, 5) & BIT(~data, 2));
-	m_ieee->ndac_w(BIT(data, 6) & BIT(~data, 1));
-	m_ieee->nrfd_w(BIT(data, 7) & BIT(~data, 1));
+	m_ieee->host_eoi_w(BIT(data, 3) & BIT(~data, 2));
+	m_ieee->host_atn_w(BIT(data, 4));
+	m_ieee->host_dav_w(BIT(data, 5) & BIT(~data, 2));
+	m_ieee->host_ndac_w(BIT(data, 6) & BIT(~data, 1));
+	m_ieee->host_nrfd_w(BIT(data, 7) & BIT(~data, 1));
 }
 
 

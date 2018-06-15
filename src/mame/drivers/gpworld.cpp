@@ -44,6 +44,7 @@ Dumping Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

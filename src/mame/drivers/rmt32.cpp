@@ -165,6 +165,7 @@ Notes: (All IC's listed for completeness)
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/sed1200.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( mt32 )

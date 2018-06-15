@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "includes/cxhumax.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

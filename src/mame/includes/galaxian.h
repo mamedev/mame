@@ -13,6 +13,7 @@
 #include "sound/dac.h"
 #include "sound/digitalk.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* we scale horizontally by 3 to render stars correctly */

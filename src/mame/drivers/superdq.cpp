@@ -24,6 +24,7 @@
 #include "machine/ldv1000.h"
 #include "sound/sn76496.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

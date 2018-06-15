@@ -9,6 +9,7 @@
 
 #include "machine/gen_latch.h"
 #include "screen.h"
+#include "emupal.h"
 
 class yunsun16_state : public driver_device
 {

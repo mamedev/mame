@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "machine/atmel_arm_aic.h"
 #include "machine/pgm2_memcard.h"
+#include "emupal.h"
 
 struct kov3_module_key
 {

@@ -29,6 +29,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

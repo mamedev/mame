@@ -38,6 +38,7 @@
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

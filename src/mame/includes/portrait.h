@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 #include "sound/tms5220.h"
+#include "emupal.h"
 
 class portrait_state : public driver_device
 {

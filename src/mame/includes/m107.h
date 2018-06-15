@@ -9,6 +9,7 @@
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 #include "screen.h"
 
 struct pf_layer_info

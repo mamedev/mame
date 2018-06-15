@@ -32,6 +32,7 @@ Wicat - various systems.
 #include "machine/wd_fdc.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "wicat.lh"

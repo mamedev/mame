@@ -4,6 +4,7 @@
 
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 
 class tnx1_state : public driver_device
 {

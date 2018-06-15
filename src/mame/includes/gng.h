@@ -8,6 +8,7 @@
 
 #include "sound/2203intf.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class gng_state : public driver_device
 {

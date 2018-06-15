@@ -225,6 +225,7 @@ To Do:
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

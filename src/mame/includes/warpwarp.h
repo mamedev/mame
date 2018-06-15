@@ -4,6 +4,7 @@
 #include "machine/watchdog.h"
 #include "audio/geebee.h"
 #include "audio/warpwarp.h"
+#include "emupal.h"
 
 class warpwarp_state : public driver_device
 {
