@@ -36,7 +36,7 @@ TODO:
 - suchiesp: I need a side-by-side to understand if the PAL shuffling is correct with the OKI BGM ROM.
 - urashima: doesn't use the mega system 1 tilemap devices, MCU might actually be responsible 
   for that too (cfr. notes).
-- Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
+- Massive clean-ups needed for the MCU snippet programs and the input ports, also check if
   the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
 
 Notes (1st MCU ver.):
@@ -136,9 +136,6 @@ public:
 		{ }
 
 	DECLARE_WRITE8_MEMBER(tilebank_w);
-//	DECLARE_WRITE16_MEMBER(urashima_sc0_vram_w);
-//	DECLARE_WRITE16_MEMBER(urashima_sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(urashima_dma_w);
 	DECLARE_WRITE16_MEMBER(okirom_w);
 	DECLARE_WRITE16_MEMBER(okibank_w);
 	DECLARE_WRITE16_MEMBER(flip_screen_w);
@@ -175,6 +172,7 @@ protected:
 
 	uint16_t m_tile_bank;
 	uint16_t m_pri;
+	void mcu_check_test_mode();
 
 private:
 	required_shared_ptr<uint16_t> m_jm_shared_ram;
@@ -222,7 +220,8 @@ public:
 	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vram_w);
 
 	DECLARE_WRITE16_MEMBER(urashima_vreg_log_w);
-	
+	DECLARE_WRITE16_MEMBER(urashima_priority_w);
+
 	template<int TileChip> TILE_GET_INFO_MEMBER(get_tile_info_urashima);
 
 	void urashima(machine_config &config);
@@ -233,7 +232,8 @@ public:
 
 protected:
 	virtual void video_start() override;
-	
+	virtual void machine_reset() override;
+
 private:
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -396,6 +396,7 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 			m_layer[0]->draw(screen,bitmap,clip,0,0);
 		}
 	}
+
 	return 0;
 }
 
@@ -459,7 +460,6 @@ WRITE16_MEMBER(urashima_state::urashima_vreg_log_w)
 		logerror("Warning vreg write to [%04x] -> %04x\n",offset*2,data);
 }
 
-
 /******************************************************************************************
 
 Protection file start
@@ -470,19 +470,9 @@ Protection file start
 #define MCU_READ(tag, _bit_, _offset_, _retval_) \
 if((0xffff - ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
 
-/*Funky "DMA" / protection thing*/
-/*---- -x-- "DMA" execute.*/
-/*---- ---x used too very often,I don't have any clue of what it is,it might just be the source or the destination address.*/
-// TODO: this might just be priority number ...
-WRITE16_MEMBER(jalmah_state::urashima_dma_w)
+WRITE16_MEMBER(urashima_state::urashima_priority_w)
 {
 	m_pri = data & 1;
-	if(data & 4)
-	{
-		uint32_t i;
-		for(i = 0; i < 0x200; i += 2)
-			space.write_word(0x88200 + i, space.read_word(0x88400 + i));
-	}
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
@@ -784,13 +774,13 @@ void urashima_state::urashima_map(address_map &map)
 	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
 //      0x080012, 0x080013  MCU write related, same for each game
 	map(0x080014, 0x080015).noprw(); // MCU handshake
-/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::urashima_dma_w));
+/**/map(0x080016, 0x080017).ram().w(FUNC(urashima_state::urashima_priority_w));
 	map(0x080018, 0x080019).w(FUNC(jalmah_state::okibank_w));
 	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::okirom_w));
 /**/map(0x08001c, 0x08001d).ram().w(FUNC(urashima_state::urashima_bank_w)).umask16(0x00ff);
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //      0x084000, 0x084001  ?
-	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
+	map(0x088000, 0x0887ff).mirror(0x800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
 	map(0x090000, 0x093fff).mirror(0x4000).rw(FUNC(urashima_state::urashima_vram_r<0>),FUNC(urashima_state::urashima_vram_w<0>)).share("videoram0");
 //	map(0x098000, 0x09bfff) unused mirror?
 	map(0x09c000, 0x09c7ff).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>));
@@ -1095,12 +1085,10 @@ static INPUT_PORTS_START( suchiesp )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-void jalmah_state::machine_reset()
+void jalmah_state::mcu_check_test_mode()
 {
 	m_respcount = 0;
-	m_pri = 0;
-	refresh_priority_system();
-	
+
 	/*check if we are into service or normal mode*/
 	switch(m_mcu_prg)
 	{
@@ -1117,6 +1105,28 @@ void jalmah_state::machine_reset()
 			m_test_mode = (~(ioport("DSW")->read()) & 0x0004) ? (1) : (0);
 			break;
 	}
+}
+
+void jalmah_state::machine_reset()
+{
+	m_pri = 0;
+	refresh_priority_system();
+	
+	mcu_check_test_mode();
+}
+
+void urashima_state::machine_reset()
+{
+//	m_pri = 0;
+	
+	// initialize tilemap vram to sane defaults (test mode cares)
+	for(int i=0;i<0x4000/2;i++)
+	{
+		m_videoram[0][i] = 0xffff;
+		m_videoram[1][i] = 0xffff;
+	}
+	
+	mcu_check_test_mode();
 }
 
 MACHINE_CONFIG_START(jalmah_state::jalmah)
@@ -1565,23 +1575,38 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 		jm_shared_ram[0x03d0/2] = 0x4ef9;
 		jm_shared_ram[0x03d2/2] = 0x0010;
 		jm_shared_ram[0x03d4/2] = 0x0000;//jmp $100000
-		jm_mcu_code[0x0000/2] = 0x4E71;//0x33fc;//CAREFUL!!!
-		jm_mcu_code[0x0002/2] = 0x4E71;//0x0400;
-		jm_mcu_code[0x0004/2] = 0x4E71;//0x0008;
-		jm_mcu_code[0x0006/2] = 0x4E71;//0x0038;
-		/*priority = 5(Something that shows the text layer,to be checked after that the priority works )*/
-		jm_mcu_code[0x0008/2] = 0x33fc;
-		jm_mcu_code[0x000a/2] = 0x0005;
-		jm_mcu_code[0x000c/2] = 0x0008;
-		jm_mcu_code[0x000e/2] = 0x0016;//move.w #
-		jm_mcu_code[0x0010/2] = 0xd0fc;
-		jm_mcu_code[0x0012/2] = 0x0060;//adda.w $60,A0
-		jm_mcu_code[0x0014/2] = 0x92fc;
-		jm_mcu_code[0x0016/2] = 0x0200;//suba.w $200,A1
-		jm_mcu_code[0x0018/2] = 0x32d8;//move.w (A0)+,(A1)+
-		jm_mcu_code[0x001a/2] = 0x51c9;
-		jm_mcu_code[0x001c/2] = 0xfffc;//dbra D1,f00ca
-		jm_mcu_code[0x001e/2] = 0x4e75;//rts
+		jm_mcu_code[0x0000/2] = 0x33fc;
+		jm_mcu_code[0x0002/2] = 0x0001;
+		jm_mcu_code[0x0004/2] = 0x0008;
+		jm_mcu_code[0x0006/2] = 0x0016; // move.w #1,#$80016 (set priority)
+		jm_mcu_code[0x0008/2] = 0x4E71; // nop
+		jm_mcu_code[0x000a/2] = 0x303c;
+		jm_mcu_code[0x000c/2] = 0x000f; // move.w #$0f, D0
+		// first get the new palette RAM colors
+		jm_mcu_code[0x000e/2] = 0x23C8;
+		jm_mcu_code[0x0010/2] = 0x0010; 
+		jm_mcu_code[0x0012/2] = 0x0400; // move.l A0, $100400 (stack push)
+		jm_mcu_code[0x0014/2] = 0x2050; // move.l (A0), A0
+		jm_mcu_code[0x0016/2] = 0x4EB9;
+		jm_mcu_code[0x0018/2] = 0x0010;
+		jm_mcu_code[0x001a/2] =	0x002e; // jsr $10002e
+		jm_mcu_code[0x001c/2] = 0x4e71; // nop
+		jm_mcu_code[0x001e/2] = 0x2079;
+		jm_mcu_code[0x0020/2] = 0x0010;
+		jm_mcu_code[0x0022/2] = 0x0400; // movea.l $100400, A0 (stack pop)
+		jm_mcu_code[0x0024/2] = 0xD0FC;
+        jm_mcu_code[0x0026/2] = 0x0004; // adda.l $#4, A0
+		jm_mcu_code[0x0028/2] = 0x51c8;
+		jm_mcu_code[0x002a/2] = 0xffe4; // dbra D0, $-0x1c
+
+		jm_mcu_code[0x002c/2] = 0x4e75; //rts
+
+		jm_mcu_code[0x002e/2] = 0x323c;
+		jm_mcu_code[0x0030/2] = 0x000f; // move.w #$0f, D1
+		jm_mcu_code[0x0032/2] = 0x32d8; //move.w (A0)+,(A1)+
+		jm_mcu_code[0x0034/2] = 0x51c9;
+		jm_mcu_code[0x0036/2] = 0xfffc; //dbra D1, $-4
+		jm_mcu_code[0x0038/2] = 0x4e75; //rts
 
 		/*******************************************************
 		2nd M68k code uploaded by the MCU (tile upload)
