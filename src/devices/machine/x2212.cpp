@@ -138,6 +138,7 @@ void x2212_device::do_recall()
 
 WRITE8_MEMBER( x2212_device::write )
 {
+	assert(offset < m_size_data);
 	m_sram[offset] = data & 0x0f;
 }
 
@@ -148,6 +149,7 @@ WRITE8_MEMBER( x2212_device::write )
 
 READ8_MEMBER( x2212_device::read )
 {
+	assert(offset < m_size_data);
 	return (m_sram[offset] & 0x0f) | (space.unmap() & 0xf0);
 }
 
