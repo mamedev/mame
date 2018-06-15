@@ -13,6 +13,7 @@ Floppies were 8 inch IBM format.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -76,8 +77,8 @@ void terak_state::mem_map(address_map &map)
 
 	// octal
 	map(0173000, 0173177).rom(); // ROM
-	map(0177000, 0177001).rw(this, FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
-	map(0177002, 0177003).rw(this, FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
+	map(0177000, 0177001).rw(FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
+	map(0177002, 0177003).rw(FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
 }
 
 /* Input ports */

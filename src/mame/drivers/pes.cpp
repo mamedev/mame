@@ -233,9 +233,9 @@ void pes_state::i80c31_mem(address_map &map)
 void pes_state::i80c31_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0, 0x0).w(this, FUNC(pes_state::rsq_wsq_w)); /* /WS(0) and /RS(1) */
-	map(0x1, 0x1).rw(this, FUNC(pes_state::port1_r), FUNC(pes_state::port1_w)); /* tms5220 reads and writes */
-	map(0x3, 0x3).rw(this, FUNC(pes_state::port3_r), FUNC(pes_state::port3_w)); /* writes and reads from port 3, see top of file */
+	map(0x0, 0x0).w(FUNC(pes_state::rsq_wsq_w)); /* /WS(0) and /RS(1) */
+	map(0x1, 0x1).rw(FUNC(pes_state::port1_r), FUNC(pes_state::port1_w)); /* tms5220 reads and writes */
+	map(0x3, 0x3).rw(FUNC(pes_state::port3_r), FUNC(pes_state::port3_w)); /* writes and reads from port 3, see top of file */
 }
 
 /******************************************************************************

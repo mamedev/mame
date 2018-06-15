@@ -96,15 +96,15 @@ void rltennis_state::rltennis_main(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x200000, 0x20ffff).ram();
-	map(0x700000, 0x70000f).w(this, FUNC(rltennis_state::blitter_w));
+	map(0x700000, 0x70000f).w(FUNC(rltennis_state::blitter_w));
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x720003, 0x720003).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x720007, 0x720007).w("ramdac", FUNC(ramdac_device::index_r_w));
-	map(0x740000, 0x740001).w(this, FUNC(rltennis_state::snd1_w));
-	map(0x760000, 0x760001).w(this, FUNC(rltennis_state::snd2_w));
+	map(0x740000, 0x740001).w(FUNC(rltennis_state::snd1_w));
+	map(0x760000, 0x760001).w(FUNC(rltennis_state::snd2_w));
 	map(0x780000, 0x780001).nopw();    /* sound control, unknown, usually = 0x0044 */
 	map(0x7a0000, 0x7a0003).nopr();     /* unknown, read only at boot time*/
-	map(0x7e0000, 0x7e0001).r(this, FUNC(rltennis_state::io_r));
+	map(0x7e0000, 0x7e0001).r(FUNC(rltennis_state::io_r));
 	map(0x7e0002, 0x7e0003).portr("P2");
 }
 

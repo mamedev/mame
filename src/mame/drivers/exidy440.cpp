@@ -468,23 +468,23 @@ void exidy440_state::machine_reset()
 void exidy440_state::exidy440_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("imageram");
-	map(0x2000, 0x209f).ram().w(this, FUNC(exidy440_state::exidy440_spriteram_w)).share("spriteram");
+	map(0x2000, 0x209f).ram().w(FUNC(exidy440_state::exidy440_spriteram_w)).share("spriteram");
 	map(0x20a0, 0x29ff).ram();
-	map(0x2a00, 0x2aff).rw(this, FUNC(exidy440_state::exidy440_videoram_r), FUNC(exidy440_state::exidy440_videoram_w));
-	map(0x2b00, 0x2b00).r(this, FUNC(exidy440_state::exidy440_vertical_pos_r));
-	map(0x2b01, 0x2b01).rw(this, FUNC(exidy440_state::exidy440_horizontal_pos_r), FUNC(exidy440_state::exidy440_interrupt_clear_w));
+	map(0x2a00, 0x2aff).rw(FUNC(exidy440_state::exidy440_videoram_r), FUNC(exidy440_state::exidy440_videoram_w));
+	map(0x2b00, 0x2b00).r(FUNC(exidy440_state::exidy440_vertical_pos_r));
+	map(0x2b01, 0x2b01).rw(FUNC(exidy440_state::exidy440_horizontal_pos_r), FUNC(exidy440_state::exidy440_interrupt_clear_w));
 	map(0x2b02, 0x2b02).ram().share("scanline");
-	map(0x2b03, 0x2b03).portr("IN0").w(this, FUNC(exidy440_state::exidy440_control_w));
-	map(0x2c00, 0x2dff).rw(this, FUNC(exidy440_state::exidy440_paletteram_r), FUNC(exidy440_state::exidy440_paletteram_w));
-	map(0x2e00, 0x2e1f).ram().w(this, FUNC(exidy440_state::sound_command_w));
-	map(0x2e20, 0x2e3f).rw(this, FUNC(exidy440_state::exidy440_input_port_3_r), FUNC(exidy440_state::exidy440_input_port_3_w));
-	map(0x2e40, 0x2e5f).nopr().w(this, FUNC(exidy440_state::exidy440_coin_counter_w));   /* read: clear coin counters I/O2 */
+	map(0x2b03, 0x2b03).portr("IN0").w(FUNC(exidy440_state::exidy440_control_w));
+	map(0x2c00, 0x2dff).rw(FUNC(exidy440_state::exidy440_paletteram_r), FUNC(exidy440_state::exidy440_paletteram_w));
+	map(0x2e00, 0x2e1f).ram().w(FUNC(exidy440_state::sound_command_w));
+	map(0x2e20, 0x2e3f).rw(FUNC(exidy440_state::exidy440_input_port_3_r), FUNC(exidy440_state::exidy440_input_port_3_w));
+	map(0x2e40, 0x2e5f).nopr().w(FUNC(exidy440_state::exidy440_coin_counter_w));   /* read: clear coin counters I/O2 */
 	map(0x2e60, 0x2e7f).portr("IN1").nopw();
 	map(0x2e80, 0x2e9f).portr("IN2").nopw();
-	map(0x2ea0, 0x2ebf).r(this, FUNC(exidy440_state::sound_command_ack_r)).nopw();
+	map(0x2ea0, 0x2ebf).r(FUNC(exidy440_state::sound_command_ack_r)).nopw();
 	map(0x2ec0, 0x2eff).noprw();
 	map(0x3000, 0x3fff).ram();
-	map(0x4000, 0x7fff).bankr("bank1").w(this, FUNC(exidy440_state::bankram_w));
+	map(0x4000, 0x7fff).bankr("bank1").w(FUNC(exidy440_state::bankram_w));
 	map(0x8000, 0xffff).rom();
 }
 

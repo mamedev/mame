@@ -120,15 +120,15 @@ void busicom_state::busicom_stat(address_map &map)
 void busicom_state::busicom_rp(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x000f).mirror(0x0700).w(this, FUNC(busicom_state::shifter_w)); // ROM0 I/O
-	map(0x0010, 0x001f).mirror(0x0700).rw(this, FUNC(busicom_state::keyboard_r), FUNC(busicom_state::printer_ctrl_w)); // ROM1 I/O
-	map(0x0020, 0x002f).mirror(0x0700).r(this, FUNC(busicom_state::printer_r));  // ROM2 I/O
+	map(0x0000, 0x000f).mirror(0x0700).w(FUNC(busicom_state::shifter_w)); // ROM0 I/O
+	map(0x0010, 0x001f).mirror(0x0700).rw(FUNC(busicom_state::keyboard_r), FUNC(busicom_state::printer_ctrl_w)); // ROM1 I/O
+	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(busicom_state::printer_r));  // ROM2 I/O
 }
 
 void busicom_state::busicom_mp(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(busicom_state::printer_w)); // RAM0 output
-	map(0x01, 0x01).w(this, FUNC(busicom_state::status_w));  // RAM1 output
+	map(0x00, 0x00).w(FUNC(busicom_state::printer_w)); // RAM0 output
+	map(0x01, 0x01).w(FUNC(busicom_state::status_w));  // RAM1 output
 }
 
 /* Input ports */

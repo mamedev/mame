@@ -309,10 +309,10 @@ void ti99_8_state::memmap(address_map &map)
 
 void ti99_8_state::crumap(address_map &map)
 {
-	map(0x0000, 0x02ff).r(this, FUNC(ti99_8_state::cruread));
+	map(0x0000, 0x02ff).r(FUNC(ti99_8_state::cruread));
 	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x17ff).w(this, FUNC(ti99_8_state::cruwrite));
+	map(0x0000, 0x17ff).w(FUNC(ti99_8_state::cruwrite));
 	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
 }
 

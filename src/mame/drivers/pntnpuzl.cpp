@@ -284,14 +284,14 @@ READ16_MEMBER(pntnpuzl_state::irq4_ack_r)
 void pntnpuzl_state::pntnpuzl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080001).r(this, FUNC(pntnpuzl_state::irq1_ack_r));
-	map(0x100000, 0x100001).r(this, FUNC(pntnpuzl_state::irq2_ack_r));
-	map(0x180000, 0x180001).r(this, FUNC(pntnpuzl_state::irq4_ack_r));
-	map(0x200000, 0x200001).w(this, FUNC(pntnpuzl_state::pntnpuzl_200000_w));
+	map(0x080000, 0x080001).r(FUNC(pntnpuzl_state::irq1_ack_r));
+	map(0x100000, 0x100001).r(FUNC(pntnpuzl_state::irq2_ack_r));
+	map(0x180000, 0x180001).r(FUNC(pntnpuzl_state::irq4_ack_r));
+	map(0x200000, 0x200001).w(FUNC(pntnpuzl_state::pntnpuzl_200000_w));
 	map(0x280000, 0x28001f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00);
-	map(0x280014, 0x280015).r(this, FUNC(pntnpuzl_state::pntnpuzl_280014_r));
-	map(0x280018, 0x280019).w(this, FUNC(pntnpuzl_state::pntnpuzl_280018_w));
-	map(0x28001a, 0x28001b).r(this, FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
+	map(0x280014, 0x280015).r(FUNC(pntnpuzl_state::pntnpuzl_280014_r));
+	map(0x280018, 0x280019).w(FUNC(pntnpuzl_state::pntnpuzl_280018_w));
+	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
 
 	/* standard VGA */
 	map(0x3a0000, 0x3bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))

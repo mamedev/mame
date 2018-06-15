@@ -94,8 +94,8 @@ void g627_state::mem_map(address_map &map)
 void g627_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x02).w(this, FUNC(g627_state::disp_w));
-	map(0x03, 0x07).w(this, FUNC(g627_state::lamp_w));
+	map(0x00, 0x02).w(FUNC(g627_state::disp_w));
+	map(0x03, 0x07).w(FUNC(g627_state::lamp_w));
 	map(0x10, 0x17).w("astrocade", FUNC(astrocade_io_device::write));
 	map(0x20, 0x27).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }

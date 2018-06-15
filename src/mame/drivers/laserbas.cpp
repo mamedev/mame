@@ -66,6 +66,7 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -333,9 +334,9 @@ WRITE_LINE_MEMBER(laserbas_state::pit_out_5_w)
 void laserbas_state::laserbas_memory(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0xbfff).rw(this, FUNC(laserbas_state::vram_r), FUNC(laserbas_state::vram_w));
+	map(0x4000, 0xbfff).rw(FUNC(laserbas_state::vram_r), FUNC(laserbas_state::vram_w));
 	map(0xc000, 0xf7ff).rom().nopw();
-	map(0xf800, 0xfbff).r(this, FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
+	map(0xf800, 0xfbff).r(FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
 	map(0xfc00, 0xffff).ram();
 }
 
@@ -344,12 +345,12 @@ void laserbas_state::laserbas_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x01, 0x01).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x10, 0x11).w(this, FUNC(laserbas_state::videoctrl_w));
+	map(0x10, 0x11).w(FUNC(laserbas_state::videoctrl_w));
 	map(0x20, 0x20).portr("DSW");
 	map(0x21, 0x21).portr("INPUTS");
-	map(0x22, 0x22).r(this, FUNC(laserbas_state::track_hi_r));
-	map(0x23, 0x23).r(this, FUNC(laserbas_state::track_lo_r));
-	map(0x20, 0x23).w(this, FUNC(laserbas_state::out_w));
+	map(0x22, 0x22).r(FUNC(laserbas_state::track_hi_r));
+	map(0x23, 0x23).r(FUNC(laserbas_state::track_lo_r));
+	map(0x20, 0x23).w(FUNC(laserbas_state::out_w));
 	map(0x40, 0x43).rw("pit0", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x44, 0x47).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x80, 0x9f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");

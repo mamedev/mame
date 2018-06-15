@@ -56,6 +56,7 @@ ToDo:
 #include "machine/mos6526.h"
 #include "machine/terminal.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -98,7 +99,7 @@ void sbc6510_state::sbc6510_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0001).ram();
-	map(0x0002, 0x0002).rw(this, FUNC(sbc6510_state::a2_r), FUNC(sbc6510_state::a2_w));
+	map(0x0002, 0x0002).rw(FUNC(sbc6510_state::a2_r), FUNC(sbc6510_state::a2_w));
 	map(0x0003, 0xdfff).ram();
 	map(0xe000, 0xe00f).mirror(0x1f0).rw("cia6526", FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0xe800, 0xe800).mirror(0x1ff).w("ay8910", FUNC(ay8910_device::address_w));

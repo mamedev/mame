@@ -83,6 +83,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -720,8 +721,8 @@ void rabbit_state::rabbit_map(address_map &map)
 	map(0x000010, 0x000013).nopw(); // bug in code / emulation?
 	map(0x000024, 0x000027).nopw(); // bug in code / emulation?
 	map(0x00719c, 0x00719f).nopw(); // bug in code / emulation?
-	map(0x200000, 0x200003).portr("INPUTS").w(this, FUNC(rabbit_state::eeprom_write));
-	map(0x400010, 0x400013).r(this, FUNC(rabbit_state::randomrabbits)); // gfx chip status?
+	map(0x200000, 0x200003).portr("INPUTS").w(FUNC(rabbit_state::eeprom_write));
+	map(0x400010, 0x400013).r(FUNC(rabbit_state::randomrabbits)); // gfx chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
 	map(0x400010, 0x400013).writeonly().share("viewregs0");
 	map(0x400100, 0x400117).writeonly().share("tilemap_regs.0"); // tilemap regs1
@@ -729,10 +730,10 @@ void rabbit_state::rabbit_map(address_map &map)
 	map(0x400140, 0x400157).writeonly().share("tilemap_regs.2"); // tilemap regs3
 	map(0x400160, 0x400177).writeonly().share("tilemap_regs.3"); // tilemap regs4
 	map(0x400200, 0x40021b).writeonly().share("spriteregs"); // sprregs?
-	map(0x400300, 0x400303).w(this, FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
+	map(0x400300, 0x400303).w(FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
 	map(0x400400, 0x400413).writeonly().share("viewregs6"); // some global controls? (brightness etc.?)
 	map(0x400500, 0x400503).writeonly().share("viewregs7");
-	map(0x400700, 0x40070f).w(this, FUNC(rabbit_state::blitter_w)).share("blitterregs");
+	map(0x400700, 0x40070f).w(FUNC(rabbit_state::blitter_w)).share("blitterregs");
 	map(0x400800, 0x40080f).writeonly().share("viewregs9"); // never changes?
 	map(0x400900, 0x4009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
@@ -740,10 +741,10 @@ void rabbit_state::rabbit_map(address_map &map)
 
 	map(0x440000, 0x47ffff).bankr("bank1"); // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
-	map(0x480000, 0x483fff).rw(this, FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
-	map(0x484000, 0x487fff).rw(this, FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
-	map(0x488000, 0x48bfff).rw(this, FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
-	map(0x48c000, 0x48ffff).rw(this, FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
+	map(0x480000, 0x483fff).rw(FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
+	map(0x484000, 0x487fff).rw(FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
+	map(0x488000, 0x48bfff).rw(FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
+	map(0x48c000, 0x48ffff).rw(FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
 	map(0x494000, 0x497fff).ram().share("spriteram"); // sprites?
 	map(0x4a0000, 0x4affff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xff0000, 0xffffff).ram();
@@ -905,7 +906,7 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
 

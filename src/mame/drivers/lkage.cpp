@@ -123,7 +123,7 @@ void lkage_state::lkage_map(address_map &map)
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf003).ram().share("vreg"); /* video registers */
 	map(0xf060, 0xf060).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf061, 0xf061).nopw().r(this, FUNC(lkage_state::sound_status_r));
+	map(0xf061, 0xf061).nopw().r(FUNC(lkage_state::sound_status_r));
 	map(0xf063, 0xf063).nopw(); /* pulsed; nmi on sound cpu? */
 	map(0xf080, 0xf080).portr("DSW1");
 	map(0xf081, 0xf081).portr("DSW2");
@@ -136,21 +136,21 @@ void lkage_state::lkage_map(address_map &map)
 	map(0xf0e1, 0xf0e1).nopw(); /* pulsed */
 	map(0xf100, 0xf15f).ram().share("spriteram");
 	map(0xf160, 0xf1ff).ram(); /* unknown - no valid sprite data */
-	map(0xf400, 0xffff).ram().w(this, FUNC(lkage_state::lkage_videoram_w)).share("videoram");
+	map(0xf400, 0xffff).ram().w(FUNC(lkage_state::lkage_videoram_w)).share("videoram");
 }
 
 void lkage_state::lkage_map_mcu(address_map &map)
 {
 	lkage_map(map);
 	map(0xf062, 0xf062).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xf087, 0xf087).r(this, FUNC(lkage_state::mcu_status_r));
+	map(0xf087, 0xf087).r(FUNC(lkage_state::mcu_status_r));
 }
 
 void lkage_state::lkage_map_boot(address_map &map)
 {
 	lkage_map(map);
-	map(0xf062, 0xf062).rw(this, FUNC(lkage_state::fake_mcu_r), FUNC(lkage_state::fake_mcu_w));
-	map(0xf087, 0xf087).r(this, FUNC(lkage_state::fake_status_r));
+	map(0xf062, 0xf062).rw(FUNC(lkage_state::fake_mcu_r), FUNC(lkage_state::fake_mcu_w));
+	map(0xf087, 0xf087).r(FUNC(lkage_state::fake_status_r));
 }
 
 
@@ -161,7 +161,7 @@ READ8_MEMBER(lkage_state::port_fetch_r)
 
 void lkage_state::lkage_io_map(address_map &map)
 {
-	map(0x4000, 0x7fff).r(this, FUNC(lkage_state::port_fetch_r));
+	map(0x4000, 0x7fff).r(FUNC(lkage_state::port_fetch_r));
 }
 
 
@@ -176,8 +176,8 @@ void lkage_state::lkage_sound_map(address_map &map)
 	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); /* ??? */
-	map(0xb001, 0xb001).nopr() /* ??? */ .w(this, FUNC(lkage_state::lkage_sh_nmi_enable_w));
-	map(0xb002, 0xb002).w(this, FUNC(lkage_state::lkage_sh_nmi_disable_w));
+	map(0xb001, 0xb001).nopr() /* ??? */ .w(FUNC(lkage_state::lkage_sh_nmi_enable_w));
+	map(0xb002, 0xb002).w(FUNC(lkage_state::lkage_sh_nmi_disable_w));
 	map(0xb003, 0xb003).nopw();
 	map(0xe000, 0xefff).rom(); /* space for diagnostic ROM? */
 }

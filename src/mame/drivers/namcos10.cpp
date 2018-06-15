@@ -40,6 +40,7 @@ Point Blank 3 (GNN2 Ver. A)                        (C) Namco, 2000
 *Ren-ai Quiz High School Angel                     (C) Namco, 2002
 Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
+Shamisen Brothers                                  (C) Kato/Konami, 2003
 Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
 *Taiko No Tatsujin                                 (C) Namco, 2001
 Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
@@ -496,10 +497,10 @@ void namcos10_state::namcos10_map(address_map &map)
 	map(0x9f500000, 0x9f501fff).ram().share("share3"); /* ram? stores block numbers */
 	map(0xbf500000, 0xbf501fff).ram().share("share3"); /* ram? stores block numbers */
 
-	map(0x1fba0000, 0x1fba000f).rw(this, FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
-	map(0x1fba0002, 0x1fba0003).rw(this, FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
-	map(0x1fba0008, 0x1fba0009).rw(this, FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
-	map(0x1fba000a, 0x1fba000b).rw(this, FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
+	map(0x1fba0000, 0x1fba000f).rw(FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
+	map(0x1fba0002, 0x1fba0003).rw(FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
+	map(0x1fba0008, 0x1fba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
+	map(0x1fba000a, 0x1fba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
 }
 
 
@@ -681,9 +682,9 @@ void namcos10_state::namcos10_memm_map(address_map &map)
 {
 	namcos10_map(map);
 
-	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f400000, 0x1f5fffff).r(this, FUNC(namcos10_state::range_r));
-	map(0x1fb40000, 0x1fb4000f).w(this, FUNC(namcos10_state::bank_w));
+	map(0x1f300000, 0x1f300001).w(FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f5fffff).r(FUNC(namcos10_state::range_r));
+	map(0x1fb40000, 0x1fb4000f).w(FUNC(namcos10_state::bank_w));
 }
 
 
@@ -777,15 +778,15 @@ void namcos10_state::namcos10_memn_map(address_map &map)
 {
 	namcos10_map(map);
 
-	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f380000, 0x1f380001).w(this, FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f400000, 0x1f400001).r(this, FUNC(namcos10_state::nand_status_r));
-	map(0x1f410000, 0x1f410000).w(this, FUNC(namcos10_state::nand_address1_w));
-	map(0x1f420000, 0x1f420000).w(this, FUNC(namcos10_state::nand_address2_w));
-	map(0x1f430000, 0x1f430000).w(this, FUNC(namcos10_state::nand_address3_w));
-	map(0x1f440000, 0x1f440000).w(this, FUNC(namcos10_state::nand_address4_w));
-	map(0x1f450000, 0x1f450001).r(this, FUNC(namcos10_state::nand_data_r));
-	map(0x1fb60000, 0x1fb60001).rw(this, FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
+	map(0x1f300000, 0x1f300001).w(FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f380000, 0x1f380001).w(FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f400001).r(FUNC(namcos10_state::nand_status_r));
+	map(0x1f410000, 0x1f410000).w(FUNC(namcos10_state::nand_address1_w));
+	map(0x1f420000, 0x1f420000).w(FUNC(namcos10_state::nand_address2_w));
+	map(0x1f430000, 0x1f430000).w(FUNC(namcos10_state::nand_address3_w));
+	map(0x1f440000, 0x1f440000).w(FUNC(namcos10_state::nand_address4_w));
+	map(0x1f450000, 0x1f450001).r(FUNC(namcos10_state::nand_data_r));
+	map(0x1fb60000, 0x1fb60001).rw(FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
 }
 
 void namcos10_state::memn_driver_init(  )

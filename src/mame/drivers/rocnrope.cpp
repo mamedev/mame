@@ -71,13 +71,13 @@ void rocnrope_state::rocnrope_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x4000, 0x402f).ram().share("spriteram2");
 	map(0x4400, 0x442f).ram().share("spriteram");
-	map(0x4800, 0x4bff).ram().w(this, FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
-	map(0x4c00, 0x4fff).ram().w(this, FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
+	map(0x4800, 0x4bff).ram().w(FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
+	map(0x4c00, 0x4fff).ram().w(FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
 	map(0x5000, 0x5fff).ram();
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8080, 0x8087).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8100, 0x8100).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
-	map(0x8182, 0x818d).w(this, FUNC(rocnrope_state::rocnrope_interrupt_vector_w));
+	map(0x8182, 0x818d).w(FUNC(rocnrope_state::rocnrope_interrupt_vector_w));
 	map(0x6000, 0xffff).rom();
 }
 

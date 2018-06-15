@@ -69,12 +69,12 @@ void metlclsh_state::metlclsh_master_map(address_map &map)
 	map(0xc002, 0xc002).portr("IN2");
 	map(0xc003, 0xc003).portr("DSW");
 	map(0xc080, 0xc080).nopw();                            // ? 0
-	map(0xc0c2, 0xc0c2).w(this, FUNC(metlclsh_state::metlclsh_cause_irq));           // cause irq on cpu #2
-	map(0xc0c3, 0xc0c3).w(this, FUNC(metlclsh_state::metlclsh_ack_nmi));             // nmi ack
+	map(0xc0c2, 0xc0c2).w(FUNC(metlclsh_state::metlclsh_cause_irq));           // cause irq on cpu #2
+	map(0xc0c3, 0xc0c3).w(FUNC(metlclsh_state::metlclsh_ack_nmi));             // nmi ack
 /**/map(0xc800, 0xc82f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 /**/map(0xcc00, 0xcc2f).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xd000, 0xd001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-/**/map(0xd800, 0xdfff).ram().w(this, FUNC(metlclsh_state::metlclsh_fgram_w)).share("fgram");
+/**/map(0xd800, 0xdfff).ram().w(FUNC(metlclsh_state::metlclsh_fgram_w)).share("fgram");
 	map(0xe000, 0xe001).w("ym2", FUNC(ym3526_device::write));
 	map(0xe800, 0xe9ff).ram().share("spriteram");
 	map(0xfff0, 0xffff).rom();                                 // Reset/IRQ vectors
@@ -111,19 +111,19 @@ void metlclsh_state::metlclsh_slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram().share("share1");
-	map(0xc000, 0xc000).portr("IN0").w(this, FUNC(metlclsh_state::metlclsh_gfxbank_w));   // bg tiles bank
+	map(0xc000, 0xc000).portr("IN0").w(FUNC(metlclsh_state::metlclsh_gfxbank_w));   // bg tiles bank
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
 	map(0xc003, 0xc003).portr("DSW");
-	map(0xc0c0, 0xc0c0).w(this, FUNC(metlclsh_state::metlclsh_cause_nmi2));          // cause nmi on cpu #1
-	map(0xc0c1, 0xc0c1).w(this, FUNC(metlclsh_state::metlclsh_ack_irq2));            // irq ack
-	map(0xd000, 0xd7ff).bankr("bank1").w(this, FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
-	map(0xe301, 0xe301).w(this, FUNC(metlclsh_state::metlclsh_flipscreen_w));        // 0/1
-	map(0xe401, 0xe401).w(this, FUNC(metlclsh_state::metlclsh_rambank_w));
+	map(0xc0c0, 0xc0c0).w(FUNC(metlclsh_state::metlclsh_cause_nmi2));          // cause nmi on cpu #1
+	map(0xc0c1, 0xc0c1).w(FUNC(metlclsh_state::metlclsh_ack_irq2));            // irq ack
+	map(0xd000, 0xd7ff).bankr("bank1").w(FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
+	map(0xe301, 0xe301).w(FUNC(metlclsh_state::metlclsh_flipscreen_w));        // 0/1
+	map(0xe401, 0xe401).w(FUNC(metlclsh_state::metlclsh_rambank_w));
 	map(0xe402, 0xe403).writeonly().share("scrollx");
 //  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
 //  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
-	map(0xe417, 0xe417).w(this, FUNC(metlclsh_state::metlclsh_ack_nmi2));            // nmi ack
+	map(0xe417, 0xe417).w(FUNC(metlclsh_state::metlclsh_ack_nmi2));            // nmi ack
 	map(0xfff0, 0xffff).rom();                                 // Reset/IRQ vectors
 }
 

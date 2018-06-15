@@ -197,6 +197,7 @@ Beeper Circuit, all ICs shown:
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"          //Display hardware
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"
@@ -310,11 +311,11 @@ void itt3030_state::itt3030_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x20, 0x2f).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
 	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
-	map(0x32, 0x32).w(this, FUNC(itt3030_state::beep_w));
-	map(0x35, 0x35).r(this, FUNC(itt3030_state::vsync_r));
-	map(0x50, 0x53).rw(this, FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
-	map(0x54, 0x54).rw(this, FUNC(itt3030_state::fdc_stat_r), FUNC(itt3030_state::fdc_cmd_w));
-	map(0xf6, 0xf6).w(this, FUNC(itt3030_state::bank_w));
+	map(0x32, 0x32).w(FUNC(itt3030_state::beep_w));
+	map(0x35, 0x35).r(FUNC(itt3030_state::vsync_r));
+	map(0x50, 0x53).rw(FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
+	map(0x54, 0x54).rw(FUNC(itt3030_state::fdc_stat_r), FUNC(itt3030_state::fdc_cmd_w));
+	map(0xf6, 0xf6).w(FUNC(itt3030_state::bank_w));
 }
 
 

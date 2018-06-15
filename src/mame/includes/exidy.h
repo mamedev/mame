@@ -8,6 +8,7 @@
 
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define EXIDY_MASTER_CLOCK              (XTAL(11'289'000))

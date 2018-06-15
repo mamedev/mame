@@ -284,6 +284,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -958,7 +959,7 @@ void videopkr_state::i8039_map(address_map &map)
 
 void videopkr_state::i8039_io_port(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(videopkr_state::videopkr_io_r), FUNC(videopkr_state::videopkr_io_w));
+	map(0x00, 0xff).rw(FUNC(videopkr_state::videopkr_io_r), FUNC(videopkr_state::videopkr_io_w));
 }
 
 void videopkr_state::i8751_map(address_map &map)
@@ -983,7 +984,7 @@ void videopkr_state::i8039_sound_mem(address_map &map)
 
 void videopkr_state::i8039_sound_port(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(videopkr_state::sound_io_r), FUNC(videopkr_state::sound_io_w));
+	map(0x00, 0xff).rw(FUNC(videopkr_state::sound_io_r), FUNC(videopkr_state::sound_io_w));
 }
 
 
@@ -1252,7 +1253,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_DEVICE_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(i8039_sound_mem)
 	MCFG_DEVICE_IO_MAP(i8039_sound_port)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
 
@@ -1325,7 +1326,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, videopkr_state, baby_sound_p0_r))
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p0_w))
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, videopkr_state, baby_sound_p1_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p3_w))
 
 	/* video hardware */

@@ -165,22 +165,22 @@ void by133_state::main_map(address_map &map)
 
 void by133_state::video_map(address_map &map)
 { // U8 Vidiot
-	map(0x0000, 0x1fff).rw(this, FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
+	map(0x0000, 0x1fff).rw(FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U7 Vidiot
-	map(0x4000, 0x4000).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x4001, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x4000, 0x4000).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x4001, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
 	map(0x8000, 0xffff).rom();
 }
 
 void by133_state::granny_map(address_map &map)
 {
-	map(0x0000, 0x0001).rw(this, FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
-	map(0x0002, 0x0002).rw(m_crtc, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x0003, 0x0003).rw(m_crtc, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x0004, 0x0004).rw(m_crtc2, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x0005, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x0006, 0x0007).w(this, FUNC(by133_state::granny_crtc_w)); // can write to both at once
+	map(0x0000, 0x0001).rw(FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
+	map(0x0002, 0x0002).rw(m_crtc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x0003, 0x0003).rw(m_crtc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0004, 0x0004).rw(m_crtc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x0005, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0006, 0x0007).w(FUNC(by133_state::granny_crtc_w)); // can write to both at once
 	map(0x0008, 0x000b).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x27ff).ram();
 	map(0x2801, 0x2801).nopr(); // The '9' test reads this location constantly and throws away the result
@@ -194,8 +194,8 @@ void by133_state::sound_map(address_map &map)
 
 void by133_state::sound_portmap(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::write)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
+	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
 }
 
 
@@ -545,13 +545,13 @@ WRITE8_MEMBER( by133_state::granny_crtc_w )
 {
 	if (offset)
 	{
-		m_crtc->register_write(space, 0, data);
-		m_crtc2->register_write(space, 0, data);
+		m_crtc->register_write(data);
+		m_crtc2->register_write(data);
 	}
 	else
 	{
-		m_crtc->vram_write(space, 0, data);
-		m_crtc2->vram_write(space, 0, data);
+		m_crtc->vram_write(data);
+		m_crtc2->vram_write(data);
 	}
 }
 

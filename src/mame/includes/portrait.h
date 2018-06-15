@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 #include "sound/tms5220.h"
+#include "emupal.h"
 
 class portrait_state : public driver_device
 {
@@ -34,6 +35,8 @@ public:
 	void portrait(machine_config &config);
 	void portrait_map(address_map &map);
 	void portrait_sound_map(address_map &map);
+
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }

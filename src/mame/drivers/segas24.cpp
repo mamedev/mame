@@ -1074,25 +1074,25 @@ void segas24_state::system24_cpu1_map(address_map &map)
 	map(0x260000, 0x260001).mirror(0x10fffe).nopw();        /* Frame trigger position (XVOUT) */
 	map(0x270000, 0x270001).mirror(0x10fffe).nopw();        /* Synchronization mode */
 	map(0x280000, 0x29ffff).mirror(0x160000).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
-	map(0x400000, 0x403fff).mirror(0x1f8000).rw(this, FUNC(segas24_state::sys16_paletteram_r), FUNC(segas24_state::sys16_paletteram_w)).share("paletteram");
+	map(0x400000, 0x403fff).mirror(0x1f8000).rw(FUNC(segas24_state::sys16_paletteram_r), FUNC(segas24_state::sys16_paletteram_w)).share("paletteram");
 	map(0x404000, 0x40401f).mirror(0x1fbfe0).rw("mixer", FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
 	map(0x600000, 0x63ffff).mirror(0x180000).rw("sprite", FUNC(segas24_sprite_device::read), FUNC(segas24_sprite_device::write));
 	map(0x800000, 0x80003f).mirror(0x1ffe00).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
-	map(0x800040, 0x80007f).mirror(0x1ffe00).rw(this, FUNC(segas24_state::iod_r), FUNC(segas24_state::iod_w));
+	map(0x800040, 0x80007f).mirror(0x1ffe00).rw(FUNC(segas24_state::iod_r), FUNC(segas24_state::iod_w));
 	map(0x800100, 0x800103).mirror(0x1ffe00).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0xa00000, 0xa00007).mirror(0x0ffff8).rw(this, FUNC(segas24_state::irq_r), FUNC(segas24_state::irq_w));
-	map(0xb00000, 0xb00007).mirror(0x07fff0).rw(this, FUNC(segas24_state::fdc_r), FUNC(segas24_state::fdc_w));
-	map(0xb00008, 0xb0000f).mirror(0x07fff0).rw(this, FUNC(segas24_state::fdc_status_r), FUNC(segas24_state::fdc_ctrl_w));
+	map(0xa00000, 0xa00007).mirror(0x0ffff8).rw(FUNC(segas24_state::irq_r), FUNC(segas24_state::irq_w));
+	map(0xb00000, 0xb00007).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_r), FUNC(segas24_state::fdc_w));
+	map(0xb00008, 0xb0000f).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_status_r), FUNC(segas24_state::fdc_ctrl_w));
 	map(0xb80000, 0xbbffff).bankr("bank1");
-	map(0xbc0000, 0xbc0001).mirror(0x03fff8).rw(this, FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
-	map(0xbc0003, 0xbc0003).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
-	map(0xbc0005, 0xbc0005).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
-	map(0xbc0006, 0xbc0007).mirror(0x03fff8).rw(this, FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
+	map(0xbc0000, 0xbc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
+	map(0xbc0003, 0xbc0003).mirror(0x03fff8).rw(FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
+	map(0xbc0005, 0xbc0005).mirror(0x03fff8).rw(FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
+	map(0xbc0006, 0xbc0007).mirror(0x03fff8).rw(FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
 	map(0xc80000, 0xcbffff).bankr("bank2");
-	map(0xcc0000, 0xcc0001).mirror(0x03fff8).rw(this, FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
-	map(0xcc0003, 0xcc0003).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
-	map(0xcc0005, 0xcc0005).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
-	map(0xcc0006, 0xcc0007).mirror(0x03fff8).rw(this, FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
+	map(0xcc0000, 0xcc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
+	map(0xcc0003, 0xcc0003).mirror(0x03fff8).rw(FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
+	map(0xcc0005, 0xcc0005).mirror(0x03fff8).rw(FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
+	map(0xcc0006, 0xcc0007).mirror(0x03fff8).rw(FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
 	map(0xf00000, 0xf3ffff).mirror(0x040000).ram().share("subcpu");
 	map(0xf80000, 0xfbffff).mirror(0x040000).ram().share("share1");
 }
@@ -1131,25 +1131,25 @@ void segas24_state::system24_cpu2_map(address_map &map)
 	map(0x260000, 0x260001).mirror(0x10fffe).nopw();        /* Frame trigger position (XVOUT) */
 	map(0x270000, 0x270001).mirror(0x10fffe).nopw();        /* Synchronization mode */
 	map(0x280000, 0x29ffff).mirror(0x160000).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
-	map(0x400000, 0x403fff).mirror(0x1f8000).rw(this, FUNC(segas24_state::sys16_paletteram_r), FUNC(segas24_state::sys16_paletteram_w)).share("paletteram");
+	map(0x400000, 0x403fff).mirror(0x1f8000).rw(FUNC(segas24_state::sys16_paletteram_r), FUNC(segas24_state::sys16_paletteram_w)).share("paletteram");
 	map(0x404000, 0x40401f).mirror(0x1fbfe0).rw("mixer", FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
 	map(0x600000, 0x63ffff).mirror(0x180000).rw("sprite", FUNC(segas24_sprite_device::read), FUNC(segas24_sprite_device::write));
 	map(0x800000, 0x80003f).mirror(0x1ffe00).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
-	map(0x800040, 0x80007f).mirror(0x1ffe00).rw(this, FUNC(segas24_state::iod_r), FUNC(segas24_state::iod_w));
+	map(0x800040, 0x80007f).mirror(0x1ffe00).rw(FUNC(segas24_state::iod_r), FUNC(segas24_state::iod_w));
 	map(0x800100, 0x800103).mirror(0x1ffe00).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0xa00000, 0xa00007).mirror(0x0ffff8).rw(this, FUNC(segas24_state::irq_r), FUNC(segas24_state::irq_w));
-	map(0xb00000, 0xb00007).mirror(0x07fff0).rw(this, FUNC(segas24_state::fdc_r), FUNC(segas24_state::fdc_w));
-	map(0xb00008, 0xb0000f).mirror(0x07fff0).rw(this, FUNC(segas24_state::fdc_status_r), FUNC(segas24_state::fdc_ctrl_w));
+	map(0xa00000, 0xa00007).mirror(0x0ffff8).rw(FUNC(segas24_state::irq_r), FUNC(segas24_state::irq_w));
+	map(0xb00000, 0xb00007).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_r), FUNC(segas24_state::fdc_w));
+	map(0xb00008, 0xb0000f).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_status_r), FUNC(segas24_state::fdc_ctrl_w));
 	map(0xb80000, 0xbbffff).bankr("bank1");
-	map(0xbc0000, 0xbc0001).mirror(0x03fff8).rw(this, FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
-	map(0xbc0003, 0xbc0003).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
-	map(0xbc0005, 0xbc0005).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
-	map(0xbc0006, 0xbc0007).mirror(0x03fff8).rw(this, FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
+	map(0xbc0000, 0xbc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
+	map(0xbc0003, 0xbc0003).mirror(0x03fff8).rw(FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
+	map(0xbc0005, 0xbc0005).mirror(0x03fff8).rw(FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
+	map(0xbc0006, 0xbc0007).mirror(0x03fff8).rw(FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
 	map(0xc80000, 0xcbffff).bankr("bank2");
-	map(0xcc0000, 0xcc0001).mirror(0x03fff8).rw(this, FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
-	map(0xcc0003, 0xcc0003).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
-	map(0xcc0005, 0xcc0005).mirror(0x03fff8).rw(this, FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
-	map(0xcc0006, 0xcc0007).mirror(0x03fff8).rw(this, FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
+	map(0xcc0000, 0xcc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
+	map(0xcc0003, 0xcc0003).mirror(0x03fff8).rw(FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
+	map(0xcc0005, 0xcc0005).mirror(0x03fff8).rw(FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
+	map(0xcc0006, 0xcc0007).mirror(0x03fff8).rw(FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
 	map(0xf00000, 0xf3ffff).mirror(0x040000).ram().share("subcpu");
 	map(0xf80000, 0xfbffff).mirror(0x040000).ram().share("share1");
 }
@@ -1881,7 +1881,7 @@ MACHINE_CONFIG_START(segas24_state::system24)
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas24_state, cnt1))
 	MCFG_315_5296_OUT_CNT2_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
 

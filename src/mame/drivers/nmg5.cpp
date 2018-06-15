@@ -228,6 +228,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -373,18 +374,18 @@ void nmg5_state::nmg5_map(address_map &map)
 	map(0x120000, 0x12ffff).ram();
 	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram");
-	map(0x180000, 0x180001).w(this, FUNC(nmg5_state::nmg5_soundlatch_w));
+	map(0x180000, 0x180001).w(FUNC(nmg5_state::nmg5_soundlatch_w));
 	map(0x180002, 0x180003).nopw();
-	map(0x180004, 0x180005).rw(this, FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
-	map(0x180006, 0x180007).w(this, FUNC(nmg5_state::gfx_bank_w));
+	map(0x180004, 0x180005).rw(FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
+	map(0x180006, 0x180007).w(FUNC(nmg5_state::gfx_bank_w));
 	map(0x180008, 0x180009).portr("DSW");
 	map(0x18000a, 0x18000b).portr("SYSTEM");
 	map(0x18000c, 0x18000d).portr("INPUTS");
-	map(0x18000e, 0x18000f).w(this, FUNC(nmg5_state::priority_reg_w));
+	map(0x18000e, 0x18000f).w(FUNC(nmg5_state::priority_reg_w));
 	map(0x300002, 0x300009).writeonly().share("scroll_ram");
 	map(0x30000a, 0x30000f).nopw();
-	map(0x320000, 0x321fff).ram().w(this, FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
-	map(0x322000, 0x323fff).ram().w(this, FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x320000, 0x321fff).ram().w(FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x322000, 0x323fff).ram().w(FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
 	map(0x800000, 0x80ffff).ram().share("bitmap");
 }
 
@@ -394,17 +395,17 @@ void nmg5_state::pclubys_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x440000, 0x4407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x460000, 0x4607ff).ram().share("spriteram");
-	map(0x480000, 0x480001).w(this, FUNC(nmg5_state::nmg5_soundlatch_w));
+	map(0x480000, 0x480001).w(FUNC(nmg5_state::nmg5_soundlatch_w));
 	map(0x480002, 0x480003).nopw();
-	map(0x480004, 0x480005).rw(this, FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
-	map(0x480006, 0x480007).w(this, FUNC(nmg5_state::gfx_bank_w));
+	map(0x480004, 0x480005).rw(FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
+	map(0x480006, 0x480007).w(FUNC(nmg5_state::gfx_bank_w));
 	map(0x480008, 0x480009).portr("DSW");
 	map(0x48000a, 0x48000b).portr("SYSTEM");
 	map(0x48000c, 0x48000d).portr("INPUTS");
-	map(0x48000e, 0x48000f).w(this, FUNC(nmg5_state::priority_reg_w));
+	map(0x48000e, 0x48000f).w(FUNC(nmg5_state::priority_reg_w));
 	map(0x500002, 0x500009).writeonly().share("scroll_ram");
-	map(0x520000, 0x521fff).ram().w(this, FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
-	map(0x522000, 0x523fff).ram().w(this, FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x520000, 0x521fff).ram().w(FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x522000, 0x523fff).ram().w(FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
 	map(0x800000, 0x80ffff).ram().share("bitmap");
 }
 
@@ -429,7 +430,7 @@ void nmg5_state::pclubys_sound_map(address_map &map)
 void nmg5_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(nmg5_state::oki_banking_w));
+	map(0x00, 0x00).w(FUNC(nmg5_state::oki_banking_w));
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x18, 0x18).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1c, 0x1c).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));

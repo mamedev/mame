@@ -28,6 +28,7 @@
 #include "machine/ripple_counter.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

@@ -9,6 +9,7 @@
 #include "machine/input_merger.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class grchamp_state : public driver_device

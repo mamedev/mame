@@ -14,6 +14,7 @@
 #include "machine/eepromser.h"
 #include "machine/mb3773.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 
 
 //**************************************************************************

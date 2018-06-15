@@ -845,18 +845,18 @@ void nc100_state::nc100_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x0f).w(this, FUNC(nc100_state::nc100_display_memory_start_w));
-	map(0x10, 0x13).rw(this, FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
-	map(0x20, 0x20).w(this, FUNC(nc100_state::nc100_memory_card_wait_state_w));
-	map(0x30, 0x30).w(this, FUNC(nc100_state::nc100_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x53).w(this, FUNC(nc100_state::nc_sound_w));
-	map(0x60, 0x60).w(this, FUNC(nc100_state::nc_irq_mask_w));
-	map(0x70, 0x70).w(this, FUNC(nc100_state::nc100_poweroff_control_w));
-	map(0x90, 0x90).rw(this, FUNC(nc100_state::nc_irq_status_r), FUNC(nc100_state::nc_irq_status_w));
-	map(0x91, 0x9f).r(this, FUNC(nc100_state::nc_irq_status_r));
-	map(0xa0, 0xaf).r(this, FUNC(nc100_state::nc100_card_battery_status_r));
-	map(0xb0, 0xb9).r(this, FUNC(nc100_state::nc_key_data_in_r));
+	map(0x00, 0x0f).w(FUNC(nc100_state::nc100_display_memory_start_w));
+	map(0x10, 0x13).rw(FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
+	map(0x20, 0x20).w(FUNC(nc100_state::nc100_memory_card_wait_state_w));
+	map(0x30, 0x30).w(FUNC(nc100_state::nc100_uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x53).w(FUNC(nc100_state::nc_sound_w));
+	map(0x60, 0x60).w(FUNC(nc100_state::nc_irq_mask_w));
+	map(0x70, 0x70).w(FUNC(nc100_state::nc100_poweroff_control_w));
+	map(0x90, 0x90).rw(FUNC(nc100_state::nc_irq_status_r), FUNC(nc100_state::nc_irq_status_w));
+	map(0x91, 0x9f).r(FUNC(nc100_state::nc_irq_status_r));
+	map(0xa0, 0xaf).r(FUNC(nc100_state::nc100_card_battery_status_r));
+	map(0xb0, 0xb9).r(FUNC(nc100_state::nc_key_data_in_r));
 	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
@@ -1250,18 +1250,18 @@ WRITE8_MEMBER(nc200_state::nc200_poweroff_control_w)
 void nc200_state::nc200_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w(this, FUNC(nc200_state::nc100_display_memory_start_w));
-	map(0x10, 0x13).rw(this, FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
-	map(0x20, 0x20).w(this, FUNC(nc200_state::nc200_memory_card_wait_state_w));
-	map(0x30, 0x30).w(this, FUNC(nc200_state::nc200_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x53).w(this, FUNC(nc200_state::nc_sound_w));
-	map(0x60, 0x60).w(this, FUNC(nc200_state::nc_irq_mask_w));
-	map(0x70, 0x70).w(this, FUNC(nc200_state::nc200_poweroff_control_w));
-	map(0x80, 0x80).r(this, FUNC(nc200_state::nc200_printer_status_r));
-	map(0x90, 0x90).rw(this, FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
-	map(0xa0, 0xa0).r(this, FUNC(nc200_state::nc200_card_battery_status_r));
-	map(0xb0, 0xb9).r(this, FUNC(nc200_state::nc_key_data_in_r));
+	map(0x00, 0x0f).w(FUNC(nc200_state::nc100_display_memory_start_w));
+	map(0x10, 0x13).rw(FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
+	map(0x20, 0x20).w(FUNC(nc200_state::nc200_memory_card_wait_state_w));
+	map(0x30, 0x30).w(FUNC(nc200_state::nc200_uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x53).w(FUNC(nc200_state::nc_sound_w));
+	map(0x60, 0x60).w(FUNC(nc200_state::nc_irq_mask_w));
+	map(0x70, 0x70).w(FUNC(nc200_state::nc200_poweroff_control_w));
+	map(0x80, 0x80).r(FUNC(nc200_state::nc200_printer_status_r));
+	map(0x90, 0x90).rw(FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
+	map(0xa0, 0xa0).r(FUNC(nc200_state::nc200_card_battery_status_r));
+	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
 	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
@@ -1405,7 +1405,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, nc_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

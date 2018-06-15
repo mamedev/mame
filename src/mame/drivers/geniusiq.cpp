@@ -158,6 +158,7 @@ PCB - German Version:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -423,19 +424,19 @@ void geniusiq_state::geniusiq_mem(address_map &map)
 	map(0x300000, 0x30FFFF).ram().share("vram");
 	map(0x310000, 0x31FFFF).ram();
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
-	map(0x600300, 0x600301).r(this, FUNC(geniusiq_state::input_r));
+	map(0x600300, 0x600301).r(FUNC(geniusiq_state::input_r));
 	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
 	//AM_RANGE(0x600600, 0x600605)                      // sound ??
-	map(0x600606, 0x600609).w(this, FUNC(geniusiq_state::gfx_base_w));
-	map(0x60060a, 0x60060b).w(this, FUNC(geniusiq_state::gfx_idx_w));
-	map(0x600802, 0x600803).r(this, FUNC(geniusiq_state::cart_state_r));  // cartridge state
-	map(0x600108, 0x600109).r(this, FUNC(geniusiq_state::unk0_r));        // read before run a BASIC program
-	map(0x600918, 0x600919).r(this, FUNC(geniusiq_state::unk0_r));        // loop at start if bit 0 is set
-	map(0x601008, 0x601009).r(this, FUNC(geniusiq_state::unk_r));         // unknown, read at start and expect that bit 2 changes several times before continue
-	map(0x601010, 0x601011).r(this, FUNC(geniusiq_state::unk0_r));        // loop at start if bit 1 is set
-	map(0x601018, 0x60101b).w(this, FUNC(geniusiq_state::gfx_dest_w));
-	map(0x60101c, 0x60101f).w(this, FUNC(geniusiq_state::gfx_color_w));
-	map(0x601060, 0x601063).w(this, FUNC(geniusiq_state::mouse_pos_w));
+	map(0x600606, 0x600609).w(FUNC(geniusiq_state::gfx_base_w));
+	map(0x60060a, 0x60060b).w(FUNC(geniusiq_state::gfx_idx_w));
+	map(0x600802, 0x600803).r(FUNC(geniusiq_state::cart_state_r));  // cartridge state
+	map(0x600108, 0x600109).r(FUNC(geniusiq_state::unk0_r));        // read before run a BASIC program
+	map(0x600918, 0x600919).r(FUNC(geniusiq_state::unk0_r));        // loop at start if bit 0 is set
+	map(0x601008, 0x601009).r(FUNC(geniusiq_state::unk_r));         // unknown, read at start and expect that bit 2 changes several times before continue
+	map(0x601010, 0x601011).r(FUNC(geniusiq_state::unk0_r));        // loop at start if bit 1 is set
+	map(0x601018, 0x60101b).w(FUNC(geniusiq_state::gfx_dest_w));
+	map(0x60101c, 0x60101f).w(FUNC(geniusiq_state::gfx_color_w));
+	map(0x601060, 0x601063).w(FUNC(geniusiq_state::mouse_pos_w));
 	map(0x601100, 0x6011ff).ram().share("mouse_gfx");   // mouse cursor gfx (24x16)
 	map(0xa00000, 0xafffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 	// 0x600000 : some memory mapped hardware

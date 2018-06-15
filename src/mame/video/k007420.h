@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 typedef device_delegate<void (int *code, int *color)> k007420_delegate;
 

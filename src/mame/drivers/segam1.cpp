@@ -41,6 +41,7 @@ uses s24 style tilemaps (ram based?)
 #include "machine/mb8421.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -194,7 +195,7 @@ void segam1_state::segam1_map(address_map &map)
 	map(0xb60000, 0xb60001).nopw();        /* Frame trigger position (XVOUT) */
 	map(0xb70000, 0xb70001).nopw();        /* Synchronization mode */
 	map(0xb80000, 0xbfffff).rw(m_tile, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
-	map(0xc00000, 0xc03fff).ram().w(this, FUNC(segam1_state::paletteram_w)).share("paletteram");
+	map(0xc00000, 0xc03fff).ram().w(FUNC(segam1_state::paletteram_w)).share("paletteram");
 	map(0xc04000, 0xc0401f).rw(m_mixer, FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
 	map(0xe00000, 0xe0001f).rw("io1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0xe40000, 0xe40001).portr("INX");
@@ -223,7 +224,7 @@ void segam1_state::segam1_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x80, 0x83).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xa0).w(this, FUNC(segam1_state::sound_a0_bank_w));
+	map(0xa0, 0xa0).w(FUNC(segam1_state::sound_a0_bank_w));
 	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read)).nopw();
 }
 

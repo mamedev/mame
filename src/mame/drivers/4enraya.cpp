@@ -252,7 +252,7 @@ WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 
 void _4enraya_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(_4enraya_state::fenraya_custom_map_r), FUNC(_4enraya_state::fenraya_custom_map_w));
+	map(0x0000, 0xffff).rw(FUNC(_4enraya_state::fenraya_custom_map_r), FUNC(_4enraya_state::fenraya_custom_map_w));
 }
 
 void _4enraya_state::main_portmap(address_map &map)
@@ -261,8 +261,8 @@ void _4enraya_state::main_portmap(address_map &map)
 	map(0x00, 0x00).portr("DSW");
 	map(0x01, 0x01).portr("INPUTS");
 	map(0x02, 0x02).portr("SYSTEM");
-	map(0x23, 0x23).w(this, FUNC(_4enraya_state::sound_data_w));
-	map(0x33, 0x33).w(this, FUNC(_4enraya_state::sound_control_w));
+	map(0x23, 0x23).w(FUNC(_4enraya_state::sound_data_w));
+	map(0x33, 0x33).w(FUNC(_4enraya_state::sound_control_w));
 }
 
 
@@ -270,7 +270,7 @@ void unk_gambl_state::unkpacg_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x7000, 0x7fff).w(this, FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
 	map(0x8000, 0x9fff).rom();
 }
 

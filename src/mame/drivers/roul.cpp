@@ -67,6 +67,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -220,13 +221,13 @@ void roul_state::roul_map(address_map &map)
 void roul_state::roul_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
-	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
+	map(0xf0, 0xf4).w(FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(FUNC(roul_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("DSW");
-	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
+	map(0xf9, 0xf9).w(FUNC(roul_state::ball_w));
 	map(0xfa, 0xfa).portr("IN0");
 	map(0xfd, 0xfd).portr("IN1");
-	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
+	map(0xfe, 0xfe).w(FUNC(roul_state::sound_latch_w));
 }
 
 void roul_state::sound_map(address_map &map)

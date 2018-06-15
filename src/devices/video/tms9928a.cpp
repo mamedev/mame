@@ -122,9 +122,9 @@ READ8_MEMBER( tms9928a_device::read )
 	uint8_t value = 0;
 
 	if ((offset & 1) == 0)
-		value = vram_read(space, 0);
+		value = vram_read();
 	else
-		value = register_read(space, 0);
+		value = register_read();
 
 	return value;
 }
@@ -132,9 +132,9 @@ READ8_MEMBER( tms9928a_device::read )
 WRITE8_MEMBER( tms9928a_device::write )
 {
 	if ((offset & 1) == 0)
-		vram_write(space, 0, data);
+		vram_write(data);
 	else
-		register_write(space, 0, data);
+		register_write(data);
 }
 
 u8 tms9928a_device::vram_read()
@@ -151,25 +151,17 @@ u8 tms9928a_device::vram_read()
 	return data;
 }
 
-READ8_MEMBER( tms9928a_device::vram_read )
-{
-	return vram_read();
-}
-
 void tms9928a_device::vram_write(u8 data)
 {
-	// prevent debugger from changing the address base
-	if (machine().side_effects_disabled()) return;
-
 	m_vram_space->write_byte(m_Addr, data);
-	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
-	m_ReadAhead = data;
-	m_latch = 0;
-}
 
-WRITE8_MEMBER( tms9928a_device::vram_write )
-{
-	vram_write(data);
+	// prevent debugger from changing the address base
+	if (!machine().side_effects_disabled())
+	{
+		m_Addr = (m_Addr + 1) & (m_vram_size - 1);
+		m_ReadAhead = data;
+		m_latch = 0;
+	}
 }
 
 u8 tms9928a_device::register_read()
@@ -184,11 +176,6 @@ u8 tms9928a_device::register_read()
 	m_latch = 0;
 
 	return data;
-}
-
-READ8_MEMBER( tms9928a_device::register_read )
-{
-	return register_read();
 }
 
 void tms9928a_device::check_interrupt()
@@ -335,11 +322,6 @@ void tms9928a_device::register_write(u8 data)
 		m_Addr = ((m_Addr & 0xff00) | data) & (m_vram_size - 1);
 		m_latch = 1;
 	}
-}
-
-WRITE8_MEMBER( tms9928a_device::register_write )
-{
-	register_write(data);
 }
 
 void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

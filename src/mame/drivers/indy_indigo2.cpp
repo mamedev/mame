@@ -59,6 +59,7 @@
 
 #include "video/newport.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -155,7 +156,7 @@ WRITE32_MEMBER(ip22_state::ip22_write_ram)
 void ip22_state::ip225015_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
-	map(0x08000000, 0x0fffffff).share("mainram").ram().w(this, FUNC(ip22_state::ip22_write_ram));     /* 128 MB of main RAM */
+	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::ip22_write_ram));     /* 128 MB of main RAM */
 	map(0x1f0f0000, 0x1f0f1fff).rw(m_newport, FUNC(newport_video_device::rex3_r), FUNC(newport_video_device::rex3_w));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_sgi_mc, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb90000, 0x1fb9ffff).rw(m_hpc3, FUNC(hpc3_device::hd_enet_r), FUNC(hpc3_device::hd_enet_w));
@@ -171,7 +172,7 @@ void ip22_state::ip225015_map(address_map &map)
 	map(0x1fbdd000, 0x1fbdd3ff).ram();
 	map(0x1fbe0000, 0x1fbe04ff).rw(m_rtc, FUNC(ds1386_device::data_r), FUNC(ds1386_device::data_w)).umask32(0x000000ff);
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
-	map(0x20000000, 0x27ffffff).share("mainram").ram().w(this, FUNC(ip22_state::ip22_write_ram));
+	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip22_state::ip22_write_ram));
 }
 
 void ip22_state::machine_reset()

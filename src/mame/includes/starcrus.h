@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
 #include "sound/samples.h"
+#include "emupal.h"
+
 class starcrus_state : public driver_device
 {
 public:

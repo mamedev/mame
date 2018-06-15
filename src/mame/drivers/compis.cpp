@@ -427,14 +427,14 @@ void compis_state::compis_io(address_map &map)
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
 	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(I80130_TAG, FUNC(i80130_device::io_map));
-	map(0x0300, 0x030f).rw(this, FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
-	map(0x0310, 0x031f).rw(this, FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
-	map(0x0320, 0x032f).rw(this, FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
-	map(0x0330, 0x033f).rw(this, FUNC(compis_state::pcs6_6_7_r), FUNC(compis_state::pcs6_6_7_w));
-	map(0x0340, 0x034f).rw(this, FUNC(compis_state::pcs6_8_9_r), FUNC(compis_state::pcs6_8_9_w));
-	map(0x0350, 0x035f).rw(this, FUNC(compis_state::pcs6_10_11_r), FUNC(compis_state::pcs6_10_11_w));
-	map(0x0360, 0x036f).rw(this, FUNC(compis_state::pcs6_12_13_r), FUNC(compis_state::pcs6_12_13_w));
-	map(0x0370, 0x037f).rw(this, FUNC(compis_state::pcs6_14_15_r), FUNC(compis_state::pcs6_14_15_w));
+	map(0x0300, 0x030f).rw(FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
+	map(0x0310, 0x031f).rw(FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
+	map(0x0320, 0x032f).rw(FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
+	map(0x0330, 0x033f).rw(FUNC(compis_state::pcs6_6_7_r), FUNC(compis_state::pcs6_6_7_w));
+	map(0x0340, 0x034f).rw(FUNC(compis_state::pcs6_8_9_r), FUNC(compis_state::pcs6_8_9_w));
+	map(0x0350, 0x035f).rw(FUNC(compis_state::pcs6_10_11_r), FUNC(compis_state::pcs6_10_11_w));
+	map(0x0360, 0x036f).rw(FUNC(compis_state::pcs6_12_13_r), FUNC(compis_state::pcs6_12_13_w));
+	map(0x0370, 0x037f).rw(FUNC(compis_state::pcs6_14_15_r), FUNC(compis_state::pcs6_14_15_w));
 }
 
 
@@ -775,7 +775,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, compis_state, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, compis_state, ppi_pc_w))
 
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(I8274_TAG, z80dart_device, ctsb_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, compis_state, write_centronics_select))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

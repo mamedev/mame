@@ -54,7 +54,7 @@ WRITE8_MEMBER( pc8001_state::port10_w )
 	m_rtc->data_in_w(BIT(data, 3));
 
 	// centronics
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }
 
 WRITE8_MEMBER( pc8001_state::port30_w )
@@ -187,11 +187,11 @@ void pc8001_state::pc8001_io(address_map &map)
 	map(0x07, 0x07).portr("Y7");
 	map(0x08, 0x08).portr("Y8");
 	map(0x09, 0x09).portr("Y9");
-	map(0x10, 0x10).mirror(0x0f).w(this, FUNC(pc8001_state::port10_w));
+	map(0x10, 0x10).mirror(0x0f).w(FUNC(pc8001_state::port10_w));
 	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x30, 0x30).mirror(0x0f).w(this, FUNC(pc8001_state::port30_w));
-	map(0x40, 0x40).mirror(0x0f).rw(this, FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
+	map(0x30, 0x30).mirror(0x0f).w(FUNC(pc8001_state::port30_w));
+	map(0x40, 0x40).mirror(0x0f).rw(FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
 	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 //  AM_RANGE(0x70, 0x7f) unused
@@ -232,8 +232,8 @@ void pc8001mk2_state::pc8001mk2_mem(address_map &map)
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
 {
 	pc8001_io(map);
-	map(0x30, 0x30).w(this, FUNC(pc8001mk2_state::port30_w));
-	map(0x31, 0x31).w(this, FUNC(pc8001mk2_state::port31_w));
+	map(0x30, 0x30).w(FUNC(pc8001mk2_state::port30_w));
+	map(0x31, 0x31).w(FUNC(pc8001mk2_state::port31_w));
 //  AM_RANGE(0x5c, 0x5c) AM_WRITE(gram_on_w)
 //  AM_RANGE(0x5f, 0x5f) AM_WRITE(gram_off_w)
 //  AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_busy))
 
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

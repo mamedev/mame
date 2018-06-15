@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -120,7 +121,7 @@ void poker72_state::poker72_map(address_map &map)
 	map(0x0000, 0x7fff).bankr("bank1");
 	map(0xc000, 0xdfff).ram(); //work ram
 	map(0xe000, 0xefff).ram().share("vram");
-	map(0xf000, 0xfbff).ram().w(this, FUNC(poker72_state::poker72_paletteram_w)).share("pal");
+	map(0xf000, 0xfbff).ram().w(FUNC(poker72_state::poker72_paletteram_w)).share("pal");
 	map(0xfc00, 0xfdff).ram(); //???
 	map(0xfe08, 0xfe08).portr("SW1");
 	map(0xfe09, 0xfe09).portr("IN1");
@@ -130,8 +131,8 @@ void poker72_state::poker72_map(address_map &map)
 	map(0xfe0e, 0xfe0e).portr("SW6");
 
 	map(0xfe17, 0xfe17).nopr(); //irq ack
-	map(0xfe20, 0xfe20).w(this, FUNC(poker72_state::output_w)); //output, irq enable?
-	map(0xfe22, 0xfe22).w(this, FUNC(poker72_state::tile_bank_w));
+	map(0xfe20, 0xfe20).w(FUNC(poker72_state::output_w)); //output, irq enable?
+	map(0xfe22, 0xfe22).w(FUNC(poker72_state::tile_bank_w));
 	map(0xfe40, 0xfe40).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xfe60, 0xfe60).w("ay", FUNC(ay8910_device::address_w));
 

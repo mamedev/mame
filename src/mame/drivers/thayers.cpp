@@ -629,20 +629,20 @@ void thayers_state::thayers_map(address_map &map)
 void thayers_state::thayers_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).rw(this, FUNC(thayers_state::ssi263_register_r), FUNC(thayers_state::ssi263_register_w));
-	map(0x20, 0x20).w(this, FUNC(thayers_state::control_w));
-	map(0x40, 0x40).rw(this, FUNC(thayers_state::irqstate_r), FUNC(thayers_state::control2_w));
-	map(0x80, 0x80).rw(this, FUNC(thayers_state::cop_data_r), FUNC(thayers_state::cop_data_w));
-	map(0xa0, 0xa0).w(this, FUNC(thayers_state::timer_int_ack_w));
-	map(0xc0, 0xc0).w(this, FUNC(thayers_state::data_rdy_int_ack_w));
-	map(0xf0, 0xf0).r(this, FUNC(thayers_state::laserdsc_data_r));
-	map(0xf1, 0xf1).r(this, FUNC(thayers_state::dsw_b_r));
+	map(0x00, 0x07).rw(FUNC(thayers_state::ssi263_register_r), FUNC(thayers_state::ssi263_register_w));
+	map(0x20, 0x20).w(FUNC(thayers_state::control_w));
+	map(0x40, 0x40).rw(FUNC(thayers_state::irqstate_r), FUNC(thayers_state::control2_w));
+	map(0x80, 0x80).rw(FUNC(thayers_state::cop_data_r), FUNC(thayers_state::cop_data_w));
+	map(0xa0, 0xa0).w(FUNC(thayers_state::timer_int_ack_w));
+	map(0xc0, 0xc0).w(FUNC(thayers_state::data_rdy_int_ack_w));
+	map(0xf0, 0xf0).r(FUNC(thayers_state::laserdsc_data_r));
+	map(0xf1, 0xf1).r(FUNC(thayers_state::dsw_b_r));
 	map(0xf2, 0xf2).portr("DSWA");
-	map(0xf3, 0xf3).w(this, FUNC(thayers_state::intrq_w));
-	map(0xf4, 0xf4).w(this, FUNC(thayers_state::laserdsc_data_w));
-	map(0xf5, 0xf5).w(this, FUNC(thayers_state::laserdsc_control_w));
-	map(0xf6, 0xf6).w(this, FUNC(thayers_state::den1_w));
-	map(0xf7, 0xf7).w(this, FUNC(thayers_state::den2_w));
+	map(0xf3, 0xf3).w(FUNC(thayers_state::intrq_w));
+	map(0xf4, 0xf4).w(FUNC(thayers_state::laserdsc_data_w));
+	map(0xf5, 0xf5).w(FUNC(thayers_state::laserdsc_control_w));
+	map(0xf6, 0xf6).w(FUNC(thayers_state::den1_w));
+	map(0xf7, 0xf7).w(FUNC(thayers_state::den2_w));
 }
 
 /* Input Ports */

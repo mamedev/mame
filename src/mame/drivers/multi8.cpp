@@ -26,6 +26,7 @@
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -292,7 +293,7 @@ void multi8_state::multi8_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rw(this, FUNC(multi8_state::vram_r), FUNC(multi8_state::vram_w));
+	map(0x8000, 0xbfff).rw(FUNC(multi8_state::vram_r), FUNC(multi8_state::vram_w));
 	map(0xc000, 0xffff).ram();
 }
 
@@ -300,11 +301,11 @@ void multi8_state::multi8_io(address_map &map)
 {
 //  ADDRESS_MAP_UNMAP_HIGH
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(multi8_state::key_input_r)); //keyboard
-	map(0x01, 0x01).r(this, FUNC(multi8_state::key_status_r)); //keyboard
+	map(0x00, 0x00).r(FUNC(multi8_state::key_input_r)); //keyboard
+	map(0x01, 0x01).r(FUNC(multi8_state::key_status_r)); //keyboard
 	map(0x18, 0x19).w(m_aysnd, FUNC(ay8910_device::address_data_w));
-	map(0x18, 0x18).r(this, FUNC(multi8_state::ay8912_0_r));
-	map(0x1a, 0x1a).r(this, FUNC(multi8_state::ay8912_1_r));
+	map(0x18, 0x18).r(FUNC(multi8_state::ay8912_0_r));
+	map(0x1a, 0x1a).r(FUNC(multi8_state::ay8912_1_r));
 	map(0x1c, 0x1c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1d, 0x1d).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x20, 0x20).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -312,8 +313,8 @@ void multi8_state::multi8_io(address_map &map)
 	map(0x24, 0x27).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)); //pit
 	map(0x28, 0x2b).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x2c, 0x2d).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)); //i8259
-	map(0x30, 0x37).rw(this, FUNC(multi8_state::pal_r), FUNC(multi8_state::pal_w));
-	map(0x40, 0x41).rw(this, FUNC(multi8_state::kanji_r), FUNC(multi8_state::kanji_w)); //kanji regs
+	map(0x30, 0x37).rw(FUNC(multi8_state::pal_r), FUNC(multi8_state::pal_w));
+	map(0x40, 0x41).rw(FUNC(multi8_state::kanji_r), FUNC(multi8_state::kanji_w)); //kanji regs
 //  AM_RANGE(0x70, 0x74) //upd765a fdc
 //  AM_RANGE(0x78, 0x78) //memory banking
 }

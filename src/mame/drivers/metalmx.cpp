@@ -257,6 +257,7 @@ Logic:
 
 #include "emu.h"
 #include "includes/metalmx.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -509,24 +510,24 @@ void metalmx_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x3fffff).rom();
-	map(0x400000, 0x4000ff).rw(this, FUNC(metalmx_state::host_gsp_r), FUNC(metalmx_state::host_gsp_w));
-	map(0x600000, 0x6fffff).rw(this, FUNC(metalmx_state::host_dram_r), FUNC(metalmx_state::host_dram_w));
-	map(0x700000, 0x7fffff).rw(this, FUNC(metalmx_state::host_vram_r), FUNC(metalmx_state::host_vram_w));
-	map(0x800000, 0x80001f).rw(this, FUNC(metalmx_state::dsp32c_2_r), FUNC(metalmx_state::dsp32c_2_w));
+	map(0x400000, 0x4000ff).rw(FUNC(metalmx_state::host_gsp_r), FUNC(metalmx_state::host_gsp_w));
+	map(0x600000, 0x6fffff).rw(FUNC(metalmx_state::host_dram_r), FUNC(metalmx_state::host_dram_w));
+	map(0x700000, 0x7fffff).rw(FUNC(metalmx_state::host_vram_r), FUNC(metalmx_state::host_vram_w));
+	map(0x800000, 0x80001f).rw(FUNC(metalmx_state::dsp32c_2_r), FUNC(metalmx_state::dsp32c_2_w));
 	map(0x800020, 0x85ffff).noprw();         /* Unknown */
-	map(0x880000, 0x88001f).rw(this, FUNC(metalmx_state::dsp32c_1_r), FUNC(metalmx_state::dsp32c_1_w));
-	map(0x980000, 0x9800ff).w(this, FUNC(metalmx_state::reset_w));
-	map(0xb40000, 0xb40003).rw(this, FUNC(metalmx_state::sound_data_r), FUNC(metalmx_state::sound_data_w));
+	map(0x880000, 0x88001f).rw(FUNC(metalmx_state::dsp32c_1_r), FUNC(metalmx_state::dsp32c_1_w));
+	map(0x980000, 0x9800ff).w(FUNC(metalmx_state::reset_w));
+	map(0xb40000, 0xb40003).rw(FUNC(metalmx_state::sound_data_r), FUNC(metalmx_state::sound_data_w));
 	map(0xf00000, 0xf00003).ram();         /* Network message port */
-	map(0xf02000, 0xf02003).rw(this, FUNC(metalmx_state::watchdog_r), FUNC(metalmx_state::shifter_w));
-	map(0xf03000, 0xf03003).portr("P1").w(this, FUNC(metalmx_state::motor_w));
+	map(0xf02000, 0xf02003).rw(FUNC(metalmx_state::watchdog_r), FUNC(metalmx_state::shifter_w));
+	map(0xf03000, 0xf03003).portr("P1").w(FUNC(metalmx_state::motor_w));
 	map(0xf04000, 0xf04003).portr("P2");
 	map(0xf05000, 0xf05fff).nopw();    /* Lamps */ // f06000 = ADC  // f01xxx = ADC
 	map(0xf19000, 0xf19003).nopw();    /* Network */
 	map(0xf1a000, 0xf1a003).nopw();
 	map(0xf1b000, 0xf1b003).nopw();
 	map(0xf1e000, 0xf1e003).ram();         /* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
-	map(0xf20000, 0xf2ffff).w(this, FUNC(metalmx_state::timer_w));
+	map(0xf20000, 0xf2ffff).w(FUNC(metalmx_state::timer_w));
 	map(0xfc0000, 0xfc1fff).ram();         /* Zero power RAM */
 	map(0xfd0000, 0xffffff).ram();         /* Scratch RAM */
 }
@@ -579,8 +580,8 @@ void metalmx_state::dsp32c_1_map(address_map &map)
 	map(0x000000, 0x03ffff).ram();
 	map(0x600000, 0x67ffff).ram();
 	map(0x700000, 0x700003).nopw();    /* LEDs? */
-	map(0xa00000, 0xa00003).r(this, FUNC(metalmx_state::unk_r));
-	map(0xb00000, 0xb00003).r(this, FUNC(metalmx_state::unk_r));
+	map(0xa00000, 0xa00003).r(FUNC(metalmx_state::unk_r));
+	map(0xb00000, 0xb00003).r(FUNC(metalmx_state::unk_r));
 	map(0xc00000, 0xc00003).ram();         /* FIFO? */
 	map(0xf00000, 0xffffff).ram();         /* 3D registers */
 }
@@ -597,8 +598,8 @@ void metalmx_state::dsp32c_2_map(address_map &map)
 	map(0x000000, 0x03ffff).ram();
 	map(0x600000, 0x67ffff).ram();
 	map(0x700000, 0x700003).nopw();    /* LEDs? */
-	map(0xa00000, 0xa00003).r(this, FUNC(metalmx_state::unk_r));
-	map(0xb00000, 0xb00003).r(this, FUNC(metalmx_state::unk_r));
+	map(0xa00000, 0xa00003).r(FUNC(metalmx_state::unk_r));
+	map(0xb00000, 0xb00003).r(FUNC(metalmx_state::unk_r));
 	map(0xc00000, 0xc00003).ram();         /* FIFO? */
 	map(0xf00000, 0xffffff).ram();         /* 3D registers */
 }

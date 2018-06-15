@@ -157,21 +157,21 @@ void ultratnk_state::ultratnk_cpu_map(address_map &map)
 	map.global_mask(0x3fff);
 
 	map(0x0000, 0x007f).mirror(0x700).ram();
-	map(0x0080, 0x00ff).mirror(0x700).rw(this, FUNC(ultratnk_state::wram_r), FUNC(ultratnk_state::wram_w));
-	map(0x0800, 0x0bff).mirror(0x400).ram().w(this, FUNC(ultratnk_state::video_ram_w)).share("videoram");
+	map(0x0080, 0x00ff).mirror(0x700).rw(FUNC(ultratnk_state::wram_r), FUNC(ultratnk_state::wram_w));
+	map(0x0800, 0x0bff).mirror(0x400).ram().w(FUNC(ultratnk_state::video_ram_w)).share("videoram");
 
 	map(0x1000, 0x17ff).portr("IN0");
 	map(0x1800, 0x1fff).portr("IN1");
 
-	map(0x2000, 0x2007).mirror(0x718).r(this, FUNC(ultratnk_state::analog_r));
-	map(0x2020, 0x2027).mirror(0x718).r(this, FUNC(ultratnk_state::coin_r));
-	map(0x2040, 0x2047).mirror(0x718).r(this, FUNC(ultratnk_state::collision_r));
-	map(0x2060, 0x2063).mirror(0x71c).r(this, FUNC(ultratnk_state::options_r));
+	map(0x2000, 0x2007).mirror(0x718).r(FUNC(ultratnk_state::analog_r));
+	map(0x2020, 0x2027).mirror(0x718).r(FUNC(ultratnk_state::coin_r));
+	map(0x2040, 0x2047).mirror(0x718).r(FUNC(ultratnk_state::collision_r));
+	map(0x2060, 0x2063).mirror(0x71c).r(FUNC(ultratnk_state::options_r));
 
-	map(0x2000, 0x2000).mirror(0x71f).w(this, FUNC(ultratnk_state::attract_w));
-	map(0x2020, 0x2027).mirror(0x718).w(this, FUNC(ultratnk_state::collision_reset_w));
-	map(0x2040, 0x2041).mirror(0x718).w(this, FUNC(ultratnk_state::da_latch_w));
-	map(0x2042, 0x2043).mirror(0x718).w(this, FUNC(ultratnk_state::explosion_w));
+	map(0x2000, 0x2000).mirror(0x71f).w(FUNC(ultratnk_state::attract_w));
+	map(0x2020, 0x2027).mirror(0x718).w(FUNC(ultratnk_state::collision_reset_w));
+	map(0x2040, 0x2041).mirror(0x718).w(FUNC(ultratnk_state::da_latch_w));
+	map(0x2042, 0x2043).mirror(0x718).w(FUNC(ultratnk_state::explosion_w));
 	map(0x2044, 0x2045).mirror(0x718).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x2060, 0x206f).mirror(0x710).w("latch", FUNC(f9334_device::write_a0));
 

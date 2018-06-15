@@ -341,9 +341,9 @@ void tec1_state::tec1_map(address_map &map)
 void tec1_state::tec1_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
-	map(0x01, 0x01).w(this, FUNC(tec1_state::tec1_digit_w));
-	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tec1_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
 }
 
 
@@ -358,10 +358,10 @@ void tec1_state::tecjmon_map(address_map &map)
 void tec1_state::tecjmon_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
-	map(0x01, 0x01).w(this, FUNC(tec1_state::tecjmon_digit_w));
-	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
-	map(0x03, 0x03).r(this, FUNC(tec1_state::latch_r));
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tecjmon_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
+	map(0x03, 0x03).r(FUNC(tec1_state::latch_r));
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
 	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
 }

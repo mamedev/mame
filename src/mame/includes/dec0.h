@@ -7,6 +7,7 @@
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class dec0_state : public driver_device
 {

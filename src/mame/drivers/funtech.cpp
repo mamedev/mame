@@ -26,6 +26,7 @@ and an unpopulated position for a YM2413 or UM3567
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -257,10 +258,10 @@ void fun_tech_corp_state::funtech_map(address_map &map)
 
 	map(0xd800, 0xdfff).ram().share("nvram");
 
-	map(0xe000, 0xefff).ram().w(this, FUNC(fun_tech_corp_state::fgram_w)).share("fgram");
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(fun_tech_corp_state::reel1_ram_w)).share("reel1ram");
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(fun_tech_corp_state::reel2_ram_w)).share("reel2ram");
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(fun_tech_corp_state::reel3_ram_w)).share("reel3ram");
+	map(0xe000, 0xefff).ram().w(FUNC(fun_tech_corp_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(fun_tech_corp_state::reel1_ram_w)).share("reel1ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(fun_tech_corp_state::reel2_ram_w)).share("reel2ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(fun_tech_corp_state::reel3_ram_w)).share("reel3ram");
 	map(0xf600, 0xf7ff).ram();
 
 	map(0xf840, 0xf87f).ram().share("reel1_scroll");
@@ -321,10 +322,10 @@ void fun_tech_corp_state::funtech_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	// lamps?
-	map(0x00, 0x00).w(this, FUNC(fun_tech_corp_state::lamps_w));
-	map(0x01, 0x01).w(this, FUNC(fun_tech_corp_state::coins_w));
+	map(0x00, 0x00).w(FUNC(fun_tech_corp_state::lamps_w));
+	map(0x01, 0x01).w(FUNC(fun_tech_corp_state::coins_w));
 
-	map(0x03, 0x03).w(this, FUNC(fun_tech_corp_state::vreg_w));
+	map(0x03, 0x03).w(FUNC(fun_tech_corp_state::vreg_w));
 
 	map(0x04, 0x04).portr("IN0");
 	map(0x05, 0x05).portr("IN1");

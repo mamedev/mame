@@ -11,6 +11,7 @@
 
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
+#include "emupal.h"
 
 /* defines for each bit and mask in input port "CSW" */
 enum

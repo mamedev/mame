@@ -82,7 +82,7 @@ private:
 void clpoker_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xdfff).ram().w(this, FUNC(clpoker_state::videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(clpoker_state::videoram_w)).share("videoram");
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xf000, 0xf000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0xf001, 0xf001).w("ramdac", FUNC(ramdac_device::pal_w));

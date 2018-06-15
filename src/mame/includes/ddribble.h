@@ -8,6 +8,7 @@
 
 #include "sound/flt_rc.h"
 #include "sound/vlm5030.h"
+#include "emupal.h"
 
 class ddribble_state : public driver_device
 {

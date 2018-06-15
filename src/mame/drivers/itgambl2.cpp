@@ -56,6 +56,7 @@
 #include "emu.h"
 #include "cpu/h8/h83337.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

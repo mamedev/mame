@@ -82,7 +82,7 @@ void mcb216_state::mcb216_io(address_map &map)
 {
 	map.global_mask(0xff);
 	// 74904 PROM provides custom remapping for TMS5501 registers
-	map(0x00, 0x00).r(this, FUNC(mcb216_state::tms5501_status_r)).w(m_tms5501, FUNC(tms5501_device::rr_w));
+	map(0x00, 0x00).r(FUNC(mcb216_state::tms5501_status_r)).w(m_tms5501, FUNC(tms5501_device::rr_w));
 	map(0x01, 0x01).rw(m_tms5501, FUNC(tms5501_device::rb_r), FUNC(tms5501_device::tb_w));
 	map(0x02, 0x02).w(m_tms5501, FUNC(tms5501_device::cmd_w));
 	map(0x03, 0x03).rw(m_tms5501, FUNC(tms5501_device::rst_r), FUNC(tms5501_device::mr_w));

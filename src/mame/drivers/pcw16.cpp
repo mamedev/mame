@@ -144,7 +144,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_timer_callback)
 
 void pcw16_state::pcw16_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pcw16_state::pcw16_mem_r), FUNC(pcw16_state::pcw16_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(pcw16_state::pcw16_mem_r), FUNC(pcw16_state::pcw16_mem_w));
 }
 
 
@@ -167,11 +167,11 @@ uint8_t pcw16_state::read_bank_data(uint8_t type, uint16_t offset)
 		}
 		if(type < 0x40)  // first flash
 		{
-			return m_flash0->read(((type & 0x3f)*0x4000)+offset);
+			return m_flash0->read(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset);
 		}
 		else  // second flash
 		{
-			return m_flash1->read(((type & 0x3f)*0x4000)+offset);
+			return m_flash1->read(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset);
 		}
 	}
 }
@@ -188,11 +188,11 @@ void pcw16_state::write_bank_data(uint8_t type, uint16_t offset, uint8_t data)
 			return;  // first four sectors are write protected
 		if(type < 0x40)  // first flash
 		{
-			m_flash0->write(((type & 0x3f)*0x4000)+offset,data);
+			m_flash0->write(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset, data);
 		}
 		else  // second flash
 		{
-			m_flash1->write(((type & 0x3f)*0x4000)+offset,data);
+			m_flash1->write(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset, data);
 		}
 	}
 }
@@ -945,19 +945,19 @@ void pcw16_state::pcw16_io(address_map &map)
 	map(0x028, 0x02f).rw(m_uart2, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x038, 0x03a).rw("lpt", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
 	/* anne asic */
-	map(0x0e0, 0x0ef).w(this, FUNC(pcw16_state::pcw16_palette_w));
-	map(0x0f0, 0x0f3).rw(this, FUNC(pcw16_state::pcw16_bankhw_r), FUNC(pcw16_state::pcw16_bankhw_w));
-	map(0x0f4, 0x0f4).rw(this, FUNC(pcw16_state::pcw16_keyboard_data_shift_r), FUNC(pcw16_state::pcw16_keyboard_data_shift_w));
-	map(0x0f5, 0x0f5).rw(this, FUNC(pcw16_state::pcw16_keyboard_status_r), FUNC(pcw16_state::pcw16_keyboard_control_w));
-	map(0x0f7, 0x0f7).rw(this, FUNC(pcw16_state::pcw16_timer_interrupt_counter_r), FUNC(pcw16_state::pcw16_video_control_w));
-	map(0x0f8, 0x0f8).rw(this, FUNC(pcw16_state::pcw16_system_status_r), FUNC(pcw16_state::pcw16_system_control_w));
-	map(0x0f9, 0x0f9).rw(this, FUNC(pcw16_state::rtc_256ths_seconds_r), FUNC(pcw16_state::rtc_control_w));
-	map(0x0fa, 0x0fa).rw(this, FUNC(pcw16_state::rtc_seconds_r), FUNC(pcw16_state::rtc_seconds_w));
-	map(0x0fb, 0x0fb).rw(this, FUNC(pcw16_state::rtc_minutes_r), FUNC(pcw16_state::rtc_minutes_w));
-	map(0x0fc, 0x0fc).rw(this, FUNC(pcw16_state::rtc_hours_r), FUNC(pcw16_state::rtc_hours_w));
-	map(0x0fd, 0x0fd).rw(this, FUNC(pcw16_state::rtc_days_r), FUNC(pcw16_state::rtc_days_w));
-	map(0x0fe, 0x0fe).rw(this, FUNC(pcw16_state::rtc_month_r), FUNC(pcw16_state::rtc_month_w));
-	map(0x0ff, 0x0ff).rw(this, FUNC(pcw16_state::rtc_year_invalid_r), FUNC(pcw16_state::rtc_year_w));
+	map(0x0e0, 0x0ef).w(FUNC(pcw16_state::pcw16_palette_w));
+	map(0x0f0, 0x0f3).rw(FUNC(pcw16_state::pcw16_bankhw_r), FUNC(pcw16_state::pcw16_bankhw_w));
+	map(0x0f4, 0x0f4).rw(FUNC(pcw16_state::pcw16_keyboard_data_shift_r), FUNC(pcw16_state::pcw16_keyboard_data_shift_w));
+	map(0x0f5, 0x0f5).rw(FUNC(pcw16_state::pcw16_keyboard_status_r), FUNC(pcw16_state::pcw16_keyboard_control_w));
+	map(0x0f7, 0x0f7).rw(FUNC(pcw16_state::pcw16_timer_interrupt_counter_r), FUNC(pcw16_state::pcw16_video_control_w));
+	map(0x0f8, 0x0f8).rw(FUNC(pcw16_state::pcw16_system_status_r), FUNC(pcw16_state::pcw16_system_control_w));
+	map(0x0f9, 0x0f9).rw(FUNC(pcw16_state::rtc_256ths_seconds_r), FUNC(pcw16_state::rtc_control_w));
+	map(0x0fa, 0x0fa).rw(FUNC(pcw16_state::rtc_seconds_r), FUNC(pcw16_state::rtc_seconds_w));
+	map(0x0fb, 0x0fb).rw(FUNC(pcw16_state::rtc_minutes_r), FUNC(pcw16_state::rtc_minutes_w));
+	map(0x0fc, 0x0fc).rw(FUNC(pcw16_state::rtc_hours_r), FUNC(pcw16_state::rtc_hours_w));
+	map(0x0fd, 0x0fd).rw(FUNC(pcw16_state::rtc_days_r), FUNC(pcw16_state::rtc_days_w));
+	map(0x0fe, 0x0fe).rw(FUNC(pcw16_state::rtc_month_r), FUNC(pcw16_state::rtc_month_w));
+	map(0x0ff, 0x0ff).rw(FUNC(pcw16_state::rtc_year_invalid_r), FUNC(pcw16_state::rtc_year_w));
 }
 
 

@@ -96,6 +96,7 @@ Notes:
 #include "machine/tmp68301.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -429,7 +430,7 @@ READ16_MEMBER(joystand_state::cart_r)
 {
 	int which = offset / 0x80000;
 	int addr  = offset & 0x7ffff;
-	return (m_cart_flash[which * 2 + 0]->read(addr) << 8) | m_cart_flash[which * 2 + 1]->read(addr);
+	return (m_cart_flash[which * 2 + 0]->read(space, addr) << 8) | m_cart_flash[which * 2 + 1]->read(space, addr);
 }
 
 WRITE16_MEMBER(joystand_state::cart_w)
@@ -438,9 +439,9 @@ WRITE16_MEMBER(joystand_state::cart_w)
 	int addr  = offset & 0x7ffff;
 
 	if (ACCESSING_BITS_0_7)
-		m_cart_flash[which * 2 + 1]->write(addr, data & 0xff);
+		m_cart_flash[which * 2 + 1]->write(space, addr, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_cart_flash[which * 2 + 0]->write(addr, data >> 8);
+		m_cart_flash[which * 2 + 0]->write(space, addr, data >> 8);
 
 	bg15_tiles_dirty = true;
 }
@@ -452,26 +453,26 @@ void joystand_state::joystand_map(address_map &map)
 	map(0x200000, 0x200003).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x200009, 0x200009).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200010, 0x200011).portr("IN0"); // r/w
-	map(0x200012, 0x200013).ram().w(this, FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
-	map(0x200014, 0x200015).rw(this, FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
+	map(0x200012, 0x200013).ram().w(FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
+	map(0x200014, 0x200015).rw(FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
 //  AM_RANGE(0x200016, 0x200017) // write $9190 at boot
 
-	map(0x400000, 0x47ffff).ram().w(this, FUNC(joystand_state::bg15_0_w)).share("bg15_0_ram"); // r5g5b5 200x200 pixel-based
+	map(0x400000, 0x47ffff).ram().w(FUNC(joystand_state::bg15_0_w)).share("bg15_0_ram"); // r5g5b5 200x200 pixel-based
 	map(0x480000, 0x4fffff).ram(); // more rgb layers? (writes at offset 0)
 	map(0x500000, 0x57ffff).ram(); // ""
 	map(0x580000, 0x5fffff).ram(); // ""
 
-	map(0x600000, 0x603fff).ram().w(this, FUNC(joystand_state::bg2_w)).share("bg2_ram");
-	map(0x604000, 0x605fff).ram().w(this, FUNC(joystand_state::bg1_w)).share("bg1_ram");
-	map(0x606000, 0x607fff).ram().w(this, FUNC(joystand_state::bg15_1_w)).share("bg15_1_ram"); // r5g5b5 200x200 tile-based
+	map(0x600000, 0x603fff).ram().w(FUNC(joystand_state::bg2_w)).share("bg2_ram");
+	map(0x604000, 0x605fff).ram().w(FUNC(joystand_state::bg1_w)).share("bg1_ram");
+	map(0x606000, 0x607fff).ram().w(FUNC(joystand_state::bg15_1_w)).share("bg15_1_ram"); // r5g5b5 200x200 tile-based
 	map(0x608000, 0x609fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x60c000, 0x60c003).ram().share("scroll"); // write
 	map(0x60c00c, 0x60c00d).ram().share("enable"); // write
 
-	map(0x800000, 0xdfffff).rw(this, FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
+	map(0x800000, 0xdfffff).rw(FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
 //  AM_RANGE(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
-	map(0xe00000, 0xe00001).r(this, FUNC(joystand_state::e00000_r)); // copy slot
-	map(0xe00020, 0xe00021).r(this, FUNC(joystand_state::e00020_r)); // master slot
+	map(0xe00000, 0xe00001).r(FUNC(joystand_state::e00000_r)); // copy slot
+	map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
 
 	map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 
@@ -632,7 +633,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_TMS_29F040_ADD("cart.u12")
 
 	// devices
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 

@@ -31,6 +31,7 @@ Notes:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -159,18 +160,18 @@ void ettrivia_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x9000, 0x9000).w(this, FUNC(ettrivia_state::ettrivia_control_w));
+	map(0x9000, 0x9000).w(FUNC(ettrivia_state::ettrivia_control_w));
 	map(0x9800, 0x9800).nopw();
 	map(0xa000, 0xa000).nopw();
-	map(0xb000, 0xb000).r(this, FUNC(ettrivia_state::b000_r)).w(this, FUNC(ettrivia_state::b000_w));
-	map(0xb800, 0xb800).w(this, FUNC(ettrivia_state::b800_w));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
+	map(0xb000, 0xb000).r(FUNC(ettrivia_state::b000_r)).w(FUNC(ettrivia_state::b000_w));
+	map(0xb800, 0xb800).w(FUNC(ettrivia_state::b800_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
 }
 
 void ettrivia_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(ettrivia_state::ettrivia_question_r));
+	map(0x0000, 0xffff).r(FUNC(ettrivia_state::ettrivia_question_r));
 }
 
 static INPUT_PORTS_START( ettrivia )

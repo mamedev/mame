@@ -3,6 +3,7 @@
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh/sh2.h"
+#include "emupal.h"
 #include "screen.h"
 
 

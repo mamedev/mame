@@ -110,7 +110,7 @@ void mikie_state::mikie_map(address_map &map)
 	map(0x0000, 0x00ff).ram();
 	map(0x2000, 0x2007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x2100, 0x2100).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2200, 0x2200).w(this, FUNC(mikie_state::mikie_palettebank_w));
+	map(0x2200, 0x2200).w(FUNC(mikie_state::mikie_palettebank_w));
 	map(0x2300, 0x2300).nopw();    // ???
 	map(0x2400, 0x2400).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x2401, 0x2401).portr("P1");
@@ -120,8 +120,8 @@ void mikie_state::mikie_map(address_map &map)
 	map(0x2501, 0x2501).portr("DSW2");
 	map(0x2800, 0x288f).ram().share("spriteram");
 	map(0x2890, 0x37ff).ram();
-	map(0x3800, 0x3bff).ram().w(this, FUNC(mikie_state::mikie_colorram_w)).share("colorram");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(mikie_state::mikie_videoram_w)).share("videoram");
+	map(0x3800, 0x3bff).ram().w(FUNC(mikie_state::mikie_colorram_w)).share("colorram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(mikie_state::mikie_videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).rom(); // Machine checks for extra rom
 	map(0x6000, 0xffff).rom();
 }
@@ -132,10 +132,10 @@ void mikie_state::sound_map(address_map &map)
 	map(0x4000, 0x43ff).ram();
 	map(0x8000, 0x8000).nopw();    // sound command latch
 	map(0x8001, 0x8001).nopw();    // ???
-	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::write)); // trigger read of latch
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::command_w)); // trigger read of latch
 	map(0x8003, 0x8003).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::write)); // trigger read of latch
-	map(0x8005, 0x8005).r(this, FUNC(mikie_state::mikie_sh_timer_r));
+	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::command_w)); // trigger read of latch
+	map(0x8005, 0x8005).r(FUNC(mikie_state::mikie_sh_timer_r));
 	map(0x8079, 0x8079).nopw();    // ???
 	map(0xa003, 0xa003).nopw();    // ???
 }

@@ -29,6 +29,7 @@
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -150,11 +151,11 @@ READ8_MEMBER(gameking_state::lcd_r)
 
 void gameking_state::gameking_mem(address_map &map)
 {
-	map(0x0000, 0x007f).rw(this, FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
+	map(0x0000, 0x007f).rw(FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
 	map(0x0080, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
 
-	map(0x0600, 0x077f).rw(this, FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
+	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
 	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
 //  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 

@@ -24,6 +24,7 @@
 #include "sound/ym2151.h"
 #include "bus/x68k/x68kexp.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define MC68901_TAG     "mc68901"

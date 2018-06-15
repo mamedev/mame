@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80
 
 void bbc_tube_z80_device::tube_z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
 }
 
 //-------------------------------------------------
@@ -36,7 +36,7 @@ void bbc_tube_z80_device::tube_z80_mem(address_map &map)
 
 void bbc_tube_z80_device::tube_z80_fetch(address_map &map)
 {
-	map(0x000, 0xffff).r(this, FUNC(bbc_tube_z80_device::opcode_r));
+	map(0x000, 0xffff).r(FUNC(bbc_tube_z80_device::opcode_r));
 }
 
 //-------------------------------------------------

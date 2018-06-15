@@ -194,8 +194,8 @@ void fastfred_state::fastfred_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd3ff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd000, 0xd3ff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xdbff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
@@ -210,10 +210,10 @@ void fastfred_state::jumpcoas_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd03f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd000, 0xd03f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd040, 0xd05f).ram().share("spriteram");
 	map(0xd060, 0xd3ff).ram();
-	map(0xd800, 0xdbff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
 	map(0xe000, 0xe000).writeonly().share("bgcolor");
 	map(0xe800, 0xe800).portr("DSW1");
 	map(0xe801, 0xe801).portr("DSW2");
@@ -228,14 +228,14 @@ void fastfred_state::jumpcoas_map(address_map &map)
 void fastfred_state::imago_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x1fff).r(this, FUNC(fastfred_state::imago_sprites_offset_r));
+	map(0x1000, 0x1fff).r(FUNC(fastfred_state::imago_sprites_offset_r));
 	map(0x2000, 0x6fff).rom();
 	map(0xb000, 0xb3ff).ram(); // same fg videoram (which one of the 2 is really used?)
-	map(0xb800, 0xbfff).ram().w(this, FUNC(fastfred_state::imago_sprites_dma_w));
+	map(0xb800, 0xbfff).ram().w(FUNC(fastfred_state::imago_sprites_dma_w));
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(this, FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xc800, 0xcbff).ram().w(FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xd8ff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS");
@@ -243,7 +243,7 @@ void fastfred_state::imago_map(address_map &map)
 	map(0xf000, 0xf000).portr("DSW");
 	map(0xf000, 0xf007).mirror(0x03f8).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xf400, 0xf400).nopw(); // writes 0 or 2
-	map(0xf401, 0xf401).w(this, FUNC(fastfred_state::imago_sprites_bank_w));
+	map(0xf401, 0xf401).w(FUNC(fastfred_state::imago_sprites_bank_w));
 	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -251,7 +251,7 @@ void fastfred_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(fastfred_state::sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(fastfred_state::sound_nmi_mask_w));
 	map(0x4000, 0x4000).writeonly();  // Reset PSG's
 	map(0x5000, 0x5001).w("ay8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay8910.2", FUNC(ay8910_device::address_data_w));
@@ -834,40 +834,58 @@ ROM_START( flyboyb )
 	ROM_LOAD( "blue.7h",      0x0200, 0x0100, CRC(85c05c18) SHA1(a609a45c593fc6c491624076f7d65da55b5e603f) )
 ROM_END
 
-ROM_START( jumpcoas )
+ROM_START( jumpcoas ) /* Kaneko FB-100A PCB, ROMs simply labeled 1 through 7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jumpcoas.001", 0x0000, 0x2000, CRC(0778c953) SHA1(7def6656532332e56d76700431e4c3199e407e50) )
-	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
-	ROM_LOAD( "jumpcoas.003", 0x4000, 0x2000, CRC(d9fc93be) SHA1(e13476991720a1e900f4ab65175df7ee40c6960d) )
-	ROM_LOAD( "jumpcoas.004", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) )
+	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(418b4b3d) SHA1(4ae8180e1f0541fcbd6644fcfa5a839447ad0c61) )
+	ROM_LOAD( "2.d2", 0x2000, 0x2000, CRC(4bba794b) SHA1(94d65034b10cd2dc72d27bb4b97e0a5c839b0b09) )
+	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(6383c0b0) SHA1(8cf46208962069a5e8e23a99f0d43e0f11b0bfa6) )
+	ROM_LOAD( "4.d5", 0x6000, 0x2000, CRC(340f4c3c) SHA1(f0d7ff44139b18d864a8c108c97e4c95262e45de) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "jumpcoas.005", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
-	ROM_LOAD( "jumpcoas.006", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
-	ROM_LOAD( "jumpcoas.007", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
+	ROM_LOAD( "5.h10", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
+	ROM_LOAD( "6.h11", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
+	ROM_LOAD( "7.h12", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "jumpcoas.red", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) )
-	ROM_LOAD( "jumpcoas.gre", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) )
-	ROM_LOAD( "jumpcoas.blu", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) )
+	ROM_LOAD( "tbp24s10n_r.e10", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) ) /* TBP24S10N BPROM marked R */
+	ROM_LOAD( "tbp24s10n_g.e11", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) ) /* TBP24S10N BPROM marked G */
+	ROM_LOAD( "tbp24s10n_b.e12", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) ) /* TBP24S10N BPROM marked B */
 ROM_END
 
-ROM_START( jumpcoast )
+ROM_START( jumpcoasa ) /* Kaneko FB-100A PCB, ROMs simply labeled 1 through 7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(8ac220c5) SHA1(714dd34ca6c6c1803778a715b803f81a94286e1c) )
-	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
-	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(17e4deba) SHA1(880689304af9744de3c96936f03345968ab8085c) )
-	ROM_LOAD( "jumpcoas.004", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) )
+	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(0778c953) SHA1(7def6656532332e56d76700431e4c3199e407e50) ) // sldh
+	ROM_LOAD( "2.d2", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) ) // sldh
+	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(d9fc93be) SHA1(e13476991720a1e900f4ab65175df7ee40c6960d) ) // sldh
+	ROM_LOAD( "4.d5", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) ) // sldh
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "jumpcoas.005", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
-	ROM_LOAD( "jumpcoas.006", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
-	ROM_LOAD( "jumpcoas.007", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
+	ROM_LOAD( "5.h10", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
+	ROM_LOAD( "6.h11", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
+	ROM_LOAD( "7.h12", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "jumpcoas.red", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) )
-	ROM_LOAD( "jumpcoas.gre", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) )
-	ROM_LOAD( "jumpcoas.blu", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) )
+	ROM_LOAD( "tbp24s10n_r.e10", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) ) /* TBP24S10N BPROM marked R */
+	ROM_LOAD( "tbp24s10n_g.e11", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) ) /* TBP24S10N BPROM marked G */
+	ROM_LOAD( "tbp24s10n_b.e12", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) ) /* TBP24S10N BPROM marked B */
+ROM_END
+
+ROM_START( jumpcoast ) /* Kaneko FB-100A PCB, ROMs simply labeled 1 through 7 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(8ac220c5) SHA1(714dd34ca6c6c1803778a715b803f81a94286e1c) ) // sldh
+	ROM_LOAD( "2.d2", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) ) // sldh
+	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(17e4deba) SHA1(880689304af9744de3c96936f03345968ab8085c) ) // sldh
+	ROM_LOAD( "4.d5", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) ) // sldh
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "5.h10", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
+	ROM_LOAD( "6.h11", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
+	ROM_LOAD( "7.h12", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "tbp24s10n_r.e10", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) ) /* TBP24S10N BPROM marked R */
+	ROM_LOAD( "tbp24s10n_g.e11", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) ) /* TBP24S10N BPROM marked G */
+	ROM_LOAD( "tbp24s10n_b.e12", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) ) /* TBP24S10N BPROM marked B */
 ROM_END
 
 ROM_START( boggy84 )
@@ -1064,7 +1082,8 @@ void fastfred_state::init_imago()
 GAME( 1982, flyboy,    0,        fastfred, flyboy,   fastfred_state, init_flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, flyboyb,   flyboy,   fastfred, flyboy,   fastfred_state, init_flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, fastfred,  flyboy,   fastfred, fastfred, fastfred_state, init_fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoas,  0,        jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoas,  0,        jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko Elc. Co.", "Jump Coaster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoasa, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jumpcoast, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, boggy84,   0,        jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )

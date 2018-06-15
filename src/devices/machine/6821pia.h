@@ -107,8 +107,8 @@ public:
 	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
 	void set_port_a_z_mask(uint8_t data) { m_port_a_z_mask = data; }// see second note in .c
 
-	DECLARE_WRITE8_MEMBER( porta_w ) { porta_w(data); }
-	void porta_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( porta_w ) { write_porta(data); }
+	void write_porta(uint8_t data);
 	void set_a_input(uint8_t data, uint8_t z_mask);
 	uint8_t a_output();
 
@@ -118,8 +118,8 @@ public:
 	bool ca2_output();
 	bool ca2_output_z();
 
-	DECLARE_WRITE8_MEMBER( portb_w ) { portb_w(data); }
-	void portb_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( portb_w ) { write_portb(data); }
+	void write_portb(uint8_t data);
 	uint8_t b_output();
 
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );

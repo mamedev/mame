@@ -7,6 +7,8 @@
 **************************************************************************/
 #include "sound/msm5205.h"
 #include "machine/bankdev.h"
+#include "emupal.h"
+
 #define MASTER_CLOCK        XTAL(18'432'000)
 
 

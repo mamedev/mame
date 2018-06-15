@@ -107,13 +107,13 @@ void ampro_state::ampro_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(ampro_state::port00_w)); // system
+	map(0x00, 0x00).w(FUNC(ampro_state::port00_w)); // system
 	//AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // printer data
 	//AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) // printer strobe
 	//AM_RANGE(0x20, 0x27) AM_READWRITE() // scsi chip
 	//AM_RANGE(0x28, 0x28) AM_WRITE(port28_w) // scsi control
 	//AM_RANGE(0x29, 0x29) AM_READ(port29_r) // ID port
-	map(0x40, 0x8f).rw(this, FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
+	map(0x40, 0x8f).rw(FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
 	map(0xc0, 0xc3).w(m_fdc, FUNC(wd1772_device::write));
 	map(0xc4, 0xc7).r(m_fdc, FUNC(wd1772_device::read));
 }

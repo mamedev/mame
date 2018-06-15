@@ -2,6 +2,7 @@
 // copyright-holders:Roberto Fresca
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "emupal.h"
 
 class calomega_state : public driver_device
 {

@@ -67,6 +67,7 @@ TODO:
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -532,92 +533,92 @@ void vamphalf_state::vamphalf_io(address_map &map)
 	map(0x0c3, 0x0c3).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140, 0x143).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x147, 0x147).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
-	map(0x1c0, 0x1c3).r(this, FUNC(vamphalf_state::eeprom_r));
-	map(0x240, 0x243).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x1c0, 0x1c3).r(FUNC(vamphalf_state::eeprom_r));
+	map(0x240, 0x243).w(FUNC(vamphalf_state::flipscreen_w));
 	map(0x600, 0x603).portr("SYSTEM");
 	map(0x604, 0x607).portr("P1_P2");
-	map(0x608, 0x60b).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x608, 0x60b).w(FUNC(vamphalf_state::eeprom_w));
 }
 
 void vamphalf_qdsp_state::misncrft_io(address_map &map)
 {
-	map(0x100, 0x103).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x100, 0x103).w(FUNC(vamphalf_state::flipscreen_w));
 	map(0x200, 0x203).portr("P1_P2");
 	map(0x240, 0x243).portr("SYSTEM");
-	map(0x3c0, 0x3c3).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x3c0, 0x3c3).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x400, 0x403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x580, 0x583).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x580, 0x583).r(FUNC(vamphalf_state::eeprom_r));
 }
 
 void vamphalf_state::coolmini_io(address_map &map)
 {
-	map(0x200, 0x203).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x200, 0x203).w(FUNC(vamphalf_state::flipscreen_w));
 	map(0x300, 0x303).portr("SYSTEM");
 	map(0x304, 0x307).portr("P1_P2");
-	map(0x308, 0x30b).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x308, 0x30b).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x4c0, 0x4c1).noprw(); // return 0, when oki chip is read / written
 	map(0x4c3, 0x4c3).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x540, 0x543).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x544, 0x547).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
-	map(0x7c0, 0x7c3).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x7c0, 0x7c3).r(FUNC(vamphalf_state::eeprom_r));
 }
 
 void vamphalf_state::mrkicker_io(address_map &map)
 {
-	map(0x002, 0x003).w(this, FUNC(vamphalf_state::mrkicker_oki_bank_w));
+	map(0x002, 0x003).w(FUNC(vamphalf_state::mrkicker_oki_bank_w));
 	coolmini_io(map);
 }
 
 void vamphalf_state::suplup_io(address_map &map)
 {
-	map(0x020, 0x023).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x020, 0x023).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x040, 0x043).portr("P1_P2");
 	map(0x060, 0x063).portr("SYSTEM");
 	map(0x080, 0x081).noprw(); // return 0, when oki chip is read / written
 	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
-	map(0x100, 0x103).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x100, 0x103).r(FUNC(vamphalf_state::eeprom_r));
 }
 
 void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
 {
-	map(0x1800, 0x1803).rw(this, FUNC(vamphalf_qdsp_state::wyvernwg_prot_r), FUNC(vamphalf_qdsp_state::wyvernwg_prot_w));
-	map(0x2000, 0x2003).w(this, FUNC(vamphalf_state::flipscreen32_w));
+	map(0x1800, 0x1803).rw(FUNC(vamphalf_qdsp_state::wyvernwg_prot_r), FUNC(vamphalf_qdsp_state::wyvernwg_prot_w));
+	map(0x2000, 0x2003).w(FUNC(vamphalf_state::flipscreen32_w));
 	map(0x2800, 0x2803).portr("P1_P2");
 	map(0x3000, 0x3003).portr("SYSTEM");
 	map(0x5400, 0x5403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
-	map(0x7000, 0x7003).w(this, FUNC(vamphalf_state::eeprom32_w));
-	map(0x7c00, 0x7c03).r(this, FUNC(vamphalf_state::eeprom32_r));
+	map(0x7000, 0x7003).w(FUNC(vamphalf_state::eeprom32_w));
+	map(0x7c00, 0x7c03).r(FUNC(vamphalf_state::eeprom32_r));
 }
 
 void vamphalf_nvram_state::finalgdr_io(address_map &map)
 {
-	map(0x2400, 0x2403).r(this, FUNC(vamphalf_nvram_state::finalgdr_prot_r));
-	map(0x2800, 0x2803).w(this, FUNC(vamphalf_nvram_state::finalgdr_backupram_bank_w));
-	map(0x2c00, 0x2dff).rw(this, FUNC(vamphalf_nvram_state::finalgdr_backupram_r), FUNC(vamphalf_nvram_state::finalgdr_backupram_w));
+	map(0x2400, 0x2403).r(FUNC(vamphalf_nvram_state::finalgdr_prot_r));
+	map(0x2800, 0x2803).w(FUNC(vamphalf_nvram_state::finalgdr_backupram_bank_w));
+	map(0x2c00, 0x2dff).rw(FUNC(vamphalf_nvram_state::finalgdr_backupram_r), FUNC(vamphalf_nvram_state::finalgdr_backupram_w));
 	map(0x3000, 0x3007).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
 	map(0x3800, 0x3803).portr("P1_P2");
 	map(0x3402, 0x3402).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x3c00, 0x3c03).portr("SYSTEM");
-	map(0x4400, 0x4403).r(this, FUNC(vamphalf_state::eeprom32_r));
+	map(0x4400, 0x4403).r(FUNC(vamphalf_state::eeprom32_r));
 	map(0x6000, 0x6003).nopr(); //?
-	map(0x6000, 0x6003).w(this, FUNC(vamphalf_nvram_state::finalgdr_eeprom_w));
-	map(0x6040, 0x6043).w(this, FUNC(vamphalf_nvram_state::finalgdr_prot_w));
+	map(0x6000, 0x6003).w(FUNC(vamphalf_nvram_state::finalgdr_eeprom_w));
+	map(0x6040, 0x6043).w(FUNC(vamphalf_nvram_state::finalgdr_prot_w));
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
-	map(0x6060, 0x6063).w(this, FUNC(vamphalf_nvram_state::finalgdr_prize_w));
-	map(0x60a0, 0x60a3).w(this, FUNC(vamphalf_nvram_state::finalgdr_oki_bank_w));
+	map(0x6060, 0x6063).w(FUNC(vamphalf_nvram_state::finalgdr_prize_w));
+	map(0x60a0, 0x60a3).w(FUNC(vamphalf_nvram_state::finalgdr_oki_bank_w));
 }
 
 void vamphalf_nvram_state::mrkickera_io(address_map &map)
 {
-	map(0x2400, 0x2403).r(this, FUNC(vamphalf_state::eeprom32_r));
+	map(0x2400, 0x2403).r(FUNC(vamphalf_state::eeprom32_r));
 	map(0x4000, 0x4003).nopr(); //?
-	map(0x4000, 0x4003).w(this, FUNC(vamphalf_nvram_state::finalgdr_eeprom_w));
-	map(0x4040, 0x4043).w(this, FUNC(vamphalf_nvram_state::finalgdr_prot_w));
+	map(0x4000, 0x4003).w(FUNC(vamphalf_nvram_state::finalgdr_eeprom_w));
+	map(0x4040, 0x4043).w(FUNC(vamphalf_nvram_state::finalgdr_prot_w));
 	map(0x4084, 0x4087).nopw(); //?
-	map(0x40a0, 0x40a3).w(this, FUNC(vamphalf_nvram_state::finalgdr_oki_bank_w));
-	map(0x6400, 0x6403).r(this, FUNC(vamphalf_nvram_state::finalgdr_prot_r));
+	map(0x40a0, 0x40a3).w(FUNC(vamphalf_nvram_state::finalgdr_oki_bank_w));
+	map(0x6400, 0x6403).r(FUNC(vamphalf_nvram_state::finalgdr_prot_r));
 	map(0x7000, 0x7007).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
 	map(0x7402, 0x7402).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7800, 0x7803).portr("P1_P2");
@@ -629,8 +630,8 @@ void vamphalf_state::jmpbreak_io(address_map &map)
 	map(0x0c0, 0x0c3).noprw(); // ?
 	map(0x100, 0x103).nopw(); // ?
 	map(0x240, 0x243).portr("P1_P2");
-	map(0x280, 0x283).w(this, FUNC(vamphalf_state::eeprom_w));
-	map(0x2c0, 0x2c3).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x280, 0x283).w(FUNC(vamphalf_state::eeprom_w));
+	map(0x2c0, 0x2c3).r(FUNC(vamphalf_state::eeprom_r));
 	map(0x440, 0x441).noprw(); // return 0, when oki chip is read / written
 	map(0x443, 0x443).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x540, 0x543).portr("SYSTEM");
@@ -640,14 +641,14 @@ void vamphalf_state::jmpbreak_io(address_map &map)
 
 void vamphalf_state::worldadv_io(address_map &map)
 {
-	map(0x180, 0x183).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x180, 0x183).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x280, 0x283).portr("P1_P2");
 	map(0x340, 0x343).portr("SYSTEM");
 	map(0x640, 0x641).noprw(); // return 0, when oki chip is read / written
 	map(0x643, 0x643).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700, 0x703).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x704, 0x707).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
-	map(0x780, 0x783).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x780, 0x783).r(FUNC(vamphalf_state::eeprom_r));
 }
 
 void vamphalf_state::mrdig_io(address_map &map)
@@ -656,9 +657,9 @@ void vamphalf_state::mrdig_io(address_map &map)
 	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
-	map(0x180, 0x183).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x180, 0x183).r(FUNC(vamphalf_state::eeprom_r));
 	map(0x280, 0x283).portr("SYSTEM");
-	map(0x3c0, 0x3c3).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x3c0, 0x3c3).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x500, 0x503).portr("P1_P2");
 }
 
@@ -674,24 +675,24 @@ void vamphalf_state::aoh_map(address_map &map)
 
 void vamphalf_state::aoh_io(address_map &map)
 {
-	map(0x0480, 0x0483).w(this, FUNC(vamphalf_state::eeprom32_w));
+	map(0x0480, 0x0483).w(FUNC(vamphalf_state::eeprom32_w));
 	map(0x0622, 0x0622).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0662, 0x0662).rw("oki_1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0640, 0x0647).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
-	map(0x0680, 0x0683).w(this, FUNC(vamphalf_state::aoh_oki_bank_w));
+	map(0x0680, 0x0683).w(FUNC(vamphalf_state::aoh_oki_bank_w));
 }
 
 void vamphalf_state::boonggab_io(address_map &map)
 {
-	map(0x0c0, 0x0c3).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x0c0, 0x0c3).r(FUNC(vamphalf_state::eeprom_r));
 	map(0x200, 0x203).noprw(); // seems unused
-	map(0x300, 0x303).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x300, 0x303).w(FUNC(vamphalf_state::flipscreen_w));
 	map(0x400, 0x403).portr("SYSTEM");
 	map(0x404, 0x407).portr("P1_P2");
-	map(0x408, 0x40b).w(this, FUNC(vamphalf_state::eeprom_w));
-	map(0x410, 0x413).w(this, FUNC(vamphalf_state::boonggab_prize_w));
-	map(0x414, 0x41b).w(this, FUNC(vamphalf_state::boonggab_lamps_w));
-	map(0x600, 0x603).w(this, FUNC(vamphalf_state::boonggab_oki_bank_w));
+	map(0x408, 0x40b).w(FUNC(vamphalf_state::eeprom_w));
+	map(0x410, 0x413).w(FUNC(vamphalf_state::boonggab_prize_w));
+	map(0x414, 0x41b).w(FUNC(vamphalf_state::boonggab_lamps_w));
+	map(0x600, 0x603).w(FUNC(vamphalf_state::boonggab_oki_bank_w));
 	map(0x700, 0x701).noprw(); // return 0, when oki chip is read / written
 	map(0x702, 0x703).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
 	map(0x743, 0x743).w("ymsnd", FUNC(ym2151_device::register_w));
@@ -1109,7 +1110,7 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 	MCFG_DEVICE_PROGRAM_MAP(common_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	// various games require fast timing to save settings, probably because our Hyperstone core timings are incorrect
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
@@ -1299,7 +1300,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_DEVICE_IO_MAP(aoh_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

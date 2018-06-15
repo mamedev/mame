@@ -1277,7 +1277,7 @@ void dkong_state::dkong_sound_map(address_map &map)
 
 void dkong_state::dkong_sound_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(dkong_state::dkong_tune_r), FUNC(dkong_state::dkong_voice_w));
+	map(0x00, 0xff).rw(FUNC(dkong_state::dkong_tune_r), FUNC(dkong_state::dkong_voice_w));
 }
 
 void dkong_state::dkongjr_sound_io_map(address_map &map)
@@ -1288,7 +1288,7 @@ void dkong_state::dkongjr_sound_io_map(address_map &map)
 void dkong_state::radarscp1_sound_io_map(address_map &map)
 {
 	map(0x00, 0x00).mirror(0xff).r("ls175.3d", FUNC(latch8_device::read));
-	map(0x00, 0xff).w(this, FUNC(dkong_state::dkong_p1_w)); /* DAC here */
+	map(0x00, 0xff).w(FUNC(dkong_state::dkong_p1_w)); /* DAC here */
 }
 
 void dkong_state::dkong3_sound1_map(address_map &map)

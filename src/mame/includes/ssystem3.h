@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_SSYSTEM3_H
 
 #include "machine/6522via.h"
+#include "emupal.h"
 
 
 struct playfield_t

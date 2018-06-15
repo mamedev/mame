@@ -78,10 +78,10 @@ void clshroad_state::clshroad_map(address_map &map)
 	map(0x9800, 0x9dff).ram();
 	map(0x9e00, 0x9fff).ram().share("spriteram");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa100, 0xa107).r(this, FUNC(clshroad_state::input_r));
-	map(0xa800, 0xafff).ram().w(this, FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0xa100, 0xa107).r(FUNC(clshroad_state::input_r));
+	map(0xa800, 0xafff).ram().w(FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
 	map(0xb000, 0xb003).writeonly().share("vregs"); // Scroll
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0xc000, 0xc7ff).ram().w(FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
 }
 
 void clshroad_state::clshroad_sound_map(address_map &map)

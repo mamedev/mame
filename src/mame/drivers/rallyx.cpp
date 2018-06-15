@@ -281,7 +281,7 @@ WRITE_LINE_MEMBER(rallyx_state::coin_counter_2_w)
 void rallyx_state::rallyx_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
 	map(0x9800, 0x9fff).ram();
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa080, 0xa080).portr("P2");
@@ -289,8 +289,8 @@ void rallyx_state::rallyx_map(address_map &map)
 	map(0xa000, 0xa00f).writeonly().share("radarattr");
 	map(0xa080, 0xa080).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa100, 0xa11f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
-	map(0xa130, 0xa130).w(this, FUNC(rallyx_state::rallyx_scrollx_w));
-	map(0xa140, 0xa140).w(this, FUNC(rallyx_state::rallyx_scrolly_w));
+	map(0xa130, 0xa130).w(FUNC(rallyx_state::rallyx_scrollx_w));
+	map(0xa140, 0xa140).w(FUNC(rallyx_state::rallyx_scrolly_w));
 	map(0xa170, 0xa170).nopw();            /* ? */
 	map(0xa180, 0xa187).w("mainlatch", FUNC(ls259_device::write_d0));
 }
@@ -298,14 +298,14 @@ void rallyx_state::rallyx_map(address_map &map)
 void rallyx_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0, 0).w(this, FUNC(rallyx_state::rallyx_interrupt_vector_w));
+	map(0, 0).w(FUNC(rallyx_state::rallyx_interrupt_vector_w));
 }
 
 
 void rallyx_state::jungler_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
 	map(0x9800, 0x9fff).ram();
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa080, 0xa080).portr("P2");
@@ -314,8 +314,8 @@ void rallyx_state::jungler_map(address_map &map)
 	map(0xa000, 0xa00f).mirror(0x00f0).writeonly().share("radarattr");   // jungler writes to a03x
 	map(0xa080, 0xa080).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa100, 0xa100).w(m_timeplt_audio, FUNC(timeplt_audio_device::sound_data_w));
-	map(0xa130, 0xa130).w(this, FUNC(rallyx_state::rallyx_scrollx_w)); /* only jungler and tactcian */
-	map(0xa140, 0xa140).w(this, FUNC(rallyx_state::rallyx_scrolly_w)); /* only jungler and tactcian */
+	map(0xa130, 0xa130).w(FUNC(rallyx_state::rallyx_scrollx_w)); /* only jungler and tactcian */
+	map(0xa140, 0xa140).w(FUNC(rallyx_state::rallyx_scrolly_w)); /* only jungler and tactcian */
 	map(0xa180, 0xa187).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 

@@ -70,7 +70,7 @@ void dynamoah_state::i8031_mem(address_map &map)
 
 void dynamoah_state::i8031_ext_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(dynamoah_state::ext_r), FUNC(dynamoah_state::ext_w));
+	map(0x0000, 0xffff).rw(FUNC(dynamoah_state::ext_r), FUNC(dynamoah_state::ext_w));
 }
 
 MACHINE_CONFIG_START(dynamoah_state::dynamoah)
@@ -86,7 +86,7 @@ MACHINE_CONFIG_START(dynamoah_state::dynamoah)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(*this, dynamoah_state, p1_w)) MCFG_DEVCB_MASK(0x1f)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, dynamoah_state, p3_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(dynamoah)

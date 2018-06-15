@@ -87,10 +87,10 @@ void h83337_device::map(address_map &map)
 	map(0xffbf, 0xffbf).rw("port8", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffc0, 0xffc0).w("port9", FUNC(h8_port_device::ddr_w));
 	map(0xffc1, 0xffc1).rw("port9", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffc2, 0xffc2).rw(this, FUNC(h83337_device::wscr_r), FUNC(h83337_device::wscr_w));
-	map(0xffc3, 0xffc3).rw(this, FUNC(h83337_device::stcr_r), FUNC(h83337_device::stcr_w));
-	map(0xffc4, 0xffc4).rw(this, FUNC(h83337_device::syscr_r), FUNC(h83337_device::syscr_w));
-	map(0xffc5, 0xffc5).rw(this, FUNC(h83337_device::mdcr_r), FUNC(h83337_device::mdcr_w));
+	map(0xffc2, 0xffc2).rw(FUNC(h83337_device::wscr_r), FUNC(h83337_device::wscr_w));
+	map(0xffc3, 0xffc3).rw(FUNC(h83337_device::stcr_r), FUNC(h83337_device::stcr_w));
+	map(0xffc4, 0xffc4).rw(FUNC(h83337_device::syscr_r), FUNC(h83337_device::syscr_w));
+	map(0xffc5, 0xffc5).rw(FUNC(h83337_device::mdcr_r), FUNC(h83337_device::mdcr_w));
 	map(0xffc6, 0xffc6).rw("intc", FUNC(h8_intc_device::iscr_r), FUNC(h8_intc_device::iscr_w));
 	map(0xffc7, 0xffc7).rw("intc", FUNC(h8_intc_device::ier_r), FUNC(h8_intc_device::ier_w));
 	map(0xffc8, 0xffc8).rw("timer8_0", FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));

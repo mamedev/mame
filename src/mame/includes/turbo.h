@@ -10,6 +10,7 @@
 #include "machine/i8255.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* sprites are scaled in the analog domain; to give a better */

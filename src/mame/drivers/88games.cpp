@@ -16,6 +16,7 @@
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -128,12 +129,12 @@ void _88games_state::main_map(address_map &map)
 	map(0x1000, 0x1fff).w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x37ff).ram().share("nvram");
-	map(0x3800, 0x3fff).rw(this, FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
-	map(0x4000, 0x7fff).rw(this, FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
-	map(0x5f84, 0x5f84).w(this, FUNC(_88games_state::k88games_5f84_w));
+	map(0x3800, 0x3fff).rw(FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
+	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
+	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
 	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x5f90, 0x5f90).w(this, FUNC(_88games_state::k88games_sh_irqtrigger_w));
+	map(0x5f90, 0x5f90).w(FUNC(_88games_state::k88games_sh_irqtrigger_w));
 	map(0x5f94, 0x5f94).portr("IN0");
 	map(0x5f95, 0x5f95).portr("IN1");
 	map(0x5f96, 0x5f96).portr("IN2");
@@ -147,10 +148,10 @@ void _88games_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(_88games_state::speech_msg_w));
+	map(0x9000, 0x9000).w(FUNC(_88games_state::speech_msg_w));
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).w(this, FUNC(_88games_state::speech_control_w));
+	map(0xe000, 0xe000).w(FUNC(_88games_state::speech_control_w));
 }
 
 

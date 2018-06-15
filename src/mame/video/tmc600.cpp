@@ -44,7 +44,7 @@ WRITE8_MEMBER( tmc600_state::page_ram_w )
 
 void tmc600_state::cdp1869_page_ram(address_map &map)
 {
-	map(0x000, 0x3ff).mirror(0x400).ram().share("page_ram").w(this, FUNC(tmc600_state::page_ram_w));
+	map(0x000, 0x3ff).mirror(0x400).ram().share("page_ram").w(FUNC(tmc600_state::page_ram_w));
 }
 
 CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )

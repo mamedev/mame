@@ -195,16 +195,16 @@ void tankbust_state::main_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).bankr("bank2");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(tankbust_state::background_videoram_w)).share("videoram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(tankbust_state::background_colorram_w)).share("colorram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(tankbust_state::txtram_w)).share("txtram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(tankbust_state::background_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(tankbust_state::background_colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(tankbust_state::txtram_w)).share("txtram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
-	map(0xe000, 0xe007).rw(this, FUNC(tankbust_state::debug_output_area_r), FUNC(tankbust_state::e0xx_w));
-	map(0xe800, 0xe800).portr("INPUTS").w(this, FUNC(tankbust_state::yscroll_w));
+	map(0xe000, 0xe007).rw(FUNC(tankbust_state::debug_output_area_r), FUNC(tankbust_state::e0xx_w));
+	map(0xe800, 0xe800).portr("INPUTS").w(FUNC(tankbust_state::yscroll_w));
 	map(0xe801, 0xe801).portr("SYSTEM");
 	map(0xe802, 0xe802).portr("DSW");
-	map(0xe801, 0xe802).w(this, FUNC(tankbust_state::xscroll_w));
-	map(0xe803, 0xe803).rw(this, FUNC(tankbust_state::some_changing_input), FUNC(tankbust_state::soundlatch_w));   /*unknown. Game expects this to change so this is not player input */
+	map(0xe801, 0xe802).w(FUNC(tankbust_state::xscroll_w));
+	map(0xe803, 0xe803).rw(FUNC(tankbust_state::some_changing_input), FUNC(tankbust_state::soundlatch_w));   /*unknown. Game expects this to change so this is not player input */
 	map(0xe804, 0xe804).nopw();    /* watchdog ? ; written in long-lasting loops */
 	map(0xf000, 0xf7ff).ram();
 	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */

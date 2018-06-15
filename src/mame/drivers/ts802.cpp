@@ -76,28 +76,28 @@ void ts802_state::ts802_io(address_map &map)
 {
 	//ADDRESS_MAP_UNMAP_HIGH
 	map.global_mask(0xff);
-	map(0x00, 0x03).r(this, FUNC(ts802_state::port00_r));  // DIP switches
+	map(0x00, 0x03).r(FUNC(ts802_state::port00_r));  // DIP switches
 	// 04 - written once after OS boot to bank in RAM from 0000-3FFF instead of ROM.  4000-FFFF is always RAM.
-	map(0x04, 0x07).w(this, FUNC(ts802_state::port04_w));
+	map(0x04, 0x07).w(FUNC(ts802_state::port04_w));
 	// 08-0B: Z80 CTC
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	// 0C-0F: Z80 SIO #1
 	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
-	map(0x0c, 0x0c).r(this, FUNC(ts802_state::port0c_r));
-	map(0x0d, 0x0d).r(this, FUNC(ts802_state::port0d_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x0e, 0x0e).r(this, FUNC(ts802_state::port0e_r));
-	map(0x0f, 0x0f).r(this, FUNC(ts802_state::port0f_r));
+	map(0x0c, 0x0c).r(FUNC(ts802_state::port0c_r));
+	map(0x0d, 0x0d).r(FUNC(ts802_state::port0d_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x0e, 0x0e).r(FUNC(ts802_state::port0e_r));
+	map(0x0f, 0x0f).r(FUNC(ts802_state::port0f_r));
 	// 10: Z80 DMA
-	map(0x10, 0x13).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x10, 0x13).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	// 14-17: WD 1793
 	map(0x14, 0x17).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	// 18: floppy misc.
-	map(0x18, 0x1c).w(this, FUNC(ts802_state::port18_w));
+	map(0x18, 0x1c).w(FUNC(ts802_state::port18_w));
 	// 20-23: Z80 SIO #2
 	map(0x20, 0x23).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	// 48-4F: WD1000 harddisk controller
 	// 80: LEDs
-	map(0x80, 0x80).w(this, FUNC(ts802_state::port80_w));
+	map(0x80, 0x80).w(FUNC(ts802_state::port80_w));
 }
 
 

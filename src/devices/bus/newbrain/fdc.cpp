@@ -85,8 +85,8 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x71);
 	map(0x00, 0x01).mirror(0x10).m(UPD765_TAG, FUNC(upd765a_device::map));
-	map(0x20, 0x20).mirror(0x11).w(this, FUNC(newbrain_fdc_device::fdc_auxiliary_w));
-	map(0x40, 0x40).mirror(0x11).r(this, FUNC(newbrain_fdc_device::fdc_control_r));
+	map(0x20, 0x20).mirror(0x11).w(FUNC(newbrain_fdc_device::fdc_auxiliary_w));
+	map(0x40, 0x40).mirror(0x11).r(FUNC(newbrain_fdc_device::fdc_control_r));
 }
 
 

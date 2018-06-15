@@ -86,9 +86,9 @@ void qvt201_state::mem_map(address_map &map)
 	map(0x8800, 0x8fff).ram().share("nvram");
 	map(0x9000, 0x9007).rw("crtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x9800, 0x980f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0xa000, 0xa000).w(this, FUNC(qvt201_state::offset_w));
-	map(0xa800, 0xa800).w(this, FUNC(qvt201_state::keyboard_w));
-	map(0xb000, 0xb000).r(this, FUNC(qvt201_state::keyboard_r));
+	map(0xa000, 0xa000).w(FUNC(qvt201_state::offset_w));
+	map(0xa800, 0xa800).w(FUNC(qvt201_state::keyboard_w));
+	map(0xb000, 0xb000).r(FUNC(qvt201_state::keyboard_r));
 	map(0xc000, 0xdfff).ram().share("dataram");
 	map(0xe000, 0xffff).ram().share("attram");
 }

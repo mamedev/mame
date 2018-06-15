@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo
+
+#include "emupal.h"
+
 class exzisus_state : public driver_device
 {
 public:

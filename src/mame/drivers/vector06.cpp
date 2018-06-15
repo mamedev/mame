@@ -48,14 +48,14 @@ void vector06_state::vector06_io(address_map &map)
 	map(0x00, 0x03).lrw8("ppi8255_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255->write(space, offset^3, data, mem_mask); });
 	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255_2->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255_2->write(space, offset^3, data, mem_mask); });
 	map(0x08, 0x0b).lrw8("pit8253_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_pit8253->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pit8253->write(space, offset^3, data, mem_mask); });
-	map(0x0c, 0x0c).w(this, FUNC(vector06_state::vector06_color_set));
-	map(0x10, 0x10).w(this, FUNC(vector06_state::vector06_ramdisk_w));
+	map(0x0c, 0x0c).w(FUNC(vector06_state::vector06_color_set));
+	map(0x10, 0x10).w(FUNC(vector06_state::vector06_ramdisk_w));
 	map(0x14, 0x15).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
 	map(0x18, 0x18).rw(m_fdc, FUNC(kr1818vg93_device::data_r), FUNC(kr1818vg93_device::data_w));
 	map(0x19, 0x19).rw(m_fdc, FUNC(kr1818vg93_device::sector_r), FUNC(kr1818vg93_device::sector_w));
 	map(0x1a, 0x1a).rw(m_fdc, FUNC(kr1818vg93_device::track_r), FUNC(kr1818vg93_device::track_w));
 	map(0x1b, 0x1b).rw(m_fdc, FUNC(kr1818vg93_device::status_r), FUNC(kr1818vg93_device::cmd_w));
-	map(0x1c, 0x1c).w(this, FUNC(vector06_state::vector06_disc_w));
+	map(0x1c, 0x1c).w(FUNC(vector06_state::vector06_disc_w));
 }
 
 /* Input ports */

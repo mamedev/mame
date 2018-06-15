@@ -188,15 +188,15 @@ READ8_MEMBER( prof180x_state::status_r )
 
 void prof180x_state::prof180x_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(prof180x_state::read), FUNC(prof180x_state::write));
+	map(0x0000, 0xffff).rw(FUNC(prof180x_state::read), FUNC(prof180x_state::write));
 }
 
 void prof180x_state::prof180x_io(address_map &map)
 {
-	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(prof180x_state::flr_w));
-	map(0x09, 0x09).select(0xff00).r(this, FUNC(prof180x_state::status_r));
+	map(0x08, 0x08).mirror(0xff00).w(FUNC(prof180x_state::flr_w));
+	map(0x09, 0x09).select(0xff00).r(FUNC(prof180x_state::status_r));
 	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
-	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x0c, 0x0d).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }
 
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

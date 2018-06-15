@@ -746,12 +746,12 @@ void intellec4_state::intellec4_rom_port_banks(address_map &map)
 	map.unmap_value_high();
 
 	// 0x0000...0x07ff MON
-	map(0x0000, 0x000f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
-	map(0x0010, 0x001f).mirror(0x1f00).w(this, FUNC(intellec4_state::rom1_out));
-	map(0x0020, 0x002f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
-	map(0x0030, 0x003f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
-	map(0x00e0, 0x00ef).mirror(0x1f00).rw(this, FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
-	map(0x00f0, 0x00ff).mirror(0x1f00).rw(this, FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
+	map(0x0000, 0x000f).mirror(0x1f00).rw(FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x1f00).w(FUNC(intellec4_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x1f00).rw(FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
+	map(0x0030, 0x003f).mirror(0x1f00).rw(FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
+	map(0x00e0, 0x00ef).mirror(0x1f00).rw(FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
+	map(0x00f0, 0x00ff).mirror(0x1f00).rw(FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
 
 	// 0x0800...0x0fff PROM
 
@@ -791,14 +791,14 @@ void intellec4_state::intellec4_ram_status(address_map &map)
 
 void intellec4_state::intellec4_ram_ports(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(intellec4_state::ram0_out));
-	map(0x01, 0x01).w(this, FUNC(intellec4_state::ram1_out));
+	map(0x00, 0x00).w(FUNC(intellec4_state::ram0_out));
+	map(0x01, 0x01).w(FUNC(intellec4_state::ram1_out));
 }
 
 void intellec4_state::intellec4_program_memory(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x01ff).rw(this, FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
+	map(0x0000, 0x01ff).rw(FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
 }
 
 

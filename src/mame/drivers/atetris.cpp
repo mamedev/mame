@@ -56,6 +56,7 @@
 #include "sound/pokey.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -173,17 +174,17 @@ WRITE8_MEMBER(atetris_state::coincount_w)
 void atetris_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(atetris_state::videoram_w)).share("videoram");
+	map(0x1000, 0x1fff).ram().w(FUNC(atetris_state::videoram_w)).share("videoram");
 	map(0x2000, 0x20ff).mirror(0x0300).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0x2800, 0x280f).mirror(0x03e0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2810, 0x281f).mirror(0x03e0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x3000, 0x3000).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
-	map(0x3800, 0x3800).mirror(0x03ff).w(this, FUNC(atetris_state::irq_ack_w));
-	map(0x3c00, 0x3c00).mirror(0x03ff).w(this, FUNC(atetris_state::coincount_w));
+	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_state::irq_ack_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(atetris_state::coincount_w));
 	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(atetris_state::slapstic_r));
+	map(0x6000, 0x7fff).r(FUNC(atetris_state::slapstic_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -191,22 +192,22 @@ void atetris_state::main_map(address_map &map)
 void atetris_state::atetrisb2_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(atetris_state::videoram_w)).share("videoram");
+	map(0x1000, 0x1fff).ram().w(FUNC(atetris_state::videoram_w)).share("videoram");
 	map(0x2000, 0x20ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x2802, 0x2802).w("sn1", FUNC(sn76496_device::write));
-	map(0x2804, 0x2804).w("sn2", FUNC(sn76496_device::write));
-	map(0x2806, 0x2806).w("sn3", FUNC(sn76496_device::write));
+	map(0x2802, 0x2802).w("sn1", FUNC(sn76496_device::command_w));
+	map(0x2804, 0x2804).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x2806, 0x2806).w("sn3", FUNC(sn76496_device::command_w));
 	map(0x2808, 0x2808).portr("IN0");
 	map(0x2808, 0x280f).nopw();
 	map(0x2818, 0x2818).portr("IN1");
 	map(0x2818, 0x281f).nopw();
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3400, 0x3400).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
-	map(0x3800, 0x3800).w(this, FUNC(atetris_state::irq_ack_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(atetris_state::coincount_w));
+	map(0x3800, 0x3800).w(FUNC(atetris_state::irq_ack_w));
+	map(0x3c00, 0x3c00).w(FUNC(atetris_state::coincount_w));
 	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(atetris_state::slapstic_r));
+	map(0x6000, 0x7fff).r(FUNC(atetris_state::slapstic_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -214,18 +215,18 @@ void atetris_state::atetrisb2_map(address_map &map)
 void atetris_mcu_state::atetrisb3_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(atetris_mcu_state::videoram_w)).share("videoram");
+	map(0x1000, 0x1fff).ram().w(FUNC(atetris_mcu_state::videoram_w)).share("videoram");
 	map(0x2000, 0x20ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x2800, 0x281f).nopr().w(this, FUNC(atetris_mcu_state::mcu_reg_w));
+	map(0x2800, 0x281f).nopr().w(FUNC(atetris_mcu_state::mcu_reg_w));
 	map(0x2808, 0x2808).portr("IN0");
 	map(0x2818, 0x2818).portr("IN1");
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3400, 0x3400).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
-	map(0x3800, 0x3800).w(this, FUNC(atetris_mcu_state::irq_ack_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(atetris_mcu_state::coincount_w));
+	map(0x3800, 0x3800).w(FUNC(atetris_mcu_state::irq_ack_w));
+	map(0x3c00, 0x3c00).w(FUNC(atetris_mcu_state::coincount_w));
 	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(atetris_mcu_state::slapstic_r));
+	map(0x6000, 0x7fff).r(FUNC(atetris_mcu_state::slapstic_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -254,7 +255,7 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
 {
 	if ((data & 0xc0) == 0x80)
-		m_sn[(data >> 4) & 3]->write(space, 0, m_mcu->p1_r(space, 0));
+		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r(space, 0));
 }
 
 WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)

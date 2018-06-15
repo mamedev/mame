@@ -7,6 +7,7 @@
 #include "sound/digitalk.h"
 #include "sound/flt_rc.h"
 #include "sound/tms5110.h"
+#include "emupal.h"
 
 class scramble_state : public galaxold_state
 {

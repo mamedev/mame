@@ -8,6 +8,7 @@
 #include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
+#include "emupal.h"
 #include "screen.h"
 
 class wecleman_state : public driver_device

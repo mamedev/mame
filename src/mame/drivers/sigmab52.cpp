@@ -127,6 +127,7 @@
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/hd63484.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -325,15 +326,15 @@ void sigmab52_state::jwildb52_map(address_map &map)
 
 	map(0x8000, 0xf6ff).rom();
 
-	map(0xf700, 0xf700).r(this, FUNC(sigmab52_state::unk_f700_r));    // ACIA ???
-	map(0xf710, 0xf710).w(this, FUNC(sigmab52_state::bank1_w));
+	map(0xf700, 0xf700).r(FUNC(sigmab52_state::unk_f700_r));    // ACIA ???
+	map(0xf710, 0xf710).w(FUNC(sigmab52_state::bank1_w));
 
 	map(0xf720, 0xf727).rw("6840ptm_1", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 
 	map(0xf730, 0xf730).rw("hd63484", FUNC(hd63484_device::status8_r), FUNC(hd63484_device::address8_w));
 	map(0xf731, 0xf731).rw("hd63484", FUNC(hd63484_device::data8_r), FUNC(hd63484_device::data8_w));
 
-	map(0xf740, 0xf740).r(this, FUNC(sigmab52_state::in0_r));
+	map(0xf740, 0xf740).r(FUNC(sigmab52_state::in0_r));
 	map(0xf741, 0xf741).portr("IN1");
 	map(0xf742, 0xf742).portr("IN2");
 	map(0xf743, 0xf743).portr("DSW1");
@@ -341,20 +342,20 @@ void sigmab52_state::jwildb52_map(address_map &map)
 	map(0xf745, 0xf745).portr("DSW3");
 	map(0xf746, 0xf746).portr("DSW4");
 	map(0xf747, 0xf747).portr("IN3");
-	map(0xf750, 0xf750).w(this, FUNC(sigmab52_state::palette_bank_w));
+	map(0xf750, 0xf750).w(FUNC(sigmab52_state::palette_bank_w));
 
-	map(0xf760, 0xf760).r(this, FUNC(sigmab52_state::unk_f760_r));
+	map(0xf760, 0xf760).r(FUNC(sigmab52_state::unk_f760_r));
 
 //  AM_RANGE(0xf770, 0xf77f)  Bill validator
 
-	map(0xf780, 0xf780).w(this, FUNC(sigmab52_state::audiocpu_cmd_irq_w));
+	map(0xf780, 0xf780).w(FUNC(sigmab52_state::audiocpu_cmd_irq_w));
 	map(0xf790, 0xf790).w("soundlatch", FUNC(generic_latch_8_device::write));
 
-	map(0xf7b0, 0xf7b0).w(this, FUNC(sigmab52_state::coin_enable_w));
-	map(0xf7d5, 0xf7d5).w(this, FUNC(sigmab52_state::hopper_w));
-	map(0xf7b2, 0xf7b7).w(this, FUNC(sigmab52_state::lamps1_w));
-	map(0xf7c0, 0xf7c3).w(this, FUNC(sigmab52_state::lamps2_w));
-	map(0xf7d6, 0xf7d7).w(this, FUNC(sigmab52_state::tower_lamps_w));
+	map(0xf7b0, 0xf7b0).w(FUNC(sigmab52_state::coin_enable_w));
+	map(0xf7d5, 0xf7d5).w(FUNC(sigmab52_state::hopper_w));
+	map(0xf7b2, 0xf7b7).w(FUNC(sigmab52_state::lamps1_w));
+	map(0xf7c0, 0xf7c3).w(FUNC(sigmab52_state::lamps2_w));
+	map(0xf7d6, 0xf7d7).w(FUNC(sigmab52_state::tower_lamps_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -374,7 +375,7 @@ void sigmab52_state::sound_prog_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x6020, 0x6027).rw(m_6840ptm_2, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x6030, 0x6030).w(this, FUNC(sigmab52_state::audiocpu_irq_ack_w));
+	map(0x6030, 0x6030).w(FUNC(sigmab52_state::audiocpu_irq_ack_w));
 	map(0x6050, 0x6050).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x6060, 0x6061).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x8000, 0xffff).rom().region("audiocpu", 0);

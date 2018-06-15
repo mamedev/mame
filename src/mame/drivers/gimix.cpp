@@ -185,8 +185,8 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x0e210, 0x0e21f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0e220, 0x0e23f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0x0e240, 0x0e3af).ram();
-	map(0x0e3b0, 0x0e3b3).rw(this, FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
-	map(0x0e3b4, 0x0e3b7).rw(this, FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
+	map(0x0e3b0, 0x0e3b3).rw(FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
+	map(0x0e3b4, 0x0e3b7).rw(FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
 	map(0x0e400, 0x0e7ff).ram();  // scratchpad RAM
 	map(0x0e800, 0x0efff).ram();
 	map(0x0f000, 0x0f7ff).bankr("rombank2");
@@ -212,7 +212,7 @@ void gimix_state::gimix_mem(address_map &map)
 	map(0xd000, 0xdfff).rw(m_bank14, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xe000, 0xefff).rw(m_bank15, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xf000, 0xfeff).rw(m_bank16, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xff00, 0xffff).bankr("fixedrombank").w(this, FUNC(gimix_state::system_w));
+	map(0xff00, 0xffff).bankr("fixedrombank").w(FUNC(gimix_state::system_w));
 }
 
 static INPUT_PORTS_START( gimix )
@@ -429,13 +429,13 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		if(DMA_DIRECTION)
 		{
 			// write to disk
-			m_fdc->data_w(m_ram->read(m_dma_current_addr));
+			m_fdc->write_data(m_ram->read(m_dma_current_addr));
 //          logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
 		}
 		else
 		{
 			// read from disk
-			m_ram->write(m_dma_current_addr,m_fdc->data_r());
+			m_ram->write(m_dma_current_addr,m_fdc->read_data());
 //          logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
 		}
 		m_dma_current_addr++;

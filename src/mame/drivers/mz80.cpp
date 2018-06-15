@@ -31,6 +31,7 @@ MZ80B
 #include "emu.h"
 #include "includes/mz80.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -253,7 +254,7 @@ void mz80_state::mz80k_mem(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("videoram"); // Video RAM
 	map(0xe000, 0xe003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)); /* PPIA 8255 */
 	map(0xe004, 0xe007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  /* PIT 8253  */
-	map(0xe008, 0xe00b).rw(this, FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
+	map(0xe008, 0xe00b).rw(FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
 	map(0xf000, 0xf3ff).rom();
 }
 

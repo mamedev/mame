@@ -27,6 +27,7 @@
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -475,8 +476,8 @@ void indigo_state::indigo_map(address_map &map)
 	map(0x0c000000, 0x0c7fffff).ram().share("share8");
 	map(0x10000000, 0x107fffff).ram().share("share9");
 	map(0x18000000, 0x187fffff).ram().share("share1");
-	map(0x1fb80000, 0x1fb8ffff).rw(this, FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
-	map(0x1fbd9000, 0x1fbd903f).rw(this, FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
+	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
 }
 
 void indigo_state::indigo3k_map(address_map &map)
@@ -611,7 +612,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)

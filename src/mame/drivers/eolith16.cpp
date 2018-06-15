@@ -18,6 +18,7 @@
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -78,8 +79,8 @@ void eolith16_state::eolith16_map(address_map &map)
 	map(0x90000000, 0x9000002f).nopw(); //?
 	map(0xff000000, 0xff1fffff).rom().region("maindata", 0);
 	map(0xffe40001, 0xffe40001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xffe80000, 0xffe80001).w(this, FUNC(eolith16_state::eeprom_w));
-	map(0xffea0000, 0xffea0001).r(this, FUNC(eolith16_state::eolith16_custom_r));
+	map(0xffe80000, 0xffe80001).w(FUNC(eolith16_state::eeprom_w));
+	map(0xffea0000, 0xffea0001).r(FUNC(eolith16_state::eolith16_custom_r));
 	map(0xffea0002, 0xffea0003).portr("SYSTEM");
 	map(0xffec0000, 0xffec0001).nopr(); // not used?
 	map(0xffec0002, 0xffec0003).portr("INPUTS");
@@ -163,7 +164,7 @@ MACHINE_CONFIG_START(eolith16_state::eolith16)
 	MCFG_DEVICE_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

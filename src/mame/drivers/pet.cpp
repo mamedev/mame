@@ -150,6 +150,7 @@ ROM sockets:  UA3   2K or 4K character
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -886,7 +887,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 
 void pet_state::pet2001_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pet_state::read), FUNC(pet_state::write));
+	map(0x0000, 0xffff).rw(FUNC(pet_state::read), FUNC(pet_state::write));
 }
 
 
@@ -896,7 +897,7 @@ void pet_state::pet2001_mem(address_map &map)
 
 void cbm8296_state::cbm8296_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(cbm8296_state::read), FUNC(cbm8296_state::write));
+	map(0x0000, 0xffff).rw(FUNC(cbm8296_state::read), FUNC(cbm8296_state::write));
 }
 
 
@@ -1229,8 +1230,8 @@ WRITE8_MEMBER( pet_state::via_pb_w )
 	*/
 
 	// IEEE-488
-	m_ieee->nrfd_w(BIT(data, 1));
-	m_ieee->atn_w(BIT(data, 2));
+	m_ieee->host_nrfd_w(BIT(data, 1));
+	m_ieee->host_atn_w(BIT(data, 2));
 
 	// cassette
 	m_cassette->write(BIT(data, 3));
@@ -1370,7 +1371,7 @@ READ8_MEMBER( pet2001b_state::pia1_pb_r )
 
 WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 {
-	m_ieee->eoi_w(state);
+	m_ieee->host_eoi_w(state);
 
 	m_blanktv = state;
 }
@@ -1658,7 +1659,7 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 
 	m_exp->reset();
 
-	m_ieee->ren_w(0);
+	m_ieee->host_ren_w(0);
 }
 
 
@@ -1818,9 +1819,9 @@ MACHINE_CONFIG_START(pet_state::pet)
 
 	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, pet_state, pia2_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, pet_state, pia2_irqb_w))
 
@@ -2282,9 +2283,9 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 
 	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, pet_state, pia2_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, pet_state, pia2_irqb_w))
 

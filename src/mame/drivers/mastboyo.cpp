@@ -11,6 +11,7 @@ this is Gaelco's first game, although there should be a 1986 release too, likely
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/nvram.h"
@@ -107,9 +108,9 @@ void mastboyo_state::mastboyo_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x5000, 0x53ff).ram().w(this, FUNC(mastboyo_state::fgram_w)).share("fgram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(mastboyo_state::fgram2_w)).share("fgram2");
-	map(0x6000, 0x6000).w(this, FUNC(mastboyo_state::rombank_w));
+	map(0x5000, 0x53ff).ram().w(FUNC(mastboyo_state::fgram_w)).share("fgram");
+	map(0x5400, 0x57ff).ram().w(FUNC(mastboyo_state::fgram2_w)).share("fgram2");
+	map(0x6000, 0x6000).w(FUNC(mastboyo_state::rombank_w));
 //  map(0x7000, 0x7000).portr("UNK"); // possible watchdog? or IRQ ack?
 	map(0x8000, 0xffff).bankr("bank1");
 }

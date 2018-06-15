@@ -3,6 +3,7 @@
 
 #include "machine/timer.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galpanic_state : public driver_device

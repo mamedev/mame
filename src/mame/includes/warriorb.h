@@ -11,6 +11,7 @@
 #include "sound/flt_vol.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
+#include "emupal.h"
 
 
 class warriorb_state : public driver_device

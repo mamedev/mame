@@ -56,7 +56,7 @@ const tiny_rom_entry *comx_prn_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(comx_prn_device::device_add_mconfig)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit0))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit2))
@@ -177,5 +177,5 @@ void comx_prn_device::comx_io_w(address_space &space, offs_t offset, uint8_t dat
 	    OUT 2 is used to send a bit to the printer
 	*/
 
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }

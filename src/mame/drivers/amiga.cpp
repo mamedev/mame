@@ -35,9 +35,9 @@ class a1000_state : public amiga_state
 {
 public:
 	a1000_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_bootrom(*this, "bootrom"),
-	m_wom(*this, "wom")
+		amiga_state(mconfig, type, tag),
+		m_bootrom(*this, "bootrom"),
+		m_wom(*this, "wom")
 	{ }
 
 	void init_pal();
@@ -64,11 +64,11 @@ class a2000_state : public amiga_state
 {
 public:
 	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "u65"),
-	m_zorro(*this, ZORROBUS_TAG),
-	m_zorro2_int2(0),
-	m_zorro2_int6(0)
+		amiga_state(mconfig, type, tag),
+		m_rtc(*this, "u65"),
+		m_zorro(*this, ZORROBUS_TAG),
+		m_zorro2_int2(0),
+		m_zorro2_int6(0)
 	{ }
 
 	void init_pal();
@@ -104,10 +104,10 @@ class a500_state : public amiga_state
 {
 public:
 	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_side(*this, EXP_SLOT_TAG),
-	m_side_int2(0),
-	m_side_int6(0)
+		amiga_state(mconfig, type, tag),
+		m_side(*this, EXP_SLOT_TAG),
+		m_side_int2(0),
+		m_side_int6(0)
 	{ }
 
 	void init_pal();
@@ -139,13 +139,13 @@ class cdtv_state : public amiga_state
 {
 public:
 	cdtv_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "u61"),
-	m_dmac(*this, "u36"),
-	m_tpi(*this, "u32"),
-	m_cdrom(*this, "cdrom"),
-	m_dmac_irq(0),
-	m_tpi_irq(0)
+		amiga_state(mconfig, type, tag),
+		m_rtc(*this, "u61"),
+		m_dmac(*this, "u36"),
+		m_tpi(*this, "u32"),
+		m_cdrom(*this, "cdrom"),
+		m_dmac_irq(0),
+		m_tpi_irq(0)
 	{ }
 
 	void init_pal();
@@ -191,7 +191,7 @@ class a3000_state : public amiga_state
 {
 public:
 	a3000_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag)
+		amiga_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_READ32_MEMBER( scsi_r );
@@ -214,11 +214,11 @@ class a500p_state : public amiga_state
 {
 public:
 	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "u9"),
-	m_side(*this, EXP_SLOT_TAG),
-	m_side_int2(0),
-	m_side_int6(0)
+		amiga_state(mconfig, type, tag),
+		m_rtc(*this, "u9"),
+		m_side(*this, EXP_SLOT_TAG),
+		m_side_int2(0),
+		m_side_int6(0)
 	{ }
 
 	DECLARE_READ16_MEMBER( clock_r );
@@ -251,8 +251,8 @@ class a600_state : public amiga_state
 {
 public:
 	a600_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_gayle_int2(0)
+		amiga_state(mconfig, type, tag),
+		m_gayle_int2(0)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
@@ -276,8 +276,8 @@ class a1200_state : public amiga_state
 {
 public:
 	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_gayle_int2(0)
+		amiga_state(mconfig, type, tag),
+		m_gayle_int2(0)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
@@ -301,13 +301,13 @@ class a4000_state : public amiga_state
 {
 public:
 	a4000_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_ata(*this, "ata"),
-	m_ramsey_config(0),
-	m_gary_coldboot(1),
-	m_gary_timeout(0),
-	m_gary_toenb(0),
-	m_ide_interrupt(0)
+		amiga_state(mconfig, type, tag),
+		m_ata(*this, "ata"),
+		m_ramsey_config(0),
+		m_gary_coldboot(1),
+		m_gary_timeout(0),
+		m_gary_toenb(0),
+		m_ide_interrupt(0)
 	{ }
 
 	DECLARE_READ32_MEMBER( scsi_r );
@@ -346,9 +346,9 @@ class cd32_state : public amiga_state
 {
 public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"}),
-	m_cdda(*this, "cdda")
+		amiga_state(mconfig, type, tag),
+		m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"}),
+		m_cdda(*this, "cdda")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
@@ -1001,7 +1001,7 @@ void a1000_state::a1000_overlay_map(address_map &map)
 
 void a1000_state::a1000_bootrom_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).mirror(0x30000).rom().region("bootrom", 0).w(this, FUNC(a1000_state::write_protect_w));
+	map(0x000000, 0x00ffff).mirror(0x30000).rom().region("bootrom", 0).w(FUNC(a1000_state::write_protect_w));
 	map(0x040000, 0x07ffff).bankr("wom");
 }
 
@@ -1009,9 +1009,9 @@ void a1000_state::a1000_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(a1000_state::cia_r), FUNC(a1000_state::cia_w));
-	map(0xc00000, 0xdfffff).rw(this, FUNC(a1000_state::custom_chip_r), FUNC(a1000_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a1000_state::rom_mirror_r));
+	map(0xa00000, 0xbfffff).rw(FUNC(a1000_state::cia_r), FUNC(a1000_state::cia_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(a1000_state::custom_chip_r), FUNC(a1000_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a1000_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xfbffff).m(m_bootrom, FUNC(address_map_bank_device::amap16));
 	map(0xfc0000, 0xffffff).bankrw("wom");
@@ -1062,15 +1062,15 @@ void a2000_state::a2000_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(a2000_state::cia_r), FUNC(a2000_state::cia_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(a2000_state::cia_r), FUNC(a2000_state::cia_w));
 	map(0xc00000, 0xc7ffff).ram();
-	map(0xc80000, 0xd7ffff).rw(this, FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
+	map(0xc80000, 0xd7ffff).rw(FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
 	map(0xd80000, 0xdbffff).noprw();
-	map(0xdc0000, 0xdc7fff).rw(this, FUNC(a2000_state::clock_r), FUNC(a2000_state::clock_w));
+	map(0xdc0000, 0xdc7fff).rw(FUNC(a2000_state::clock_r), FUNC(a2000_state::clock_w));
 	map(0xdc8000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a2000_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a2000_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1081,12 +1081,12 @@ void a500_state::a500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(a500_state::cia_r), FUNC(a500_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(this, FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(a500_state::cia_r), FUNC(a500_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a500_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a500_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1097,14 +1097,14 @@ void cdtv_state::cdtv_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(cdtv_state::cia_r), FUNC(cdtv_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(this, FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(cdtv_state::cia_r), FUNC(cdtv_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
 	map(0xd80000, 0xdbffff).noprw();
-	map(0xdc0000, 0xdc7fff).rw(this, FUNC(cdtv_state::clock_r), FUNC(cdtv_state::clock_w));
+	map(0xdc0000, 0xdc7fff).rw(FUNC(cdtv_state::clock_r), FUNC(cdtv_state::clock_w));
 	map(0xdc8000, 0xdc87ff).mirror(0x7800).ram().share("sram");
 	map(0xdd0000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
+	map(0xde0000, 0xdeffff).rw(FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
 	map(0xe00000, 0xe3ffff).mirror(0x40000).ram().share("memcard");
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf00000, 0xf3ffff).mirror(0x40000).rom().region("cdrom", 0);
@@ -1120,13 +1120,13 @@ void a3000_state::a3000_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
-	map(0x00b80000, 0x00bfffff).rw(this, FUNC(a3000_state::cia_r), FUNC(a3000_state::cia_w));
-	map(0x00c00000, 0x00cfffff).rw(this, FUNC(a3000_state::custom_chip_r), FUNC(a3000_state::custom_chip_w));
+	map(0x00b80000, 0x00bfffff).rw(FUNC(a3000_state::cia_r), FUNC(a3000_state::cia_w));
+	map(0x00c00000, 0x00cfffff).rw(FUNC(a3000_state::custom_chip_r), FUNC(a3000_state::custom_chip_w));
 	map(0x00d00000, 0x00dbffff).noprw();
 	map(0x00dc0000, 0x00dcffff).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write)).umask32(0x000000ff);
-	map(0x00dd0000, 0x00ddffff).rw(this, FUNC(a3000_state::scsi_r), FUNC(a3000_state::scsi_w));
-	map(0x00de0000, 0x00deffff).rw(this, FUNC(a3000_state::motherboard_r), FUNC(a3000_state::motherboard_w));
-	map(0x00df0000, 0x00dfffff).rw(this, FUNC(a3000_state::custom_chip_r), FUNC(a3000_state::custom_chip_w));
+	map(0x00dd0000, 0x00ddffff).rw(FUNC(a3000_state::scsi_r), FUNC(a3000_state::scsi_w));
+	map(0x00de0000, 0x00deffff).rw(FUNC(a3000_state::motherboard_r), FUNC(a3000_state::motherboard_w));
+	map(0x00df0000, 0x00dfffff).rw(FUNC(a3000_state::custom_chip_r), FUNC(a3000_state::custom_chip_w));
 	map(0x00e80000, 0x00efffff).noprw(); // autoconfig space (installed by devices)
 	map(0x00f00000, 0x00f7ffff).noprw(); // cartridge space
 	map(0x00f80000, 0x00ffffff).rom().region("kickstart", 0);
@@ -1138,15 +1138,15 @@ void a500p_state::a500p_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(a500p_state::cia_r), FUNC(a500p_state::cia_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(a500p_state::cia_r), FUNC(a500p_state::cia_w));
 	map(0xc00000, 0xc7ffff).ram();
-	map(0xc80000, 0xd7ffff).rw(this, FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
+	map(0xc80000, 0xd7ffff).rw(FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
 	map(0xd80000, 0xdbffff).noprw();
-	map(0xdc0000, 0xdc7fff).rw(this, FUNC(a500p_state::clock_r), FUNC(a500p_state::clock_w));
+	map(0xdc0000, 0xdc7fff).rw(FUNC(a500p_state::clock_r), FUNC(a500p_state::clock_w));
 	map(0xdc8000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a500p_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a500p_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
@@ -1157,10 +1157,10 @@ void a600_state::a600_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
 	map(0x200000, 0xa7ffff).noprw();
-	map(0xa80000, 0xafffff).nopw().r(this, FUNC(a600_state::rom_mirror_r));
-	map(0xb00000, 0xb7ffff).nopw().r(this, FUNC(a600_state::rom_mirror_r));
+	map(0xa80000, 0xafffff).nopw().r(FUNC(a600_state::rom_mirror_r));
+	map(0xb00000, 0xb7ffff).nopw().r(FUNC(a600_state::rom_mirror_r));
 	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
-	map(0xbf0000, 0xbfffff).rw(this, FUNC(a600_state::cia_r), FUNC(a600_state::gayle_cia_w));
+	map(0xbf0000, 0xbfffff).rw(FUNC(a600_state::cia_r), FUNC(a600_state::gayle_cia_w));
 	map(0xc00000, 0xd7ffff).noprw(); // slow mem
 	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
 	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
@@ -1169,8 +1169,8 @@ void a600_state::a600_mem(address_map &map)
 	map(0xdc0000, 0xdcffff).noprw(); // rtc
 	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
 	map(0xde0000, 0xdeffff).rw("gayle", FUNC(gayle_device::gayle_id_r), FUNC(gayle_device::gayle_id_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(a600_state::custom_chip_r), FUNC(a600_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a600_state::rom_mirror_r));
+	map(0xdf0000, 0xdfffff).rw(FUNC(a600_state::custom_chip_r), FUNC(a600_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a600_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1182,10 +1182,10 @@ void a1200_state::a1200_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
 	map(0x200000, 0xa7ffff).noprw();
-	map(0xa80000, 0xafffff).nopw().r(this, FUNC(a1200_state::rom_mirror32_r));
-	map(0xb00000, 0xb7ffff).nopw().r(this, FUNC(a1200_state::rom_mirror32_r));
+	map(0xa80000, 0xafffff).nopw().r(FUNC(a1200_state::rom_mirror32_r));
+	map(0xb00000, 0xb7ffff).nopw().r(FUNC(a1200_state::rom_mirror32_r));
 	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
-	map(0xbf0000, 0xbfffff).rw(this, FUNC(a1200_state::cia_r), FUNC(a1200_state::gayle_cia_w));
+	map(0xbf0000, 0xbfffff).rw(FUNC(a1200_state::cia_r), FUNC(a1200_state::gayle_cia_w));
 	map(0xc00000, 0xd7ffff).noprw(); // slow mem
 	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
 	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
@@ -1194,8 +1194,8 @@ void a1200_state::a1200_mem(address_map &map)
 	map(0xdc0000, 0xdcffff).noprw(); // rtc
 	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
 	map(0xde0000, 0xdeffff).rw("gayle", FUNC(gayle_device::gayle_id_r), FUNC(gayle_device::gayle_id_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(a1200_state::custom_chip_r), FUNC(a1200_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a1200_state::rom_mirror32_r));
+	map(0xdf0000, 0xdfffff).rw(FUNC(a1200_state::custom_chip_r), FUNC(a1200_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a1200_state::rom_mirror32_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1209,17 +1209,17 @@ void a4000_state::a4000_mem(address_map &map)
 	map(0x00200000, 0x009fffff).noprw(); // zorro2 expansion
 	map(0x00a00000, 0x00b7ffff).noprw();
 	map(0x00b80000, 0x00beffff).noprw();
-	map(0x00bf0000, 0x00bfffff).rw(this, FUNC(a4000_state::cia_r), FUNC(a4000_state::cia_w));
-	map(0x00c00000, 0x00cfffff).rw(this, FUNC(a4000_state::custom_chip_r), FUNC(a4000_state::custom_chip_w));
+	map(0x00bf0000, 0x00bfffff).rw(FUNC(a4000_state::cia_r), FUNC(a4000_state::cia_w));
+	map(0x00c00000, 0x00cfffff).rw(FUNC(a4000_state::custom_chip_r), FUNC(a4000_state::custom_chip_w));
 	map(0x00d00000, 0x00d9ffff).noprw();
 	map(0x00da0000, 0x00dbffff).noprw();
 	map(0x00dc0000, 0x00dcffff).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write)).umask32(0x000000ff);
 	map(0x00dd0000, 0x00dd0fff).noprw();
-	map(0x00dd1000, 0x00dd3fff).rw(this, FUNC(a4000_state::ide_r), FUNC(a4000_state::ide_w));
+	map(0x00dd1000, 0x00dd3fff).rw(FUNC(a4000_state::ide_r), FUNC(a4000_state::ide_w));
 	map(0x00dd4000, 0x00ddffff).noprw();
-	map(0x00de0000, 0x00deffff).rw(this, FUNC(a4000_state::motherboard_r), FUNC(a4000_state::motherboard_w));
-	map(0x00df0000, 0x00dfffff).rw(this, FUNC(a4000_state::custom_chip_r), FUNC(a4000_state::custom_chip_w));
-	map(0x00e00000, 0x00e7ffff).nopw().r(this, FUNC(a4000_state::rom_mirror32_r));
+	map(0x00de0000, 0x00deffff).rw(FUNC(a4000_state::motherboard_r), FUNC(a4000_state::motherboard_w));
+	map(0x00df0000, 0x00dfffff).rw(FUNC(a4000_state::custom_chip_r), FUNC(a4000_state::custom_chip_w));
+	map(0x00e00000, 0x00e7ffff).nopw().r(FUNC(a4000_state::rom_mirror32_r));
 	map(0x00e80000, 0x00efffff).noprw(); // zorro2 autoconfig space (installed by devices)
 	map(0x00f00000, 0x00f7ffff).noprw(); // cartridge space
 	map(0x00f80000, 0x00ffffff).rom().region("kickstart", 0);
@@ -1244,8 +1244,8 @@ void cd32_state::cd32_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
 	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
-	map(0xbf0000, 0xbfffff).rw(this, FUNC(cd32_state::cia_r), FUNC(cd32_state::gayle_cia_w));
-	map(0xc00000, 0xdfffff).rw(this, FUNC(cd32_state::custom_chip_r), FUNC(cd32_state::custom_chip_w));
+	map(0xbf0000, 0xbfffff).rw(FUNC(cd32_state::cia_r), FUNC(cd32_state::gayle_cia_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(cd32_state::custom_chip_r), FUNC(cd32_state::custom_chip_w));
 	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
 	map(0xe80000, 0xf7ffff).noprw();
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1256,7 +1256,7 @@ void a4000_state::a4000t_mem(address_map &map)
 {
 	map.unmap_value_high();
 	a4000_mem(map);
-	map(0x00dd0000, 0x00dd0fff).rw(this, FUNC(a4000_state::scsi_r), FUNC(a4000_state::scsi_w));
+	map(0x00dd0000, 0x00dd0fff).rw(FUNC(a4000_state::scsi_r), FUNC(a4000_state::scsi_w));
 }
 
 
@@ -1385,7 +1385,7 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("cia_0_port_a"))
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w)) MCFG_DEVCB_INVERT
 
@@ -1430,7 +1430,7 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, amiga_state, rs232_cts_w))
 
 	// centronics
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, amiga_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amiga_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, amiga_state, centronics_perror_w))
@@ -1737,10 +1737,10 @@ MACHINE_CONFIG_START(a600_state::a600)
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a600_state::GAYLE_ID)
 	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a600_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, read_cs0))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs0))
-	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, read_cs1))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs1))
+	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, cs0_r))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs0_w))
+	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
@@ -1792,10 +1792,10 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
 	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a1200_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, read_cs0))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs0))
-	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, read_cs1))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs1))
+	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, cs0_r))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs0_w))
+	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))

@@ -19,19 +19,44 @@ public:
 	d400_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_novram(*this, "novram")
 	{ }
 
+	void d461(machine_config &config);
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void d461(machine_config &config);
+	DECLARE_READ8_MEMBER(novram_recall_r);
+	DECLARE_READ8_MEMBER(novram_store_r);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
+	required_device<x2210_device> m_novram;
 };
 
 u32 d400_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+READ8_MEMBER(d400_state::novram_recall_r)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_novram->recall(1);
+		m_novram->recall(0);
+	}
+	return 0xff;
+}
+
+READ8_MEMBER(d400_state::novram_store_r)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_novram->store(1);
+		m_novram->store(0);
+	}
+	return 0xff;
 }
 
 void d400_state::mem_map(address_map &map)
@@ -43,6 +68,8 @@ void d400_state::mem_map(address_map &map)
 	map(0x6000, 0x6fff).ram();
 	map(0x7800, 0x780f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0x7880, 0x78bf).rw("novram", FUNC(x2210_device::read), FUNC(x2210_device::write));
+	map(0x7900, 0x7900).r(FUNC(d400_state::novram_recall_r));
+	map(0x7980, 0x7980).r(FUNC(d400_state::novram_store_r));
 	map(0x7c00, 0x7c00).nopw();
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 }
@@ -62,6 +89,7 @@ MACHINE_CONFIG_START(d400_state::d461)
 	MCFG_DEVICE_ADD("novram", X2210, 0)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 MACHINE_CONFIG_END
 
 

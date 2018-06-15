@@ -106,6 +106,7 @@ Notes:
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
 #include <algorithm>
@@ -187,7 +188,7 @@ void speglsht_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	map(0xe1, 0xe1).w(this, FUNC(speglsht_state::st0016_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(speglsht_state::st0016_rom_bank_w));
 	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
@@ -267,17 +268,17 @@ void speglsht_state::speglsht_mem(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram();
 	map(0x01000000, 0x01007fff).ram(); //tested - STATIC RAM
-	map(0x01600000, 0x0160004f).rw(this, FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share("cop_ram");
-	map(0x01800200, 0x01800203).w(this, FUNC(speglsht_state::videoreg_w));
+	map(0x01600000, 0x0160004f).rw(FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share("cop_ram");
+	map(0x01800200, 0x01800203).w(FUNC(speglsht_state::videoreg_w));
 	map(0x01800300, 0x01800303).portr("IN0");
 	map(0x01800400, 0x01800403).portr("IN1");
 	map(0x01a00000, 0x01afffff).ram().share("framebuffer");
 	map(0x01b00000, 0x01b07fff).ram(); //cleared ...  video related ?
 	map(0x01c00000, 0x01dfffff).rom().region("user2", 0);
-	map(0x0a000000, 0x0a003fff).rw(this, FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
+	map(0x0a000000, 0x0a003fff).rw(FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
 	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("user1", 0);
 	map(0x1eff0000, 0x1eff001f).ram();
-	map(0x1eff003c, 0x1eff003f).r(this, FUNC(speglsht_state::irq_ack_clear));
+	map(0x1eff003c, 0x1eff003f).r(FUNC(speglsht_state::irq_ack_clear));
 }
 
 static INPUT_PORTS_START( speglsht )

@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class brkthru_state : public driver_device
 {

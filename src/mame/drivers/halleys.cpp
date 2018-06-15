@@ -169,6 +169,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1635,29 +1636,29 @@ READ8_MEMBER(halleys_state::io_mirror_r)
 
 void halleys_state::halleys_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(this, FUNC(halleys_state::blitter_r), FUNC(halleys_state::blitter_w)).share("blitter_ram");
-	map(0x1f00, 0x1fff).w(this, FUNC(halleys_state::bgtile_w));     // background tiles?(Ben Bero Beh only)
+	map(0x0000, 0x0fff).rw(FUNC(halleys_state::blitter_r), FUNC(halleys_state::blitter_w)).share("blitter_ram");
+	map(0x1f00, 0x1fff).w(FUNC(halleys_state::bgtile_w));     // background tiles?(Ben Bero Beh only)
 	map(0x1000, 0xefff).rom();
 	map(0xf000, 0xfeff).ram();                 // work ram
 
 	map(0xff00, 0xffbf).ram().share("io_ram");  // I/O write fall-through
 
-	map(0xff66, 0xff66).r(this, FUNC(halleys_state::collision_id_r)); // HACK: collision detection bypass(Halley's Comet only)
-	map(0xff71, 0xff71).r(this, FUNC(halleys_state::blitter_status_r));
-	map(0xff80, 0xff83).r(this, FUNC(halleys_state::io_mirror_r));
-	map(0xff8a, 0xff8a).w(this, FUNC(halleys_state::soundcommand_w));
+	map(0xff66, 0xff66).r(FUNC(halleys_state::collision_id_r)); // HACK: collision detection bypass(Halley's Comet only)
+	map(0xff71, 0xff71).r(FUNC(halleys_state::blitter_status_r));
+	map(0xff80, 0xff83).r(FUNC(halleys_state::io_mirror_r));
+	map(0xff8a, 0xff8a).w(FUNC(halleys_state::soundcommand_w));
 	map(0xff90, 0xff90).portr("IN0");    // coin/start
 	map(0xff91, 0xff91).portr("IN1");    // player 1
 	map(0xff92, 0xff92).portr("IN2");    // player 2
 	map(0xff93, 0xff93).portr("IN3");    // unused?
-	map(0xff94, 0xff94).r(this, FUNC(halleys_state::coin_lockout_r));
+	map(0xff94, 0xff94).r(FUNC(halleys_state::coin_lockout_r));
 	map(0xff95, 0xff95).portr("DSW1");   // dipswitch 4
 	map(0xff96, 0xff96).portr("DSW2");   // dipswitch 3
 	map(0xff97, 0xff97).portr("DSW3");   // dipswitch 2
-	map(0xff9c, 0xff9c).w(this, FUNC(halleys_state::firq_ack_w));
+	map(0xff9c, 0xff9c).w(FUNC(halleys_state::firq_ack_w));
 
-	map(0xffc0, 0xffdf).rw(this, FUNC(halleys_state::paletteram_r), FUNC(halleys_state::paletteram_w));
-	map(0xffe0, 0xffff).r(this, FUNC(halleys_state::vector_r));
+	map(0xffc0, 0xffdf).rw(FUNC(halleys_state::paletteram_r), FUNC(halleys_state::paletteram_w));
+	map(0xffe0, 0xffff).r(FUNC(halleys_state::vector_r));
 }
 
 

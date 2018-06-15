@@ -73,9 +73,9 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
 void yunsung8_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x0001, 0x0001).w(this, FUNC(yunsung8_state::bankswitch_w));    // ROM Bank (again?)
+	map(0x0001, 0x0001).w(FUNC(yunsung8_state::bankswitch_w));    // ROM Bank (again?)
 	map(0x8000, 0xbfff).bankr("mainbank");    // Banked ROM
-	map(0xc000, 0xdfff).rw(this, FUNC(yunsung8_state::videoram_r), FUNC(yunsung8_state::videoram_w)); // Video RAM (Banked)
+	map(0xc000, 0xdfff).rw(FUNC(yunsung8_state::videoram_r), FUNC(yunsung8_state::videoram_w)); // Video RAM (Banked)
 	map(0xe000, 0xffff).ram();
 }
 
@@ -83,13 +83,13 @@ void yunsung8_state::main_map(address_map &map)
 void yunsung8_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(this, FUNC(yunsung8_state::videobank_w));  // video RAM bank
-	map(0x01, 0x01).portr("P1").w(this, FUNC(yunsung8_state::bankswitch_w)); // ROM Bank + Layers Enable
+	map(0x00, 0x00).portr("SYSTEM").w(FUNC(yunsung8_state::videobank_w));  // video RAM bank
+	map(0x01, 0x01).portr("P1").w(FUNC(yunsung8_state::bankswitch_w)); // ROM Bank + Layers Enable
 	map(0x02, 0x02).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); // To Sound CPU
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x06, 0x06).w(this, FUNC(yunsung8_state::flipscreen_w));    // Flip Screen
-	map(0x07, 0x07).w(this, FUNC(yunsung8_state::main_irq_ack_w));
+	map(0x06, 0x06).w(FUNC(yunsung8_state::flipscreen_w));    // Flip Screen
+	map(0x07, 0x07).w(FUNC(yunsung8_state::main_irq_ack_w));
 }
 
 
@@ -118,7 +118,7 @@ void yunsung8_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");      // Banked ROM
-	map(0xe000, 0xe000).w(this, FUNC(yunsung8_state::sound_bankswitch_w)); // ROM Bank
+	map(0xe000, 0xe000).w(FUNC(yunsung8_state::sound_bankswitch_w)); // ROM Bank
 	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
 	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf000, 0xf7ff).ram();

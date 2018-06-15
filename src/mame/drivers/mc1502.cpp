@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, mc1502_state, mc1502_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portc_w))
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_DEVICE_ADD("ppi8255n2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, mc1502_state, mc1502_kppi_porta_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, read))
+	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, bus_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portc_w))
 
 	MCFG_DEVICE_ADD("upd8251", I8251, 0)
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	WAVE(config, "wave", "cassette"); // FIXME: really no output routes for the cassette sound?
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))

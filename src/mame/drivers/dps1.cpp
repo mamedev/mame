@@ -70,14 +70,14 @@ void dps1_state::io_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x03).rw("uart", FUNC(mc2661_device::read), FUNC(mc2661_device::write)); // S2651
 	map(0xb0, 0xb1).m(m_fdc, FUNC(upd765_family_device::map));
-	map(0xb2, 0xb3).w(this, FUNC(dps1_state::portb2_w)); // set dma fdc->memory
-	map(0xb4, 0xb5).w(this, FUNC(dps1_state::portb4_w)); // set dma memory->fdc
-	map(0xb6, 0xb7).w(this, FUNC(dps1_state::portb6_w)); // enable eprom
-	map(0xb8, 0xb9).w(this, FUNC(dps1_state::portb8_w)); // set A16-23
-	map(0xba, 0xbb).w(this, FUNC(dps1_state::portba_w)); // set A8-15
-	map(0xbc, 0xbd).w(this, FUNC(dps1_state::portbc_w)); // set A0-7
-	map(0xbe, 0xbf).w(this, FUNC(dps1_state::portbe_w)); // disable eprom
-	map(0xff, 0xff).rw(this, FUNC(dps1_state::portff_r), FUNC(dps1_state::portff_w));
+	map(0xb2, 0xb3).w(FUNC(dps1_state::portb2_w)); // set dma fdc->memory
+	map(0xb4, 0xb5).w(FUNC(dps1_state::portb4_w)); // set dma memory->fdc
+	map(0xb6, 0xb7).w(FUNC(dps1_state::portb6_w)); // enable eprom
+	map(0xb8, 0xb9).w(FUNC(dps1_state::portb8_w)); // set A16-23
+	map(0xba, 0xbb).w(FUNC(dps1_state::portba_w)); // set A8-15
+	map(0xbc, 0xbd).w(FUNC(dps1_state::portbc_w)); // set A0-7
+	map(0xbe, 0xbf).w(FUNC(dps1_state::portbe_w)); // disable eprom
+	map(0xff, 0xff).rw(FUNC(dps1_state::portff_r), FUNC(dps1_state::portff_w));
 	// other allocated ports, optional
 	// AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", mc2661_device, read, write) // S2651
 	// AM_RANGE(0x08, 0x0b) parallel ports

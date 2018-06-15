@@ -25,6 +25,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -455,16 +456,16 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 
 void tk2000_state::apple2_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
-	map(0xc000, 0xc07f).rw(this, FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
+	map(0x0000, 0xbfff).rw(FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
+	map(0xc000, 0xc07f).rw(FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
+	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void tk2000_state::inhbank_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom().region("maincpu", 0x100);
-	map(0x4000, 0x7eff).rw(this, FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
+	map(0x4000, 0x7eff).rw(FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
 }
 
 /***************************************************************************

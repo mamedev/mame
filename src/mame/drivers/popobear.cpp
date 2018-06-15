@@ -82,6 +82,7 @@ Component Side   A   B   Solder Side
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -479,7 +480,7 @@ void popobear_state::popobear_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram();
 	map(0x280000, 0x2fffff).ram().share("spr"); // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
-	map(0x300000, 0x3fffff).ram().w(this, FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
+	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
 
 
 	/* Most if not all of these are vregs */
@@ -489,7 +490,7 @@ void popobear_state::popobear_mem(address_map &map)
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(480020_r) AM_WRITE(480020_w)
 //  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(480028_w)
 //  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(48002c_w)
-	map(0x480031, 0x480031).w(this, FUNC(popobear_state::irq_ack_w));
+	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).ram(); // coin counter or coin lockout
 	map(0x48003a, 0x48003b).ram(); //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
@@ -501,7 +502,7 @@ void popobear_state::popobear_mem(address_map &map)
 	map(0x550000, 0x550003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 
 	map(0x600000, 0x600001).nopw();
-	map(0x620000, 0x620000).r(this, FUNC(popobear_state::_620000_r));
+	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r));
 	map(0x620000, 0x620001).nopw();
 	map(0x800000, 0xbfffff).rom();
 }

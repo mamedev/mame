@@ -50,15 +50,15 @@ WRITE8_MEMBER(tagteam_state::irq_clear_w)
 void tagteam_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x2000).portr("P2").w(this, FUNC(tagteam_state::flipscreen_w));
-	map(0x2001, 0x2001).portr("P1").w(this, FUNC(tagteam_state::control_w));
+	map(0x2000, 0x2000).portr("P2").w(FUNC(tagteam_state::flipscreen_w));
+	map(0x2001, 0x2001).portr("P1").w(FUNC(tagteam_state::control_w));
 	map(0x2002, 0x2002).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x2003, 0x2003).portr("DSW2").w(this, FUNC(tagteam_state::irq_clear_w));
-	map(0x4000, 0x43ff).rw(this, FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
-	map(0x4400, 0x47ff).rw(this, FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
+	map(0x2003, 0x2003).portr("DSW2").w(FUNC(tagteam_state::irq_clear_w));
+	map(0x4000, 0x43ff).rw(FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
+	map(0x4400, 0x47ff).rw(FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
 	map(0x4800, 0x4fff).readonly();
-	map(0x4800, 0x4bff).w(this, FUNC(tagteam_state::videoram_w)).share("videoram");
-	map(0x4c00, 0x4fff).w(this, FUNC(tagteam_state::colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).w(FUNC(tagteam_state::videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).w(FUNC(tagteam_state::colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -73,8 +73,8 @@ void tagteam_state::sound_map(address_map &map)
 	map(0x0000, 0x03ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2005, 0x2005).w(this, FUNC(tagteam_state::sound_nmi_mask_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(tagteam_state::sound_nmi_mask_w));
 	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }

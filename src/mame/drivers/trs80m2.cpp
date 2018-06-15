@@ -321,7 +321,7 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
 
 void trs80m2_state::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(trs80m2_state::read), FUNC(trs80m2_state::write));
+	map(0x0000, 0xffff).rw(FUNC(trs80m2_state::read), FUNC(trs80m2_state::write));
 }
 
 
@@ -333,16 +333,16 @@ void trs80m2_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xe0, 0xe3).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xe4, 0xe7).rw(this, FUNC(trs80m2_state::fdc_r), FUNC(trs80m2_state::fdc_w));
-	map(0xef, 0xef).w(this, FUNC(trs80m2_state::drvslt_w));
+	map(0xe4, 0xe7).rw(FUNC(trs80m2_state::fdc_r), FUNC(trs80m2_state::fdc_w));
+	map(0xef, 0xef).w(FUNC(trs80m2_state::drvslt_w));
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
-	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0xf9, 0xf9).w(this, FUNC(trs80m2_state::rom_enable_w));
-	map(0xfc, 0xfc).r(this, FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xf9, 0xf9).w(FUNC(trs80m2_state::rom_enable_w));
+	map(0xfc, 0xfc).r(FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xfd, 0xfd).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xfe, 0xfe).r(this, FUNC(trs80m2_state::rtc_r));
-	map(0xff, 0xff).rw(this, FUNC(trs80m2_state::nmi_r), FUNC(trs80m2_state::nmi_w));
+	map(0xfe, 0xfe).r(FUNC(trs80m2_state::rtc_r));
+	map(0xff, 0xff).rw(FUNC(trs80m2_state::nmi_r), FUNC(trs80m2_state::nmi_w));
 }
 
 
@@ -353,8 +353,8 @@ void trs80m2_state::z80_io(address_map &map)
 void trs80m16_state::m16_z80_io(address_map &map)
 {
 	z80_io(map);
-	map(0xde, 0xde).w(this, FUNC(trs80m16_state::tcl_w));
-	map(0xdf, 0xdf).w(this, FUNC(trs80m16_state::ual_w));
+	map(0xde, 0xde).w(FUNC(trs80m16_state::tcl_w));
+	map(0xdf, 0xdf).w(FUNC(trs80m16_state::ual_w));
 }
 
 
@@ -760,13 +760,13 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
@@ -850,7 +850,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
@@ -859,7 +859,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
 	MCFG_AM9519_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))

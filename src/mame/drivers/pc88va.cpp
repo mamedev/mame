@@ -36,6 +36,7 @@
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -686,7 +687,7 @@ void pc88va_state::pc88va_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
 //  AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
-	map(0xa0000, 0xdffff).rw(this, FUNC(pc88va_state::sys_mem_r), FUNC(pc88va_state::sys_mem_w));
+	map(0xa0000, 0xdffff).rw(FUNC(pc88va_state::sys_mem_r), FUNC(pc88va_state::sys_mem_w));
 	map(0xe0000, 0xeffff).bankr("rom00_bank");
 	map(0xf0000, 0xfffff).bankr("rom10_bank");
 }
@@ -1260,14 +1261,14 @@ READ8_MEMBER(pc88va_state::no_subfdc_r)
 
 void pc88va_state::pc88va_io_map(address_map &map)
 {
-	map(0x0000, 0x000f).r(this, FUNC(pc88va_state::key_r)); // Keyboard ROW reading
+	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
 //  AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
 	map(0x0020, 0x0021).noprw(); // RS-232C
-	map(0x0030, 0x0031).rw(this, FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
+	map(0x0030, 0x0031).rw(FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
 //  AM_RANGE(0x0032, 0x0032) (R) ? (W) System Port 2
 //  AM_RANGE(0x0034, 0x0034) GVRAM Control Port 1
 //  AM_RANGE(0x0035, 0x0035) GVRAM Control Port 2
-	map(0x0040, 0x0041).r(this, FUNC(pc88va_state::sys_port4_r)); // (R) System Port 4 (W) System port 3 (strobe port)
+	map(0x0040, 0x0041).r(FUNC(pc88va_state::sys_port4_r)); // (R) System Port 4 (W) System port 3 (strobe port)
 	map(0x0044, 0x0045).mirror(0x0002).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  AM_RANGE(0x005c, 0x005c) (R) GVRAM status
 //  AM_RANGE(0x005c, 0x005f) (W) GVRAM selection
@@ -1275,7 +1276,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  AM_RANGE(0x0071, 0x0071) Expansion ROM select (*)
 //  AM_RANGE(0x0078, 0x0078) Memory offset increment (*)
 //  AM_RANGE(0x0080, 0x0081) HDD related
-	map(0x0082, 0x0082).r(this, FUNC(pc88va_state::hdd_status_r));// HDD control, byte access 7-0
+	map(0x0082, 0x0082).r(FUNC(pc88va_state::hdd_status_r));// HDD control, byte access 7-0
 //  AM_RANGE(0x00bc, 0x00bf) d8255 1
 //  AM_RANGE(0x00e2, 0x00e3) Expansion RAM selection (*)
 //  AM_RANGE(0x00e4, 0x00e4) 8214 IRQ control (*)
@@ -1285,12 +1286,12 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	#if TEST_SUBFDC
 	map(0x00fc, 0x00ff).rw("d8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // d8255 2, FDD
 	#else
-	map(0x00fc, 0x00ff).r(this, FUNC(pc88va_state::no_subfdc_r)).nopw();
+	map(0x00fc, 0x00ff).r(FUNC(pc88va_state::no_subfdc_r)).nopw();
 	#endif
 
-	map(0x0100, 0x0101).rw(this, FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
+	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
 //  AM_RANGE(0x0102, 0x0103) Graphic Screen Control Register
-	map(0x0106, 0x0109).w(this, FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
+	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
 //  AM_RANGE(0x010a, 0x010b) Picture Mask Mode Register
 //  AM_RANGE(0x010c, 0x010d) Color Palette Mode Register
 //  AM_RANGE(0x010e, 0x010f) Backdrop Color Register
@@ -1299,14 +1300,14 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  AM_RANGE(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
 //  AM_RANGE(0x012e, 0x012f) ? (related to Transparent Color of Text/Sprite)
 //  AM_RANGE(0x0130, 0x0137) Picture Mask Parameter
-	map(0x0142, 0x0142).rw(this, FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
-	map(0x0146, 0x0146).w(this, FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
+	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
+	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
 //  AM_RANGE(0x0148, 0x0149) Text control port 1
 //  AM_RANGE(0x014c, 0x014f) ? CG Port
-	map(0x0150, 0x0151).r(this, FUNC(pc88va_state::sysop_r)); // System Operational Mode
-	map(0x0152, 0x0153).rw(this, FUNC(pc88va_state::bios_bank_r), FUNC(pc88va_state::bios_bank_w)); // Memory Map Register
+	map(0x0150, 0x0151).r(FUNC(pc88va_state::sysop_r)); // System Operational Mode
+	map(0x0152, 0x0153).rw(FUNC(pc88va_state::bios_bank_r), FUNC(pc88va_state::bios_bank_w)); // Memory Map Register
 //  AM_RANGE(0x0154, 0x0155) Refresh Register (wait states)
-	map(0x0156, 0x0156).r(this, FUNC(pc88va_state::rom_bank_r)); // ROM bank status
+	map(0x0156, 0x0156).r(FUNC(pc88va_state::rom_bank_r)); // ROM bank status
 //  AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //  AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
 	map(0x0160, 0x016f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // DMA Controller
@@ -1314,11 +1315,11 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0188, 0x018b).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // ICU, also controls 8214 emulation
 //  AM_RANGE(0x0190, 0x0191) System Port 5
 //  AM_RANGE(0x0196, 0x0197) Keyboard sub CPU command port
-	map(0x0198, 0x0199).w(this, FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
-	map(0x019a, 0x019b).w(this, FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
+	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
+	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
 	map(0x01a0, 0x01a7).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);// vTCU (timer counter unit)
-	map(0x01a8, 0x01a8).w(this, FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
-	map(0x01b0, 0x01b7).rw(this, FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
+	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
+	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  AM_RANGE(0x01c0, 0x01c1) ?
 	map(0x01c6, 0x01c7).nopw(); // ???
@@ -1328,7 +1329,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0220, 0x023f).ram(); // Frame buffer 1 control parameter
 	map(0x0240, 0x025f).ram(); // Frame buffer 2 control parameter
 	map(0x0260, 0x027f).ram(); // Frame buffer 3 control parameter
-	map(0x0300, 0x033f).ram().w(this, FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
+	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  AM_RANGE(0x0500, 0x05ff) GVRAM
 //  AM_RANGE(0x1000, 0xfeff) user area (???)
@@ -1370,9 +1371,9 @@ WRITE8_MEMBER(pc88va_state::upd765_mc_w)
 void pc88va_state::pc88va_z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(pc88va_state::fdc_irq_vector_w)); // Interrupt Opcode Port
+	map(0xf0, 0xf0).w(FUNC(pc88va_state::fdc_irq_vector_w)); // Interrupt Opcode Port
 //  AM_RANGE(0xf4, 0xf4) // Drive Control Port
-	map(0xf8, 0xf8).rw(this, FUNC(pc88va_state::upd765_tc_r), FUNC(pc88va_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
+	map(0xf8, 0xf8).rw(FUNC(pc88va_state::upd765_tc_r), FUNC(pc88va_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xff).rw("d8255_2s", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }

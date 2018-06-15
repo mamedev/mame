@@ -2,6 +2,7 @@
 // copyright-holders:Paul Priest, David Haywood
 
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 class mcatadv_state : public driver_device
 {

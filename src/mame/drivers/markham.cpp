@@ -182,7 +182,7 @@ void markham_state::base_master_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(markham_state::videoram_w)).share("videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(markham_state::videoram_w)).share("videoram");
 }
 
 void markham_state::markham_master_map(address_map &map)
@@ -197,15 +197,15 @@ void markham_state::markham_master_map(address_map &map)
 	map(0xe002, 0xe002).portr("P1");
 	map(0xe003, 0xe003).portr("P2");
 
-	map(0xe004, 0xe004).r(this, FUNC(markham_state::markham_e004_r)); /* from CPU2 busack */
+	map(0xe004, 0xe004).r(FUNC(markham_state::markham_e004_r)); /* from CPU2 busack */
 
 	map(0xe005, 0xe005).portr("SYSTEM");
 
-	map(0xe008, 0xe008).w(this, FUNC(markham_state::coin_output_w));
+	map(0xe008, 0xe008).w(FUNC(markham_state::coin_output_w));
 	map(0xe009, 0xe009).nopw(); /* to CPU2 busreq */
 
 	map(0xe00c, 0xe00d).writeonly().share("xscroll");
-	map(0xe00e, 0xe00e).w(this, FUNC(markham_state::flipscreen_w<0>));
+	map(0xe00e, 0xe00e).w(FUNC(markham_state::flipscreen_w<0>));
 }
 
 void markham_state::strnskil_master_map(address_map &map)
@@ -216,7 +216,7 @@ void markham_state::strnskil_master_map(address_map &map)
 
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd800, 0xd800).r(this, FUNC(markham_state::strnskil_d800_r));
+	map(0xd800, 0xd800).r(FUNC(markham_state::strnskil_d800_r));
 	map(0xd801, 0xd801).portr("DSW1");
 	map(0xd802, 0xd802).portr("DSW2");
 	map(0xd803, 0xd803).portr("SYSTEM");
@@ -224,17 +224,17 @@ void markham_state::strnskil_master_map(address_map &map)
 	map(0xd805, 0xd805).portr("P2");
 
 	/* same write used here is used for scrolling */
-	map(0xd808, 0xd808).w(this, FUNC(markham_state::flipscreen_w<3>));
-	map(0xd809, 0xd809).w(this, FUNC(markham_state::coin_output_w));
+	map(0xd808, 0xd808).w(FUNC(markham_state::flipscreen_w<3>));
+	map(0xd809, 0xd809).w(FUNC(markham_state::coin_output_w));
 	map(0xd80a, 0xd80b).writeonly().share("xscroll");
 }
 
 void markham_state::banbam_master_map(address_map &map)
 {
 	strnskil_master_map(map);
-	map(0xd806, 0xd806).r(this, FUNC(markham_state::banbam_protection_r)); /* mcu data read */
-	map(0xd80d, 0xd80d).w(this, FUNC(markham_state::banbam_protection_w)); /* mcu data write */
-	map(0xd80c, 0xd80c).w(this, FUNC(markham_state::mcu_reset_w)); /* mcu reset? */
+	map(0xd806, 0xd806).r(FUNC(markham_state::banbam_protection_r)); /* mcu data read */
+	map(0xd80d, 0xd80d).w(FUNC(markham_state::banbam_protection_w)); /* mcu data write */
+	map(0xd80c, 0xd80c).w(FUNC(markham_state::mcu_reset_w)); /* mcu reset? */
 }
 
 void markham_state::markham_slave_map(address_map &map)
@@ -242,8 +242,8 @@ void markham_state::markham_slave_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x87ff).ram().share("share1");
 
-	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::write));
-	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::write));
+	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::command_w));
+	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::command_w));
 
 	map(0xc002, 0xc002).nopw(); /* unknown */
 	map(0xc003, 0xc003).nopw(); /* unknown */
@@ -255,8 +255,8 @@ void markham_state::strnskil_slave_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
 }
 
 /****************************************************************************/

@@ -33,7 +33,7 @@
 
 void apple3_state::apple3_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
+	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
 }
 
 static void apple3_cards(device_slot_interface &device)

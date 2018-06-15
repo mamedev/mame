@@ -408,8 +408,8 @@ void systeme_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::write));
-	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::write));
+	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::command_w));
+	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
 	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
@@ -420,7 +420,7 @@ void systeme_state::io_map(address_map &map)
 	map(0xe2, 0xe2).portr("e2");
 	map(0xf2, 0xf2).portr("f2");
 	map(0xf3, 0xf3).portr("f3");
-	map(0xf7, 0xf7).w(this, FUNC(systeme_state::bank_write));
+	map(0xf7, 0xf7).w(FUNC(systeme_state::bank_write));
 	map(0xf8, 0xfb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 

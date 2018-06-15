@@ -79,7 +79,7 @@ void vigilant_state::vigilant_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
 	map(0x0000, 0x7fff).rom();
 	map(0xc020, 0xc0df).ram().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcfff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
 	map(0xd000, 0xdfff).ram().share("videoram");
 	map(0xe000, 0xefff).ram();
 }
@@ -88,13 +88,13 @@ void vigilant_state::vigilant_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));    /* SD */
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
+	map(0x01, 0x01).portr("IN1").w(FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2").w(this, FUNC(vigilant_state::bank_select_w));  /* PBANK */
-	map(0x80, 0x81).w(this, FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
-	map(0x82, 0x83).w(this, FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
-	map(0x84, 0x84).w(this, FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
+	map(0x04, 0x04).portr("DSW2").w(FUNC(vigilant_state::bank_select_w));  /* PBANK */
+	map(0x80, 0x81).w(FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
+	map(0x82, 0x83).w(FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
+	map(0x84, 0x84).w(FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
 }
 
 void vigilant_state::kikcubic_map(address_map &map)
@@ -102,7 +102,7 @@ void vigilant_state::kikcubic_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc0ff).ram().share("spriteram");
-	map(0xc800, 0xcaff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcaff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
 	map(0xd000, 0xdfff).ram().share("videoram");
 	map(0xe000, 0xffff).ram();
 }
@@ -110,11 +110,11 @@ void vigilant_state::kikcubic_map(address_map &map)
 void vigilant_state::kikcubic_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w(this, FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
+	map(0x00, 0x00).portr("DSW1").w(FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
 	map(0x01, 0x01).portr("DSW2");
 	map(0x02, 0x02).portr("IN0");
 	map(0x03, 0x03).portr("IN1");
-	map(0x04, 0x04).portr("IN2").w(this, FUNC(vigilant_state::bank_select_w));
+	map(0x04, 0x04).portr("IN2").w(FUNC(vigilant_state::bank_select_w));
 	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 }

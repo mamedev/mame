@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,David Haywood
 
+#include "emupal.h"
 
 class freekick_state : public driver_device
 {

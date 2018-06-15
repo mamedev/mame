@@ -63,6 +63,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "hp2640.lh"
@@ -940,18 +941,18 @@ void hp2645_state::cpu_mem_map(address_map &map)
 	map.unmap_value_low();
 	map(0x0000, 0x57ff).rom();
 	map(0x8100, 0x8100).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x8120, 0x8120).r(this, FUNC(hp2645_state::async_status_r));
-	map(0x8140, 0x8140).w(this, FUNC(hp2645_state::async_control_w));
+	map(0x8120, 0x8120).r(FUNC(hp2645_state::async_status_r));
+	map(0x8140, 0x8140).w(FUNC(hp2645_state::async_control_w));
 	map(0x8160, 0x8160).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x8300, 0x8300).w(this, FUNC(hp2645_state::kb_led_w));
-	map(0x8300, 0x830d).r(this, FUNC(hp2645_state::kb_r));
-	map(0x830e, 0x830e).r(this, FUNC(hp2645_state::switches_ah_r));
-	map(0x830f, 0x830f).r(this, FUNC(hp2645_state::datacomm_sw_r));
-	map(0x8320, 0x8320).w(this, FUNC(hp2645_state::kb_prev_w));
-	map(0x8380, 0x8380).rw(this, FUNC(hp2645_state::switches_jr_r), FUNC(hp2645_state::kb_reset_w));
-	map(0x83a0, 0x83a0).r(this, FUNC(hp2645_state::switches_sz_r));
-	map(0x8700, 0x8700).w(this, FUNC(hp2645_state::cx_w));
-	map(0x8720, 0x8720).w(this, FUNC(hp2645_state::cy_w));
+	map(0x8300, 0x8300).w(FUNC(hp2645_state::kb_led_w));
+	map(0x8300, 0x830d).r(FUNC(hp2645_state::kb_r));
+	map(0x830e, 0x830e).r(FUNC(hp2645_state::switches_ah_r));
+	map(0x830f, 0x830f).r(FUNC(hp2645_state::datacomm_sw_r));
+	map(0x8320, 0x8320).w(FUNC(hp2645_state::kb_prev_w));
+	map(0x8380, 0x8380).rw(FUNC(hp2645_state::switches_jr_r), FUNC(hp2645_state::kb_reset_w));
+	map(0x83a0, 0x83a0).r(FUNC(hp2645_state::switches_sz_r));
+	map(0x8700, 0x8700).w(FUNC(hp2645_state::cx_w));
+	map(0x8720, 0x8720).w(FUNC(hp2645_state::cy_w));
 	map(0x9100, 0x91ff).ram();
 	map(0xc000, 0xffff).ram();
 }
@@ -959,7 +960,7 @@ void hp2645_state::cpu_mem_map(address_map &map)
 void hp2645_state::cpu_io_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x00, 0xff).w(this, FUNC(hp2645_state::mode_byte_w));
+	map(0x00, 0xff).w(FUNC(hp2645_state::mode_byte_w));
 }
 
 MACHINE_CONFIG_START(hp2645_state::hp2645)

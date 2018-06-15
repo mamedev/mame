@@ -25,6 +25,7 @@ rom 5 and 6 are prg roms
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -173,21 +174,21 @@ void fresh_state::fresh_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0xc00000, 0xc0ffff).ram().w(this, FUNC(fresh_state::fresh_bg_2_videoram_w)).share("bg_videoram_2");
-	map(0xc10000, 0xc1ffff).ram().w(this, FUNC(fresh_state::fresh_attr_2_videoram_w)).share("attr_videoram_2");
-	map(0xc20000, 0xc2ffff).ram().w(this, FUNC(fresh_state::fresh_bg_videoram_w)).share("bg_videoram");
-	map(0xc30000, 0xc3ffff).ram().w(this, FUNC(fresh_state::fresh_attr_videoram_w)).share("attr_videoram");
+	map(0xc00000, 0xc0ffff).ram().w(FUNC(fresh_state::fresh_bg_2_videoram_w)).share("bg_videoram_2");
+	map(0xc10000, 0xc1ffff).ram().w(FUNC(fresh_state::fresh_attr_2_videoram_w)).share("attr_videoram_2");
+	map(0xc20000, 0xc2ffff).ram().w(FUNC(fresh_state::fresh_bg_videoram_w)).share("bg_videoram");
+	map(0xc30000, 0xc3ffff).ram().w(FUNC(fresh_state::fresh_attr_videoram_w)).share("attr_videoram");
 
 //  AM_RANGE(0xc70000, 0xc70001) AM_RAM
 //  AM_RANGE(0xc70002, 0xc70003) AM_RAM
-	map(0xc71000, 0xc71001).w(this, FUNC(fresh_state::c71000_write));
+	map(0xc71000, 0xc71001).w(FUNC(fresh_state::c71000_write));
 //  AM_RANGE(0xc72000, 0xc72001) AM_RAM
 //  AM_RANGE(0xc72002, 0xc72003) AM_RAM
 //  AM_RANGE(0xc73000, 0xc73001) AM_RAM
 //  AM_RANGE(0xc73002, 0xc73003) AM_RAM
-	map(0xc74000, 0xc74001).w(this, FUNC(fresh_state::c74000_write));
-	map(0xc75000, 0xc75001).w(this, FUNC(fresh_state::c75000_write));
-	map(0xc76000, 0xc76001).w(this, FUNC(fresh_state::c76000_write));
+	map(0xc74000, 0xc74001).w(FUNC(fresh_state::c74000_write));
+	map(0xc75000, 0xc75001).w(FUNC(fresh_state::c75000_write));
+	map(0xc76000, 0xc76001).w(FUNC(fresh_state::c76000_write));
 //  AM_RANGE(0xc77000, 0xc77001) AM_RAM
 //  AM_RANGE(0xc77002, 0xc77003) AM_RAM
 
@@ -199,7 +200,7 @@ void fresh_state::fresh_map(address_map &map)
 	map(0xd00001, 0xd00001).w("ymsnd", FUNC(ym2413_device::register_port_w));
 	map(0xd10001, 0xd10001).w("ymsnd", FUNC(ym2413_device::data_port_w));
 
-	map(0xd30000, 0xd30001).w(this, FUNC(fresh_state::d30000_write));
+	map(0xd30000, 0xd30001).w(FUNC(fresh_state::d30000_write));
 	map(0xd40000, 0xd40001).portr("IN0"); //AM_WRITENOP // checks for 0x10
 //  AM_RANGE(0xd40002, 0xd40003) AM_WRITENOP
 	map(0xd70000, 0xd70001).portr("IN1"); // checks for 0x10, dead loop if fail

@@ -44,14 +44,14 @@ DEFINE_DEVICE_TYPE(BUDDHA, buddha_device, "buddha", "Buddha IDE controller")
 
 void buddha_device::mmio_map(address_map &map)
 {
-	map(0x7fe, 0x7ff).rw(this, FUNC(buddha_device::speed_r), FUNC(buddha_device::speed_w));
-	map(0x800, 0x8ff).rw(this, FUNC(buddha_device::ide_0_cs0_r), FUNC(buddha_device::ide_0_cs0_w));
-	map(0x900, 0x9ff).rw(this, FUNC(buddha_device::ide_0_cs1_r), FUNC(buddha_device::ide_0_cs1_w));
-	map(0xa00, 0xaff).rw(this, FUNC(buddha_device::ide_1_cs0_r), FUNC(buddha_device::ide_1_cs0_w));
-	map(0xb00, 0xbff).rw(this, FUNC(buddha_device::ide_1_cs1_r), FUNC(buddha_device::ide_1_cs1_w));
-	map(0xf00, 0xf3f).r(this, FUNC(buddha_device::ide_0_interrupt_r));
-	map(0xf40, 0xf7f).r(this, FUNC(buddha_device::ide_1_interrupt_r));
-	map(0xfc0, 0xfff).w(this, FUNC(buddha_device::ide_interrupt_enable_w));
+	map(0x7fe, 0x7ff).rw(FUNC(buddha_device::speed_r), FUNC(buddha_device::speed_w));
+	map(0x800, 0x8ff).rw(FUNC(buddha_device::ide_0_cs0_r), FUNC(buddha_device::ide_0_cs0_w));
+	map(0x900, 0x9ff).rw(FUNC(buddha_device::ide_0_cs1_r), FUNC(buddha_device::ide_0_cs1_w));
+	map(0xa00, 0xaff).rw(FUNC(buddha_device::ide_1_cs0_r), FUNC(buddha_device::ide_1_cs0_w));
+	map(0xb00, 0xbff).rw(FUNC(buddha_device::ide_1_cs1_r), FUNC(buddha_device::ide_1_cs1_w));
+	map(0xf00, 0xf3f).r(FUNC(buddha_device::ide_0_interrupt_r));
+	map(0xf40, 0xf7f).r(FUNC(buddha_device::ide_1_interrupt_r));
+	map(0xfc0, 0xfff).w(FUNC(buddha_device::ide_interrupt_enable_w));
 }
 
 //-------------------------------------------------
