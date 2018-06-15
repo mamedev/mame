@@ -9,6 +9,7 @@
 #include "machine/taitoio.h"
 #include "machine/taitoio_yoke.h"
 #include "video/tc0080vco.h"
+#include "emupal.h"
 #include "screen.h"
 
 enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };

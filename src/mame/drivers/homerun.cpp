@@ -107,17 +107,17 @@ void homerun_state::homerun_memmap(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("bank1");
-	map(0x8000, 0x9fff).ram().w(this, FUNC(homerun_state::homerun_videoram_w)).share("videoram");
+	map(0x8000, 0x9fff).ram().w(FUNC(homerun_state::homerun_videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).ram().share("spriteram");
-	map(0xb000, 0xb03f).ram().w(this, FUNC(homerun_state::homerun_color_w)).share("colorram");
+	map(0xb000, 0xb03f).ram().w(FUNC(homerun_state::homerun_color_w)).share("colorram");
 	map(0xc000, 0xdfff).ram();
 }
 
 void homerun_state::homerun_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w(this, FUNC(homerun_state::homerun_d7756_sample_w));
-	map(0x20, 0x20).w(this, FUNC(homerun_state::homerun_control_w));
+	map(0x10, 0x10).w(FUNC(homerun_state::homerun_d7756_sample_w));
+	map(0x20, 0x20).w(FUNC(homerun_state::homerun_control_w));
 	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x40).portr("IN0");
 	map(0x50, 0x50).portr("IN2");

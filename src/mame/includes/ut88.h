@@ -14,6 +14,7 @@
 #include "sound/wave.h"
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 
 
 class ut88_state : public driver_device

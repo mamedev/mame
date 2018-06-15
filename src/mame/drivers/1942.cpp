@@ -161,12 +161,12 @@ static NETLIST_START(nl_1942)
 
 NETLIST_END()
 
-WRITE8_MEMBER(_1942_state::c1942_bankswitch_w)
+WRITE8_MEMBER(_1942_state::_1942_bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
 {
 	int scanline = param;
 
@@ -180,7 +180,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
 
 
 
-void _1942_state::c1942_map(address_map &map)
+void _1942_state::_1942_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
@@ -190,22 +190,22 @@ void _1942_state::c1942_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
 	map(0xc800, 0xc800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc802, 0xc803).w(this, FUNC(_1942_state::c1942_scroll_w));
-	map(0xc804, 0xc804).w(this, FUNC(_1942_state::c1942_c804_w));
-	map(0xc805, 0xc805).w(this, FUNC(_1942_state::c1942_palette_bank_w));
-	map(0xc806, 0xc806).w(this, FUNC(_1942_state::c1942_bankswitch_w));
+	map(0xc802, 0xc803).w(FUNC(_1942_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
+	map(0xc806, 0xc806).w(FUNC(_1942_state::_1942_bankswitch_w));
 	map(0xcc00, 0xcc7f).ram().share("spriteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(_1942_state::c1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(_1942_state::c1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xefff).ram();
 }
 
-WRITE8_MEMBER(_1942_state::c1942p_f600_w)
+WRITE8_MEMBER(_1942p_state::_1942p_f600_w)
 {
-//  printf("c1942p_f600_w %02x\n", data);
+//  printf("_1942p_f600_w %02x\n", data);
 }
 
-WRITE8_MEMBER(_1942_state::c1942p_palette_w)
+WRITE8_MEMBER(_1942p_state::_1942p_palette_w)
 {
 	m_protopal[offset] = data;
 
@@ -216,27 +216,27 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
-void _1942_state::c1942p_map(address_map &map)
+void _1942p_state::_1942p_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(_1942_state::c1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(_1942_state::c1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
 
 	map(0xe000, 0xefff).ram();
 
 	map(0xce00, 0xcfff).ram().share("spriteram");
 
-	map(0xdc02, 0xdc03).w(this, FUNC(_1942_state::c1942_scroll_w));
-	map(0xc804, 0xc804).w(this, FUNC(_1942_state::c1942_c804_w));
-	map(0xc805, 0xc805).w(this, FUNC(_1942_state::c1942_palette_bank_w));
+	map(0xdc02, 0xdc03).w(FUNC(_1942_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
 
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(_1942_state::c1942p_palette_w)).share("protopal");
+	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
 
-	map(0xf400, 0xf400).w(this, FUNC(_1942_state::c1942_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(_1942_state::_1942_bankswitch_w));
 	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf600, 0xf600).w(this, FUNC(_1942_state::c1942p_f600_w));
+	map(0xf600, 0xf600).w(FUNC(_1942p_state::_1942p_f600_w));
 
 	map(0xf700, 0xf700).portr("DSWA");
 	map(0xf701, 0xf701).portr("SYSTEM");
@@ -246,14 +246,14 @@ void _1942_state::c1942p_map(address_map &map)
 }
 
 
-void _1942_state::c1942p_sound_map(address_map &map)
+void _1942p_state::_1942p_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void _1942_state::c1942p_sound_io(address_map &map)
+void _1942p_state::_1942p_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x0000, 0x0000).nopw();
@@ -563,8 +563,8 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(c1942_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, c1942_scanline, "screen", 0, 1)
+	MCFG_DEVICE_PROGRAM_MAP(_1942_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, _1942_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_1942_state, screen_update_1942)
+	MCFG_SCREEN_UPDATE_DRIVER(_1942_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
@@ -627,16 +627,16 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(_1942_state::_1942p)
+MACHINE_CONFIG_START(_1942p_state::_1942p)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(c1942p_map)
+	MCFG_DEVICE_PROGRAM_MAP(_1942p_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1942_state,  irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK_1942P)  /* 4 MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(c1942p_sound_map)
-	MCFG_DEVICE_IO_MAP(c1942p_sound_io)
+	MCFG_DEVICE_PROGRAM_MAP(_1942p_sound_map)
+	MCFG_DEVICE_IO_MAP(_1942p_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
 
 
@@ -644,16 +644,14 @@ MACHINE_CONFIG_START(_1942_state::_1942p)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
 	MCFG_PALETTE_ADD("palette", 0x500)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942p)
-
-	MCFG_VIDEO_START_OVERRIDE(_1942_state,c1942p)
+	MCFG_PALETTE_INIT_OWNER(_1942p_state, 1942p)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_1942_state, screen_update_1942p)
+	MCFG_SCREEN_UPDATE_DRIVER(_1942p_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -951,17 +949,17 @@ ROM_START( 1942p )
 ROM_END
 
 
-void _1942_state::init_1942()
+void _1942_state::driver_init()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
 
-GAME( 1984, 1942,    0,    _1942, 1942, _1942_state, init_1942, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942a,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942abl, 1942, _1942, 1942, _1942_state, init_1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
-GAME( 1991, 1942h,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942b,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, 1942w,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
-GAME( 1984, 1942p,   1942, _1942p,1942p,_1942_state, init_1942, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942,    0,    _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942a,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942abl, 1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
+GAME( 1991, 1942h,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942b,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, 1942w,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
+GAME( 1984, 1942p,   1942, _1942p, 1942p, _1942p_state, driver_init, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )

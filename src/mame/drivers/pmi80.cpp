@@ -97,8 +97,8 @@ void pmi80_state::pmi80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).w(this, FUNC(pmi80_state::leds_w));
-	map(0xfa, 0xfa).rw(this, FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
+	map(0xf8, 0xf8).w(FUNC(pmi80_state::leds_w));
+	map(0xfa, 0xfa).rw(FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
 }
 
 /* Input ports */

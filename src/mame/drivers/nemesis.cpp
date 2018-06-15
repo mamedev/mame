@@ -254,18 +254,18 @@ WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
 void nemesis_state::nemesis_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x04ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x050000, 0x051fff).ram();
 	map(0x050000, 0x0503ff).share("xscroll1");
 	map(0x050400, 0x0507ff).share("xscroll2");
 	map(0x050f00, 0x050f7f).share("yscroll2");
 	map(0x050f80, 0x050fff).share("yscroll1");
-	map(0x052000, 0x052fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x054000, 0x054fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x055000, 0x055fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x056000, 0x056fff).ram().share("spriteram");
-	map(0x05a000, 0x05afff).ram().w(this, FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c400, 0x05c401).portr("DSW0");
 	map(0x05c402, 0x05c403).portr("DSW1");
@@ -283,20 +283,20 @@ void nemesis_state::gx400_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
 	map(0x010000, 0x01ffff).ram();
-	map(0x020000, 0x027fff).rw(this, FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
-	map(0x030000, 0x03ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x050000, 0x051fff).ram();
 	map(0x050000, 0x0503ff).share("xscroll1");
 	map(0x050400, 0x0507ff).share("xscroll2");
 	map(0x050f00, 0x050f7f).share("yscroll2");
 	map(0x050f80, 0x050fff).share("yscroll1");
-	map(0x052000, 0x052fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x054000, 0x054fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x055000, 0x055fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x056000, 0x056fff).ram().share("spriteram");
 	map(0x057000, 0x057fff).ram();             /* needed for twinbee */
-	map(0x05a000, 0x05afff).ram().w(this, FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c402, 0x05c403).portr("DSW0");
 	map(0x05c404, 0x05c405).portr("DSW1");
@@ -314,18 +314,18 @@ void nemesis_state::gx400_map(address_map &map)
 void nemesis_state::konamigt_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x04ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x050000, 0x051fff).ram();
 	map(0x050000, 0x0503ff).share("xscroll1");
 	map(0x050400, 0x0507ff).share("xscroll2");
 	map(0x050f00, 0x050f7f).share("yscroll2");
 	map(0x050f80, 0x050fff).share("yscroll1");
-	map(0x052000, 0x052fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x054000, 0x054fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x055000, 0x055fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x056000, 0x056fff).ram().share("spriteram");
-	map(0x05a000, 0x05afff).ram().w(this, FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c400, 0x05c401).portr("DSW0");
 	map(0x05c402, 0x05c403).portr("DSW1");
@@ -337,26 +337,26 @@ void nemesis_state::konamigt_map(address_map &map)
 	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x060000, 0x067fff).ram();         /* WORK RAM */
-	map(0x070000, 0x070001).r(this, FUNC(nemesis_state::konamigt_input_word_r));
+	map(0x070000, 0x070001).r(FUNC(nemesis_state::konamigt_input_word_r));
 }
 
 void nemesis_state::rf2_gx400_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
 	map(0x010000, 0x01ffff).ram();
-	map(0x020000, 0x027fff).rw(this, FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
-	map(0x030000, 0x03ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x050000, 0x051fff).ram();
 	map(0x050000, 0x0503ff).share("xscroll1");
 	map(0x050400, 0x0507ff).share("xscroll2");
 	map(0x050f00, 0x050f7f).share("yscroll2");
 	map(0x050f80, 0x050fff).share("yscroll1");
-	map(0x052000, 0x052fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x054000, 0x054fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x055000, 0x055fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x056000, 0x056fff).ram().share("spriteram");
-	map(0x05a000, 0x05afff).ram().w(this, FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c402, 0x05c403).portr("DSW0");
 	map(0x05c404, 0x05c405).portr("DSW1");
@@ -368,7 +368,7 @@ void nemesis_state::rf2_gx400_map(address_map &map)
 	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x060000, 0x067fff).ram();         /* WORK RAM */
-	map(0x070000, 0x070001).r(this, FUNC(nemesis_state::konamigt_input_word_r));
+	map(0x070000, 0x070001).r(FUNC(nemesis_state::konamigt_input_word_r));
 	map(0x080000, 0x0bffff).rom();
 }
 
@@ -384,7 +384,7 @@ void nemesis_state::sound_map(address_map &map)
 	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
 	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
-	map(0xe007, 0xe007).select(0x1ff8).w(this, FUNC(nemesis_state::nemesis_filter_w));
+	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
 	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
 	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
@@ -404,8 +404,8 @@ void nemesis_state::gx400_sound_map(address_map &map)
 	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
 	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
-	map(0xe007, 0xe007).select(0x1ff8).w(this, FUNC(nemesis_state::nemesis_filter_w));
-	map(0xe030, 0xe030).w(this, FUNC(nemesis_state::gx400_speech_start_w));
+	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
+	map(0xe030, 0xe030).w(FUNC(nemesis_state::gx400_speech_start_w));
 	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
 	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
@@ -426,7 +426,7 @@ void nemesis_state::salamand_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x087fff).ram();
 	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).w(this, FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0a0000, 0x0a0001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
 	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0002, 0x0c0003).portr("DSW0");
 	map(0x0c0004, 0x0c0005).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
@@ -434,11 +434,11 @@ void nemesis_state::salamand_map(address_map &map)
 	map(0x0c2002, 0x0c2003).portr("IN1");
 	map(0x0c2004, 0x0c2005).portr("IN2");
 	map(0x0c2006, 0x0c2007).portr("DSW1");
-	map(0x100000, 0x100fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
-	map(0x102000, 0x102fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
-	map(0x103000, 0x103fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x120000, 0x12ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
+	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
+	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x180fff).ram().share("spriteram");       /* more sprite ram ??? */
 	map(0x190000, 0x191fff).ram();
 	map(0x190000, 0x1903ff).share("xscroll2");
@@ -452,7 +452,7 @@ void nemesis_state::blkpnthr_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x081fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x090000, 0x097fff).ram();
-	map(0x0a0000, 0x0a0001).ram().w(this, FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0a0000, 0x0a0001).ram().w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
 	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0002, 0x0c0003).portr("DSW0");
 	map(0x0c0004, 0x0c0005).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
@@ -460,11 +460,11 @@ void nemesis_state::blkpnthr_map(address_map &map)
 	map(0x0c2002, 0x0c2003).portr("IN1");
 	map(0x0c2004, 0x0c2005).portr("IN2");
 	map(0x0c2006, 0x0c2007).portr("DSW1");
-	map(0x100000, 0x100fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1").mirror(0x4000); /* VRAM */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2").mirror(0x4000);
-	map(0x102000, 0x102fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
-	map(0x103000, 0x103fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x120000, 0x12ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1").mirror(0x4000); /* VRAM */
+	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2").mirror(0x4000);
+	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
+	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x181fff).ram();
 	map(0x180000, 0x1803ff).share("xscroll1");
 	map(0x180400, 0x1807ff).share("xscroll2");
@@ -485,14 +485,14 @@ void nemesis_state::citybomb_map(address_map &map)
 	map(0x0f0008, 0x0f0009).portr("DSW0");
 	map(0x0f0011, 0x0f0011).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0f0018, 0x0f0019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x0f0020, 0x0f0021).r(this, FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control? */
-	map(0x0f8000, 0x0f8001).w(this, FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0f0020, 0x0f0021).r(FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control? */
+	map(0x0f8000, 0x0f8001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
 	map(0x100000, 0x1bffff).rom();
-	map(0x200000, 0x20ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x210000, 0x210fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
-	map(0x211000, 0x211fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x212000, 0x212fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x213000, 0x213fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x200000, 0x20ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x210000, 0x210fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x211000, 0x211fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x212000, 0x212fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x213000, 0x213fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x300000, 0x301fff).ram();
 	map(0x300000, 0x3003ff).share("xscroll1");
 	map(0x300400, 0x3007ff).share("xscroll2");
@@ -513,13 +513,13 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x070008, 0x070009).portr("DSW0");
 	map(0x070011, 0x070011).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x070018, 0x070019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x078000, 0x078001).w(this, FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x078000, 0x078001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
 	map(0x100000, 0x13ffff).rom();
-	map(0x200000, 0x200fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
-	map(0x201000, 0x201fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
-	map(0x202000, 0x202fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x203000, 0x203fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
-	map(0x210000, 0x21ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x200000, 0x200fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x201000, 0x201fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x202000, 0x202fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x203000, 0x203fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x210000, 0x21ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x300000, 0x300fff).ram().share("spriteram");       /* more sprite ram ??? */
 	map(0x310000, 0x311fff).ram();
 	map(0x310000, 0x3103ff).share("xscroll1");
@@ -542,8 +542,8 @@ void nemesis_state::sal_sound_map(address_map &map)
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_vlm, FUNC(vlm5030_device::data_w));
-	map(0xe000, 0xe000).r(this, FUNC(nemesis_state::wd_r)); /* watchdog?? */
-	map(0xf000, 0xf000).w(this, FUNC(nemesis_state::salamand_speech_start_w));
+	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
+	map(0xf000, 0xf000).w(FUNC(nemesis_state::salamand_speech_start_w));
 }
 
 void nemesis_state::salamand_vlm_map(address_map &map)
@@ -559,7 +559,7 @@ void nemesis_state::blkpnthr_sound_map(address_map &map)
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).r(this, FUNC(nemesis_state::wd_r)); /* watchdog?? */
+	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
 }
 
 void nemesis_state::city_sound_map(address_map &map)
@@ -569,7 +569,7 @@ void nemesis_state::city_sound_map(address_map &map)
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xc000, 0xc000).w(this, FUNC(nemesis_state::city_sound_bank_w)); /* 7232 bankswitch */
+	map(0xc000, 0xc000).w(FUNC(nemesis_state::city_sound_bank_w)); /* 7232 bankswitch */
 	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
@@ -581,22 +581,22 @@ void nemesis_state::hcrash_map(address_map &map)
 	map(0x040000, 0x05ffff).rom();
 	map(0x080000, 0x083fff).ram();
 	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).w(this, FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0a0000, 0x0a0001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
 	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0002, 0x0c0003).portr("DSW0");
 	map(0x0c0004, 0x0c0005).portr("DSW1");
 	map(0x0c0006, 0x0c0007).portr("TEST");
 	map(0x0c0008, 0x0c0009).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* watchdog probably */
 	map(0x0c000a, 0x0c000b).portr("IN0");
-	map(0x0c2000, 0x0c2001).r(this, FUNC(nemesis_state::konamigt_input_word_r)); /* Konami GT control */
+	map(0x0c2000, 0x0c2001).r(FUNC(nemesis_state::konamigt_input_word_r)); /* Konami GT control */
 	map(0x0c2800, 0x0c280f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); // ???
-	map(0x0c4000, 0x0c4001).portr("IN1").w(this, FUNC(nemesis_state::selected_ip_word_w));
-	map(0x0c4002, 0x0c4003).r(this, FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control. latches the value read previously */
-	map(0x100000, 0x100fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
-	map(0x102000, 0x102fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
-	map(0x103000, 0x103fff).ram().w(this, FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
-	map(0x120000, 0x12ffff).ram().w(this, FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x0c4000, 0x0c4001).portr("IN1").w(FUNC(nemesis_state::selected_ip_word_w));
+	map(0x0c4002, 0x0c4003).r(FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control. latches the value read previously */
+	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
+	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
+	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x180fff).ram().share("spriteram");
 	map(0x190000, 0x191fff).ram();
 	map(0x190000, 0x1903ff).share("xscroll2");

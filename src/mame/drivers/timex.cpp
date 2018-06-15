@@ -527,11 +527,11 @@ void spectrum_state::ts2068_update_memory()
 
 void spectrum_state::ts2068_io(address_map &map)
 {
-	map(0xf4, 0xf4).rw(this, FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
+	map(0xf4, 0xf4).rw(FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
 	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
 	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
-	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
 }
 
 void spectrum_state::ts2068_mem(address_map &map)
@@ -573,8 +573,8 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 
 void spectrum_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
+	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
 }
 
 void spectrum_state::tc2048_mem(address_map &map)

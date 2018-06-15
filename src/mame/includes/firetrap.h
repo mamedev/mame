@@ -9,6 +9,7 @@
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class firetrap_state : public driver_device
 {

@@ -15,6 +15,7 @@
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
@@ -150,9 +151,9 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0x00000, 0x8ffff).ram();
 	map(0xa8000, 0xbffff).ram().share("gvram");
 	map(0xc0000, 0xc0fff).ram().share("cvram");
-	map(0xf8000, 0xf801f).rw(this, FUNC(duet16_state::dmapg_r), FUNC(duet16_state::dmapg_w)).umask16(0x00ff);
+	map(0xf8000, 0xf801f).rw(FUNC(duet16_state::dmapg_r), FUNC(duet16_state::dmapg_w)).umask16(0x00ff);
 	map(0xf8000, 0xf801f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
-	map(0xf8020, 0xf8023).rw(this, FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
+	map(0xf8020, 0xf8023).rw(FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
 	map(0xf8040, 0xf804f).rw("itm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
@@ -162,13 +163,13 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
 	map(0xf80e0, 0xf80e3).rw("i8741", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
 	map(0xf8100, 0xf8103).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0xf8120, 0xf8120).rw(this, FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
-	map(0xf8160, 0xf819f).w(this, FUNC(duet16_state::pal_w));
-	map(0xf8200, 0xf8201).r(this, FUNC(duet16_state::sysstat_r));
-	map(0xf8220, 0xf8220).w(this, FUNC(duet16_state::fdcctrl_w));
-	map(0xf8260, 0xf8260).w(this, FUNC(duet16_state::rtc_addr_w));
-	map(0xf8280, 0xf8280).r(this, FUNC(duet16_state::rtc_stat_r));
-	map(0xf8280, 0xf8280).w(this, FUNC(duet16_state::dispctrl_w));
+	map(0xf8120, 0xf8120).rw(FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
+	map(0xf8160, 0xf819f).w(FUNC(duet16_state::pal_w));
+	map(0xf8200, 0xf8201).r(FUNC(duet16_state::sysstat_r));
+	map(0xf8220, 0xf8220).w(FUNC(duet16_state::fdcctrl_w));
+	map(0xf8260, 0xf8260).w(FUNC(duet16_state::rtc_addr_w));
+	map(0xf8280, 0xf8280).r(FUNC(duet16_state::rtc_stat_r));
+	map(0xf8280, 0xf8280).w(FUNC(duet16_state::dispctrl_w));
 	map(0xfe000, 0xfffff).rom().region("rom", 0);
 }
 

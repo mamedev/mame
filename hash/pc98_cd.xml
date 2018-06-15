@@ -2738,8 +2738,8 @@
 		</part>
 	</software>
 
-	<!-- 
-	Needs the mouse driver loaded, otherwise displays everything at double size. Doesn't happen on real hardware. 
+	<!--
+	Needs the mouse driver loaded, otherwise displays everything at double size. Doesn't happen on real hardware.
 	Also, CDDA playback is a bit spotty. Sometimes tracks restart when they shouldn't.
 	-->
 	<software name="msquadro" supported="partial">

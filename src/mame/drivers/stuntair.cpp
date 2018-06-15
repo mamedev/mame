@@ -86,6 +86,7 @@ Bprom dump by f205v
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -324,17 +325,17 @@ void stuntair_state::stuntair_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xc800, 0xcbff).ram().w(this, FUNC(stuntair_state::stuntair_bgattrram_w)).share("bgattrram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(stuntair_state::stuntair_bgram_w)).share("bgram");
+	map(0xc800, 0xcbff).ram().w(FUNC(stuntair_state::stuntair_bgattrram_w)).share("bgattrram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(stuntair_state::stuntair_bgram_w)).share("bgram");
 	map(0xd800, 0xdfff).ram().share("sprram");
-	map(0xe000, 0xe000).portr("DSWB").w(this, FUNC(stuntair_state::stuntair_coin_w));
-	map(0xe800, 0xe800).portr("DSWA").w(this, FUNC(stuntair_state::stuntair_bgxscroll_w));
+	map(0xe000, 0xe000).portr("DSWB").w(FUNC(stuntair_state::stuntair_coin_w));
+	map(0xe800, 0xe800).portr("DSWA").w(FUNC(stuntair_state::stuntair_bgxscroll_w));
 	map(0xf000, 0xf000).portr("IN2");
 	map(0xf002, 0xf002).portr("IN3");
 	map(0xf003, 0xf003).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf000, 0xf007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xf800, 0xfbff).ram().w(this, FUNC(stuntair_state::stuntair_fgram_w)).share("fgram");
-	map(0xfc03, 0xfc03).w(this, FUNC(stuntair_state::stuntair_sound_w));
+	map(0xf800, 0xfbff).ram().w(FUNC(stuntair_state::stuntair_fgram_w)).share("fgram");
+	map(0xfc03, 0xfc03).w(FUNC(stuntair_state::stuntair_sound_w));
 }
 
 // sound Z80

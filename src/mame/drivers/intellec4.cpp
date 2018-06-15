@@ -746,12 +746,12 @@ void intellec4_state::intellec4_rom_port_banks(address_map &map)
 	map.unmap_value_high();
 
 	// 0x0000...0x07ff MON
-	map(0x0000, 0x000f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
-	map(0x0010, 0x001f).mirror(0x1f00).w(this, FUNC(intellec4_state::rom1_out));
-	map(0x0020, 0x002f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
-	map(0x0030, 0x003f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
-	map(0x00e0, 0x00ef).mirror(0x1f00).rw(this, FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
-	map(0x00f0, 0x00ff).mirror(0x1f00).rw(this, FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
+	map(0x0000, 0x000f).mirror(0x1f00).rw(FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x1f00).w(FUNC(intellec4_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x1f00).rw(FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
+	map(0x0030, 0x003f).mirror(0x1f00).rw(FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
+	map(0x00e0, 0x00ef).mirror(0x1f00).rw(FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
+	map(0x00f0, 0x00ff).mirror(0x1f00).rw(FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
 
 	// 0x0800...0x0fff PROM
 
@@ -791,14 +791,14 @@ void intellec4_state::intellec4_ram_status(address_map &map)
 
 void intellec4_state::intellec4_ram_ports(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(intellec4_state::ram0_out));
-	map(0x01, 0x01).w(this, FUNC(intellec4_state::ram1_out));
+	map(0x00, 0x00).w(FUNC(intellec4_state::ram0_out));
+	map(0x01, 0x01).w(FUNC(intellec4_state::ram1_out));
 }
 
 void intellec4_state::intellec4_program_memory(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x01ff).rw(this, FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
+	map(0x0000, 0x01ff).rw(FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
 }
 
 
@@ -1123,13 +1123,14 @@ INPUT_CHANGED_MEMBER(mod4_state::sw_one_shot)
 
 MACHINE_CONFIG_START(mod4_state::mod4)
 	intellec4(config);
+
 	MCFG_DEVICE_ADD(m_cpu, I4004, 5.185_MHz_XTAL / 7)
-	MCFG_I4004_ROM_MAP(intellec4_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
-	MCFG_I4004_ROM_PORTS_MAP(intellec4_rom_ports)
-	MCFG_I4004_RAM_STATUS_MAP(intellec4_ram_status)
-	MCFG_I4004_RAM_PORTS_MAP(intellec4_ram_ports)
-	MCFG_I4004_PROGRAM_MEMORY_MAP(intellec4_program_memory)
+	m_cpu->set_rom_map(&mod4_state::intellec4_rom);
+	m_cpu->set_ram_memory_map(&mod4_state::intellec4_ram_memory);
+	m_cpu->set_rom_ports_map(&mod4_state::intellec4_rom_ports);
+	m_cpu->set_ram_status_map(&mod4_state::intellec4_ram_status);
+	m_cpu->set_ram_ports_map(&mod4_state::intellec4_ram_ports);
+	m_cpu->set_program_memory_map(&mod4_state::intellec4_program_memory);
 	MCFG_I4004_BUS_CYCLE_CB(BUSCYCLE(mod4_state, bus_cycle));
 	MCFG_I4004_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
 
@@ -1348,14 +1349,15 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_single_step)
 
 MACHINE_CONFIG_START(mod40_state::mod40)
 	intellec4(config);
+
 	MCFG_DEVICE_ADD(m_cpu, I4040, 5.185_MHz_XTAL / 7)
-	MCFG_I4040_ROM_MAP(intellec4_rom)
-	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
-	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)
-	MCFG_I4040_RAM_STATUS_MAP(intellec4_ram_status)
-	MCFG_I4040_RAM_PORTS_MAP(intellec4_ram_ports)
-	MCFG_I4040_PROGRAM_MEMORY_MAP(intellec4_program_memory)
-	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle));
+	m_cpu->set_rom_map(&mod40_state::intellec4_rom);
+	m_cpu->set_ram_memory_map(&mod40_state::intellec4_ram_memory);
+	m_cpu->set_rom_ports_map(&mod40_state::intellec4_rom_ports);
+	m_cpu->set_ram_status_map(&mod40_state::intellec4_ram_status);
+	m_cpu->set_ram_ports_map(&mod40_state::intellec4_ram_ports);
+	m_cpu->set_program_memory_map(&mod40_state::intellec4_program_memory);
+	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle))
 	MCFG_I4040_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
 	MCFG_I4040_STP_ACK_CB(WRITELINE(*this, mod40_state, stp_ack))
 
@@ -1434,25 +1436,25 @@ ROM_START(intlc44)
 	ROM_REGION(0x0400, "monitor", 0) // 4 * 1702A
 	ROM_DEFAULT_BIOS("v2.1")
 	ROM_SYSTEM_BIOS(0, "v2.1", "MON 4 V2.1")
-	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(1))
+	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(0))
 ROM_END
 
 ROM_START(intlc440)
 	ROM_REGION(0x0400, "monitor", 0) // 4 * 1702A
 	ROM_DEFAULT_BIOS("v2.1")
 	ROM_SYSTEM_BIOS(0, "v2.1", "MON 4 V2.1")
-	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(1))
+	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2.1_1200", "MON 4 V2.1 1200 Baud hack")
-	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(2))
-	ROMX_LOAD("i40_mon-1.a2",            0x0100, 0x0100, CRC(cd9fecd6) SHA1(9c4fb85118c881687fd4b324e5089df05d1e63d1), ROM_BIOS(2))
-	ROMX_LOAD("i40_mon-2.a3",            0x0200, 0x0100, CRC(037de128) SHA1(3694636e1f4e23688b36ea9ee755a0c5888f4328), ROM_BIOS(2))
-	ROMX_LOAD("1200_baud-i40_mon-f3.a4", 0x0300, 0x0100, CRC(f3198d79) SHA1(b7903073b69f487b6f78842c08694f12225d85f0), ROM_BIOS(2))
+	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
+	ROMX_LOAD("i40_mon-1.a2",            0x0100, 0x0100, CRC(cd9fecd6) SHA1(9c4fb85118c881687fd4b324e5089df05d1e63d1), ROM_BIOS(1))
+	ROMX_LOAD("i40_mon-2.a3",            0x0200, 0x0100, CRC(037de128) SHA1(3694636e1f4e23688b36ea9ee755a0c5888f4328), ROM_BIOS(1))
+	ROMX_LOAD("1200_baud-i40_mon-f3.a4", 0x0300, 0x0100, CRC(f3198d79) SHA1(b7903073b69f487b6f78842c08694f12225d85f0), ROM_BIOS(1))
 ROM_END
 
 } // anonymous namespace

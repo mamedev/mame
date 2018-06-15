@@ -93,11 +93,11 @@ void raiden_state::main_map(address_map &map)
 	map(0x07000, 0x07fff).ram().share("spriteram");
 	map(0x08000, 0x08fff).ram().share("shared_ram");
 	map(0x0a000, 0x0a00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0x0c000, 0x0c7ff).w(this, FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
 	map(0x0e000, 0x0e001).portr("P1_P2");
 	map(0x0e002, 0x0e003).portr("DSW");
 	map(0x0e004, 0x0e005).nopw(); // watchdog?
-	map(0x0e006, 0x0e006).w(this, FUNC(raiden_state::raiden_control_w));
+	map(0x0e006, 0x0e006).w(FUNC(raiden_state::raiden_control_w));
 	map(0x0f000, 0x0f03f).writeonly().share("scroll_ram");
 	map(0xa0000, 0xfffff).rom();
 }
@@ -105,8 +105,8 @@ void raiden_state::main_map(address_map &map)
 void raiden_state::sub_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
-	map(0x02000, 0x027ff).ram().w(this, FUNC(raiden_state::raiden_background_w)).share("back_data");
-	map(0x02800, 0x02fff).ram().w(this, FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
+	map(0x02000, 0x027ff).ram().w(FUNC(raiden_state::raiden_background_w)).share("back_data");
+	map(0x02800, 0x02fff).ram().w(FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
 	map(0x03000, 0x03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x04000, 0x04fff).ram().share("shared_ram");
 	map(0x07ffe, 0x07fff).nopw(); // ?
@@ -127,8 +127,8 @@ void raiden_state::raidenu_main_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw(); // watchdog?
-	map(0x0b006, 0x0b006).w(this, FUNC(raiden_state::raiden_control_w));
-	map(0x0c000, 0x0c7ff).w(this, FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0b006, 0x0b006).w(FUNC(raiden_state::raiden_control_w));
+	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xa0000, 0xfffff).rom();
 }
@@ -136,8 +136,8 @@ void raiden_state::raidenu_main_map(address_map &map)
 void raiden_state::raidenu_sub_map(address_map &map)
 {
 	map(0x00000, 0x05fff).ram();
-	map(0x06000, 0x067ff).ram().w(this, FUNC(raiden_state::raiden_background_w)).share("back_data");
-	map(0x06800, 0x06fff).ram().w(this, FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
+	map(0x06000, 0x067ff).ram().w(FUNC(raiden_state::raiden_background_w)).share("back_data");
+	map(0x06800, 0x06fff).ram().w(FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
 	map(0x07000, 0x07fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08000, 0x08fff).ram().share("shared_ram");
 	map(0x0a000, 0x0a001).nopw(); // ?
@@ -156,8 +156,8 @@ void raiden_state::raidenb_main_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw(); // watchdog?
-	map(0x0b006, 0x0b006).w(this, FUNC(raiden_state::raidenb_control_w));
-	map(0x0c000, 0x0c7ff).w(this, FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0b006, 0x0b006).w(FUNC(raiden_state::raidenb_control_w));
+	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x0d040, 0x0d08f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0xa0000, 0xfffff).rom();

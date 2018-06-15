@@ -129,11 +129,11 @@ void sub_state::subm_map(address_map &map)
 {
 	map(0x0000, 0xafff).rom();
 	map(0xb000, 0xbfff).ram();
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(sub_state::attr_w)).share("attr");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(sub_state::vram_w)).share("vram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(sub_state::attr_w)).share("attr");
+	map(0xc400, 0xc7ff).ram().w(FUNC(sub_state::vram_w)).share("vram");
 	map(0xd000, 0xd03f).ram().share("spriteram");
 	map(0xd800, 0xd83f).ram().share("spriteram2");
-	map(0xd840, 0xd85f).ram().w(this, FUNC(sub_state::scrolly_w)).share("scrolly");
+	map(0xd840, 0xd85f).ram().w(FUNC(sub_state::scrolly_w)).share("scrolly");
 
 	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe800, 0xe807).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -161,7 +161,7 @@ void sub_state::subm_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x6000, 0x6000).w(this, FUNC(sub_state::nmi_mask_w));
+	map(0x6000, 0x6000).w(FUNC(sub_state::nmi_mask_w));
 }
 
 void sub_state::subm_sound_io(address_map &map)

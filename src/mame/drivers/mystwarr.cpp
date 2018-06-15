@@ -296,23 +296,23 @@ void mystwarr_state::mystwarr_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // main program
 	map(0x200000, 0x20ffff).ram().share("gx_workram");
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x480000, 0x4800ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x482000, 0x48200f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x482010, 0x48201f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
 	map(0x484000, 0x484007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
 	map(0x48a000, 0x48a01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48c000, 0x48c03f).w(m_k056832, FUNC(k056832_device::word_w));
-	map(0x490000, 0x490001).w(this, FUNC(mystwarr_state::mweeprom_w));
+	map(0x490000, 0x490001).w(FUNC(mystwarr_state::mweeprom_w));
 	map(0x492000, 0x492001).noprw();    // watchdog
 	map(0x494000, 0x494001).portr("P1_P2");
 	map(0x494002, 0x494003).portr("P3_P4");
 	map(0x496000, 0x496001).portr("IN0");
-	map(0x496002, 0x496003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x496002, 0x496003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x498000, 0x49801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x49a000, 0x49a001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x49a000, 0x49a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x49c000, 0x49c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x49e000, 0x49e007).w(this, FUNC(mystwarr_state::irq_ack_w));    // VSCCS (custom)
+	map(0x49e000, 0x49e007).w(FUNC(mystwarr_state::irq_ack_w));    // VSCCS (custom)
 	map(0x600000, 0x601fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x602000, 0x603fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
 	map(0x680000, 0x683fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
@@ -334,16 +334,16 @@ void mystwarr_state::metamrph_map(address_map &map)
 	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x264000, 0x264001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x264000, 0x264001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x268000, 0x26801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x274000, 0x274001).portr("P1_P3");
 	map(0x274002, 0x274003).portr("P2_P4");
 	map(0x278000, 0x278001).portr("IN0");
-	map(0x278002, 0x278003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr(); // watchdog lives here
-	map(0x27c000, 0x27c001).w(this, FUNC(mystwarr_state::mmeeprom_w));
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
 	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
@@ -365,18 +365,18 @@ void mystwarr_state::viostorm_map(address_map &map)
 	map(0x250000, 0x25000f).ram();     // K053250 reg
 	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
-	map(0x25c000, 0x25c03f).rw(this, FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x25c000, 0x25c03f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
 	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x264000, 0x264001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x264000, 0x264001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x268000, 0x26801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x274000, 0x274001).portr("P1_P3");
 	map(0x274002, 0x274003).portr("P2_P4");
 	map(0x278000, 0x278001).portr("IN0");
-	map(0x278002, 0x278003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr();     // watchdog lives here
-	map(0x27c000, 0x27c001).w(this, FUNC(mystwarr_state::mmeeprom_w));
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
 	map(0x304000, 0x3041ff).ram();
@@ -458,18 +458,18 @@ void mystwarr_state::martchmp_map(address_map &map)
 	map(0x404000, 0x404007).w(m_k055673, FUNC(k055673_device::k053246_word_w));                // OBJSET1
 	map(0x40a000, 0x40a01f).w(m_k054338, FUNC(k054338_device::word_w));                // CLTC
 	map(0x40c000, 0x40c03f).w(m_k056832, FUNC(k056832_device::word_w));                // VACSET
-	map(0x40e000, 0x40e03f).w(this, FUNC(mystwarr_state::K053990_martchmp_word_w));      // protection
-	map(0x410000, 0x410001).w(this, FUNC(mystwarr_state::mceeprom_w));
-	map(0x412000, 0x412001).rw(this, FUNC(mystwarr_state::mccontrol_r), FUNC(mystwarr_state::mccontrol_w));
+	map(0x40e000, 0x40e03f).w(FUNC(mystwarr_state::K053990_martchmp_word_w));      // protection
+	map(0x410000, 0x410001).w(FUNC(mystwarr_state::mceeprom_w));
+	map(0x412000, 0x412001).rw(FUNC(mystwarr_state::mccontrol_r), FUNC(mystwarr_state::mccontrol_w));
 	map(0x414000, 0x414001).portr("P1_P2");
 	map(0x414002, 0x414003).portr("P3_P4");
 	map(0x416000, 0x416001).portr("IN0");
-	map(0x416002, 0x416003).r(this, FUNC(mystwarr_state::eeprom_r));                  // eeprom read
+	map(0x416002, 0x416003).r(FUNC(mystwarr_state::eeprom_r));                  // eeprom read
 	map(0x418000, 0x41801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x41a000, 0x41a001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x41a000, 0x41a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x41c000, 0x41c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);              // CCU
 	map(0x41e000, 0x41e007).w(m_k056832, FUNC(k056832_device::b_word_w));              // VSCCS
-	map(0x480000, 0x483fff).rw(this, FUNC(mystwarr_state::k053247_martchmp_word_r), FUNC(mystwarr_state::k053247_martchmp_word_w)).share("spriteram");    // sprite RAM
+	map(0x480000, 0x483fff).rw(FUNC(mystwarr_state::k053247_martchmp_word_r), FUNC(mystwarr_state::k053247_martchmp_word_w)).share("spriteram");    // sprite RAM
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                     // palette RAM
 	map(0x680000, 0x681fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM
 	map(0x682000, 0x683fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
@@ -480,7 +480,7 @@ void mystwarr_state::martchmp_map(address_map &map)
 void mystwarr_state::dadandrn_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                         // main program and data ROM
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x410000, 0x411fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM
 	map(0x412000, 0x413fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
 	map(0x420000, 0x421fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -492,21 +492,21 @@ void mystwarr_state::dadandrn_map(address_map &map)
 	map(0x470000, 0x470fff).ram().share("k053936_0_li16");
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));        // VACSET
 	map(0x482000, 0x482007).w(m_k056832, FUNC(k056832_device::b_word_w));  // VSCCS
-	map(0x484000, 0x484003).w(this, FUNC(mystwarr_state::ddd_053936_clip_w));
+	map(0x484000, 0x484003).w(FUNC(mystwarr_state::ddd_053936_clip_w));
 	map(0x486000, 0x48601f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
 	map(0x488000, 0x4880ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x48a000, 0x48a01f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x48c000, 0x48c01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48e000, 0x48e001).portr("IN0_P1"); // bit 3 (0x8) is test switch
-	map(0x48e020, 0x48e021).r(this, FUNC(mystwarr_state::dddeeprom_r));
+	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
-	map(0x680000, 0x68003f).rw(this, FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
-	map(0x6a0000, 0x6a0001).w(this, FUNC(mystwarr_state::mmeeprom_w));
-	map(0x6c0000, 0x6c0001).w(this, FUNC(mystwarr_state::ddd_053936_enable_w));
-	map(0x6e0000, 0x6e0001).w(this, FUNC(mystwarr_state::sound_irq_w));
-	map(0x800000, 0x87ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_0_r));    // 256k tilemap readback
-	map(0xa00000, 0xa7ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_1_r)); // 128k tilemap readback
-	map(0xc00000, 0xdfffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_2_r));    // tile character readback
+	map(0x680000, 0x68003f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
+	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
+	map(0x800000, 0x87ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_0_r));    // 256k tilemap readback
+	map(0xa00000, 0xa7ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_1_r)); // 128k tilemap readback
+	map(0xc00000, 0xdfffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_2_r));    // tile character readback
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
@@ -517,7 +517,7 @@ void mystwarr_state::dadandrn_map(address_map &map)
 void mystwarr_state::gaiapols_map(address_map &map)
 {
 	map(0x000000, 0x2fffff).rom();                             // main program
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x410000, 0x411fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));     // tilemap RAM
 	map(0x412000, 0x413fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));     // tilemap RAM mirror read / write (essential)
 	map(0x420000, 0x421fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -529,21 +529,21 @@ void mystwarr_state::gaiapols_map(address_map &map)
 	map(0x470000, 0x470fff).ram().share("k053936_0_li16");
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));            // VACSET
 	map(0x482000, 0x482007).w(m_k056832, FUNC(k056832_device::b_word_w));          // VSCCS
-	map(0x484000, 0x484003).w(this, FUNC(mystwarr_state::ddd_053936_clip_w));
+	map(0x484000, 0x484003).w(FUNC(mystwarr_state::ddd_053936_clip_w));
 	map(0x486000, 0x48601f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
 	map(0x488000, 0x4880ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x48a000, 0x48a01f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x48c000, 0x48c01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48e000, 0x48e001).portr("IN0_P1");             // bit 3 (0x8) is test switch
-	map(0x48e020, 0x48e021).r(this, FUNC(mystwarr_state::dddeeprom_r));
+	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
 	map(0x660000, 0x6600ff).rw("k054000", FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
-	map(0x6a0000, 0x6a0001).w(this, FUNC(mystwarr_state::mmeeprom_w));
-	map(0x6c0000, 0x6c0001).w(this, FUNC(mystwarr_state::ddd_053936_enable_w));
-	map(0x6e0000, 0x6e0001).w(this, FUNC(mystwarr_state::sound_irq_w));
-	map(0x800000, 0x87ffff).r(this, FUNC(mystwarr_state::gai_053936_tilerom_0_r));    // 256k tilemap readback
-	map(0xa00000, 0xa7ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_1_r));    // 128k tilemap readback
-	map(0xc00000, 0xdfffff).r(this, FUNC(mystwarr_state::gai_053936_tilerom_2_r));    // tile character readback
+	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
+	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
+	map(0x800000, 0x87ffff).r(FUNC(mystwarr_state::gai_053936_tilerom_0_r));    // 256k tilemap readback
+	map(0xa00000, 0xa7ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_1_r));    // 128k tilemap readback
+	map(0xc00000, 0xdfffff).r(FUNC(mystwarr_state::gai_053936_tilerom_2_r));    // tile character readback
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
@@ -577,7 +577,7 @@ void mystwarr_state::mystwarr_sound_map(address_map &map)
 	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(mystwarr_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(mystwarr_state::sound_ctrl_w));
 	map(0xfff0, 0xfff3).nopw();    // unknown write
 }
 
@@ -593,7 +593,7 @@ void mystwarr_state::martchmp_sound_map(address_map &map)
 	map(0xe400, 0xe62f).noprw();
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(mystwarr_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(mystwarr_state::sound_ctrl_w));
 	map(0xfff0, 0xfff3).nopw();    // unknown write
 }
 
@@ -952,7 +952,7 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
 	MCFG_K053252_OFFSETS(24, 16)
@@ -977,7 +977,7 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
@@ -987,9 +987,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
 	MCFG_K054338_ALPHAINV(1)
-	MCFG_K054338_MIXER("k055555")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 

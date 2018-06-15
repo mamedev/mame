@@ -1593,6 +1593,7 @@ Premier Eleven
 #include "emu.h"
 #include "includes/naomi.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1692,21 +1693,21 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).share("rombase"); // BIOS
 
 	map(0x00200000, 0x00207fff).ram().share("sram");
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7018, 0x005f702f).mirror(0x02000000).rw("comm_board", FUNC(m3comm_device::naomi_r), FUNC(m3comm_device::naomi_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_g2_ctrl_r), FUNC(naomi_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_g2_ctrl_r), FUNC(naomi_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi_state::naomi_g2bus_r));
+	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi_state::naomi_g2bus_r));
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).mirror(0x02000000).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -1752,20 +1753,20 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).share("rombase"); // BIOS
 
 	map(0x00200000, 0x00207fff).ram().share("sram");
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_g2_ctrl_r), FUNC(naomi2_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_g2_ctrl_r), FUNC(naomi2_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi2_state::naomi_g2bus_r));
+	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi2_state::naomi_g2bus_r));
 
 	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
 	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
@@ -1780,8 +1781,8 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x07000000, 0x07ffffff).ram().share("frameram2");// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	map(0x085f6800, 0x085f69ff).w(this, FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
-	map(0x085f8000, 0x085f9fff).w(this, FUNC(naomi2_state::both_pvr2_ta_w));
+	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
+	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
 	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
@@ -1809,20 +1810,20 @@ void naomi2_state::naomi2_map(address_map &map)
 
 void naomi_state::naomi_port(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(naomi_state::eeprom_93c46a_r), FUNC(naomi_state::eeprom_93c46a_w));
+	map(0x00, 0x0f).rw(FUNC(naomi_state::eeprom_93c46a_r), FUNC(naomi_state::eeprom_93c46a_w));
 }
 
 /*
  * Atomiswave address map, almost identical to Dreamcast
  */
 
-READ64_MEMBER(atomiswave_state::aw_flash_r )
+READ64_MEMBER(atomiswave_state::aw_flash_r)
 {
-	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
-			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
+	return (uint64_t)m_awflash->read(space, offset*8) | (uint64_t)m_awflash->read(space, (offset*8)+1)<<8 | (uint64_t)m_awflash->read(space, (offset*8)+2)<<16 | (uint64_t)m_awflash->read(space, (offset*8)+3)<<24 |
+			(uint64_t)m_awflash->read(space, (offset*8)+4)<<32 | (uint64_t)m_awflash->read(space, (offset*8)+5)<<40 | (uint64_t)m_awflash->read(space, (offset*8)+6)<<48 | (uint64_t)m_awflash->read(space, (offset*8)+7)<<56;
 }
 
-WRITE64_MEMBER(atomiswave_state::aw_flash_w )
+WRITE64_MEMBER(atomiswave_state::aw_flash_w)
 {
 	int i;
 	uint32_t addr = offset * 8;
@@ -1838,7 +1839,7 @@ WRITE64_MEMBER(atomiswave_state::aw_flash_w )
 
 	data >>= (i*8);
 
-	m_awflash->write(addr, data);
+	m_awflash->write(space, addr, data);
 }
 
 // TODO: don't we have a common function for this?
@@ -1925,21 +1926,21 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 void atomiswave_state::aw_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x0001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
-	map(0xa0000000, 0xa001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
+	map(0x00000000, 0x0001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
+	map(0xa0000000, 0xa001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
 
 	map(0x00200000, 0x0021ffff).ram().share("sram");     // battery backed up RAM
-	map(0x005f6800, 0x005f69ff).rw(this, FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).rw(FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).rw(this, FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).rw(FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).rw(this, FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
-	map(0x00700000, 0x00707fff).rw(this, FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).rw(FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
+	map(0x00700000, 0x00707fff).rw(FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).rw(this, FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
@@ -1984,7 +1985,7 @@ void dc_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x007fffff).ram().share("dc_sound_ram");                /* shared with SH-4 */
-	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
+	map(0x00800000, 0x00807fff).rw(FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
 }
 
 /*
@@ -2565,11 +2566,11 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("P1 Left Control") PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT)   PORT_NAME("P1 Left Shift") PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT)     PORT_NAME("P1 Left Alt") PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LWIN)     PORT_NAME("P1 S1") PORT_PLAYER(1) 
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LWIN)     PORT_NAME("P1 S1") PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("P1 Right Control") PORT_PLAYER(1)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RSHIFT)   PORT_NAME("P1 Right Shift") PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT)     PORT_NAME("P1 Right Alt") PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RWIN)     PORT_NAME("P1 S2") PORT_PLAYER(1) 
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RWIN)     PORT_NAME("P1 S2") PORT_PLAYER(1)
 
 	PORT_START("P1.LD")
 	// TODO: LED information
@@ -2580,13 +2581,13 @@ static INPUT_PORTS_START( naomi_kb )
 	// ---- -x-- scroll lock
 	// ---- --x- caps lock
 	// ---- ---x num lock
-	
+
 	PORT_START("P1.KC1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state, naomi_kb_r, 0)
 
 	PORT_START("P1.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("P1.KC3")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -2631,14 +2632,14 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Y) PORT_NAME("P1 y / Y")
 	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 z / Z")
 	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_1) PORT_NAME("P1 1 / !")
-	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_2) PORT_NAME("P1 2 / “")
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_2) PORT_NAME("P1 2 / \"")
 
 	PORT_START("P1.ROW1")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_3) PORT_NAME("P1 3 / #")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_4) PORT_NAME("P1 4 / $")
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_5) PORT_NAME("P1 5 / %")
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_6) PORT_NAME("P1 6 / &")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_7) PORT_NAME("P1 7 / ‘")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_7) PORT_NAME("P1 7 / '")
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_8) PORT_NAME("P1 8 / (")
 	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_9) PORT_NAME("P1 9 / )")
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_0) PORT_NAME("P1 0 / ~")
@@ -2687,7 +2688,7 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LEFT) PORT_NAME("P1 Left")
 	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_DOWN) PORT_NAME("P1 Down")
 	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_UP) PORT_NAME("P1 Up")
-	PORT_BIT(0xfff80000, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT(0xfff80000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1.ROW3")
 	PORT_BIT(0x0000001f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2702,7 +2703,7 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P1 Kanji Henkan")
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P1 Kanji Muhenkan")
 	PORT_BIT(0xfffff000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	// TODO: keyboard for player 2
 	PORT_START("P2.M")
 	PORT_DIPNAME( 0x01, 0x00, "P2.ROW0" )
@@ -2732,7 +2733,7 @@ static INPUT_PORTS_START( naomi_kb )
 
 	PORT_START("P2.LD")
 	// TODO: same as above
-	
+
 	PORT_START("P2.KC1")
 	PORT_DIPNAME( 0x01, 0x00, "P2.ROW2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2939,8 +2940,8 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
 	MCFG_DEVICE_IO_MAP(naomi_port)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("main_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	// high probable this MCU uses one of "fast Z80" cores, like ASCII R800, Kawasaki KC80 or similar, where clocks per instructions is much different from regular Z80.
 	// was made few attempts to measure CPU core clock using different methods (in term of "regular Z80" clock and cycles):
@@ -2950,7 +2951,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
 	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
+	MCFG_DEVICE_ADD("mie_eeprom", EEPROM_SERIAL_93C46_8BIT)
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
 	MCFG_M3COMM_ADD("comm_board")
@@ -3022,7 +3023,7 @@ MACHINE_CONFIG_START(naomi_state::naomigd_kb)
 	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
 	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
 MACHINE_CONFIG_END
- 
+
 /*
  * Naomi 2
  */
@@ -3107,7 +3108,7 @@ MACHINE_CONFIG_START(atomiswave_state::aw2c)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
@@ -4366,6 +4367,7 @@ ROM_START( f355twn2 )
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-23399.ic22",  0x0000000, 0x400000, CRC(36de514c) SHA1(1c32064169c233156921fdf170c1958dc0f8a750) )
+	ROM_LOAD( "epr-23399_alt.ic22",  0x0000000, 0x400000, CRC(39d9d275) SHA1(db201954b00f96b6c5de66902f255b01628886b9) ) // data is same as above, but unused ROM space 0-filled
 	ROM_LOAD( "mpr-23378.ic1",   0x0800000, 0x800000, CRC(1ad80f12) SHA1(415a021987e07bb298e43eacb54ff898619837b1) )
 	ROM_LOAD( "mpr-23379.ic2",   0x1000000, 0x800000, CRC(a198f0a8) SHA1(7025adfd26f80087fa405acb49797d5c77a55e98) )
 	ROM_LOAD( "mpr-23380.ic3",   0x1800000, 0x800000, CRC(b1993286) SHA1(01ddc81ba3542f37dd2dadac972114ec254059a1) )
@@ -10656,13 +10658,13 @@ ROM_END
 /* 0029A */ GAME( 2003, clubkcyc, naomi2,  naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Club Kart for Cycraft (Rev A) (GDS-0029A)", GAME_FLAGS )
 /* 0030A */ GAME( 2003, dragntra, dragntr, naomigd,  naomi,   naomi_state,  init_naomigd, ROT0, "Sega", "Dragon Treasure (Rev A) (GDS-0030A)", GAME_FLAGS )
 /* 0030B */ GAME( 2003, dragntr,  naomigd, naomigd,  naomi,   naomi_state,  init_naomigd, ROT0, "Sega", "Dragon Treasure (Rev B) (GDS-0030B)", GAME_FLAGS )
-/* 0031  */ GAME( 2003, puyofev,  naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Puyo Puyo Fever (Japan) (GDS-0031)", GAME_FLAGS )
+/* 0031  */ GAME( 2003, puyofev,  naomigd, naomigd,  naomi,   naomi_state,  init_naomigd, ROT0, "Sega", "Puyo Puyo Fever (Japan) (GDS-0031)", GAME_FLAGS )
 // 0032  Initial D Arcade Stage Ver. 3 (Japan) (GDS-0032)
 // 0032A Initial D Arcade Stage Ver. 3 (Japan) (Rev A) (GDS-0032A)
 /* 0032B */ GAME( 2004, initdv3jb,initdv3j,naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Japan) (Rev B) (GDS-0032B)", GAME_FLAGS )
 /* 0032C */ GAME( 2004, initdv3j, naomi2,  naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Japan) (Rev C) (GDS-0032C)", GAME_FLAGS )
 /* 0033 */  GAME( 2004, initdv3e, naomi2,  naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Export) (GDS-0033)", GAME_FLAGS )
-// 0034
+// 0034  Puyo Pop Fever (GDS-0034)
 // 0035
 // 0036  Virtua Fighter 4 Final Tuned (GDS-0036)
 /* 0036A */ GAME( 2004, vf4tuneda,vf4tuned,naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Virtua Fighter 4 Final Tuned (GDS-0036A)", GAME_FLAGS )
@@ -10704,18 +10706,18 @@ ROM_END
 /* 0014A */ GAME( 2002, chocomk,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_FLAGS )
 // 0015
 // 0016  Yonin Uchi Mahjong MJ (GDL-0016)
-/* 0017  */ GAME( 2002, quizqgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270,"Amedio (Taito license)","Quiz Keitai Q mode (GDL-0017)", GAME_FLAGS )
-/* 0018  */ GAME( 2002, azumanga,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"MOSS (Taito license)","Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_FLAGS )
-/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,"Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
-/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,"Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
+/* 0017  */ GAME( 2002, quizqgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Amedio (Taito license)","Quiz Keitai Q mode (GDL-0017)", GAME_FLAGS )
+/* 0018  */ GAME( 2002, azumanga,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "MOSS (Taito license)","Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_FLAGS )
+/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
+/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Success",      "Tetris Kiwamemichi (Japan) (GDL-0020)", GAME_FLAGS )
 /* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
-/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,"Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
+/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
 // 0023  Border Down (GDL-0023)
 /* 0023A */ GAME( 2003, bdrdown,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_FLAGS )
 /* 0024  */ GAME( 2003, psyvar2,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Success",      "Psyvariar 2 - The Will To Fabricate (Japan) (GDL-0024)", GAME_FLAGS )
 /* 0025  */ GAME( 2004, cfield,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Able",         "Chaos Field (Japan) (GDL-0025)", GAME_FLAGS )
-/* 0026  */ GAME( 2004, trizeal,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Taito",        "Trizeal (Japan) (GDL-0026)", GAME_FLAGS )
+/* 0026  */ GAME( 2004, trizeal,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Triangle Service",  "Trizeal (Japan) (GDL-0026)", GAME_FLAGS )
 // 0027
 /* 0028  */ GAME( 2005, meltyblo,  meltybld,naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza (Japan) (GDL-0028)", GAME_FLAGS )
 // 0028A Melty Blood Act Cadenza (Rev A) (GDL-0028A)

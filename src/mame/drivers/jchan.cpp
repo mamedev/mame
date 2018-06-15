@@ -163,6 +163,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "video/sknsspr.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -464,12 +465,12 @@ void jchan_state::jchan_main(address_map &map)
 	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* 1st sprite layer */
-	map(0x500000, 0x503fff).ram().w(this, FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
-	map(0x600000, 0x60003f).ram().w(this, FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
+	map(0x500000, 0x503fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
+	map(0x600000, 0x60003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
 
 	map(0x700000, 0x70ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette
 
-	map(0xf00000, 0xf00007).rw(this, FUNC(jchan_state::ctrl_r), FUNC(jchan_state::ctrl_w)).share("ctrl");
+	map(0xf00000, 0xf00007).rw(FUNC(jchan_state::ctrl_r), FUNC(jchan_state::ctrl_w)).share("ctrl");
 
 	map(0xf80000, 0xf80001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 }
@@ -487,8 +488,8 @@ void jchan_state::jchan_sub(address_map &map)
 	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 
 	/* background sprites */
-	map(0x700000, 0x703fff).ram().w(this, FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
-	map(0x780000, 0x78003f).ram().w(this, FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
+	map(0x700000, 0x703fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
+	map(0x780000, 0x78003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
 
 	map(0x800000, 0x800003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff); // sound
 
@@ -632,9 +633,9 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -152,16 +152,16 @@ void aerofgt_state::pspikes_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x203fff).ram().share("sprlookupram1");
-	map(0xff8000, 0xff8fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffc3ff).writeonly().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(this, FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(this, FUNC(aerofgt_state::pspikes_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(this, FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff400, 0xfff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
@@ -171,16 +171,16 @@ void aerofgt_state::pspikesb_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x203fff).ram().share("sprlookupram1");
 	map(0xc04000, 0xc04001).nopw();
-	map(0xff8000, 0xff8fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffcbff).ram().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
-	map(0xffd200, 0xffd201).w(this, FUNC(aerofgt_state::pspikesb_gfxbank_w));
+	map(0xffd200, 0xffd201).w(FUNC(aerofgt_state::pspikesb_gfxbank_w));
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff004, 0xfff005).portr("DSW").w(this, FUNC(aerofgt_state::scrolly_w<0>));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
 	map(0xfff007, 0xfff007).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xfff008, 0xfff009).w(this, FUNC(aerofgt_state::pspikesb_oki_banking_w));
+	map(0xfff008, 0xfff009).w(FUNC(aerofgt_state::pspikesb_oki_banking_w));
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
@@ -190,20 +190,20 @@ void aerofgt_state::spikes91_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x203fff).ram().share("sprlookupram1");
 	map(0xc04000, 0xc04001).nopw();
-	map(0xff8000, 0xff8fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
 
 	map(0xffa000, 0xffbfff).ram().share("tx_tilemap_ram");
 
 	map(0xffc000, 0xffcfff).ram().share("spriteram");
-	//map(0xffd200, 0xffd201).w(this, FUNC(aerofgt_state::pspikesb_gfxbank_w));
+	//map(0xffd200, 0xffd201).w(FUNC(aerofgt_state::pspikesb_gfxbank_w));
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(this, FUNC(aerofgt_state::pspikes_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(this, FUNC(aerofgt_state::scrolly_w<0>));
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
 	map(0xfff006, 0xfff007).noprw();
-	map(0xfff008, 0xfff009).w(this, FUNC(aerofgt_state::spikes91_lookup_w));
+	map(0xfff008, 0xfff009).w(FUNC(aerofgt_state::spikes91_lookup_w));
 }
 
 void aerofgt_state::pspikesc_map(address_map &map)
@@ -211,16 +211,16 @@ void aerofgt_state::pspikesc_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x203fff).ram().share("sprlookupram1");
-	map(0xff8000, 0xff8fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffcbff).ram().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(this, FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(this, FUNC(aerofgt_state::pspikes_gfxbank_w));
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW");
-	map(0xfff004, 0xfff005).w(this, FUNC(aerofgt_state::scrolly_w<0>));
+	map(0xfff004, 0xfff005).w(FUNC(aerofgt_state::scrolly_w<0>));
 	map(0xfff007, 0xfff007).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
@@ -230,16 +230,16 @@ void aerofgt_state::kickball_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x20ffff).ram().share("sprlookupram1");
-	map(0xff8000, 0xff8fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffc3ff).writeonly().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(this, FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(this, FUNC(aerofgt_state::kickball_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(this, FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::kickball_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
@@ -247,8 +247,8 @@ void aerofgt_state::karatblz_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x081fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x082000, 0x083fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x080000, 0x081fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x082000, 0x083fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x0a0000, 0x0affff).ram().share("sprlookupram1");
 	map(0x0b0000, 0x0bffff).ram().share("sprlookupram2");
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
@@ -256,17 +256,17 @@ void aerofgt_state::karatblz_map(address_map &map)
 	map(0x0fc000, 0x0fc7ff).ram().share("spriteram");
 	map(0x0fe000, 0x0fe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0ff000, 0x0ff001).portr("IN0");
-	map(0x0ff000, 0x0ff000).w(this, FUNC(aerofgt_state::spinlbrk_flip_screen_w));
+	map(0x0ff000, 0x0ff000).w(FUNC(aerofgt_state::spinlbrk_flip_screen_w));
 	map(0x0ff002, 0x0ff003).portr("IN1");
-	map(0x0ff002, 0x0ff002).w(this, FUNC(aerofgt_state::karatblz_gfxbank_w));
+	map(0x0ff002, 0x0ff002).w(FUNC(aerofgt_state::karatblz_gfxbank_w));
 	map(0x0ff004, 0x0ff005).portr("IN2");
 	map(0x0ff006, 0x0ff007).portr("IN3");
 	map(0x0ff007, 0x0ff007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0ff008, 0x0ff009).portr("DSW").w(this, FUNC(aerofgt_state::scrollx_w<0>));
-	map(0x0ff00b, 0x0ff00b).r(this, FUNC(aerofgt_state::pending_command_r));
-	map(0x0ff00a, 0x0ff00b).w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0ff00c, 0x0ff00d).w(this, FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0ff00e, 0x0ff00f).w(this, FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_state::scrollx_w<0>));
+	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_state::pending_command_r));
+	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_state::scrolly_w<1>));
 	map(0x0ff400, 0x0ff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
@@ -274,8 +274,8 @@ void aerofgt_state::karatblzbl_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x081fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x082000, 0x083fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x080000, 0x081fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x082000, 0x083fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x0a0000, 0x0affff).ram().share("sprlookupram1");
 	map(0x0b0000, 0x0bffff).ram().share("sprlookupram2");
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
@@ -283,33 +283,33 @@ void aerofgt_state::karatblzbl_map(address_map &map)
 	map(0x0fc000, 0x0fc7ff).ram().share("spriteram");
 	map(0x0fe000, 0x0fe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0ff000, 0x0ff001).portr("IN0");
-	map(0x0ff000, 0x0ff000).w(this, FUNC(aerofgt_state::spinlbrk_flip_screen_w));
+	map(0x0ff000, 0x0ff000).w(FUNC(aerofgt_state::spinlbrk_flip_screen_w));
 	map(0x0ff002, 0x0ff003).portr("IN1");
-	map(0x0ff002, 0x0ff002).w(this, FUNC(aerofgt_state::karatblz_gfxbank_w));
+	map(0x0ff002, 0x0ff002).w(FUNC(aerofgt_state::karatblz_gfxbank_w));
 	map(0x0ff004, 0x0ff005).portr("IN2");
 	map(0x0ff006, 0x0ff007).portr("IN3");
-	map(0x0ff007, 0x0ff007).w(this, FUNC(aerofgt_state::karatblzbl_soundlatch_w));
-	map(0x0ff008, 0x0ff009).portr("DSW").w(this, FUNC(aerofgt_state::scrollx_w<0>));
-	map(0x0ff00b, 0x0ff00b).r(this, FUNC(aerofgt_state::pending_command_r));
-	map(0x0ff00a, 0x0ff00b).w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0ff00c, 0x0ff00d).w(this, FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0ff00e, 0x0ff00f).w(this, FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0ff007, 0x0ff007).w(FUNC(aerofgt_state::karatblzbl_soundlatch_w));
+	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_state::scrollx_w<0>));
+	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_state::pending_command_r));
+	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_state::scrolly_w<1>));
 	map(0x0ff400, 0x0ff403).nopw(); // GGA access
 }
 
 void aerofgt_state::spinlbrk_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x082000, 0x082fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x080000, 0x080fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x082000, 0x082fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0xff8000, 0xffbfff).ram(); /* work RAM */
 	map(0xffc000, 0xffc7ff).ram().share("spriteram");
 	map(0xffd000, 0xffd1ff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff000, 0xfff000).w(this, FUNC(aerofgt_state::spinlbrk_flip_screen_w));
-	map(0xfff001, 0xfff001).w(this, FUNC(aerofgt_state::spinlbrk_gfxbank_w));
-	map(0xfff002, 0xfff003).portr("IN1").w(this, FUNC(aerofgt_state::scrollx_w<1>));
+	map(0xfff000, 0xfff000).w(FUNC(aerofgt_state::spinlbrk_flip_screen_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::spinlbrk_gfxbank_w));
+	map(0xfff002, 0xfff003).portr("IN1").w(FUNC(aerofgt_state::scrollx_w<1>));
 	map(0xfff004, 0xfff005).portr("DSW");
 	map(0xfff007, 0xfff007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 //  map(0xfff008, 0xfff009); - read when analog inputs are enabled
@@ -322,8 +322,8 @@ void aerofgt_state::turbofrc_map(address_map &map)
 	map.global_mask(0xfffff);
 	map(0x000000, 0x0bffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
@@ -331,13 +331,13 @@ void aerofgt_state::turbofrc_map(address_map &map)
 	map(0x0fd000, 0x0fdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0x0fe000, 0x0fe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0ff000, 0x0ff001).portr("IN0");
-	map(0x0ff001, 0x0ff001).w(this, FUNC(aerofgt_state::turbofrc_flip_screen_w));
-	map(0x0ff002, 0x0ff003).portr("IN1").w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0ff004, 0x0ff005).portr("DSW").w(this, FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0ff007, 0x0ff007).r(this, FUNC(aerofgt_state::pending_command_r));
-	map(0x0ff006, 0x0ff007).w(this, FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0ff001, 0x0ff001).w(FUNC(aerofgt_state::turbofrc_flip_screen_w));
+	map(0x0ff002, 0x0ff003).portr("IN1").w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0x0ff004, 0x0ff005).portr("DSW").w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0x0ff007, 0x0ff007).r(FUNC(aerofgt_state::pending_command_r));
+	map(0x0ff006, 0x0ff007).w(FUNC(aerofgt_state::scrolly_w<1>));
 	map(0x0ff008, 0x0ff009).portr("IN2");
-	map(0x0ff008, 0x0ff00b).w(this, FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0ff008, 0x0ff00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
 	map(0x0ff00c, 0x0ff00d).nopw();    /* related to bg2 (written together with the scroll registers) */
 	map(0x0ff00e, 0x0ff00e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0ff400, 0x0ff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
@@ -347,21 +347,21 @@ void aerofgt_state::aerofgtb_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
 	map(0x0fc000, 0x0fc7ff).ram().share("spriteram");
 	map(0x0fd000, 0x0fd7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0fe000, 0x0fe001).portr("IN0");
-	map(0x0fe001, 0x0fe001).w(this, FUNC(aerofgt_state::turbofrc_flip_screen_w));
-	map(0x0fe002, 0x0fe003).portr("IN1").w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0fe004, 0x0fe005).portr("DSW1").w(this, FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0fe007, 0x0fe007).r(this, FUNC(aerofgt_state::pending_command_r));
-	map(0x0fe006, 0x0fe007).w(this, FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0fe001, 0x0fe001).w(FUNC(aerofgt_state::turbofrc_flip_screen_w));
+	map(0x0fe002, 0x0fe003).portr("IN1").w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0x0fe004, 0x0fe005).portr("DSW1").w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0x0fe007, 0x0fe007).r(FUNC(aerofgt_state::pending_command_r));
+	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_state::scrolly_w<1>));
 	map(0x0fe008, 0x0fe009).portr("DSW2");
-	map(0x0fe008, 0x0fe00b).w(this, FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
 	map(0x0fe00e, 0x0fe00e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0fe400, 0x0fe403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 	map(0x0ff000, 0x0fffff).ram().share("rasterram");   /* used only for the scroll registers */
@@ -374,14 +374,14 @@ void aerofgt_state::aerofgt_map(address_map &map)
 	map(0x1b0000, 0x1b07ff).ram().share("rasterram");   /* used only for the scroll registers */
 	map(0x1b0800, 0x1b0801).ram(); /* tracks watchdog state */
 	map(0x1b0ff0, 0x1b0fff).ram(); /* stack area during boot */
-	map(0x1b2000, 0x1b3fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x1b4000, 0x1b5fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x1c0000, 0x1c7fff).ram().share("sprlookupram1");
 	map(0x1d0000, 0x1d1fff).ram().share("spriteram");
 	map(0xfef000, 0xffefff).ram(); /* work RAM */
-	map(0xffff80, 0xffff87).w(this, FUNC(aerofgt_state::aerofgt_gfxbank_w));
-	map(0xffff88, 0xffff89).w(this, FUNC(aerofgt_state::scrolly_w<0>)); /* + something else in the top byte */
-	map(0xffff90, 0xffff91).w(this, FUNC(aerofgt_state::scrolly_w<1>)); /* + something else in the top byte */
+	map(0xffff80, 0xffff87).w(FUNC(aerofgt_state::aerofgt_gfxbank_w));
+	map(0xffff88, 0xffff89).w(FUNC(aerofgt_state::scrolly_w<0>)); /* + something else in the top byte */
+	map(0xffff90, 0xffff91).w(FUNC(aerofgt_state::scrolly_w<1>)); /* + something else in the top byte */
 	map(0xffffa0, 0xffffbf).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
@@ -390,8 +390,8 @@ void aerofgt_state::aerfboot_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
@@ -401,10 +401,10 @@ void aerofgt_state::aerfboot_map(address_map &map)
 	map(0x0fe002, 0x0fe003).portr("IN1");
 	map(0x0fe004, 0x0fe005).portr("DSW1");
 	map(0x0fe008, 0x0fe009).portr("DSW2");
-	map(0x0fe002, 0x0fe003).w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0fe004, 0x0fe005).w(this, FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0fe006, 0x0fe007).w(this, FUNC(aerofgt_state::scrolly_w<1>));
-	map(0x0fe008, 0x0fe00b).w(this, FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0fe002, 0x0fe003).w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0x0fe004, 0x0fe005).w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
 	map(0x0fe00e, 0x0fe00e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0fe010, 0x0fe011).nopw();
 	map(0x0fe012, 0x0fe013).nopw(); // MSB = watchdog?
@@ -419,8 +419,8 @@ void aerofgt_state::aerfboo2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(this, FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
@@ -430,15 +430,15 @@ void aerofgt_state::aerfboo2_map(address_map &map)
 	map(0x0fe002, 0x0fe003).portr("IN1");
 	map(0x0fe004, 0x0fe005).portr("DSW1");
 	map(0x0fe008, 0x0fe009).portr("DSW2");
-	map(0x0fe002, 0x0fe003).w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0fe004, 0x0fe005).w(this, FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0fe006, 0x0fe007).w(this, FUNC(aerofgt_state::scrolly_w<1>));
-	map(0x0fe008, 0x0fe00b).w(this, FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0fe002, 0x0fe003).w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0x0fe004, 0x0fe005).w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
 	map(0x0fe006, 0x0fe006).r(m_oki, FUNC(okim6295_device::read));
 	map(0x0fe00e, 0x0fe00e).w(m_oki, FUNC(okim6295_device::write));
-	map(0x0fe01e, 0x0fe01f).w(this, FUNC(aerofgt_state::aerfboo2_okim6295_banking_w));
+	map(0x0fe01e, 0x0fe01f).w(FUNC(aerofgt_state::aerfboo2_okim6295_banking_w));
 //  map(0x0fe010, 0x0fe011).nopw();
-//  map(0x0fe012, 0x0fe013).w(this, FUNC(aerofgt_state::aerfboot_soundlatch_w));
+//  map(0x0fe012, 0x0fe013).w(FUNC(aerofgt_state::aerfboot_soundlatch_w));
 	map(0x0fe400, 0x0fe403).nopw(); // GGA access
 	map(0x0ff000, 0x0fffff).ram().share("rasterram");   /* used only for the scroll registers */
 }
@@ -449,17 +449,17 @@ void aerofgt_state::wbbc97_map(address_map &map)
 	map(0x500000, 0x50ffff).ram(); /* work RAM */
 	map(0x600000, 0x605fff).ram().share("sprlookupram1");
 	map(0xa00000, 0xa3ffff).ram().share("bitmapram");
-	map(0xff8000, 0xff8fff).ram().w(this, FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffc3ff).writeonly().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(this, FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(this, FUNC(aerofgt_state::pspikes_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(this, FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(this, FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
-	map(0xfff00e, 0xfff00f).w(this, FUNC(aerofgt_state::wbbc97_bitmap_enable_w));
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff00e, 0xfff00f).w(FUNC(aerofgt_state::wbbc97_bitmap_enable_w));
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
@@ -473,7 +473,7 @@ void aerofgt_state::sound_map(address_map &map)
 void aerofgt_state::spinlbrk_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(aerofgt_state::spinlbrk_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(aerofgt_state::spinlbrk_sh_bankswitch_w));
 	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -481,7 +481,7 @@ void aerofgt_state::spinlbrk_sound_portmap(address_map &map)
 void aerofgt_state::turbofrc_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(aerofgt_state::aerofgt_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(aerofgt_state::aerofgt_sh_bankswitch_w));
 	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -490,7 +490,7 @@ void aerofgt_state::aerofgt_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x04, 0x04).w(this, FUNC(aerofgt_state::aerofgt_sh_bankswitch_w));
+	map(0x04, 0x04).w(FUNC(aerofgt_state::aerofgt_sh_bankswitch_w));
 	map(0x08, 0x08).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x0c, 0x0c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -499,7 +499,7 @@ void aerofgt_state::aerfboot_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(aerofgt_state::aerfboot_okim6295_banking_w));
+	map(0x9000, 0x9000).w(FUNC(aerofgt_state::aerfboot_okim6295_banking_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -526,8 +526,8 @@ void aerofgt_state::karatblzbl_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x40, 0x40).w(this, FUNC(aerofgt_state::karatblzbl_d7759_write_port_0_w));
-	map(0x80, 0x80).w(this, FUNC(aerofgt_state::karatblzbl_d7759_reset_w));
+	map(0x40, 0x40).w(FUNC(aerofgt_state::karatblzbl_d7759_write_port_0_w));
+	map(0x80, 0x80).w(FUNC(aerofgt_state::karatblzbl_d7759_reset_w));
 }
 
 void aerofgt_state::kickball_sound_map(address_map &map)

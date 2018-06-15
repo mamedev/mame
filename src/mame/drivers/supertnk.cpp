@@ -322,7 +322,7 @@ void supertnk_state::supertnk_map(address_map &map)
 	map(0x1efe, 0x1eff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x1efe, 0x1efe).portr("DSW");
 	map(0x1eff, 0x1eff).portr("UNK");
-	map(0x2000, 0x3fff).rw(this, FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
+	map(0x2000, 0x3fff).rw(FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
 }
 
 
@@ -336,11 +336,11 @@ void supertnk_state::supertnk_map(address_map &map)
 void supertnk_state::supertnk_io_map(address_map &map)
 {
 	map(0x0000, 0x0000).nopw();
-	map(0x0400, 0x0400).w(this, FUNC(supertnk_state::supertnk_bitplane_select_0_w));
-	map(0x0401, 0x0401).w(this, FUNC(supertnk_state::supertnk_bitplane_select_1_w));
-	map(0x0402, 0x0402).w(this, FUNC(supertnk_state::supertnk_bankswitch_0_w));
-	map(0x0404, 0x0404).w(this, FUNC(supertnk_state::supertnk_bankswitch_1_w));
-	map(0x0406, 0x0406).w(this, FUNC(supertnk_state::supertnk_interrupt_ack_w));
+	map(0x0400, 0x0400).w(FUNC(supertnk_state::supertnk_bitplane_select_0_w));
+	map(0x0401, 0x0401).w(FUNC(supertnk_state::supertnk_bitplane_select_1_w));
+	map(0x0402, 0x0402).w(FUNC(supertnk_state::supertnk_bankswitch_0_w));
+	map(0x0404, 0x0404).w(FUNC(supertnk_state::supertnk_bankswitch_1_w));
+	map(0x0406, 0x0406).w(FUNC(supertnk_state::supertnk_interrupt_ack_w));
 	map(0x0407, 0x0407).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 

@@ -713,39 +713,41 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		switch (command[2] & 0x3f)
 		{
 			case 0xe:   // CD Audio control page
-				data[0] = 0x8e; // page E, parameter is savable
-				data[1] = 0x0e; // page length
-				data[2] = (1 << 2) | (m_sotc << 1); // IMMED = 1
-				data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
+				data[1] = 0x0e + 8;
+				data[0+8] = 0x8e; // page E, parameter is savable
+				data[1+8] = 0x0e; // page length
+				data[2+8] = (1 << 2) | (m_sotc << 1); // IMMED = 1
+				data[3+8] = data[4+8] = data[5+8] = data[6+8] = data[7+8] = 0; // reserved
 
 				// connect each audio channel to 1 output port
-				data[8] = 1;
-				data[10] = 2;
-				data[12] = 4;
-				data[14] = 8;
+				data[8+8] = 1;
+				data[10+8] = 2;
+				data[12+8] = 4;
+				data[14+8] = 8;
 
 				// indicate max volume
-				data[9] = data[11] = data[13] = data[15] = 0xff;
+				data[9+8] = data[11+8] = data[13+8] = data[15+8] = 0xff;
 				break;
 			case 0x2a:  // Page capabilities
-				data[0] = 0x2a;
-				data[1] = 0x14; // page length
-				data[2] = 0x00; data[3] = 0x00; // CD-R only
-				data[4] = 0x01; // can play audio
-				data[5] = 0;
-				data[6] = 0;
-				data[7] = 0;
-				data[8] = 0x02; data[9] = 0xc0; // 4x speed
-				data[10] = 0;
-				data[11] = 2; // two volumen levels
-				data[12] = 0x00; data[13] = 0x00; // buffer
-				data[14] = 0x02; data[15] = 0xc0; // 4x read speed
-				data[16] = 0;
-				data[17] = 0;
-				data[18] = 0;
-				data[19] = 0;
-				data[20] = 0;
-				data[21] = 0;
+				data[1] = 0x14 + 8;
+				data[0+8] = 0x2a;
+				data[1+8] = 0x14; // page length
+				data[2+8] = 0x00; data[3+8] = 0x00; // CD-R only
+				data[4+8] = 0x01; // can play audio
+				data[5+8] = 0;
+				data[6+8] = 0;
+				data[7+8] = 0;
+				data[8+8] = 0x02; data[9+8] = 0xc0; // 4x speed
+				data[10+8] = 0;
+				data[11+8] = 2; // two volumen levels
+				data[12+8] = 0x00; data[13+8] = 0x00; // buffer
+				data[14+8] = 0x02; data[15+8] = 0xc0; // 4x read speed
+				data[16+8] = 0;
+				data[17+8] = 0;
+				data[18+8] = 0;
+				data[19+8] = 0;
+				data[20+8] = 0;
+				data[21+8] = 0;
 				break;
 
 			default:

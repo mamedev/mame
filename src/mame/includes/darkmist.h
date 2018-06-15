@@ -3,6 +3,7 @@
 
 #include "audio/t5182.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class darkmist_state : public driver_device

@@ -38,6 +38,7 @@
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -336,10 +337,10 @@ void eurocom2_state::eurocom2_map(address_map &map)
 	map(0xf000, 0xfcef).rom().region("maincpu", 0);
 	map(0xfcf0, 0xfcf3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfcf4, 0xfcf5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xfcf6, 0xfcf7).w(this, FUNC(eurocom2_state::vico_w));
+	map(0xfcf6, 0xfcf7).w(FUNC(eurocom2_state::vico_w));
 	map(0xfcf8, 0xfcfb).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfd30, 0xfd37).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0xfd38, 0xfd38).rw(this, FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
+	map(0xfd38, 0xfd38).rw(FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
 	map(0xfd40, 0xffff).rom().region("maincpu", 0xd40).nopw();
 }
 
@@ -349,7 +350,7 @@ void waveterm_state::waveterm_map(address_map &map)
 	map(0xfd00, 0xfd03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfd08, 0xfd0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xfd10, 0xfd17).unmaprw();
-	map(0xfd18, 0xfd18).r(this, FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
+	map(0xfd18, 0xfd18).r(FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
 //  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
 }
 
@@ -434,11 +435,11 @@ static void eurocom_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(eurocom2_state::eurocom2)
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
+	MCFG_DEVICE_ADD("maincpu", MC6809, 10.7172_MHz_XTAL / 2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	MCFG_DEVICE_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'717'200), VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
+	MCFG_SCREEN_RAW_PARAMS(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -468,7 +469,7 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
 
-	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)/2)
+	MCFG_DEVICE_ADD("fdc", FD1793, 2_MHz_XTAL / 2)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -508,15 +509,15 @@ ROM_START(eurocom2)
 
 	ROM_DEFAULT_BIOS("mon54")
 	ROM_SYSTEM_BIOS(0, "mon24", "Eurocom Control V2.4")
-	ROMX_LOAD("mon24.bin", 0x0000, 0x1000, CRC(abf5e115) SHA1(d056705779e109bb56c82f906e2e5a52efe77ec1), ROM_BIOS(1))
+	ROMX_LOAD("mon24.bin", 0x0000, 0x1000, CRC(abf5e115) SHA1(d056705779e109bb56c82f906e2e5a52efe77ec1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon53", "Eurocom Control V5.3")
-	ROMX_LOAD("mon53.bin", 0x0000, 0x1000, CRC(fb39c2ad) SHA1(8ce07c349c56f92503f11bb63e32e32c139c003a), ROM_BIOS(2))
+	ROMX_LOAD("mon53.bin", 0x0000, 0x1000, CRC(fb39c2ad) SHA1(8ce07c349c56f92503f11bb63e32e32c139c003a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "mon54", "Eurocom Control V5.4")
-	ROMX_LOAD("mon54.bin", 0x0000, 0x1000, CRC(2c5a4ad2) SHA1(67b9deec5a6a71d768e35ac97c16cb8992ae159f), ROM_BIOS(3))
+	ROMX_LOAD("mon54.bin", 0x0000, 0x1000, CRC(2c5a4ad2) SHA1(67b9deec5a6a71d768e35ac97c16cb8992ae159f), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "monu546", "Eurocom Control U5.4")
-	ROMX_LOAD("monu54-6.bin", 0x0000, 0x1000, CRC(80c82fa8) SHA1(7255bc2dd536d3dd08cca3ea46992e5ca59323b1), ROM_BIOS(4))
+	ROMX_LOAD("monu54-6.bin", 0x0000, 0x1000, CRC(80c82fa8) SHA1(7255bc2dd536d3dd08cca3ea46992e5ca59323b1), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "neumon54", "New Monitor 5.4")
-	ROMX_LOAD("neumon54.bin", 0x0000, 0x1000, CRC(2b60ca41) SHA1(c7252d2e9b267b046f4f3ea6cd77e40d4744a33e), ROM_BIOS(5))
+	ROMX_LOAD("neumon54.bin", 0x0000, 0x1000, CRC(2b60ca41) SHA1(c7252d2e9b267b046f4f3ea6cd77e40d4744a33e), ROM_BIOS(4))
 ROM_END
 
 ROM_START(waveterm)

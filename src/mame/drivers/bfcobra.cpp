@@ -84,6 +84,7 @@
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1273,12 +1274,12 @@ void bfcobra_state::z80_prog_map(address_map &map)
 void bfcobra_state::z80_io_map(address_map &map)
 {
 map.global_mask(0xff);
-	map(0x00, 0x23).rw(this, FUNC(bfcobra_state::chipset_r), FUNC(bfcobra_state::chipset_w));
+	map(0x00, 0x23).rw(FUNC(bfcobra_state::chipset_r), FUNC(bfcobra_state::chipset_w));
 	map(0x24, 0x25).w(m_acia6850_0, FUNC(acia6850_device::write));
 	map(0x26, 0x27).r(m_acia6850_0, FUNC(acia6850_device::read));
-	map(0x30, 0x30).r(this, FUNC(bfcobra_state::fdctrl_r));
-	map(0x31, 0x31).rw(this, FUNC(bfcobra_state::fddata_r), FUNC(bfcobra_state::fdctrl_w));
-	map(0x40, 0x40).w(this, FUNC(bfcobra_state::rombank_w));
+	map(0x30, 0x30).r(FUNC(bfcobra_state::fdctrl_r));
+	map(0x31, 0x31).rw(FUNC(bfcobra_state::fddata_r), FUNC(bfcobra_state::fdctrl_w));
+	map(0x40, 0x40).w(FUNC(bfcobra_state::rombank_w));
 	map(0x50, 0x50).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x51, 0x51).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x52, 0x52).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -1406,10 +1407,10 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).ram();     // W 'B', 6F
 	map(0x2200, 0x2200).ram();     // W 'F'
-	map(0x2600, 0x2600).rw(this, FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
+	map(0x2600, 0x2600).rw(FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
 	map(0x2800, 0x2800).ram();     // W
-	map(0x2A00, 0x2A02).rw(this, FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
-	map(0x2E00, 0x2E00).r(this, FUNC(bfcobra_state::int_latch_r));
+	map(0x2A00, 0x2A02).rw(FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
+	map(0x2E00, 0x2E00).r(FUNC(bfcobra_state::int_latch_r));
 	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3201, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x3404, 0x3405).rw(m_acia6850_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -1417,7 +1418,7 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
-	map(0x3801, 0x3801).rw(this, FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
+	map(0x3801, 0x3801).rw(FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
 	map(0x8000, 0xffff).rom();
 	map(0xf000, 0xf000).nopw();    /* Watchdog */
 }

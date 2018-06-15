@@ -721,13 +721,13 @@ WRITE32_MEMBER(sun3_state::parity_w)
 
 void sun3_state::sun3_mem(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
 }
 
 // type 0 device space
 void sun3_state::vmetype0space_map(address_map &map)
 {
-	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 	map(0xfe400000, 0xfe41ffff).ram(); // not sure what's going on here (3/110)
 	map(0xff000000, 0xff03ffff).ram().share("bw2_vram");
 }
@@ -735,7 +735,7 @@ void sun3_state::vmetype0space_map(address_map &map)
 // type 0 without VRAM (3/50)
 void sun3_state::vmetype0space_novram_map(address_map &map)
 {
-	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 }
 
 // type 1 device space
@@ -744,11 +744,11 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
-	map(0x00060000, 0x0006ffff).rw(this, FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
-	map(0x00080000, 0x0008000f).rw(this, FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
-	map(0x000a0000, 0x000a0003).rw(this, FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
+	map(0x00060000, 0x0006ffff).rw(FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
+	map(0x00080000, 0x0008000f).rw(FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
+	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
-	map(0x001e0000, 0x001e00ff).rw(this, FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
+	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
 // type 2 device space
@@ -1016,13 +1016,13 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1121,13 +1121,13 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1160,15 +1160,15 @@ Sun 3/50 V2.7 Bootprom
 Sun 3/50 V2.8 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev28", "Rev 2.8")
-	ROMX_LOAD( "sun3_50_v2.8", 0x0000, 0x10000, CRC(1ca6b0e8) SHA1(5773ac1c46399501d29d1758aa342862b03ec472), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_50_v2.8", 0x0000, 0x10000, CRC(1ca6b0e8) SHA1(5773ac1c46399501d29d1758aa342862b03ec472), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev27", "Rev 2.7")
-	ROMX_LOAD( "sun3_50_v2.7", 0x0000, 0x10000, CRC(7c4a9e20) SHA1(6dcd4883a170538050fd0e1f151fae413ec9ea52), ROM_BIOS(2))
+	ROMX_LOAD( "sun3_50_v2.7", 0x0000, 0x10000, CRC(7c4a9e20) SHA1(6dcd4883a170538050fd0e1f151fae413ec9ea52), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev26", "Rev 2.6")
-	ROMX_LOAD( "sun3_50_v2.6", 0x0000, 0x10000, CRC(08abbb3b) SHA1(6bfb8d5c97d801cd7bb7d564de0e68a48fb807c4), ROM_BIOS(3))
+	ROMX_LOAD( "sun3_50_v2.6", 0x0000, 0x10000, CRC(08abbb3b) SHA1(6bfb8d5c97d801cd7bb7d564de0e68a48fb807c4), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "rev23", "Rev 2.3")
-	ROMX_LOAD( "sun3_50_v2.3", 0x0000, 0x10000, CRC(163500b3) SHA1(437c8d539e12d442ca6877566dbbe165d577fcab), ROM_BIOS(4))
+	ROMX_LOAD( "sun3_50_v2.3", 0x0000, 0x10000, CRC(163500b3) SHA1(437c8d539e12d442ca6877566dbbe165d577fcab), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "rev16", "Rev 1.6")
-	ROMX_LOAD( "sun3_50_v1.6", 0x0000, 0x10000, CRC(8be20826) SHA1(2a4d73fcb7fe0f0c83eb0f4c91d957b7bf88b7ed), ROM_BIOS(5))
+	ROMX_LOAD( "sun3_50_v1.6", 0x0000, 0x10000, CRC(8be20826) SHA1(2a4d73fcb7fe0f0c83eb0f4c91d957b7bf88b7ed), ROM_BIOS(4))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-50-idprom.bin", 0x000000, 0x000020, CRC(80610dbe) SHA1(0f37e31ed209b8905c5dc7c2663fa01a9b9baaba) )
@@ -1186,11 +1186,11 @@ Sun 3/60 V2.8.3 Bootprom
 Sun 3/60 V3.0.1 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev301", "Rev 3.0.1")
-	ROMX_LOAD( "sun_3.60v3.0.1", 0x0000, 0x10000, CRC(e55dc1d8) SHA1(6e48414ce2139282e69f57612b20f7d5c475e74c), ROM_BIOS(1))
+	ROMX_LOAD( "sun_3.60v3.0.1", 0x0000, 0x10000, CRC(e55dc1d8) SHA1(6e48414ce2139282e69f57612b20f7d5c475e74c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev283", "Rev 2.8.3")
-	ROMX_LOAD( "sun_3.60v2.8.3", 0x0000, 0x10000, CRC(de4ec54d) SHA1(e621a9c1a2a7df4975b12fa3a0d7f106383736ef), ROM_BIOS(2))
+	ROMX_LOAD( "sun_3.60v2.8.3", 0x0000, 0x10000, CRC(de4ec54d) SHA1(e621a9c1a2a7df4975b12fa3a0d7f106383736ef), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev19", "Rev 1.9")
-	ROMX_LOAD( "sun_3.60v1.9",   0x0000, 0x10000, CRC(32b6d3a9) SHA1(307756ba5698611d51059881057f8086956ce895), ROM_BIOS(3))
+	ROMX_LOAD( "sun_3.60v1.9",   0x0000, 0x10000, CRC(32b6d3a9) SHA1(307756ba5698611d51059881057f8086956ce895), ROM_BIOS(2))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-60-idprom.bin", 0x000000, 0x000020, CRC(117e766a) SHA1(f01547be0156bd4e06bbdee4c342d1b38c7646ae) )
@@ -1208,7 +1208,7 @@ Sun 3/110 V2.8 Bootprom
 Sun 3/110 V3.0 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
-	ROMX_LOAD( "sun3_110_v3.0", 0x0000, 0x10000, CRC(a193b26b) SHA1(0f54212ee3a5709f70e921069cca1ddb8c143b1b), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_110_v3.0", 0x0000, 0x10000, CRC(a193b26b) SHA1(0f54212ee3a5709f70e921069cca1ddb8c143b1b), ROM_BIOS(0))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-110-idprom.bin", 0x000000, 0x000020, CRC(d6cd934a) SHA1(b0913708fe733250ef5c1289c10146dcef6d1a67) )
@@ -1231,15 +1231,15 @@ Sun 3/1[4,5,6,8]0 V2.8.4 Bootprom
 Sun 3/1[4,5,6,8]0 V3.0 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
-	ROMX_LOAD( "sun3_160_v3.0",   0x0000, 0x10000, CRC(fee6e4d6) SHA1(440d532e1848298dba0f043de710bb0b001fb675), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_160_v3.0",   0x0000, 0x10000, CRC(fee6e4d6) SHA1(440d532e1848298dba0f043de710bb0b001fb675), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev284", "Rev 2.8.4")
-	ROMX_LOAD( "sun3_160_v2.8.4", 0x0000, 0x10000, CRC(3befd013) SHA1(f642bb42200b794e6e32e2fe6c87d5c269c8656d), ROM_BIOS(2))
+	ROMX_LOAD( "sun3_160_v2.8.4", 0x0000, 0x10000, CRC(3befd013) SHA1(f642bb42200b794e6e32e2fe6c87d5c269c8656d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev23", "Rev 2.3")
-	ROMX_LOAD( "sun3_160_v2.3",   0x0000, 0x10000, CRC(09585745) SHA1(1de1725dd9e27f5a910989bbb5b51acfbdc1d70b), ROM_BIOS(3))
+	ROMX_LOAD( "sun3_160_v2.3",   0x0000, 0x10000, CRC(09585745) SHA1(1de1725dd9e27f5a910989bbb5b51acfbdc1d70b), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "rev21rf", "Rev 2.1 RF")
-	ROMX_LOAD( "sun3_160_v2.1_rf",   0x0000, 0x10000, CRC(5c7e9271) SHA1(5e4dbb50859a21f9e1d3e4a06c42494d13a9a8eb), ROM_BIOS(4))
+	ROMX_LOAD( "sun3_160_v2.1_rf",   0x0000, 0x10000, CRC(5c7e9271) SHA1(5e4dbb50859a21f9e1d3e4a06c42494d13a9a8eb), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "rev15", "Rev 1.5")
-	ROMX_LOAD( "sun3_160_v1.5",   0x0000, 0x10000, CRC(06daee37) SHA1(b9873cd48d78ad8e0c85d69966fc20c21cfc99aa), ROM_BIOS(5))
+	ROMX_LOAD( "sun3_160_v1.5",   0x0000, 0x10000, CRC(06daee37) SHA1(b9873cd48d78ad8e0c85d69966fc20c21cfc99aa), ROM_BIOS(4))
 
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
@@ -1259,11 +1259,11 @@ Sun 3/260/280 V2.8.4 Bootprom
 Sun 3/260/280 V3.0 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
-	ROMX_LOAD( "sun3_260_v3.0", 0x0000, 0x10000, CRC(f43ed1d3) SHA1(204880436bd087ede136f853610403d75e60bd75), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_260_v3.0", 0x0000, 0x10000, CRC(f43ed1d3) SHA1(204880436bd087ede136f853610403d75e60bd75), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev27", "Rev 2.7")
-	ROMX_LOAD( "sun3_260_v2.7", 0x0000, 0x10000, CRC(099fcaab) SHA1(4a5233c778676f48103bdd8bab03b4264686b4aa), ROM_BIOS(2))
+	ROMX_LOAD( "sun3_260_v2.7", 0x0000, 0x10000, CRC(099fcaab) SHA1(4a5233c778676f48103bdd8bab03b4264686b4aa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev26", "Rev 2.6")
-	ROMX_LOAD( "sun3_260_v2.6", 0x0000, 0x10000, CRC(e8b17951) SHA1(e1fdef42670a349d99b0eca9c50c8566b8bb7c56), ROM_BIOS(3))
+	ROMX_LOAD( "sun3_260_v2.6", 0x0000, 0x10000, CRC(e8b17951) SHA1(e1fdef42670a349d99b0eca9c50c8566b8bb7c56), ROM_BIOS(2))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-260-idprom.bin", 0x000000, 0x000020, CRC(d51794f3) SHA1(17930c773b6fe9a32819094ffaf69e5453d1ea4d) )
@@ -1272,7 +1272,7 @@ ROM_END
 ROM_START( sun3_e )
 	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "rev28", "Rev 3.2")
-	ROMX_LOAD( "sun3_e.32", 0x0000, 0x10000, CRC(acedde7e) SHA1(1ab6ec28f4365a613a5e326c34cb37585c3f0ecc), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_e.32", 0x0000, 0x10000, CRC(acedde7e) SHA1(1ab6ec28f4365a613a5e326c34cb37585c3f0ecc), ROM_BIOS(0))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )

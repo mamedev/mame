@@ -64,10 +64,10 @@ void adam_printer_device::adam_prn_mem(address_map &map)
 
 void adam_printer_device::adam_prn_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(adam_printer_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_printer_device::p2_r), FUNC(adam_printer_device::p2_w));
-	map(M6801_PORT3, M6801_PORT3).r(this, FUNC(adam_printer_device::p3_r));
-	map(M6801_PORT4, M6801_PORT4).rw(this, FUNC(adam_printer_device::p4_r), FUNC(adam_printer_device::p4_w));
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_printer_device::p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_printer_device::p2_r), FUNC(adam_printer_device::p2_w));
+	map(M6801_PORT3, M6801_PORT3).r(FUNC(adam_printer_device::p3_r));
+	map(M6801_PORT4, M6801_PORT4).rw(FUNC(adam_printer_device::p4_r), FUNC(adam_printer_device::p4_w));
 }
 
 

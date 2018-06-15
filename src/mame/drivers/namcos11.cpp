@@ -472,7 +472,7 @@ WRITE16_MEMBER( namcos11_state::c76_shared_w )
 
 void namcos11_state::namcos11_map(address_map &map)
 {
-	map(0x1fa04000, 0x1fa0ffff).rw(this, FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared ram with C76 */
+	map(0x1fa04000, 0x1fa0ffff).rw(FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared ram with C76 */
 	map(0x1fa20000, 0x1fa2001f).rw("keycus", FUNC(ns11_keycus_device::read), FUNC(ns11_keycus_device::write));
 	map(0x1fa30000, 0x1fa30fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* eeprom */
 	map(0x1fb00000, 0x1fb00003).nopw(); /* ?? */
@@ -491,7 +491,7 @@ void namcos11_state::rom8_map(address_map &map)
 	map(0x1f500000, 0x1f5fffff).bankr("bank6");
 	map(0x1f600000, 0x1f6fffff).bankr("bank7");
 	map(0x1f700000, 0x1f7fffff).bankr("bank8");
-	map(0x1fa10020, 0x1fa1002f).w(this, FUNC(namcos11_state::rom8_w));
+	map(0x1fa10020, 0x1fa1002f).w(FUNC(namcos11_state::rom8_w));
 }
 
 void namcos11_state::rom8_64_map(address_map &map)
@@ -506,16 +506,16 @@ void namcos11_state::rom8_64_map(address_map &map)
 	map(0x1f500000, 0x1f5fffff).bankr("bank6");
 	map(0x1f600000, 0x1f6fffff).bankr("bank7");
 	map(0x1f700000, 0x1f7fffff).bankr("bank8");
-	map(0x1f080000, 0x1f080003).w(this, FUNC(namcos11_state::rom8_64_upper_w));
-	map(0x1fa10020, 0x1fa1002f).nopr().w(this, FUNC(namcos11_state::rom8_64_w));
+	map(0x1f080000, 0x1f080003).w(FUNC(namcos11_state::rom8_64_upper_w));
+	map(0x1fa10020, 0x1fa1002f).nopr().w(FUNC(namcos11_state::rom8_64_w));
 }
 
 void namcos11_state::ptblank2ua_map(address_map &map)
 {
 	rom8_64_map(map);
 
-	map(0x1f780000, 0x1f78000f).r(this, FUNC(namcos11_state::lightgun_r));
-	map(0x1f788000, 0x1f788003).w(this, FUNC(namcos11_state::lightgun_w));
+	map(0x1f780000, 0x1f78000f).r(FUNC(namcos11_state::lightgun_r));
+	map(0x1f788000, 0x1f788003).w(FUNC(namcos11_state::lightgun_w));
 }
 
 void namcos11_state::c76_map(address_map &map)
@@ -627,13 +627,13 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", 25401600, 288)
+	MCFG_DEVICE_ADD("c352", C352, 25401600, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", nullptr )
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::coh100)

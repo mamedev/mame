@@ -380,9 +380,9 @@ void sslam_state::sslam_program_map(address_map &map)
 	map(0x000000, 0xffffff).rom();   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 
 	map(0x000400, 0x07ffff).ram();
-	map(0x100000, 0x103fff).ram().w(this, FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
-	map(0x104000, 0x107fff).ram().w(this, FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
-	map(0x108000, 0x10ffff).ram().w(this, FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
+	map(0x100000, 0x103fff).ram().w(FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
+	map(0x104000, 0x107fff).ram().w(FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
+	map(0x108000, 0x10ffff).ram().w(FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
 	map(0x110000, 0x11000d).ram().share("regs");
 	map(0x200000, 0x200001).nopw();
 	map(0x280000, 0x280fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -395,14 +395,14 @@ void sslam_state::sslam_program_map(address_map &map)
 	map(0x300018, 0x300019).portr("IN4");
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-	map(0x30001f, 0x30001f).w(this, FUNC(sslam_state::sslam_snd_w));
+	map(0x30001f, 0x30001f).w(FUNC(sslam_state::sslam_snd_w));
 	map(0xf00000, 0xffffff).ram();   /* Main RAM */
 }
 
 void sslam_state::powerbls_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram().w(this, FUNC(sslam_state::powerbls_bg_tileram_w)).share("bg_tileram");
+	map(0x100000, 0x103fff).ram().w(FUNC(sslam_state::powerbls_bg_tileram_w)).share("bg_tileram");
 	map(0x104000, 0x107fff).ram(); // not used
 	map(0x110000, 0x11000d).ram().share("regs");
 	map(0x200000, 0x200001).nopw();
@@ -413,7 +413,7 @@ void sslam_state::powerbls_map(address_map &map)
 	map(0x300014, 0x300015).portr("IN2");
 	map(0x30001a, 0x30001b).portr("DSW1");
 	map(0x30001c, 0x30001d).portr("DSW2");
-	map(0x30001e, 0x30001f).w(this, FUNC(sslam_state::powerbls_sound_w));
+	map(0x30001e, 0x30001f).w(FUNC(sslam_state::powerbls_sound_w));
 	map(0x304000, 0x304001).nopw();
 	map(0xff0000, 0xffffff).ram();   /* Main RAM */
 }

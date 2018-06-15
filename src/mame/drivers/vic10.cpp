@@ -247,7 +247,7 @@ READ8_MEMBER( vic10_state::vic_colorram_r )
 
 void vic10_state::vic10_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(vic10_state::read), FUNC(vic10_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vic10_state::read), FUNC(vic10_state::write));
 }
 
 
@@ -257,7 +257,7 @@ void vic10_state::vic10_mem(address_map &map)
 
 void vic10_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(vic10_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(vic10_state::vic_videoram_r));
 }
 
 
@@ -267,7 +267,7 @@ void vic10_state::vic_videoram_map(address_map &map)
 
 void vic10_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(vic10_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(vic10_state::vic_colorram_r));
 }
 
 

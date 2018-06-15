@@ -173,13 +173,13 @@ void seta2_state::grdians_map(address_map &map)
 	map(0x700002, 0x700003).portr("P2");                 // P2
 	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
 	map(0x70000c, 0x70000d).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x800000, 0x800001).w(this, FUNC(seta2_state::grdians_lockout_w));
+	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
-	map(0xe00010, 0xe0001f).w(this, FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -212,13 +212,13 @@ void seta2_state::gundamex_map(address_map &map)
 	map(0x700008, 0x700009).portr("IN0");                // P1
 	map(0x70000a, 0x70000b).portr("IN1");                // P2
 	map(0x70000c, 0x70000d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x800000, 0x800001).w(this, FUNC(seta2_state::grdians_lockout_w));
+	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
-	map(0xe00010, 0xe0001f).w(this, FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -227,8 +227,9 @@ void seta2_state::gundamex_map(address_map &map)
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta2_state, mj4simai)
+void mj4simai_state::machine_start()
 {
+	seta2_state::machine_start();
 	save_item(NAME(m_keyboard_row));
 }
 
@@ -268,19 +269,19 @@ void seta2_state::mj4simai_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x600000, 0x600001).r(this, FUNC(seta2_state::mj4simai_p1_r));             // P1
-	map(0x600002, 0x600003).r(this, FUNC(seta2_state::mj4simai_p2_r));             // P2
-	map(0x600004, 0x600005).w(this, FUNC(seta2_state::mj4simai_keyboard_w));      // select keyboard row to read
+	map(0x600000, 0x600001).r(FUNC(seta2_state::mj4simai_p1_r));             // P1
+	map(0x600002, 0x600003).r(FUNC(seta2_state::mj4simai_p2_r));             // P2
+	map(0x600004, 0x600005).w(FUNC(seta2_state::mj4simai_keyboard_w));      // select keyboard row to read
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x600100, 0x600101).portr("SYSTEM");             //
 	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
 	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
 	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
-	map(0x600300, 0x60030f).w(this, FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -300,11 +301,11 @@ void seta2_state::myangel_map(address_map &map)
 	map(0x700200, 0x700201).nopw();                        // Leds? Coins?
 	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
 	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
-	map(0x700310, 0x70031f).w(this, FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x700310, 0x70031f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -324,11 +325,11 @@ void seta2_state::myangel2_map(address_map &map)
 	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
 	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
 	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
-	map(0x600300, 0x60030f).w(this, FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xd00000, 0xd3ffff).ram().share("spriteram");       // Sprites
 	map(0xd40000, 0xd4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xd60000, 0xd6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
+	map(0xd60000, 0xd6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -365,15 +366,15 @@ void seta2_state::pzlbowl_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();                                 // RAM
 	map(0x400300, 0x400301).portr("DSW1");                   // DSW 1
 	map(0x400302, 0x400303).portr("DSW2");                   // DSW 2
-	map(0x400300, 0x40030f).w(this, FUNC(seta2_state::sound_bank_w));           // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w));           // Samples Banks
 	map(0x500000, 0x500001).portr("P1");                     // P1
 	map(0x500002, 0x500003).portr("P2");                     // P2
-	map(0x500004, 0x500005).rw(this, FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
+	map(0x500004, 0x500005).rw(FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
 	map(0x500006, 0x500007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x700000, 0x700001).r(this, FUNC(seta2_state::pzlbowl_protection_r));          // Protection
+	map(0x700000, 0x700001).r(FUNC(seta2_state::pzlbowl_protection_r));          // Protection
 	map(0x800000, 0x83ffff).ram().share("spriteram");       // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x860000, 0x86003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
@@ -393,7 +394,7 @@ void seta2_state::penbros_base_map(address_map &map)
 	map(0x600000, 0x600001).portr("P1");
 	map(0x600002, 0x600003).portr("P2");
 	map(0x600004, 0x600005).portr("SYSTEM");
-	map(0x600004, 0x600005).w(this, FUNC(seta2_state::pzlbowl_coin_counter_w));
+	map(0x600004, 0x600005).w(FUNC(seta2_state::pzlbowl_coin_counter_w));
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xa00000, 0xa03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));
 	map(0xb00000, 0xb3ffff).ram().share("spriteram");
@@ -406,8 +407,8 @@ void seta2_state::penbros_map(address_map &map)
 	map(0x300000, 0x30ffff).ram();
 	map(0x500300, 0x500301).portr("DSW1");
 	map(0x500302, 0x500303).portr("DSW2");
-	map(0x500300, 0x50030f).w(this, FUNC(seta2_state::sound_bank_w));
-	map(0xb60000, 0xb6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w));
+	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
@@ -428,13 +429,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // start
-		output().set_led_value(1, data & 0x0002 );  // small
-		output().set_led_value(2, data & 0x0004 );  // bet
-		output().set_led_value(3, data & 0x0008 );  // big
-		output().set_led_value(4, data & 0x0010 );  // double up
-		output().set_led_value(5, data & 0x0020 );  // collect
-		output().set_led_value(6, data & 0x0040 );  // bet cancel
+		m_leds[0] = BIT(data, 0);  // start
+		m_leds[1] = BIT(data, 1);  // small
+		m_leds[2] = BIT(data, 2);  // bet
+		m_leds[3] = BIT(data, 3);  // big
+		m_leds[4] = BIT(data, 4);  // double up
+		m_leds[5] = BIT(data, 5);  // collect
+		m_leds[6] = BIT(data, 6);  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -467,14 +468,14 @@ void seta2_state::reelquak_map(address_map &map)
 	map(0x400002, 0x400003).portr("TICKET");             // Tickets
 	map(0x400004, 0x400005).portr("SYSTEM");             // Coins
 	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x400200, 0x400201).w(this, FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
+	map(0x400200, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
 	map(0x400300, 0x400301).portr("DSW1");               // DSW 1
 	map(0x400302, 0x400303).portr("DSW2");               // DSW 2
-	map(0x400300, 0x40030f).w(this, FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -489,7 +490,7 @@ void seta2_state::namcostr_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
-	map(0xc60000, 0xc6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -520,19 +521,19 @@ void seta2_state::samshoot_map(address_map &map)
 	map(0x400000, 0x400001).portr("DSW1");             // DSW 1
 	map(0x400002, 0x400003).portr("BUTTONS");          // Buttons
 
-	map(0x400300, 0x40030f).w(this, FUNC(seta2_state::sound_bank_w));    // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w));    // Samples Banks
 
 	map(0x500000, 0x500001).portr("GUN1");             // P1
 	map(0x580000, 0x580001).portr("GUN2");             // P2
 
 	map(0x700000, 0x700001).portr("TRIGGER");          // Trigger
 	map(0x700002, 0x700003).portr("PUMP");             // Pump
-	map(0x700004, 0x700005).portr("COIN").w(this, FUNC(seta2_state::samshoot_coin_w));  // Coins
+	map(0x700004, 0x700005).portr("COIN").w(FUNC(seta2_state::samshoot_coin_w));  // Coins
 	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog?
 
 	map(0x800000, 0x83ffff).ram().share("spriteram"); // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x860000, 0x86003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
+	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
 
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 
@@ -556,9 +557,9 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // Lamp 1 |
-		output().set_led_value(1, data & 0x0002 );  // Lamp 2 |- Camera Lamps
-		output().set_led_value(2, data & 0x0004 );  // Lamp 3 |
+		m_leds[0] = BIT(data, 0);  // Lamp 1 |
+		m_leds[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
+		m_leds[2] = BIT(data, 2);  // Lamp 3 |
 		//                        data & 0x0008 );  // Degauss
 	}
 	staraudi_debug_outputs();
@@ -570,8 +571,8 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		//                        data & 0x0020 );  // ? Always On
-		output().set_led_value(3, data & 0x0040 );  // 2P Switch Lamp
-		output().set_led_value(4, data & 0x0080 );  // 1P Switch Lamp
+		m_leds[3] = BIT(data, 6);  // 2P Switch Lamp
+		m_leds[4] = BIT(data, 7);  // 1P Switch Lamp
 	}
 	staraudi_debug_outputs();
 }
@@ -612,25 +613,25 @@ void staraudi_state::staraudi_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();                             // ROM
 	map(0x200000, 0x23ffff).ram();                             // RAM
 
-	map(0x400000, 0x45ffff).rw(this, FUNC(staraudi_state::staraudi_tileram_r), FUNC(staraudi_state::staraudi_tileram_w)).share("tileram"); // Tile RAM
+	map(0x400000, 0x45ffff).rw(FUNC(staraudi_state::staraudi_tileram_r), FUNC(staraudi_state::staraudi_tileram_w)).share("tileram"); // Tile RAM
 
 //  AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
 //  AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
 	map(0x500000, 0x57ffff).ram().share("rgbram");
 
-	map(0x600000, 0x600001).w(this, FUNC(staraudi_state::staraudi_camera_w));        // Camera Outputs
+	map(0x600000, 0x600001).w(FUNC(staraudi_state::staraudi_camera_w));        // Camera Outputs
 
 	map(0x700000, 0x700001).portr("P1");                 // P1
 	map(0x700002, 0x700003).portr("P2");                 // P2
 	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
 	map(0x700006, 0x700007).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 
-	map(0x700100, 0x700101).w(this, FUNC(staraudi_state::staraudi_lamps1_w));        // Lamps 1
+	map(0x700100, 0x700101).w(FUNC(staraudi_state::staraudi_lamps1_w));        // Lamps 1
 	map(0x700180, 0x70018f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
-	map(0x700200, 0x700201).w(this, FUNC(staraudi_state::staraudi_lamps2_w));        // Lamps 2
+	map(0x700200, 0x700201).w(FUNC(staraudi_state::staraudi_lamps2_w));        // Lamps 2
 	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
 	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
-	map(0x700300, 0x70030f).w(this, FUNC(staraudi_state::sound_bank_w));             // Samples Banks
+	map(0x700300, 0x70030f).w(FUNC(staraudi_state::sound_bank_w));             // Samples Banks
 
 	map(0x800000, 0x9fffff).rw(m_flash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 
@@ -638,7 +639,7 @@ void staraudi_state::staraudi_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(this, FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -651,14 +652,14 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value(0, data & 0x0001 ); //
-		output().set_lamp_value(1, data & 0x0002 ); //
-		output().set_lamp_value(2, data & 0x0004 ); //
-		output().set_lamp_value(3, data & 0x0008 ); //
-		output().set_lamp_value(4, data & 0x0010 ); //
-		output().set_lamp_value(5, data & 0x0020 ); //
-		output().set_lamp_value(6, data & 0x0040 ); //
-		output().set_lamp_value(7, data & 0x0080 ); //
+		m_lamps[0] = BIT(data, 0); //
+		m_lamps[1] = BIT(data, 1); //
+		m_lamps[2] = BIT(data, 2); //
+		m_lamps[3] = BIT(data, 3); //
+		m_lamps[4] = BIT(data, 4); //
+		m_lamps[5] = BIT(data, 5); //
+		m_lamps[6] = BIT(data, 6); //
+		m_lamps[7] = BIT(data, 7); //
 	}
 
 //  popmessage("LAMP1 %04X", data);
@@ -668,9 +669,9 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value( 8, data & 0x0001 ); // on/off lamp (throughout)
-		output().set_lamp_value( 9, data & 0x0002 ); // bet lamp
-		output().set_lamp_value(10, data & 0x0004 ); // payout lamp
+		m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
+		m_lamps[9] = BIT(data, 1); // bet lamp
+		m_lamps[10] = BIT(data, 2); // payout lamp
 		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
 		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
 		//                          data & 0x0020 ); // on credit increase
@@ -703,16 +704,16 @@ void seta2_state::telpacfl_map(address_map &map)
 	map(0x700002, 0x700003).portr("P1");                  // P1 + Dispenser
 	map(0x700004, 0x700005).portr("SERVICE");             // Service
 	map(0x700006, 0x700007).portr("UNKNOWN");             // (unused?)
-	map(0x700008, 0x700009).w(this, FUNC(seta2_state::telpacfl_lamp1_w));          // Lamps
-	map(0x70000c, 0x70000d).w(this, FUNC(seta2_state::telpacfl_lamp2_w));          // ""
-	map(0x800000, 0x800001).w(this, FUNC(seta2_state::telpacfl_lockout_w));        // Coin Blockers
+	map(0x700008, 0x700009).w(FUNC(seta2_state::telpacfl_lamp1_w));          // Lamps
+	map(0x70000c, 0x70000d).w(FUNC(seta2_state::telpacfl_lamp2_w));          // ""
+	map(0x800000, 0x800001).w(FUNC(seta2_state::telpacfl_lockout_w));        // Coin Blockers
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xb00000, 0xb3ffff).ram().share("spriteram");        // Sprites
 	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xb60000, 0xb6003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
+	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
 	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
-	map(0xe00010, 0xe0001f).w(this, FUNC(seta2_state::sound_bank_w));              // Samples Banks
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w));              // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -837,13 +838,13 @@ void funcube_touchscreen_device::tra_callback()
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-READ32_MEMBER(seta2_state::funcube_nvram_dword_r)
+READ32_MEMBER(funcube_state::funcube_nvram_dword_r)
 {
 	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
+WRITE32_MEMBER(funcube_state::funcube_nvram_dword_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -868,7 +869,7 @@ READ16_MEMBER(seta2_state::spriteram16_word_r)
 // Main CPU
 
 
-READ32_MEMBER(seta2_state::funcube_debug_r)
+READ32_MEMBER(funcube_state::funcube_debug_r)
 {
 	uint32_t ret = ioport("DEBUG")->read();
 
@@ -897,41 +898,41 @@ WRITE32_MEMBER(seta2_state::oki_write)
 	}
 }
 
-void seta2_state::funcube_map(address_map &map)
+void funcube_state::funcube_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00400000, 0x00400003).r(this, FUNC(seta2_state::funcube_debug_r));
+	map(0x00400000, 0x00400003).r(FUNC(funcube_state::funcube_debug_r));
 	map(0x00400004, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
-	map(0x00500000, 0x00500003).rw(this, FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
+	map(0x00500000, 0x00500003).rw(FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
 
-	map(0x00800000, 0x0083ffff).rw(this, FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
+	map(0x00800000, 0x0083ffff).rw(FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
-	map(0x00860000, 0x0086003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
 
-	map(0x00c00000, 0x00c002ff).rw(this, FUNC(seta2_state::funcube_nvram_dword_r), FUNC(seta2_state::funcube_nvram_dword_w));
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::funcube_nvram_dword_r), FUNC(funcube_state::funcube_nvram_dword_w));
 
 	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
-void seta2_state::funcube2_map(address_map &map)
+void funcube_state::funcube2_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00500000, 0x00500003).r(this, FUNC(seta2_state::funcube_debug_r));
+	map(0x00500000, 0x00500003).r(FUNC(funcube_state::funcube_debug_r));
 	map(0x00500004, 0x00500007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
-	map(0x00600000, 0x00600003).rw(this, FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
+	map(0x00600000, 0x00600003).rw(FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
 
-	map(0x00800000, 0x0083ffff).rw(this, FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
+	map(0x00800000, 0x0083ffff).rw(FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x00860000, 0x0086003f).w(this, FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
 
-	map(0x00c00000, 0x00c002ff).rw(this, FUNC(seta2_state::funcube_nvram_dword_r), FUNC(seta2_state::funcube_nvram_dword_w));
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::funcube_nvram_dword_r), FUNC(funcube_state::funcube_nvram_dword_w));
 
 	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
@@ -939,7 +940,7 @@ void seta2_state::funcube2_map(address_map &map)
 
 // Sub CPU
 
-void seta2_state::funcube_sub_map(address_map &map)
+void funcube_state::funcube_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x20017f).ram().share("nvram");
@@ -952,7 +953,7 @@ void seta2_state::funcube_sub_map(address_map &map)
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-READ16_MEMBER(seta2_state::funcube_coins_r)
+READ16_MEMBER(funcube_state::funcube_coins_r)
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1;    // active low
@@ -982,36 +983,36 @@ READ16_MEMBER(seta2_state::funcube_coins_r)
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
 }
 
-void seta2_state::funcube_debug_outputs()
+void funcube_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
 //  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_funcube_outputs);
 #endif
 }
 
-WRITE16_MEMBER(seta2_state::funcube_leds_w)
+WRITE16_MEMBER(funcube_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
-	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
+	m_leds[0] = BIT(~data, 0); // win lamp (red)
+	m_leds[1] = BIT(~data, 1); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	output().set_led_value(2, (~data) & 0x10 );
-	output().set_led_value(3, (~data) & 0x20 );
-	output().set_led_value(4, (~data) & 0x40 );
-	output().set_led_value(5, (~data) & 0x80 );
+	m_leds[2] = BIT(~data, 4);
+	m_leds[3] = BIT(~data, 5);
+	m_leds[4] = BIT(~data, 6);
+	m_leds[5] = BIT(~data, 7);
 
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(seta2_state::funcube_outputs_r)
+READ16_MEMBER(funcube_state::funcube_outputs_r)
 {
 	// Bits 1,2,3 read
 	return *m_funcube_outputs;
 }
 
-WRITE16_MEMBER(seta2_state::funcube_outputs_w)
+WRITE16_MEMBER(funcube_state::funcube_outputs_w)
 {
 	*m_funcube_outputs = data;
 
@@ -1023,31 +1024,31 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	output().set_led_value(6, (~data) & 0x08 );
+	m_leds[6] = BIT(~data, 3);
 
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(seta2_state::funcube_battery_r)
+READ16_MEMBER(funcube_state::funcube_battery_r)
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
 
 // cabinet linking on sci0
-void seta2_state::funcube_sub_io(address_map &map)
+void funcube_state::funcube_sub_io(address_map &map)
 {
-	map(h8_device::PORT_7, h8_device::PORT_7).r(this, FUNC(seta2_state::funcube_coins_r));
-	map(h8_device::PORT_4, h8_device::PORT_4).r(this, FUNC(seta2_state::funcube_battery_r));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(seta2_state::funcube_outputs_r), FUNC(seta2_state::funcube_outputs_w)).share("funcube_outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(this, FUNC(seta2_state::funcube_leds_w)).share("funcube_leds");
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::funcube_coins_r));
+	map(h8_device::PORT_4, h8_device::PORT_4).r(FUNC(funcube_state::funcube_battery_r));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::funcube_outputs_r), FUNC(funcube_state::funcube_outputs_w)).share("funcube_outputs");
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::funcube_leds_w)).share("funcube_leds");
 }
 
-void seta2_state::funcube2_sub_io(address_map &map)
+void funcube_state::funcube2_sub_io(address_map &map)
 {
-	map(h8_device::PORT_7, h8_device::PORT_7).r(this, FUNC(seta2_state::funcube_coins_r));
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::funcube_coins_r));
 	map(h8_device::PORT_4, h8_device::PORT_4).noprw();  // unused
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(seta2_state::funcube_outputs_r), FUNC(seta2_state::funcube_outputs_w)).share("funcube_outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(this, FUNC(seta2_state::funcube_leds_w)).share("funcube_leds");
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::funcube_outputs_r), FUNC(funcube_state::funcube_outputs_w)).share("funcube_outputs");
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::funcube_leds_w)).share("funcube_leds");
 }
 
 
@@ -2581,13 +2582,6 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(seta2_state::mj4simai)
-	seta2(config);
-	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
-
-MACHINE_CONFIG_END
-
-
 MACHINE_CONFIG_START(seta2_state::gundamex)
 	seta2(config);
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2597,7 +2591,7 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2733,7 +2727,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // not hooked up, seems unused
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // not hooked up, seems unused
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_HOPPER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2749,7 +2743,7 @@ MACHINE_CONFIG_END
                                Funcube series
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(funcube_state::funcube_interrupt)
 {
 	int scanline = param;
 
@@ -2760,23 +2754,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(seta2_state, funcube)
+void funcube_state::machine_start()
 {
+	seta2_state::machine_start();
 	save_item(NAME(m_funcube_coin_start_cycles));
 	save_item(NAME(m_funcube_hopper_motor));
 }
 
-MACHINE_RESET_MEMBER(seta2_state, funcube)
+void funcube_state::machine_reset()
 {
 	m_funcube_coin_start_cycles = 0;
 	m_funcube_hopper_motor = 0;
 }
 
-MACHINE_CONFIG_START(seta2_state::funcube)
+MACHINE_CONFIG_START(funcube_state::funcube)
 
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
 	MCFG_DEVICE_PROGRAM_MAP(funcube_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta2_state, funcube_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", funcube_state, funcube_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)
@@ -2790,9 +2785,6 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
-
-	MCFG_MACHINE_START_OVERRIDE(seta2_state, funcube)
-	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2818,7 +2810,7 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(seta2_state::funcube2)
+MACHINE_CONFIG_START(funcube_state::funcube2)
 	funcube(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(funcube2_map)
@@ -2832,7 +2824,7 @@ MACHINE_CONFIG_START(seta2_state::funcube2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(seta2_state::funcube3)
+MACHINE_CONFIG_START(funcube_state::funcube3)
 	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -3072,7 +3064,7 @@ ROM_START( funcube5 )
 	ROM_LOAD( "fc51_snd-0.u47", 0x000000, 0x200000, CRC(2a504fe1) SHA1(911ad650bf48aa78d9cb3c64284aa526ceb519ba) )
 ROM_END
 
-void seta2_state::init_funcube()
+void funcube_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3083,7 +3075,7 @@ void seta2_state::init_funcube()
 	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
-void seta2_state::init_funcube2()
+void funcube_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3096,7 +3088,7 @@ void seta2_state::init_funcube2()
 	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
-void seta2_state::init_funcube3()
+void funcube_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -4266,7 +4258,7 @@ ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a 
 
 	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) 
+	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END
 
 ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9 - on a P0-145-1 main PCB with a P1-115A flash ROM board */
@@ -4347,34 +4339,34 @@ ROM_START( telpacfl )
 	ROM_LOAD( "kc-002c.u52", 0x117, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state, empty_init,    ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
-GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state, empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, mj4simai,  0,        mj4simai, mj4simai, seta2_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", MACHINE_NO_COCKTAIL )
-GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state, empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state, empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, telpacfl,  0,        telpacfl, telpacfl, seta2_state, empty_init,    ROT270, "Sunsoft",               "TelePachi Fever Lion (V1.0)",                  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, empty_init,    ROT0,   "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init, ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, empty_init,    ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
-GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
-GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state, empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",              MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
-GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state, empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state, empty_init,    ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
-GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V3",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0 (Location Test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, funcube,   0,        funcube,  funcube,  seta2_state, init_funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube2,  0,        funcube2, funcube,  seta2_state, init_funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube3,  0,        funcube3, funcube,  seta2_state, init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube4,  0,        funcube2, funcube,  seta2_state, init_funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
-GAME( 2002, funcube5,  0,        funcube2, funcube,  seta2_state, init_funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )
+GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,    ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
+GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state,    empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state,    empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, telpacfl,  0,        telpacfl, telpacfl, seta2_state,    empty_init,    ROT270, "Sunsoft",               "TelePachi Fever Lion (V1.0)",                  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state,    empty_init,    ROT0,   "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
+GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
+GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",              MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
+GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
+GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V3",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.00",                     MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.00",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.00 (location test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, funcube,   0,        funcube,  funcube,  funcube_state,  init_funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube2,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube3,  0,        funcube3, funcube,  funcube_state,  init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube4,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
+GAME( 2002, funcube5,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )

@@ -179,15 +179,15 @@ void embargo_state::main_map(address_map &map)
 
 void embargo_state::main_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(this, FUNC(embargo_state::port_1_w));
-	map(0x02, 0x02).rw(this, FUNC(embargo_state::dial_r), FUNC(embargo_state::port_2_w));
+	map(0x01, 0x01).portr("IN0").w(FUNC(embargo_state::port_1_w));
+	map(0x02, 0x02).rw(FUNC(embargo_state::dial_r), FUNC(embargo_state::port_2_w));
 	map(0x03, 0x03).nopw(); /* always 0xFE */
 }
 
 void embargo_state::main_data_map(address_map &map)
 {
 	map(S2650_DATA_PORT, S2650_DATA_PORT).portr("IN2");
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(embargo_state::input_port_bit_r), FUNC(embargo_state::input_select_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(embargo_state::input_port_bit_r), FUNC(embargo_state::input_select_w));
 }
 
 

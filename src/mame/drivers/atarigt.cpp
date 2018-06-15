@@ -600,24 +600,24 @@ WRITE32_MEMBER(atarigt_state::colorram_protection_w)
 void atarigt_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0xc00000, 0xc00003).rw(this, FUNC(atarigt_state::sound_data_r), FUNC(atarigt_state::sound_data_w));
-	map(0xd00010, 0xd0001f).r(this, FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
+	map(0xc00000, 0xc00003).rw(FUNC(atarigt_state::sound_data_r), FUNC(atarigt_state::sound_data_w));
+	map(0xd00010, 0xd0001f).r(FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd4ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xd70000, 0xd7ffff).ram();
 	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
 	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(this, FUNC(atarigt_state::mo_command_w)).share("mo_command");
-	map(0xd80000, 0xdfffff).rw(this, FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
-	map(0xe04000, 0xe04003).w(this, FUNC(atarigt_state::led_w));
-	map(0xe08000, 0xe08003).w(this, FUNC(atarigt_state::latch_w));
-	map(0xe0a000, 0xe0a003).w(this, FUNC(atarigt_state::scanline_int_ack_w));
-	map(0xe0c000, 0xe0c003).w(this, FUNC(atarigt_state::video_int_ack_w));
+	map(0xd7a200, 0xd7a203).w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
+	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
+	map(0xe04000, 0xe04003).w(FUNC(atarigt_state::led_w));
+	map(0xe08000, 0xe08003).w(FUNC(atarigt_state::latch_w));
+	map(0xe0a000, 0xe0a003).w(FUNC(atarigt_state::scanline_int_ack_w));
+	map(0xe0c000, 0xe0c003).w(FUNC(atarigt_state::video_int_ack_w));
 	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
 	map(0xe80000, 0xe80003).portr("P1_P2");
-	map(0xe82000, 0xe82003).r(this, FUNC(atarigt_state::special_port2_r));
-	map(0xe82004, 0xe82007).r(this, FUNC(atarigt_state::special_port3_r));
+	map(0xe82000, 0xe82003).r(FUNC(atarigt_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(FUNC(atarigt_state::special_port3_r));
 	map(0xf80000, 0xffffff).ram();
 }
 

@@ -63,6 +63,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -135,7 +136,7 @@ void tavernie_state::ivg09_mem(address_map &map)
 	map(0x2080, 0x2080).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2081, 0x2081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe000, 0xe003).rw(m_fdc, FUNC(fd1795_device::read), FUNC(fd1795_device::write));
-	map(0xe080, 0xe080).w(this, FUNC(tavernie_state::ds_w));
+	map(0xe080, 0xe080).w(FUNC(tavernie_state::ds_w));
 	map(0xeb00, 0xeb03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
@@ -295,7 +296,7 @@ void tavernie_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(cpu09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
@@ -314,7 +315,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 4)
 	// all i/o lines connect to the 40-pin expansion connector
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_O2_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -368,7 +369,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tavernie_state, pa_ivg_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE("beeper", beep_device, set_state))
 
-	MCFG_FD1795_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", FD1795, 8_MHz_XTAL / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

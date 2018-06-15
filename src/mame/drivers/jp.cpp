@@ -91,17 +91,17 @@ void jp_state::jp_map(address_map &map)
 	map(0x6000, 0x6000).mirror(0x1ffc).w("ay", FUNC(ay8910_device::address_w));
 	map(0x6001, 0x6001).mirror(0x1ffc).r("ay", FUNC(ay8910_device::data_r));
 	map(0x6002, 0x6002).mirror(0x1ffc).w("ay", FUNC(ay8910_device::data_w));
-	map(0xa000, 0xa007).mirror(0x1ff8).w(this, FUNC(jp_state::out1_w));
-	map(0xc000, 0xc007).mirror(0x1ff8).w(this, FUNC(jp_state::out2_w));
+	map(0xa000, 0xa007).mirror(0x1ff8).w(FUNC(jp_state::out1_w));
+	map(0xc000, 0xc007).mirror(0x1ff8).w(FUNC(jp_state::out2_w));
 }
 
 void jp_state::jp_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom(); // includes ADPCM data from 0x0400 to 0x3fff
 	map(0x4000, 0x47ff).ram();
-	map(0x5000, 0x5000).w(this, FUNC(jp_state::sample_bank_w));
+	map(0x5000, 0x5000).w(FUNC(jp_state::sample_bank_w));
 	map(0x6000, 0x6000).w(m_adpcm_select, FUNC(ls157_device::ba_w));
-	map(0x7000, 0x7000).w(this, FUNC(jp_state::adpcm_reset_w));
+	map(0x7000, 0x7000).w(FUNC(jp_state::adpcm_reset_w));
 	map(0x8000, 0xffff).bankr("adpcm_bank");
 }
 

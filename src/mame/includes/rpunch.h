@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "video/vsystem_gga.h"
+#include "emupal.h"
 #include "screen.h"
 
 class rpunch_state : public driver_device

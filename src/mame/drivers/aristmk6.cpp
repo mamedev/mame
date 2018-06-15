@@ -29,6 +29,7 @@ notes:
 #include "cpu/sh/sh4.h"
 #include "machine/ins8250.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 
 class aristmk6_state : public driver_device
@@ -309,15 +310,15 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x11000000, 0x1107ffff).ram(); // SRAM1 512KB
 	map(0x11800000, 0x1187ffff).ram(); // SRAM2 512KB
 // 12000xxx main control registers area
-	map(0x12000010, 0x12000017).w(this, FUNC(aristmk6_state::eeprom_w));
+	map(0x12000010, 0x12000017).w(FUNC(aristmk6_state::eeprom_w));
 	map(0x12000078, 0x1200007f).nopw(); // watchdog ??
 	map(0x12000080, 0x12000087).nopw(); // 0-1-2 written here repeatedly, diag LED or smth ?
-	map(0x120000E0, 0x120000E7).r(this, FUNC(aristmk6_state::hwver_r));
-	map(0x120000E8, 0x12000107).r(this, FUNC(aristmk6_state::irqpend_r));
-	map(0x12000108, 0x12000127).w(this, FUNC(aristmk6_state::irqen_w));
+	map(0x120000E0, 0x120000E7).r(FUNC(aristmk6_state::hwver_r));
+	map(0x120000E8, 0x12000107).r(FUNC(aristmk6_state::irqpend_r));
+	map(0x12000108, 0x12000127).w(FUNC(aristmk6_state::irqen_w));
 	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x13800000, 0x13800007).r(this, FUNC(aristmk6_state::test_r));
+	map(0x13800000, 0x13800007).r(FUNC(aristmk6_state::test_r));
 }
 
 void aristmk6_state::aristmk6_port(address_map &map)
@@ -353,8 +354,8 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	MCFG_DEVICE_ADD( "uart0", NS16550, 8_MHz_XTAL )
 	MCFG_DEVICE_ADD( "uart1", NS16550, 8_MHz_XTAL )
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0xFF)
+	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0xFF)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -369,10 +370,10 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD32_WORD_BIOS(bios, name, offset, length, hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(bios))
 
 #define ROM_LOAD64_WORD_BIOS(bios, name, offset, length, hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6) | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6) | ROM_BIOS(bios))
 
 /*
 BIOS/set chips are known to be in 3 locations depending on the PCB used:

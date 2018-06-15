@@ -692,27 +692,27 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
 void agat7_state::agat7_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xbfff).rw(this, FUNC(agat7_state::agat7_ram_r), FUNC(agat7_state::agat7_ram_w));
-	map(0xc000, 0xc000).mirror(0xf).r(this, FUNC(agat7_state::keyb_data_r)).nopw();
-	map(0xc010, 0xc010).mirror(0xf).rw(this, FUNC(agat7_state::keyb_strobe_r), FUNC(agat7_state::keyb_strobe_w));
-	map(0xc020, 0xc020).mirror(0xf).rw(this, FUNC(agat7_state::cassette_toggle_r), FUNC(agat7_state::cassette_toggle_w));
-	map(0xc030, 0xc030).mirror(0xf).rw(this, FUNC(agat7_state::speaker_toggle_r), FUNC(agat7_state::speaker_toggle_w));
-	map(0xc040, 0xc040).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_on_r), FUNC(agat7_state::interrupts_on_w));
-	map(0xc050, 0xc050).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_off_r), FUNC(agat7_state::interrupts_off_w));
-	map(0xc060, 0xc067).mirror(0x8).r(this, FUNC(agat7_state::flags_r)).nopw();
-	map(0xc070, 0xc070).mirror(0xf).rw(this, FUNC(agat7_state::controller_strobe_r), FUNC(agat7_state::controller_strobe_w));
-	map(0xc080, 0xc0ef).rw(this, FUNC(agat7_state::c080_r), FUNC(agat7_state::c080_w));
-	map(0xc0f0, 0xc0ff).rw(this, FUNC(agat7_state::agat7_membank_r), FUNC(agat7_state::agat7_membank_w));
-	map(0xc100, 0xc6ff).rw(this, FUNC(agat7_state::c100_r), FUNC(agat7_state::c100_w));
+	map(0x0000, 0xbfff).rw(FUNC(agat7_state::agat7_ram_r), FUNC(agat7_state::agat7_ram_w));
+	map(0xc000, 0xc000).mirror(0xf).r(FUNC(agat7_state::keyb_data_r)).nopw();
+	map(0xc010, 0xc010).mirror(0xf).rw(FUNC(agat7_state::keyb_strobe_r), FUNC(agat7_state::keyb_strobe_w));
+	map(0xc020, 0xc020).mirror(0xf).rw(FUNC(agat7_state::cassette_toggle_r), FUNC(agat7_state::cassette_toggle_w));
+	map(0xc030, 0xc030).mirror(0xf).rw(FUNC(agat7_state::speaker_toggle_r), FUNC(agat7_state::speaker_toggle_w));
+	map(0xc040, 0xc040).mirror(0xf).rw(FUNC(agat7_state::interrupts_on_r), FUNC(agat7_state::interrupts_on_w));
+	map(0xc050, 0xc050).mirror(0xf).rw(FUNC(agat7_state::interrupts_off_r), FUNC(agat7_state::interrupts_off_w));
+	map(0xc060, 0xc067).mirror(0x8).r(FUNC(agat7_state::flags_r)).nopw();
+	map(0xc070, 0xc070).mirror(0xf).rw(FUNC(agat7_state::controller_strobe_r), FUNC(agat7_state::controller_strobe_w));
+	map(0xc080, 0xc0ef).rw(FUNC(agat7_state::c080_r), FUNC(agat7_state::c080_w));
+	map(0xc0f0, 0xc0ff).rw(FUNC(agat7_state::agat7_membank_r), FUNC(agat7_state::agat7_membank_w));
+	map(0xc100, 0xc6ff).rw(FUNC(agat7_state::c100_r), FUNC(agat7_state::c100_w));
 	map(0xc700, 0xc7ff).rw("a7video", FUNC(agat7video_device::read), FUNC(agat7video_device::write));
-	map(0xc800, 0xcfff).rw(this, FUNC(agat7_state::c800_r), FUNC(agat7_state::c800_w));
+	map(0xc800, 0xcfff).rw(FUNC(agat7_state::c800_r), FUNC(agat7_state::c800_w));
 	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void agat7_state::inhbank_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(this, FUNC(agat7_state::inh_w));
-	map(0x3000, 0x5fff).rw(this, FUNC(agat7_state::inh_r), FUNC(agat7_state::inh_w));
+	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(FUNC(agat7_state::inh_w));
+	map(0x3000, 0x5fff).rw(FUNC(agat7_state::inh_r), FUNC(agat7_state::inh_w));
 }
 
 /***************************************************************************
@@ -1158,11 +1158,11 @@ ROM_START( agat7 )
 	ROM_DEFAULT_BIOS("v1")
 
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" ) // original?
-	ROMX_LOAD( "monitor7.rom", 0x3800, 0x0800, CRC(071fda0b) SHA1(6089d46b7addc4e2ae096b2cf81124681bd2b27a), ROM_BIOS(1))
+	ROMX_LOAD("monitor7.rom", 0x3800, 0x0800, CRC(071fda0b) SHA1(6089d46b7addc4e2ae096b2cf81124681bd2b27a), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" ) // modded by author of agatcomp.ru
-	ROMX_LOAD( "agat_pzu.bin", 0x3800, 0x0800, CRC(c605163d) SHA1(b30fd1b264a347a9de69bb9e3105483254994d06), ROM_BIOS(2))
+	ROMX_LOAD("agat_pzu.bin", 0x3800, 0x0800, CRC(c605163d) SHA1(b30fd1b264a347a9de69bb9e3105483254994d06), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "debug", "Debug" )  // written by author of agatcomp.ru
-	ROMX_LOAD( "debug-sysmon7.bin", 0x3800, 0x0800, CRC(d26f18a4) SHA1(2862c13a82e2f4dfc757aa2eeab11fe71c570c12), ROM_BIOS(3))
+	ROMX_LOAD("debug-sysmon7.bin", 0x3800, 0x0800, CRC(d26f18a4) SHA1(2862c13a82e2f4dfc757aa2eeab11fe71c570c12), ROM_BIOS(2))
 
 	// 140KB floppy controller
 	ROM_LOAD( "shugart7.rom", 0x4500, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34))
@@ -1176,9 +1176,9 @@ ROM_END
 ROM_START( agat9 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "monitor9.rom", 0x3800, 0x0800, CRC(b90bb66a) SHA1(02217f0785913b41fc25eabcff70fa814799c69a), ROM_BIOS(1))
+	ROMX_LOAD("monitor9.rom", 0x3800, 0x0800, CRC(b90bb66a) SHA1(02217f0785913b41fc25eabcff70fa814799c69a), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "monitor91.rom", 0x3800, 0x0800, CRC(89b10fc1) SHA1(7fe1ede32b5525255f82597ca9c3c2034c5996fa), ROM_BIOS(2))
+	ROMX_LOAD("monitor91.rom", 0x3800, 0x0800, CRC(89b10fc1) SHA1(7fe1ede32b5525255f82597ca9c3c2034c5996fa), ROM_BIOS(1))
 	// Floppy controllers
 	ROM_LOAD( "shugart9.rom", 0x4500, 0x0100, CRC(964a0ce2) SHA1(bf955189ebffe874c20ef649a3db8177dc16af61))
 	ROM_LOAD( "teac.rom",     0x4500, 0x0100, CRC(94266928) SHA1(5d369bad6cdd6a70b0bb16480eba69640de87a2e))

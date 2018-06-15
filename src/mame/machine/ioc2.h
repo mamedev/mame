@@ -18,19 +18,10 @@
 #include "machine/pit8253.h"
 #include "machine/z80scc.h"
 
-#define MCFG_IOC2_GUINNESS_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
-
-#define MCFG_IOC2_FULL_HOUSE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2_FULL_HOUSE, 0)
-
-#define MCFG_IOC2_CPU(cpu_tag) \
-	downcast<ioc2_device &>(*device).set_cpu_tag(cpu_tag);
-
 class ioc2_device : public device_t
 {
 public:
-	void set_cpu_tag(const char *tag) { m_maincpu.set_tag(tag); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -193,6 +184,13 @@ protected:
 class ioc2_guinness_device : public ioc2_device
 {
 public:
+	template <typename T>
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: ioc2_guinness_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -202,6 +200,13 @@ protected:
 class ioc2_full_house_device : public ioc2_device
 {
 public:
+	template <typename T>
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: ioc2_full_house_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

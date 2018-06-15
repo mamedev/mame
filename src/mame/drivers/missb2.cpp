@@ -21,6 +21,7 @@ written, so it may be normal behaviour.
 #include "sound/3526intf.h"
 #include "sound/okim6295.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -188,10 +189,10 @@ void missb2_state::maincpu_map(address_map &map)
 	map(0xe000, 0xf7ff).ram().share("share1");
 	map(0xf800, 0xf9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).mirror(0x007c).r(this, FUNC(missb2_state::common_sound_semaphores_r));
-	map(0xfa03, 0xfa03).mirror(0x007c).w(this, FUNC(missb2_state::bublbobl_soundcpu_reset_w));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(missb2_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(missb2_state::bublbobl_soundcpu_reset_w));
 	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfb40, 0xfb40).w(this, FUNC(missb2_state::bublbobl_bankswitch_w));
+	map(0xfb40, 0xfb40).w(FUNC(missb2_state::bublbobl_bankswitch_w));
 	map(0xfc00, 0xfcff).ram();
 	map(0xfd00, 0xfdff).ram();         // ???
 	map(0xfe00, 0xfe03).ram();         // ???
@@ -212,7 +213,7 @@ void missb2_state::subcpu_map(address_map &map)
 	map(0xb000, 0xb1ff).rom();         // banked ???
 	map(0xc000, 0xc1ff).ram().w(m_bgpalette, FUNC(palette_device::write8)).share("bgpalette");
 	map(0xc800, 0xcfff).ram();         // main ???
-	map(0xd000, 0xd000).w(this, FUNC(missb2_state::missb2_bg_bank_w));
+	map(0xd000, 0xd000).w(FUNC(missb2_state::missb2_bg_bank_w));
 	map(0xd002, 0xd002).nopw();
 	map(0xd003, 0xd003).ram().share("bgvram");
 	map(0xe000, 0xf7ff).ram().share("share1");
@@ -225,10 +226,10 @@ void missb2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9000).rw(this, FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
+	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
 	map(0xa000, 0xa001).mirror(0x0ffe).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
-	map(0xb001, 0xb001).mirror(0x0ffc).r(this, FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
+	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xe000, 0xefff).rom();         // space for diagnostic ROM?
 }

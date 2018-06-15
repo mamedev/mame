@@ -71,9 +71,9 @@ void surpratk_state::surpratk_map(address_map &map)
 	map(0x5f90, 0x5f90).portr("DSW2");
 	map(0x5fa0, 0x5faf).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
 	map(0x5fb0, 0x5fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(surpratk_state::surpratk_5fc0_w));
+	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::surpratk_5fc0_w));
 	map(0x5fd0, 0x5fd1).w("ymsnd", FUNC(ym2151_device::write));
-	map(0x5fc4, 0x5fc4).w(this, FUNC(surpratk_state::surpratk_videobank_w));
+	map(0x5fc4, 0x5fc4).w(FUNC(surpratk_state::surpratk_videobank_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 

@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 
 // Analog Devices AD1848, main codec in Windows Sound System adapters
+// TODO: Emulate pin-compatible Crystal Semiconductor CS4231 and its extra Mode 2 features
 
 #include "emu.h"
 #include "sound/ad1848.h"
@@ -10,7 +11,7 @@
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "Analog Device AD1848")
+DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "AD1848 16-bit SoundPort Stereo Codec")
 
 ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AD1848, tag, owner, clock),
@@ -93,14 +94,15 @@ WRITE8_MEMBER(ad1848_device::write)
 			switch(m_addr)
 			{
 				case 8:
-					if(m_mce)
+					if(!m_mce)
 						return;
 					m_regs.dform &= 0x7f;
 					break;
 				case 9:
 				{
 					m_play = (data & 1) ? true : false;
-					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? XTAL(24'576'000) : XTAL(16'934'400))
+					// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
+					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 					m_timer->adjust(rate, 0 , rate);
 					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);

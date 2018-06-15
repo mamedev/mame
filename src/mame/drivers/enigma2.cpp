@@ -27,6 +27,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -444,13 +445,13 @@ void enigma2_state::enigma2_main_cpu_map(address_map &map)
 	map(0x0000, 0x1fff).rom().nopw();
 	map(0x2000, 0x3fff).mirror(0x4000).ram().share("videoram");
 	map(0x4000, 0x4fff).rom().nopw();
-	map(0x5000, 0x57ff).r(this, FUNC(enigma2_state::dip_switch_r)).nopw();
+	map(0x5000, 0x57ff).r(FUNC(enigma2_state::dip_switch_r)).nopw();
 	map(0x5800, 0x5800).mirror(0x07f8).noprw();
 	map(0x5801, 0x5801).mirror(0x07f8).portr("IN0").nopw();
 	map(0x5802, 0x5802).mirror(0x07f8).portr("IN1").nopw();
-	map(0x5803, 0x5803).mirror(0x07f8).nopr().w(this, FUNC(enigma2_state::sound_data_w));
+	map(0x5803, 0x5803).mirror(0x07f8).nopr().w(FUNC(enigma2_state::sound_data_w));
 	map(0x5804, 0x5804).mirror(0x07f8).noprw();
-	map(0x5805, 0x5805).mirror(0x07f8).nopr().w(this, FUNC(enigma2_state::enigma2_flip_screen_w));
+	map(0x5805, 0x5805).mirror(0x07f8).nopr().w(FUNC(enigma2_state::enigma2_flip_screen_w));
 	map(0x5806, 0x5807).mirror(0x07f8).noprw();
 }
 
@@ -460,7 +461,7 @@ void enigma2_state::enigma2a_main_cpu_map(address_map &map)
 	map(0x0000, 0x1fff).rom().nopw();
 	map(0x2000, 0x3fff).mirror(0x4000).ram().share("videoram");
 	map(0x4000, 0x4fff).rom().nopw();
-	map(0x5000, 0x57ff).r(this, FUNC(enigma2_state::dip_switch_r)).nopw();
+	map(0x5000, 0x57ff).r(FUNC(enigma2_state::dip_switch_r)).nopw();
 	map(0x5800, 0x5fff).noprw();
 }
 
@@ -471,9 +472,9 @@ void enigma2_state::enigma2a_main_cpu_io_map(address_map &map)
 	map(0x00, 0x00).noprw();
 	map(0x01, 0x01).portr("IN0").nopw();
 	map(0x02, 0x02).portr("IN1").nopw();
-	map(0x03, 0x03).nopr().w(this, FUNC(enigma2_state::sound_data_w));
+	map(0x03, 0x03).nopr().w(FUNC(enigma2_state::sound_data_w));
 	map(0x04, 0x04).noprw();
-	map(0x05, 0x05).nopr().w(this, FUNC(enigma2_state::enigma2_flip_screen_w));
+	map(0x05, 0x05).nopr().w(FUNC(enigma2_state::enigma2_flip_screen_w));
 	map(0x06, 0x07).noprw();
 }
 

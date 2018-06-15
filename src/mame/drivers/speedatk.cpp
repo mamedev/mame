@@ -184,8 +184,8 @@ WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 void speedatk_state::speedatk_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).rw(this, FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
-	map(0x8001, 0x8001).rw(this, FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
+	map(0x8000, 0x8000).rw(FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
+	map(0x8001, 0x8001).rw(FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
 	map(0x8800, 0x8fff).ram();
 	map(0xa000, 0xa3ff).ram().share("videoram");
 	map(0xb000, 0xb3ff).ram().share("colorram");
@@ -195,7 +195,7 @@ void speedatk_state::speedatk_mem(address_map &map)
 void speedatk_state::speedatk_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
+	map(0x00, 0x01).w(FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
 	map(0x24, 0x24).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));

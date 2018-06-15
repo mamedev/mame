@@ -151,12 +151,6 @@ private:
 	CMAP_t m_CMAP0;
 };
 
-
-
-#define MCFG_NEWPORT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NEWPORT_VIDEO, 0)
-
-
 DECLARE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device)
 
 

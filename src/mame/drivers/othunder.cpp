@@ -429,10 +429,10 @@ void othunder_state::othunder_map(address_map &map)
 	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x300000, 0x300003).rw(this, FUNC(othunder_state::sound_r), FUNC(othunder_state::sound_w));
+	map(0x300000, 0x300003).rw(FUNC(othunder_state::sound_r), FUNC(othunder_state::sound_w));
 	map(0x400000, 0x4005ff).ram().share("spriteram");
 	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x600000, 0x600003).w(this, FUNC(othunder_state::irq_ack_w));
+	map(0x600000, 0x600003).w(FUNC(othunder_state::irq_ack_w));
 }
 
 
@@ -446,12 +446,12 @@ void othunder_state::z80_sound_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).w(this, FUNC(othunder_state::tc0310fam_w)); /* pan */
+	map(0xe400, 0xe403).w(FUNC(othunder_state::tc0310fam_w)); /* pan */
 	map(0xe600, 0xe600).nopw(); /* ? */
 	map(0xea00, 0xea00).portr("ROTARY");  /* rotary input */
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(othunder_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(othunder_state::sound_bankswitch_w));
 }
 
 
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
 	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 16_MHz_XTAL/2/2/8)
 	MCFG_ADC0808_EOC_CB(WRITELINE(*this, othunder_state, adc_eoc_w))
@@ -651,8 +651,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

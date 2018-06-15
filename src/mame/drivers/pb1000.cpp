@@ -25,6 +25,7 @@
 #include "sound/beep.h"
 #include "video/hd44352.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -96,7 +97,7 @@ void pb1000_state::pb2000c_mem(address_map &map)
 	map(0x00000, 0x0ffff).bankr("bank1");
 	map(0x00000, 0x00bff).rom();
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
-	map(0x00c10, 0x00c11).w(this, FUNC(pb1000_state::gatearray_w));
+	map(0x00c10, 0x00c11).w(FUNC(pb1000_state::gatearray_w));
 	map(0x10000, 0x1ffff).ram().share("nvram1");
 	map(0x20000, 0x27fff).r(m_card1, FUNC(generic_slot_device::read16_rom));
 	map(0x28000, 0x2ffff).ram().share("nvram2");
@@ -541,9 +542,9 @@ ROM_START( pb1000 )
 
 	ROM_REGION( 0x10000, "rom", ROMREGION_ERASE )
 	ROM_SYSTEM_BIOS(0, "basic", "BASIC")
-	ROMX_LOAD( "pb1000.bin", 0x0000, 0x8000, CRC(8127a090) SHA1(067c1c2e7efb5249e95afa7805bb98543b30b630), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD( "pb1000.bin", 0x0000, 0x8000, CRC(8127a090) SHA1(067c1c2e7efb5249e95afa7805bb98543b30b630), ROM_BIOS(0) | ROM_SKIP(1))
 	ROM_SYSTEM_BIOS(1, "basicj", "BASIC Jap")
-	ROMX_LOAD( "pb1000j.bin", 0x0000, 0x8000, CRC(14a0df57) SHA1(ab47bb54eb2a24dcd9d2663462e9272d974fa7da), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD( "pb1000j.bin", 0x0000, 0x8000, CRC(14a0df57) SHA1(ab47bb54eb2a24dcd9d2663462e9272d974fa7da), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))

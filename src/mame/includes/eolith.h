@@ -4,6 +4,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/timer.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 
 class eolith_state : public driver_device
@@ -20,6 +21,7 @@ public:
 		, m_in0(*this, "IN0")
 		, m_penxport(*this, "PEN_X_P%u", 1)
 		, m_penyport(*this, "PEN_Y_P%u", 1)
+		, m_led(*this, "led0")
 		, m_sndbank(*this, "sound_bank")
 	{
 	}
@@ -60,6 +62,7 @@ public:
 	void sound_io_map(address_map &map);
 	void sound_prg_map(address_map &map);
 protected:
+	virtual void machine_start() override;
 	// shared with eolith16.cpp, vegaeo.cpp
 	optional_ioport m_eepromoutport;
 
@@ -77,6 +80,7 @@ private:
 	optional_ioport m_in0; // klondkp doesn't have it
 	optional_ioport_array<2> m_penxport;
 	optional_ioport_array<2> m_penyport;
+	output_finder<> m_led;
 
 	optional_memory_bank m_sndbank;
 

@@ -441,7 +441,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	}
 
 	/* first look for a tag match */
-	result = m_machine.device(param);
+	result = m_machine.root_device().subdevice(param);
 	if (result)
 		return true;
 

@@ -14,6 +14,7 @@ From disassembly: chips: Z80, 6845, 8251, 2x 8255, Z80CTC
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class m3_state : public driver_device

@@ -306,7 +306,7 @@ void vtech1_state::init_vtech1h()
 void vtech1_state::laser110_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom(); // basic rom
-	map(0x6800, 0x6fff).rw(this, FUNC(vtech1_state::vtech1_keyboard_r), FUNC(vtech1_state::vtech1_latch_w));
+	map(0x6800, 0x6fff).rw(FUNC(vtech1_state::vtech1_keyboard_r), FUNC(vtech1_state::vtech1_latch_w));
 	map(0x7000, 0x77ff).ram().share("videoram"); // 6847
 	map(0x7800, 0x7fff).ram(); // 2k user ram
 }
@@ -314,7 +314,7 @@ void vtech1_state::laser110_mem(address_map &map)
 void vtech1_state::laser210_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom(); // basic rom
-	map(0x6800, 0x6fff).rw(this, FUNC(vtech1_state::vtech1_keyboard_r), FUNC(vtech1_state::vtech1_latch_w));
+	map(0x6800, 0x6fff).rw(FUNC(vtech1_state::vtech1_keyboard_r), FUNC(vtech1_state::vtech1_latch_w));
 	map(0x7000, 0x77ff).ram().share("videoram"); // 6847
 	map(0x7800, 0x8fff).ram(); // 6k user ram
 }
@@ -322,7 +322,7 @@ void vtech1_state::laser210_mem(address_map &map)
 void vtech1_state::laser310_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom(); // basic rom
-	map(0x6800, 0x6fff).rw(this, FUNC(vtech1_state::vtech1_keyboard_r), FUNC(vtech1_state::vtech1_latch_w));
+	map(0x6800, 0x6fff).rw(FUNC(vtech1_state::vtech1_keyboard_r), FUNC(vtech1_state::vtech1_latch_w));
 	map(0x7000, 0x77ff).ram().share("videoram"); // 6847
 	map(0x7800, 0xb7ff).ram(); // 16k user ram
 }
@@ -330,13 +330,13 @@ void vtech1_state::laser310_mem(address_map &map)
 void vtech1_state::vtech1_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x4f).r(this, FUNC(vtech1_state::vtech1_lightpen_r));
+	map(0x40, 0x4f).r(FUNC(vtech1_state::vtech1_lightpen_r));
 }
 
 void vtech1_state::vtech1_shrg_io(address_map &map)
 {
 	vtech1_io(map);
-	map(0xd0, 0xdf).w(this, FUNC(vtech1_state::vtech1_video_bank_w));
+	map(0xd0, 0xdf).w(FUNC(vtech1_state::vtech1_video_bank_w));
 }
 
 
@@ -545,19 +545,19 @@ ROM_END
 ROM_START( vz200 )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "basic20", "BASIC V2.0")
-	ROMX_LOAD("vtechv20.u09",  0x0000, 0x2000, CRC(cc854fe9) SHA1(6e66a309b8e6dc4f5b0b44e1ba5f680467353d66), ROM_BIOS(1))
-	ROMX_LOAD("vtechv20.u10",  0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440), ROM_BIOS(1))
+	ROMX_LOAD("vtechv20.u09",  0x0000, 0x2000, CRC(cc854fe9) SHA1(6e66a309b8e6dc4f5b0b44e1ba5f680467353d66), ROM_BIOS(0))
+	ROMX_LOAD("vtechv20.u10",  0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "enhanced", "VZ-200 Enhanced BASIC V1.01")
-	ROMX_LOAD("vz200_v101.u9", 0x0000, 0x2000, CRC(70340b97) SHA1(eb3f3c8cf0cfa7acd646e89a90a3edf9e556cab6), ROM_BIOS(2))
-	ROMX_LOAD("vtechv20.u10",  0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440), ROM_BIOS(2))
+	ROMX_LOAD("vz200_v101.u9", 0x0000, 0x2000, CRC(70340b97) SHA1(eb3f3c8cf0cfa7acd646e89a90a3edf9e556cab6), ROM_BIOS(1))
+	ROMX_LOAD("vtechv20.u10",  0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440), ROM_BIOS(1))
 ROM_END
 
 ROM_START( laser310 )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "basic20", "BASIC V2.0")
-	ROMX_LOAD("vtechv20.u12", 0x0000, 0x4000, CRC(613de12c) SHA1(f216c266bc09b0dbdbad720796e5ea9bc7d91e53), ROM_BIOS(1))
+	ROMX_LOAD("vtechv20.u12", 0x0000, 0x4000, CRC(613de12c) SHA1(f216c266bc09b0dbdbad720796e5ea9bc7d91e53), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "basic21", "BASIC V2.1 (hack)")
-	ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(2))
+	ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(1))
 ROM_END
 
 #define rom_vz300       rom_laser310

@@ -68,6 +68,7 @@ Notes:
 #include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -416,27 +417,27 @@ void lastfght_state::lastfght_map(address_map &map)
 
 	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
-	map(0x600000, 0x600001).w(this, FUNC(lastfght_state::hi_w));
-	map(0x600002, 0x600003).rw(this, FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
-	map(0x600006, 0x600007).w(this, FUNC(lastfght_state::blit_w));
+	map(0x600000, 0x600001).w(FUNC(lastfght_state::hi_w));
+	map(0x600002, 0x600003).rw(FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
+	map(0x600006, 0x600007).w(FUNC(lastfght_state::blit_w));
 	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x60000a, 0x60000a).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x800000, 0x800001).w(this, FUNC(lastfght_state::sx_w));
-	map(0x800002, 0x800003).w(this, FUNC(lastfght_state::sd_w));
-	map(0x800004, 0x800005).w(this, FUNC(lastfght_state::sy_w));
-	map(0x800006, 0x800007).w(this, FUNC(lastfght_state::sr_w));
-	map(0x800008, 0x800009).w(this, FUNC(lastfght_state::x_w));
-	map(0x80000a, 0x80000b).w(this, FUNC(lastfght_state::yw_w));
-	map(0x80000c, 0x80000d).w(this, FUNC(lastfght_state::h_w));
+	map(0x800000, 0x800001).w(FUNC(lastfght_state::sx_w));
+	map(0x800002, 0x800003).w(FUNC(lastfght_state::sd_w));
+	map(0x800004, 0x800005).w(FUNC(lastfght_state::sy_w));
+	map(0x800006, 0x800007).w(FUNC(lastfght_state::sr_w));
+	map(0x800008, 0x800009).w(FUNC(lastfght_state::x_w));
+	map(0x80000a, 0x80000b).w(FUNC(lastfght_state::yw_w));
+	map(0x80000c, 0x80000d).w(FUNC(lastfght_state::h_w));
 
-	map(0x800014, 0x800015).w(this, FUNC(lastfght_state::dest_w));
+	map(0x800014, 0x800015).w(FUNC(lastfght_state::dest_w));
 
-	map(0xc00000, 0xc00001).r(this, FUNC(lastfght_state::c00000_r));
-	map(0xc00002, 0xc00003).r(this, FUNC(lastfght_state::c00002_r));
-	map(0xc00004, 0xc00005).r(this, FUNC(lastfght_state::c00004_r));
-	map(0xc00006, 0xc00007).rw(this, FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
+	map(0xc00000, 0xc00001).r(FUNC(lastfght_state::c00000_r));
+	map(0xc00002, 0xc00003).r(FUNC(lastfght_state::c00002_r));
+	map(0xc00004, 0xc00005).r(FUNC(lastfght_state::c00004_r));
+	map(0xc00006, 0xc00007).rw(FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
 }
 
 void lastfght_state::ramdac_map(address_map &map)

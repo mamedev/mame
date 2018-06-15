@@ -14,6 +14,7 @@
 #include "bus/gameboy/gb_slot.h"
 #include "machine/ram.h"
 #include "video/gb_lcd.h"
+#include "emupal.h"
 
 
 class gb_state : public driver_device

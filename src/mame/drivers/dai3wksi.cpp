@@ -43,6 +43,7 @@ Driver Notes:
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -327,9 +328,9 @@ void dai3wksi_state::main_map(address_map &map)
 	map(0x2000, 0x23ff).ram();
 	map(0x2400, 0x24ff).mirror(0x100).portr("IN0");
 	map(0x2800, 0x28ff).mirror(0x100).portr("IN1");
-	map(0x3000, 0x3000).w(this, FUNC(dai3wksi_state::dai3wksi_audio_1_w));
-	map(0x3400, 0x3400).w(this, FUNC(dai3wksi_state::dai3wksi_audio_2_w));
-	map(0x3800, 0x3800).w(this, FUNC(dai3wksi_state::dai3wksi_audio_3_w));
+	map(0x3000, 0x3000).w(FUNC(dai3wksi_state::dai3wksi_audio_1_w));
+	map(0x3400, 0x3400).w(FUNC(dai3wksi_state::dai3wksi_audio_2_w));
+	map(0x3800, 0x3800).w(FUNC(dai3wksi_state::dai3wksi_audio_3_w));
 	map(0x8000, 0xbfff).ram().share("videoram");
 }
 

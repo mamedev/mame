@@ -575,22 +575,22 @@ DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega256
 
 void atmega88_device::atmega88_internal_map(address_map &map)
 {
-	map(0x0000, 0x00ff).rw(this, FUNC(atmega88_device::regs_r), FUNC(atmega88_device::regs_w));
+	map(0x0000, 0x00ff).rw(FUNC(atmega88_device::regs_r), FUNC(atmega88_device::regs_w));
 }
 
 void atmega644_device::atmega644_internal_map(address_map &map)
 {
-	map(0x0000, 0x00ff).rw(this, FUNC(atmega644_device::regs_r), FUNC(atmega644_device::regs_w));
+	map(0x0000, 0x00ff).rw(FUNC(atmega644_device::regs_r), FUNC(atmega644_device::regs_w));
 }
 
 void atmega1280_device::atmega1280_internal_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(atmega1280_device::regs_r), FUNC(atmega1280_device::regs_w));
+	map(0x0000, 0x01ff).rw(FUNC(atmega1280_device::regs_r), FUNC(atmega1280_device::regs_w));
 }
 
 void atmega2560_device::atmega2560_internal_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(atmega2560_device::regs_r), FUNC(atmega2560_device::regs_w));
+	map(0x0000, 0x01ff).rw(FUNC(atmega2560_device::regs_r), FUNC(atmega2560_device::regs_w));
 }
 
 //-------------------------------------------------

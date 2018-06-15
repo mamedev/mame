@@ -3192,6 +3192,7 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 		case 0x40:
 		case 0x41:
 		case 0x42:
+		case 0x43:
 			if( n_gpu_buffer_offset < 2 )
 			{
 				n_gpu_buffer_offset++;
@@ -3307,7 +3308,9 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 			}
 			break;
 		case 0x68:
+		case 0x69:
 		case 0x6a:
+		case 0x6b:
 			if( n_gpu_buffer_offset < 1 )
 			{
 				n_gpu_buffer_offset++;
@@ -3324,6 +3327,8 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 			break;
 		case 0x70:
 		case 0x71:
+		case 0x72:
+		case 0x73:
 			/* 8*8 rectangle */
 			if( n_gpu_buffer_offset < 1 )
 			{
@@ -3355,6 +3360,8 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 			break;
 		case 0x78:
 		case 0x79:
+		case 0x7a:
+		case 0x7b:
 			/* 16*16 rectangle */
 			if( n_gpu_buffer_offset < 1 )
 			{

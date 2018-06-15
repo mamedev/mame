@@ -31,6 +31,7 @@ ToDo:
 #include "sound/wave.h"
 #include "video/upd7220.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,7 +57,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -358,21 +359,21 @@ void a5105_state::a5105_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x40, 0x41).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x48, 0x4f).w(this, FUNC(a5105_state::a5105_upd765_w));
+	map(0x48, 0x4f).w(FUNC(a5105_state::a5105_upd765_w));
 
 	map(0x80, 0x83).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x90, 0x93).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x98, 0x99).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 
-	map(0x9c, 0x9c).w(this, FUNC(a5105_state::pcg_val_w));
+	map(0x9c, 0x9c).w(FUNC(a5105_state::pcg_val_w));
 //  AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
-	map(0x9e, 0x9e).w(this, FUNC(a5105_state::pcg_addr_w));
+	map(0x9e, 0x9e).w(FUNC(a5105_state::pcg_addr_w));
 
 //  AM_RANGE(0xa0, 0xa1) ay8910?
-	map(0xa8, 0xa8).rw(this, FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
-	map(0xa9, 0xa9).r(this, FUNC(a5105_state::key_r));
-	map(0xaa, 0xaa).rw(this, FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));
-	map(0xab, 0xab).w(this, FUNC(a5105_state::a5105_ab_w)); //misc output, see above
+	map(0xa8, 0xa8).rw(FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
+	map(0xa9, 0xa9).r(FUNC(a5105_state::key_r));
+	map(0xaa, 0xaa).rw(FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));
+	map(0xab, 0xab).w(FUNC(a5105_state::a5105_ab_w)); //misc output, see above
 }
 
 /* Input ports */

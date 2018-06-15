@@ -119,14 +119,15 @@
 
 #include "video/dl1416.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define Q209_CPU_CLOCK      XTAL(40'210'000) / 40 // divider not verified (very complex circuit)
+#define Q209_CPU_CLOCK      40.21_MHz_XTAL / 40 // divider not verified (very complex circuit)
 
 #define M6809_CLOCK             8000000 // wrong
-#define MASTER_OSCILLATOR       XTAL(34'291'712)
+#define MASTER_OSCILLATOR       34.291712_MHz_XTAL
 
 #define CPU_1                   0
 #define CPU_2                   1
@@ -142,7 +143,7 @@
 #define PAGE_MASK               (PAGE_SIZE - 1)
 #define PAGE_SHIFT              5
 
-#define PIXEL_CLOCK             XTAL(10'380'000)
+#define PIXEL_CLOCK             10.38_MHz_XTAL
 #define HTOTAL                  672
 #define HBLANK_END              0
 #define HBLANK_START            512
@@ -875,12 +876,12 @@ READ16_MEMBER( cmi_state::midi_dma_r )
 /* The maps are dynamically populated */
 void cmi_state::maincpu1_map(address_map &map)
 {
-	map(0xfffe, 0xffff).r(this, FUNC(cmi_state::vector_r<0>));
+	map(0xfffe, 0xffff).r(FUNC(cmi_state::vector_r<0>));
 }
 
 void cmi_state::maincpu2_map(address_map &map)
 {
-	map(0xfffe, 0xffff).r(this, FUNC(cmi_state::vector_r<1>));
+	map(0xfffe, 0xffff).r(FUNC(cmi_state::vector_r<1>));
 }
 
 void cmi_state::muskeys_map(address_map &map)
@@ -908,7 +909,7 @@ void cmi_state::alphakeys_map(address_map &map)
 void cmi_state::midicpu_map(address_map &map)
 {
 	map(0x000000, 0x003fff).rom();
-	map(0x040000, 0x05ffff).rw(this, FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
+	map(0x040000, 0x05ffff).rw(FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
 //  AM_RANGE(0x060000, 0x06001f) TIMERS
 //  AM_RANGE(0x060050, 0x06005f) ACIA
 //  AM_RANGE(0x060070, 0x06007f) SMPTE
@@ -1358,10 +1359,10 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 			case 0x6: m_fdc_dma_cnt.b.l = data;     break;
 			case 0x8: m_fdc_dma_cnt.b.h = data;     break;
 			case 0xa: dma_fdc_rom();                break;
-			case 0xc: m_wd1791->cmd_w(data ^ 0xff);        break;
-			case 0xd: m_wd1791->track_w(data ^ 0xff);      break;
-			case 0xe: m_wd1791->sector_w(data ^ 0xff);     break;
-			case 0xf: m_wd1791->data_w(data ^ 0xff);       break;
+			case 0xc: m_wd1791->write_cmd(data ^ 0xff);        break;
+			case 0xd: m_wd1791->write_track(data ^ 0xff);      break;
+			case 0xe: m_wd1791->write_sector(data ^ 0xff);     break;
+			case 0xf: m_wd1791->write_data(data ^ 0xff);       break;
 			default: printf("fdc_w: Invalid access (%x with %x)", m_fdc_addr, data);
 		}
 	}
@@ -1378,10 +1379,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
-			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
-			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
-			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
+			case 0xc: { return m_wd1791->read_status() ^ 0xff; }
+			case 0xd: { return m_wd1791->read_track() ^ 0xff; }
+			case 0xe: { return m_wd1791->read_sector() ^ 0xff; }
+			case 0xf: { return m_wd1791->read_data() ^ 0xff; }
 			default:  return 0;
 		}
 	}
@@ -1413,7 +1414,7 @@ void cmi_state::fdc_dma_transfer()
 	if (!BIT(m_fdc_ctrl, 4))
 	{
 		/* Read a byte at a time */
-		uint8_t data = m_wd1791->data_r() ^ 0xff;
+		uint8_t data = m_wd1791->read_data() ^ 0xff;
 
 		if (m_fdc_dma_cnt.w.l == 0xffff)
 			return;
@@ -1445,7 +1446,7 @@ void cmi_state::fdc_dma_transfer()
 		if (phys_page & 0x80)
 			data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
 
-		m_wd1791->data_w(data ^ 0xff);
+		m_wd1791->write_data(data ^ 0xff);
 
 		if (!BIT(m_fdc_ctrl, 3))
 			m_fdc_dma_addr.w.l++;
@@ -2183,14 +2184,14 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
 
-	MCFG_DEVICE_ADD("muskeys", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("muskeys", M6802, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(muskeys_map)
 
-	MCFG_DEVICE_ADD("alphakeys", M6802, XTAL(3'840'000))
+	MCFG_DEVICE_ADD("alphakeys", M6802, 3.84_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(alphakeys_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, XTAL(3'840'000) / 400) // TODO: PIA controls this
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, 3.84_MHz_XTAL / 400) // TODO: PIA controls this
 
-	MCFG_DEVICE_ADD("smptemidi", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_ADD("smptemidi", M68000, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(midicpu_map)
 
 	MCFG_DEVICE_ADD("cmi07cpu", MC6809E, Q209_CPU_CLOCK) // ?
@@ -2212,7 +2213,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MSM5832_ADD("msm5832", XTAL(32'768))
+	MCFG_DEVICE_ADD("msm5832", MSM5832, 32.768_kHz_XTAL)
 
 	MCFG_DEVICE_ADD("i8214_1", I8214, 1000000) // cmi_8214_intf_1
 	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_1_int_w))
@@ -2251,30 +2252,30 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_PTM6840_O2_CB(WRITELINE(*this, cmi_state, cmi02_ptm_o2))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, cmi02_ptm_irq))
 
-	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL(1'843'200) / 12)
+	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 1.8432_MHz_XTAL / 12)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, cmi_state, mkbd_acia_clock))
 
-	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL(1'843'200))
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, 1.8432_MHz_XTAL)
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, XTAL(1'843'200))
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, 1.8432_MHz_XTAL)
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, XTAL(1'843'200))
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, 1.8432_MHz_XTAL)
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<2>))
 
-	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, XTAL(1'843'200))
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, 1.8432_MHz_XTAL)
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<3>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("q133_acia_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi_state, q133_acia_irq))
 
-	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_kbd
-	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_cmi
+	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, 1.8432_MHz_XTAL / 12) // acia_mkbd_kbd
+	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, 1.8432_MHz_XTAL / 12) // acia_mkbd_cmi
 	MCFG_DEVICE_ADD("ank_pia", PIA6821, 0) // pia_ank_config
 
 	MCFG_DEVICE_MODIFY("q133_acia_0")
@@ -2308,7 +2309,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 2000000) // ptm_cmi07_config TODO
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, cmi07_irq))
 
-	MCFG_FD1791_ADD("wd1791", XTAL(16'000'000) / 8) // wd1791_interface
+	MCFG_DEVICE_ADD("wd1791", FD1791, 16_MHz_XTAL / 8) // wd1791_interface
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)

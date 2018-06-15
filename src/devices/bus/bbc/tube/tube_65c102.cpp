@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_65C102, bbc_tube_65c102_device, "bbc_tube_65c102", "
 
 void bbc_tube_65c102_device::tube_6502_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_65c102_device::read), FUNC(bbc_tube_65c102_device::write));
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_65c102_device::read), FUNC(bbc_tube_65c102_device::write));
 }
 
 //-------------------------------------------------

@@ -81,6 +81,10 @@ void timer_device::device_validity_check(validity_checker &valid) const
 				osd_printf_warning("Scanline timer specified parameters for a periodic timer\n");
 			if (m_param != 0)
 				osd_printf_warning("Scanline timer specified parameter which is ignored\n");
+			if (m_screen_tag == nullptr)
+				osd_printf_error("Scanline timer has no screen specified\n");
+			else if (dynamic_cast<screen_device *>(siblingdevice(m_screen_tag)) == nullptr)
+				osd_printf_error("Scanline timer specifies nonexistent screen %s\n", m_screen_tag);
 //          if (m_first_vpos < 0)
 //              osd_printf_error("Scanline timer specified invalid initial position\n");
 //          if (m_increment < 0)
@@ -103,7 +107,7 @@ void timer_device::device_start()
 {
 	// fetch the screen
 	if (m_screen_tag != nullptr)
-		m_screen = machine().device<screen_device>(m_screen_tag);
+		m_screen = siblingdevice<screen_device>(m_screen_tag);
 
 	// allocate the timer
 	m_timer = timer_alloc();
@@ -171,8 +175,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				(m_callback)(*this, m_ptr, param);
 			break;
 
-
-		// scanline timers have to do some additiona bookkeeping
+		// scanline timers have to do some additional bookkeeping
 		case TIMER_TYPE_SCANLINE:
 		{
 			// by default, we fire at the first position

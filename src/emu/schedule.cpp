@@ -762,7 +762,7 @@ void device_scheduler::rebuild_execute_list()
 		// if the configuration specifies a device to make perfect, pick that as the minimum
 		if (!machine().config().m_perfect_cpu_quantum.empty())
 		{
-			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum.c_str());
+			device_t *device = machine().root_device().subdevice(machine().config().m_perfect_cpu_quantum.c_str());
 			if (device == nullptr)
 				fatalerror("Device '%s' specified for perfect interleave is not present!\n", machine().config().m_perfect_cpu_quantum.c_str());
 

@@ -53,6 +53,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -166,7 +167,7 @@ void diverboy_state::diverboy_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram();
 	map(0x080000, 0x083fff).ram().share("spriteram");
-	map(0x100000, 0x100001).w(this, FUNC(diverboy_state::soundcmd_w));
+	map(0x100000, 0x100001).w(FUNC(diverboy_state::soundcmd_w));
 	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x180001).portr("P1_P2");
 	map(0x180002, 0x180003).portr("DSW");
@@ -183,7 +184,7 @@ void diverboy_state::snd_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(diverboy_state::okibank_w));
+	map(0x9000, 0x9000).w(FUNC(diverboy_state::okibank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

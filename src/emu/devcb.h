@@ -256,7 +256,7 @@ protected:
 	};
 
 	// configuration
-	device_t &		    m_owner;                // reference to our owning device
+	device_t &          m_owner;                // reference to our owning device
 	std::reference_wrapper<device_t> m_base;    // device to resolve relative to
 	callback_type       m_type;                 // type of callback registered
 	const char *        m_target_tag;           // tag of target object

@@ -118,13 +118,13 @@ WRITE_LINE_MEMBER(dectalk_isa_device::clock_w)
 
 void dectalk_isa_device::dectalk_cpu_io(address_map &map)
 {
-	map(0x0400, 0x0401).rw(this, FUNC(dectalk_isa_device::cmd_r), FUNC(dectalk_isa_device::status_w)); //PCS0
-	map(0x0480, 0x0481).rw(this, FUNC(dectalk_isa_device::data_r), FUNC(dectalk_isa_device::data_w)); //PCS1
-	map(0x0500, 0x0501).w(this, FUNC(dectalk_isa_device::dsp_dma_w)); //PCS2
-	map(0x0580, 0x0581).r(this, FUNC(dectalk_isa_device::host_irq_r)); //PCS3
-	map(0x0600, 0x0601).w(this, FUNC(dectalk_isa_device::output_ctl_w)); //PCS4
-	map(0x0680, 0x0680).rw(this, FUNC(dectalk_isa_device::dma_r), FUNC(dectalk_isa_device::dma_w)); //PCS5
-	map(0x0700, 0x0701).w(this, FUNC(dectalk_isa_device::irq_line_w)); //PCS6
+	map(0x0400, 0x0401).rw(FUNC(dectalk_isa_device::cmd_r), FUNC(dectalk_isa_device::status_w)); //PCS0
+	map(0x0480, 0x0481).rw(FUNC(dectalk_isa_device::data_r), FUNC(dectalk_isa_device::data_w)); //PCS1
+	map(0x0500, 0x0501).w(FUNC(dectalk_isa_device::dsp_dma_w)); //PCS2
+	map(0x0580, 0x0581).r(FUNC(dectalk_isa_device::host_irq_r)); //PCS3
+	map(0x0600, 0x0601).w(FUNC(dectalk_isa_device::output_ctl_w)); //PCS4
+	map(0x0680, 0x0680).rw(FUNC(dectalk_isa_device::dma_r), FUNC(dectalk_isa_device::dma_w)); //PCS5
+	map(0x0700, 0x0701).w(FUNC(dectalk_isa_device::irq_line_w)); //PCS6
 }
 
 void dectalk_isa_device::dectalk_cpu_map(address_map &map)
@@ -135,8 +135,8 @@ void dectalk_isa_device::dectalk_cpu_map(address_map &map)
 
 void dectalk_isa_device::dectalk_dsp_io(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(dectalk_isa_device::dsp_dma_r));
-	map(0x1, 0x1).rw(this, FUNC(dectalk_isa_device::dsp_dma_r), FUNC(dectalk_isa_device::dac_w));
+	map(0x0, 0x0).r(FUNC(dectalk_isa_device::dsp_dma_r));
+	map(0x1, 0x1).rw(FUNC(dectalk_isa_device::dsp_dma_r), FUNC(dectalk_isa_device::dac_w));
 }
 
 void dectalk_isa_device::dectalk_dsp_map(address_map &map)

@@ -10,6 +10,7 @@
 #include "video/vsystem_spr.h"
 #include "video/mb60553.h"
 #include "video/vs920a.h"
+#include "emupal.h"
 #include "screen.h"
 
 

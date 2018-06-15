@@ -16,6 +16,7 @@
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 
 class taitof2_state : public driver_device

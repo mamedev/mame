@@ -48,8 +48,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
 
 WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
 {
-	if (state)
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_custom->sound_interrupt_w(state);
 
 	update_irq_encoder(INPUT_LINE_IRQ3, state);
 }
@@ -101,9 +100,9 @@ WRITE16_MEMBER(vertigo_state::vertigo_wsot_w)
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_custom->sound_reset_w(ASSERT_LINE);
 	else
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_custom->sound_reset_w(CLEAR_LINE);
 }
 
 

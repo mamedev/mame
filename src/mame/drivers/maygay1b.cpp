@@ -480,17 +480,17 @@ void maygay1b_state::m1_memmap(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 
-	map(0x2000, 0x2000).w(this, FUNC(maygay1b_state::reel12_w));
-	map(0x2010, 0x2010).w(this, FUNC(maygay1b_state::reel34_w));
-	map(0x2020, 0x2020).w(this, FUNC(maygay1b_state::reel56_w));
+	map(0x2000, 0x2000).w(FUNC(maygay1b_state::reel12_w));
+	map(0x2010, 0x2010).w(FUNC(maygay1b_state::reel34_w));
+	map(0x2020, 0x2020).w(FUNC(maygay1b_state::reel56_w));
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
 	map(0x2030, 0x2031).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 
 #ifdef USE_MCU
 	//8051
-	map(0x2040, 0x2040).w(this, FUNC(maygay1b_state::main_to_mcu_0_w));
-	map(0x2041, 0x2041).w(this, FUNC(maygay1b_state::main_to_mcu_1_w));
+	map(0x2040, 0x2040).w(FUNC(maygay1b_state::main_to_mcu_0_w));
+	map(0x2041, 0x2041).w(FUNC(maygay1b_state::main_to_mcu_1_w));
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -500,7 +500,7 @@ void maygay1b_state::m1_memmap(address_map &map)
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
 
 	map(0x2090, 0x2091).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x20B0, 0x20B0).r(this, FUNC(maygay1b_state::m1_meter_r));
+	map(0x20B0, 0x20B0).r(FUNC(maygay1b_state::m1_meter_r));
 
 	map(0x20A0, 0x20A3).w("pia", FUNC(pia6821_device::write));
 	map(0x20A0, 0x20A3).r("pia", FUNC(pia6821_device::read));
@@ -508,14 +508,14 @@ void maygay1b_state::m1_memmap(address_map &map)
 	map(0x20C0, 0x20C7).w("mainlatch", FUNC(hc259_device::write_d0));
 
 	map(0x2400, 0x2401).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x2404, 0x2405).r(this, FUNC(maygay1b_state::latch_st_lo));
-	map(0x2406, 0x2407).r(this, FUNC(maygay1b_state::latch_st_hi));
+	map(0x2404, 0x2405).r(FUNC(maygay1b_state::latch_st_lo));
+	map(0x2406, 0x2407).r(FUNC(maygay1b_state::latch_st_hi));
 
-	map(0x2410, 0x2410).r(this, FUNC(maygay1b_state::m1_firq_clr_r));
+	map(0x2410, 0x2410).r(FUNC(maygay1b_state::m1_firq_clr_r));
 
-	map(0x2412, 0x2412).r(this, FUNC(maygay1b_state::m1_firq_trg_r)); // firq, sample playback?
+	map(0x2412, 0x2412).r(FUNC(maygay1b_state::m1_firq_trg_r)); // firq, sample playback?
 
-	map(0x2420, 0x2421).w(this, FUNC(maygay1b_state::latch_ch2_w)); // oki
+	map(0x2420, 0x2421).w(FUNC(maygay1b_state::latch_ch2_w)); // oki
 
 	map(0x2800, 0xdfff).rom();
 	map(0xe000, 0xffff).bankr("bank1");    /* 64k  paged ROM (4 pages)  */
@@ -566,17 +566,17 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 
-	map(0x2000, 0x2000).w(this, FUNC(maygay1b_state::reel12_w));
-	map(0x2010, 0x2010).w(this, FUNC(maygay1b_state::reel34_w));
-	map(0x2020, 0x2020).w(this, FUNC(maygay1b_state::reel56_w));
+	map(0x2000, 0x2000).w(FUNC(maygay1b_state::reel12_w));
+	map(0x2010, 0x2010).w(FUNC(maygay1b_state::reel34_w));
+	map(0x2020, 0x2020).w(FUNC(maygay1b_state::reel56_w));
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
 	map(0x2030, 0x2031).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 
 #ifdef USE_MCU
 	//8051
-	map(0x2040, 0x2040).w(this, FUNC(maygay1b_state::main_to_mcu_0_w));
-	map(0x2041, 0x2041).w(this, FUNC(maygay1b_state::main_to_mcu_1_w));
+	map(0x2040, 0x2040).w(FUNC(maygay1b_state::main_to_mcu_0_w));
+	map(0x2041, 0x2041).w(FUNC(maygay1b_state::main_to_mcu_1_w));
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -586,7 +586,7 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
 
 	map(0x2090, 0x2091).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x20B0, 0x20B0).r(this, FUNC(maygay1b_state::m1_meter_r));
+	map(0x20B0, 0x20B0).r(FUNC(maygay1b_state::m1_meter_r));
 
 	map(0x20A0, 0x20A3).w("pia", FUNC(pia6821_device::write));
 	map(0x20A0, 0x20A3).r("pia", FUNC(pia6821_device::read));
@@ -594,14 +594,14 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
 	map(0x20C0, 0x20C7).w("mainlatch", FUNC(hc259_device::write_d0));
 
 	map(0x2400, 0x2401).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x2404, 0x2405).w(this, FUNC(maygay1b_state::nec_bank0_w));
-	map(0x2406, 0x2407).w(this, FUNC(maygay1b_state::nec_bank1_w));
+	map(0x2404, 0x2405).w(FUNC(maygay1b_state::nec_bank0_w));
+	map(0x2406, 0x2407).w(FUNC(maygay1b_state::nec_bank1_w));
 
-	map(0x2408, 0x2409).r(this, FUNC(maygay1b_state::nec_reset_r));
+	map(0x2408, 0x2409).r(FUNC(maygay1b_state::nec_reset_r));
 
-	map(0x240c, 0x240d).r(this, FUNC(maygay1b_state::m1_firq_clr_r));
+	map(0x240c, 0x240d).r(FUNC(maygay1b_state::m1_firq_clr_r));
 
-	map(0x240e, 0x240f).r(this, FUNC(maygay1b_state::m1_firq_nec_r));
+	map(0x240e, 0x240f).r(FUNC(maygay1b_state::m1_firq_nec_r));
 
 	map(0x2800, 0xdfff).rom();
 	map(0xe000, 0xffff).bankr("bank1");    /* 64k  paged ROM (4 pages)  */
@@ -823,17 +823,17 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygay1b_state, lamp_data_2_w))       // display A&B
 #endif
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<0>))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<1>))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<2>))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<3>))
-	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<4>))
-	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<5>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

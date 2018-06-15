@@ -30,6 +30,7 @@
 #include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -270,20 +271,20 @@ void quickpick5_state::quickpick5_main(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).ram().share("nvram");
 	map(0xdc00, 0xdc0f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
-	map(0xdc40, 0xdc4f).rw(this, FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
+	map(0xdc40, 0xdc4f).rw(FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
 	map(0xdc80, 0xdc80).portr("DSW3");
 	map(0xdc81, 0xdc81).portr("DSW4");
 	map(0xdcc0, 0xdcc0).portr("DSW1");
 	map(0xdcc1, 0xdcc1).portr("DSW2");
 	map(0xdd00, 0xdd00).nopw();
 	map(0xdd40, 0xdd40).noprw();
-	map(0xdd80, 0xdd80).rw(this, FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
+	map(0xdd80, 0xdd80).rw(FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
 	map(0xddc0, 0xddc0).nopw();
 	map(0xde00, 0xde00).nopw();
 	map(0xde40, 0xde40).w(m_oki, FUNC(okim6295_device::write));
-	map(0xe000, 0xefff).rw(this, FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
+	map(0xe000, 0xefff).rw(FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
 	map(0xf000, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xffff).rw(this, FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
+	map(0xf800, 0xffff).rw(FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
 }
 
 static INPUT_PORTS_START( quickpick5 )

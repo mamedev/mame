@@ -16,6 +16,7 @@ Espirit3: 2x R6551AP, HD46850P (6850), R6502BP, R6545-1AP, R6522AP, 1.8432, 17.9
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class esprit_state : public driver_device

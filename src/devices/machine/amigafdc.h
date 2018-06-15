@@ -107,6 +107,7 @@ private:
 	devcb_write16 m_write_dma;
 	devcb_write_line m_write_dskblk;
 	devcb_write_line m_write_dsksyn;
+	output_finder<2> m_leds;
 
 	floppy_image_device *floppy;
 	floppy_image_device *floppy_devices[4];

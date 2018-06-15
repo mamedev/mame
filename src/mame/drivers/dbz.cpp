@@ -127,14 +127,14 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
 	map(0x4e4000, 0x4e4001).portr("DSW2");
 	map(0x4e8000, 0x4e8001).nopw();
-	map(0x4ec000, 0x4ec001).w(this, FUNC(dbz_state::dbzcontrol_w));
-	map(0x4f0000, 0x4f0001).w(this, FUNC(dbz_state::dbz_sound_command_w));
-	map(0x4f4000, 0x4f4001).w(this, FUNC(dbz_state::dbz_sound_cause_nmi));
+	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
+	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
+	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::dbz_sound_cause_nmi));
 	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 251 #1
 	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::lsb_w));   // 251 #2
 
-	map(0x500000, 0x501fff).ram().w(this, FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
-	map(0x508000, 0x509fff).ram().w(this, FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
+	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
 	map(0x510000, 0x513fff).rw(m_k053936_1, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x518000, 0x51bfff).rw(m_k053936_2, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x600000, 0x6fffff).nopr();             // PSAC 1 ROM readback window
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(dbz_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)

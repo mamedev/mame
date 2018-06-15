@@ -38,6 +38,8 @@ public:
 		, m_digitalker(*this, "digitalker")
 		, m_aysnd(*this, "aysnd")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{
 	}
 
@@ -87,6 +89,8 @@ private:
 	required_device<digitalker_device> m_digitalker;
 	optional_device<ay8910_device> m_aysnd; // only faceoffh
 	output_finder<4> m_digits;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
 };
 
 
@@ -151,9 +155,9 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	m_digits[3] = patterns[(m_shift >>  (8+0)) & 0xf];
 
 	// Leds (period being played)
-	output().set_led_value(0, BIT(m_shift,2));
-	output().set_led_value(1, BIT(m_shift,1));
-	output().set_led_value(2, BIT(m_shift,0));
+	m_leds[0] = BIT(m_shift,2);
+	m_leds[1] = BIT(m_shift,1);
+	m_leds[2] = BIT(m_shift,0);
 
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
@@ -181,7 +185,7 @@ void chexx_state::chexx83_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // 6810 - 128 x 8 static RAM
 	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
+	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -190,8 +194,8 @@ void chexx_state::chexx83_map(address_map &map)
 WRITE8_MEMBER(chexx_state::lamp_w)
 {
 	m_lamp = data;
-	output().set_lamp_value(0, BIT(m_lamp,0));
-	output().set_lamp_value(1, BIT(m_lamp,1));
+	m_lamps[0] = BIT(m_lamp,0);
+	m_lamps[1] = BIT(m_lamp,1);
 }
 
 WRITE8_MEMBER(chexx_state::ay_w)
@@ -219,9 +223,9 @@ void chexx_state::faceoffh_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // M58725P - 2KB
 	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
-	map(0xa000, 0xa001).w(this, FUNC(chexx_state::ay_w));
-	map(0xc000, 0xc000).w(this, FUNC(chexx_state::lamp_w));
+	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
+	map(0xa000, 0xa001).w(FUNC(chexx_state::ay_w));
+	map(0xc000, 0xc000).w(FUNC(chexx_state::lamp_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -262,6 +266,8 @@ INPUT_PORTS_END
 void chexx_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
+	m_lamps.resolve();
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)

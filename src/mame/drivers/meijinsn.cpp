@@ -67,6 +67,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -192,13 +193,13 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 void meijinsn_state::meijinsn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080e00, 0x080fff).r(this, FUNC(meijinsn_state::alpha_mcu_r)).nopw();
+	map(0x080e00, 0x080fff).r(FUNC(meijinsn_state::alpha_mcu_r)).nopw();
 	map(0x100000, 0x107fff).ram().share("videoram");
 	map(0x180000, 0x180dff).ram();
 	map(0x180e00, 0x180fff).ram().share("shared_ram");
 	map(0x181000, 0x181fff).ram();
 	map(0x1c0000, 0x1c0001).portr("P2");
-	map(0x1a0000, 0x1a0001).portr("P1").w(this, FUNC(meijinsn_state::sound_w));
+	map(0x1a0000, 0x1a0001).portr("P1").w(FUNC(meijinsn_state::sound_w));
 }
 
 void meijinsn_state::meijinsn_sound_map(address_map &map)

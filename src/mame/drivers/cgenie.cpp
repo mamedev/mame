@@ -114,9 +114,9 @@ void cgenie_state::cgenie_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
 	map(0xc000, 0xefff).noprw(); // cartridge space
-	map(0xf000, 0xf3ff).rw(this, FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
+	map(0xf000, 0xf3ff).rw(FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
 	map(0xf400, 0xf7ff).ram().share("fontram");
-	map(0xf800, 0xf8ff).mirror(0x300).r(this, FUNC(cgenie_state::keyboard_r));
+	map(0xf800, 0xf8ff).mirror(0x300).r(FUNC(cgenie_state::keyboard_r));
 	map(0xfc00, 0xffff).noprw(); // cartridge space
 }
 
@@ -127,7 +127,7 @@ void cgenie_state::cgenie_io(address_map &map)
 	map(0xf9, 0xf9).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xfa, 0xfa).w(m_crtc, FUNC(hd6845_device::address_w));
 	map(0xfb, 0xfb).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xff, 0xff).rw(this, FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
+	map(0xff, 0xff).rw(FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
 }
 
 
@@ -511,9 +511,9 @@ ROM_END
 ROM_START( cgenienz )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
-	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1))
+	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
-	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2))
+	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(1))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))

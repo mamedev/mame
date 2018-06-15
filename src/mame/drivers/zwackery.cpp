@@ -25,6 +25,7 @@
 #include "machine/6840ptm.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -108,13 +109,13 @@ void zwackery_state::zwackery_map(address_map &map)
 	map(0x000000, 0x037fff).rom();
 	map(0x080000, 0x080fff).ram();
 	map(0x084000, 0x084fff).ram();
-	map(0x100000, 0x10000f).r(this, FUNC(zwackery_state::ptm_r)).umask16(0xff00).w(m_ptm, FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x100000, 0x10000f).r(FUNC(zwackery_state::ptm_r)).umask16(0xff00).w(m_ptm, FUNC(ptm6840_device::write)).umask16(0xff00);
 	map(0x104000, 0x104007).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
 	map(0x108000, 0x108007).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
 	map(0x10c000, 0x10c007).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
-	map(0x800000, 0x800fff).ram().w(this, FUNC(zwackery_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(zwackery_state::videoram_w)).share("videoram");
 	map(0x802000, 0x803fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xc00000, 0xc00fff).rw(this, FUNC(zwackery_state::spriteram_r), FUNC(zwackery_state::spriteram_w)).umask16(0x00ff);
+	map(0xc00000, 0xc00fff).rw(FUNC(zwackery_state::spriteram_r), FUNC(zwackery_state::spriteram_w)).umask16(0x00ff);
 }
 
 

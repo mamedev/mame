@@ -873,6 +873,7 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 #include "screen.h"
 
 

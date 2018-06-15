@@ -19,6 +19,7 @@
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -38,7 +39,7 @@ void ultraman_state::main_map(address_map &map)
 	map(0x1c0004, 0x1c0005).portr("P2");
 	map(0x1c0006, 0x1c0007).portr("DSW1");
 	map(0x1c0008, 0x1c0009).portr("DSW2");
-	map(0x1c0018, 0x1c0019).w(this, FUNC(ultraman_state::ultraman_gfxctrl_w));   /* counters + gfx ctrl */
+	map(0x1c0018, 0x1c0019).w(FUNC(ultraman_state::ultraman_gfxctrl_w));   /* counters + gfx ctrl */
 	map(0x1c0021, 0x1c0021).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0029, 0x1c0029).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0x1c0030, 0x1c0031).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -57,7 +58,7 @@ void ultraman_state::sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).ram();
 	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xd000, 0xd000).w(this, FUNC(ultraman_state::sound_nmi_enable_w));
+	map(0xd000, 0xd000).w(FUNC(ultraman_state::sound_nmi_enable_w));
 	map(0xe000, 0xe000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       /* M6295 */
 	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   /* YM2151 */
 }

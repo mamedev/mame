@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood,Nicola Salmoria,Paul Priest
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class pirates_state : public driver_device
 {

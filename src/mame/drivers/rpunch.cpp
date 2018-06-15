@@ -208,17 +208,17 @@ void rpunch_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().share("bitmapram");
 	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x080000, 0x083fff).ram().w(this, FUNC(rpunch_state::rpunch_videoram_w)).share("videoram");
+	map(0x080000, 0x083fff).ram().w(FUNC(rpunch_state::rpunch_videoram_w)).share("videoram");
 	map(0x0a0000, 0x0a07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0c0000, 0x0c0007).w(this, FUNC(rpunch_state::rpunch_scrollreg_w));
-	map(0x0c0009, 0x0c0009).select(0x20).w(this, FUNC(rpunch_state::rpunch_gga_w));
-	map(0x0c000c, 0x0c000d).w(this, FUNC(rpunch_state::rpunch_videoreg_w));
+	map(0x0c0000, 0x0c0007).w(FUNC(rpunch_state::rpunch_scrollreg_w));
+	map(0x0c0009, 0x0c0009).select(0x20).w(FUNC(rpunch_state::rpunch_gga_w));
+	map(0x0c000c, 0x0c000d).w(FUNC(rpunch_state::rpunch_videoreg_w));
 	map(0x0c000f, 0x0c000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c0010, 0x0c0013).w(this, FUNC(rpunch_state::rpunch_ins_w));
+	map(0x0c0010, 0x0c0013).w(FUNC(rpunch_state::rpunch_ins_w));
 	map(0x0c0018, 0x0c0019).portr("P1");
 	map(0x0c001a, 0x0c001b).portr("P2");
 	map(0x0c001c, 0x0c001d).portr("DSW");
-	map(0x0c001e, 0x0c001f).r(this, FUNC(rpunch_state::sound_busy_r));
+	map(0x0c001e, 0x0c001f).r(FUNC(rpunch_state::sound_busy_r));
 	map(0x0fc000, 0x0fffff).ram();
 }
 
@@ -235,8 +235,8 @@ void rpunch_state::sound_map(address_map &map)
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf200, 0xf200).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf400, 0xf400).w(this, FUNC(rpunch_state::upd_control_w));
-	map(0xf600, 0xf600).w(this, FUNC(rpunch_state::upd_data_w));
+	map(0xf400, 0xf400).w(FUNC(rpunch_state::upd_control_w));
+	map(0xf600, 0xf600).w(FUNC(rpunch_state::upd_data_w));
 	map(0xf800, 0xffff).ram();
 }
 

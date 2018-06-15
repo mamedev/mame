@@ -113,11 +113,11 @@ void dmax8000_state::dmax8000_io(address_map &map)
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // fdd controls
 	map(0x10, 0x13).rw("pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // centronics & parallel ports
-	map(0x14, 0x17).w(this, FUNC(dmax8000_state::port14_w)); // control lines for the centronics & parallel ports
+	map(0x14, 0x17).w(FUNC(dmax8000_state::port14_w)); // control lines for the centronics & parallel ports
 	//AM_RANGE(0x18, 0x19) AM_MIRROR(2) AM_DEVREADWRITE("am9511", am9512_device, read, write) // optional numeric coprocessor
 	//AM_RANGE(0x1c, 0x1d) AM_MIRROR(2)  // optional hard disk controller (1C=status, 1D=data)
 	map(0x20, 0x23).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x40, 0x40).w(this, FUNC(dmax8000_state::port40_w)); // memory bank control
+	map(0x40, 0x40).w(FUNC(dmax8000_state::port40_w)); // memory bank control
 	//AM_RANGE(0x60, 0x67) // optional IEEE488 GPIB
 	map(0x70, 0x7f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)); // optional RTC
 }
@@ -151,17 +151,17 @@ static void floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) ) // no idea what crystal is used, but 4MHz clock is confirmed
+	MCFG_DEVICE_ADD("maincpu", Z80, 4'000'000) // no idea what crystal is used, but 4MHz clock is confirmed
 	MCFG_DEVICE_PROGRAM_MAP(dmax8000_mem)
 	MCFG_DEVICE_IO_MAP(dmax8000_io)
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'000'000) / 2) // 2MHz
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 4'000'000 / 2) // 2MHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 4'000'000)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart1", z80dart_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart1", z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart2", z80dart_device, rxca_w))
@@ -169,7 +169,7 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart2", z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("dart1", z80dart_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(4'000'000)) // A = terminal; B = aux
+	MCFG_DEVICE_ADD("dart1", Z80DART, 4'000'000) // A = terminal; B = aux
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -180,15 +180,15 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_RS232_RI_HANDLER(WRITELINE("dart1", z80dart_device, ria_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("dart1", z80dart_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(4'000'000)) // RS232 ports
+	MCFG_DEVICE_ADD("dart2", Z80DART, 4'000'000) // RS232 ports
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("pio1", Z80PIO, 4'000'000)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, dmax8000_state, port0c_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, dmax8000_state, port0d_w))
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("pio2", Z80PIO, 4'000'000)
 
-	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)) // no idea
+	MCFG_DEVICE_ADD("fdc", FD1793, 2'000'000) // no idea
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dmax8000_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)

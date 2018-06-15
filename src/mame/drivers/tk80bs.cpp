@@ -26,6 +26,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tk80bs_state : public driver_device
@@ -114,7 +115,7 @@ void tk80bs_state::tk80bs_mem(address_map &map)
 	map(0x0000, 0x07ff).rom();
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	map(0x7df8, 0x7df9).noprw(); // i8251 sio
-	map(0x7dfc, 0x7dff).rw(this, FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
+	map(0x7dfc, 0x7dff).rw(FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
 	map(0x7e00, 0x7fff).ram().share("videoram"); // video ram
 	map(0x8000, 0xcfff).ram(); // RAM
 	map(0xd000, 0xefff).rom(); // BASIC
@@ -200,22 +201,22 @@ ROM_START( tk80bs )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	/* all of these aren't taken from an original machine*/
 	ROM_SYSTEM_BIOS(0, "psedo", "Pseudo LEVEL 1")
-	ROMX_LOAD( "tk80.dummy", 0x0000, 0x0800, BAD_DUMP CRC(553b25ca) SHA1(939350d7fa56ce567ddf393c9f4b9db6ebc18a2c), ROM_BIOS(1))
-	ROMX_LOAD( "ext.l1",     0x0c00, 0x6e46, BAD_DUMP CRC(d05ed3ff) SHA1(8544aa2cb58df9edf221f5be2cdafa248dd33828), ROM_BIOS(1))
-	ROMX_LOAD( "lv1basic.l1",0xe000, 0x09a2, BAD_DUMP CRC(3ff67a71) SHA1(528c9331740637e853c099e1739ecdea6dd200bc), ROM_BIOS(1))
-	ROMX_LOAD( "bsmon.l1",   0xf000, 0x0db0, BAD_DUMP CRC(5daa599b) SHA1(7e6ec5bfb3eea114f7ee9ef589a89246b8533b2f), ROM_BIOS(1))
+	ROMX_LOAD( "tk80.dummy", 0x0000, 0x0800, BAD_DUMP CRC(553b25ca) SHA1(939350d7fa56ce567ddf393c9f4b9db6ebc18a2c), ROM_BIOS(0))
+	ROMX_LOAD( "ext.l1",     0x0c00, 0x6e46, BAD_DUMP CRC(d05ed3ff) SHA1(8544aa2cb58df9edf221f5be2cdafa248dd33828), ROM_BIOS(0))
+	ROMX_LOAD( "lv1basic.l1",0xe000, 0x09a2, BAD_DUMP CRC(3ff67a71) SHA1(528c9331740637e853c099e1739ecdea6dd200bc), ROM_BIOS(0))
+	ROMX_LOAD( "bsmon.l1",   0xf000, 0x0db0, BAD_DUMP CRC(5daa599b) SHA1(7e6ec5bfb3eea114f7ee9ef589a89246b8533b2f), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "psedo10", "Pseudo LEVEL 2 1.0")
-	ROMX_LOAD( "tk80.dummy", 0x0000, 0x0800, BAD_DUMP CRC(553b25ca) SHA1(939350d7fa56ce567ddf393c9f4b9db6ebc18a2c), ROM_BIOS(2))
-	ROMX_LOAD( "ext.10",     0x0c00, 0x3dc2, BAD_DUMP CRC(3c64d488) SHA1(919180d5b34b981ab3dd8b2885d3c0933203f355), ROM_BIOS(2))
-	ROMX_LOAD( "lv2basic.10",0xd000, 0x2000, BAD_DUMP CRC(594fe70e) SHA1(5854c1be5fa78c1bfee365379495f14bc23e15e7), ROM_BIOS(2))
-	ROMX_LOAD( "bsmon.10",   0xf000, 0x0daf, BAD_DUMP CRC(d0047983) SHA1(79e2b5dc47b574b55375cbafffff144744093ec1), ROM_BIOS(2))
+	ROMX_LOAD( "tk80.dummy", 0x0000, 0x0800, BAD_DUMP CRC(553b25ca) SHA1(939350d7fa56ce567ddf393c9f4b9db6ebc18a2c), ROM_BIOS(1))
+	ROMX_LOAD( "ext.10",     0x0c00, 0x3dc2, BAD_DUMP CRC(3c64d488) SHA1(919180d5b34b981ab3dd8b2885d3c0933203f355), ROM_BIOS(1))
+	ROMX_LOAD( "lv2basic.10",0xd000, 0x2000, BAD_DUMP CRC(594fe70e) SHA1(5854c1be5fa78c1bfee365379495f14bc23e15e7), ROM_BIOS(1))
+	ROMX_LOAD( "bsmon.10",   0xf000, 0x0daf, BAD_DUMP CRC(d0047983) SHA1(79e2b5dc47b574b55375cbafffff144744093ec1), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "psedo11", "Pseudo LEVEL 2 1.1")
-	ROMX_LOAD( "tk80.dummy", 0x0000, 0x0800, BAD_DUMP CRC(553b25ca) SHA1(939350d7fa56ce567ddf393c9f4b9db6ebc18a2c), ROM_BIOS(3))
-	ROMX_LOAD( "ext.11",     0x0c00, 0x3dd4, BAD_DUMP CRC(bd5c5169) SHA1(2ad70828348372328b76bac0fa93d3f6f17ade34), ROM_BIOS(3))
-	ROMX_LOAD( "lv2basic.11",0xd000, 0x2000, BAD_DUMP CRC(3df9a3bd) SHA1(9539409c876bce27d630fe47d07a4316d2ce09cb), ROM_BIOS(3))
-	ROMX_LOAD( "bsmon.11",   0xf000, 0x0ff6, BAD_DUMP CRC(fca7a609) SHA1(7c7eb5e5e4cf1e0021383bdfc192b88262aba6f5), ROM_BIOS(3))
+	ROMX_LOAD( "tk80.dummy", 0x0000, 0x0800, BAD_DUMP CRC(553b25ca) SHA1(939350d7fa56ce567ddf393c9f4b9db6ebc18a2c), ROM_BIOS(2))
+	ROMX_LOAD( "ext.11",     0x0c00, 0x3dd4, BAD_DUMP CRC(bd5c5169) SHA1(2ad70828348372328b76bac0fa93d3f6f17ade34), ROM_BIOS(2))
+	ROMX_LOAD( "lv2basic.11",0xd000, 0x2000, BAD_DUMP CRC(3df9a3bd) SHA1(9539409c876bce27d630fe47d07a4316d2ce09cb), ROM_BIOS(2))
+	ROMX_LOAD( "bsmon.11",   0xf000, 0x0ff6, BAD_DUMP CRC(fca7a609) SHA1(7c7eb5e5e4cf1e0021383bdfc192b88262aba6f5), ROM_BIOS(2))
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "font.rom",    0x0000, 0x1000, BAD_DUMP CRC(94d95199) SHA1(9fe741eab866b0c520d4108bccc6277172fa190c))

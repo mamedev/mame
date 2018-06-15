@@ -39,7 +39,6 @@ protected:
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	virtual ioport_constructor device_input_ports() const override;
 
 private:

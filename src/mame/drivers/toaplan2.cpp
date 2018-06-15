@@ -851,7 +851,7 @@ void toaplan2_state::tekipaki_68k_mem(address_map &map)
 	map(0x180010, 0x180011).portr("DSWB");
 	map(0x180020, 0x180021).portr("SYS");
 	map(0x180030, 0x180031).portr("JMPR");           // CPU 2 busy and Region Jumper block
-	map(0x180040, 0x180041).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x180040, 0x180041).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x180050, 0x180051).portr("IN1");
 	map(0x180060, 0x180061).portr("IN2");
 	map(0x180071, 0x180071).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -862,13 +862,13 @@ void toaplan2_state::tekipaki_68k_mem(address_map &map)
 void toaplan2_state::ghox_68k_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040001).r(this, FUNC(toaplan2_state::ghox_p2_h_analog_r));
+	map(0x040000, 0x040001).r(FUNC(toaplan2_state::ghox_p2_h_analog_r));
 	map(0x080000, 0x083fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x100000, 0x100001).r(this, FUNC(toaplan2_state::ghox_p1_h_analog_r));
+	map(0x100000, 0x100001).r(FUNC(toaplan2_state::ghox_p1_h_analog_r));
 	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
-	map(0x180000, 0x180fff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x181000, 0x181001).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x180000, 0x180fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x181000, 0x181001).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x18100c, 0x18100d).portr("JMPR");
 }
 
@@ -880,12 +880,12 @@ void toaplan2_state::dogyuun_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).w(this, FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
-	map(0x210000, 0x21ffff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
+	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));         // test bit 8
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
 }
 
 
@@ -893,14 +893,14 @@ void toaplan2_state::kbash_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x200000, 0x200fff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x200000, 0x200fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x208010, 0x208011).portr("IN1");
 	map(0x208014, 0x208015).portr("IN2");
 	map(0x208018, 0x208019).portr("SYS");
-	map(0x20801c, 0x20801d).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x20801c, 0x20801d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));         // test bit 8
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
 }
 
 
@@ -919,8 +919,8 @@ void toaplan2_state::kbash2_68k_mem(address_map &map)
 	map(0x200018, 0x200019).portr("SYS");
 	map(0x200021, 0x200021).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200025, 0x200025).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x200029, 0x200029).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x20002c, 0x20002d).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x200029, 0x200029).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x20002c, 0x20002d).r(FUNC(toaplan2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
@@ -932,12 +932,12 @@ void toaplan2_state::truxton2_68k_mem(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x300000, 0x300fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x401fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x400000, 0x401fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
 	map(0x402000, 0x402fff).ram().share("tx_lineselect");
-	map(0x403000, 0x4031ff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x403000, 0x4031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
 	map(0x403200, 0x403fff).ram();
-	map(0x500000, 0x50ffff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
-	map(0x600000, 0x600001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x500000, 0x50ffff).ram().w(FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x600000, 0x600001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x700000, 0x700001).portr("DSWA");
 	map(0x700002, 0x700003).portr("DSWB");
 	map(0x700004, 0x700005).portr("JMPR");
@@ -946,7 +946,7 @@ void toaplan2_state::truxton2_68k_mem(address_map &map)
 	map(0x70000a, 0x70000b).portr("SYS");
 	map(0x700011, 0x700011).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700014, 0x700017).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x70001e, 0x70001f).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x70001e, 0x70001f).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 }
 
 
@@ -956,8 +956,8 @@ void toaplan2_state::pipibibs_68k_mem(address_map &map)
 	map(0x080000, 0x082fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
-	map(0x190000, 0x190fff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x19c01c, 0x19c01d).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x190000, 0x190fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x19c01c, 0x19c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");
 	map(0x19c028, 0x19c029).portr("JMPR");
@@ -978,9 +978,9 @@ void toaplan2_state::pipibibi_bootleg_68k_mem(address_map &map)
 //  AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        // ???
 	map(0x180000, 0x182fff).rw(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_r), FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_w)); // TileRAM
 	map(0x188000, 0x18800f).w(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_scroll_w));
-	map(0x190002, 0x190003).r(this, FUNC(toaplan2_state::shared_ram_r));  // Z80 ready ?
-	map(0x190010, 0x190011).w(this, FUNC(toaplan2_state::shared_ram_w)); // Z80 task to perform
-	map(0x19c01c, 0x19c01d).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x190002, 0x190003).r(FUNC(toaplan2_state::shared_ram_r));  // Z80 ready ?
+	map(0x190010, 0x190011).w(FUNC(toaplan2_state::shared_ram_w)); // Z80 task to perform
+	map(0x19c01c, 0x19c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");
 	map(0x19c028, 0x19c029).portr("JMPR");
@@ -998,16 +998,16 @@ void toaplan2_state::fixeight_68k_mem(address_map &map)
 	map(0x200004, 0x200005).portr("IN2");
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x20001c, 0x20001d).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
-	map(0x280000, 0x28ffff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x280000, 0x28ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x5021ff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
-	map(0x700000, 0x700001).w(this, FUNC(toaplan2_state::fixeight_subcpu_ctrl_w));
-	map(0x800000, 0x800001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x700000, 0x700001).w(FUNC(toaplan2_state::fixeight_subcpu_ctrl_w));
+	map(0x800000, 0x800001).r(FUNC(toaplan2_state::video_count_r));
 }
 
 
@@ -1020,13 +1020,13 @@ void toaplan2_state::fixeightbl_68k_mem(address_map &map)
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x20000c, 0x20000d).portr("DSWB");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x200015, 0x200015).w(this, FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
+	map(0x200015, 0x200015).w(FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
 	map(0x200019, 0x200019).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x20001c, 0x20001d).portr("DSWA");
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x800000, 0x87ffff).rom().region("maincpu", 0x80000);
 }
 
@@ -1039,11 +1039,11 @@ void toaplan2_state::vfive_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).w(this, FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
-	map(0x210000, 0x21ffff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
+	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 }
 
 
@@ -1054,12 +1054,12 @@ void toaplan2_state::batsugun_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).w(this, FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
-	map(0x210000, 0x21ffff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
+	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 }
 
 void toaplan2_state::pwrkick_68k_mem(address_map &map)
@@ -1073,16 +1073,16 @@ void toaplan2_state::pwrkick_68k_mem(address_map &map)
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700014, 0x700015).portr("IN2");
 	map(0x700018, 0x700019).portr("DSWC");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700035, 0x700035).w(this, FUNC(toaplan2_state::pwrkick_coin_w));
-	map(0x700039, 0x700039).w(this, FUNC(toaplan2_state::pwrkick_coin_lockout_w));
+	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x700035, 0x700035).w(FUNC(toaplan2_state::pwrkick_coin_w));
+	map(0x700039, 0x700039).w(FUNC(toaplan2_state::pwrkick_coin_lockout_w));
 }
 
 void toaplan2_state::othldrby_68k_mem(address_map &map)
@@ -1096,14 +1096,14 @@ void toaplan2_state::othldrby_68k_mem(address_map &map)
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700010, 0x700011).portr("IN2");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700034, 0x700035).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x700034, 0x700035).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 }
 
 
@@ -1132,7 +1132,7 @@ void toaplan2_state::enmadaio_68k_mem(address_map &map)
 	map(0x400000, 0x400003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x500001, 0x500001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x700000, 0x700001).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x70000c, 0x70000d).portr("MISC2");
@@ -1141,7 +1141,7 @@ void toaplan2_state::enmadaio_68k_mem(address_map &map)
 	map(0x700018, 0x700019).portr("SYS");
 	map(0x70001c, 0x70001d).portr("UNK"); //AM_READ_PORT("SYS")
 
-	map(0x700020, 0x700021).w(this, FUNC(toaplan2_state::enmadaio_oki_bank_w)); // oki bank
+	map(0x700020, 0x700021).w(FUNC(toaplan2_state::enmadaio_oki_bank_w)); // oki bank
 
 	map(0x700028, 0x700029).nopw();
 	map(0x70003c, 0x70003d).nopw();
@@ -1164,8 +1164,8 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 	map(0x700014, 0x700015).portr("IN3");
 	map(0x700018, 0x700019).portr("IN4");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700034, 0x700035).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x700034, 0x700035).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 }
 
 
@@ -1173,21 +1173,21 @@ void toaplan2_state::mahoudai_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x21c01c, 0x21c01d).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x21c01c, 0x21c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
 	map(0x21c02c, 0x21c02d).portr("DSWA");
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
 	map(0x503200, 0x503fff).ram();
 }
 
@@ -1196,22 +1196,22 @@ void toaplan2_state::shippumd_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 //  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    // ???
-	map(0x21c01c, 0x21c01d).w(this, FUNC(toaplan2_state::shippumd_coin_word_w)); // Coin count/lock + oki bankswitch
+	map(0x21c01c, 0x21c01d).w(FUNC(toaplan2_state::shippumd_coin_word_w)); // Coin count/lock + oki bankswitch
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
 	map(0x21c02c, 0x21c02d).portr("DSWA");
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
 	map(0x503200, 0x503fff).ram();
 }
 
@@ -1220,20 +1220,20 @@ void toaplan2_state::bgaregga_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(this, FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x21c01c, 0x21c01d).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x21c01c, 0x21c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
 	map(0x21c02c, 0x21c02d).portr("DSWA");
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
 	map(0x503200, 0x503fff).ram();
 	map(0x600001, 0x600001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
@@ -1241,12 +1241,12 @@ void toaplan2_state::bgaregga_68k_mem(address_map &map)
 
 void toaplan2_state::batrider_dma_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x0000, 0x1fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
 	map(0x2000, 0x2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x3000, 0x31ff).ram().share("tx_lineselect");
-	map(0x3200, 0x33ff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x3200, 0x33ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
 	map(0x3400, 0x7fff).ram();
-	map(0x8000, 0xffff).ram().w(this, FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x8000, 0xffff).ram().w(FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
 }
 
 
@@ -1256,24 +1256,24 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	map(0x200000, 0x207fff).ram().share("mainram16");
 	map(0x208000, 0x20ffff).ram();
-	map(0x300000, 0x37ffff).r(this, FUNC(toaplan2_state::batrider_z80rom_r));
+	map(0x300000, 0x37ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_alt_r), FUNC(gp9001vdp_device::gp9001_vdp_alt_w));
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
-	map(0x500006, 0x500007).r(this, FUNC(toaplan2_state::video_count_r));
+	map(0x500006, 0x500007).r(FUNC(toaplan2_state::video_count_r));
 	map(0x500009, 0x500009).r("soundlatch3", FUNC(generic_latch_8_device::read));
 	map(0x50000b, 0x50000b).r("soundlatch4", FUNC(generic_latch_8_device::read));
-	map(0x50000c, 0x50000d).r(this, FUNC(toaplan2_state::batrider_z80_busack_r));
-	map(0x500010, 0x500011).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
-	map(0x500021, 0x500021).w(this, FUNC(toaplan2_state::batrider_soundlatch_w));
-	map(0x500023, 0x500023).w(this, FUNC(toaplan2_state::batrider_soundlatch2_w));
-	map(0x500024, 0x500025).w(this, FUNC(toaplan2_state::batrider_unknown_sound_w));
-	map(0x500026, 0x500027).w(this, FUNC(toaplan2_state::batrider_clear_sndirq_w));
-	map(0x500061, 0x500061).w(this, FUNC(toaplan2_state::batrider_z80_busreq_w));
-	map(0x500080, 0x500081).w(this, FUNC(toaplan2_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(this, FUNC(toaplan2_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(this, FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
+	map(0x50000c, 0x50000d).r(FUNC(toaplan2_state::batrider_z80_busack_r));
+	map(0x500010, 0x500011).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x500021, 0x500021).w(FUNC(toaplan2_state::batrider_soundlatch_w));
+	map(0x500023, 0x500023).w(FUNC(toaplan2_state::batrider_soundlatch2_w));
+	map(0x500024, 0x500025).w(FUNC(toaplan2_state::batrider_unknown_sound_w));
+	map(0x500026, 0x500027).w(FUNC(toaplan2_state::batrider_clear_sndirq_w));
+	map(0x500061, 0x500061).w(FUNC(toaplan2_state::batrider_z80_busreq_w));
+	map(0x500080, 0x500081).w(FUNC(toaplan2_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(toaplan2_state::batrider_pal_text_dma_w));
+	map(0x5000c0, 0x5000cf).w(FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
@@ -1283,24 +1283,24 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	map(0x200000, 0x207fff).ram().share("mainram16");
 	map(0x208000, 0x20ffff).ram();
-	map(0x300000, 0x33ffff).r(this, FUNC(toaplan2_state::batrider_z80rom_r));
+	map(0x300000, 0x33ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_alt_r), FUNC(gp9001vdp_device::gp9001_vdp_alt_w));
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
-	map(0x500006, 0x500007).r(this, FUNC(toaplan2_state::video_count_r));
-	map(0x500008, 0x500009).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x500006, 0x500007).r(FUNC(toaplan2_state::video_count_r));
+	map(0x500008, 0x500009).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x500011, 0x500011).r("soundlatch3", FUNC(generic_latch_8_device::read));
 	map(0x500013, 0x500013).r("soundlatch4", FUNC(generic_latch_8_device::read));
-	map(0x500015, 0x500015).w(this, FUNC(toaplan2_state::batrider_soundlatch_w));
-	map(0x500017, 0x500017).w(this, FUNC(toaplan2_state::batrider_soundlatch2_w));
-	map(0x500018, 0x500019).r(this, FUNC(toaplan2_state::bbakraid_eeprom_r));
-	map(0x50001a, 0x50001b).w(this, FUNC(toaplan2_state::batrider_unknown_sound_w));
-	map(0x50001c, 0x50001d).w(this, FUNC(toaplan2_state::batrider_clear_sndirq_w));
-	map(0x50001e, 0x50001f).w(this, FUNC(toaplan2_state::bbakraid_eeprom_w));
-	map(0x500080, 0x500081).w(this, FUNC(toaplan2_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(this, FUNC(toaplan2_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(this, FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
+	map(0x500015, 0x500015).w(FUNC(toaplan2_state::batrider_soundlatch_w));
+	map(0x500017, 0x500017).w(FUNC(toaplan2_state::batrider_soundlatch2_w));
+	map(0x500018, 0x500019).r(FUNC(toaplan2_state::bbakraid_eeprom_r));
+	map(0x50001a, 0x50001b).w(FUNC(toaplan2_state::batrider_unknown_sound_w));
+	map(0x50001c, 0x50001d).w(FUNC(toaplan2_state::batrider_clear_sndirq_w));
+	map(0x50001e, 0x50001f).w(FUNC(toaplan2_state::bbakraid_eeprom_w));
+	map(0x500080, 0x500081).w(FUNC(toaplan2_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(toaplan2_state::batrider_pal_text_dma_w));
+	map(0x5000c0, 0x5000cf).w(FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
@@ -1319,7 +1319,7 @@ void toaplan2_state::raizing_sound_z80_mem(address_map &map)
 	map(0xc000, 0xdfff).ram().share("shared_ram");
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe00e, 0xe00e).w(this, FUNC(toaplan2_state::toaplan2_coin_w));
+	map(0xe00e, 0xe00e).w(FUNC(toaplan2_state::toaplan2_coin_w));
 }
 
 
@@ -1330,11 +1330,11 @@ void toaplan2_state::bgaregga_sound_z80_mem(address_map &map)
 	map(0xc000, 0xdfff).ram().share("shared_ram");
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe006, 0xe008).w(this, FUNC(toaplan2_state::raizing_oki_bankswitch_w));
-	map(0xe00a, 0xe00a).w(this, FUNC(toaplan2_state::raizing_z80_bankswitch_w));
+	map(0xe006, 0xe008).w(FUNC(toaplan2_state::raizing_oki_bankswitch_w));
+	map(0xe00a, 0xe00a).w(FUNC(toaplan2_state::raizing_z80_bankswitch_w));
 	map(0xe00c, 0xe00c).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xe01c, 0xe01c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe01d, 0xe01d).r(this, FUNC(toaplan2_state::bgaregga_E01D_r));
+	map(0xe01d, 0xe01d).r(FUNC(toaplan2_state::bgaregga_E01D_r));
 }
 
 
@@ -1351,15 +1351,15 @@ void toaplan2_state::batrider_sound_z80_port(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).w("soundlatch3", FUNC(generic_latch_8_device::write));
 	map(0x42, 0x42).w("soundlatch4", FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(this, FUNC(toaplan2_state::batrider_sndirq_w));
-	map(0x46, 0x46).w(this, FUNC(toaplan2_state::batrider_clear_nmi_w));
+	map(0x44, 0x44).w(FUNC(toaplan2_state::batrider_sndirq_w));
+	map(0x46, 0x46).w(FUNC(toaplan2_state::batrider_clear_nmi_w));
 	map(0x48, 0x48).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x82, 0x82).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x84, 0x84).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x88, 0x88).w(this, FUNC(toaplan2_state::raizing_z80_bankswitch_w));
-	map(0xc0, 0xc6).w(this, FUNC(toaplan2_state::raizing_oki_bankswitch_w));
+	map(0x88, 0x88).w(FUNC(toaplan2_state::raizing_z80_bankswitch_w));
+	map(0xc0, 0xc6).w(FUNC(toaplan2_state::raizing_oki_bankswitch_w));
 }
 
 
@@ -1375,8 +1375,8 @@ void toaplan2_state::bbakraid_sound_z80_port(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).w("soundlatch3", FUNC(generic_latch_8_device::write));
 	map(0x42, 0x42).w("soundlatch4", FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(this, FUNC(toaplan2_state::batrider_sndirq_w));
-	map(0x46, 0x46).w(this, FUNC(toaplan2_state::batrider_clear_nmi_w));
+	map(0x44, 0x44).w(FUNC(toaplan2_state::batrider_sndirq_w));
+	map(0x46, 0x46).w(FUNC(toaplan2_state::batrider_clear_nmi_w));
 	map(0x48, 0x48).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
@@ -1447,7 +1447,7 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x60, 0x60).r(this, FUNC(toaplan2_state::tekipaki_cmdavailable_r));
+	map(0x60, 0x60).r(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
 	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
@@ -3642,7 +3642,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	MCFG_V25_PORT_P0_READ_CB(IOPORT("EEPROM"))
 	MCFG_V25_PORT_P0_WRITE_CB(IOPORT("EEPROM"))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4165,7 +4165,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
 
 	MCFG_DEVICE_ADD("dma_space", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(batrider_dma_mem)

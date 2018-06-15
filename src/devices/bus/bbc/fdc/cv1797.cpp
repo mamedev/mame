@@ -43,7 +43,7 @@ ROM_START( cv1797 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
 	ROM_DEFAULT_BIOS("lvldos")
 	ROM_SYSTEM_BIOS(0, "lvldos", "LVL Dos 0.91")
-	ROMX_LOAD("lvldos91.rom", 0x0000, 0x2000, CRC(69d7653a) SHA1(9cd39d011290b97d5ba05b6c745689a8553be5fc), ROM_BIOS(1))
+	ROMX_LOAD("lvldos91.rom", 0x0000, 0x2000, CRC(69d7653a) SHA1(9cd39d011290b97d5ba05b6c745689a8553be5fc), ROM_BIOS(0))
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
@@ -53,7 +53,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_cv1797_device::device_add_mconfig)
-	MCFG_FD1797_ADD("fd1797", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_cv1797_device, motor_w))

@@ -165,7 +165,7 @@ void vme_fcisio1_card_device::fcisio1_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x01ffff).ram(); /* SRAM */
-	map(0x000000, 0x000007).rom().r(this, FUNC(vme_fcisio1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000000, 0x000007).rom().r(FUNC(vme_fcisio1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
 	map(0xe00000, 0xe001ff).rw("duscc0", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
 	map(0xe20000, 0xe201ff).rw("duscc1", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
 	map(0xe40000, 0xe401ff).rw("duscc2", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);

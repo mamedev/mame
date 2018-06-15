@@ -6682,7 +6682,7 @@ ROM_START( gnw_smb )
 	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "ym-105.melody", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "ym-105.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
 
 	ROM_REGION( 648209, "svg", 0)
 	ROM_LOAD( "gnw_smb.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
@@ -7201,7 +7201,7 @@ CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_stat
 // new wide screen
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
 // micro vs.
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )

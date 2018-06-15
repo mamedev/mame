@@ -214,6 +214,7 @@ TODO:
 #include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -697,7 +698,7 @@ void expro02_state::expro02_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw();    /* ??? */
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
@@ -713,7 +714,7 @@ void expro02_state::fantasia_map(address_map &map)
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 	map(0x800006, 0x800007).noprw(); // ? used ?
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw();    /* ??? */
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xf00000, 0xf00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -729,13 +730,13 @@ void expro02_state::comad_map(address_map &map)
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 //  map(0x800006, 0x800007);    ??
-	map(0x80000a, 0x80000b).r(this, FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
-	map(0x80000c, 0x80000d).r(this, FUNC(expro02_state::comad_timer_r)); /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x80000a, 0x80000b).r(FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x80000c, 0x80000d).r(FUNC(expro02_state::comad_timer_r)); /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
 	map(0xc00000, 0xc0ffff).ram();
 	map(0xc80000, 0xc8ffff).ram();
-	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
-	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* newfant */
+	map(0xf00000, 0xf00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0xf80000, 0xf80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* newfant */
 }
 
 void expro02_state::fantsia2_map(address_map &map)
@@ -746,10 +747,10 @@ void expro02_state::fantsia2_map(address_map &map)
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 //  map(0x800006, 0x800007);    ??
-	map(0x800008, 0x800009).r(this, FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x800008, 0x800009).r(FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();    /* coin counters, + ? */
-	map(0xc80000, 0xc80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write));
+	map(0xc80000, 0xc80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write));
 	map(0xf80000, 0xf8ffff).ram();
 }
 
@@ -766,7 +767,7 @@ void expro02_state::galhustl_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw(); // ?
 	map(0xd00000, 0xd00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe80000, 0xe8ffff).ram();
@@ -783,8 +784,8 @@ void expro02_state::zipzap_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
-	map(0xc00000, 0xc00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xc00000, 0xc00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 	map(0xc80000, 0xc8ffff).ram();     // main ram
 
 	map(0x780000, 0x78001f).noprw(); // prevent sprites being flipped
@@ -798,15 +799,15 @@ void expro02_state::supmodel_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x800006, 0x800007).r(this, FUNC(expro02_state::comad_timer_r));
-	map(0x800008, 0x800009).r(this, FUNC(expro02_state::comad_timer_r));
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
+	map(0x800008, 0x800009).r(FUNC(expro02_state::comad_timer_r));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xd80000, 0xd80001).nopw();
 	map(0xe00012, 0xe00013).nopw();
 	map(0xe80000, 0xe80001).nopw();
-	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0xf80000, 0xf80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 }
 
 void expro02_state::smissw_map(address_map &map)
@@ -817,15 +818,15 @@ void expro02_state::smissw_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x800006, 0x800007).r(this, FUNC(expro02_state::comad_timer_r));
-	map(0x80000e, 0x80000f).r(this, FUNC(expro02_state::comad_timer_r));
-	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
+	map(0x80000e, 0x80000f).r(FUNC(expro02_state::comad_timer_r));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();
 	map(0xc00000, 0xc0ffff).ram();
 	map(0xd80000, 0xd80001).nopw();
 	map(0xe00012, 0xe00013).nopw();
 	map(0xe80000, 0xe80001).nopw();
-	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0xf00000, 0xf00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 }
 
 void expro02_state::oki_map(address_map &map)

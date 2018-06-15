@@ -163,18 +163,18 @@ void pg685_state::pg675_mem(address_map &map)
 	map(0xf9f00, 0xf9f01).rw("kbdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xf9f02, 0xf9f02).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xf9f03, 0xf9f03).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xf9f04, 0xf9f04).rw(this, FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
+	map(0xf9f04, 0xf9f04).rw(FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
 	map(0xf9f06, 0xf9f07).rw("mainpic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f08, 0xf9f08).rw("mainuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9f09, 0xf9f09).rw("mainuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf9f20, 0xf9f23).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
-	map(0xf9f24, 0xf9f24).rw(this, FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
+	map(0xf9f24, 0xf9f24).rw(FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
 	map(0xf9f28, 0xf9f2b).rw("modppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf9f2c, 0xf9f2f).rw("modppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf9f30, 0xf9f30).rw("moduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9f31, 0xf9f31).rw("moduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf9f32, 0xf9f32).w(this, FUNC(pg685_state::f9f32_w));
-	map(0xf9f33, 0xf9f33).r(this, FUNC(pg685_state::f9f33_r));
+	map(0xf9f32, 0xf9f32).w(FUNC(pg685_state::f9f32_w));
+	map(0xf9f33, 0xf9f33).r(FUNC(pg685_state::f9f33_r));
 	map(0xf9f40, 0xf9f5f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0xfa000, 0xfa7ff).ram().share("charcopy");
 	map(0xfb000, 0xfb7ff).ram().share("framebuffer");
@@ -188,10 +188,10 @@ void pg685_state::pg685_mem(address_map &map)
 	map(0xf9f34, 0xf9f37).rw("bppit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf9f3e, 0xf9f3e).w(this, FUNC(pg685_state::f9f3e_w));
+	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
 	map(0xf9f70, 0xf9f77).rw("hdc", FUNC(wd2010_device::read), FUNC(wd2010_device::write));
-	map(0xf9f78, 0xf9f78).rw(this, FUNC(pg685_state::f9f78_r), FUNC(pg685_state::f9f78_w));
-	map(0xf9f79, 0xf9f79).w(this, FUNC(pg685_state::f9f79_w));
+	map(0xf9f78, 0xf9f78).rw(FUNC(pg685_state::f9f78_r), FUNC(pg685_state::f9f78_w));
+	map(0xf9f79, 0xf9f79).w(FUNC(pg685_state::f9f79_w));
 }
 
 void pg685_state::pg685oua12_mem(address_map &map)
@@ -201,27 +201,27 @@ void pg685_state::pg685oua12_mem(address_map &map)
 	map(0xe0000, 0xeffff).ram().share("framebuffer16");
 	map(0xf0000, 0xf1fff).ram();
 	map(0xf9f00, 0xf9f01).rw("kbdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xf9f04, 0xf9f04).rw(this, FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
+	map(0xf9f04, 0xf9f04).rw(FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
 	map(0xf9f06, 0xf9f07).rw("mainpic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f08, 0xf9f08).rw("mainuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9f09, 0xf9f09).rw("mainuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf9f20, 0xf9f23).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
-	map(0xf9f24, 0xf9f24).rw(this, FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
+	map(0xf9f24, 0xf9f24).rw(FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
 	map(0xf9f28, 0xf9f2b).rw("modppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf9f2c, 0xf9f2f).rw("modppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf9f30, 0xf9f30).rw("moduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9f31, 0xf9f31).rw("moduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf9f32, 0xf9f32).w(this, FUNC(pg685_state::f9f32_w));
-	map(0xf9f33, 0xf9f33).r(this, FUNC(pg685_state::f9f33_r));
+	map(0xf9f32, 0xf9f32).w(FUNC(pg685_state::f9f32_w));
+	map(0xf9f33, 0xf9f33).r(FUNC(pg685_state::f9f33_r));
 	map(0xf9f34, 0xf9f37).rw("bppit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf9f3e, 0xf9f3e).w(this, FUNC(pg685_state::f9f3e_w));
-	map(0xf9f3f, 0xf9f3f).r(this, FUNC(pg685_state::f9f3f_r));
+	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
+	map(0xf9f3f, 0xf9f3f).r(FUNC(pg685_state::f9f3f_r));
 	map(0xf9f40, 0xf9f5f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0xf9f70, 0xf9f77).rw("hdc", FUNC(wd2010_device::read), FUNC(wd2010_device::write));
-	map(0xf9f78, 0xf9f78).rw(this, FUNC(pg685_state::f9f78_r), FUNC(pg685_state::f9f78_w));
-	map(0xf9f79, 0xf9f79).w(this, FUNC(pg685_state::f9f79_w));
+	map(0xf9f78, 0xf9f78).rw(FUNC(pg685_state::f9f78_r), FUNC(pg685_state::f9f78_w));
+	map(0xf9f79, 0xf9f79).w(FUNC(pg685_state::f9f79_w));
 	map(0xf9f80, 0xf9f80).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xf9f81, 0xf9f81).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xfc000, 0xfffff).ram();    // BIOS RAM shadow

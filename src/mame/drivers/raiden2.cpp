@@ -224,10 +224,10 @@ int cnt=0, ccol = -1;
 
 WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 {
-	//  map(0x0d000, 0x0d7ff).ram().w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	//  map(0x0d800, 0x0dfff).ram().w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	//  map(0x0e000, 0x0e7ff).ram().w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	//  map(0x0e800, 0x0f7ff).ram().w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	//  map(0x0d000, 0x0d7ff).ram().w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	//  map(0x0d800, 0x0dfff).ram().w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	//  map(0x0e000, 0x0e7ff).ram().w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	//  map(0x0e800, 0x0f7ff).ram().w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
 
 	if (offset < 0x800 / 2)
 	{
@@ -377,25 +377,25 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 WRITE16_MEMBER(raiden2_state::raiden2_background_w)
 {
-	COMBINE_DATA(&back_data[offset]);
+	COMBINE_DATA(&m_back_data[offset]);
 	background_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
 {
-	COMBINE_DATA(&mid_data[offset]);
+	COMBINE_DATA(&m_mid_data[offset]);
 	midground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
 {
-	COMBINE_DATA(&fore_data[offset]);
+	COMBINE_DATA(&m_fore_data[offset]);
 	foreground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_text_w)
 {
-	COMBINE_DATA(&text_data[offset]);
+	COMBINE_DATA(&m_text_data[offset]);
 	text_layer->mark_tile_dirty(offset);
 }
 
@@ -481,7 +481,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 {
-	int tile = back_data[tile_index];
+	int tile = m_back_data[tile_index];
 	int color = (tile >> 12) | (0 << 4);
 
 	tile = (tile & 0xfff) | (bg_bank << 12);
@@ -491,7 +491,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 {
-	int tile = mid_data[tile_index];
+	int tile = m_mid_data[tile_index];
 	int color = (tile >> 12) | (2 << 4);
 
 	tile = (tile & 0xfff) | (mid_bank << 12);
@@ -501,7 +501,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 {
-	int tile = fore_data[tile_index];
+	int tile = m_fore_data[tile_index];
 	int color = (tile >> 12) | (1 << 4);
 
 	tile = (tile & 0xfff) | (fg_bank << 12);
@@ -511,7 +511,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 {
-	int tile = text_data[tile_index];
+	int tile = m_text_data[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -524,15 +524,18 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	text_data =  make_unique_clear<uint16_t[]>(0x1000/2);
+	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_mid_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_text_data = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_palette_data = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
 
-	save_pointer(NAME(back_data.get()), 0x800/2);
-	save_pointer(NAME(fore_data.get()), 0x800/2);
-	save_pointer(NAME(mid_data.get()), 0x800/2);
-	save_pointer(NAME(text_data.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data.get()), 0x800/2);
+	save_pointer(NAME(m_fore_data.get()), 0x800/2);
+	save_pointer(NAME(m_mid_data.get()), 0x800/2);
+	save_pointer(NAME(m_text_data.get()), 0x1000/2);
+	save_pointer(NAME(m_palette_data.get()), 0x1000/2);
 
 	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
@@ -913,7 +916,7 @@ void raiden2_state::raiden2_cop_mem(address_map &map)
 	map(0x00458, 0x00459).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_param_w));
 	map(0x0045a, 0x0045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
 	map(0x0045c, 0x0045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
-	map(0x00470, 0x00471).rw(this, FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::cop_tile_bank_2_w)); // implementaton of this varies between games, external hookup?
+	map(0x00470, 0x00471).rw(FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::cop_tile_bank_2_w)); // implementaton of this varies between games, external hookup?
 
 	map(0x00476, 0x00477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
 	map(0x00478, 0x00479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
@@ -934,31 +937,31 @@ void raiden2_state::raiden2_cop_mem(address_map &map)
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
-	map(0x006a0, 0x006a3).w(this, FUNC(raiden2_state::sprcpt_val_1_w));
-	map(0x006a4, 0x006a7).w(this, FUNC(raiden2_state::sprcpt_data_3_w));
-	map(0x006a8, 0x006ab).w(this, FUNC(raiden2_state::sprcpt_data_4_w));
-	map(0x006ac, 0x006af).w(this, FUNC(raiden2_state::sprcpt_flags_1_w));
-	map(0x006b0, 0x006b3).w(this, FUNC(raiden2_state::sprcpt_data_1_w));
-	map(0x006b4, 0x006b7).w(this, FUNC(raiden2_state::sprcpt_data_2_w));
-	map(0x006b8, 0x006bb).w(this, FUNC(raiden2_state::sprcpt_val_2_w));
-	map(0x006bc, 0x006bf).w(this, FUNC(raiden2_state::sprcpt_adr_w));
-	map(0x006c0, 0x006c1).rw(this, FUNC(raiden2_state::sprite_prot_off_r), FUNC(raiden2_state::sprite_prot_off_w));
-	map(0x006c2, 0x006c3).rw(this, FUNC(raiden2_state::sprite_prot_src_seg_r), FUNC(raiden2_state::sprite_prot_src_seg_w));
+	map(0x006a0, 0x006a3).w(FUNC(raiden2_state::sprcpt_val_1_w));
+	map(0x006a4, 0x006a7).w(FUNC(raiden2_state::sprcpt_data_3_w));
+	map(0x006a8, 0x006ab).w(FUNC(raiden2_state::sprcpt_data_4_w));
+	map(0x006ac, 0x006af).w(FUNC(raiden2_state::sprcpt_flags_1_w));
+	map(0x006b0, 0x006b3).w(FUNC(raiden2_state::sprcpt_data_1_w));
+	map(0x006b4, 0x006b7).w(FUNC(raiden2_state::sprcpt_data_2_w));
+	map(0x006b8, 0x006bb).w(FUNC(raiden2_state::sprcpt_val_2_w));
+	map(0x006bc, 0x006bf).w(FUNC(raiden2_state::sprcpt_adr_w));
+	map(0x006c0, 0x006c1).rw(FUNC(raiden2_state::sprite_prot_off_r), FUNC(raiden2_state::sprite_prot_off_w));
+	map(0x006c2, 0x006c3).rw(FUNC(raiden2_state::sprite_prot_src_seg_r), FUNC(raiden2_state::sprite_prot_src_seg_w));
 	map(0x006c4, 0x006c5).nopw(); // constant value written along with 0x6c0
-	map(0x006c6, 0x006c7).w(this, FUNC(raiden2_state::sprite_prot_dst1_w));
-	map(0x006ca, 0x006cb).w(this, FUNC(raiden2_state::raiden2_bank_w));
-	map(0x006cc, 0x006cd).w(this, FUNC(raiden2_state::tile_bank_01_w));
-	map(0x006ce, 0x006cf).w(this, FUNC(raiden2_state::sprcpt_flags_2_w));
-	map(0x006d8, 0x006d9).w(this, FUNC(raiden2_state::sprite_prot_x_w));
-	map(0x006da, 0x006db).w(this, FUNC(raiden2_state::sprite_prot_y_w));
-	map(0x006dc, 0x006dd).rw(this, FUNC(raiden2_state::sprite_prot_maxx_r), FUNC(raiden2_state::sprite_prot_maxx_w));
-	map(0x006de, 0x006df).w(this, FUNC(raiden2_state::sprite_prot_src_w));
+	map(0x006c6, 0x006c7).w(FUNC(raiden2_state::sprite_prot_dst1_w));
+	map(0x006ca, 0x006cb).w(FUNC(raiden2_state::raiden2_bank_w));
+	map(0x006cc, 0x006cd).w(FUNC(raiden2_state::tile_bank_01_w));
+	map(0x006ce, 0x006cf).w(FUNC(raiden2_state::sprcpt_flags_2_w));
+	map(0x006d8, 0x006d9).w(FUNC(raiden2_state::sprite_prot_x_w));
+	map(0x006da, 0x006db).w(FUNC(raiden2_state::sprite_prot_y_w));
+	map(0x006dc, 0x006dd).rw(FUNC(raiden2_state::sprite_prot_maxx_r), FUNC(raiden2_state::sprite_prot_maxx_w));
+	map(0x006de, 0x006df).w(FUNC(raiden2_state::sprite_prot_src_w));
 	/* end video block */
 
 	map(0x006fc, 0x006fd).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_trigger_w));
 	map(0x006fe, 0x006ff).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_dma_trig_w)); // sort-DMA trigger
 
-	map(0x00762, 0x00763).r(this, FUNC(raiden2_state::sprite_prot_dst1_r));
+	map(0x00762, 0x00763).r(FUNC(raiden2_state::sprite_prot_dst1_r));
 }
 
 void raiden2_state::raiden2_mem(address_map &map)
@@ -984,10 +987,10 @@ void raiden2_state::raiden2_mem(address_map &map)
 	map(0x00800, 0x0bfff).ram();
 
 	map(0x0c000, 0x0cfff).ram().share("sprites");
-	map(0x0d000, 0x0d7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0d800, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0e000, 0x0e7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0e800, 0x0f7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0d000, 0x0d7ff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 
 	map(0x10000, 0x1efff).ram();
@@ -1001,7 +1004,7 @@ void raiden2_state::raiden2_mem(address_map &map)
 void raiden2_state::raidendx_mem(address_map &map)
 {
 	raiden2_mem(map);
-	map(0x00470, 0x00471).rw(this, FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::raidendx_cop_bank_2_w));
+	map(0x00470, 0x00471).rw(FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::raidendx_cop_bank_2_w));
 	map(0x004d0, 0x004d7).ram(); //???
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
 //  map(0x006ca, 0x006cb).nopw();
@@ -1032,10 +1035,10 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
 	map(0x0f000, 0x0ffff).ram().share("sprites");
 	map(0x10000, 0x1ffff).ram();
@@ -1070,10 +1073,10 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
 	map(0x0f000, 0x0ffff).ram().share("sprites");
 
@@ -1450,7 +1453,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
@@ -1458,6 +1461,8 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1524,7 +1529,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
@@ -1532,6 +1537,8 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

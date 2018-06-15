@@ -4,7 +4,7 @@
 #include "machine/taito68705interface.h"
 
 #include "machine/gen_latch.h"
-
+#include "emupal.h"
 
 class retofinv_state : public driver_device
 {

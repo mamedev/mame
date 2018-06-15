@@ -242,7 +242,6 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #include "audio/cclimber.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "screen.h"
@@ -335,7 +334,7 @@ void cclimber_state::cclimber_map(address_map &map)
 	map(0x9800, 0x981f).ram().share("column_scroll");
 	map(0x9880, 0x989f).ram().share("spriteram");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
@@ -363,7 +362,7 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0x9800, 0x981f).ram().share("column_scroll");
 	map(0x9880, 0x989f).ram().share("spriteram");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
@@ -380,10 +379,10 @@ void cclimber_state::swimmer_map(address_map &map)
 	map(0x9800, 0x981f).writeonly().share("column_scroll");
 	map(0x9880, 0x989f).writeonly().share("spriteram");
 	map(0x98fc, 0x98ff).writeonly().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
-	map(0xa800, 0xa800).portr("P1").w(this, FUNC(cclimber_state::swimmer_sh_soundlatch_w));
+	map(0xa800, 0xa800).portr("P1").w(FUNC(cclimber_state::swimmer_sh_soundlatch_w));
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb800, 0xb800).portr("DSW2").writeonly().share("bgcolor");
 	map(0xb880, 0xb880).portr("SYSTEM");
@@ -410,7 +409,7 @@ void cclimber_state::yamato_map(address_map &map)
 	map(0x9800, 0x981f).ram().share("column_scroll");
 	map(0x9880, 0x989f).ram().share("spriteram");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2");
@@ -459,7 +458,7 @@ void cclimber_state::bagmanf_map(address_map &map)
 	map(0x9800, 0x9800).portr("SYSTEM");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl"); // wrong
 	map(0x9c00, 0x9fff).ram();  /* not used, but initialized */
-	map(0xa000, 0xa000).r(this, FUNC(cclimber_state::bagmanf_a000_r));
+	map(0xa000, 0xa000).r(FUNC(cclimber_state::bagmanf_a000_r));
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).nopr().w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
 	map(0xb000, 0xb000).portr("DSW").w("cclimber_audio", FUNC(cclimber_audio_device::sample_volume_w));
@@ -482,8 +481,8 @@ void cclimber_state::cclimber_portmap(address_map &map)
 void cclimber_state::yamato_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cclimber_state::yamato_p0_w));  /* ??? */
-	map(0x01, 0x01).w(this, FUNC(cclimber_state::yamato_p1_w));  /* ??? */
+	map(0x00, 0x00).w(FUNC(cclimber_state::yamato_p0_w));  /* ??? */
+	map(0x01, 0x01).w(FUNC(cclimber_state::yamato_p1_w));  /* ??? */
 }
 
 
@@ -514,8 +513,8 @@ void cclimber_state::yamato_audio_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x04).r(this, FUNC(cclimber_state::yamato_p0_r));   /* ??? */
-	map(0x08, 0x08).r(this, FUNC(cclimber_state::yamato_p1_r));   /* ??? */
+	map(0x04, 0x04).r(FUNC(cclimber_state::yamato_p0_r));   /* ??? */
+	map(0x08, 0x08).r(FUNC(cclimber_state::yamato_p1_r));   /* ??? */
 }
 
 
@@ -1142,12 +1141,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::cclimber)
 	root(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // 7J on CCG-1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger))
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
+	MCFG_DEVICE_ADD("cclimber_audio", CCLIMBER_AUDIO, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cclimber_state::cclimberx)
@@ -2669,18 +2668,9 @@ void cclimber_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
-	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
-
-	// this seems to be a messy abuse / use of the encryption, investigate
-	if (!cpu)
-	{
-		fatalerror("can't find cpu!\n");
-	}
-	else
-	{
-		cpu->set_region_p(memregion("user1")->base());
-		cpu->set_decrypted_p(m_opcodes.get());
-	}
+	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
+	cpu.set_region_p(memregion("user1")->base());
+	cpu.set_decrypted_p(m_opcodes.get());
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
 	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);

@@ -25,6 +25,7 @@
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class vector06_state : public driver_device

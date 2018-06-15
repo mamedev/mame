@@ -247,10 +247,10 @@ void uapce_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x07FF).rom();
 	map(0x0800, 0x0FFF).ram();
-	map(0x1000, 0x17FF).w(this, FUNC(uapce_state::jamma_if_control_latch_w));
-	map(0x1800, 0x1FFF).r(this, FUNC(uapce_state::jamma_if_read_dsw));
+	map(0x1000, 0x17FF).w(FUNC(uapce_state::jamma_if_control_latch_w));
+	map(0x1800, 0x1FFF).r(FUNC(uapce_state::jamma_if_read_dsw));
 	map(0x2000, 0x27FF).portr("COIN");
-	map(0x2800, 0x2FFF).r(this, FUNC(uapce_state::jamma_if_control_latch_r));
+	map(0x2800, 0x2FFF).r(FUNC(uapce_state::jamma_if_control_latch_r));
 }
 
 
@@ -295,7 +295,7 @@ void uapce_state::pce_mem(address_map &map)
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(uapce_state::pce_joystick_r), FUNC(uapce_state::pce_joystick_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(uapce_state::pce_joystick_r), FUNC(uapce_state::pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 

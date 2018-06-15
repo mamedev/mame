@@ -45,6 +45,7 @@
 #include "sound/beep.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -223,11 +224,11 @@ void fp1100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0xfeff) slot memory area
-	map(0xff00, 0xff7f).rw(this, FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
-	map(0xff80, 0xffff).r(this, FUNC(fp1100_state::sub_to_main_r));
-	map(0xff80, 0xff9f).w(this, FUNC(fp1100_state::irq_mask_w));
-	map(0xffa0, 0xffbf).w(this, FUNC(fp1100_state::main_bank_w));
-	map(0xffc0, 0xffff).w(this, FUNC(fp1100_state::main_to_sub_w));
+	map(0xff00, 0xff7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
+	map(0xff80, 0xffff).r(FUNC(fp1100_state::sub_to_main_r));
+	map(0xff80, 0xff9f).w(FUNC(fp1100_state::irq_mask_w));
+	map(0xffa0, 0xffbf).w(FUNC(fp1100_state::main_bank_w));
+	map(0xffc0, 0xffff).w(FUNC(fp1100_state::main_to_sub_w));
 }
 
 READ8_MEMBER( fp1100_state::main_to_sub_r )
@@ -283,10 +284,10 @@ void fp1100_state::sub_map(address_map &map)
 	map(0x2000, 0xdfff).ram().share("videoram"); //vram B/R/G
 	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe400, 0xe7ff).portr("DSW").w(this, FUNC(fp1100_state::kbd_row_w));
-	map(0xe800, 0xebff).rw(this, FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
+	map(0xe400, 0xe7ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
+	map(0xe800, 0xebff).rw(FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
 	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" is coded in but isn't currently executed
-	map(0xf000, 0xf3ff).w(this, FUNC(fp1100_state::colour_control_w));
+	map(0xf000, 0xf3ff).w(FUNC(fp1100_state::colour_control_w));
 	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
 }
 
@@ -643,7 +644,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, fp1100_state, porta_w))
 	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, fp1100_state, portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, fp1100_state, portc_r))
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fp1100_state, portc_w))
 	MCFG_UPD7810_TXD(WRITELINE(*this, fp1100_state, cass_w))
@@ -672,7 +673,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_MC6845_UPDATE_ROW_CB(fp1100_state, crtc_update_row)
 
 	/* Printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp1100_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

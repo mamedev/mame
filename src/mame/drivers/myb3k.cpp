@@ -581,10 +581,10 @@ void myb3k_state::myb3k_io(address_map &map)
 	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	// Discrete latches
-	map(0x04, 0x04).r(this, FUNC(myb3k_state::myb3k_kbd_r));
-	map(0x04, 0x04).w(this, FUNC(myb3k_state::myb3k_video_mode_w)); // b0=40CH, b1=80CH, b2=16 raster
-	map(0x05, 0x05).r(this, FUNC(myb3k_state::myb3k_io_status_r)); // printer connector bits: b3=fault b2=paper out b1 or b0=busy
-	map(0x05, 0x05).w(this, FUNC(myb3k_state::dma_segment_w)); // b0-b3=addr, b6=A b7=B
+	map(0x04, 0x04).r(FUNC(myb3k_state::myb3k_kbd_r));
+	map(0x04, 0x04).w(FUNC(myb3k_state::myb3k_video_mode_w)); // b0=40CH, b1=80CH, b2=16 raster
+	map(0x05, 0x05).r(FUNC(myb3k_state::myb3k_io_status_r)); // printer connector bits: b3=fault b2=paper out b1 or b0=busy
+	map(0x05, 0x05).w(FUNC(myb3k_state::dma_segment_w)); // b0-b3=addr, b6=A b7=B
 	map(0x06, 0x06).portr("DSW2");
 
 	// 8-9 8259A interrupt controller
@@ -948,7 +948,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* Parallel port */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, myb3k_state, ppi_portb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, myb3k_state, ppi_portc_w))
 
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
 
 	/* Centronics */
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, myb3k_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, myb3k_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, myb3k_state, centronics_perror_w))

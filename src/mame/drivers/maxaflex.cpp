@@ -45,8 +45,8 @@ public:
 		, m_console(*this, "console")
 		, m_joy01(*this, "djoy_0_1")
 		, m_joy23(*this, "djoy_2_3")
-		, m_lamp(*this, "lamp%u", 0U)
-		, m_digit(*this, "digit%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
 
@@ -84,8 +84,8 @@ private:
 	required_ioport m_console;
 	required_ioport m_joy01;
 	required_ioport m_joy23;
-	output_finder<4> m_lamp;
-	output_finder<3> m_digit;
+	output_finder<4> m_lamps;
+	output_finder<3> m_digits;
 };
 
 
@@ -164,10 +164,10 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 	/* latch for lamps */
 	if (BIT(diff, 6) && !BIT(data, 6))
 	{
-		m_lamp[0] = BIT(m_portC_out, 0);
-		m_lamp[1] = BIT(m_portC_out, 1);
-		m_lamp[2] = BIT(m_portC_out, 2);
-		m_lamp[3] = BIT(m_portC_out, 3);
+		m_lamps[0] = BIT(m_portC_out, 0);
+		m_lamps[1] = BIT(m_portC_out, 1);
+		m_lamps[2] = BIT(m_portC_out, 2);
+		m_lamps[3] = BIT(m_portC_out, 3);
 	}
 }
 
@@ -188,7 +188,7 @@ WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
 	/* displays */
 	uint8_t const sel = m_portB_out & 0x03;
 	if (3U > sel)
-		m_digit[sel] = ls48_map[m_portC_out];
+		m_digits[sel] = ls48_map[m_portC_out];
 }
 
 INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
@@ -295,8 +295,8 @@ void maxaflex_state::machine_start()
 {
 	atari_common_state::machine_start();
 
-	m_lamp.resolve();
-	m_digit.resolve();
+	m_lamps.resolve();
+	m_digits.resolve();
 
 	save_item(NAME(m_portB_out));
 	save_item(NAME(m_portC_out));
@@ -306,15 +306,14 @@ void maxaflex_state::machine_reset()
 {
 	atari_common_state::machine_reset();
 
-	pokey_device *pokey = machine().device<pokey_device>("pokey");
-	pokey->write(15,0);
+	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
 
 	// Supervisor board reset
 	m_portB_out = 0xff;
 	m_portC_out = 0xff;
 
-	std::fill(std::begin(m_lamp), std::end(m_lamp), 0);
-	std::fill(std::begin(m_digit), std::end(m_digit), 0x00);
+	std::fill(std::begin(m_lamps), std::end(m_lamps), 0);
+	std::fill(std::begin(m_digits), std::end(m_digits), 0x00);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )

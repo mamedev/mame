@@ -12,6 +12,7 @@
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 class peoplepc_state : public driver_device
@@ -196,7 +197,7 @@ void peoplepc_state::peoplepc_map(address_map &map)
 	map(0x00000, 0x7ffff).ram();
 	map(0xc0000, 0xdffff).ram().share("gvram");
 	map(0xe0000, 0xe3fff).ram().share("cvram");
-	map(0xe4000, 0xe5fff).w(this, FUNC(peoplepc_state::charram_w));
+	map(0xe4000, 0xe5fff).w(FUNC(peoplepc_state::charram_w));
 	map(0xfe000, 0xfffff).rom().region("maincpu", 0);
 }
 
@@ -215,7 +216,7 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x0064, 0x0067).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
 	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0070, 0x0070).w(this, FUNC(peoplepc_state::dmapg_w));
+	map(0x0070, 0x0070).w(FUNC(peoplepc_state::dmapg_w));
 }
 
 static void peoplepc_floppies(device_slot_interface &device)
@@ -306,11 +307,11 @@ MACHINE_CONFIG_END
 ROM_START( olypeopl )
 	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "hd",  "HD ROM")
-	ROMX_LOAD( "u01271c0.bin", 0x00000, 0x1000, CRC(8e0ef114) SHA1(774bab0a3e29853e9f6b951cf73082063ea61e6d), ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD( "u01271d0.bin", 0x00001, 0x1000, CRC(e2419bf9) SHA1(d88381f8709c91e2adba08f378e29bd0d19ee5ae), ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD( "u01271c0.bin", 0x00000, 0x1000, CRC(8e0ef114) SHA1(774bab0a3e29853e9f6b951cf73082063ea61e6d), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "u01271d0.bin", 0x00001, 0x1000, CRC(e2419bf9) SHA1(d88381f8709c91e2adba08f378e29bd0d19ee5ae), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "2fd",  "2 FD ROM")
-	ROMX_LOAD( "u01277f3.bin", 0x00000, 0x1000, CRC(428ff135) SHA1(ec11f0e43455570c40f5dc4b84f8420da5939368), ROM_SKIP(1)|ROM_BIOS(2))
-	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD( "u01277f3.bin", 0x00000, 0x1000, CRC(428ff135) SHA1(ec11f0e43455570c40f5dc4b84f8420da5939368), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 COMP( 198?, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

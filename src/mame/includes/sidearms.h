@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class sidearms_state : public driver_device
 {

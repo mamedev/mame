@@ -12,12 +12,10 @@
 #include "emu.h"
 #include "includes/redalert.h"
 
-#include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "machine/6821pia.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 
@@ -79,7 +77,6 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 
 WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
 	{
@@ -89,7 +86,7 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			m_ay8910_latch_1 = ay8910->data_r(space, 0);
+			m_ay8910_latch_1 = m_ay8910->data_r(space, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -97,7 +94,7 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 		case 0x02:
 		case 0x03:
 		default:
-			ay8910->data_address_w(space, data, m_ay8910_latch_2);
+			m_ay8910->data_address_w(space, data, m_ay8910_latch_2);
 			break;
 	}
 }
@@ -118,8 +115,8 @@ void redalert_state::redalert_audio_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
-	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(this, FUNC(redalert_state::redalert_AY8910_w));
-	map(0x1001, 0x1001).mirror(0x0ffe).rw(this, FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
+	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(FUNC(redalert_state::redalert_AY8910_w));
+	map(0x1001, 0x1001).mirror(0x0ffe).rw(FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
 	map(0x2000, 0x6fff).noprw();
 	map(0x7000, 0x77ff).mirror(0x0800).rom();
 }
@@ -146,7 +143,7 @@ void redalert_state::sound_start()
 WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
 {
 	m_soundlatch2->write(space, 0, (data & 0x78) >> 3);
-	machine().device("voice")->execute().set_input_line(I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	m_voicecpu->set_input_line(I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -272,35 +269,32 @@ READ8_MEMBER(redalert_state::demoneye_ay8910_latch_2_r)
 
 WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 {
-	ay8910_device *ay1 = machine().device<ay8910_device>("ay1");
-	ay8910_device *ay2 = machine().device<ay8910_device>("ay2");
-
 	switch (m_ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
 			if (m_ay8910_latch_1 & 0x10)
-				ay1->data_w(space, 0, data);
+				m_ay[0]->data_w(space, 0, data);
 
 			if (m_ay8910_latch_1 & 0x20)
-				ay2->data_w(space, 0, data);
+				m_ay[1]->data_w(space, 0, data);
 
 			break;
 
 		case 0x01:
 			if (m_ay8910_latch_1 & 0x10)
-				m_ay8910_latch_2 = ay1->data_r(space, 0);
+				m_ay8910_latch_2 = m_ay[0]->data_r(space, 0);
 
 			if (m_ay8910_latch_1 & 0x20)
-				m_ay8910_latch_2 = ay2->data_r(space, 0);
+				m_ay8910_latch_2 = m_ay[1]->data_r(space, 0);
 
 			break;
 
 		case 0x03:
 			if (m_ay8910_latch_1 & 0x10)
-				ay1->address_w(space, 0, data);
+				m_ay[0]->address_w(space, 0, data);
 
 			if (m_ay8910_latch_1 & 0x20)
-				ay2->address_w(space, 0, data);
+				m_ay[1]->address_w(space, 0, data);
 
 			break;
 

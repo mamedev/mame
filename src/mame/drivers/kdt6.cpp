@@ -27,6 +27,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/psi_kbd/psi_kbd.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -41,29 +42,29 @@ class kdt6_state : public driver_device
 {
 public:
 	kdt6_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_cpu(*this, "maincpu"),
-	m_dma(*this, "dma"),
-	m_sio(*this, "sio"),
-	m_crtc(*this, "crtc"),
-	m_page_r(*this, "page%x_r", 0), m_page_w(*this, "page%x_w", 0),
-	m_boot(*this, "boot"),
-	m_palette(*this, "palette"),
-	m_gfx(*this, "gfx"),
-	m_rtc(*this, "rtc"),
-	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_beeper(*this, "beeper"),
-	m_beep_timer(*this, "beep_timer"),
-	m_centronics(*this, "centronics"),
-	m_dip_s2(*this, "S2"),
-	m_keyboard(*this, "kbd"),
-	m_rs232b(*this, "rs232b"),
-	m_sasi_dma(false),
-	m_dma_map(0),
-	m_status0(0), m_status1(0), m_status2(0),
-	m_video_address(0)
+		driver_device(mconfig, type, tag),
+		m_cpu(*this, "maincpu"),
+		m_dma(*this, "dma"),
+		m_sio(*this, "sio"),
+		m_crtc(*this, "crtc"),
+		m_page_r(*this, "page%x_r", 0), m_page_w(*this, "page%x_w", 0),
+		m_boot(*this, "boot"),
+		m_palette(*this, "palette"),
+		m_gfx(*this, "gfx"),
+		m_rtc(*this, "rtc"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_beeper(*this, "beeper"),
+		m_beep_timer(*this, "beep_timer"),
+		m_centronics(*this, "centronics"),
+		m_dip_s2(*this, "S2"),
+		m_keyboard(*this, "kbd"),
+		m_rs232b(*this, "rs232b"),
+		m_sasi_dma(false),
+		m_dma_map(0),
+		m_status0(0), m_status1(0), m_status2(0),
+		m_video_address(0)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
@@ -173,7 +174,7 @@ void kdt6_state::psi98_mem(address_map &map)
 void kdt6_state::psi98_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x04, 0x07).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
@@ -182,27 +183,27 @@ void kdt6_state::psi98_io(address_map &map)
 	map(0x15, 0x15).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x18, 0x18).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x19, 0x19).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1c, 0x1c).w(this, FUNC(kdt6_state::status0_w));
+	map(0x1c, 0x1c).w(FUNC(kdt6_state::status0_w));
 	map(0x1d, 0x1d).r(m_keyboard, FUNC(psi_keyboard_bus_device::key_data_r));
 	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
-	map(0x1f, 0x1f).w(this, FUNC(kdt6_state::fdc_tc_w));
-	map(0x20, 0x2f).rw(this, FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
-	map(0x30, 0x30).rw(this, FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
-	map(0x31, 0x31).w(this, FUNC(kdt6_state::video_data_inc_w));
-	map(0x36, 0x36).w(this, FUNC(kdt6_state::video_data_dec_w));
-	map(0x37, 0x37).w(this, FUNC(kdt6_state::video_data_inc_w));
-	map(0x38, 0x38).w(this, FUNC(kdt6_state::status1_w));
-	map(0x39, 0x39).r(this, FUNC(kdt6_state::status1_r));
-	map(0x3a, 0x3a).w(this, FUNC(kdt6_state::status2_w));
-	map(0x3b, 0x3b).rw(this, FUNC(kdt6_state::sasi_ctrl_r), FUNC(kdt6_state::sasi_ctrl_w));
-	map(0x3c, 0x3c).w(this, FUNC(kdt6_state::dma_map_w));
+	map(0x1f, 0x1f).w(FUNC(kdt6_state::fdc_tc_w));
+	map(0x20, 0x2f).rw(FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
+	map(0x30, 0x30).rw(FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
+	map(0x31, 0x31).w(FUNC(kdt6_state::video_data_inc_w));
+	map(0x36, 0x36).w(FUNC(kdt6_state::video_data_dec_w));
+	map(0x37, 0x37).w(FUNC(kdt6_state::video_data_inc_w));
+	map(0x38, 0x38).w(FUNC(kdt6_state::status1_w));
+	map(0x39, 0x39).r(FUNC(kdt6_state::status1_r));
+	map(0x3a, 0x3a).w(FUNC(kdt6_state::status2_w));
+	map(0x3b, 0x3b).rw(FUNC(kdt6_state::sasi_ctrl_r), FUNC(kdt6_state::sasi_ctrl_w));
+	map(0x3c, 0x3c).w(FUNC(kdt6_state::dma_map_w));
 #if 0
 	map(0x3d, 0x3d) WATCHDOG
 	map(0x3e, 0x3e) WATCHDOG TRIGGER
 	map(0x3f, 0x3f) SASI DATA
 #endif
-	map(0x40, 0x40).w(this, FUNC(kdt6_state::video_address_latch_high_w));
-	map(0x41, 0x41).w(this, FUNC(kdt6_state::video_address_latch_low_w));
+	map(0x40, 0x40).w(FUNC(kdt6_state::video_address_latch_high_w));
+	map(0x41, 0x41).w(FUNC(kdt6_state::video_address_latch_low_w));
 }
 
 
@@ -691,10 +692,10 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kdt6_state, pio_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("pio", z80pio_device, pa2_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("pio", z80pio_device, pa3_w))

@@ -65,7 +65,7 @@ Std-chan is most current program.
 */
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 ROM_START( scm_500 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

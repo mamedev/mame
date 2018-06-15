@@ -41,7 +41,7 @@ Games on this system include....
 | | 2003 | The Key Of Avalon: The Wizard Master (client)                   | Sega / Hitmaker                     | GDROM | GDT-0006       | 317-0355-JPN | 253-5508-0355J|
 | | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev A)           | Sega / Hitmaker                     | GDROM | GDT-0006A      | 317-0355-JPN | 253-5508-0355J|
 | | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev B)           | Sega / Hitmaker                     | GDROM | GDT-0006B      | 317-0355-JPN | 253-5508-0355J|
-| | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev C)           | Sega / Hitmaker                     | GDROM | GDT-0006C      | 317-0355-JPN | 253-5508-0355J|
+|*| 2003 | The Key Of Avalon: The Wizard Master (client) (Rev C)           | Sega / Hitmaker                     | GDROM | GDT-0006C      | 317-0355-JPN | 253-5508-0355J|
 | | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev D)           | Sega / Hitmaker                     | GDROM | GDT-0006D      | 317-0355-JPN | 253-5508-0355J|
 |*| 2003 | The Key Of Avalon: The Wizard Master (client) (Rev E)           | Sega / Hitmaker                     | GDROM | GDT-0006E      | 317-0355-JPN | 253-5508-0355J|
 |*| 2003 | The Key Of Avalon: The Wizard Master (client) (Rev F)           | Sega / Hitmaker                     | GDROM | GDT-0006F      | 317-0355-JPN | 253-5508-0355J|
@@ -77,10 +77,10 @@ Games on this system include....
 | | 2004 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | GDROM |                |              |               |
 |*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server)                  | Sega / Hitmaker                     | GDROM | GDT-0018       | 317-0403-JPN | 253-5508-0403J|
-| | 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0018A      | 317-0403-JPN | 253-5508-0403J|
+|*| 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0018A      | 317-0403-JPN | 253-5508-0403J|
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev B)          | Sega / Hitmaker                     | GDROM | GDT-0018B      | 317-0403-JPN | 253-5508-0403J|
 | | 2005 | The Key Of Avalon 2.5: War of the Key (client)                  | Sega / Hitmaker                     | GDROM | GDT-0019       | 317-0403-JPN | 253-5508-0403J|
-| | 2005 | The Key Of Avalon 2.5: War of the Key (client) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0019A      | 317-0403-JPN | 253-5508-0403J|
+|*| 2005 | The Key Of Avalon 2.5: War of the Key (client) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0019A      | 317-0403-JPN | 253-5508-0403J|
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (client) (Rev B)          | Sega / Hitmaker                     | GDROM | GDT-0019B      | 317-0403-JPN | 253-5508-0403J|
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan)                               | Sega                                | GDROM | GDT-0020       | 317-0432-JPN | 253-5508-0432J|
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev A)                       | Sega                                | GDROM | GDT-0020A      | 317-0432-JPN | 253-5508-0432J|
@@ -443,6 +443,7 @@ Notes:
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/naomigd.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -487,8 +488,8 @@ WRITE64_MEMBER(triforce_state::gc_exi_w)
 void triforce_state::gc_map(address_map &map)
 {
 	map(0x00000000, 0x017fffff).ram();
-	map(0x0c003000, 0x0c003fff).rw(this, FUNC(triforce_state::gc_pi_r), FUNC(triforce_state::gc_pi_w));
-	map(0x0c006800, 0x0c0068ff).rw(this, FUNC(triforce_state::gc_exi_r), FUNC(triforce_state::gc_exi_w));
+	map(0x0c003000, 0x0c003fff).rw(FUNC(triforce_state::gc_pi_r), FUNC(triforce_state::gc_pi_w));
+	map(0x0c006800, 0x0c0068ff).rw(FUNC(triforce_state::gc_exi_r), FUNC(triforce_state::gc_exi_w));
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0).share("share2");  /* Program ROM */
 }
 
@@ -595,7 +596,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 #define TRIFORCE_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
@@ -720,6 +721,16 @@ ROM_START( avalons )
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0005g", 0, SHA1(f2dca7ecd6c07ff098ac91e353ffc3fd843054e3) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0355-jpn.data", 0x00, 0x50, CRC(9b9db9d8) SHA1(60aab36fcfd7a2850b2947effea70e44a06d1f78) )
+ROM_END
+
+ROM_START( avaloncc )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0006c", 0, SHA1(be761300165b152e2872750eea98ab3b894bddde) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0355-jpn.data", 0x00, 0x50, CRC(9b9db9d8) SHA1(60aab36fcfd7a2850b2947effea70e44a06d1f78) )
@@ -933,11 +944,31 @@ ROM_START( avalon20 )
 	ROM_LOAD("317-0403-jpn.data", 0x00, 0x50, CRC(c5071ada) SHA1(70018180b917beec1b2c272f9125fa43fd1a7b00) )
 ROM_END
 
+ROM_START( avalns25a )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0018a", 0, SHA1(548aecb062009e62c0bf97bd6b575b9ac205751f) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0403-jpn.data", 0x00, 0x50, CRC(c5071ada) SHA1(70018180b917beec1b2c272f9125fa43fd1a7b00) )
+ROM_END
+
 ROM_START( avalns25 )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0018b", 0, SHA1(4cd10813e66b72021ca344886638025f979d40c0) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0403-jpn.data", 0x00, 0x50, CRC(c5071ada) SHA1(70018180b917beec1b2c272f9125fa43fd1a7b00) )
+ROM_END
+
+ROM_START( avalnc25a )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0019a", 0, SHA1(1784a659027a4798ec4332063bd145afcecbda0e) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0403-jpn.data", 0x00, 0x50, CRC(c5071ada) SHA1(70018180b917beec1b2c272f9125fa43fd1a7b00) )
@@ -1107,7 +1138,7 @@ ROM_END
 // 0006     GAME( 2003, avalonco, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (GDT-0006)", MACHINE_IS_SKELETON )
 // 0006A    GAME( 2003, avalonca, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev A) (GDT-0006A)", MACHINE_IS_SKELETON )
 // 0006B    GAME( 2003, avaloncb, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev B) (GDT-0006B)", MACHINE_IS_SKELETON )
-// 0006C    GAME( 2003, avaloncc, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev C) (GDT-0006C)", MACHINE_IS_SKELETON )
+/* 0006C */ GAME( 2003, avaloncc, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev C) (GDT-0006C)", MACHINE_IS_SKELETON )
 // 0006D    GAME( 2003, avaloncd, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev D) (GDT-0006D)", MACHINE_IS_SKELETON )
 /* 0006E */ GAME( 2003, avalonce, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev E) (GDT-0006E)", MACHINE_IS_SKELETON )
 /* 0006F */ GAME( 2003, avaloncf, avalonc,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (Rev F) (GDT-0006F)", MACHINE_IS_SKELETON )
@@ -1140,10 +1171,10 @@ ROM_END
 // 0017A    GAME( 2004, avalon20a,avalon20, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (Rev A) (GDT-0017A)", MACHINE_IS_SKELETON )
 /* 0017B */ GAME( 2004, avalon20, triforce, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (Rev B) (GDT-0017B)", MACHINE_IS_SKELETON )
 // 0018     GAME( 2005, avalns25o,avalns25, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (server) (GDT-0018)", MACHINE_IS_SKELETON )
-// 0018A    GAME( 2005, avalns25a,avalns25, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (server) (Rev A) (GDT-0018A)", MACHINE_IS_SKELETON )
+/* 0018A */ GAME( 2005, avalns25a,avalns25, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (server) (Rev A) (GDT-0018A)", MACHINE_IS_SKELETON )
 /* 0018B */ GAME( 2005, avalns25, triforce, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (server) (Rev B) (GDT-0018B)", MACHINE_IS_SKELETON )
 // 0019     GAME( 2005, avalnc25o,avalnc25, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (client) (GDT-0019)", MACHINE_IS_SKELETON )
-// 0019A    GAME( 2005, avalnc25a,avalnc25, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (client) (Rev A) (GDT-0019A)", MACHINE_IS_SKELETON )
+/* 0019A */ GAME( 2005, avalnc25a,avalnc25, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (client) (Rev A) (GDT-0019A)", MACHINE_IS_SKELETON )
 /* 0019B */ GAME( 2005, avalnc25, triforce, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (client) (Rev B) (GDT-0019B)", MACHINE_IS_SKELETON )
 // 0020     GAME( 2006, vs42006o, vs42006,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (GDT-0020)", MACHINE_IS_SKELETON )
 // 0020A    GAME( 2006, vs42006a, vs42006,  triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev A) (GDT-0020A)", MACHINE_IS_SKELETON )

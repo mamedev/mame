@@ -167,6 +167,7 @@ Notes:
 #include "includes/mw8080bw.h"
 
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -430,8 +431,8 @@ void spaceg_state::spaceg_map(address_map &map)
 	map(0x3000, 0x3fff).rom();
 	map(0x7000, 0x77ff).ram();
 
-	map(0xa000, 0xbfff).ram().r(this, FUNC(spaceg_state::colorram_r)).share("colorram");
-	map(0xc000, 0xdfff).ram().w(this, FUNC(spaceg_state::zvideoram_w)).share("videoram");
+	map(0xa000, 0xbfff).ram().r(FUNC(spaceg_state::colorram_r)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(FUNC(spaceg_state::zvideoram_w)).share("videoram");
 
 	map(0x9400, 0x9400).writeonly().share("io9400"); /* gfx ctrl */
 	map(0x9401, 0x9401).writeonly().share("io9401"); /* gfx ctrl */
@@ -442,9 +443,9 @@ void spaceg_state::spaceg_map(address_map &map)
 	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
 	*/
 	map(0x9402, 0x9402).nopw();
-	map(0x9405, 0x9405).w(this, FUNC(spaceg_state::sound1_w));
-	map(0x9406, 0x9406).w(this, FUNC(spaceg_state::sound2_w));
-	map(0x9407, 0x9407).w(this, FUNC(spaceg_state::sound3_w));
+	map(0x9405, 0x9405).w(FUNC(spaceg_state::sound1_w));
+	map(0x9406, 0x9406).w(FUNC(spaceg_state::sound2_w));
+	map(0x9407, 0x9407).w(FUNC(spaceg_state::sound3_w));
 
 	map(0x9800, 0x9800).portr("9800");
 	map(0x9801, 0x9801).portr("9801");

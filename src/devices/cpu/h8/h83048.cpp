@@ -144,7 +144,7 @@ void h83048_device::map(address_map &map)
 	map(0xffffe8, 0xffffe8).rw("adc", FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
 	map(0xffffe9, 0xffffe9).rw("adc", FUNC(h8_adc_device::adcr_r), FUNC(h8_adc_device::adcr_w));
 
-	map(0xfffff2, 0xfffff2).rw(this, FUNC(h83048_device::syscr_r), FUNC(h83048_device::syscr_w));
+	map(0xfffff2, 0xfffff2).rw(FUNC(h83048_device::syscr_r), FUNC(h83048_device::syscr_w));
 
 	map(0xfffff4, 0xfffff4).rw("intc", FUNC(h8h_intc_device::iscr_r), FUNC(h8h_intc_device::iscr_w));
 	map(0xfffff5, 0xfffff5).rw("intc", FUNC(h8h_intc_device::ier_r), FUNC(h8h_intc_device::ier_w));

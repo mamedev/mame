@@ -12,7 +12,9 @@
 #pragma once
 
 #include "machine/eepromser.h"
+#include "machine/mb3773.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -67,6 +69,18 @@
 #define MCFG_MODEL1IO2_OUTPUT_CB(_devcb) \
 	devcb = &downcast<model1io2_device &>(*device).set_output_callback(DEVCB_##_devcb);
 
+#define MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG(_tag) \
+	downcast<model1io2_device &>(*device).set_lightgun_tag<0>(_tag);
+
+#define MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG(_tag) \
+	downcast<model1io2_device &>(*device).set_lightgun_tag<1>(_tag);
+
+#define MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG(_tag) \
+	downcast<model1io2_device &>(*device).set_lightgun_tag<2>(_tag);
+
+#define MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG(_tag) \
+	downcast<model1io2_device &>(*device).set_lightgun_tag<3>(_tag);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -100,6 +114,8 @@ public:
 	template <class Object> devcb_base &set_output_callback(Object &&cb)
 	{ return m_output_cb.set_callback(std::forward<Object>(cb)); }
 
+	template <int Index> void set_lightgun_tag(const char *tag) { m_lightgun_ports[Index].set_tag(tag); }
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -109,25 +125,28 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<mb3773_device> m_watchdog;
 	required_device<hd44780_device> m_lcd;
 	output_finder<> m_led_comm_err;
+	optional_ioport_array<4> m_lightgun_ports;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_READ8_MEMBER(in2_r);
-	DECLARE_READ8_MEMBER(in4_r);
-	DECLARE_WRITE8_MEMBER(out3_w);
-	DECLARE_WRITE8_MEMBER(out4_w);
-	DECLARE_WRITE8_MEMBER(out5_w);
-	DECLARE_WRITE8_MEMBER(out6_w);
+	DECLARE_READ8_MEMBER(io_pa_r);
+	DECLARE_READ8_MEMBER(io_pb_r);
+	DECLARE_READ8_MEMBER(io_pc_r);
+	DECLARE_WRITE8_MEMBER(io_pd_w);
+	DECLARE_READ8_MEMBER(io_pe_r);
+	DECLARE_WRITE8_MEMBER(io_pe_w);
+	DECLARE_WRITE8_MEMBER(io_pf_w);
+	DECLARE_WRITE8_MEMBER(io_pg_w);
 	DECLARE_READ8_MEMBER(fpga_r);
 	DECLARE_WRITE8_MEMBER(fpga_w);
 
@@ -146,6 +165,7 @@ private:
 
 	bool m_secondary_controls;
 	uint8_t m_lcd_data;
+	int m_fpga_counter;
 };
 
 // device type definition

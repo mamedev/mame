@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class blmbycar_state : public driver_device
 {
 public:

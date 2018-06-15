@@ -109,6 +109,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -118,8 +119,8 @@ void pass_state::pass_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
-	map(0x200000, 0x200fff).ram().w(this, FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
-	map(0x210000, 0x213fff).ram().w(this, FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
+	map(0x200000, 0x200fff).ram().w(FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
+	map(0x210000, 0x213fff).ram().w(FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
 	map(0x220000, 0x2203ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x230001, 0x230001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x230100, 0x230101).portr("DSW");

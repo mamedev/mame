@@ -310,8 +310,8 @@ READ16_MEMBER(cgc7900_state::unmapped_r)
 
 WRITE8_MEMBER(cgc7900_state::baud_write)
 {
-	m_dbrg->str_w(data >> 0);
-	m_dbrg->stt_w(data >> 4);
+	m_dbrg->write_str(data >> 0);
+	m_dbrg->write_stt(data >> 4);
 }
 
 WRITE_LINE_MEMBER(cgc7900_state::write_rs232_clock)
@@ -339,10 +339,10 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).ram().share("chrom_ram");
 	map(0x800000, 0x80ffff).rom().region(M68000_TAG, 0);
-	map(0x810000, 0x9fffff).r(this, FUNC(cgc7900_state::unmapped_r));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
+	map(0x810000, 0x9fffff).r(FUNC(cgc7900_state::unmapped_r));
+	map(0xa00000, 0xbfffff).rw(FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
 	map(0xc00000, 0xdfffff).ram().share("plane_ram");
-	map(0xe00000, 0xe1ffff).w(this, FUNC(cgc7900_state::color_status_w));
+	map(0xe00000, 0xe1ffff).w(FUNC(cgc7900_state::color_status_w));
 //  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
 	map(0xe30000, 0xe303ff).ram().share("clut_ram");
 	map(0xe38000, 0xe3bfff).ram().share("overlay_ram");
@@ -369,22 +369,22 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map(0xff8003, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xff8041, 0xff8041).rw(m_i8251_1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xff8043, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xff8080, 0xff8081).rw(this, FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
+	map(0xff8080, 0xff8081).rw(FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
 //  AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
-	map(0xff8100, 0xff8101).rw(this, FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
-	map(0xff8120, 0xff8121).rw(this, FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
+	map(0xff8100, 0xff8101).rw(FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
+	map(0xff8120, 0xff8121).rw(FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
 	map(0xff8140, 0xff8141).portr("BEZEL");
-	map(0xff8180, 0xff8180).w(this, FUNC(cgc7900_state::baud_write));
+	map(0xff8180, 0xff8180).w(FUNC(cgc7900_state::baud_write));
 	map(0xff81c0, 0xff81ff).rw(MM58167_TAG, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
-	map(0xff8200, 0xff8201).w(this, FUNC(cgc7900_state::interrupt_mask_w));
+	map(0xff8200, 0xff8201).w(FUNC(cgc7900_state::interrupt_mask_w));
 //  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
 //  AM_RANGE(0xff8242, 0xff8243) Light Pen X value
 //  AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
 //  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
 //  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
-	map(0xff824a, 0xff824b).r(this, FUNC(cgc7900_state::sync_r));
+	map(0xff824a, 0xff824b).r(FUNC(cgc7900_state::sync_r));
 	map(0xff83c0, 0xff83c0).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0xff83c2, 0xff83c2).r(AY8910_TAG, FUNC(ay8910_device::data_r));
 	map(0xff83c4, 0xff83c4).w(AY8910_TAG, FUNC(ay8910_device::data_w));

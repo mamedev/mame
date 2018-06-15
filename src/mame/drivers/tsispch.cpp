@@ -114,7 +114,6 @@
 #include "includes/tsispch.h"
 
 #include "cpu/i86/i86.h"
-#include "cpu/upd7725/upd7725.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -184,44 +183,38 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 *****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(true);
+	uint8_t temp = m_dsp->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(true);
+	return m_dsp->snesdsp_read(true);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
 #endif
-	upd7725->snesdsp_write(true, data);
+	m_dsp->snesdsp_write(true, data);
 }
 
 READ16_MEMBER( tsispch_state::dsp_status_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(false);
+	uint8_t temp = m_dsp->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(false);
+	return m_dsp->snesdsp_read(false);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_status_w )
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
-	upd7725->snesdsp_write(false, data);
+	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
@@ -317,10 +310,10 @@ void tsispch_state::i8086_mem(address_map &map)
 	map(0x03000, 0x03000).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x03002, 0x03002).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
-	map(0x03400, 0x03400).mirror(0x341FE).r(this, FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
-	map(0x03401, 0x03401).mirror(0x341FE).w(this, FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
-	map(0x03600, 0x03601).mirror(0x341FC).rw(this, FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
-	map(0x03602, 0x03603).mirror(0x341FC).rw(this, FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
+	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
+	map(0x03600, 0x03601).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03603).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
 	map(0xc0000, 0xfffff).rom(); // verified
 }
 

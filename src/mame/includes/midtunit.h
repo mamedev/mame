@@ -11,6 +11,7 @@
 #include "audio/williams.h"
 
 #include "cpu/tms34010/tms34010.h"
+#include "emupal.h"
 
 
 class midtunit_state : public driver_device
@@ -27,7 +28,7 @@ public:
 		m_palette(*this, "palette"),
 		m_dcs(*this, "dcs"),
 		m_cvsd_sound(*this, "cvsd"),
-		m_adpcm_sound(*this, "adpcm") ,
+		m_adpcm_sound(*this, "adpcm"),
 		m_nvram(*this, "nvram"),
 		m_gfxrom(*this, "gfxrom") { }
 

@@ -84,9 +84,9 @@ void z80dev_state::io_map(address_map &map)
 	map(0x21, 0x21).portr("LINE1");
 	map(0x22, 0x22).portr("LINE2");
 	map(0x23, 0x23).portr("LINE3");
-	map(0x20, 0x25).w(this, FUNC(z80dev_state::display_w));
+	map(0x20, 0x25).w(FUNC(z80dev_state::display_w));
 
-	map(0x13, 0x13).r(this, FUNC(z80dev_state::test_r));
+	map(0x13, 0x13).r(FUNC(z80dev_state::test_r));
 }
 
 /* Input ports */

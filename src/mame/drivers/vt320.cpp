@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/ram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -119,16 +120,16 @@ ROM_START( vt320 )
 	//DOL: http://web.archive.org/web/20060905115711/http://cmcnabb.cc.vt.edu/dec94mds/vt320dol.txt
 	ROM_SYSTEM_BIOS( 0, "vt320v11", "VT320 V1.1" )
 	// 23-054E7 below can also appear (same contents?) as 23-048E7 which is a mask rom
-	ROMX_LOAD( "23-054e7.e9", 0x0000, 0x10000, CRC(be98f9a4) SHA1(b8044d42ffaadb734fbd047fbca9c8aadeb0bf6c), ROM_BIOS(1) ) // EPROM
+	ROMX_LOAD( "23-054e7.e9", 0x0000, 0x10000, CRC(be98f9a4) SHA1(b8044d42ffaadb734fbd047fbca9c8aadeb0bf6c), ROM_BIOS(0) ) // EPROM
 	ROM_SYSTEM_BIOS( 1, "vt320", "VT320 V1.2" )
-	ROMX_LOAD( "23-104e7.e9", 0x0000, 0x10000, CRC(5f419b5a) SHA1(dbc429b32d6baefd8a56862717d6e7fea1fb0c1c), ROM_BIOS(2) )
+	ROMX_LOAD( "23-104e7.e9", 0x0000, 0x10000, CRC(5f419b5a) SHA1(dbc429b32d6baefd8a56862717d6e7fea1fb0c1c), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( vt330 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt330" )
 	ROM_SYSTEM_BIOS( 0, "vt330", "VT330" )
-	ROMX_LOAD( "23-236e6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(1) ) // 27256 EPROM
+	ROMX_LOAD( "23-236e6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(0) ) // 27256 EPROM
 ROM_END
 
 /* Driver */

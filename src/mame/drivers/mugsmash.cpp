@@ -178,16 +178,16 @@ READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 void mugsmash_state::mugsmash_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(mugsmash_state::mugsmash_videoram1_w)).share("videoram1");
-	map(0x082000, 0x082fff).ram().w(this, FUNC(mugsmash_state::mugsmash_videoram2_w)).share("videoram2");
-	map(0x0c0000, 0x0c0007).w(this, FUNC(mugsmash_state::mugsmash_reg_w)).share("regs1"); /* video registers*/
+	map(0x080000, 0x080fff).ram().w(FUNC(mugsmash_state::mugsmash_videoram1_w)).share("videoram1");
+	map(0x082000, 0x082fff).ram().w(FUNC(mugsmash_state::mugsmash_videoram2_w)).share("videoram2");
+	map(0x0c0000, 0x0c0007).w(FUNC(mugsmash_state::mugsmash_reg_w)).share("regs1"); /* video registers*/
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x140000, 0x140007).w(this, FUNC(mugsmash_state::mugsmash_reg2_w)).share("regs2"); /* sound + ? */
+	map(0x140000, 0x140007).w(FUNC(mugsmash_state::mugsmash_reg2_w)).share("regs2"); /* sound + ? */
 	map(0x1c0000, 0x1c3fff).ram(); /* main ram? */
 	map(0x1c4000, 0x1cffff).ram();
 	map(0x200000, 0x203fff).ram().share("spriteram"); /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
-	map(0x180000, 0x180007).r(this, FUNC(mugsmash_state::mugsmash_input_ports_r));
+	map(0x180000, 0x180007).r(FUNC(mugsmash_state::mugsmash_input_ports_r));
 #else
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");

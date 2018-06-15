@@ -50,7 +50,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_switch(*this, "SWITCH.%u", 0)
-		, m_led(*this, "led_%u", 1U)
+		, m_leds(*this, "led_%u", 1U)
 		, m_dpl(*this, "dpl_%u", 0U)
 	{ }
 
@@ -84,7 +84,7 @@ private:
 	uint8_t m_disp_layout[36];
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_switch;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 	output_finder<34> m_dpl; // 0 used as black hole
 };
 
@@ -134,10 +134,10 @@ WRITE8_MEMBER( peyper_state::disp_w )
 		switch (q)
 		{
 			case 34: // player indicator lights (7-digit only)
-				m_led[0] = BIT(a, 0); // PLAYER 1
-				m_led[1] = BIT(a, 1); // PLAYER 2
-				m_led[2] = BIT(a, 2); // PLAYER 3
-				m_led[3] = BIT(a, 3); // PLAYER 4
+				m_leds[0] = BIT(a, 0); // PLAYER 1
+				m_leds[1] = BIT(a, 1); // PLAYER 2
+				m_leds[2] = BIT(a, 2); // PLAYER 3
+				m_leds[3] = BIT(a, 3); // PLAYER 4
 				break;
 
 			case 35: // units digits show 0
@@ -160,7 +160,7 @@ WRITE8_MEMBER( peyper_state::disp_w )
 			case 38: // player 2 indicators (6-digit only)
 			case 39: // player 3 indicators (6-digit only)
 			case 40: // player 4 indicators (6-digit only)
-				m_led[q - 37] = BIT(a, 1); // player indicator
+				m_leds[q - 37] = BIT(a, 1); // player indicator
 				m_dpl[q - 7] = BIT(a, 2) ? 6 : 0; // million led (we show blank or 1 in millions digit)
 				// bit 3, looks like it turns on all the decimal points, reason unknown
 				break;
@@ -223,12 +223,12 @@ void peyper_state::peyper_io(address_map &map)
 	map(0x08, 0x08).w("ay2", FUNC(ay8910_device::address_w));
 	map(0x09, 0x09).r("ay2", FUNC(ay8910_device::data_r)); // never actually read?
 	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
-	map(0x0c, 0x0c).w(this, FUNC(peyper_state::sol_w));
-	map(0x10, 0x18).w(this, FUNC(peyper_state::lamp_w));
+	map(0x0c, 0x0c).w(FUNC(peyper_state::sol_w));
+	map(0x10, 0x18).w(FUNC(peyper_state::lamp_w));
 	map(0x20, 0x20).portr("DSW0");
 	map(0x24, 0x24).portr("DSW1");
 	map(0x28, 0x28).portr("SYSTEM");
-	map(0x2c, 0x2c).w(this, FUNC(peyper_state::lamp7_w));
+	map(0x2c, 0x2c).w(FUNC(peyper_state::lamp7_w));
 }
 
 static INPUT_PORTS_START( pbsonic_generic )
@@ -591,7 +591,7 @@ void peyper_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_led.resolve();
+	m_leds.resolve();
 	m_dpl.resolve();
 
 	save_item(NAME(m_digit));

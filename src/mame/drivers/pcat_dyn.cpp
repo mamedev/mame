@@ -69,7 +69,7 @@ void pcat_dyn_state::machine_start()
 {
 	m_prgbank->configure_entries(0, 256, memregion("game_prg")->base(), 0x1000);
 	m_nvram_bank->configure_entries(0, 2, &m_nvram_mem[0], 0x1000);
-	machine().device<nvram_device>("nvram")->set_base(&m_nvram_mem[0], 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram_mem[0], 0x2000);
 }
 
 void pcat_dyn_state::nvram_init(nvram_device &nvram, void *base, size_t size)
@@ -102,8 +102,8 @@ void pcat_dyn_state::pcat_map(address_map &map)
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000d0000, 0x000d0fff).rom().region("game_prg", 0x0000).w(this, FUNC(pcat_dyn_state::bank1_w));
-	map(0x000d1000, 0x000d1fff).rom().region("game_prg", 0x1000).w(this, FUNC(pcat_dyn_state::bank2_w));
+	map(0x000d0000, 0x000d0fff).rom().region("game_prg", 0x0000).w(FUNC(pcat_dyn_state::bank1_w));
+	map(0x000d1000, 0x000d1fff).rom().region("game_prg", 0x1000).w(FUNC(pcat_dyn_state::bank2_w));
 	map(0x000d2000, 0x000d2fff).bankr("prgbank");
 	map(0x000d3000, 0x000d3fff).bankrw("nvram_bank");
 	map(0x000df400, 0x000df8ff).ram(); //I/O board?
@@ -119,7 +119,7 @@ void pcat_dyn_state::pcat_io(address_map &map)
 	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x0530, 0x0533).r(this, FUNC(pcat_dyn_state::audio_r));
+	map(0x0530, 0x0533).r(FUNC(pcat_dyn_state::audio_r));
 	map(0x0534, 0x0537).rw("ad1848", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
 }
 

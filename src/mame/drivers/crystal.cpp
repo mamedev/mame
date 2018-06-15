@@ -233,6 +233,7 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 #include "machine/nvram.h"
 #include "sound/vrender0.h"
 #include "video/vrender0.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -251,6 +252,7 @@ public:
 		m_reset_patch(*this, "reset_patch"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0(*this, "vr0"),
+		m_video(*this, "vrender"),
 		m_ds1302(*this, "rtc"),
 		m_screen(*this, "screen")
 	{ }
@@ -266,6 +268,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<vr0video_device> m_vr0;
+	required_device<vrender0_device> m_video;
 	required_device<ds1302_device> m_ds1302;
 	required_device<screen_device> m_screen;
 
@@ -654,33 +657,33 @@ void crystal_state::crystal_mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom().nopw();
 
-	map(0x01200000, 0x0120000f).r(this, FUNC(crystal_state::Input_r));
-	map(0x01280000, 0x01280003).w(this, FUNC(crystal_state::Banksw_w));
+	map(0x01200000, 0x0120000f).r(FUNC(crystal_state::Input_r));
+	map(0x01280000, 0x01280003).w(FUNC(crystal_state::Banksw_w));
 	map(0x01400000, 0x0140ffff).ram().share("nvram");
 
 	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 
-	map(0x01800800, 0x01800803).rw(this, FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
-	map(0x01800810, 0x01800813).rw(this, FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
+	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
+	map(0x01800810, 0x01800813).rw(FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
 
-	map(0x01800c04, 0x01800c07).w(this, FUNC(crystal_state::IntAck_w));
+	map(0x01800c04, 0x01800c07).w(FUNC(crystal_state::IntAck_w));
 
-	map(0x01801400, 0x01801403).rw(this, FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
-	map(0x01801408, 0x0180140b).rw(this, FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
-	map(0x01801410, 0x01801413).rw(this, FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
-	map(0x01801418, 0x0180141b).rw(this, FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
-	map(0x01802004, 0x01802007).rw(this, FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
+	map(0x01801400, 0x01801403).rw(FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
+	map(0x01801408, 0x0180140b).rw(FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
+	map(0x01801410, 0x01801413).rw(FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
+	map(0x01801418, 0x0180141b).rw(FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
 	map(0x03000000, 0x0300ffff).ram().share("vidregs");
-	map(0x030000a4, 0x030000a7).rw(this, FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+	map(0x030000a4, 0x030000a7).rw(FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw("vrender", FUNC(vrender0_device::vr0_snd_read), FUNC(vrender0_device::vr0_snd_write));
 
 	map(0x05000000, 0x05ffffff).bankr("bank1");
-	map(0x05000000, 0x05000003).rw(this, FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
+	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 	map(0x44414F4C, 0x44414F7F).ram().share("reset_patch");
 }
@@ -714,7 +717,7 @@ void crystal_state::trivrus_mem(address_map &map)
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
 //  0x01280000 & 0x0000ffff (written at boot)
-	map(0x01500000, 0x01500003).rw(this, FUNC(crystal_state::trivrus_input_r), FUNC(crystal_state::trivrus_input_w));
+	map(0x01500000, 0x01500003).rw(FUNC(crystal_state::trivrus_input_r), FUNC(crystal_state::trivrus_input_w));
 //  0x01500010 & 0x000000ff = sec
 //  0x01500010 & 0x00ff0000 = min
 //  0x01500014 & 0x000000ff = hour
@@ -725,28 +728,28 @@ void crystal_state::trivrus_mem(address_map &map)
 
 	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 
-	map(0x01800800, 0x01800803).rw(this, FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
-	map(0x01800810, 0x01800813).rw(this, FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
+	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
+	map(0x01800810, 0x01800813).rw(FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
 
-	map(0x01800c04, 0x01800c07).w(this, FUNC(crystal_state::IntAck_w));
+	map(0x01800c04, 0x01800c07).w(FUNC(crystal_state::IntAck_w));
 
-	map(0x01801400, 0x01801403).rw(this, FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
-	map(0x01801408, 0x0180140b).rw(this, FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
-	map(0x01801410, 0x01801413).rw(this, FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
-	map(0x01801418, 0x0180141b).rw(this, FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
-	map(0x01802004, 0x01802007).rw(this, FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
+	map(0x01801400, 0x01801403).rw(FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
+	map(0x01801408, 0x0180140b).rw(FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
+	map(0x01801410, 0x01801413).rw(FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
+	map(0x01801418, 0x0180141b).rw(FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
 
 	map(0x03000000, 0x0300ffff).ram().share("vidregs");
-	map(0x030000a4, 0x030000a7).rw(this, FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+	map(0x030000a4, 0x030000a7).rw(FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw("vrender", FUNC(vrender0_device::vr0_snd_read), FUNC(vrender0_device::vr0_snd_write));
 
 	map(0x05000000, 0x05ffffff).bankr("bank1");
-	map(0x05000000, 0x05000003).rw(this, FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
+	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 }
@@ -755,8 +758,8 @@ void crystal_state::crospuzl_mem(address_map &map)
 {
 	trivrus_mem(map);
 
-	map(0x01500000, 0x01500003).r(this, FUNC(crystal_state::FlashCmd_r));
-	map(0x01500100, 0x01500103).w(this, FUNC(crystal_state::FlashCmd_w));
+	map(0x01500000, 0x01500003).r(FUNC(crystal_state::FlashCmd_r));
+	map(0x01500100, 0x01500103).w(FUNC(crystal_state::FlashCmd_w));
 	map(0x01510000, 0x01510003).portr("IN0");
 	map(0x01511000, 0x01511003).portr("IN1");
 	map(0x01512000, 0x01512003).portr("IN2");
@@ -808,35 +811,35 @@ void crystal_state::crzyddz2_mem(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).rom().nopw();
 
-	map(0x01280000, 0x01280003).w(this, FUNC(crystal_state::Banksw_w));
+	map(0x01280000, 0x01280003).w(FUNC(crystal_state::Banksw_w));
 	map(0x01400000, 0x0140ffff).ram().share("nvram");
 	map(0x01500000, 0x01500003).portr("P1_P2");
-	map(0x01500004, 0x01500007).r(this, FUNC(crystal_state::crzyddz2_key_r));
+	map(0x01500004, 0x01500007).r(FUNC(crystal_state::crzyddz2_key_r));
 
 	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 
-	map(0x01800800, 0x01800803).rw(this, FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
-	map(0x01800810, 0x01800813).rw(this, FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
+	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
+	map(0x01800810, 0x01800813).rw(FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
 
-	map(0x01800c04, 0x01800c07).w(this, FUNC(crystal_state::IntAck_w));
+	map(0x01800c04, 0x01800c07).w(FUNC(crystal_state::IntAck_w));
 
-	map(0x01801400, 0x01801403).rw(this, FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
-	map(0x01801408, 0x0180140b).rw(this, FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
-	map(0x01801410, 0x01801413).rw(this, FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
-	map(0x01801418, 0x0180141b).rw(this, FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
-	map(0x01802004, 0x01802007).rw(this, FUNC(crystal_state::PIO_r), FUNC(crystal_state::crzyddz2_PIO_w));
+	map(0x01801400, 0x01801403).rw(FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
+	map(0x01801408, 0x0180140b).rw(FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
+	map(0x01801410, 0x01801413).rw(FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
+	map(0x01801418, 0x0180141b).rw(FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::crzyddz2_PIO_w));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
 
 	map(0x03000000, 0x0300ffff).ram().share("vidregs");
-	map(0x030000a4, 0x030000a7).rw(this, FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+	map(0x030000a4, 0x030000a7).rw(FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw("vrender", FUNC(vrender0_device::vr0_snd_read), FUNC(vrender0_device::vr0_snd_write));
 
 	map(0x05000000, 0x05ffffff).bankr("bank1");
-	map(0x05000000, 0x05000003).rw(this, FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
+	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 }
@@ -928,8 +931,6 @@ void crystal_state::machine_start()
 
 void crystal_state::machine_reset()
 {
-	int i;
-
 	memset(m_sysregs, 0, 0x10000);
 	memset(m_vidregs, 0, 0x10000);
 
@@ -943,13 +944,13 @@ void crystal_state::machine_reset()
 	m_DMActrl[0] = 0;
 	m_DMActrl[1] = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		*TimerRegsPtr(i) = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
 
-	machine().device<vrender0_device>("vrender")->set_areas(m_textureram, m_frameram);
+	m_video->set_areas(m_textureram, m_frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead = 0;
 #endif
@@ -1503,12 +1504,11 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
-	MCFG_VIDEO_VRENDER0_CPU("maincpu")
+	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0, "maincpu")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 
-	MCFG_DS1302_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", DS1302, 32.768_kHz_XTAL)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

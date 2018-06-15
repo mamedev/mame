@@ -144,9 +144,9 @@ void cbuster_state::twocrude_map(address_map &map)
 	map(0x0b4000, 0x0b4001).nopw();
 	map(0x0b5000, 0x0b500f).w("tilegen1", FUNC(deco16ic_device::pf_control_w));
 	map(0x0b6000, 0x0b600f).w("tilegen2", FUNC(deco16ic_device::pf_control_w));
-	map(0x0b8000, 0x0b8fff).ram().w(this, FUNC(cbuster_state::palette_w)).share("palette");
-	map(0x0b9000, 0x0b9fff).ram().w(this, FUNC(cbuster_state::palette_ext_w)).share("palette_ext");
-	map(0x0bc000, 0x0bc00f).rw(this, FUNC(cbuster_state::twocrude_control_r), FUNC(cbuster_state::twocrude_control_w));
+	map(0x0b8000, 0x0b8fff).ram().w(FUNC(cbuster_state::palette_w)).share("palette");
+	map(0x0b9000, 0x0b9fff).ram().w(FUNC(cbuster_state::palette_ext_w)).share("palette_ext");
+	map(0x0bc000, 0x0bc00f).rw(FUNC(cbuster_state::twocrude_control_r), FUNC(cbuster_state::twocrude_control_w));
 }
 
 

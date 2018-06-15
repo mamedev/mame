@@ -251,21 +251,21 @@ void mc1000_state::mc1000_banking_mem(address_map &map)
 	map(0x4000, 0x7fff).bankrw("bank3");
 	map(0x8000, 0x97ff).bankrw("bank4").share("mc6847_vram");
 	map(0x9800, 0xbfff).bankrw("bank5");
-	map(0xc000, 0xffff).r(this, FUNC(mc1000_state::rom_banking_r));
+	map(0xc000, 0xffff).r(FUNC(mc1000_state::rom_banking_r));
 }
 
 void mc1000_state::mc1000_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x04, 0x04).rw(this, FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
-	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x04, 0x04).rw(FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
+	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::bus_w));
 //  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 //  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	map(0x12, 0x12).w(this, FUNC(mc1000_state::mc6845_ctrl_w));
+	map(0x12, 0x12).w(FUNC(mc1000_state::mc6845_ctrl_w));
 	map(0x20, 0x20).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0x40, 0x40).r(AY8910_TAG, FUNC(ay8910_device::data_r));
 	map(0x60, 0x60).w(AY8910_TAG, FUNC(ay8910_device::data_w));
-	map(0x80, 0x80).w(this, FUNC(mc1000_state::mc6847_attr_w));
+	map(0x80, 0x80).w(FUNC(mc1000_state::mc6847_attr_w));
 }
 
 /* Input Ports */
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mc1000_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

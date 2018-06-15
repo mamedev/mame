@@ -103,8 +103,8 @@ void elekscmp_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x0fff);
 	map(0x000, 0x5ff).rom(); // ROM
-	map(0x700, 0x707).w(this, FUNC(elekscmp_state::hex_display_w));
-	map(0x708, 0x70f).r(this, FUNC(elekscmp_state::keyboard_r));
+	map(0x700, 0x707).w(FUNC(elekscmp_state::hex_display_w));
+	map(0x708, 0x70f).r(FUNC(elekscmp_state::keyboard_r));
 	map(0x800, 0xfff).ram(); // RAM - up to 2K of RAM
 }
 

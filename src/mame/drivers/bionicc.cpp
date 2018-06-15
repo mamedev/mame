@@ -71,6 +71,10 @@
         This is probably done to be pedantic about coin insertions (might be protection
         related). In fact, currently coin insertions are not consistently recognized.
 
+        We have the schematics for this board and the protection circuit, there
+        are a number of incorrect assumptions in the code which need fixing, especially
+        regarding the two MCU interrupt hookups.
+
 
 ******************************************************************************************/
 
@@ -186,14 +190,14 @@ void bionicc_state::main_map(address_map &map)
 	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
 	map(0xfe0d00, 0xfe3fff).ram();              /* RAM? */
 	map(0xfe4000, 0xfe4001).portr("SYSTEM");
-	map(0xfe4000, 0xfe4001).w(this, FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
+	map(0xfe4000, 0xfe4001).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
 	map(0xfe4002, 0xfe4003).portr("DSW").nopw();
-	map(0xfe8010, 0xfe8017).w(this, FUNC(bionicc_state::scroll_w));
+	map(0xfe8010, 0xfe8017).w(FUNC(bionicc_state::scroll_w));
 	map(0xfe8018, 0xfe8019).nopw(); // vblank irq ack?
-	map(0xfe801a, 0xfe801b).w(this, FUNC(bionicc_state::mpu_trigger_w)); // based on the code this looks like the MCU trigger if compared to F1 Dream, but 0xfe4002 would match up closer in terms of addresses.  Maybe this is IRQ4 related instead?
-	map(0xfec000, 0xfecfff).ram().w(this, FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
-	map(0xff0000, 0xff3fff).ram().w(this, FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
-	map(0xff4000, 0xff7fff).ram().w(this, FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
+	map(0xfe801a, 0xfe801b).w(FUNC(bionicc_state::mpu_trigger_w)); // based on the code this looks like the MCU trigger if compared to F1 Dream, but 0xfe4002 would match up closer in terms of addresses.  Maybe this is IRQ4 related instead?
+	map(0xfec000, 0xfecfff).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
+	map(0xff0000, 0xff3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
+	map(0xff4000, 0xff7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffc000, 0xffffff).ram().share("ram16");
 }
@@ -209,7 +213,7 @@ void bionicc_state::sound_map(address_map &map)
 
 void bionicc_state::mcu_io(address_map &map)
 {
-	map(0x000, 0x7ff).rw(this, FUNC(bionicc_state::mcu_shared_r), FUNC(bionicc_state::mcu_shared_w));
+	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_shared_r), FUNC(bionicc_state::mcu_shared_w));
 }
 
 /*************************************

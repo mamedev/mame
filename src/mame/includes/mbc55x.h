@@ -26,6 +26,7 @@
 
 #include "debug/debugcon.h"
 #include "debugger.h"
+#include "emupal.h"
 
 #include "formats/pc_dsk.h"
 

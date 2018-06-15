@@ -88,6 +88,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "machine/bankdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -435,7 +436,7 @@ WRITE8_MEMBER(socrates_state::common_ram_bank_w)
 
 READ8_MEMBER(socrates_state::socrates_cart_r)
 {
-	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac)); style stuff
+	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac)); style stuff
 	// demangle the offset, offset passed is bits 11111111 11111111 00000000 00000000
 	// where . is 0                               EDCBA987 65432.10 FEDCBA98 76543210
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
@@ -990,8 +991,8 @@ void socrates_state::socrates_rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
-	map(0x040000, 0x07ffff).r(this, FUNC(socrates_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
-	map(0x080000, 0x0bffff).r(this, FUNC(socrates_state::read_f3));                                        // xxxx 10** **** **** **** ****
+	map(0x040000, 0x07ffff).r(FUNC(socrates_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x080000, 0x0bffff).r(FUNC(socrates_state::read_f3));                                        // xxxx 10** **** **** **** ****
 }
 
 void socrates_state::socrates_rambank_map(address_map &map)
@@ -1004,9 +1005,9 @@ void socrates_state::z80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(socrates_state::common_rom_bank_r), FUNC(socrates_state::common_rom_bank_w)).mirror(0x7); /* rom bank select - RW - 8 bits */
-	map(0x08, 0x08).rw(this, FUNC(socrates_state::common_ram_bank_r), FUNC(socrates_state::common_ram_bank_w)).mirror(0x7); /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	map(0x10, 0x17).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_sound_w)).mirror(0x8); /* sound section:
+	map(0x00, 0x00).rw(FUNC(socrates_state::common_rom_bank_r), FUNC(socrates_state::common_rom_bank_w)).mirror(0x7); /* rom bank select - RW - 8 bits */
+	map(0x08, 0x08).rw(FUNC(socrates_state::common_ram_bank_r), FUNC(socrates_state::common_ram_bank_w)).mirror(0x7); /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
+	map(0x10, 0x17).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_sound_w)).mirror(0x8); /* sound section:
 	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL(21'477'272)/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b***EVVVV enable, volume control for channel 1
@@ -1018,12 +1019,12 @@ void socrates_state::z80_io(address_map &map)
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
 	<todo: test the others, maybe take samples?>
 	*/
-	map(0x20, 0x21).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
-	map(0x30, 0x30).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
-	map(0x40, 0x40).rw(this, FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
-	map(0x50, 0x51).rw(this, FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
-	map(0x60, 0x60).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
-	map(0x70, 0xFF).r(this, FUNC(socrates_state::read_f3)); // nothing mapped here afaik
+	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
+	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
+	map(0x40, 0x40).rw(FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x50, 0x51).rw(FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
+	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
+	map(0x70, 0xFF).r(FUNC(socrates_state::read_f3)); // nothing mapped here afaik
 }
 
 void iqunlimz_state::iqunlimz_mem(address_map &map)
@@ -1039,7 +1040,7 @@ void iqunlimz_state::iqunlimz_rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
-	map(0x040000, 0x07ffff).r(this, FUNC(iqunlimz_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x040000, 0x07ffff).r(FUNC(iqunlimz_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
 	map(0x080000, 0x0bffff).rom().region("maincpu", 0x40000).mirror(0xF00000);// xxxx 10** **** **** **** ****
 }
 
@@ -1053,19 +1054,19 @@ void iqunlimz_state::iqunlimz_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw(this, FUNC(iqunlimz_state::common_rom_bank_r), FUNC(iqunlimz_state::common_rom_bank_w)).mirror(0x06);
-	map(0x08, 0x08).rw(this, FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
-	map(0x10, 0x17).w(this, FUNC(iqunlimz_state::socrates_sound_w)).mirror(0x08);
-	map(0x20, 0x21).w(this, FUNC(iqunlimz_state::socrates_scroll_w)).mirror(0x0E);
+	map(0x00, 0x01).rw(FUNC(iqunlimz_state::common_rom_bank_r), FUNC(iqunlimz_state::common_rom_bank_w)).mirror(0x06);
+	map(0x08, 0x08).rw(FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
+	map(0x10, 0x17).w(FUNC(iqunlimz_state::socrates_sound_w)).mirror(0x08);
+	map(0x20, 0x21).w(FUNC(iqunlimz_state::socrates_scroll_w)).mirror(0x0E);
 	// 30: writes an incrementing value here, once per keypress?
 	// 40: some sort of serial select/reset or enable, related to 0x60
-	map(0x50, 0x51).rw(this, FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
+	map(0x50, 0x51).rw(FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
 	// 60: some sort of serial read/write port, related to 0x40
-	map(0x70, 0x73).rw(this, FUNC(iqunlimz_state::video_regs_r), FUNC(iqunlimz_state::video_regs_w)).mirror(0x0C);
+	map(0x70, 0x73).rw(FUNC(iqunlimz_state::video_regs_r), FUNC(iqunlimz_state::video_regs_w)).mirror(0x0C);
 	map(0x80, 0x81).nopw(); // LCD
 	map(0xb1, 0xb1).nopw();
-	map(0xa0, 0xa0).r(this, FUNC(iqunlimz_state::status_r)).mirror(0x0F);
-	map(0xe0, 0xe7).w(this, FUNC(iqunlimz_state::colors_w)).mirror(0x08);
+	map(0xa0, 0xa0).r(FUNC(iqunlimz_state::status_r)).mirror(0x0F);
+	map(0xe0, 0xe7).w(FUNC(iqunlimz_state::colors_w)).mirror(0x08);
 }
 
 
@@ -1663,9 +1664,9 @@ ROM_START(profweis)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
 	/* Yeno Professor Weiss-Alles (German PAL) */
 	ROM_SYSTEM_BIOS(0, "89", "1989")
-	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(1)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
+	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(0)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
 	ROM_SYSTEM_BIOS(1, "88", "1988")
-	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(2)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 

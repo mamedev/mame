@@ -137,6 +137,7 @@ Dip locations added based on the notes above.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -208,9 +209,9 @@ void ppmast93_state::ppmast93_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().nopw();
 	map(0x8000, 0xbfff).bankr("cpubank");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(ppmast93_state::bgram_w)).share("bgram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(ppmast93_state::bgram_w)).share("bgram");
 	map(0xd800, 0xdfff).nopw();
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(ppmast93_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(ppmast93_state::fgram_w)).share("fgram");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -219,7 +220,7 @@ void ppmast93_state::ppmast93_cpu1_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).portr("P2");
-	map(0x04, 0x04).portr("SYSTEM").w(this, FUNC(ppmast93_state::port4_w));
+	map(0x04, 0x04).portr("SYSTEM").w(FUNC(ppmast93_state::port4_w));
 	map(0x06, 0x06).portr("DSW1");
 	map(0x08, 0x08).portr("DSW2");
 }
@@ -235,7 +236,7 @@ void ppmast93_state::ppmast93_cpu2_io(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("sub", 0x20000);
 	map(0x0000, 0x0001).mirror(0xff00).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( ppmast93 )

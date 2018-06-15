@@ -57,14 +57,14 @@ void labyrunr_state::labyrunr_map(address_map &map)
 	map(0x0a00, 0x0a00).portr("P2");
 	map(0x0a01, 0x0a01).portr("P1");
 	map(0x0b00, 0x0b00).portr("SYSTEM");
-	map(0x0c00, 0x0c00).w(this, FUNC(labyrunr_state::labyrunr_bankswitch_w));
+	map(0x0c00, 0x0c00).w(FUNC(labyrunr_state::labyrunr_bankswitch_w));
 	map(0x0d00, 0x0d1f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
 	map(0x0e00, 0x0e00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1000, 0x10ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0x1800, 0x1fff).ram();
 	map(0x2000, 0x2fff).ram().share("spriteram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(labyrunr_state::labyrunr_vram1_w)).share("videoram1");
-	map(0x3800, 0x3fff).ram().w(this, FUNC(labyrunr_state::labyrunr_vram2_w)).share("videoram2");
+	map(0x3000, 0x37ff).ram().w(FUNC(labyrunr_state::labyrunr_vram1_w)).share("videoram1");
+	map(0x3800, 0x3fff).ram().w(FUNC(labyrunr_state::labyrunr_vram2_w)).share("videoram2");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }

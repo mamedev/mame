@@ -108,15 +108,15 @@ void tv910_state::tv910_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x4000, 0x47ff).ram().share("vram"); // VRAM
-	map(0x8010, 0x801f).r(this, FUNC(tv910_state::charset_r));
+	map(0x8010, 0x801f).r(FUNC(tv910_state::charset_r));
 	map(0x8020, 0x8020).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8021, 0x8021).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
 	map(0x8030, 0x8033).rw(ACIA_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x8040, 0x804f).w(this, FUNC(tv910_state::vbl_ack_w));
-	map(0x8050, 0x805f).w(this, FUNC(tv910_state::nmi_ack_w));
-	map(0x8060, 0x806f).r(this, FUNC(tv910_state::kbd_ascii_r));
-	map(0x8070, 0x807f).r(this, FUNC(tv910_state::kbd_flags_r));
-	map(0x9000, 0x9000).w(this, FUNC(tv910_state::control_w));
+	map(0x8040, 0x804f).w(FUNC(tv910_state::vbl_ack_w));
+	map(0x8050, 0x805f).w(FUNC(tv910_state::nmi_ack_w));
+	map(0x8060, 0x806f).r(FUNC(tv910_state::kbd_ascii_r));
+	map(0x8070, 0x807f).r(FUNC(tv910_state::kbd_flags_r));
+	map(0x9000, 0x9000).w(FUNC(tv910_state::control_w));
 	map(0x9001, 0x9001).portr("DSW1");
 	map(0x9002, 0x9002).portr("DSW2");
 	map(0xf000, 0xffff).rom().region("maincpu", 0);

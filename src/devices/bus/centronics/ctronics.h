@@ -14,10 +14,6 @@
 #include "machine/output_latch.h"
 
 
-#define MCFG_CENTRONICS_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, CENTRONICS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 #define MCFG_CENTRONICS_STROBE_HANDLER(_devcb) \
 	devcb = &downcast<centronics_device &>(*device).set_strobe_handler(DEVCB_##_devcb);
 
@@ -100,6 +96,15 @@ class centronics_device : public device_t,
 	friend class device_centronics_peripheral_interface;
 
 public:
+	template <typename T>
+	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: centronics_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_strobe_handler(Object &&cb) { return m_strobe_handler.set_callback(std::forward<Object>(cb)); }

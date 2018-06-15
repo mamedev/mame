@@ -1235,7 +1235,7 @@ void x07_state::x07_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(x07_state::x07_io_r), FUNC(x07_state::x07_io_w));
+	map(0x00, 0xff).rw(FUNC(x07_state::x07_io_r), FUNC(x07_state::x07_io_w));
 }
 
 /* Input ports */

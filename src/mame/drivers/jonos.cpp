@@ -19,6 +19,7 @@ There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -57,9 +58,9 @@ void jonos_state::jonos_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("roms", 0);
 	map(0x1800, 0x27ff).ram().share("videoram");
-	map(0x3000, 0x3001).w(this, FUNC(jonos_state::cursor_w)); // unknown device
+	map(0x3000, 0x3001).w(FUNC(jonos_state::cursor_w)); // unknown device
 	map(0x4000, 0x4001); // unknown device
-	map(0x5000, 0x5003).r(this, FUNC(jonos_state::keyboard_r)); // unknown device
+	map(0x5000, 0x5003).r(FUNC(jonos_state::keyboard_r)); // unknown device
 	map(0x6000, 0x6001); // unknown device
 }
 

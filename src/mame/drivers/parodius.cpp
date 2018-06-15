@@ -17,6 +17,7 @@
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -105,9 +106,9 @@ void parodius_state::parodius_map(address_map &map)
 	map(0x3f90, 0x3f90).portr("DSW2");
 	map(0x3fa0, 0x3faf).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
 	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x3fc0, 0x3fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(parodius_state::parodius_3fc0_w));
-	map(0x3fc4, 0x3fc4).w(this, FUNC(parodius_state::parodius_videobank_w));
-	map(0x3fc8, 0x3fc8).w(this, FUNC(parodius_state::parodius_sh_irqtrigger_w));
+	map(0x3fc0, 0x3fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(parodius_state::parodius_3fc0_w));
+	map(0x3fc4, 0x3fc4).w(FUNC(parodius_state::parodius_videobank_w));
+	map(0x3fc8, 0x3fc8).w(FUNC(parodius_state::parodius_sh_irqtrigger_w));
 	map(0x3fcc, 0x3fcd).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x6000, 0x9fff).bankr("bank1");            /* banked ROM */
 	map(0xa000, 0xffff).rom().region("maincpu", 0x3a000);
@@ -130,7 +131,7 @@ void parodius_state::parodius_sound_map(address_map &map)
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfa00, 0xfa00).w(this, FUNC(parodius_state::sound_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(FUNC(parodius_state::sound_arm_nmi_w));
 	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 }
 

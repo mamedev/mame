@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari, Curt Coder
+
+#include "emupal.h"
+
 class lvcards_state : public driver_device
 {
 public:

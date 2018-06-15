@@ -1264,6 +1264,7 @@ Notes:
 #include "machine/rtc4543.h"
 #include "sound/c352.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include <float.h>
@@ -1406,8 +1407,8 @@ struct render_t
 class namcos23_state : public driver_device
 {
 public:
-	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcos23_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_adc(*this, "subcpu:adc"),
@@ -1430,82 +1431,16 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC.%u", 0)
+		m_adc_ports(*this, "ADC.%u", 0),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	required_device<mips3_device> m_maincpu;
-	required_device<h83002_device> m_subcpu;
-	required_device<h8_adc_device> m_adc;
-	optional_device<h83334_device> m_iocpu;
-	required_device<rtc4543_device> m_rtc;
-	required_device<namco_settings_device> m_settings;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_shared_ram;
-	required_shared_ptr<uint32_t> m_gammaram;
-	required_shared_ptr<uint32_t> m_charram;
-	required_shared_ptr<uint32_t> m_textram;
-	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<cpu_device> m_gmen_sh2;
-	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_ioport m_lightx;
-	optional_ioport m_lighty;
-	required_ioport m_p1;
-	required_ioport m_p2;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
-
-	c404_t m_c404;
-	c361_t m_c361;
-	c417_t m_c417;
-	c412_t m_c412;
-	c421_t m_c421;
-	c422_t m_c422;
 	render_t m_render;
-
-	tilemap_t *m_bgtilemap;
-	uint8_t m_jvssense;
-	int32_t m_has_jvsio;
-	uint32_t m_main_irqcause;
-	bool m_ctl_vbl_active;
-	uint8_t m_ctl_led;
-	uint16_t m_ctl_inp_buffer[2];
-	bool m_subcpu_running;
-	uint32_t m_c435_address;
-	uint32_t m_c435_size;
-	const uint32_t *m_ptrom;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;
 	const uint8_t *m_texrom;
 	uint32_t m_tileid_mask;
 	uint32_t m_tile_mask;
-	uint32_t m_ptrom_limit;
-
-	int m_vblank_count;
-
-// It may only be 128
-// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
-// That fits pretty much anywhere, including inside a IC
-// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
-
-// Matrices are stored in signed 2.14 fixed point
-// Vectors are stored in signed 10.14 fixed point
-
-	int16_t m_matrices[256][9];
-	int32_t m_vectors[256][3];
-	int32_t m_light_vector[3];
-	uint16_t m_scaling;
-	int32_t m_spv[3];
-	int16_t m_spm[3];
-
-	uint16_t m_c435_buffer[256];
-	int m_c435_buffer_pos;
-
-	uint8_t m_sub_porta;
-	uint8_t m_sub_portb;
-	uint8_t m_tssio_port_4;
 
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
@@ -1560,8 +1495,6 @@ public:
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
@@ -1613,6 +1546,79 @@ public:
 	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<mips3_device> m_maincpu;
+	required_device<h83002_device> m_subcpu;
+	required_device<h8_adc_device> m_adc;
+	optional_device<h83334_device> m_iocpu;
+	required_device<rtc4543_device> m_rtc;
+	required_device<namco_settings_device> m_settings;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_shared_ram;
+	required_shared_ptr<uint32_t> m_gammaram;
+	required_shared_ptr<uint32_t> m_charram;
+	required_shared_ptr<uint32_t> m_textram;
+	optional_shared_ptr<uint32_t> m_czattr;
+	optional_device<cpu_device> m_gmen_sh2;
+	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_ioport m_lightx;
+	optional_ioport m_lighty;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_ioport_array<4> m_adc_ports;
+
+	c404_t m_c404;
+	c361_t m_c361;
+	c417_t m_c417;
+	c412_t m_c412;
+	c421_t m_c421;
+	c422_t m_c422;
+
+	tilemap_t *m_bgtilemap;
+	uint8_t m_jvssense;
+	int32_t m_has_jvsio;
+	uint32_t m_main_irqcause;
+	bool m_ctl_vbl_active;
+	uint8_t m_ctl_led;
+	uint16_t m_ctl_inp_buffer[2];
+	bool m_subcpu_running;
+	uint32_t m_c435_address;
+	uint32_t m_c435_size;
+	const uint32_t *m_ptrom;
+	uint32_t m_ptrom_limit;
+
+	int m_vblank_count;
+
+// It may only be 128
+// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
+// That fits pretty much anywhere, including inside a IC
+// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
+
+// Matrices are stored in signed 2.14 fixed point
+// Vectors are stored in signed 10.14 fixed point
+
+	int16_t m_matrices[256][9];
+	int32_t m_vectors[256][3];
+	int32_t m_light_vector[3];
+	uint16_t m_scaling;
+	int32_t m_spv[3];
+	int16_t m_spm[3];
+
+	uint16_t m_c435_buffer[256];
+	int m_c435_buffer_pos;
+
+	uint8_t m_sub_porta;
+	uint8_t m_sub_portb;
+	uint8_t m_tssio_port_4;
+	output_finder<8> m_lamps;
 };
 
 
@@ -2792,7 +2798,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 		if(m_ctl_led != (data & 0xff)) {
 			m_ctl_led = data & 0xff;
 			for(int i = 0; i < 8; i++)
-				output().set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
+				m_lamps[i] = BIT(data, 7 - i);
 		}
 		break;
 
@@ -2894,24 +2900,24 @@ void namcos23_state::gorgon_map(address_map &map)
 {
 	map.global_mask(0xfffffff);
 	map(0x00000000, 0x003fffff).ram().share("mainram");
-	map(0x01000000, 0x010000ff).rw(this, FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
-	map(0x02000000, 0x0200000f).rw(this, FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
+	map(0x01000000, 0x010000ff).rw(FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
+	map(0x02000000, 0x0200000f).rw(FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
 	map(0x04400000, 0x0440ffff).ram().share("shared_ram"); // Communication RAM (C416)
-	map(0x04c3ff00, 0x04c3ff0f).w(this, FUNC(namcos23_state::mcuen_w));
+	map(0x04c3ff00, 0x04c3ff0f).w(FUNC(namcos23_state::mcuen_w));
 	map(0x06080000, 0x0608000f).ram().share("czattr");
 	map(0x06080200, 0x060803ff).ram(); // PCZ Convert RAM (C406) (should be banked)
 	map(0x06108000, 0x061087ff).ram().share("gammaram"); // Gamma RAM (C404)
-	map(0x06110000, 0x0613ffff).ram().w(this, FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
-	map(0x06400000, 0x0641dfff).ram().w(this, FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
-	map(0x0641e000, 0x0641ffff).ram().w(this, FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
-	map(0x06420000, 0x0642000f).rw(this, FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
+	map(0x06110000, 0x0613ffff).ram().w(FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
+	map(0x06400000, 0x0641dfff).ram().w(FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
+	map(0x0641e000, 0x0641ffff).ram().w(FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06420000, 0x0642000f).rw(FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
 	map(0x08000000, 0x087fffff).rom().region("data", 0); // data ROMs
 	map(0x0c000000, 0x0c00ffff).ram().share("nvram"); // Backup RAM
-	map(0x0d000000, 0x0d00000f).rw(this, FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w)); // write for LEDs at d000000, watchdog at d000004
+	map(0x0d000000, 0x0d00000f).rw(FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w)); // write for LEDs at d000000, watchdog at d000004
 	map(0x0e000000, 0x0e007fff).ram(); // C405 RAM - what is this?
-	map(0x0f000000, 0x0f000003).rw(this, FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0f000000, 0x0f000003).rw(FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
 	map(0x0f200000, 0x0f203fff).ram(); // C422 RAM
-	map(0x0f300000, 0x0f30000f).rw(this, FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x0f300000, 0x0f30000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
 	map(0x0fc00000, 0x0fffffff).nopw().rom().region("user1", 0);
 }
 
@@ -2920,26 +2926,26 @@ void namcos23_state::s23_map(address_map &map)
 {
 	map.global_mask(0xfffffff);
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
-	map(0x01000000, 0x010000ff).rw(this, FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
-	map(0x02000000, 0x0200000f).rw(this, FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
+	map(0x01000000, 0x010000ff).rw(FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
+	map(0x02000000, 0x0200000f).rw(FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
 	map(0x04400000, 0x0440ffff).ram().share("shared_ram"); // Communication RAM (C416)
-	map(0x04c3ff00, 0x04c3ff0f).w(this, FUNC(namcos23_state::mcuen_w));
+	map(0x04c3ff00, 0x04c3ff0f).w(FUNC(namcos23_state::mcuen_w));
 	map(0x06000000, 0x0600ffff).ram().share("nvram"); // Backup RAM
 	map(0x06200000, 0x06203fff).ram(); // C422 RAM
-	map(0x06400000, 0x0640000f).rw(this, FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
-	map(0x06800000, 0x0681dfff).ram().w(this, FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
-	map(0x0681e000, 0x0681ffff).ram().w(this, FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
-	map(0x06820000, 0x0682000f).rw(this, FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
+	map(0x06400000, 0x0640000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x06800000, 0x0681dfff).ram().w(FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
+	map(0x0681e000, 0x0681ffff).ram().w(FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06820000, 0x0682000f).rw(FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
 	map(0x06a08000, 0x06a087ff).ram().share("gammaram"); // Gamma RAM (C404)
-	map(0x06a10000, 0x06a3ffff).ram().w(this, FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
+	map(0x06a10000, 0x06a3ffff).ram().w(FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
 	map(0x08000000, 0x08ffffff).rom().region("data", 0x0000000).mirror(0x1000000); // data ROMs
 	map(0x0a000000, 0x0affffff).rom().region("data", 0x1000000).mirror(0x1000000);
-	map(0x0c000000, 0x0c00001f).rw(this, FUNC(namcos23_state::c412_r), FUNC(namcos23_state::c412_w));
-	map(0x0c400000, 0x0c400007).rw(this, FUNC(namcos23_state::c421_r), FUNC(namcos23_state::c421_w));
-	map(0x0c800010, 0x0c800011).w(this, FUNC(namcos23_state::c435_state_reset_w));
-	map(0x0c800016, 0x0c800017).w(this, FUNC(namcos23_state::c435_state_pio_w));
-	map(0x0d000000, 0x0d00000f).rw(this, FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w));
-	map(0x0e800000, 0x0e800003).rw(this, FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0c000000, 0x0c00001f).rw(FUNC(namcos23_state::c412_r), FUNC(namcos23_state::c412_w));
+	map(0x0c400000, 0x0c400007).rw(FUNC(namcos23_state::c421_r), FUNC(namcos23_state::c421_w));
+	map(0x0c800010, 0x0c800011).w(FUNC(namcos23_state::c435_state_reset_w));
+	map(0x0c800016, 0x0c800017).w(FUNC(namcos23_state::c435_state_pio_w));
+	map(0x0d000000, 0x0d00000f).rw(FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w));
+	map(0x0e800000, 0x0e800003).rw(FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
 	map(0x0fc00000, 0x0fffffff).nopw().rom().region("user1", 0);
 }
 
@@ -2968,8 +2974,8 @@ WRITE32_MEMBER(namcos23_state::sh2_shared_w)
 void namcos23_state::gmen_mips_map(address_map &map)
 {
 	s23_map(map);
-	map(0x0e400000, 0x0e400003).r(this, FUNC(namcos23_state::gmen_trigger_sh2));
-	map(0x0e700000, 0x0e70ffff).rw(this, FUNC(namcos23_state::sh2_shared_r), FUNC(namcos23_state::sh2_shared_w));
+	map(0x0e400000, 0x0e400003).r(FUNC(namcos23_state::gmen_trigger_sh2));
+	map(0x0e700000, 0x0e70ffff).rw(FUNC(namcos23_state::sh2_shared_r), FUNC(namcos23_state::sh2_shared_w));
 }
 
 
@@ -3092,21 +3098,21 @@ WRITE16_MEMBER(namcos23_state::mcu_pb_w)
 void namcos23_state::s23h8rwmap(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x08ffff).rw(this, FUNC(namcos23_state::sharedram_sub_r), FUNC(namcos23_state::sharedram_sub_w));
+	map(0x080000, 0x08ffff).rw(FUNC(namcos23_state::sharedram_sub_r), FUNC(namcos23_state::sharedram_sub_w));
 	map(0x280000, 0x287fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0x300000, 0x300003).noprw(); // seems to be more inputs, maybe false leftover code from System 12?
 	map(0x300010, 0x300011).noprw();
-	map(0x300020, 0x300021).w(this, FUNC(namcos23_state::sub_interrupt_main_w));
+	map(0x300020, 0x300021).w(FUNC(namcos23_state::sub_interrupt_main_w));
 	map(0x300030, 0x300031).nopw();    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 }
 
 
 void namcos23_state::s23h8iomap(address_map &map)
 {
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(namcos23_state::mcu_p6_r), FUNC(namcos23_state::mcu_p6_w));
-	map(h8_device::PORT_8, h8_device::PORT_8).rw(this, FUNC(namcos23_state::mcu_p8_r), FUNC(namcos23_state::mcu_p8_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos23_state::mcu_pa_r), FUNC(namcos23_state::mcu_pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos23_state::mcu_pb_r), FUNC(namcos23_state::mcu_pb_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::mcu_p6_r), FUNC(namcos23_state::mcu_p6_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).rw(FUNC(namcos23_state::mcu_p8_r), FUNC(namcos23_state::mcu_p8_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos23_state::mcu_pa_r), FUNC(namcos23_state::mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos23_state::mcu_pb_r), FUNC(namcos23_state::mcu_pb_w));
 	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
 	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
 	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
@@ -3177,12 +3183,12 @@ void namcos23_state::s23iobrdmap(address_map &map)
 
 void namcos23_state::s23iobrdiomap(address_map &map)
 {
-	map(h8_device::PORT_4, h8_device::PORT_4).rw(this, FUNC(namcos23_state::iob_p4_r), FUNC(namcos23_state::iob_p4_w));
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos23_state::iob_p4_r), FUNC(namcos23_state::iob_p4_w));
 	map(h8_device::PORT_5, h8_device::PORT_5).noprw();   // bit 2 = status LED to indicate transmitting packet to main
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
 	map(h8_device::PORT_8, h8_device::PORT_8).noprw();   // unknown - used on ASCA-5 only
 	map(h8_device::PORT_9, h8_device::PORT_9).noprw();   // unknown - used on ASCA-5 only
-	map(h8_device::ADC_0, h8_device::ADC_3).r(this, FUNC(namcos23_state::iob_analog_r));
+	map(h8_device::ADC_0, h8_device::ADC_3).r(FUNC(namcos23_state::iob_analog_r));
 }
 
 
@@ -3209,7 +3215,7 @@ READ8_MEMBER(namcos23_state::iob_gun_r)
 void namcos23_state::timecrs2iobrdmap(address_map &map)
 {
 	s23iobrdmap(map);
-	map(0x7000, 0x700f).r(this, FUNC(namcos23_state::iob_gun_r));
+	map(0x7000, 0x700f).r(FUNC(namcos23_state::iob_gun_r));
 }
 
 
@@ -3467,6 +3473,8 @@ INPUT_PORTS_END
 
 void namcos23_state::machine_start()
 {
+	m_lamps.resolve();
+
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
@@ -3620,7 +3628,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
@@ -3687,7 +3695,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3767,7 +3775,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)

@@ -15,11 +15,11 @@
 
 DEFINE_DEVICE_TYPE(NV2A_HOST, nv2a_host_device, "nv2a_host", "NV2A PCI Bridge Device - Host Bridge")
 
-nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
-	  cpu_tag(nullptr),
-	  cpu(nullptr)
+nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
+	cpu(*this, finder_base::DUMMY_TAG)
 {
+	set_ids(0x10de01b0, 0, 0, 0);
 }
 
 void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -28,15 +28,9 @@ void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 }
 
-void nv2a_host_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
-}
-
 void nv2a_host_device::device_start()
 {
 	pci_host_device::device_start();
-	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
 
@@ -64,12 +58,13 @@ DEFINE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device, "nv2a_ram", "NV2A Memory Controlle
 void nv2a_ram_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x6c, 0x6f).rw(this, FUNC(nv2a_ram_device::config_register_r), FUNC(nv2a_ram_device::config_register_w));
+	map(0x6c, 0x6f).rw(FUNC(nv2a_ram_device::config_register_r), FUNC(nv2a_ram_device::config_register_w));
 }
 
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, NV2A_RAM, tag, owner, clock)
 {
+	set_ids(0x10de02a6, 0, 0, 0);
 }
 
 READ32_MEMBER(nv2a_ram_device::config_register_r)
@@ -89,12 +84,13 @@ DEFINE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device, "mcpx_lpc", "MCPX HUB Interface - 
 
 void mcpx_lpc_device::lpc_io(address_map &map)
 {
-	map(0x00000000, 0x000000ff).rw(this, FUNC(mcpx_lpc_device::lpc_r), FUNC(mcpx_lpc_device::lpc_w));
+	map(0x00000000, 0x000000ff).rw(FUNC(mcpx_lpc_device::lpc_r), FUNC(mcpx_lpc_device::lpc_w));
 }
 
 mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_LPC, tag, owner, clock)
 {
+	set_ids(0x10de01b2, 0xb4, 0, 0); // revision id must be at least 0xb4, otherwise usb will require a hub
 }
 
 void mcpx_lpc_device::device_start()
@@ -131,7 +127,7 @@ void mcpx_smbus_device::smbus_io0(address_map &map)
 
 void mcpx_smbus_device::smbus_io1(address_map &map)
 {
-	map(0x00000000, 0x0000000f).rw(this, FUNC(mcpx_smbus_device::smbus_r), FUNC(mcpx_smbus_device::smbus_w));
+	map(0x00000000, 0x0000000f).rw(FUNC(mcpx_smbus_device::smbus_r), FUNC(mcpx_smbus_device::smbus_w));
 }
 
 void mcpx_smbus_device::smbus_io2(address_map &map)
@@ -143,6 +139,7 @@ mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *
 	: pci_device(mconfig, MCPX_SMBUS, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
+	set_ids(0x10de01b4, 0, 0, 0);
 }
 
 void mcpx_smbus_device::device_start()
@@ -228,7 +225,7 @@ DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Cont
 
 void mcpx_ohci_device::ohci_mmio(address_map &map)
 {
-	map(0x00000000, 0x00000fff).rw(this, FUNC(mcpx_ohci_device::ohci_r), FUNC(mcpx_ohci_device::ohci_w));
+	map(0x00000000, 0x00000fff).rw(FUNC(mcpx_ohci_device::ohci_r), FUNC(mcpx_ohci_device::ohci_w));
 }
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -238,6 +235,7 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	timer(nullptr),
 	connecteds_count(0)
 {
+	set_ids(0x10de01c2, 0, 0, 0);
 }
 
 void mcpx_ohci_device::plug_usb_device(int port, ohci_function *function)
@@ -326,17 +324,18 @@ DEFINE_DEVICE_TYPE(MCPX_ETH, mcpx_eth_device, "mcpx_eth", "MCP Networking Adapte
 
 void mcpx_eth_device::eth_mmio(address_map &map)
 {
-	map(0x00000000, 0x0000003ff).rw(this, FUNC(mcpx_eth_device::eth_r), FUNC(mcpx_eth_device::eth_w));
+	map(0x00000000, 0x0000003ff).rw(FUNC(mcpx_eth_device::eth_r), FUNC(mcpx_eth_device::eth_w));
 }
 
 void mcpx_eth_device::eth_io(address_map &map)
 {
-	map(0x00000000, 0x000000007).rw(this, FUNC(mcpx_eth_device::eth_io_r), FUNC(mcpx_eth_device::eth_io_w));
+	map(0x00000000, 0x000000007).rw(FUNC(mcpx_eth_device::eth_io_r), FUNC(mcpx_eth_device::eth_io_w));
 }
 
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_ETH, tag, owner, clock)
 {
+	set_ids(0x10de01c3, 0, 0, 0);
 }
 
 void mcpx_eth_device::device_start()
@@ -379,19 +378,13 @@ DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 
 void mcpx_apu_device::apu_mmio(address_map &map)
 {
-	map(0x00000000, 0x00007ffff).rw(this, FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
+	map(0x00000000, 0x00007ffff).rw(FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
 }
 
-mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_APU, tag, owner, clock),
-	cpu_tag(nullptr),
-	cpu(nullptr)
+mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, MCPX_APU, tag, owner, clock),
+	cpu(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void mcpx_apu_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
 }
 
 void mcpx_apu_device::device_start()
@@ -406,7 +399,6 @@ void mcpx_apu_device::device_start()
 	memset(apust.voices_position_start, 0, sizeof(apust.voices_position_start));
 	memset(apust.voices_position_end, 0, sizeof(apust.voices_position_end));
 	memset(apust.voices_position_increment, 0, sizeof(apust.voices_position_increment));
-	cpu = machine().device<cpu_device>(cpu_tag);
 	apust.space = &cpu->space();
 	apust.timer = timer_alloc(0);
 	apust.timer->enable(false);
@@ -573,22 +565,23 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "
 
 void mcpx_ac97_audio_device::ac97_mmio(address_map &map)
 {
-	map(0x00000000, 0x000000fff).rw(this, FUNC(mcpx_ac97_audio_device::ac97_audio_r), FUNC(mcpx_ac97_audio_device::ac97_audio_w));
+	map(0x00000000, 0x000000fff).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_r), FUNC(mcpx_ac97_audio_device::ac97_audio_w));
 }
 
 void mcpx_ac97_audio_device::ac97_io0(address_map &map)
 {
-	map(0x00000000, 0x0000000ff).rw(this, FUNC(mcpx_ac97_audio_device::ac97_audio_io0_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io0_w));
+	map(0x00000000, 0x0000000ff).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_io0_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io0_w));
 }
 
 void mcpx_ac97_audio_device::ac97_io1(address_map &map)
 {
-	map(0x00000000, 0x00000007f).rw(this, FUNC(mcpx_ac97_audio_device::ac97_audio_io1_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io1_w));
+	map(0x00000000, 0x00000007f).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_io1_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io1_w));
 }
 
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_AUDIO, tag, owner, clock)
 {
+	set_ids(0x10de01b1, 0, 0, 0);
 }
 
 void mcpx_ac97_audio_device::device_start()
@@ -682,6 +675,7 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device, "mcpx_ac97_modem", "
 mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_MODEM, tag, owner, clock)
 {
+	set_ids(0x10de01c1, 0, 0, 0);
 }
 
 /*
@@ -699,6 +693,7 @@ mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag,
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
+	set_ids(0x10de01bc, 0, 0, 0);
 }
 
 void mcpx_ide_device::device_start()
@@ -754,26 +749,22 @@ DEFINE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device, "nv2a_gpu", "NVIDIA NV2A GPU")
 
 void nv2a_gpu_device::nv2a_mmio(address_map &map)
 {
-	map(0x00000000, 0x00ffffff).ram().rw(this, FUNC(nv2a_gpu_device::geforce_r), FUNC(nv2a_gpu_device::geforce_w));
+	map(0x00000000, 0x00ffffff).ram().rw(FUNC(nv2a_gpu_device::geforce_r), FUNC(nv2a_gpu_device::geforce_w));
 }
 
 void nv2a_gpu_device::nv2a_mirror(address_map &map)
 {
-	map(0x00000000, 0x07ffffff).ram().rw(this, FUNC(nv2a_gpu_device::nv2a_mirror_r), FUNC(nv2a_gpu_device::nv2a_mirror_w));
+	map(0x00000000, 0x07ffffff).ram().rw(FUNC(nv2a_gpu_device::nv2a_mirror_r), FUNC(nv2a_gpu_device::nv2a_mirror_w));
 }
 
-nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, NV2A_GPU, tag, owner, clock),
+nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, NV2A_GPU, tag, owner, clock),
 	nvidia_nv2a(nullptr),
-	cpu_tag(nullptr),
+	cpu(*this, finder_base::DUMMY_TAG),
 	m_interrupt_handler(*this),
 	m_program(nullptr)
 {
-}
-
-void nv2a_gpu_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
+	set_ids(0x10de02a0, 0, 0, 0);
 }
 
 void nv2a_gpu_device::device_start()
@@ -784,7 +775,7 @@ void nv2a_gpu_device::device_start()
 	bank_infos[0].adr = 0xfd000000;
 	add_map(0x08000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mirror));
 	bank_infos[1].adr = 0xf0000000;
-	m_program = &machine().device<cpu_device>(cpu_tag)->space();
+	m_program = &cpu->space(AS_PROGRAM); // FIXME: isn't there a proper way to map stuff or do DMA via the PCI device interface?
 	nvidia_nv2a = new nv2a_renderer(machine());
 	nvidia_nv2a->set_irq_callbaclk(
 		[&](int state)

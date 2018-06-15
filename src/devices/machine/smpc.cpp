@@ -181,17 +181,17 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 void smpc_hle_device::smpc_regs(address_map &map)
 {
 //  ADDRESS_MAP_UNMAP_HIGH
-	map(0x00, 0x0d).w(this, FUNC(smpc_hle_device::ireg_w));
-	map(0x1f, 0x1f).w(this, FUNC(smpc_hle_device::command_register_w));
-	map(0x20, 0x5f).r(this, FUNC(smpc_hle_device::oreg_r));
-	map(0x61, 0x61).r(this, FUNC(smpc_hle_device::status_register_r));
-	map(0x63, 0x63).rw(this, FUNC(smpc_hle_device::status_flag_r), FUNC(smpc_hle_device::status_flag_w));
-	map(0x75, 0x75).rw(this, FUNC(smpc_hle_device::pdr1_r), FUNC(smpc_hle_device::pdr1_w));
-	map(0x77, 0x77).rw(this, FUNC(smpc_hle_device::pdr2_r), FUNC(smpc_hle_device::pdr2_w));
-	map(0x79, 0x79).w(this, FUNC(smpc_hle_device::ddr1_w));
-	map(0x7b, 0x7b).w(this, FUNC(smpc_hle_device::ddr2_w));
-	map(0x7d, 0x7d).w(this, FUNC(smpc_hle_device::iosel_w));
-	map(0x7f, 0x7f).w(this, FUNC(smpc_hle_device::exle_w));
+	map(0x00, 0x0d).w(FUNC(smpc_hle_device::ireg_w));
+	map(0x1f, 0x1f).w(FUNC(smpc_hle_device::command_register_w));
+	map(0x20, 0x5f).r(FUNC(smpc_hle_device::oreg_r));
+	map(0x61, 0x61).r(FUNC(smpc_hle_device::status_register_r));
+	map(0x63, 0x63).rw(FUNC(smpc_hle_device::status_flag_r), FUNC(smpc_hle_device::status_flag_w));
+	map(0x75, 0x75).rw(FUNC(smpc_hle_device::pdr1_r), FUNC(smpc_hle_device::pdr1_w));
+	map(0x77, 0x77).rw(FUNC(smpc_hle_device::pdr2_r), FUNC(smpc_hle_device::pdr2_w));
+	map(0x79, 0x79).w(FUNC(smpc_hle_device::ddr1_w));
+	map(0x7b, 0x7b).w(FUNC(smpc_hle_device::ddr2_w));
+	map(0x7d, 0x7d).w(FUNC(smpc_hle_device::iosel_w));
+	map(0x7f, 0x7f).w(FUNC(smpc_hle_device::exle_w));
 }
 
 //**************************************************************************

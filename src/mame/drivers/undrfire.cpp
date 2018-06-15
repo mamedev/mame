@@ -346,7 +346,7 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x300000, 0x303fff).ram().share("spriteram");
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
-	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::motor_control_w));      /* gun vibration */
+	map(0x400000, 0x400003).w(FUNC(undrfire_state::motor_control_w));      /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).noprw(); // space for ADC0809, not fitted on pcb
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
@@ -356,8 +356,8 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb003ff).ram();                         /* single bytes, blending ??? */
-	map(0xd00000, 0xd00003).w(this, FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
-	map(0xf00000, 0xf00007).r(this, FUNC(undrfire_state::undrfire_lightgun_r));   /* stick coords read at $11b2-bc */
+	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
+	map(0xf00000, 0xf00007).r(FUNC(undrfire_state::undrfire_lightgun_r));   /* stick coords read at $11b2-bc */
 }
 
 
@@ -366,7 +366,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).ram();
 	map(0x300000, 0x303fff).ram().share("spriteram");
-	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::cbombers_cpua_ctrl_w));
+	map(0x400000, 0x400003).w(FUNC(undrfire_state::cbombers_cpua_ctrl_w));
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
@@ -377,7 +377,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb0000f).ram(); /* ? */
 	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
-	map(0xd00000, 0xd00003).w(this, FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
+	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
 	map(0xe00000, 0xe0ffff).ram().share("shared_ram");
 }
 
@@ -386,7 +386,7 @@ void undrfire_state::cbombers_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x40ffff).ram(); /* local ram */
 //  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
-	map(0x800000, 0x80ffff).rw(this, FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
+	map(0x800000, 0x80ffff).rw(FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
 //  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 }
 
@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_DEVICE_PROGRAM_MAP(undrfire_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))

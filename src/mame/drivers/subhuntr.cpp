@@ -21,6 +21,7 @@ QTY     Type    position
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
