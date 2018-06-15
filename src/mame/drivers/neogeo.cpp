@@ -2212,47 +2212,58 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( x+13, "unibios10", "Universe Bios (Hack, Ver. 1.0)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( x+13, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
 
-/* the number shown in the top right corner (only displayed on the colour test in early versions) should be connected to the revision, the actual numbering / naming here is a mess, possibly due to upgrades where stickers weren't replaced
-   also is the colour of the outside of the test grid connected to the region? / cabinet type? (if so, why so many colours for US ones, but not other regions and are Asia + Europe really just the same thing?)
+/* The number shown in the top right corner (only displayed on the colour test in early versions) should be connected to the revision.
 
-   these details have been added to the comments */
+   The actual numbering / naming here is a mess, possibly due to upgrades where stickers weren't replaced
+      
+   The colour shown on the outer edges of the test grid in 'Hardware test' appears to be connected to the region with Blue being
+   the Asia / Europe region (which appear to be a single region, you always get the European language options) and Red being the
+   Japanese region.  For an unknown reason there are multiple colours for the USA region, maybe it also was used to indicate
+   the PCB type in the USA?
+
+   The final revisions of the BIOS ROMs found on MV-1C type boards are mask ROMs with 512KB capacity and the data duplicated 4 times
+
+ */
 
 #define NEOGEO_BIOS \
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "euro", "Europe MVS (Ver. 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-s2.sp1",         0x00000, 0x020000, CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543) ) /* 5 Dark Blue - Europe, 1 Slot, has also been found on 2 Slot and 4 Slot (the old hacks were designed for this one) */ \
-	ROM_SYSTEM_BIOS( 1, "euro-s1", "Europe MVS (Ver. 1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "sp-s.sp1",          0x00000, 0x020000, CRC(c7f2fa45) SHA1(09576ff20b4d6b365e78e6a5698ea450262697cd) ) /* 3 Dark Blue - Europe, 4 Slot */ \
-	\
-	ROM_SYSTEM_BIOS( 2, "us", "US MVS (Ver. 2?)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "sp-u2.sp1",         0x00000, 0x020000, CRC(e72943de) SHA1(5c6bba07d2ec8ac95776aa3511109f5e1e2e92eb) ) /* 5 Cyan - US, 2 Slot */ \
-	ROM_SYSTEM_BIOS( 3, "us-e", "US MVS (Ver. 1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-e.sp1",          0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* 5 Yellow - US, 6 Slot (V5?) */ \
-	ROM_SYSTEM_BIOS( 4, "us-v2", "US MVS (4 slot, Ver 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "sp1-u2",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 Cyan - US, 4 slot - also seen with "v2" label*/ \
-	ROM_SYSTEM_BIOS( 5, "us-u3", "US MVS (U3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
-	\
-	ROM_SYSTEM_BIOS( 6, "asia", "Asia MVS (Ver. 3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "asia-s3.rom",       0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* 6 Dark Blue - Asia */ \
-	\
-	ROM_SYSTEM_BIOS( 7, "japan", "Japan MVS (Ver. 3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS Bios */ \
-	ROM_SYSTEM_BIOS( 8, "japan-s2", "Japan MVS (Ver. 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "sp-j2.sp1",         0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 Red - Japan, Older */ \
-	ROM_SYSTEM_BIOS( 9, "japan-s1", "Japan MVS (Ver. 1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "sp1.jipan.1024",    0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 Red - Japan, Older */ \
-	ROM_SYSTEM_BIOS( 10, "mv1c", "NEO-MVH MV1C" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp-45.sp1",        0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* 6 Dark Blue - Latest Asia bios (overdump?) */ \
-	ROM_SYSTEM_BIOS( 11, "japan-j3", "Japan MVS (J3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan bios; correct chip label unknown */ \
-	ROM_SYSTEM_BIOS( 12, "japan-hotel", "Custom Japanese Hotel" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
+	/* Europe / Asia ROMs - Blue test grid */ \
+	ROM_SYSTEM_BIOS( 0, "mv1c", "NEO-MVH MV1C (Asia)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-45.sp1",        0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* 6 - Latest Asia bios (mask ROM, from MV-1C) */ \
+	ROM_SYSTEM_BIOS( 1, "asia", "Asia MVS (Ver. 3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "sp-s3.sp1",        0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* 6 - Asia (from MV-1B) */ \
+	ROM_SYSTEM_BIOS( 2, "euro", "Europe MVS (Ver. 2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "sp-s2.sp1",        0x00000, 0x020000, CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543) ) /* 5 - Europe (Asia?), 1 Slot, has also been found on 2 Slot and 4 Slot (the old hacks were designed for this one) */ \
+	ROM_SYSTEM_BIOS( 3, "euro-s1", "Europe MVS (Ver. 1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-s.sp1",         0x00000, 0x020000, CRC(c7f2fa45) SHA1(09576ff20b4d6b365e78e6a5698ea450262697cd) ) /* 3 - Europe (Asia?), 4 Slot */ \
+	/* USA ROMs - Cyan / Yellow / Green test grids */ \
+	ROM_SYSTEM_BIOS( 4, "us", "US MVS (Ver. 2?)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "sp-u2.sp1",        0x00000, 0x020000, CRC(e72943de) SHA1(5c6bba07d2ec8ac95776aa3511109f5e1e2e92eb) ) /* 5 - 2 Slot (Cyan test grid) */ \
+	ROM_SYSTEM_BIOS( 5, "us-v2", "US MVS (4 slot, Ver 2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "sp1-u2.sp1",       0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 - 4 slot - also seen with "v2" label (Cyan test grid) */ \
+	ROM_SYSTEM_BIOS( 6, "us-e", "US MVS (Ver. 1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "sp-e.sp1",         0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* 5 - 6 Slot (V5?) (Yellow test grid)*/ \
+	ROM_SYSTEM_BIOS( 7, "us-u3", "US MVS (U3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1-u3.sp1",       0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 - 6 Slot (Green test grid) */ \
+	/* Japan ROMs - Red test grids */ \
+	ROM_SYSTEM_BIOS( 8, "japan", "NEO-MVH MV1C (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "sp-j3.sp1",        0x00000, 0x080000, CRC(486cb450) SHA1(52c21ea817928904b80745a8c8d15cbad61e1dc1) ) /* 6 - Latest Japan bios (mask ROM, from MV-1C) */ \
+	ROM_SYSTEM_BIOS( 9, "japan-j3", "Japan MVS (J3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "japan-j3.sp1",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 - Japan (from MV-1B) */ \
+	ROM_SYSTEM_BIOS( 10, "japanvs", "Japan MVS (Ver. 3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "vs-bios.sp1",     0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 - Ver 6 VS Bios */ \
+	ROM_SYSTEM_BIOS( 11, "japan-s2", "Japan MVS (Ver. 2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "sp-j2.sp1",       0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 - Older */ \
+	ROM_SYSTEM_BIOS( 12, "japan-s1", "Japan MVS (Ver. 1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "sp1.jipan.sp1",   0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 - Older */ \
 	ROM_SYSTEM_BIOS( 13, "japan-j3a", "Japan MVS (J3, alt)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp1-j3.bin",       0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 Red - 6 Slot */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp1-j3.sp1",      0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 - 6 Slot */ \
+	/* Special BIOS ROMs (should be treated as a different system?) */ \
+	ROM_SYSTEM_BIOS( 14, "japan-hotel", "Custom Japanese Hotel" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "sp-1v1_3db8c.sp1", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 and PAL/NTSC flag in test mode */ \
 	\
-	NEOGEO_UNIBIOS(14) \
-	NEOGEO_UNIBIOS_1_2_AND_OLDER(14)
+	NEOGEO_UNIBIOS(15) \
+	NEOGEO_UNIBIOS_1_2_AND_OLDER(15)
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) \
@@ -3183,6 +3194,15 @@ ROM_END
  NEO-MVS PROG-HERO / NEO-MVS CHA-32
  . NGH-006
  NEO-AEG PROG-HERO / NEO-AEG CHA-32
+
+ --
+
+ The MCU rom was dumped from a prototype
+ cartridge with external ROM. The data
+ contained within the rest of the ROMS
+ on the prototype matches the 'ridhero'
+ set
+
 ****************************************/
 
 ROM_START( ridhero ) /* MVS AND AES VERSION */
@@ -3190,7 +3210,7 @@ ROM_START( ridhero ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "006-p1.p1", 0x000000, 0x080000, CRC(d4aaf597) SHA1(34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84) ) /* MB834200 */
 
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3219,7 +3239,7 @@ ROM_START( ridheroh )
 	/* Chip label p1h does not exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. */
 
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
