@@ -177,19 +177,19 @@ static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
 void wwfsstar_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(wwfsstar_state::fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram */
-	map(0x0c0000, 0x0c0fff).ram().w(this, FUNC(wwfsstar_state::bg0_videoram_w)).share("bg0_videoram"); /* BG0 Ram */
+	map(0x080000, 0x080fff).ram().w(FUNC(wwfsstar_state::fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram */
+	map(0x0c0000, 0x0c0fff).ram().w(FUNC(wwfsstar_state::bg0_videoram_w)).share("bg0_videoram"); /* BG0 Ram */
 	map(0x100000, 0x1003ff).ram().share("spriteram");       /* SPR Ram */
 	map(0x140000, 0x140fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x180000, 0x180003).w(this, FUNC(wwfsstar_state::irqack_w));
+	map(0x180000, 0x180003).w(FUNC(wwfsstar_state::irqack_w));
 	map(0x180000, 0x180001).portr("DSW1");
 	map(0x180002, 0x180003).portr("DSW2");
 	map(0x180004, 0x180005).portr("P1");
-	map(0x180004, 0x180007).w(this, FUNC(wwfsstar_state::scroll_w));
+	map(0x180004, 0x180007).w(FUNC(wwfsstar_state::scroll_w));
 	map(0x180006, 0x180007).portr("P2");
 	map(0x180008, 0x180009).portr("SYSTEM");
 	map(0x180009, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x18000a, 0x18000b).w(this, FUNC(wwfsstar_state::flipscreen_w));
+	map(0x18000a, 0x18000b).w(FUNC(wwfsstar_state::flipscreen_w));
 	map(0x1c0000, 0x1c3fff).ram();                             /* Work Ram */
 }
 

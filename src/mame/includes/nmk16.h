@@ -8,6 +8,7 @@
 #include "machine/nmk004.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class nmk16_state : public driver_device, protected seibu_sound_common
 {
@@ -31,6 +32,8 @@ public:
 		m_tilemap_rom(*this, "tilerom"),
 		m_audiobank(*this, "audiobank"),
 		m_okibank(*this, "okibank%u", 1U),
+		m_dsw_io(*this, "DSW%u", 1U),
+		m_in_io(*this, "IN%u", 0U),
 		m_sprdma_base(0x8000) { }
 
 	required_device<cpu_device> m_maincpu;
@@ -52,6 +55,9 @@ public:
 	optional_region_ptr<uint16_t> m_tilemap_rom;
 	optional_memory_bank m_audiobank;
 	optional_memory_bank_array<2> m_okibank;
+
+	optional_ioport_array<2> m_dsw_io;
+	optional_ioport_array<3> m_in_io;
 
 	int m_sprclk;
 	int m_sprlimit;

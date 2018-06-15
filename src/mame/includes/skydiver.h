@@ -13,6 +13,7 @@
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define SKYDIVER_RANGE_DATA     NODE_01

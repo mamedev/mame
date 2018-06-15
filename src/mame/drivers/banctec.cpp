@@ -19,6 +19,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6800/m6801.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class banctec_state : public driver_device
@@ -63,7 +64,7 @@ void banctec_state::banctec_mcu_mem(address_map &map)
 	map(0x0000, 0x00ff).ram(); /* Probably wrong. Must be verified on pcb! */
 	map(0x2000, 0x2000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2003, 0x2003).w(this, FUNC(banctec_state::videoram_w));
+	map(0x2003, 0x2003).w(FUNC(banctec_state::videoram_w));
 	map(0x8000, 0x80ff).ram().share("videoram"); /* Probably wrong. Must be verified on pcb! */
 	map(0xe000, 0xffff).rom().region("mcu", 0x0000);
 }

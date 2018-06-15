@@ -15,6 +15,7 @@
 #include "machine/ram.h"
 #include "sound/discrete.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define M6502_TAG       "m6502"

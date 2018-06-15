@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 #define PSXGPU_DEBUG_VIEWER ( 0 )
 
 

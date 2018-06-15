@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/pckeybrd.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VERBOSE 2
@@ -200,14 +201,14 @@ void kron180_state::kron180_mem(address_map &map)
 void kron180_state::kron180_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x000f).w(this, FUNC(kron180_state::sn74259_w));
-	map(0x0010, 0x001f).rw(this, FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
-	map(0x0020, 0x002f).w(this, FUNC(kron180_state::wkb_w));
-	map(0x0030, 0x003f).r(this, FUNC(kron180_state::sn74299_r));
-	map(0x0040, 0x004f).w(this, FUNC(kron180_state::sn74299_w));
-	map(0x0050, 0x005f).w(this, FUNC(kron180_state::txen_w));
-	map(0x0060, 0x006f).w(this, FUNC(kron180_state::kbd_reset_w));
-	map(0x0070, 0x007f).w(this, FUNC(kron180_state::dreq_w));
+	map(0x0000, 0x000f).w(FUNC(kron180_state::sn74259_w));
+	map(0x0010, 0x001f).rw(FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
+	map(0x0020, 0x002f).w(FUNC(kron180_state::wkb_w));
+	map(0x0030, 0x003f).r(FUNC(kron180_state::sn74299_r));
+	map(0x0040, 0x004f).w(FUNC(kron180_state::sn74299_w));
+	map(0x0050, 0x005f).w(FUNC(kron180_state::txen_w));
+	map(0x0060, 0x006f).w(FUNC(kron180_state::kbd_reset_w));
+	map(0x0070, 0x007f).w(FUNC(kron180_state::dreq_w));
 }
 
 /* Input ports */

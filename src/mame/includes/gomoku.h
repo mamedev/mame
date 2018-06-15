@@ -3,6 +3,7 @@
 #ifndef MAME_INCLUDES_GOMOKU_H
 #define MAME_INCLUDES_GOMOKU_H
 
+#include "emupal.h"
 #include "screen.h"
 
 class gomoku_state : public driver_device

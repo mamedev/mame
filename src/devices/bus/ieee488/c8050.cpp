@@ -80,20 +80,21 @@ DEFINE_DEVICE_TYPE(SFD1001, sfd1001_device, "sfd10001", "Commodore SFD-1001")
 */
 
 ROM_START( c8050 ) // schematic 8050001
-	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("dos27")
 	ROM_SYSTEM_BIOS( 0, "dos25r1", "DOS 2.5 Revision 1" )
-	ROMX_LOAD( "901482-01.ul1", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "901482-02.uh1", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "dos25r2", "DOS 2.5 Revision 2" )
-	ROMX_LOAD( "901482-03.ul1", 0x0000, 0x2000, CRC(09a609b9) SHA1(166d8bfaaa9c4767f9b17ad63fc7ae77c199a64e), ROM_BIOS(2) )
-	ROMX_LOAD( "901482-04.uh1", 0x2000, 0x2000, CRC(1bcf9df9) SHA1(217f4a8b348658bb365f4a1de21ecbaa6402b1c0), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "dos25r3", "DOS 2.5 Revision 3" )
-	ROMX_LOAD( "901482-06.ul1", 0x0000, 0x2000, CRC(3cbd2756) SHA1(7f5fbed0cddb95138dd99b8fe84fddab900e3650), ROM_BIOS(3) )
-	ROMX_LOAD( "901482-07.uh1", 0x2000, 0x2000, CRC(c7532d90) SHA1(0b6d1e55afea612516df5f07f4a6dccd3bd73963), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "dos27", "DOS 2.7" )// 2364 ROM DOS 2.7
-	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(4) )
-	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(4) )
+
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROMX_LOAD( "901482-01.ul1", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "901482-02.uh1", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "901482-03.ul1", 0x0000, 0x2000, CRC(09a609b9) SHA1(166d8bfaaa9c4767f9b17ad63fc7ae77c199a64e), ROM_BIOS(1) )
+	ROMX_LOAD( "901482-04.uh1", 0x2000, 0x2000, CRC(1bcf9df9) SHA1(217f4a8b348658bb365f4a1de21ecbaa6402b1c0), ROM_BIOS(1) )
+	ROMX_LOAD( "901482-06.ul1", 0x0000, 0x2000, CRC(3cbd2756) SHA1(7f5fbed0cddb95138dd99b8fe84fddab900e3650), ROM_BIOS(2) )
+	ROMX_LOAD( "901482-07.uh1", 0x2000, 0x2000, CRC(c7532d90) SHA1(0b6d1e55afea612516df5f07f4a6dccd3bd73963), ROM_BIOS(2) )
+	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(3) )
+	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(3) )
 
 	ROM_REGION( 0x400, M6530_TAG, 0 )
 	ROM_LOAD_OPTIONAL( "901483-02.uk3", 0x000, 0x400, CRC(d7277f95) SHA1(7607f9357f3a08f2a9f20931058d60d9e3c17d39) ) // 6530-036
@@ -121,22 +122,23 @@ const tiny_rom_entry *c8050_device::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( c8250lp )
-	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("dos27")
 	ROM_SYSTEM_BIOS( 0, "dos27", "DOS 2.7" )
-	ROMX_LOAD( "251165-01.ua11",  0x0000, 0x2000, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "251166-01.ua13",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "dos27b", "DOS 2.7B" )
-	ROMX_LOAD( "dos-2.7b.bin", 0x0000, 0x4000, CRC(96e3b209) SHA1(9849300be9f2e0143c2ed2564d26a4ba3b27526c), ROM_BIOS(2) ) // CBM DOS 2.7B from the 8250LP inside 8296D
 	ROM_SYSTEM_BIOS( 2, "speeddos", "SpeedDOS" )
-	ROMX_LOAD( "speeddos-c000.ua11", 0x0000, 0x2000, CRC(46cc260f) SHA1(e9838635d6868e35ec9c161b6e5c1ad92a4a241a), ROM_BIOS(3) )
-	ROMX_LOAD( "speeddos-e000.ua13", 0x2000, 0x2000, CRC(88cfd505) SHA1(0fb570b180504cd1fcb7d203d8d37ea3d7e72ab4), ROM_BIOS(3) )
+
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROMX_LOAD( "251165-01.ua11",  0x0000, 0x2000, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "251166-01.ua13",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "dos-2.7b.bin", 0x0000, 0x4000, CRC(96e3b209) SHA1(9849300be9f2e0143c2ed2564d26a4ba3b27526c), ROM_BIOS(1) ) // CBM DOS 2.7B from the 8250LP inside 8296D
+	ROMX_LOAD( "speeddos-c000.ua11", 0x0000, 0x2000, CRC(46cc260f) SHA1(e9838635d6868e35ec9c161b6e5c1ad92a4a241a), ROM_BIOS(2) )
+	ROMX_LOAD( "speeddos-e000.ua13", 0x2000, 0x2000, CRC(88cfd505) SHA1(0fb570b180504cd1fcb7d203d8d37ea3d7e72ab4), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, M6504_TAG, 0 )
-	ROMX_LOAD( "251256-02", 0x000, 0x400, NO_DUMP, ROM_BIOS(1) ) // 6530-050
-	ROMX_LOAD( "251474-01b", 0x000, 0x400, CRC(9e9a9f90) SHA1(39498d7369a31ea7527b5044071acf35a84ea2ac), ROM_BIOS(1) ) // Matsushita
-	ROMX_LOAD( "fdc-2.7b.bin", 0x000, 0x800, CRC(13a24482) SHA1(1cfa52d2ed245a95e6369b46a36c6c7aa3929931), ROM_BIOS(2) ) // CBM DOS 2.7B FDC ROM from the 8250LP inside 8296D
-	ROMX_LOAD( "speeddos-fdc-f800.bin", 0x000, 0x800, CRC(253e760f) SHA1(3f7892a9bab84b633f45686bbbbe66bc2948c8e5), ROM_BIOS(3) )
+	ROMX_LOAD( "251256-02", 0x000, 0x400, NO_DUMP, ROM_BIOS(0) ) // 6530-050
+	ROMX_LOAD( "251474-01b", 0x000, 0x400, CRC(9e9a9f90) SHA1(39498d7369a31ea7527b5044071acf35a84ea2ac), ROM_BIOS(0) ) // Matsushita
+	ROMX_LOAD( "fdc-2.7b.bin", 0x000, 0x800, CRC(13a24482) SHA1(1cfa52d2ed245a95e6369b46a36c6c7aa3929931), ROM_BIOS(1) ) // CBM DOS 2.7B FDC ROM from the 8250LP inside 8296D
+	ROMX_LOAD( "speeddos-fdc-f800.bin", 0x000, 0x800, CRC(253e760f) SHA1(3f7892a9bab84b633f45686bbbbe66bc2948c8e5), ROM_BIOS(2) )
 ROM_END
 
 
@@ -273,7 +275,7 @@ READ8_MEMBER( c8050_device::dio_r )
 
 	*/
 
-	return m_bus->dio_r();
+	return m_bus->read_dio();
 }
 
 WRITE8_MEMBER( c8050_device::dio_w )
@@ -415,13 +417,13 @@ WRITE8_MEMBER( c8050_device::riot1_pb_w )
 	*/
 
 	// activity led 1
-	m_led[LED_ACT1] = BIT(data, 3);
+	m_leds[LED_ACT1] = BIT(data, 3);
 
 	// activity led 0
-	m_led[LED_ACT0] = BIT(data, 4);
+	m_leds[LED_ACT0] = BIT(data, 4);
 
 	// error led
-	m_led[LED_ERR] = BIT(data, 5);
+	m_leds[LED_ERR] = BIT(data, 5);
 }
 
 WRITE8_MEMBER( c8050_device::via_pb_w )
@@ -782,7 +784,7 @@ c8050_device::c8050_device(const machine_config &mconfig, device_type type, cons
 	m_floppy1(*this, FDC_TAG ":1"),
 	m_fdc(*this, FDC_TAG),
 	m_address(*this, "ADDRESS"),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
 	m_atna(1),
@@ -832,7 +834,7 @@ sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, d
 
 void c8050_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// install image callbacks
 	m_fdc->set_floppy(m_floppy0, m_floppy1);

@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 
 	/* Serial EEPROM (128 bytes, 8-bit data organization) */
 	/* The EEPROM stores the setup data */
-	MCFG_EEPROM_SERIAL_MSM16911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_MSM16911_8BIT)
 
 	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
 	MCFG_DEVICE_ADD("recorder", RS232_PORT, default_rs232_devices, nullptr)

@@ -68,7 +68,7 @@ void dsb46_state::dsb46_io(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x03).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x1a, 0x1a).w(this, FUNC(dsb46_state::port1a_w));
+	map(0x1a, 0x1a).w(FUNC(dsb46_state::port1a_w));
 	//AM_RANGE(0x10, 0x10) disk related
 	//AM_RANGE(0x14, 0x14) ?? (read after CTC1 TRG3)
 	//AM_RANGE(0x18, 0x18) ??

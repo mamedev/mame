@@ -161,17 +161,17 @@ void silkroad_state::cpu_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x40c000, 0x40cfff).ram().share("sprram"); // sprites
-	map(0x600000, 0x603fff).ram().w(this, FUNC(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)).share("paletteram"); // palette
-	map(0x800000, 0x803fff).ram().w(this, FUNC(silkroad_state::silkroad_fgram_w)).share("vidram");  // lower Layer
-	map(0x804000, 0x807fff).ram().w(this, FUNC(silkroad_state::silkroad_fgram2_w)).share("vidram2");  // mid layer
-	map(0x808000, 0x80bfff).ram().w(this, FUNC(silkroad_state::silkroad_fgram3_w)).share("vidram3"); // higher layer
+	map(0x600000, 0x603fff).ram().w(FUNC(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)).share("paletteram"); // palette
+	map(0x800000, 0x803fff).ram().w(FUNC(silkroad_state::silkroad_fgram_w)).share("vidram");  // lower Layer
+	map(0x804000, 0x807fff).ram().w(FUNC(silkroad_state::silkroad_fgram2_w)).share("vidram2");  // mid layer
+	map(0x808000, 0x80bfff).ram().w(FUNC(silkroad_state::silkroad_fgram3_w)).share("vidram3"); // higher layer
 	map(0xc00000, 0xc00003).portr("INPUTS");
 	map(0xc00004, 0xc00007).portr("DSW");
 	map(0xc00025, 0xc00025).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc00028, 0xc0002f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x00ff0000);
 	map(0xc00031, 0xc00031).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc00034, 0xc00037).w(this, FUNC(silkroad_state::silk_6295_bank_w));
-	map(0xc00038, 0xc0003b).w(this, FUNC(silkroad_state::silk_coin_counter_w));
+	map(0xc00034, 0xc00037).w(FUNC(silkroad_state::silk_6295_bank_w));
+	map(0xc00038, 0xc0003b).w(FUNC(silkroad_state::silk_coin_counter_w));
 	map(0xc0010c, 0xc00123).writeonly().share("regs");
 	map(0xfe0000, 0xffffff).ram();
 }

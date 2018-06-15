@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(C64_CPM, c64_cpm_cartridge_device, "c64_cpm", "C64 CP/M cartr
 
 void c64_cpm_cartridge_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
 }
 
 
@@ -52,7 +52,7 @@ void c64_cpm_cartridge_device::z80_mem(address_map &map)
 
 void c64_cpm_cartridge_device::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
 }
 
 

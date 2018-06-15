@@ -465,7 +465,7 @@
 #include "swhr2u.lh"          // 5      1, 2, 3, 4, 5   25
 #include "wnpost.lh"          // 5      1, 2, 3, 5, 10  50
 
-#define MASTER_CLOCK        XTAL(72'000'000)      /* confirmed */
+#define MASTER_CLOCK        72_MHz_XTAL      /* confirmed */
 
 class aristmk5_state : public archimedes_state
 {
@@ -921,10 +921,10 @@ void aristmk5_state::aristmk5_map(address_map &map)
 {
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
-	map(0x03000000, 0x0331ffff).rw(this, FUNC(aristmk5_state::archimedes_ioc_r), FUNC(aristmk5_state::archimedes_ioc_w));
+	map(0x03000000, 0x0331ffff).rw(FUNC(aristmk5_state::archimedes_ioc_r), FUNC(aristmk5_state::archimedes_ioc_w));
 
 	/* MK-5 overrides */
-	map(0x03010420, 0x03010420).w(this, FUNC(aristmk5_state::sram_banksel_w)); // SRAM bank select write
+	map(0x03010420, 0x03010420).w(FUNC(aristmk5_state::sram_banksel_w)); // SRAM bank select write
 
 	map(0x03010480, 0x0301049f).rw("uart_0a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010500, 0x0301051f).rw("uart_0b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
@@ -933,20 +933,20 @@ void aristmk5_state::aristmk5_map(address_map &map)
 	map(0x03010680, 0x0301069f).rw("uart_1b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 
 	map(0x03010700, 0x03010703).portr("P6");
-	map(0x03010800, 0x03010800).r(this, FUNC(aristmk5_state::eeprom_r));
+	map(0x03010800, 0x03010800).r(FUNC(aristmk5_state::eeprom_r));
 	map(0x03010810, 0x03010813).rw("watchdog", FUNC(watchdog_timer_device::reset32_r), FUNC(watchdog_timer_device::reset32_w)); //MK-5 specific, watchdog
-	map(0x03220000, 0x0323ffff).rw(this, FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
+	map(0x03220000, 0x0323ffff).rw(FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
 
 	// bank5 slow
-	map(0x03250048, 0x0325004b).w(this, FUNC(aristmk5_state::Ns5w48)); //IOEB control register
-	map(0x03250050, 0x03250053).r(this, FUNC(aristmk5_state::Ns5r50));  //IOEB ID register
-	map(0x03250058, 0x0325005b).r(this, FUNC(aristmk5_state::Ns5x58));  //IOEB interrupt Latch
+	map(0x03250048, 0x0325004b).w(FUNC(aristmk5_state::Ns5w48)); //IOEB control register
+	map(0x03250050, 0x03250053).r(FUNC(aristmk5_state::Ns5r50));  //IOEB ID register
+	map(0x03250058, 0x0325005b).r(FUNC(aristmk5_state::Ns5x58));  //IOEB interrupt Latch
 
-	map(0x03320000, 0x0333ffff).rw(this, FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
+	map(0x03320000, 0x0333ffff).rw(FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
 
-	map(0x03400000, 0x035fffff).w(this, FUNC(aristmk5_state::archimedes_vidc_w));
-	map(0x03600000, 0x037fffff).w(this, FUNC(aristmk5_state::archimedes_memc_w));
-	map(0x03800000, 0x039fffff).w(this, FUNC(aristmk5_state::archimedes_memc_page_w));
+	map(0x03400000, 0x035fffff).w(FUNC(aristmk5_state::archimedes_vidc_w));
+	map(0x03600000, 0x037fffff).w(FUNC(aristmk5_state::archimedes_memc_w));
+	map(0x03800000, 0x039fffff).w(FUNC(aristmk5_state::archimedes_memc_page_w));
 
 	map(0x03400000, 0x03bfffff).rom().region("maincpu", 0);
 }
@@ -956,10 +956,10 @@ void aristmk5_state::aristmk5_usa_map(address_map &map)
 {
 	aristmk5_map(map);
 
-	map(0x00000000, 0x01ffffff).rw(this, FUNC(aristmk5_state::archimedes_memc_logical_r), FUNC(aristmk5_state::archimedes_memc_logical_w));
+	map(0x00000000, 0x01ffffff).rw(FUNC(aristmk5_state::archimedes_memc_logical_r), FUNC(aristmk5_state::archimedes_memc_logical_w));
 
-	map(0x03010440, 0x03010440).w(this, FUNC(aristmk5_state::rtc_usa_w));
-	map(0x03010450, 0x03010450).w(this, FUNC(aristmk5_state::eeprom_usa_w));
+	map(0x03010440, 0x03010440).w(FUNC(aristmk5_state::rtc_usa_w));
+	map(0x03010450, 0x03010450).w(FUNC(aristmk5_state::eeprom_usa_w));
 
 	map(0x03012000, 0x03012003).portr("P1");
 	map(0x03012010, 0x03012013).portr("P2");
@@ -967,13 +967,13 @@ void aristmk5_state::aristmk5_usa_map(address_map &map)
 	map(0x03012210, 0x03012213).portr("DSW2");
 	map(0x03010584, 0x03010587).portr("P4");
 
-	map(0x03012020, 0x03012020).r(this, FUNC(aristmk5_state::ldor_r));
-	map(0x03012070, 0x03012070).w(this, FUNC(aristmk5_state::ldor_clk_w));
+	map(0x03012020, 0x03012020).r(FUNC(aristmk5_state::ldor_r));
+	map(0x03012070, 0x03012070).w(FUNC(aristmk5_state::ldor_clk_w));
 	map(0x03012184, 0x03012187).portr("P5");
 
-	map(0x03012000, 0x0301201f).w(this, FUNC(aristmk5_state::buttons_lamps_w)).umask32(0x000000ff);
-	map(0x03012030, 0x0301203f).w(this, FUNC(aristmk5_state::other_lamps_w)).umask32(0x000000ff);
-	map(0x03012380, 0x0301238f).w(this, FUNC(aristmk5_state::bill_acceptor_lamps_w)).umask32(0x000000ff);
+	map(0x03012000, 0x0301201f).w(FUNC(aristmk5_state::buttons_lamps_w)).umask32(0x000000ff);
+	map(0x03012030, 0x0301203f).w(FUNC(aristmk5_state::other_lamps_w)).umask32(0x000000ff);
+	map(0x03012380, 0x0301238f).w(FUNC(aristmk5_state::bill_acceptor_lamps_w)).umask32(0x000000ff);
 
 	map(0x03012100, 0x0301211f).rw("uart_2a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03012140, 0x0301215f).rw("uart_2b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
@@ -986,16 +986,16 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 {
 	aristmk5_map(map);
 
-	map(0x00000000, 0x01ffffff).rw(this, FUNC(aristmk5_state::aristmk5_drame_memc_logical_r), FUNC(aristmk5_state::archimedes_memc_logical_w));
+	map(0x00000000, 0x01ffffff).rw(FUNC(aristmk5_state::aristmk5_drame_memc_logical_r), FUNC(aristmk5_state::archimedes_memc_logical_w));
 
-	map(0x03010430, 0x03010430).w(this, FUNC(aristmk5_state::hopper_w));
-	map(0x03010440, 0x03010440).w(this, FUNC(aristmk5_state::rtc_w));
-	map(0x03010450, 0x03010450).w(this, FUNC(aristmk5_state::eeprom_w));
+	map(0x03010430, 0x03010430).w(FUNC(aristmk5_state::hopper_w));
+	map(0x03010440, 0x03010440).w(FUNC(aristmk5_state::rtc_w));
+	map(0x03010450, 0x03010450).w(FUNC(aristmk5_state::eeprom_w));
 
-	map(0x03010400, 0x03010400).w(this, FUNC(aristmk5_state::spi_mux_w));
-	map(0x03010470, 0x03010470).w(this, FUNC(aristmk5_state::spi_data_w));
-	map(0x03010850, 0x03010850).rw(this, FUNC(aristmk5_state::spi_int_ack_r), FUNC(aristmk5_state::spi_int_ack_w));
-	map(0x03010870, 0x03010870).r(this, FUNC(aristmk5_state::spi_data_r));
+	map(0x03010400, 0x03010400).w(FUNC(aristmk5_state::spi_mux_w));
+	map(0x03010470, 0x03010470).w(FUNC(aristmk5_state::spi_data_w));
+	map(0x03010850, 0x03010850).rw(FUNC(aristmk5_state::spi_int_ack_r), FUNC(aristmk5_state::spi_int_ack_w));
+	map(0x03010870, 0x03010870).r(FUNC(aristmk5_state::spi_data_r));
 
 	map(0x03014000, 0x0301401f).rw("uart_2a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03014020, 0x0301403f).rw("uart_2b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
@@ -2054,8 +2054,8 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom1")
+	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
+	MCFG_DEVICE_ADD("eeprom1", EEPROM_SERIAL_93C56_16BIT)
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
@@ -2086,7 +2086,7 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 
-	MCFG_DS1302_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", DS1302, 32.768_kHz_XTAL)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 

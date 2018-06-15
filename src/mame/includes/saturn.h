@@ -21,6 +21,7 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class saturn_state : public driver_device

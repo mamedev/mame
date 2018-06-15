@@ -59,8 +59,8 @@ void evmbug_state::io_map(address_map &map)
 	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
-	map(0x0000, 0x0003).r(this, FUNC(evmbug_state::rs232_r));
-	map(0x0000, 0x001f).w(this, FUNC(evmbug_state::rs232_w));
+	map(0x0000, 0x0003).r(FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(FUNC(evmbug_state::rs232_w));
 }
 
 /* Input ports */

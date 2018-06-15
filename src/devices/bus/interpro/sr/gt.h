@@ -91,44 +91,44 @@ public:
 	DECLARE_WRITE16_MEMBER(bsga_tmp_w) { COMBINE_DATA(&m_bsga_tmp); }
 
 	DECLARE_READ16_MEMBER(bsga_xmin_r) { return m_bsga_xmin; }
-	DECLARE_WRITE16_MEMBER(bsga_xmin_w) { COMBINE_DATA(&m_bsga_xmin); logerror("xmin = %04x\n", m_bsga_xmin); }
+	DECLARE_WRITE16_MEMBER(bsga_xmin_w) { COMBINE_DATA(&m_bsga_xmin); }
 	DECLARE_READ16_MEMBER(bsga_ymin_r) { return m_bsga_ymin; }
-	DECLARE_WRITE16_MEMBER(bsga_ymin_w) { COMBINE_DATA(&m_bsga_ymin); logerror("ymin = %04x\n", m_bsga_ymin); }
+	DECLARE_WRITE16_MEMBER(bsga_ymin_w) { COMBINE_DATA(&m_bsga_ymin); }
 
 	DECLARE_READ16_MEMBER(bsga_acc0_r) { return (m_bsga_width - m_bsga_xin1); }
 	DECLARE_READ16_MEMBER(bsga_acc1_r) { return -(m_bsga_width - m_bsga_xin1); }
 
 	DECLARE_READ16_MEMBER(bsga_xmax_r) { return m_bsga_xmax; }
-	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); logerror("xmax = %04x\n", m_bsga_xmax); }
+	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); }
 	DECLARE_READ16_MEMBER(bsga_ymax_r) { return m_bsga_ymax; }
-	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); logerror("ymax = %04x\n", m_bsga_ymax); bsga_clip_status(m_bsga_xin1, m_bsga_yin1); }
+	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); bsga_clip_status(m_bsga_xin1, m_bsga_yin1); }
 
 	DECLARE_READ16_MEMBER(bsga_src0_r) { return m_bsga_xin1; }
 	DECLARE_READ16_MEMBER(bsga_src1_r) { return m_bsga_xin1; }
 
-	DECLARE_WRITE16_MEMBER(bsga_xin1_w) { COMBINE_DATA(&m_bsga_xin1); m_bsga_xin = m_bsga_xin1; m_bsga_tmp = m_bsga_xin1; logerror("xin = %04x\n", m_bsga_xin1); }
-	DECLARE_WRITE16_MEMBER(bsga_yin1_w) { COMBINE_DATA(&m_bsga_yin1); m_bsga_yin = m_bsga_yin1; logerror("yin = %04x\n", m_bsga_yin1); }
+	DECLARE_WRITE16_MEMBER(bsga_xin1_w) { COMBINE_DATA(&m_bsga_xin1); m_bsga_xin = m_bsga_xin1; m_bsga_tmp = m_bsga_xin1; }
+	DECLARE_WRITE16_MEMBER(bsga_yin1_w) { COMBINE_DATA(&m_bsga_yin1); m_bsga_yin = m_bsga_yin1; }
 	DECLARE_WRITE32_MEMBER(bsga_xin1yin1_w);
 
 	enum bsga_status_mask
 	{
-		STATUS_CLIP0_YMAX = 0x1000, // y1 > max y
-		STATUS_CLIP0_YMIN = 0x0800, // y1 < min y
-		STATUS_CLIP0_XMAX = 0x0400, // x1 > max x
-		STATUS_CLIP0_XMIN = 0x0200, // x1 < min x
-		STATUS_CLIP1_YMAX = 0x0100, // y2 > max y
-		STATUS_CLIP1_YMIN = 0x0080, // y2 < min y
-		STATUS_CLIP1_XMAX = 0x0040, // x2 > max x
-		STATUS_CLIP1_XMIN = 0x0020, // x2 < min x
+		STATUS_CLIP0_YMAX  = 0x1000, // y1 > max y
+		STATUS_CLIP0_YMIN  = 0x0800, // y1 < min y
+		STATUS_CLIP0_XMAX  = 0x0400, // x1 > max x
+		STATUS_CLIP0_XMIN  = 0x0200, // x1 < min x
+		STATUS_CLIP1_YMAX  = 0x0100, // y2 > max y
+		STATUS_CLIP1_YMIN  = 0x0080, // y2 < min y
+		STATUS_CLIP1_XMAX  = 0x0040, // x2 > max x
+		STATUS_CLIP1_XMIN  = 0x0020, // x2 < min x
 
 		STATUS_FLOAT_OFLOW = 0x0010,
 
-		STATUS_CLIP_BOTH = 0x0008, // set if both inputs fall outside clipping region
-		STATUS_CLIP_ANY = 0x0004, // set if any input falls outside clipping region
+		STATUS_CLIP_BOTH   = 0x0008, // set if both inputs fall outside clipping region
+		STATUS_CLIP_ANY    = 0x0004, // set if any input falls outside clipping region
 
-		STATUS_CLIP0_MASK = 0x1e00, // x1,y1 clip result
-		STATUS_CLIP1_MASK = 0x01e0, // x2,y2 clip result
-		STATUS_CLIP_MASK = 0x1fe0  // both clip results
+		STATUS_CLIP0_MASK  = 0x1e00, // x1,y1 clip result
+		STATUS_CLIP1_MASK  = 0x01e0, // x2,y2 clip result
+		STATUS_CLIP_MASK   = 0x1fe0  // both clip results
 	};
 	DECLARE_READ16_MEMBER(bsga_status_r);
 

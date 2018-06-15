@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 class pc090oj_device : public device_t
 {
 public:

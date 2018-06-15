@@ -47,7 +47,7 @@ void pc_lpt_device::device_reset()
 }
 
 MACHINE_CONFIG_START(pc_lpt_device::device_add_mconfig)
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit3))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))

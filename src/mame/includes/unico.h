@@ -7,6 +7,7 @@
 
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 
 class unico_state : public driver_device
@@ -15,7 +16,7 @@ public:
 	unico_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U),
+		m_leds(*this, "led%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -43,7 +44,7 @@ protected:
 	void burglarx_map(address_map &map);
 
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 private:
 	std::unique_ptr<uint16_t[]> m_vram;

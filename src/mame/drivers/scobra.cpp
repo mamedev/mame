@@ -142,18 +142,18 @@ void scobra_state::type1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
-	map(0x9000, 0x903f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
+	map(0x9000, 0x903f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x9040, 0x905f).ram().share("spriteram");
 	map(0x9060, 0x907f).ram().share("bulletsram");
 	map(0x9080, 0x90ff).ram();
 	map(0x9800, 0x9803).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa000, 0xa003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa801, 0xa801).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
-	map(0xa802, 0xa802).w(this, FUNC(scobra_state::galaxold_coin_counter_w));
-	map(0xa804, 0xa804).w(this, FUNC(scobra_state::galaxold_stars_enable_w));
-	map(0xa806, 0xa806).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
-	map(0xa807, 0xa807).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xa801, 0xa801).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xa802, 0xa802).w(FUNC(scobra_state::galaxold_coin_counter_w));
+	map(0xa804, 0xa804).w(FUNC(scobra_state::galaxold_stars_enable_w));
+	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xa807, 0xa807).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
 	map(0xb000, 0xb000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -161,73 +161,73 @@ void scobra_state::type2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x883f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x8800, 0x883f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x8840, 0x885f).ram().share("spriteram");
 	map(0x8860, 0x887f).ram().share("bulletsram");
 	map(0x8880, 0x88ff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
+	map(0x9000, 0x93ff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
 	map(0x9800, 0x9800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xa000, 0xa00f).rw(this, FUNC(scobra_state::scobra_type2_ppi8255_0_r), FUNC(scobra_state::scobra_type2_ppi8255_0_w));
-	map(0xa800, 0xa80f).rw(this, FUNC(scobra_state::scobra_type2_ppi8255_1_r), FUNC(scobra_state::scobra_type2_ppi8255_1_w));
-	map(0xb000, 0xb000).w(this, FUNC(scobra_state::galaxold_stars_enable_w));
-	map(0xb004, 0xb004).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
-	map(0xb006, 0xb006).w(this, FUNC(scobra_state::galaxold_coin_counter_0_w));
-	map(0xb008, 0xb008).w(this, FUNC(scobra_state::galaxold_coin_counter_1_w));
-	map(0xb00c, 0xb00c).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
-	map(0xb00e, 0xb00e).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xa000, 0xa00f).rw(FUNC(scobra_state::scobra_type2_ppi8255_0_r), FUNC(scobra_state::scobra_type2_ppi8255_0_w));
+	map(0xa800, 0xa80f).rw(FUNC(scobra_state::scobra_type2_ppi8255_1_r), FUNC(scobra_state::scobra_type2_ppi8255_1_w));
+	map(0xb000, 0xb000).w(FUNC(scobra_state::galaxold_stars_enable_w));
+	map(0xb004, 0xb004).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xb006, 0xb006).w(FUNC(scobra_state::galaxold_coin_counter_0_w));
+	map(0xb008, 0xb008).w(FUNC(scobra_state::galaxold_coin_counter_1_w));
+	map(0xb00c, 0xb00c).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xb00e, 0xb00e).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
 }
 
 void scobra_state::tazmani3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x883f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x8800, 0x883f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x8840, 0x885f).ram().share("spriteram");
 	map(0x8860, 0x887f).ram().share("bulletsram");
 	map(0x8880, 0x88ff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
+	map(0x9000, 0x93ff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
 	map(0x9800, 0x9800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xa000, 0xa003).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa800, 0xa803).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xb000, 0xb000).w(this, FUNC(scobra_state::galaxold_stars_enable_w));
-	map(0xb001, 0xb001).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
-	map(0xb006, 0xb006).w(this, FUNC(scobra_state::galaxold_coin_counter_0_w));
-	map(0xb008, 0xb008).w(this, FUNC(scobra_state::galaxold_coin_counter_1_w));
-	map(0xb00c, 0xb00c).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
-	map(0xb00e, 0xb00e).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xb000, 0xb000).w(FUNC(scobra_state::galaxold_stars_enable_w));
+	map(0xb001, 0xb001).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xb006, 0xb006).w(FUNC(scobra_state::galaxold_coin_counter_0_w));
+	map(0xb008, 0xb008).w(FUNC(scobra_state::galaxold_coin_counter_1_w));
+	map(0xb00c, 0xb00c).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xb00e, 0xb00e).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
 }
 
 void scobra_state::hustler_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
-	map(0x9000, 0x903f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
+	map(0x9000, 0x903f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x9040, 0x905f).ram().share("spriteram");
 	map(0x9060, 0x907f).ram().share("bulletsram");
 	map(0x9080, 0x90ff).ram();
-	map(0xa802, 0xa802).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
-	map(0xa804, 0xa804).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
-	map(0xa806, 0xa806).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xa802, 0xa802).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xa804, 0xa804).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
 	map(0xa80e, 0xa80e).nopw();    /* coin counters */
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xd000, 0xd01f).rw(this, FUNC(scobra_state::hustler_ppi8255_0_r), FUNC(scobra_state::hustler_ppi8255_0_w));
-	map(0xe000, 0xe01f).rw(this, FUNC(scobra_state::hustler_ppi8255_1_r), FUNC(scobra_state::hustler_ppi8255_1_w));
+	map(0xd000, 0xd01f).rw(FUNC(scobra_state::hustler_ppi8255_0_r), FUNC(scobra_state::hustler_ppi8255_0_w));
+	map(0xe000, 0xe01f).rw(FUNC(scobra_state::hustler_ppi8255_1_r), FUNC(scobra_state::hustler_ppi8255_1_w));
 }
 
 void scobra_state::hustlerb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
-	map(0x9000, 0x903f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
+	map(0x9000, 0x903f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x9040, 0x905f).ram().share("spriteram");
 	map(0x9060, 0x907f).ram().share("bulletsram");
 	map(0x9080, 0x90ff).ram();
-	map(0xa801, 0xa801).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xa801, 0xa801).w(FUNC(scobra_state::galaxold_nmi_enable_w));
 	map(0xa802, 0xa802).nopw();    /* coin counters */
-	map(0xa806, 0xa806).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
-	map(0xa807, 0xa807).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xa807, 0xa807).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
 	map(0xb000, 0xb000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc100, 0xc103).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc200, 0xc203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -238,17 +238,17 @@ void scobra_state::mimonkey_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
-	map(0x9000, 0x903f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram").mirror(0x0400);
+	map(0x9000, 0x903f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x9040, 0x905f).ram().share("spriteram");
 	map(0x9060, 0x907f).ram().share("bulletsram");
 	map(0x9080, 0x90ff).ram();
 	map(0x9800, 0x9803).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa000, 0xa003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa800, 0xa802).w(this, FUNC(scobra_state::galaxold_gfxbank_w));
-	map(0xa801, 0xa801).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
-	map(0xa806, 0xa806).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
-	map(0xa807, 0xa807).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xa800, 0xa802).w(FUNC(scobra_state::galaxold_gfxbank_w));
+	map(0xa801, 0xa801).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xa807, 0xa807).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
 	map(0xb000, 0xb000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc000, 0xffff).rom();
 }
@@ -258,8 +258,8 @@ void scobra_state::rescuefe_map(address_map &map)
 {
 	map(0x0000, 0x05ff).rom();
 	map(0x0600, 0x0fff).ram(); // sets stack here
-	map(0x1000, 0x13ff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
-	map(0x1400, 0x143f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x1000, 0x13ff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
+	map(0x1400, 0x143f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x1440, 0x145f).ram().share("spriteram");
 	map(0x1460, 0x147f).ram().share("bulletsram");
 	map(0x1480, 0x14ff).ram();
@@ -271,10 +271,10 @@ void scobra_state::rescuefe_map(address_map &map)
 
 	map(0xa600, 0xa6ff).rom(); // wrong (taunt string) jumps to around a600 so something must map in this area?
 
-	map(0xEA01, 0xEA01).w(this, FUNC(scobra_state::galaxold_nmi_enable_w));
-	map(0xEA93, 0xEA93).w(this, FUNC(scobra_state::scrambold_background_enable_w));
-	map(0xEA86, 0xEA86).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w));
-	map(0xEA87, 0xEA87).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xEA01, 0xEA01).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xEA93, 0xEA93).w(FUNC(scobra_state::scrambold_background_enable_w));
+	map(0xEA86, 0xEA86).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xEA87, 0xEA87).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
 
 	// does it have a real ppi8255?
 	map(0xC190, 0xC193).r(m_ppi8255_0, FUNC(i8255_device::read)); // ?
@@ -293,7 +293,7 @@ void scobra_state::rescuefe_map(address_map &map)
 void scobra_state::minefldfe_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom(); // ok
-	map(0x0c00, 0x0c3f).ram().w(this, FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram"); // ok
+	map(0x0c00, 0x0c3f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram"); // ok
 	map(0x0c40, 0x0c5f).ram().share("spriteram"); // ok
 	map(0x0c60, 0x0c7f).ram().share("bulletsram"); // ok
 	map(0x0c80, 0x17ff).ram();
@@ -302,13 +302,13 @@ void scobra_state::minefldfe_map(address_map &map)
 	map(0x5800, 0x6dff).rom();
 	map(0x8a00, 0x91ff).rom();
 
-	map(0x4200, 0x45ff).ram().w(this, FUNC(scobra_state::galaxold_videoram_w)).share("videoram"); // ok
+	map(0x4200, 0x45ff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram"); // ok
 
-	map(0x7621, 0x7621).w(this, FUNC(scobra_state::galaxold_nmi_enable_w)); // a801
-	map(0x7673, 0x7673).w(this, FUNC(scobra_state::scrambold_background_enable_w)); // a083
-	map(0x7704, 0x7704).w(this, FUNC(scobra_state::galaxold_stars_enable_w)); // a804
-	map(0x7616, 0x7616).w(this, FUNC(scobra_state::galaxold_flip_screen_x_w)); // a806
-	map(0x7617, 0x7617).w(this, FUNC(scobra_state::galaxold_flip_screen_y_w)); // a807
+	map(0x7621, 0x7621).w(FUNC(scobra_state::galaxold_nmi_enable_w)); // a801
+	map(0x7673, 0x7673).w(FUNC(scobra_state::scrambold_background_enable_w)); // a083
+	map(0x7704, 0x7704).w(FUNC(scobra_state::galaxold_stars_enable_w)); // a804
+	map(0x7616, 0x7616).w(FUNC(scobra_state::galaxold_flip_screen_x_w)); // a806
+	map(0x7617, 0x7617).w(FUNC(scobra_state::galaxold_flip_screen_y_w)); // a807
 
 	map(0x4C00, 0x4C03).mirror(0x00fc).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4B00, 0x4B03).mirror(0x00fc).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -320,7 +320,7 @@ void scobra_state::minefldfe_map(address_map &map)
 
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
-	map(0xf802, 0xf802).w(this, FUNC(scobra_state::galaxold_coin_counter_w));
+	map(0xf802, 0xf802).w(FUNC(scobra_state::galaxold_coin_counter_w));
 }
 
 
@@ -337,8 +337,8 @@ WRITE8_MEMBER(scobra_state::scobra_soundram_w)
 void scobra_state::scobra_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x8000, 0x8fff).rw(this, FUNC(scobra_state::scobra_soundram_r), FUNC(scobra_state::scobra_soundram_w)).share("soundram");
-	map(0x9000, 0x9fff).w(this, FUNC(scobra_state::scramble_filter_w));
+	map(0x8000, 0x8fff).rw(FUNC(scobra_state::scobra_soundram_r), FUNC(scobra_state::scobra_soundram_w)).share("soundram");
+	map(0x9000, 0x9fff).nopw(); // w(FUNC(scobra_state::scramble_filter_w)); - scobra doesn't instantiate any RC filters. This is dead code!
 }
 
 
@@ -355,7 +355,7 @@ void scobra_state::hustler_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x6000, 0x6fff).w(this, FUNC(scobra_state::frogger_filter_w));
+	map(0x6000, 0x6fff).nopw(); // w(FUNC(scobra_state::frogger_filter_w)); - hustler doesn't instantiate any RC filters. This is dead code!
 }
 
 void scobra_state::hustler_sound_io_map(address_map &map)
@@ -369,8 +369,8 @@ void scobra_state::hustler_sound_io_map(address_map &map)
 void scobra_state::hustlerb_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x6000, 0x6fff).w(this, FUNC(scobra_state::frogger_filter_w));
-	map(0x8000, 0x8fff).ram().r(this, FUNC(scobra_state::scobra_soundram_r)).share("soundram");  /* only here to initialize pointer */
+	map(0x6000, 0x6fff).nopw(); // w(FUNC(scobra_state::frogger_filter_w)); - hustlerb doesn't instantiate any RC filters. This is dead code!
+	map(0x8000, 0x8fff).ram().r(FUNC(scobra_state::scobra_soundram_r)).share("soundram");  /* only here to initialize pointer */
 }
 
 void scobra_state::hustlerb_sound_io_map(address_map &map)
@@ -1269,6 +1269,7 @@ ROM_END
 
     CPU/Video Board: A969 (Has various wire mods)
     Sound Board:     ?
+    Interface Card:  A2372
 */
 
 ROM_START( rescue )

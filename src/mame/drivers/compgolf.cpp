@@ -63,12 +63,12 @@ WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
 void compgolf_state::compgolf_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram().w(this, FUNC(compgolf_state::compgolf_video_w)).share("videoram");
-	map(0x1800, 0x1fff).ram().w(this, FUNC(compgolf_state::compgolf_back_w)).share("bg_ram");
+	map(0x1000, 0x17ff).ram().w(FUNC(compgolf_state::compgolf_video_w)).share("videoram");
+	map(0x1800, 0x1fff).ram().w(FUNC(compgolf_state::compgolf_back_w)).share("bg_ram");
 	map(0x2000, 0x2060).ram().share("spriteram");
 	map(0x2061, 0x2061).nopw();
 	map(0x3000, 0x3000).portr("P1");
-	map(0x3001, 0x3001).portr("P2").w(this, FUNC(compgolf_state::compgolf_ctrl_w));
+	map(0x3001, 0x3001).portr("P2").w(FUNC(compgolf_state::compgolf_ctrl_w));
 	map(0x3002, 0x3002).portr("DSW1");
 	map(0x3003, 0x3003).portr("DSW2");
 	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));

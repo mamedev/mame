@@ -102,9 +102,9 @@ WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 void aquarium_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0xc00000, 0xc00fff).ram().w(this, FUNC(aquarium_state::aquarium_mid_videoram_w)).share("mid_videoram");
-	map(0xc01000, 0xc01fff).ram().w(this, FUNC(aquarium_state::aquarium_bak_videoram_w)).share("bak_videoram");
-	map(0xc02000, 0xc03fff).ram().w(this, FUNC(aquarium_state::aquarium_txt_videoram_w)).share("txt_videoram");
+	map(0xc00000, 0xc00fff).ram().w(FUNC(aquarium_state::aquarium_mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(FUNC(aquarium_state::aquarium_bak_videoram_w)).share("bak_videoram");
+	map(0xc02000, 0xc03fff).ram().w(FUNC(aquarium_state::aquarium_txt_videoram_w)).share("txt_videoram");
 	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80014, 0xd8001f).writeonly().share("scroll");
@@ -113,7 +113,7 @@ void aquarium_state::main_map(address_map &map)
 	map(0xd80082, 0xd80083).nopr(); /* stored but not read back ? check code at 0x01f440 */
 	map(0xd80084, 0xd80085).portr("INPUTS");
 	map(0xd80086, 0xd80087).portr("SYSTEM");
-	map(0xd80088, 0xd80088).w(this, FUNC(aquarium_state::aquarium_watchdog_w));
+	map(0xd80088, 0xd80088).w(FUNC(aquarium_state::aquarium_watchdog_w));
 	map(0xd8008b, 0xd8008b).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xff0000, 0xffffff).ram();
 }
@@ -129,10 +129,10 @@ void aquarium_state::snd_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x02, 0x02).rw(this, FUNC(aquarium_state::aquarium_oki_r), FUNC(aquarium_state::aquarium_oki_w));
+	map(0x02, 0x02).rw(FUNC(aquarium_state::aquarium_oki_r), FUNC(aquarium_state::aquarium_oki_w));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x06, 0x06).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w)); // only written with 0 for some reason
-	map(0x08, 0x08).w(this, FUNC(aquarium_state::aquarium_z80_bank_w));
+	map(0x08, 0x08).w(FUNC(aquarium_state::aquarium_z80_bank_w));
 }
 
 static INPUT_PORTS_START( aquarium )

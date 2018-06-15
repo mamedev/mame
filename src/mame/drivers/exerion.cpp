@@ -195,14 +195,14 @@ void exerion_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("main_ram");
-	map(0x6008, 0x600b).r(this, FUNC(exerion_state::exerion_protection_r));
+	map(0x6008, 0x600b).r(FUNC(exerion_state::exerion_protection_r));
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x887f).ram().share("spriteram");
 	map(0x8880, 0x8bff).ram();
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa800, 0xa800).portr("DSW0");
 	map(0xb000, 0xb000).portr("DSW1");
-	map(0xc000, 0xc000).w(this, FUNC(exerion_state::exerion_videoreg_w));
+	map(0xc000, 0xc000).w(FUNC(exerion_state::exerion_videoreg_w));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd000, 0xd001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xd800, 0xd801).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -222,8 +222,8 @@ void exerion_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x800c).w(this, FUNC(exerion_state::exerion_video_latch_w));
-	map(0xa000, 0xa000).r(this, FUNC(exerion_state::exerion_video_timing_r));
+	map(0x8000, 0x800c).w(FUNC(exerion_state::exerion_video_latch_w));
+	map(0xa000, 0xa000).r(FUNC(exerion_state::exerion_video_timing_r));
 }
 
 
@@ -556,9 +556,9 @@ void exerion_state::init_exerion()
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-					       ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-					       ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-					       ((oldaddr     ) & 0x0001);        /* keep h2 */
+						   ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+						   ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+						   ((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -574,10 +574,10 @@ void exerion_state::init_exerion()
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					       ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					       ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					       ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					       ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 }

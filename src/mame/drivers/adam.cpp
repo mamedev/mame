@@ -544,24 +544,16 @@ READ8_MEMBER( adam_state::iorq_r )
 
 	case 5:
 		if (BIT(offset, 0))
-		{
-			data = m_vdc->register_read(space, 0);
-		}
+			data = m_vdc->register_read();
 		else
-		{
-			data = m_vdc->vram_read(space, 0);
-		}
+			data = m_vdc->vram_read();
 		break;
 
 	case 7:
 		if (BIT(offset, 1))
-		{
 			data = m_joy2->read();
-		}
 		else
-		{
 			data = m_joy1->read();
-		}
 		break;
 	}
 
@@ -600,13 +592,9 @@ WRITE8_MEMBER( adam_state::iorq_w )
 
 	case 5:
 		if (BIT(offset, 0))
-		{
-			m_vdc->register_write(space, 0, data);
-		}
+			m_vdc->register_write(data);
 		else
-		{
-			m_vdc->vram_write(space, 0, data);
-		}
+			m_vdc->vram_write(data);
 		break;
 
 	case 6:
@@ -617,7 +605,7 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 
 	case 7:
-		m_psg->write(space, 0, data);
+		m_psg->write(data);
 		break;
 	}
 
@@ -876,7 +864,7 @@ WRITE8_MEMBER( adam_state::m6801_p4_w )
 
 void adam_state::adam_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(adam_state::mreq_r), FUNC(adam_state::mreq_w));
+	map(0x0000, 0xffff).rw(FUNC(adam_state::mreq_r), FUNC(adam_state::mreq_w));
 }
 
 
@@ -886,7 +874,7 @@ void adam_state::adam_mem(address_map &map)
 
 void adam_state::adam_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(adam_state::iorq_r), FUNC(adam_state::iorq_w));
+	map(0x0000, 0xffff).rw(FUNC(adam_state::iorq_r), FUNC(adam_state::iorq_w));
 }
 
 
@@ -908,10 +896,10 @@ void adam_state::m6801_mem(address_map &map)
 
 void adam_state::m6801_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(adam_state::m6801_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_state::m6801_p2_r), FUNC(adam_state::m6801_p2_w));
-	map(M6801_PORT3, M6801_PORT3).rw(this, FUNC(adam_state::m6801_p3_r), FUNC(adam_state::m6801_p3_w));
-	map(M6801_PORT4, M6801_PORT4).w(this, FUNC(adam_state::m6801_p4_w));
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_state::m6801_p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_state::m6801_p2_r), FUNC(adam_state::m6801_p2_w));
+	map(M6801_PORT3, M6801_PORT3).rw(FUNC(adam_state::m6801_p3_r), FUNC(adam_state::m6801_p3_w));
+	map(M6801_PORT4, M6801_PORT4).w(FUNC(adam_state::m6801_p4_w));
 }
 
 

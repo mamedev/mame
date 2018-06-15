@@ -8,6 +8,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Calculated from CRT controller writes */
@@ -45,7 +46,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamp(*this, "lamp1")
 	{ }
 
 	void lockon(machine_config &config);
@@ -108,7 +109,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_lamp;
+	output_finder<> m_lamp;
 
 	DECLARE_READ16_MEMBER(lockon_crtc_r);
 	DECLARE_WRITE16_MEMBER(lockon_crtc_w);

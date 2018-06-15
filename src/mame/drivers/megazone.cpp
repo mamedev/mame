@@ -161,7 +161,7 @@ void megazone_state::megazone_map(address_map &map)
 void megazone_state::megazone_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x2000).w(this, FUNC(megazone_state::megazone_i8039_irq_w)); /* START line. Interrupts 8039 */
+	map(0x2000, 0x2000).w(FUNC(megazone_state::megazone_i8039_irq_w)); /* START line. Interrupts 8039 */
 	map(0x4000, 0x4000).w("soundlatch", FUNC(generic_latch_8_device::write));            /* CODE  line. Command Interrupts 8039 */
 	map(0x6000, 0x6000).portr("IN0");            /* IO Coin */
 	map(0x6001, 0x6001).portr("IN1");            /* P1 IO */
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_DEVICE_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
 	MCFG_DEVICE_PROGRAM_MAP(megazone_i8039_map)
 	MCFG_DEVICE_IO_MAP(megazone_i8039_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, megazone_state, i8039_irqen_and_status_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))

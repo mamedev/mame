@@ -17,6 +17,7 @@
 
 #include "machine/7474.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* star circuit */
@@ -45,7 +46,7 @@ public:
 		, m_bulletsram(*this,"bulletsram")
 		, m_rockclim_videoram(*this,"rockclim_vram")
 		, m_racknrol_tiles_bank(*this,"racknrol_tbank")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 		, m_leftclip(2)
 	{ }
 
@@ -66,7 +67,7 @@ public:
 	optional_shared_ptr<uint8_t> m_bulletsram;
 	optional_shared_ptr<uint8_t> m_rockclim_videoram;
 	optional_shared_ptr<uint8_t> m_racknrol_tiles_bank;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	int m_irq_line;
 	uint8_t m__4in1_bank;
@@ -326,7 +327,7 @@ public:
 	void tazzmang(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

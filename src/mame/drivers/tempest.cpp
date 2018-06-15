@@ -311,7 +311,7 @@ public:
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
 		m_in1(*this, "IN1/DSW0"),
 		m_in2(*this, "IN2"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
@@ -344,7 +344,7 @@ private:
 	required_ioport m_buttons_p2;
 	required_ioport m_in1;
 	required_ioport m_in2;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	uint8_t m_player_select;
 };
@@ -352,7 +352,7 @@ private:
 
 void tempest_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	save_item(NAME(m_player_select));
 }
 
@@ -413,8 +413,8 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
 
 WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	m_led[0] = BIT(~data, 1);
-	m_led[1] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 0);
 	/* FLIP is bit 0x04 */
 	m_player_select = data & 0x04;
 }
@@ -457,9 +457,9 @@ void tempest_state::main_map(address_map &map)
 	map(0x0e00, 0x0e00).portr("DSW2");
 	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(this, FUNC(tempest_state::tempest_coin_w));
+	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
-	map(0x5000, 0x5000).w(this, FUNC(tempest_state::wdclr_w));
+	map(0x5000, 0x5000).w(FUNC(tempest_state::wdclr_w));
 	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
 	map(0x6000, 0x603f).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
@@ -469,9 +469,9 @@ void tempest_state::main_map(address_map &map)
 	map(0x6080, 0x609f).w(m_mathbox, FUNC(mathbox_device::go_w));
 	map(0x60c0, 0x60cf).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x60d0, 0x60df).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x60e0, 0x60e0).w(this, FUNC(tempest_state::tempest_led_w));
+	map(0x60e0, 0x60e0).w(FUNC(tempest_state::tempest_led_w));
 	map(0x9000, 0xdfff).rom();
-	map(0xae1f, 0xae1f).r(this, FUNC(tempest_state::rom_ae1f_r));
+	map(0xae1f, 0xae1f).r(FUNC(tempest_state::rom_ae1f_r));
 	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 

@@ -30,15 +30,15 @@
 void m58_state::yard_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(m58_state::videoram_w)).share("videoram");
-	map(0x9000, 0x9fff).w(this, FUNC(m58_state::scroll_panel_w));
+	map(0x8000, 0x8fff).ram().w(FUNC(m58_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).w(FUNC(m58_state::scroll_panel_w));
 	map(0xc820, 0xc87f).ram().share("spriteram");
 	map(0xa000, 0xa000).ram().share("scroll_x_low");
 	map(0xa200, 0xa200).ram().share("scroll_x_high");
 	map(0xa400, 0xa400).ram().share("scroll_y_low");
 	map(0xa800, 0xa800).ram().share("score_disable");
 	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).w(this, FUNC(m58_state::flipscreen_w));    /* + coin counters */
+	map(0xd001, 0xd001).w(FUNC(m58_state::flipscreen_w));    /* + coin counters */
 	map(0xd000, 0xd000).portr("IN0");
 	map(0xd001, 0xd001).portr("IN1");
 	map(0xd002, 0xd002).portr("IN2");

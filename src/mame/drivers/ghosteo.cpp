@@ -64,6 +64,7 @@ ToDo: verify QS1000 hook-up
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,7 +270,6 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	#endif
@@ -294,7 +294,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	#endif
@@ -329,7 +328,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	uint8_t data = 0;
 	switch (nand.mode)
 	{
@@ -375,7 +373,6 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
 {
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 	#endif
@@ -431,7 +428,7 @@ void ghosteo_state::bballoon_map(address_map &map)
 
 void ghosteo_state::touryuu_map(address_map &map)
 {
-	map(0x10000000, 0x10000003).r(this, FUNC(ghosteo_state::touryuu_port_10000000_r));
+	map(0x10000000, 0x10000003).r(FUNC(ghosteo_state::touryuu_port_10000000_r));
 	map(0x10100000, 0x10100003).portr("10100000");
 	map(0x10200000, 0x10200003).portr("10200000");
 	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);

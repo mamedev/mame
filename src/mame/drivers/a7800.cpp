@@ -104,6 +104,7 @@
 #include "machine/mos6530n.h"
 #include "video/maria.h"
 #include "bus/a7800/a78_carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -303,7 +304,7 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
 
 void a7800_state::a7800_mem(address_map &map)
 {
-	map(0x0000, 0x001f).mirror(0x300).rw(this, FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
+	map(0x0000, 0x001f).mirror(0x300).rw(FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
 	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
 	map(0x0040, 0x00ff).bankrw("zpmirror"); // mirror of 0x2040-0x20ff, for zero page
 	map(0x0140, 0x01ff).bankrw("spmirror"); // mirror of 0x2140-0x21ff, for stack page
@@ -319,7 +320,7 @@ void a7800_state::a7800_mem(address_map &map)
 								// and even then with inconsistent and unreliable results.
 	map(0x4000, 0xffff).w(m_cart, FUNC(a78_cart_slot_device::write_40xx));
 	map(0x4000, 0xbfff).r(m_cart, FUNC(a78_cart_slot_device::read_40xx));
-	map(0xc000, 0xffff).r(this, FUNC(a7800_state::bios_or_cart_r));    // here also the BIOS can be accessed
+	map(0xc000, 0xffff).r(FUNC(a7800_state::bios_or_cart_r));    // here also the BIOS can be accessed
 }
 
 
@@ -1448,9 +1449,9 @@ MACHINE_CONFIG_END
 ROM_START( a7800 )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
-	ROMX_LOAD("7800.u7", 0x3000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
+	ROMX_LOAD("7800.u7", 0x3000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 (prototype with Asteroids)" )
-	ROMX_LOAD("c300558-001a.u7", 0x0000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(2))
+	ROMX_LOAD("c300558-001a.u7", 0x0000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(1))
 ROM_END
 
 ROM_START( a7800p )

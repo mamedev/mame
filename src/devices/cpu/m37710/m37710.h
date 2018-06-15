@@ -99,11 +99,10 @@ enum
 
 class m37710_cpu_device : public cpu_device, public m7700_disassembler::config
 {
-public:
+protected:
 	DECLARE_READ8_MEMBER( m37710_internal_r );
 	DECLARE_WRITE8_MEMBER( m37710_internal_w );
 
-protected:
 	// construction/destruction
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
@@ -236,8 +235,6 @@ private:
 	TIMER_CALLBACK_MEMBER( m37710_timer_cb );
 	void m37710_external_tick(int timer, int state);
 	void m37710_recalc_timer(int timer);
-	uint8_t m37710_internal_r(int offset);
-	void m37710_internal_w(int offset, uint8_t data);
 	uint32_t m37710i_get_reg_M0X0(int regnum);
 	uint32_t m37710i_get_reg_M0X1(int regnum);
 	uint32_t m37710i_get_reg_M1X0(int regnum);

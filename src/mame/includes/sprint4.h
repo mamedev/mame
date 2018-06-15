@@ -7,6 +7,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sprint4_state : public driver_device

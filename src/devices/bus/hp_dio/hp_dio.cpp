@@ -19,9 +19,6 @@ DEFINE_DEVICE_TYPE(DIO16_SLOT, dio16_slot_device, "dio16_slot", "16-bit DIO slot
 //  LIVE DEVICE
 //**************************************************************************
 
-//-------------------------------------------------
-//  dio16_slot_device - constructor
-//-------------------------------------------------
 dio16_slot_device::dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dio16_slot_device(mconfig, DIO16_SLOT, tag, owner, clock)
 {
@@ -30,25 +27,29 @@ dio16_slot_device::dio16_slot_device(const machine_config &mconfig, const char *
 dio16_slot_device::dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_owner(nullptr), m_dio_tag(nullptr)
+	m_dio(*this, finder_base::DUMMY_TAG)
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+void dio16_slot_device::device_resolve_objects()
+{
+	device_dio16_card_interface *const card(dynamic_cast<device_dio16_card_interface *>(get_card_device()));
+	if (card && m_dio)
+		card->set_diobus(*m_dio);
+}
+
+void dio16_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_dio16_card_interface *>(card))
+		osd_printf_error("Card device %s (%s) does not implement device_dio16_card_interface\n", card->tag(), card->name());
+}
 
 void dio16_slot_device::device_start()
 {
-	device_dio16_card_interface *dev = dynamic_cast<device_dio16_card_interface *>(get_card_device());
-
-	const device_dio32_card_interface *intf;
-	if (get_card_device() && get_card_device()->interface(intf))
-	{
-		fatalerror("DIO32 device in DIO16 slot\n");
-	}
-
-	if (dev) dev->set_diobus(m_owner->subdevice(m_dio_tag));
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_dio16_card_interface *>(card))
+		throw emu_fatalerror("dio16_slot_device: card device %s (%s) does not implement device_dio16_card_interface\n", card->tag(), card->name());
 }
 
 
@@ -77,8 +78,7 @@ dio32_slot_device::dio32_slot_device(const machine_config &mconfig, const char *
 
 void dio32_slot_device::device_start()
 {
-	device_dio16_card_interface *dev = dynamic_cast<device_dio16_card_interface *>(get_card_device());
-	if (dev) dev->set_diobus(m_owner->subdevice(m_dio_tag));
+	dio16_slot_device::device_start();
 }
 
 
@@ -103,13 +103,12 @@ dio16_device::dio16_device(const machine_config &mconfig, const char *tag, devic
 
 dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(nullptr),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_prgspace(nullptr),
 	m_out_irq3_cb(*this),
 	m_out_irq4_cb(*this),
 	m_out_irq5_cb(*this),
-	m_out_irq6_cb(*this),
-	m_cputag(nullptr)
+	m_out_irq6_cb(*this)
 {
 	m_prgwidth = 0;
 }
@@ -125,7 +124,6 @@ void dio16_device::device_start()
 	m_out_irq5_cb.resolve_safe();
 	m_out_irq6_cb.resolve_safe();
 
-	m_maincpu = subdevice<cpu_device>(m_cputag);
 	m_prgspace = &m_maincpu->space(AS_PROGRAM);
 	m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 }
@@ -167,7 +165,7 @@ void dio16_device::unmap_bank(offs_t start, offs_t end)
 
 void dio16_device::install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
-	m_prgspace->install_read_bank(start, end, 0, tag );
+	m_prgspace->install_read_bank(start, end, 0, tag);
 	machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -176,86 +174,62 @@ void dio16_device::unmap_rom(offs_t start, offs_t end)
 	m_prgspace->unmap_read(start, end);
 }
 
-// interrupt request from dio card
-WRITE_LINE_MEMBER( dio16_device::irq3_w ) { m_out_irq3_cb(state); }
-WRITE_LINE_MEMBER( dio16_device::irq4_w ) { m_out_irq4_cb(state); }
-WRITE_LINE_MEMBER( dio16_device::irq5_w ) { m_out_irq5_cb(state); }
-WRITE_LINE_MEMBER( dio16_device::irq6_w ) { m_out_irq6_cb(state); }
-
-//**************************************************************************
-//  DEVICE CONFIG DIO16 CARD INTERFACE
-//**************************************************************************
-
 
 //**************************************************************************
 //  DEVICE DIO16 CARD INTERFACE
 //**************************************************************************
 
-//-------------------------------------------------
-//  device_dio16_card_interface - constructor
-//-------------------------------------------------
-
-device_dio16_card_interface::device_dio16_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_dio(nullptr), m_dio_dev(nullptr), m_next(nullptr)
+device_dio16_card_interface::device_dio16_card_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
+	m_dio_dev(nullptr), m_next(nullptr)
 {
 }
-
-
-//-------------------------------------------------
-//  ~device_dio16_card_interface - destructor
-//-------------------------------------------------
 
 device_dio16_card_interface::~device_dio16_card_interface()
 {
 }
 
-void device_dio16_card_interface::set_dio_device()
+void device_dio16_card_interface::interface_pre_start()
 {
-	m_dio = dynamic_cast<dio16_device *>(m_dio_dev);
+	if (!m_dio_dev)
+		throw emu_fatalerror("device_dio16_card_interface: DIO bus not configured\n");
 }
 
 
-DEFINE_DEVICE_TYPE(DIO32, dio32_device, "dio32", "32-bit DIO-II bus")
+//**************************************************************************
+//  DIO32 DEVICE
+//**************************************************************************
 
-//-------------------------------------------------
-//  dio32_device - constructor
-//-------------------------------------------------
+DEFINE_DEVICE_TYPE(DIO32, dio32_device, "dio32", "32-bit DIO-II bus")
 
 dio32_device::dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dio16_device(mconfig, DIO32, tag, owner, clock)
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void dio32_device::device_start()
 {
 	dio16_device::device_start();
 }
 
-//-------------------------------------------------
-//  device_dio32_card_interface - constructor
-//-------------------------------------------------
 
-device_dio32_card_interface::device_dio32_card_interface(const machine_config &mconfig, device_t &device)
-	: device_dio16_card_interface(mconfig,device), m_dio(nullptr)
+//**************************************************************************
+//  DEVICE DIO32 CARD INTERFACE
+//**************************************************************************
+
+device_dio32_card_interface::device_dio32_card_interface(const machine_config &mconfig, device_t &device) :
+	device_dio16_card_interface(mconfig, device)
 {
 }
-
-
-//-------------------------------------------------
-//  ~device_dio32_card_interface - destructor
-//-------------------------------------------------
 
 device_dio32_card_interface::~device_dio32_card_interface()
 {
 }
 
-void device_dio32_card_interface::set_dio_device()
+void device_dio32_card_interface::interface_pre_start()
 {
-	m_dio = dynamic_cast<dio32_device *>(m_dio_dev);
-}
+	device_dio16_card_interface::interface_pre_start();
 
+	if (m_dio_dev && !dynamic_cast<dio32_device *>(m_dio_dev))
+		throw emu_fatalerror("device_dio32_card_interface: DIO32 device %s (%s) in DIO16 slot %s\n", device().tag(), device().name(), m_dio_dev->name());
+}

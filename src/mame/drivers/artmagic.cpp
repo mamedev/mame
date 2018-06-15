@@ -419,8 +419,8 @@ void artmagic_state::main_map(address_map &map)
 	map(0x300006, 0x300007).portr("300006");
 	map(0x300008, 0x300009).portr("300008");
 	map(0x30000a, 0x30000b).portr("30000a");
-	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
-	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x360001, 0x360001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 }
@@ -439,8 +439,8 @@ void artmagic_state::stonebal_map(address_map &map)
 	map(0x30000a, 0x30000b).portr("30000a");
 	map(0x30000c, 0x30000d).portr("30000c");
 	map(0x30000e, 0x30000f).portr("30000e");
-	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
-	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 }
@@ -453,8 +453,8 @@ void artmagic_state::shtstar_map(address_map &map)
 	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
 	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
-	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
-	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x3c0000, 0x3c001f).rw("mainduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -471,7 +471,7 @@ void artmagic_state::tms_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
-	map(0x00800000, 0x0080007f).rw(this, FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).ram();
@@ -482,7 +482,7 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
-	map(0x00800000, 0x0080007f).rw(this, FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffc00000, 0xffffffff).ram();

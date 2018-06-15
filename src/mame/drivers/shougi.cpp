@@ -84,6 +84,7 @@ PROM  : Type MB7051
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -283,7 +284,7 @@ void shougi_state::sub_map(address_map &map)
 void shougi_state::readport_sub(address_map &map)
 {
 	map.global_mask(0x00ff);
-	map(0x00, 0x00).r(this, FUNC(shougi_state::semaphore_r));
+	map(0x00, 0x00).r(FUNC(shougi_state::semaphore_r));
 }
 
 

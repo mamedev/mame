@@ -93,11 +93,11 @@ void tmc2000e_state::tmc2000e_io_map(address_map &map)
 {
 	map(0x01, 0x01).w(m_cti, FUNC(cdp1864_device::tone_latch_w));
 	map(0x02, 0x02).w(m_cti, FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x03, 0x03).rw(this, FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
-	map(0x04, 0x04).rw(this, FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
-	map(0x05, 0x05).rw(this, FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
-	map(0x06, 0x06).rw(this, FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
-	map(0x07, 0x07).portr("DSW0").w(this, FUNC(tmc2000e_state::io_select_w));
+	map(0x03, 0x03).rw(FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
+	map(0x04, 0x04).rw(FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
+	map(0x05, 0x05).rw(FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
+	map(0x06, 0x06).rw(FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
+	map(0x07, 0x07).portr("DSW0").w(FUNC(tmc2000e_state::io_select_w));
 }
 
 /* Input Ports */

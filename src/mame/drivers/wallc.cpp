@@ -53,6 +53,7 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -288,7 +289,7 @@ WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
 void wallc_state::wallc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
 	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
 	map(0xb000, 0xb000).portr("DSW1");
@@ -297,7 +298,7 @@ void wallc_state::wallc_map(address_map &map)
 	map(0xb600, 0xb600).portr("DSW2");
 
 	map(0xb000, 0xb000).nopw();
-	map(0xb100, 0xb100).w(this, FUNC(wallc_state::wallc_coin_counter_w));
+	map(0xb100, 0xb100).w(FUNC(wallc_state::wallc_coin_counter_w));
 	map(0xb200, 0xb200).nopw();
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
 	map(0xb600, 0xb600).w("aysnd", FUNC(ay8912_device::data_w));
@@ -306,7 +307,7 @@ void wallc_state::wallc_map(address_map &map)
 void wallc_state::unkitpkr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
 	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
 	map(0xb000, 0xb000).portr("DSW1");
@@ -315,9 +316,9 @@ void wallc_state::unkitpkr_map(address_map &map)
 	map(0xb300, 0xb300).portr("IN3");
 	map(0xb500, 0xb5ff).nopr(); // read by memory test routine. left over from some other game
 
-	map(0xb000, 0xb000).w(this, FUNC(wallc_state::unkitpkr_out0_w));
-	map(0xb100, 0xb100).w(this, FUNC(wallc_state::unkitpkr_out1_w));
-	map(0xb200, 0xb200).w(this, FUNC(wallc_state::unkitpkr_out2_w));
+	map(0xb000, 0xb000).w(FUNC(wallc_state::unkitpkr_out0_w));
+	map(0xb100, 0xb100).w(FUNC(wallc_state::unkitpkr_out1_w));
+	map(0xb200, 0xb200).w(FUNC(wallc_state::unkitpkr_out2_w));
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
 	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));  // Port A = DSW
 }

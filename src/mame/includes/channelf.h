@@ -15,6 +15,8 @@
 #include "bus/chanf/slot.h"
 #include "bus/chanf/rom.h"
 
+#include "emupal.h"
+
 
 class channelf_state : public driver_device
 {

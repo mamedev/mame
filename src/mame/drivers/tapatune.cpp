@@ -285,9 +285,9 @@ void tapatune_state::video_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();
 	map(0x300000, 0x31ffff).ram().share("videoram");
 	map(0x320000, 0x33ffff).ram();
-	map(0x400000, 0x400003).rw(this, FUNC(tapatune_state::read_from_z80), FUNC(tapatune_state::write_to_z80));
+	map(0x400000, 0x400003).rw(FUNC(tapatune_state::read_from_z80), FUNC(tapatune_state::write_to_z80));
 	map(0x400010, 0x400011).noprw(); // Watchdog?
-	map(0x600000, 0x600005).w(this, FUNC(tapatune_state::palette_w));
+	map(0x600000, 0x600005).w(FUNC(tapatune_state::palette_w));
 	map(0x800000, 0x800000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -303,20 +303,20 @@ void tapatune_state::maincpu_map(address_map &map)
 void tapatune_state::maincpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(tapatune_state::bsmt_data_lo_w));
-	map(0x08, 0x08).w(this, FUNC(tapatune_state::bsmt_data_hi_w));
-	map(0x10, 0x10).w(this, FUNC(tapatune_state::bsmt_reg_w));
-	map(0x18, 0x18).w(this, FUNC(tapatune_state::controls_mux));
-	map(0x20, 0x20).r(this, FUNC(tapatune_state::sound_irq_clear));
-	map(0x28, 0x28).r(this, FUNC(tapatune_state::status_r));
-	map(0x30, 0x30).r(this, FUNC(tapatune_state::controls_r));
+	map(0x00, 0x00).w(FUNC(tapatune_state::bsmt_data_lo_w));
+	map(0x08, 0x08).w(FUNC(tapatune_state::bsmt_data_hi_w));
+	map(0x10, 0x10).w(FUNC(tapatune_state::bsmt_reg_w));
+	map(0x18, 0x18).w(FUNC(tapatune_state::controls_mux));
+	map(0x20, 0x20).r(FUNC(tapatune_state::sound_irq_clear));
+	map(0x28, 0x28).r(FUNC(tapatune_state::status_r));
+	map(0x30, 0x30).r(FUNC(tapatune_state::controls_r));
 	map(0x38, 0x38).portr("COINS");
-	map(0x60, 0x60).w(this, FUNC(tapatune_state::write_index_to_68k));
-	map(0x61, 0x61).w(this, FUNC(tapatune_state::write_data_to_68k));
-	map(0x63, 0x63).w(this, FUNC(tapatune_state::lamps_w));
-	map(0x68, 0x68).r(this, FUNC(tapatune_state::read_index_from_68k));
-	map(0x69, 0x69).r(this, FUNC(tapatune_state::read_data_from_68k));
-	map(0x6b, 0x6b).r(this, FUNC(tapatune_state::special_r));
+	map(0x60, 0x60).w(FUNC(tapatune_state::write_index_to_68k));
+	map(0x61, 0x61).w(FUNC(tapatune_state::write_data_to_68k));
+	map(0x63, 0x63).w(FUNC(tapatune_state::lamps_w));
+	map(0x68, 0x68).r(FUNC(tapatune_state::read_index_from_68k));
+	map(0x69, 0x69).r(FUNC(tapatune_state::read_data_from_68k));
+	map(0x6b, 0x6b).r(FUNC(tapatune_state::special_r));
 }
 
 

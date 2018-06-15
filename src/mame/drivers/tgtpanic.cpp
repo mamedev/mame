@@ -111,7 +111,7 @@ void tgtpanic_state::prg_map(address_map &map)
 void tgtpanic_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(tgtpanic_state::color_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(tgtpanic_state::color_w));
 	map(0x01, 0x01).portr("IN1");
 }
 

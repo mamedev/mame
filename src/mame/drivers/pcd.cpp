@@ -439,39 +439,39 @@ READ16_MEMBER(pcd_state::mem_r)
 
 void pcd_state::pcd_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
-	map(0x00000, 0x7ffff).rw(this, FUNC(pcd_state::mem_r), FUNC(pcd_state::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x00000, 0x7ffff).rw(FUNC(pcd_state::mem_r), FUNC(pcd_state::mem_w));
 	map(0xfc000, 0xfffff).rom().region("bios", 0);
 }
 
 void pcd_state::pcd_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xefff).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x0000, 0xefff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xf801).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf820, 0xf821).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf840, 0xf840).rw(this, FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
-	map(0xf841, 0xf841).rw(this, FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
-	map(0xf880, 0xf8bf).rw(this, FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
+	map(0xf840, 0xf840).rw(FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
+	map(0xf841, 0xf841).rw(FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
+	map(0xf880, 0xf8bf).rw(FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
 	map(0xf900, 0xf903).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0xf904, 0xf905).rw(this, FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
-	map(0xf940, 0xf943).rw(this, FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
+	map(0xf904, 0xf905).rw(FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
+	map(0xf940, 0xf943).rw(FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
 	map(0xf980, 0xf9bf).m("video", FUNC(pcdx_video_device::map));
 	map(0xf9c0, 0xf9c3).rw("usart1", FUNC(mc2661_device::read), FUNC(mc2661_device::write));  // UARTs
 	map(0xf9d0, 0xf9d3).rw("usart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9e0, 0xf9e3).rw("usart3", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 //  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
-	map(0xfb00, 0xfb00).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
-	map(0xfb02, 0xffff).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0xfb00, 0xfb00).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0xfb02, 0xffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }
 
 void pcd_state::pcx_io(address_map &map)
 {
 	map.unmap_value_high();
 	pcd_io(map);
-	map(0x8000, 0x8fff).rw(this, FUNC(pcd_state::mmu_r), FUNC(pcd_state::mmu_w));
-	map(0xfb01, 0xfb01).rw(this, FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x8000, 0x8fff).rw(FUNC(pcd_state::mmu_r), FUNC(pcd_state::mmu_w));
+	map(0xfb01, 0xfb01).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }
 
 //**************************************************************************
@@ -497,13 +497,13 @@ static INPUT_PORTS_START(pcx)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pcd_state::pcd)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pcd_map)
 	MCFG_DEVICE_IO_MAP(pcd_io)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, pcd_state, i186_timer1_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, pcd_state, irq_callback))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL(16'000'000) / 24)) // adjusted to pass post
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(16_MHz_XTAL / 24)) // adjusted to pass post
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	// floppy disk controller
-	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -530,15 +530,15 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats)
 
 	// usart
-	MCFG_DEVICE_ADD("usart1", MC2661, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("usart1", MC2661, 4.9152_MHz_XTAL)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("usart2", MC2661, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("usart2", MC2661, 4.9152_MHz_XTAL)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w))
 	//MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
-	MCFG_DEVICE_ADD("usart3", MC2661, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("usart3", MC2661, 4.9152_MHz_XTAL)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
-	MCFG_MC146818_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic1", pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
 	MCFG_MC146818_BINARY_YEAR(true)
@@ -599,21 +599,21 @@ MACHINE_CONFIG_END
 ROM_START( pcd )
 	ROM_REGION(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
-	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v3", "V3 GS4") // from mainboard SYBAC S26361-D359 V3 GS4
-	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START( pcx )
 	ROM_REGION(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
-	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v3", "V3 GS4") // from mainboard SYBAC S26361-D359 V3 GS4
-	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 //**************************************************************************

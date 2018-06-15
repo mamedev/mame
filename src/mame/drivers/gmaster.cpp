@@ -12,6 +12,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -240,7 +241,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 void gmaster_state::gmaster_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).rw(this, FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
+	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
 }
 

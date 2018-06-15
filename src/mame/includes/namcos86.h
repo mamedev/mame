@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "machine/watchdog.h"
 #include "sound/namco.h"
+#include "emupal.h"
 
 class namcos86_state : public driver_device
 {
@@ -18,7 +19,7 @@ public:
 		, m_rthunder_videoram2(*this, "videoram2")
 		, m_rthunder_spriteram(*this, "spriteram")
 		, m_user1_ptr(*this, "user1")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bankswitch1_w);
@@ -90,7 +91,7 @@ protected:
 	required_shared_ptr<uint8_t> m_rthunder_videoram2;
 	required_shared_ptr<uint8_t> m_rthunder_spriteram;
 	optional_region_ptr<uint8_t> m_user1_ptr;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	uint8_t *m_spriteram;
 	int m_wdog;

@@ -84,7 +84,7 @@ public:
 		m_reel3(*this, "reel3"),
 		m_acia6850_0(*this, "acia6850_0"),
 		m_meters(*this, "meters"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
@@ -140,7 +140,7 @@ protected:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 };
 
 #define MASTER_CLOCK    (XTAL(4'000'000))
@@ -319,7 +319,7 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 
 	for (int i = 0; i < 8; i++ )
 	{
-		m_lamp[off] = BIT(data, i);
+		m_lamps[off] = BIT(data, i);
 		off++;
 	}
 }
@@ -355,7 +355,7 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////
@@ -364,17 +364,17 @@ void bfmsys85_state::memmap(address_map &map)
 {
 
 	map(0x0000, 0x1fff).ram().share("nvram"); //8k RAM
-	map(0x2000, 0x21FF).w(this, FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
-	map(0x2200, 0x23FF).w(this, FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
-	map(0x2400, 0x25FF).w(this, FUNC(bfmsys85_state::vfd_w));            // vfd latch
+	map(0x2000, 0x21FF).w(FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
+	map(0x2200, 0x23FF).w(FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
+	map(0x2400, 0x25FF).w(FUNC(bfmsys85_state::vfd_w));            // vfd latch
 
-	map(0x2600, 0x27FF).rw(this, FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
-	map(0x2800, 0x2800).r(this, FUNC(bfmsys85_state::triac_r));           // payslide triacs
-	map(0x2800, 0x29FF).w(this, FUNC(bfmsys85_state::triac_w));          // triacs
+	map(0x2600, 0x27FF).rw(FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
+	map(0x2800, 0x2800).r(FUNC(bfmsys85_state::triac_r));           // payslide triacs
+	map(0x2800, 0x29FF).w(FUNC(bfmsys85_state::triac_w));          // triacs
 
-	map(0x2A00, 0x2A00).rw(this, FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
-	map(0x2A01, 0x2A01).rw(this, FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
-	map(0x2E00, 0x2E00).r(this, FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
+	map(0x2A00, 0x2A00).rw(FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
+	map(0x2A01, 0x2A01).rw(FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
+	map(0x2E00, 0x2E00).r(FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
 
 	map(0x3000, 0x3000).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3001, 0x3001).nopr(); //sound latch
@@ -383,10 +383,10 @@ void bfmsys85_state::memmap(address_map &map)
 	map(0x3402, 0x3403).w(m_acia6850_0, FUNC(acia6850_device::write));
 	map(0x3406, 0x3407).r(m_acia6850_0, FUNC(acia6850_device::read));
 
-	map(0x3600, 0x3600).w(this, FUNC(bfmsys85_state::mux_enable_w));     // mux enable
+	map(0x3600, 0x3600).w(FUNC(bfmsys85_state::mux_enable_w));     // mux enable
 
 	map(0x4000, 0xffff).rom();                     // 48K ROM
-	map(0x8000, 0xFFFF).w(this, FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
+	map(0x8000, 0xFFFF).w(FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
 
 }
 
@@ -410,13 +410,13 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")                       // load/save nv RAM
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel0_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel1_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel2_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel3_optic_cb))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

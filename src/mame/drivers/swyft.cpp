@@ -261,6 +261,7 @@ ToDo:
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -298,8 +299,8 @@ ToDo:
 class swyft_state : public driver_device
 {
 public:
-	swyft_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	swyft_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctx(*this, "ctx"),
 		m_ctx_data_out(*this, "ctx_data_out"),
@@ -316,7 +317,7 @@ public:
 		m_y5(*this, "Y5"),
 		m_y6(*this, "Y6"),
 		m_y7(*this, "Y7")*/
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
@@ -567,10 +568,10 @@ void swyft_state::swyft_mem(address_map &map)
 	map.global_mask(0xfffff);
 	map(0x000000, 0x00ffff).rom(); // 64 KB ROM
 	map(0x040000, 0x07ffff).ram().share("p_swyft_vram"); // 256 KB RAM
-	map(0x0d0000, 0x0d000f).r(this, FUNC(swyft_state::swyft_d0000)); // status of something? reads from d0000, d0004, d0008, d000a, d000e
+	map(0x0d0000, 0x0d000f).r(FUNC(swyft_state::swyft_d0000)); // status of something? reads from d0000, d0004, d0008, d000a, d000e
 	map(0x0e1000, 0x0e1000).w(m_acia6850, FUNC(acia6850_device::control_w)); // 6850 ACIA lives here
-	map(0x0e2000, 0x0e2fff).rw(this, FUNC(swyft_state::swyft_via0_r), FUNC(swyft_state::swyft_via0_w)); // io area with selector on a9 a8 a7 a6?
-	map(0x0e4000, 0x0e4fff).rw(this, FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
+	map(0x0e2000, 0x0e2fff).rw(FUNC(swyft_state::swyft_via0_r), FUNC(swyft_state::swyft_via0_w)); // io area with selector on a9 a8 a7 a6?
+	map(0x0e4000, 0x0e4fff).rw(FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
 }
 
 MACHINE_START_MEMBER(swyft_state,swyft)
@@ -814,12 +815,12 @@ MACHINE_CONFIG_END
 ROM_START( swyft )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v331", "IAI Swyft Version 331 Firmware")
-	ROMX_LOAD( "331-lo.u30", 0x0000, 0x8000, CRC(d6cc2e2f) SHA1(39ff26c18b1cf589fc48793263f280ef3780cc61), ROM_BIOS(1))
-	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(1))
+	ROMX_LOAD( "331-lo.u30", 0x0000, 0x8000, CRC(d6cc2e2f) SHA1(39ff26c18b1cf589fc48793263f280ef3780cc61), ROM_BIOS(0))
+	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(0))
 	/* this version of the swyft code identifies itself at 0x3FCB as version 330 */
 	ROM_SYSTEM_BIOS( 1, "v330", "IAI Swyft Version 330 Firmware")
-	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(2))
-	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(2))
+	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(1))
+	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(1))
 	ROM_REGION( 0x4000, "pals", ROMREGION_ERASEFF )
 	/* Swyft PALs:
 	 * The Swyft has four PALs, whose rough function can be derived from their names:

@@ -79,12 +79,12 @@ void marineb_state::marineb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(marineb_state::marineb_videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).ram().w(FUNC(marineb_state::marineb_videoram_w)).share("videoram");
 	map(0x8c00, 0x8c3f).ram().share("spriteram");  /* Hoccer only */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(marineb_state::marineb_colorram_w)).share("colorram");
-	map(0x9800, 0x9800).w(this, FUNC(marineb_state::marineb_column_scroll_w));
-	map(0x9a00, 0x9a00).w(this, FUNC(marineb_state::marineb_palette_bank_0_w));
-	map(0x9c00, 0x9c00).w(this, FUNC(marineb_state::marineb_palette_bank_1_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(marineb_state::marineb_colorram_w)).share("colorram");
+	map(0x9800, 0x9800).w(FUNC(marineb_state::marineb_column_scroll_w));
+	map(0x9a00, 0x9a00).w(FUNC(marineb_state::marineb_palette_bank_0_w));
+	map(0x9c00, 0x9c00).w(FUNC(marineb_state::marineb_palette_bank_1_w));
 	map(0xa000, 0xa007).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");

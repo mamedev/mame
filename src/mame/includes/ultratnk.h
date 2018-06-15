@@ -12,6 +12,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ultratnk_state : public driver_device

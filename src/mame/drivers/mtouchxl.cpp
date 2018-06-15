@@ -132,9 +132,9 @@ void mtxl_state::at32_io(address_map &map)
 	map(0x0224, 0x0227).rw("cs4231", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
 	#endif
 	map(0x0228, 0x022b).portr("Unknown");
-	map(0x022f, 0x022f).w(this, FUNC(mtxl_state::bank_w));
-	map(0x022d, 0x022d).rw(this, FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
-	map(0x022c, 0x022c).r(this, FUNC(mtxl_state::coin_r));
+	map(0x022f, 0x022f).w(FUNC(mtxl_state::bank_w));
+	map(0x022d, 0x022d).rw(FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
+	map(0x022c, 0x022c).r(FUNC(mtxl_state::coin_r));
 	#ifndef REAL_PCI_CHIPSET
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	#endif

@@ -13,6 +13,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000

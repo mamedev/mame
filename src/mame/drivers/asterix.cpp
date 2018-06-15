@@ -21,6 +21,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -179,14 +180,14 @@ void asterix_state::main_map(address_map &map)
 	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));
 	map(0x380000, 0x380001).portr("IN0");
 	map(0x380002, 0x380003).portr("IN1");
-	map(0x380100, 0x380101).w(this, FUNC(asterix_state::control2_w));
+	map(0x380100, 0x380101).w(FUNC(asterix_state::control2_w));
 	map(0x380200, 0x380203).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x380300, 0x380301).w(this, FUNC(asterix_state::sound_irq_w));
-	map(0x380400, 0x380401).w(this, FUNC(asterix_state::asterix_spritebank_w));
+	map(0x380300, 0x380301).w(FUNC(asterix_state::sound_irq_w));
+	map(0x380400, 0x380401).w(FUNC(asterix_state::asterix_spritebank_w));
 	map(0x380500, 0x38051f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x380600, 0x380601).noprw();                             // Watchdog
 	map(0x380700, 0x380707).w(m_k056832, FUNC(k056832_device::b_word_w));
-	map(0x380800, 0x380803).w(this, FUNC(asterix_state::protection_w));
+	map(0x380800, 0x380803).w(FUNC(asterix_state::protection_w));
 	map(0x400000, 0x400fff).rw(m_k056832, FUNC(k056832_device::ram_half_word_r), FUNC(k056832_device::ram_half_word_w));
 	map(0x420000, 0x421fff).r(m_k056832, FUNC(k056832_device::old_rom_word_r));   // Passthrough to tile roms
 	map(0x440000, 0x44003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -198,7 +199,7 @@ void asterix_state::sound_map(address_map &map)
 	map(0xf000, 0xf7ff).ram();
 	map(0xf801, 0xf801).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 	map(0xfa00, 0xfa2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
-	map(0xfc00, 0xfc00).w(this, FUNC(asterix_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc00).w(FUNC(asterix_state::sound_arm_nmi_w));
 	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::register_w));
 }
 
@@ -269,7 +270,7 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -286,7 +287,7 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(asterix_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053244", K053244, 0)

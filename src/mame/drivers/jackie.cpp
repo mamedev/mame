@@ -50,6 +50,7 @@ Note
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,7 +72,7 @@ public:
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
 		, m_led(*this, "led")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -129,7 +130,7 @@ protected:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	output_finder<> m_led;
-	output_finder<7> m_lamp;
+	output_finder<6> m_lamps;
 
 	int m_exp_bank;
 	tilemap_t *m_fg_tilemap;
@@ -279,7 +280,7 @@ uint32_t jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void jackie_state::machine_start()
 {
 	m_led.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_exp_bank));
 	// save_item(NAME(m_irq_enable)); //always 1?
@@ -362,12 +363,12 @@ WRITE8_MEMBER(jackie_state::lamps_w)
     ---- -x--  Hold5 lamp.
     ---- ---x  Start lamp.
 */
-	m_lamp[1] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
-	m_lamp[3] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 0);           /* Lamp 6 - START */
+	m_lamps[0] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
+	m_lamps[2] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 0);           /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 
@@ -406,12 +407,12 @@ void jackie_state::jackie_prg_map(address_map &map)
 
 void jackie_state::jackie_io_map(address_map &map)
 {
-	map(0x0520, 0x0524).w(this, FUNC(jackie_state::unk_reg1_lo_w));
-	map(0x0d20, 0x0d24).w(this, FUNC(jackie_state::unk_reg1_hi_w));
-	map(0x0560, 0x0564).w(this, FUNC(jackie_state::unk_reg2_lo_w));
-	map(0x0d60, 0x0d64).w(this, FUNC(jackie_state::unk_reg2_hi_w));
-	map(0x05a0, 0x05a4).w(this, FUNC(jackie_state::unk_reg3_lo_w));
-	map(0x0da0, 0x0da4).w(this, FUNC(jackie_state::unk_reg3_hi_w));
+	map(0x0520, 0x0524).w(FUNC(jackie_state::unk_reg1_lo_w));
+	map(0x0d20, 0x0d24).w(FUNC(jackie_state::unk_reg1_hi_w));
+	map(0x0560, 0x0564).w(FUNC(jackie_state::unk_reg2_lo_w));
+	map(0x0d60, 0x0d64).w(FUNC(jackie_state::unk_reg2_hi_w));
+	map(0x05a0, 0x05a4).w(FUNC(jackie_state::unk_reg3_lo_w));
+	map(0x0da0, 0x0da4).w(FUNC(jackie_state::unk_reg3_hi_w));
 	map(0x1000, 0x1107).ram().share("bg_scroll2");
 	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
@@ -424,14 +425,14 @@ void jackie_state::jackie_io_map(address_map &map)
 	map(0x5090, 0x5093).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x50a0, 0x50a0).portr("BUTTONS2");
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x50c0, 0x50c0).r(this, FUNC(jackie_state::igs_irqack_r)).w(this, FUNC(jackie_state::igs_irqack_w));
-	map(0x6000, 0x60ff).ram().w(this, FUNC(jackie_state::bg_scroll_w)).share("bg_scroll");
-	map(0x6800, 0x69ff).ram().w(this, FUNC(jackie_state::reel1_ram_w)).share("reel1_ram");
-	map(0x6a00, 0x6bff).ram().w(this, FUNC(jackie_state::reel2_ram_w)).share("reel2_ram");
-	map(0x6c00, 0x6dff).ram().w(this, FUNC(jackie_state::reel3_ram_w)).share("reel3_ram");
-	map(0x7000, 0x77ff).ram().w(this, FUNC(jackie_state::fg_tile_w)).share("fg_tile_ram");
-	map(0x7800, 0x7fff).ram().w(this, FUNC(jackie_state::fg_color_w)).share("fg_color_ram");
-	map(0x8000, 0xffff).r(this, FUNC(jackie_state::expram_r));
+	map(0x50c0, 0x50c0).r(FUNC(jackie_state::igs_irqack_r)).w(FUNC(jackie_state::igs_irqack_w));
+	map(0x6000, 0x60ff).ram().w(FUNC(jackie_state::bg_scroll_w)).share("bg_scroll");
+	map(0x6800, 0x69ff).ram().w(FUNC(jackie_state::reel1_ram_w)).share("reel1_ram");
+	map(0x6a00, 0x6bff).ram().w(FUNC(jackie_state::reel2_ram_w)).share("reel2_ram");
+	map(0x6c00, 0x6dff).ram().w(FUNC(jackie_state::reel3_ram_w)).share("reel3_ram");
+	map(0x7000, 0x77ff).ram().w(FUNC(jackie_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x7800, 0x7fff).ram().w(FUNC(jackie_state::fg_color_w)).share("fg_color_ram");
+	map(0x8000, 0xffff).r(FUNC(jackie_state::expram_r));
 }
 
 CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)

@@ -99,9 +99,9 @@ void tonton_state::tonton_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
-	map(0x00, 0x00).w(this, FUNC(tonton_state::tonton_outport_w));
+	map(0x00, 0x00).w(FUNC(tonton_state::tonton_outport_w));
 	map(0x01, 0x01).portr("IN1");
-	map(0x01, 0x01).w(this, FUNC(tonton_state::hopper_w));
+	map(0x01, 0x01).w(FUNC(tonton_state::hopper_w));
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
 	map(0x88, 0x8b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));

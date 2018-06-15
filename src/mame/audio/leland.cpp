@@ -328,13 +328,13 @@ void leland_80186_sound_device::ataxx_80186_map_io(address_map &map)
 
 void redline_80186_sound_device::redline_80186_map_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(redline_80186_sound_device::redline_dac_w));
+	map(0x0000, 0xffff).w(FUNC(redline_80186_sound_device::redline_dac_w));
 }
 
 
 void leland_80186_sound_device::leland_80186_map_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(leland_80186_sound_device::dac_w));
+	map(0x0000, 0xffff).w(FUNC(leland_80186_sound_device::dac_w));
 }
 
 /*************************************
@@ -490,7 +490,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
+/*  m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	m_audiocpu->int0_w(data & 0x20);

@@ -109,12 +109,12 @@ static void altos486_floppies(device_slot_interface &device)
 void altos486_state::altos486_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0xfffff).rw(this, FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
+	map(0x00000, 0xfffff).rw(FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
 }
 
 void altos486_state::altos486_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
 }
 
 void altos486_state::altos486_z80_mem(address_map &map)
@@ -228,11 +228,11 @@ MACHINE_CONFIG_END
 ROM_START( altos486 )
 	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "Altos 486 v1.1")
-	ROMX_LOAD("16577_lo_v1.1.bin",   0x0000, 0x2000, CRC(65a9db18) SHA1(3ac2b87f1fc0b28ed4907c9b4091aaa170609674), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("16576_hi_v1.1.bin",   0x0001, 0x2000, CRC(cea4cd8d) SHA1(f9f49828bd5e3281bd7cc34d4460ca1b677530b0), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("16577_lo_v1.1.bin",   0x0000, 0x2000, CRC(65a9db18) SHA1(3ac2b87f1fc0b28ed4907c9b4091aaa170609674), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("16576_hi_v1.1.bin",   0x0001, 0x2000, CRC(cea4cd8d) SHA1(f9f49828bd5e3281bd7cc34d4460ca1b677530b0), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v12", "Altos 486 v1.2")
-	ROMX_LOAD("16577-003_4d_v1.2.bin",   0x0000, 0x2000, CRC(e2ac806b) SHA1(9b358246e26b3e85a6dff418899a180370884537), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("16576-003_3d_v1.2.bin",   0x0001, 0x2000, CRC(912f4c12) SHA1(df5088e8610513b577926b0c752e3b54bc880167), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("16577-003_4d_v1.2.bin",   0x0000, 0x2000, CRC(e2ac806b) SHA1(9b358246e26b3e85a6dff418899a180370884537), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("16576-003_3d_v1.2.bin",   0x0001, 0x2000, CRC(912f4c12) SHA1(df5088e8610513b577926b0c752e3b54bc880167), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "iocpu", 0 )
 	ROM_LOAD("16019_z80.bin", 0x0000, 0x1000, CRC(68b1b2e1) SHA1(5d83609a465029212d5e3f72ac9c520b3dbed838))

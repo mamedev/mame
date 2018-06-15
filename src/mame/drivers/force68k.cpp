@@ -236,7 +236,7 @@ private:
 void force68k_state::force68k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().r(this, FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000000, 0x000007).rom().r(FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
 	map(0x000008, 0x01ffff).ram(); /* DRAM CPU-1B */
 //AM_RANGE (0x020000, 0x07ffff) AM_RAM /* Additional DRAM CPU-1D */
 	map(0x080000, 0x083fff).rom(); /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
@@ -248,8 +248,8 @@ void force68k_state::force68k_mem(address_map &map)
 	map(0x0c0400, 0x0c042f).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0e0035).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
-	map(0x100000, 0xfeffff).rw(this, FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
-	map(0xff0000, 0xffffff).rw(this, FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
+	map(0x100000, 0xfeffff).rw(FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
+	map(0xff0000, 0xffffff).rw(FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
 }
 
 /* Input ports */
@@ -441,22 +441,26 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a24_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a24_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a16_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a16_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
 /*
@@ -571,7 +575,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200))
+	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (*this, force68k_state, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, force68k_state, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (*this, force68k_state, write_f5_clock))
@@ -587,11 +591,11 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(16'000'000) / 2)
-	MCFG_PIT68230_PA_OUTPUT_CB (WRITE8 ("cent_data_out", output_latch_device, write))
-	MCFG_PIT68230_H2_CB (WRITELINE ("centronics", centronics_device, write_strobe))
+	MCFG_PIT68230_PA_OUTPUT_CB (WRITE8 ("cent_data_out", output_latch_device, bus_w))
+	MCFG_PIT68230_H2_CB (WRITELINE (m_centronics, centronics_device, write_strobe))
 
 	// Centronics
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, force68k_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, force68k_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, force68k_state, centronics_perror_w))
@@ -638,16 +642,16 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (fccpu1)
-ROM_REGION (0x1000000, "maincpu", 0)
-ROM_DEFAULT_BIOS("forcemon-1.0l")
+	ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("forcemon-1.0l")
 
-ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
-ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(1))
-ROMX_LOAD ("fccpu1v1.0l.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
+	ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD ("fccpu1v1.0l.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(0))
 
-ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
-ROMX_LOAD ("fccpu1v1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(2))
-ROMX_LOAD ("fccpu1v1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
+	ROMX_LOAD ("fccpu1v1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("fccpu1v1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(1))
 
 /*
  * System ROM terminal commands
@@ -704,23 +708,23 @@ ROM_END
  */
 #if 0
 ROM_START (fccpu6)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6a)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6v)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6va)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6vb)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 #endif
 

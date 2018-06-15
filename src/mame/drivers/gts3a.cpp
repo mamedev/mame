@@ -24,6 +24,7 @@ ToDo:
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -80,7 +81,7 @@ void gts3a_state::gts3a_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x200f).rw(m_u4, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x2010, 0x201f).rw(m_u5, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x2020, 0x2023).mirror(0x0c).w(this, FUNC(gts3a_state::segbank_w));
+	map(0x2020, 0x2023).mirror(0x0c).w(FUNC(gts3a_state::segbank_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -91,8 +92,8 @@ void gts3a_state::gts3a_dmd_map(address_map &map)
 	map(0x2001, 0x2001).r("crtc", FUNC(mc6845_device::register_r));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x3000, 0x3000).r(this, FUNC(gts3a_state::dmd_r));
-	map(0x3800, 0x3800).w(this, FUNC(gts3a_state::dmd_w));
+	map(0x3000, 0x3000).r(FUNC(gts3a_state::dmd_r));
+	map(0x3800, 0x3800).w(FUNC(gts3a_state::dmd_w));
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom().region("dmdcpu", 0x78000);
 }

@@ -303,28 +303,28 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	m_lamp[0] = BIT(data, 0);
-	m_lamp[1] = BIT(data, 1);
-	m_lamp[2] = BIT(data, 2);
-	m_lamp[3] = BIT(data, 3);
-	m_lamp[4] = BIT(data, 4);
-	m_lamp[5] = BIT(data, 5);
-	m_lamp[6] = BIT(data, 6);
-	m_lamp[7] = BIT(data, 7);
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+	m_lamps[2] = BIT(data, 2);
+	m_lamps[3] = BIT(data, 3);
+	m_lamps[4] = BIT(data, 4);
+	m_lamps[5] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 
 //  popmessage("p1 lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-	m_lamp[8 + 0] = BIT(data, 0);
-	m_lamp[8 + 1] = BIT(data, 1);
-	m_lamp[8 + 2] = BIT(data, 2);
-	m_lamp[8 + 3] = BIT(data, 3);
-	m_lamp[8 + 4] = BIT(data, 4);
-	m_lamp[8 + 5] = BIT(data, 5);
-	m_lamp[8 + 6] = BIT(data, 6);
-	m_lamp[8 + 7] = BIT(data, 7);
+	m_lamps[8 + 0] = BIT(data, 0);
+	m_lamps[8 + 1] = BIT(data, 1);
+	m_lamps[8 + 2] = BIT(data, 2);
+	m_lamps[8 + 3] = BIT(data, 3);
+	m_lamps[8 + 4] = BIT(data, 4);
+	m_lamps[8 + 5] = BIT(data, 5);
+	m_lamps[8 + 6] = BIT(data, 6);
+	m_lamps[8 + 7] = BIT(data, 7);
 
 //  popmessage("p2 lamps: %02X", data);
 }
@@ -335,11 +335,11 @@ void goldstar_state::goldstar_map(address_map &map)
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xc7ff).rom();
-	map(0xc800, 0xcfff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf040, 0xf07f).ram().share("reel1_scroll");
 	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
 	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
@@ -356,11 +356,11 @@ void goldstar_state::goldstar_map(address_map &map)
 	map(0xf820, 0xf820).portr("DSW2");
 	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xf900, 0xf900).w(this, FUNC(goldstar_state::p1_lamps_w));
-	map(0xfa00, 0xfa00).w(this, FUNC(goldstar_state::goldstar_fa00_w));
+	map(0xf900, 0xf900).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xfa00, 0xfa00).w(FUNC(goldstar_state::goldstar_fa00_w));
 	map(0xfb00, 0xfb00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfd00, 0xfdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xfe00, 0xfe00).rw(this, FUNC(goldstar_state::protection_r), FUNC(goldstar_state::protection_w));
+	map(0xfe00, 0xfe00).rw(FUNC(goldstar_state::protection_r), FUNC(goldstar_state::protection_w));
 }
 
 void goldstar_state::goldstar_readport(address_map &map)
@@ -374,8 +374,8 @@ void sanghopm_state::star100_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 
-	map(0xc800, 0xcfff).ram().w(this, FUNC(sanghopm_state::fg_vidram_w)).share("fg_vidram");    // videoram 1
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(sanghopm_state::fg_atrram_w)).share("fg_atrram");    // atrram 1
+	map(0xc800, 0xcfff).ram().w(FUNC(sanghopm_state::fg_vidram_w)).share("fg_vidram");    // videoram 1
+	map(0xd000, 0xd7ff).ram().w(FUNC(sanghopm_state::fg_atrram_w)).share("fg_atrram");    // atrram 1
 
 	map(0xd800, 0xd83f).ram().share("reel1_scroll");
 	map(0xd840, 0xd9ff).ram();
@@ -384,17 +384,17 @@ void sanghopm_state::star100_map(address_map &map)
 	map(0xdc00, 0xdc3f).ram().share("reel3_scroll");
 	map(0xdc40, 0xdfff).ram();
 
-	map(0xe000, 0xe1ff).ram().w(this, FUNC(sanghopm_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe200, 0xe3ff).ram().w(this, FUNC(sanghopm_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe400, 0xe5ff).ram().w(this, FUNC(sanghopm_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(sanghopm_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe3ff).ram().w(FUNC(sanghopm_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xe5ff).ram().w(FUNC(sanghopm_state::goldstar_reel3_ram_w)).share("reel3_ram");
 
-	map(0xe600, 0xe7ff).ram().w(this, FUNC(sanghopm_state::bg_vidram_w)).share("bg_vidram");    // videoram 2
+	map(0xe600, 0xe7ff).ram().w(FUNC(sanghopm_state::bg_vidram_w)).share("bg_vidram");    // videoram 2
 
-	map(0xe800, 0xe9ff).ram().w(this, FUNC(sanghopm_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xea00, 0xebff).ram().w(this, FUNC(sanghopm_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xec00, 0xedff).ram().w(this, FUNC(sanghopm_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(sanghopm_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xea00, 0xebff).ram().w(FUNC(sanghopm_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xec00, 0xedff).ram().w(FUNC(sanghopm_state::reel3_attrram_w)).share("reel3_attrram");
 
-	map(0xee00, 0xefff).ram().w(this, FUNC(sanghopm_state::bg_atrram_w)).share("bg_atrram");    // atrram 2
+	map(0xee00, 0xefff).ram().w(FUNC(sanghopm_state::bg_atrram_w)).share("bg_atrram");    // atrram 2
 
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xffff).ram();
@@ -446,13 +446,13 @@ void sanghopm_state::star100_readport(address_map &map)
 	map(0x20, 0x20).portr("DSW4-0");     // the first 4 bits map to DSW4 1 to 4.
 	map(0x21, 0x21).portr("DSW4-1");     // the first 4 bits map to DSW4 5 to 8.
 
-	map(0x24, 0x24).w(this, FUNC(sanghopm_state::coincount_w));      // coin counters.
+	map(0x24, 0x24).w(FUNC(sanghopm_state::coincount_w));      // coin counters.
 
 	map(0x25, 0x25).portr("DSW2");
 	map(0x26, 0x26).portr("DSW3");
 
 	map(0xe0, 0xe0).nopw();                // Writing 0's and 1's constantly.  Watchdog feeder?
-	map(0xe1, 0xe1).w(this, FUNC(sanghopm_state::enable_w));         // enable/disable reels register.
+	map(0xe1, 0xe1).w(FUNC(sanghopm_state::enable_w));         // enable/disable reels register.
 
 }
 
@@ -611,11 +611,11 @@ void cb3_state::ncb3_map(address_map &map)
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xc7ff).rom();
-	map(0xc800, 0xcfff).ram().w(this, FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(this, FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(this, FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf040, 0xf07f).ram().share("reel1_scroll");
 	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
 	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
@@ -623,13 +623,13 @@ void cb3_state::ncb3_map(address_map &map)
 	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0xf820, 0xf823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
-	map(0xf822, 0xf822).w(this, FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
+	map(0xf822, 0xf822).w(FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
 
 	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xf850, 0xf850).w(this, FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
-	map(0xf860, 0xf860).w(this, FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
-	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
+	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::command_w));    /* guess... device is initialized, but doesn't seems to be used.*/
 }
 
 void goldstar_state::ncb3_readwriteport(address_map &map)
@@ -640,7 +640,7 @@ void goldstar_state::ncb3_readwriteport(address_map &map)
 //  AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)    // unknown...
 //  AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)    // unknown...
 	map(0x10, 0x10).portr("DSW5");   /* confirmed for ncb3 */
-	map(0x81, 0x81).w(this, FUNC(goldstar_state::ncb3_port81_w)); // ---> large writes.
+	map(0x81, 0x81).w(FUNC(goldstar_state::ncb3_port81_w)); // ---> large writes.
 
 }
 
@@ -683,11 +683,11 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xc000, 0xc7ff).rom();
 
 	/* Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf040, 0xf07f).ram().share("reel1_scroll");
 	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
 	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
@@ -701,7 +701,7 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf640, 0xf640).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xf650, 0xf650).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
 	map(0xf660, 0xf660).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
-	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::command_w));    /* guess... device is initialized, but doesn't seems to be used.*/
 
 	map(0xf800, 0xffff).ram();
 }
@@ -739,12 +739,12 @@ void goldstar_state::cm_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("nvram");
 	map(0xd800, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf600, 0xf7ff).ram();
 
 	map(0xf800, 0xf87f).ram().share("reel1_scroll");
@@ -762,12 +762,12 @@ void goldstar_state::nfm_map(address_map &map)
 
 	map(0xd800, 0xdfff).ram().share("nvram");
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf600, 0xf7ff).ram();
 
 	map(0xf800, 0xf87f).ram().share("reel1_scroll");
@@ -811,11 +811,11 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Inputs */
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
-	map(0x10, 0x10).w(this, FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(this, FUNC(cmaster_state::cm_coincount_w));
-	map(0x12, 0x12).w(this, FUNC(cmaster_state::p1_lamps_w));
-	map(0x13, 0x13).w(this, FUNC(cmaster_state::background_col_w));
-	map(0x14, 0x14).w(this, FUNC(cmaster_state::girl_scroll_w));
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
 
@@ -833,9 +833,9 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 
 	map(0x20, 0x20).portr("DSW3-0");
 	map(0x21, 0x21).portr("DSW3-1");
-	map(0x22, 0x22).w(this, FUNC(goldstar_state::p1_lamps_w));
+	map(0x22, 0x22).w(FUNC(goldstar_state::p1_lamps_w));
 
-	map(0x24, 0x24).w(this, FUNC(goldstar_state::cm_coincount_w));
+	map(0x24, 0x24).w(FUNC(goldstar_state::cm_coincount_w));
 	map(0x25, 0x25).portr("DSW1");
 	map(0x26, 0x26).portr("DSW2");
 
@@ -860,10 +860,10 @@ void cmaster_state::amcoe1_portmap(address_map &map)
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
-	map(0x10, 0x10).w(this, FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(this, FUNC(cmaster_state::cm_coincount_w));
-	map(0x12, 0x12).w(this, FUNC(cmaster_state::p1_lamps_w));
-	map(0x13, 0x13).w(this, FUNC(cmaster_state::background_col_w));
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x20, 0x20).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -874,10 +874,10 @@ void cmaster_state::amcoe2_portmap(address_map &map)
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
-	map(0x10, 0x10).w(this, FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(this, FUNC(cmaster_state::cm_coincount_w));
-	map(0x12, 0x12).w(this, FUNC(cmaster_state::p1_lamps_w));
-	map(0x13, 0x13).w(this, FUNC(cmaster_state::background_col_w));
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 }
 
 
@@ -885,11 +885,11 @@ void goldstar_state::lucky8_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xb040, 0xb07f).ram().share("reel1_scroll");
 	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 	map(0xb100, 0xb17f).ram().share("reel3_scroll");
@@ -899,9 +899,9 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
-	map(0xb850, 0xb850).w(this, FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(this, FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
 	map(0xf800, 0xffff).ram();
 }
@@ -910,14 +910,14 @@ void goldstar_state::flaming7_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
 //  AM_RANGE(0x9a00, 0x9fff) AM_RAM
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
 //  AM_RANGE(0xa200, 0xa7ff) AM_RAM
-	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 //  AM_RANGE(0xaa00, 0xafff) AM_RAM
 
 //  AM_RANGE(0xb000, 0xb03f) AM_RAM
@@ -932,9 +932,9 @@ void goldstar_state::flaming7_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports (90) */
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
-	map(0xb850, 0xb850).w(this, FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(this, FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
 //  AM_RANGE(0xc000, 0xd3ff) AM_RAM
 	map(0xf800, 0xffff).ram();
 }
@@ -970,11 +970,11 @@ void goldstar_state::mbstar_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xb040, 0xb07f).ram().share("reel1_scroll");
 	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 	map(0xb100, 0xb17f).ram().share("reel3_scroll");
@@ -984,9 +984,9 @@ void goldstar_state::mbstar_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
-	map(0xb850, 0xb850).w(this, FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(this, FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
 	map(0xc000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
 }
@@ -1023,11 +1023,11 @@ void wingco_state::magodds_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(wingco_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(wingco_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(this, FUNC(wingco_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(wingco_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa900, 0xaaff).ram().w(this, FUNC(wingco_state::goldstar_reel3_ram_w)).share("reel3_ram"); // +0x100 compared to lucky8
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa900, 0xaaff).ram().w(FUNC(wingco_state::goldstar_reel3_ram_w)).share("reel3_ram"); // +0x100 compared to lucky8
 	map(0xb040, 0xb07f).ram().share("reel1_scroll");
 	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 	map(0xb100, 0xb17f).ram().share("reel3_scroll");
@@ -1037,9 +1037,9 @@ void wingco_state::magodds_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
-	map(0xb850, 0xb850).w(this, FUNC(wingco_state::magodds_outb850_w));                                /* lamps */
-	map(0xb860, 0xb860).w(this, FUNC(wingco_state::magodds_outb860_w));                                /* watchdog */
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xb850, 0xb850).w(FUNC(wingco_state::magodds_outb850_w));                                /* lamps */
+	map(0xb860, 0xb860).w(FUNC(wingco_state::magodds_outb860_w));                                /* watchdog */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
 	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
 }
 
@@ -1047,11 +1047,11 @@ void goldstar_state::kkotnoli_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram(); /* definitely no NVRAM */
-	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xb040, 0xb07f).ram().share("reel1_scroll");
 	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 	map(0xb100, 0xb17f).ram().share("reel3_scroll");
@@ -1061,8 +1061,8 @@ void goldstar_state::kkotnoli_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Port */
 	map(0xb830, 0xb830).nopw();                                                /* no ay8910 */
 	map(0xb840, 0xb840).nopw();                                                /* no ay8910 */
-	map(0xb850, 0xb850).w(this, FUNC(goldstar_state::p1_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1087,11 +1087,11 @@ void goldstar_state::ladylinr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xb040, 0xb07f).ram().share("reel1_scroll");
 	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 	map(0xb100, 0xb17f).ram().share("reel3_scroll");
@@ -1101,7 +1101,7 @@ void goldstar_state::ladylinr_map(address_map &map)
 	map(0xb830, 0xb830).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... unused? */
 	map(0xb840, 0xb840).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb850, 0xb850).nopw();                                                /* just turn off the lamps, if exist */
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1109,11 +1109,11 @@ void goldstar_state::wcat3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xb040, 0xb07f).ram().share("reel1_scroll");
 	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 	map(0xb100, 0xb17f).ram().share("reel3_scroll");
@@ -1123,8 +1123,8 @@ void goldstar_state::wcat3_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
-	map(0xb850, 0xb850).w(this, FUNC(goldstar_state::p1_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)    /* Other PPI initialized? */
 	map(0xd000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
@@ -1145,16 +1145,16 @@ void unkch_state::unkch_map(address_map &map)
 	map(0xd900, 0xd93f).ram().share("reel3_scroll");
 	map(0xdfc0, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf600, 0xf7ff).ram();
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
 	map(0xfe00, 0xffff).ram();
 }
 
@@ -1203,12 +1203,12 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	if (!m_vblank_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_lamp[0] = BIT(data, 0);  /* Bet-A / Stop 2 */
-	m_lamp[1] = BIT(data, 1);  /* Start / Stop All */
-	m_lamp[2] = BIT(data, 2);  /* Info / Small / Stop 3 */
-	m_lamp[3] = BIT(data, 3);  /* Big */
-	m_lamp[4] = BIT(data, 4);  /* Bet-B / D-Up */
-	m_lamp[5] = BIT(data, 5);  /* Take / Stop 1 */
+	m_lamps[0] = BIT(data, 0);  /* Bet-A / Stop 2 */
+	m_lamps[1] = BIT(data, 1);  /* Start / Stop All */
+	m_lamps[2] = BIT(data, 2);  /* Info / Small / Stop 3 */
+	m_lamps[3] = BIT(data, 3);  /* Big */
+	m_lamps[4] = BIT(data, 4);  /* Bet-B / D-Up */
+	m_lamps[5] = BIT(data, 5);  /* Take / Stop 1 */
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
@@ -1225,9 +1225,9 @@ void unkch_state::unkch_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x01, 0x01).w(this, FUNC(unkch_state::coincount_w));
-	map(0x02, 0x02).w(this, FUNC(unkch_state::unkcm_0x02_w));
-	map(0x03, 0x03).w(this, FUNC(unkch_state::unkcm_0x03_w));
+	map(0x01, 0x01).w(FUNC(unkch_state::coincount_w));
+	map(0x02, 0x02).w(FUNC(unkch_state::unkcm_0x02_w));
+	map(0x03, 0x03).w(FUNC(unkch_state::unkcm_0x03_w));
 
 	map(0x08, 0x08).portr("IN0");
 	map(0x09, 0x09).portr("IN1");
@@ -1252,16 +1252,16 @@ void unkch_state::megaline_map(address_map &map)
 	map(0xd900, 0xd93f).ram().share("reel3_scroll");
 	map(0xdfc0, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
 	map(0xf600, 0xf7ff).ram();
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
 	map(0xfe00, 0xffff).ram();
 }
 
@@ -1274,9 +1274,9 @@ void unkch_state::megaline_map(address_map &map)
 void goldstar_state::megaline_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::write));                      /* SN76489 #1 */
-	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::write));                      /* SN76489 #2 */
-	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::write));                      /* SN76489 #3 */
+	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::command_w));                      /* SN76489 #1 */
+	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::command_w));                      /* SN76489 #2 */
+	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::command_w));                      /* SN76489 #3 */
 	map(0x60, 0x60).w("aysnd", FUNC(ay8910_device::address_w));                 /* AY8910 control? */
 	map(0x80, 0x80).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));        /* AY8910 Input? */
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1292,21 +1292,21 @@ void unkch_state::bonusch_map(address_map &map)
 
 	map(0xd800, 0xdfff).ram(); //AM_SHARE("nvram")
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
 /* just placeholders */
-	map(0xf000, 0xf1ff).ram().w(this, FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(this, FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(this, FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
 
 	map(0xf640, 0xf67f).ram().share("reel1_scroll");
 	map(0xf680, 0xf6bf).ram().share("reel2_scroll");
 	map(0xf700, 0xf73f).ram().share("reel3_scroll");
 
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
 }
 
 /* Bonus Chance W-8
@@ -1331,10 +1331,10 @@ void goldstar_state::bonusch_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x10).portr("IN0");
 	map(0x20, 0x20).portr("IN1");
-	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::write));      /* SN76489 #1 */
-	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::write));      /* SN76489 #2 */
-	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::write));      /* SN76489 #3 */
-	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::write));      /* SN76489 #4 */
+	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::command_w));      /* SN76489 #1 */
+	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::command_w));      /* SN76489 #2 */
+	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::command_w));      /* SN76489 #3 */
+	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::command_w));      /* SN76489 #4 */
 	map(0x60, 0x60).portr("IN3");
 }
 
@@ -8662,7 +8662,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_w4)
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
-	MCFG_DS2401_ADD("fl7w4_id")
+	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::flaming7)
@@ -8677,7 +8677,7 @@ MACHINE_CONFIG_START(wingco_state::flaming7)
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
-	MCFG_DS2401_ADD("fl7w4_id")
+	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::flam7_tw)
@@ -8692,7 +8692,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_tw)
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
-	MCFG_DS2401_ADD("fl7w4_id")
+	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::mbstar)

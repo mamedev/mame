@@ -135,7 +135,7 @@ void x2212_device::nvram_write(emu_file &file)
 {
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_auto_save)
-		store();
+		do_store();
 
 	uint8_t *buffer = (uint8_t *) alloca(m_size_data);
 	for (int byte = 0; byte < m_size_data; byte++)
@@ -150,11 +150,11 @@ void x2212_device::nvram_write(emu_file &file)
 //**************************************************************************
 
 //-------------------------------------------------
-//  store - store data from live RAM into the
+//  do_store - store data from live RAM into the
 //  EEPROM
 //-------------------------------------------------
 
-void x2212_device::store()
+void x2212_device::do_store()
 {
 	for (int byte = 0; byte < m_size_data; byte++)
 		m_e2prom->write_byte(byte, m_sram->read_byte(byte));
@@ -162,11 +162,11 @@ void x2212_device::store()
 
 
 //-------------------------------------------------
-//  recall - fetch data from the EEPROM into live
+//  do_recall - fetch data from the EEPROM into live
 //  RAM
 //-------------------------------------------------
 
-void x2212_device::recall()
+void x2212_device::do_recall()
 {
 	for (int byte = 0; byte < m_size_data; byte++)
 		m_sram->write_byte(byte, m_e2prom->read_byte(byte));
@@ -206,7 +206,7 @@ READ8_MEMBER( x2212_device::read )
 WRITE_LINE_MEMBER( x2212_device::store )
 {
 	if (state != 0 && !m_store)
-		store();
+		do_store();
 	m_store = (state != 0);
 }
 
@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER( x2212_device::store )
 WRITE_LINE_MEMBER( x2212_device::recall )
 {
 	if (state != 0 && !m_array_recall)
-		recall();
+		do_recall();
 	m_array_recall = (state != 0);
 }
 

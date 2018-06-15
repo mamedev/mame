@@ -34,6 +34,7 @@
 #include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,7 +51,7 @@ public:
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
 		m_fg_color_ram(*this, "fg_color_ram"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +66,7 @@ public:
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 
-	output_finder<7> m_led;
+	output_finder<7> m_leds;
 
 	// common
 	int m_nmi_ack;
@@ -189,7 +190,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin out mech
 
-	m_led[6] = BIT(data, 6);   // led for coin out / hopper active
+	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
 	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -202,8 +203,8 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(spoker_state::video_and_leds_w)
 {
-	m_led[4] = BIT(data, 0); // start?
-	m_led[5] = BIT(data, 2); // l_bet?
+	m_leds[4] = BIT(data, 0); // start?
+	m_leds[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable = data & 0x40;
 	m_hopper = (~data)& 0x80;
@@ -214,10 +215,10 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 
 WRITE8_MEMBER(spoker_state::leds_w)
 {
-	m_led[0] = BIT(data, 0);  // stop_1
-	m_led[1] = BIT(data, 1);  // stop_2
-	m_led[2] = BIT(data, 2);  // stop_3
-	m_led[3] = BIT(data, 3);  // stop
+	m_leds[0] = BIT(data, 0);  // stop_1
+	m_leds[1] = BIT(data, 1);  // stop_2
+	m_leds[2] = BIT(data, 2);  // stop_3
+	m_leds[3] = BIT(data, 3);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -278,15 +279,15 @@ void spoker_state::spoker_portmap(address_map &map)
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
-	map(0x5000, 0x5fff).ram().w(this, FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
 	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* NMI and coins (w), service (r), coins (r) */
 	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* buttons 1 (r), video and leds (w), leds (w) */
 	map(0x64a0, 0x64a0).portr("BUTTONS2");
 	map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x64d0, 0x64d1).rw(this, FUNC(spoker_state::magic_r), FUNC(spoker_state::magic_w));    // DSW1-5
-	map(0x7000, 0x7fff).ram().w(this, FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
+	map(0x64d0, 0x64d1).rw(FUNC(spoker_state::magic_r), FUNC(spoker_state::magic_w));    // DSW1-5
+	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
 }
 
 void spoker_state::_3super8_portmap(address_map &map)
@@ -294,14 +295,14 @@ void spoker_state::_3super8_portmap(address_map &map)
 //  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
 	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
 	map(0x4000, 0x4000).portr("DSW1");
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
 //  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
-	map(0x5000, 0x5fff).ram().w(this, FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
 
 //  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization
 //  setting O-I-I for ports ABC. Except these routines are just a leftover from the original game,
@@ -311,10 +312,10 @@ void spoker_state::_3super8_portmap(address_map &map)
 
 	map(0x6491, 0x6491).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x64a0, 0x64a0).portr("IN2");
-	map(0x64b0, 0x64b0).w(this, FUNC(spoker_state::leds_w));
+	map(0x64b0, 0x64b0).w(FUNC(spoker_state::leds_w));
 	map(0x64c0, 0x64c0).nopr(); //irq ack?
-	map(0x64f0, 0x64f0).w(this, FUNC(spoker_state::nmi_and_coins_w));
-	map(0x7000, 0x7fff).ram().w(this, FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
+	map(0x64f0, 0x64f0).w(FUNC(spoker_state::nmi_and_coins_w));
+	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
 }
 
 
@@ -582,7 +583,7 @@ GFXDECODE_END
 
 void spoker_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_nmi_ack));
 	save_item(NAME(m_out));

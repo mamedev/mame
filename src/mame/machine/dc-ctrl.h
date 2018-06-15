@@ -50,14 +50,14 @@ protected:
 	uint32_t id;
 	uint32_t electric_current;
 	uint32_t region;
-	
+
 	ioport_port *port[8];
-	
+
 	virtual void fixed_status(uint32_t *dest) = 0;
 	virtual void free_status(uint32_t *dest) = 0;
 	virtual void read(uint32_t *dest) = 0;
 };
-	
+
 class dc_controller_device : public dc_common_device
 {
 public:

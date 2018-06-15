@@ -94,6 +94,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -119,7 +120,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
@@ -151,7 +152,7 @@ public:
 	void sgsafari_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	tilemap_t *m_layer0_tilemap;
@@ -166,7 +167,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<9> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 
@@ -307,14 +308,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 
 //  popmessage("lamps: %02X", data);
 
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
-	m_lamp[3] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 5);      /* Lamp 6 - START  */
-	m_lamp[7] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
-	m_lamp[8] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
+	m_lamps[2] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 5);      /* Lamp 6 - START  */
+	m_lamps[6] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
+	m_lamps[7] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x400);
 }
@@ -326,14 +327,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 void magic10_state::magic10_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x400001).portr("INPUTS");
 	map(0x400002, 0x400003).portr("DSW");
-	map(0x400008, 0x400009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x400008, 0x400009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x40000b, 0x40000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x40000e, 0x40000f).nopw();
 	map(0x400080, 0x400087).ram().share("vregs");
@@ -343,14 +344,14 @@ void magic10_state::magic10_map(address_map &map)
 void magic10_state::magic10a_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x500001).portr("INPUTS");
 	map(0x500002, 0x500003).portr("DSW");
-	map(0x500008, 0x500009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).nopw();
 	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
@@ -360,12 +361,12 @@ void magic10_state::magic10a_map(address_map &map)
 void magic10_state::magic102_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x500001).r(this, FUNC(magic10_state::magic102_r));
+	map(0x500000, 0x500001).r(FUNC(magic10_state::magic102_r));
 	map(0x500004, 0x500005).nopr(); // gives credits
 	map(0x500006, 0x500007).nopr(); // gives credits
 	map(0x50001a, 0x50001b).portr("IN0");
@@ -380,12 +381,12 @@ void magic10_state::magic102_map(address_map &map)
 void magic10_state::hotslot_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500004, 0x500005).rw(this, FUNC(magic10_state::hotslot_copro_r), FUNC(magic10_state::hotslot_copro_w)); // copro comm
+	map(0x500004, 0x500005).rw(FUNC(magic10_state::hotslot_copro_r), FUNC(magic10_state::hotslot_copro_w)); // copro comm
 	map(0x500006, 0x500011).ram();
 	map(0x500012, 0x500013).portr("IN0");
 	map(0x500014, 0x500015).portr("IN1");
@@ -400,13 +401,13 @@ void magic10_state::hotslot_map(address_map &map)
 void magic10_state::sgsafari_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x203fff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500002, 0x500003).portr("DSW1");
-	map(0x500008, 0x500009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).portr("IN0");
 	map(0x500080, 0x500087).ram().share("vregs");   // video registers?

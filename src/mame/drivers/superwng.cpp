@@ -35,6 +35,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -325,32 +326,32 @@ void superwng_state::superwng_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x6fff).bankr("bank1");
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(superwng_state::superwng_bg_vram_w)).share("videorabg");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(superwng_state::superwng_fg_vram_w)).share("videorafg");
-	map(0x8800, 0x8bff).ram().w(this, FUNC(superwng_state::superwng_bg_cram_w)).share("colorrabg");
-	map(0x8c00, 0x8fff).ram().w(this, FUNC(superwng_state::superwng_fg_cram_w)).share("colorrafg");
+	map(0x8000, 0x83ff).ram().w(FUNC(superwng_state::superwng_bg_vram_w)).share("videorabg");
+	map(0x8400, 0x87ff).ram().w(FUNC(superwng_state::superwng_fg_vram_w)).share("videorafg");
+	map(0x8800, 0x8bff).ram().w(FUNC(superwng_state::superwng_bg_cram_w)).share("colorrabg");
+	map(0x8c00, 0x8fff).ram().w(FUNC(superwng_state::superwng_fg_cram_w)).share("colorrafg");
 	map(0x9800, 0x99ff).ram();
 	map(0xa000, 0xa000).portr("P1");
-	map(0xa000, 0xa000).w(this, FUNC(superwng_state::superwng_hopper_w));
+	map(0xa000, 0xa000).w(FUNC(superwng_state::superwng_hopper_w));
 	map(0xa080, 0xa080).portr("P2");
 	map(0xa100, 0xa100).portr("DSW1");
-	map(0xa100, 0xa100).w(this, FUNC(superwng_state::superwng_sound_interrupt_w));
+	map(0xa100, 0xa100).w(FUNC(superwng_state::superwng_sound_interrupt_w));
 	map(0xa180, 0xa180).portr("DSW2");
 	map(0xa180, 0xa180).nopw(); // watchdog? int ack?
-	map(0xa181, 0xa181).w(this, FUNC(superwng_state::superwng_nmi_enable_w));
-	map(0xa182, 0xa182).w(this, FUNC(superwng_state::superwng_tilebank_w));
-	map(0xa183, 0xa183).w(this, FUNC(superwng_state::superwng_flip_screen_w));
-	map(0xa184, 0xa184).w(this, FUNC(superwng_state::superwng_cointcnt1_w));
-	map(0xa185, 0xa185).w(this, FUNC(superwng_state::superwng_unk_a185_w));  // unknown, always(?) 0
-	map(0xa186, 0xa186).w(this, FUNC(superwng_state::superwng_cointcnt2_w));
-	map(0xa187, 0xa187).w(this, FUNC(superwng_state::superwng_unk_a187_w)); // unknown, always(?) 0
+	map(0xa181, 0xa181).w(FUNC(superwng_state::superwng_nmi_enable_w));
+	map(0xa182, 0xa182).w(FUNC(superwng_state::superwng_tilebank_w));
+	map(0xa183, 0xa183).w(FUNC(superwng_state::superwng_flip_screen_w));
+	map(0xa184, 0xa184).w(FUNC(superwng_state::superwng_cointcnt1_w));
+	map(0xa185, 0xa185).w(FUNC(superwng_state::superwng_unk_a185_w));  // unknown, always(?) 0
+	map(0xa186, 0xa186).w(FUNC(superwng_state::superwng_cointcnt2_w));
+	map(0xa187, 0xa187).w(FUNC(superwng_state::superwng_unk_a187_w)); // unknown, always(?) 0
 }
 
 void superwng_state::superwng_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).w(this, FUNC(superwng_state::superwng_sound_nmi_clear_w));
+	map(0x3000, 0x3000).w(FUNC(superwng_state::superwng_sound_nmi_clear_w));
 	map(0x4000, 0x4000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));

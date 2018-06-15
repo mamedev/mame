@@ -18,6 +18,7 @@ months for an average citizen.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -93,11 +94,11 @@ MACHINE_CONFIG_END
 ROM_START( mk90 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "bas1", "Basic 1")
-	ROMX_LOAD( "mk90ro10.bin",  0x8000, 0x8000, CRC(fac18038) SHA1(639f09a1be5f781f897603d0f799f7c6efd1b67f), ROM_BIOS(1))
+	ROMX_LOAD( "mk90ro10.bin",  0x8000, 0x8000, CRC(fac18038) SHA1(639f09a1be5f781f897603d0f799f7c6efd1b67f), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "bas2", "Basic 2")
-	ROMX_LOAD( "mk90ro20.bin",  0x8000, 0x8000, CRC(d8b3a5f5) SHA1(8f7ab2d97c7466392b6354c0ea7017531c2133ae), ROM_BIOS(2))
-	ROMX_LOAD( "mk90ro20t.bin", 0x4000, 0x4000, CRC(0f4b9434) SHA1(c74bbde6d201913c9e67ef8e2abe14b784187f8d), ROM_BIOS(2))  // Expansion ROM
+	ROMX_LOAD( "mk90ro20.bin",  0x8000, 0x8000, CRC(d8b3a5f5) SHA1(8f7ab2d97c7466392b6354c0ea7017531c2133ae), ROM_BIOS(1))
+	ROMX_LOAD( "mk90ro20t.bin", 0x4000, 0x4000, CRC(0f4b9434) SHA1(c74bbde6d201913c9e67ef8e2abe14b784187f8d), ROM_BIOS(1))  // Expansion ROM
 ROM_END
 
 /* Driver */

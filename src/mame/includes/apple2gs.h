@@ -19,6 +19,7 @@
 #include "cpu/g65816/g65816.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/z80scc.h"
+#include "emupal.h"
 
 #define ADBMICRO_TAG    "adbmicro"
 #define SCC_TAG     "scc"

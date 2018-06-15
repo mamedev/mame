@@ -13,6 +13,7 @@
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 // We encode priority with colour in the tilemaps, so need a larger palette

@@ -21,6 +21,7 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Spectrum crystals */

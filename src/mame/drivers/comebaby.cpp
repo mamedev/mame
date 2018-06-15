@@ -185,6 +185,7 @@ Nearly everything.
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 

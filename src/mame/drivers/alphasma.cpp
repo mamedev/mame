@@ -17,6 +17,7 @@
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -175,14 +176,14 @@ void alphasmart_state::alphasmart_mem(address_map &map)
 	map(0x0000, 0x003f).noprw();   // internal registers
 	map(0x0040, 0x00ff).ram();   // internal RAM
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
-	map(0x8000, 0x8000).rw(this, FUNC(alphasmart_state::kb_r), FUNC(alphasmart_state::kb_matrixh_w));
-	map(0xc000, 0xc000).w(this, FUNC(alphasmart_state::kb_matrixl_w));
+	map(0x8000, 0x8000).rw(FUNC(alphasmart_state::kb_r), FUNC(alphasmart_state::kb_matrixh_w));
+	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
 }
 
 void alphasmart_state::alphasmart_io(address_map &map)
 {
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(alphasmart_state::port_a_r), FUNC(alphasmart_state::port_a_w));
-	map(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD).rw(this, FUNC(alphasmart_state::port_d_r), FUNC(alphasmart_state::port_d_w));
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(alphasmart_state::port_a_r), FUNC(alphasmart_state::port_a_w));
+	map(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD).rw(FUNC(alphasmart_state::port_d_r), FUNC(alphasmart_state::port_d_w));
 }
 
 READ8_MEMBER(asma2k_state::io_r)
@@ -237,7 +238,7 @@ void asma2k_state::asma2k_mem(address_map &map)
 	map(0x0000, 0x003f).noprw();   // internal registers
 	map(0x0040, 0x00ff).ram().share("internal_ram");   // internal RAM
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
-	map(0x9000, 0x9000).w(this, FUNC(asma2k_state::kb_matrixl_w));
+	map(0x9000, 0x9000).w(FUNC(asma2k_state::kb_matrixl_w));
 }
 
 /* Input ports */
@@ -477,9 +478,9 @@ ROM_START( asma2k )
 	    which is integrated onto one plcc44 chip called a zpsd211r.
 	*/
 	ROM_SYSTEM_BIOS( 0, "v314", "v3.14" )
-	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(1) )
+	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
-	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(2) )
+	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
 	ROM_REGION( 0x8000, "spellcheck", 0 )
 	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )

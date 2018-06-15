@@ -22,8 +22,8 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SILICON_DISC, einstein_silicon_disc_device, "einstei
 
 void einstein_silicon_disc_device::map(address_map &map)
 {
-	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(einstein_silicon_disc_device::sector_low_w));
-	map(0x09, 0x09).mirror(0xff00).w(this, FUNC(einstein_silicon_disc_device::sector_high_w));
+	map(0x08, 0x08).mirror(0xff00).w(FUNC(einstein_silicon_disc_device::sector_low_w));
+	map(0x09, 0x09).mirror(0xff00).w(FUNC(einstein_silicon_disc_device::sector_high_w));
 }
 
 //-------------------------------------------------

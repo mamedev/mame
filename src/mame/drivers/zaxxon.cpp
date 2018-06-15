@@ -440,7 +440,7 @@ void zaxxon_state::zaxxon_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).mirror(0x1f00).ram().share("spriteram");
 	map(0xc000, 0xc000).mirror(0x18fc).portr("SW00");
 	map(0xc001, 0xc001).mirror(0x18fc).portr("SW01");
@@ -449,7 +449,7 @@ void zaxxon_state::zaxxon_map(address_map &map)
 	map(0xc100, 0xc100).mirror(0x18ff).portr("SW100");
 	map(0xc000, 0xc007).mirror(0x18f8).w("mainlatch1", FUNC(ls259_device::write_d0));
 	map(0xe03c, 0xe03f).mirror(0x1f00).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(this, FUNC(zaxxon_state::zaxxon_control_w));
+	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(FUNC(zaxxon_state::zaxxon_control_w));
 }
 
 void zaxxon_state::decrypted_opcodes_map(address_map &map)
@@ -462,7 +462,7 @@ void zaxxon_state::ixion_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).mirror(0x1f00).ram().share("spriteram");
 	map(0xc000, 0xc000).mirror(0x18fc).portr("SW00");
 	map(0xc001, 0xc001).mirror(0x18fc).portr("SW01");
@@ -471,7 +471,7 @@ void zaxxon_state::ixion_map(address_map &map)
 	map(0xc100, 0xc100).mirror(0x18ff).portr("SW100");
 	map(0xc000, 0xc007).mirror(0x18f8).w("mainlatch1", FUNC(ls259_device::write_d0));
 	map(0xe03c, 0xe03c).mirror(0x1f00).rw("usbsnd", FUNC(usb_sound_device::status_r), FUNC(usb_sound_device::data_w));
-	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(this, FUNC(zaxxon_state::zaxxon_control_w));
+	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(FUNC(zaxxon_state::zaxxon_control_w));
 }
 
 
@@ -480,8 +480,8 @@ void zaxxon_state::congo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0xa000, 0xa3ff).mirror(0x1800).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
-	map(0xa400, 0xa7ff).mirror(0x1800).ram().w(this, FUNC(zaxxon_state::congo_colorram_w)).share("colorram");
+	map(0xa000, 0xa3ff).mirror(0x1800).ram().w(FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0xa400, 0xa7ff).mirror(0x1800).ram().w(FUNC(zaxxon_state::congo_colorram_w)).share("colorram");
 	map(0xc000, 0xc000).mirror(0x1fc4).portr("SW00");
 	map(0xc001, 0xc001).mirror(0x1fc4).portr("SW01");
 	map(0xc002, 0xc002).mirror(0x1fc4).portr("DSW02");
@@ -489,8 +489,8 @@ void zaxxon_state::congo_map(address_map &map)
 	map(0xc008, 0xc008).mirror(0x1fc7).portr("SW100");
 	map(0xc018, 0xc01f).mirror(0x1fc0).w("mainlatch1", FUNC(ls259_device::write_d0));
 	map(0xc020, 0xc027).mirror(0x1fc0).w("mainlatch2", FUNC(ls259_device::write_d0));
-	map(0xc028, 0xc029).mirror(0x1fc4).w(this, FUNC(zaxxon_state::bg_position_w));
-	map(0xc030, 0xc033).mirror(0x1fc4).w(this, FUNC(zaxxon_state::congo_sprite_custom_w));
+	map(0xc028, 0xc029).mirror(0x1fc4).w(FUNC(zaxxon_state::bg_position_w));
+	map(0xc030, 0xc033).mirror(0x1fc4).w(FUNC(zaxxon_state::congo_sprite_custom_w));
 	map(0xc038, 0xc03f).mirror(0x1fc0).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -500,9 +500,9 @@ void zaxxon_state::congo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).mirror(0x1800).ram();
-	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
+	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::command_w));
 	map(0x8000, 0x8003).mirror(0x1ffc).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::command_w));
 }
 
 
@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_SEGAUSBROM_ADD("usbsnd")
+	MCFG_SEGAUSBROM_ADD("usbsnd", "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::ixion)

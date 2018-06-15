@@ -277,6 +277,7 @@ MH86171 Color Palette RAMDAC
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -298,7 +299,7 @@ public:
 		m_2c01_regs(*this, "2c01_regs"),
 		m_3000_regs(*this, "3000_regs"),
 		m_3800_regs(*this, "3800_regs"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
@@ -450,7 +451,7 @@ public:
 	void sfbonus_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -478,7 +479,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_reel3_ram;
 	std::unique_ptr<uint8_t[]> m_reel4_ram;
 	std::unique_ptr<uint8_t[]> m_videoram;
-	output_finder<6> m_lamp;
+	output_finder<6> m_lamps;
 };
 
 
@@ -1193,22 +1194,22 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		m_lamp[0] = BIT(m_1800_regs[6], 0);
-		m_lamp[1] = BIT(m_1800_regs[6], 2);
-		m_lamp[2] = BIT(m_1800_regs[5], 2);
-		m_lamp[3] = BIT(m_1800_regs[5], 0);
-		m_lamp[4] = BIT(m_1800_regs[4], 2);
-		m_lamp[5] = BIT(m_1800_regs[4], 0);
+		m_lamps[0] = BIT(m_1800_regs[6], 0);
+		m_lamps[1] = BIT(m_1800_regs[6], 2);
+		m_lamps[2] = BIT(m_1800_regs[5], 2);
+		m_lamps[3] = BIT(m_1800_regs[5], 0);
+		m_lamps[4] = BIT(m_1800_regs[4], 2);
+		m_lamps[5] = BIT(m_1800_regs[4], 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		m_lamp[0] = BIT(m_1800_regs[0], 1);
-		m_lamp[1] = BIT(m_1800_regs[4], 1);
-		m_lamp[2] = BIT(m_1800_regs[3], 1);
-		m_lamp[3] = BIT(m_1800_regs[6], 2);
-		m_lamp[4] = BIT(m_1800_regs[4], 2);
-		m_lamp[5] = BIT(m_1800_regs[3], 2);
+		m_lamps[0] = BIT(m_1800_regs[0], 1);
+		m_lamps[1] = BIT(m_1800_regs[4], 1);
+		m_lamps[2] = BIT(m_1800_regs[3], 1);
+		m_lamps[3] = BIT(m_1800_regs[6], 2);
+		m_lamps[4] = BIT(m_1800_regs[4], 2);
+		m_lamps[5] = BIT(m_1800_regs[3], 2);
 	}
 
 	return 0;
@@ -1218,7 +1219,7 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 void sfbonus_state::sfbonus_map(address_map &map)
 {
-	map(0x0000, 0xefff).bankr("bank1").w(this, FUNC(sfbonus_state::sfbonus_videoram_w));
+	map(0x0000, 0xefff).bankr("bank1").w(FUNC(sfbonus_state::sfbonus_videoram_w));
 	map(0xf000, 0xffff).ram().share("nvram");
 }
 
@@ -1305,21 +1306,21 @@ void sfbonus_state::sfbonus_io(address_map &map)
 	map(0x0c01, 0x0c01).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0c02, 0x0c02).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x1800, 0x1807).w(this, FUNC(sfbonus_state::sfbonus_1800_w)).share("1800_regs"); // lamps and coin counters
+	map(0x1800, 0x1807).w(FUNC(sfbonus_state::sfbonus_1800_w)).share("1800_regs"); // lamps and coin counters
 
 	map(0x2400, 0x241f).ram().share("vregs");
 
-	map(0x2800, 0x2800).r(this, FUNC(sfbonus_state::sfbonus_2800_r));
-	map(0x2801, 0x2801).r(this, FUNC(sfbonus_state::sfbonus_2801_r)).w(this, FUNC(sfbonus_state::sfbonus_2801_w)).share("2801_regs");
+	map(0x2800, 0x2800).r(FUNC(sfbonus_state::sfbonus_2800_r));
+	map(0x2801, 0x2801).r(FUNC(sfbonus_state::sfbonus_2801_r)).w(FUNC(sfbonus_state::sfbonus_2801_w)).share("2801_regs");
 
-	map(0x2c00, 0x2c00).r(this, FUNC(sfbonus_state::sfbonus_2c00_r));
-	map(0x2c01, 0x2c01).r(this, FUNC(sfbonus_state::sfbonus_2c01_r)).w(this, FUNC(sfbonus_state::sfbonus_2c01_w)).share("2c01_regs");
+	map(0x2c00, 0x2c00).r(FUNC(sfbonus_state::sfbonus_2c00_r));
+	map(0x2c01, 0x2c01).r(FUNC(sfbonus_state::sfbonus_2c01_r)).w(FUNC(sfbonus_state::sfbonus_2c01_w)).share("2c01_regs");
 
-	map(0x3000, 0x3000).w(this, FUNC(sfbonus_state::sfbonus_3000_w)).share("3000_regs");
-	map(0x3400, 0x3400).w(this, FUNC(sfbonus_state::sfbonus_bank_w));
-	map(0x3800, 0x3800).r(this, FUNC(sfbonus_state::sfbonus_3800_r));
+	map(0x3000, 0x3000).w(FUNC(sfbonus_state::sfbonus_3000_w)).share("3000_regs");
+	map(0x3400, 0x3400).w(FUNC(sfbonus_state::sfbonus_bank_w));
+	map(0x3800, 0x3800).r(FUNC(sfbonus_state::sfbonus_3800_r));
 
-	map(0x3800, 0x3807).w(this, FUNC(sfbonus_state::sfbonus_3800_w)).share("3800_regs");
+	map(0x3800, 0x3807).w(FUNC(sfbonus_state::sfbonus_3800_w)).share("3800_regs");
 }
 
 

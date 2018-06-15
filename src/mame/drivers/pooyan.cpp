@@ -67,8 +67,8 @@ WRITE_LINE_MEMBER(pooyan_state::coin_counter_2_w)
 void pooyan_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pooyan_state::colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pooyan_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pooyan_state::colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pooyan_state::videoram_w)).share("videoram");
 	map(0x8800, 0x8fff).ram();
 	map(0x9000, 0x90ff).mirror(0x0b00).ram().share("spriteram");
 	map(0x9400, 0x94ff).mirror(0x0b00).ram().share("spriteram2");

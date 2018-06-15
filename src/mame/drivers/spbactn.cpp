@@ -151,8 +151,8 @@ void spbactn_state::spbactn_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x43fff).ram();   // main ram
 	map(0x50000, 0x50fff).ram().share("spvideoram");
-	map(0x60000, 0x67fff).ram().w(this, FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
-	map(0x70000, 0x77fff).ram().w(this, FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
+	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
 	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90010, 0x90011).portr("IN1");
@@ -163,7 +163,7 @@ void spbactn_state::spbactn_map(address_map &map)
 	/* this are an awful lot of unknowns */
 	map(0x90000, 0x90001).nopw();
 	map(0x90011, 0x90011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x90020, 0x90021).w(this, FUNC(spbactn_state::main_irq_ack_w));
+	map(0x90020, 0x90021).w(FUNC(spbactn_state::main_irq_ack_w));
 	map(0x90030, 0x90031).nopw();
 	map(0x90050, 0x90051).nopw();
 
@@ -201,22 +201,22 @@ void spbactn_state::spbactnp_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x43fff).ram();   // main ram
 	map(0x50000, 0x50fff).ram().share("spvideoram");
-	map(0x60000, 0x67fff).ram().w(this, FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
-	map(0x70000, 0x77fff).ram().w(this, FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
+	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
 	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // yes R and G are swapped vs. the released version
 
-	map(0x90002, 0x90003).w(this, FUNC(spbactn_state::main_irq_ack_w));
-	map(0x90006, 0x90007).w(this, FUNC(spbactn_state::spbatnp_90006_w));
-	map(0x9000a, 0x9000b).w(this, FUNC(spbactn_state::spbatnp_9000a_w));
-	map(0x9000c, 0x9000d).w(this, FUNC(spbactn_state::spbatnp_9000c_w));
-	map(0x9000e, 0x9000f).w(this, FUNC(spbactn_state::spbatnp_9000e_w));
+	map(0x90002, 0x90003).w(FUNC(spbactn_state::main_irq_ack_w));
+	map(0x90006, 0x90007).w(FUNC(spbactn_state::spbatnp_90006_w));
+	map(0x9000a, 0x9000b).w(FUNC(spbactn_state::spbatnp_9000a_w));
+	map(0x9000c, 0x9000d).w(FUNC(spbactn_state::spbatnp_9000c_w));
+	map(0x9000e, 0x9000f).w(FUNC(spbactn_state::spbatnp_9000e_w));
 
-	map(0x90124, 0x90125).w(this, FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
-	map(0x9012c, 0x9012d).w(this, FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
+	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
+	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
 
 
 
-	map(0x90000, 0x900ff).r(this, FUNC(spbactn_state::temp_read_handler_r)); // temp
+	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
 
 }
 
@@ -238,7 +238,7 @@ void spbactn_state::spbactnp_extra_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("extraram2");
 	map(0xe000, 0xefff).ram();
-	map(0xd000, 0xd1ff).ram().w(this, FUNC(spbactn_state::extraram_w)).share("extraram");
+	map(0xd000, 0xd1ff).ram().w(FUNC(spbactn_state::extraram_w)).share("extraram");
 	map(0xd200, 0xd200).ram();
 }
 

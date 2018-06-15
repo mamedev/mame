@@ -1579,7 +1579,7 @@ MACHINE_CONFIG_START(bship82_state::bship82)
 	MCFG_DEVICE_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(*this, bship82_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_COP400_READ_L_CB(READ8(*this, bship82_state, read_l))
 	MCFG_COP400_READ_IN_CB(READ8(*this, bship82_state, read_in))
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, bship82_state, write_so))
@@ -1802,7 +1802,7 @@ MACHINE_CONFIG_START(vidchal_state::vidchal)
 	MCFG_DEVICE_ADD("maincpu", COP420, 900000) // approximation
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(*this, vidchal_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_COP400_WRITE_L_CB(WRITE8(*this, vidchal_state, write_l))
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, vidchal_state, write_sk))

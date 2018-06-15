@@ -112,23 +112,23 @@
 
 void imds2_state::ipc_mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(imds2_state::ipc_mem_read), FUNC(imds2_state::ipc_mem_write));
+	map(0x0000, 0xffff).rw(FUNC(imds2_state::ipc_mem_read), FUNC(imds2_state::ipc_mem_write));
 }
 
 void imds2_state::ipc_io_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0xc0, 0xc0).rw(this, FUNC(imds2_state::imds2_ipc_dbbout_r), FUNC(imds2_state::imds2_ipc_dbbin_data_w));
-	map(0xc1, 0xc1).rw(this, FUNC(imds2_state::imds2_ipc_status_r), FUNC(imds2_state::imds2_ipc_dbbin_cmd_w));
-		map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-		map(0xf4, 0xf4).rw(m_ipcusart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-		map(0xf5, 0xf5).rw(m_ipcusart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-		map(0xf6, 0xf6).rw(m_ipcusart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-		map(0xf7, 0xf7).rw(m_ipcusart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc0).rw(FUNC(imds2_state::imds2_ipc_dbbout_r), FUNC(imds2_state::imds2_ipc_dbbin_data_w));
+	map(0xc1, 0xc1).rw(FUNC(imds2_state::imds2_ipc_status_r), FUNC(imds2_state::imds2_ipc_dbbin_cmd_w));
+	map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf4, 0xf4).rw(m_ipcusart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf5, 0xf5).rw(m_ipcusart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf6, 0xf6).rw(m_ipcusart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf7, 0xf7).rw(m_ipcusart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf8, 0xf9).rw(m_iocpio, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
-	map(0xfa, 0xfb).rw(this, FUNC(imds2_state::imds2_ipclocpic_r), FUNC(imds2_state::imds2_ipclocpic_w));
-	map(0xfc, 0xfd).rw(this, FUNC(imds2_state::imds2_ipcsyspic_r), FUNC(imds2_state::imds2_ipcsyspic_w));
-	map(0xff, 0xff).w(this, FUNC(imds2_state::imds2_ipc_control_w));
+	map(0xfa, 0xfb).rw(FUNC(imds2_state::imds2_ipclocpic_r), FUNC(imds2_state::imds2_ipclocpic_w));
+	map(0xfc, 0xfd).rw(FUNC(imds2_state::imds2_ipcsyspic_r), FUNC(imds2_state::imds2_ipcsyspic_w));
+	map(0xff, 0xff).w(FUNC(imds2_state::imds2_ipc_control_w));
 }
 
 void imds2_state::ioc_mem_map(address_map &map)
@@ -141,16 +141,16 @@ void imds2_state::ioc_mem_map(address_map &map)
 void imds2_state::ioc_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x0f).w(this, FUNC(imds2_state::imds2_ioc_dbbout_w));
-	map(0x20, 0x2f).w(this, FUNC(imds2_state::imds2_ioc_f0_w));
-	map(0x30, 0x3f).w(this, FUNC(imds2_state::imds2_ioc_set_f1_w));
-	map(0x40, 0x4f).w(this, FUNC(imds2_state::imds2_ioc_reset_f1_w));
-	map(0x50, 0x5f).w(this, FUNC(imds2_state::imds2_start_timer_w));
-	map(0x60, 0x6f).w(this, FUNC(imds2_state::imds2_miscout_w));
-	map(0x80, 0x8f).r(this, FUNC(imds2_state::imds2_miscin_r));
-	map(0x90, 0x9f).r(this, FUNC(imds2_state::imds2_kb_read));
-	map(0xa0, 0xaf).r(this, FUNC(imds2_state::imds2_ioc_status_r));
-	map(0xb0, 0xbf).r(this, FUNC(imds2_state::imds2_ioc_dbbin_r));
+	map(0x00, 0x0f).w(FUNC(imds2_state::imds2_ioc_dbbout_w));
+	map(0x20, 0x2f).w(FUNC(imds2_state::imds2_ioc_f0_w));
+	map(0x30, 0x3f).w(FUNC(imds2_state::imds2_ioc_set_f1_w));
+	map(0x40, 0x4f).w(FUNC(imds2_state::imds2_ioc_reset_f1_w));
+	map(0x50, 0x5f).w(FUNC(imds2_state::imds2_start_timer_w));
+	map(0x60, 0x6f).w(FUNC(imds2_state::imds2_miscout_w));
+	map(0x80, 0x8f).r(FUNC(imds2_state::imds2_miscin_r));
+	map(0x90, 0x9f).r(FUNC(imds2_state::imds2_kb_read));
+	map(0xa0, 0xaf).r(FUNC(imds2_state::imds2_ioc_status_r));
+	map(0xb0, 0xbf).r(FUNC(imds2_state::imds2_ioc_dbbin_r));
 	map(0xc0, 0xcf).m(m_iocfdc, FUNC(i8271_device::map));
 	map(0xd0, 0xdf).rw(m_ioccrtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xe0, 0xef).rw(m_ioctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -159,16 +159,16 @@ void imds2_state::ioc_io_map(address_map &map)
 	map(0xf0, 0xf8).rw(m_iocdma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 }
 
-imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig , type , tag),
+imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig , type , tag),
 	m_ipccpu(*this , "ipccpu"),
 	m_ipcsyspic(*this , "ipcsyspic"),
 	m_ipclocpic(*this , "ipclocpic"),
-		m_ipctimer(*this , "ipctimer"),
-		m_ipcusart0(*this , "ipcusart0"),
-		m_ipcusart1(*this , "ipcusart1"),
-		m_serial0(*this , "serial0"),
-		m_serial1(*this , "serial1"),
+	m_ipctimer(*this , "ipctimer"),
+	m_ipcusart0(*this , "ipcusart0"),
+	m_ipcusart1(*this , "ipcusart1"),
+	m_serial0(*this , "serial0"),
+	m_serial1(*this , "serial1"),
 	m_ioccpu(*this , "ioccpu"),
 	m_iocdma(*this , "iocdma"),
 	m_ioccrtc(*this , "ioccrtc"),
@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, imds2_state, imds2_kb_port_t1_r))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+		MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 		MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, imds2_state , imds2_pio_lpt_ack_w))
 		MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, imds2_state , imds2_pio_lpt_busy_w))
 		MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, imds2_state , imds2_pio_lpt_select_w))
@@ -892,15 +892,15 @@ ROM_START(imds2)
 		ROM_DEFAULT_BIOS("mon13")
 		// 1x2732 Copyright 1979
 		ROM_SYSTEM_BIOS(0, "mon13", "Series II Monitor v1.3")
-		ROMX_LOAD("ipc13_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(1))
+		ROMX_LOAD("ipc13_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(0))
 		// 2x2716 Copyright 1978
 		ROM_SYSTEM_BIOS(1, "mon12", "Series II Monitor v1.2")
-		ROMX_LOAD("ipc12_a57.bin" , 0x0000 , 0x0800 , CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(2))
-		ROMX_LOAD("ipc12_a48.bin" , 0x0800 , 0x0800 , CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(2))
+		ROMX_LOAD("ipc12_a57.bin" , 0x0000 , 0x0800 , CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(1))
+		ROMX_LOAD("ipc12_a48.bin" , 0x0800 , 0x0800 , CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(1))
 		// 2x2716 Copyright 1977
 		ROM_SYSTEM_BIOS(2, "mon11", "Series II Monitor v1.1")
-		ROMX_LOAD("ipc11_a57.bin" , 0x0000 , 0x0800 , CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(3))
-		ROMX_LOAD("ipc11_a48.bin" , 0x0800 , 0x0800 , CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(3))
+		ROMX_LOAD("ipc11_a57.bin" , 0x0000 , 0x0800 , CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(2))
+		ROMX_LOAD("ipc11_a48.bin" , 0x0800 , 0x0800 , CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(2))
 
 		// ROM definition of IOC cpu (8080A)
 		ROM_REGION(0x2000 , "ioccpu" , 0)

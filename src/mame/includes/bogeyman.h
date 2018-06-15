@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 class bogeyman_state : public driver_device
 {

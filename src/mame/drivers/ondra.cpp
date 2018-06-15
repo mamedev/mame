@@ -16,6 +16,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -33,7 +34,7 @@ void ondra_state::ondra_io(address_map &map)
 {
 	map.global_mask(0x0b);
 	map.unmap_value_high();
-	map(0x03, 0x03).w(this, FUNC(ondra_state::ondra_port_03_w));
+	map(0x03, 0x03).w(FUNC(ondra_state::ondra_port_03_w));
 	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
 	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
 }

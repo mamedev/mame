@@ -30,9 +30,9 @@ ROM_START( bootbug )
 	ROM_REGION(0x10000, BOOTBUG_ROM_REGION, 0)
 	ROM_DEFAULT_BIOS("bb15")
 	ROM_SYSTEM_BIOS(0, "bb15", "BootBug v1.5")
-	ROMX_LOAD( "bootbug1.5.bin", 0x000000, 0x010000, CRC(432badf0) SHA1(914ad4bb28946cac732cf8b178508b69e4c1aae2), ROM_BIOS(1))
+	ROMX_LOAD( "bootbug1.5.bin", 0x000000, 0x010000, CRC(432badf0) SHA1(914ad4bb28946cac732cf8b178508b69e4c1aae2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "bb13", "BootBug v1.3")
-	ROMX_LOAD( "bootbug1.3.bin", 0x000000, 0x010000, CRC(2902a234) SHA1(c783d19a5e4c536e58e1e7e201ec47e8fb78d435), ROM_BIOS(2))
+	ROMX_LOAD( "bootbug1.3.bin", 0x000000, 0x010000, CRC(2902a234) SHA1(c783d19a5e4c536e58e1e7e201ec47e8fb78d435), ROM_BIOS(1))
 ROM_END
 
 //**************************************************************************

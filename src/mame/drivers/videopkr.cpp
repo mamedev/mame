@@ -284,6 +284,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -308,10 +309,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
-		, m_dac(*this, "dac")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_aysnd(*this, "aysnd")
 		, m_digits(*this, "digit%u", 0U)
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 		{ }
 
 	DECLARE_READ8_MEMBER(videopkr_io_r);
@@ -329,10 +330,6 @@ public:
 	DECLARE_READ8_MEMBER(baby_sound_p0_r);
 	DECLARE_WRITE8_MEMBER(baby_sound_p0_w);
 	DECLARE_READ8_MEMBER(baby_sound_p1_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p1_w);
-	DECLARE_READ8_MEMBER(baby_sound_p2_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p3_r);
 	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_PALETTE_INIT(videopkr);
@@ -371,7 +368,6 @@ protected:
 	uint8_t m_vp_sound_p2;
 	uint8_t m_p24_data;
 	uint8_t m_sound_latch;
-	uint8_t m_baby_latch;
 	uint8_t m_sound_ant;
 	uint8_t m_dc_4020;
 	uint8_t m_dc_40103;
@@ -392,15 +388,13 @@ protected:
 	unsigned long m_count3;
 	unsigned long m_count4;
 	uint8_t m_sbp0;
-	uint8_t m_sbp2;
-	uint8_t m_sbp3;
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<ay8910_device> m_aysnd;
 	output_finder<28> m_digits;
-	output_finder<14> m_lamp;
+	output_finder<14> m_lamps;
 };
 
 
@@ -695,14 +689,14 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 
 		case 0xef:  /* Port 2.4 */
 		{
-			m_lamp[0] = BIT(data, 0);    /* L_1 */
-			m_lamp[1] = BIT(data, 1);    /* L_2 */
-			m_lamp[2] = BIT(data, 2);    /* L_3 */
-			m_lamp[3] = BIT(data, 3);    /* L_4 */
-			m_lamp[4] = BIT(data, 4);    /* Coin */
-			m_lamp[5] = BIT(data, 5);    /* Hopper_1 */
-			m_lamp[6] = BIT(data, 6);    /* Hopper_2 */
-			m_lamp[7] = BIT(data, 7);    /* Diverter */
+			m_lamps[0] = BIT(data, 0);    /* L_1 */
+			m_lamps[1] = BIT(data, 1);    /* L_2 */
+			m_lamps[2] = BIT(data, 2);    /* L_3 */
+			m_lamps[3] = BIT(data, 3);    /* L_4 */
+			m_lamps[4] = BIT(data, 4);    /* Coin */
+			m_lamps[5] = BIT(data, 5);    /* Hopper_1 */
+			m_lamps[6] = BIT(data, 6);    /* Hopper_2 */
+			m_lamps[7] = BIT(data, 7);    /* Diverter */
 			m_p24_data = data;
 			m_hp_1 = (~m_p24_data >> 6) & 1;
 			m_hp_2 = (~m_p24_data >> 5) & 1;
@@ -732,12 +726,12 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 {
 	m_p1 = data;
 
-	m_lamp[8] = BIT(data, 0);    /* Aux_0 - Jackpot mech. counter (Baby Games)*/
-	m_lamp[9] = BIT(data, 1);    /* Aux_1 - */
-	m_lamp[10] = BIT(data, 2);   /* Aux_2 - */
-	m_lamp[11] = BIT(data, 3);   /* Aux_3 - */
-	m_lamp[12] = BIT(data, 4);   /* Aux_4 - Bell */
-	m_lamp[13] = BIT(data, 5);   /* Aux_5 - /CIO */
+	m_lamps[8] = BIT(data, 0);    /* Aux_0 - Jackpot mech. counter (Baby Games)*/
+	m_lamps[9] = BIT(data, 1);    /* Aux_1 - */
+	m_lamps[10] = BIT(data, 2);   /* Aux_2 - */
+	m_lamps[11] = BIT(data, 3);   /* Aux_3 - */
+	m_lamps[12] = BIT(data, 4);   /* Aux_4 - Bell */
+	m_lamps[13] = BIT(data, 5);   /* Aux_5 - /CIO */
 
 	m_jckp = m_p1 & 1;
 
@@ -907,60 +901,36 @@ READ8_MEMBER(videopkr_state::baby_sound_p1_r)
 	m_hp_2 = (~m_p24_data >> 5) & 1;
 	m_bell = (m_p1 >> 4) & 1;
 	m_aux3 = (m_p1 >> 3) & 1;
-	m_baby_latch = m_c_io + (m_hp_1 << 1) + (m_hp_2 << 2) + (m_bell << 3) + (m_aux3 << 4) + 0xe0;
-	return m_baby_latch;
-}
-
-WRITE8_MEMBER(videopkr_state::baby_sound_p1_w)
-{
-	m_baby_latch = m_baby_latch | data;
-}
-
-READ8_MEMBER(videopkr_state::baby_sound_p2_r)
-{
-	return m_sbp2;
-}
-
-WRITE8_MEMBER(videopkr_state::baby_sound_p2_w)
-{
-	m_sbp2 = data;
-	m_dac->write(data);
-}
-
-READ8_MEMBER(videopkr_state::baby_sound_p3_r)
-{
-	return m_sbp3;
+	return m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | (m_bell << 3) | (m_aux3 << 4) | 0xe0;
 }
 
 WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	uint8_t lmp_ports, ay_intf;
-	m_sbp3 = data;
-	lmp_ports = m_sbp3 >> 1 & 0x07;
+	lmp_ports = data >> 1 & 0x07;
 
 	output().set_value("TOP_1", (lmp_ports >> 0) & 1);
 	output().set_value("TOP_2", (lmp_ports >> 1) & 1);
 	output().set_value("TOP_3", (lmp_ports >> 2) & 1);
 
-	if (!(m_sbp3 & 0x10))
+	if (!(data & 0x10))
 	{
 		reset();
 		logerror("AY3-8910: Reset\n");
 	}
 
-	ay_intf = (m_sbp3 >> 5) & 0x07;
+	ay_intf = (data >> 5) & 0x07;
 
 	switch (ay_intf)
 	{
 		case 0x00:  break;
 		case 0x01:  break;
 		case 0x02:  break;
-		case 0x03:  ay8910->data_w(space, 1, m_sbp0); break;
+		case 0x03:  m_aysnd->data_w(space, 1, m_sbp0); break;
 		case 0x04:  break;
-		case 0x05:  m_sbp0 = ay8910->data_r(space, m_sbp0); break;
+		case 0x05:  m_sbp0 = m_aysnd->data_r(space, m_sbp0); break;
 		case 0x06:  break;
-		case 0x07:  ay8910->address_w(space, 0, m_sbp0); break;
+		case 0x07:  m_aysnd->address_w(space, 0, m_sbp0); break;
 	}
 }
 
@@ -989,7 +959,7 @@ void videopkr_state::i8039_map(address_map &map)
 
 void videopkr_state::i8039_io_port(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(videopkr_state::videopkr_io_r), FUNC(videopkr_state::videopkr_io_w));
+	map(0x00, 0xff).rw(FUNC(videopkr_state::videopkr_io_r), FUNC(videopkr_state::videopkr_io_w));
 }
 
 void videopkr_state::i8751_map(address_map &map)
@@ -1014,7 +984,7 @@ void videopkr_state::i8039_sound_mem(address_map &map)
 
 void videopkr_state::i8039_sound_port(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(videopkr_state::sound_io_r), FUNC(videopkr_state::sound_io_w));
+	map(0x00, 0xff).rw(FUNC(videopkr_state::sound_io_r), FUNC(videopkr_state::sound_io_w));
 }
 
 
@@ -1250,7 +1220,7 @@ GFXDECODE_END
 void videopkr_state::machine_start()
 {
 	m_digits.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 	m_vp_sound_p2 = 0xff;   /* default P2 latch value */
 	m_sound_latch = 0xff;   /* default sound data latch value */
 	m_p24_data = 0xff;
@@ -1258,7 +1228,7 @@ void videopkr_state::machine_start()
 	m_ant_cio = 0;
 	m_count0 = 0;
 
-	machine().device<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
+	subdevice<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
 
 /************************
@@ -1283,7 +1253,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_DEVICE_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(i8039_sound_mem)
 	MCFG_DEVICE_IO_MAP(i8039_sound_port)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
 
@@ -1356,10 +1326,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, videopkr_state, baby_sound_p0_r))
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p0_w))
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, videopkr_state, baby_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, videopkr_state, baby_sound_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, videopkr_state, baby_sound_p3_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p3_w))
 
 	/* video hardware */

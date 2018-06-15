@@ -102,7 +102,7 @@ void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
 {
 	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
 	map(0x47, 0x58).mirror(0xff00).nopr();
-	map(0x00, 0x00).mirror(0xff00).w(SN76496_TAG, FUNC(sn76496_device::write));
+	map(0x00, 0x00).mirror(0xff00).w(SN76496_TAG, FUNC(sn76496_device::command_w));
 }
 
 
@@ -371,7 +371,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 	m_maincpu(*this, I8051_TAG),
 	m_y(*this, "Y%u", 0),
 	m_txd_handler(*this),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_keylatch(0),
 	m_rxd(1)
 {
@@ -385,7 +385,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 void wangpc_keyboard_device::device_start()
 {
 	m_txd_handler.resolve_safe();
-	m_led.resolve();
+	m_leds.resolve();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 
@@ -535,7 +535,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 	for (int i = 0; i < 6; i++)
 	{
-		m_led[i] = BIT(~data, i);
+		m_leds[i] = BIT(~data, i);
 	}
 
 	//if (LOG) logerror("P1 %02x\n", data);

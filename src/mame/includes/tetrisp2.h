@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tetrisp2_state : public driver_device
 {
@@ -32,7 +33,7 @@ public:
 		m_sub_palette(*this, "sub_palette"),
 		m_paletteram(*this, "paletteram"),
 		m_sub_paletteram(*this, "sub_paletteram"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(rockn_systemregs_w);
@@ -104,7 +105,7 @@ public:
 	void tetrisp2_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -134,7 +135,7 @@ protected:
 	optional_device<palette_device> m_sub_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_sub_paletteram;
-	output_finder<45> m_led;
+	output_finder<45> m_leds;
 
 	uint16_t m_rocknms_sub_systemregs[0x10];
 	uint16_t m_rockn_protectdata;

@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK XTAL(12'096'000)
@@ -40,7 +41,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void boxer(machine_config &config);
@@ -82,7 +83,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };
 
 /*************************************
@@ -333,8 +334,8 @@ WRITE8_MEMBER(boxer_state::crowd_w)
 
 WRITE8_MEMBER(boxer_state::led_w)
 {
-	m_led[1] = BIT(~data, 0);
-	m_led[0] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 1);
 }
 
 
@@ -349,14 +350,14 @@ void boxer_state::boxer_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram().share("tile_ram");
-	map(0x0800, 0x08ff).r(this, FUNC(boxer_state::input_r));
-	map(0x1000, 0x17ff).r(this, FUNC(boxer_state::misc_r));
-	map(0x1800, 0x1800).w(this, FUNC(boxer_state::pot_w));
-	map(0x1900, 0x19ff).w(this, FUNC(boxer_state::led_w));
-	map(0x1a00, 0x1aff).w(this, FUNC(boxer_state::sound_w));
-	map(0x1b00, 0x1bff).w(this, FUNC(boxer_state::crowd_w));
-	map(0x1c00, 0x1cff).w(this, FUNC(boxer_state::irq_reset_w));
-	map(0x1d00, 0x1dff).w(this, FUNC(boxer_state::bell_w));
+	map(0x0800, 0x08ff).r(FUNC(boxer_state::input_r));
+	map(0x1000, 0x17ff).r(FUNC(boxer_state::misc_r));
+	map(0x1800, 0x1800).w(FUNC(boxer_state::pot_w));
+	map(0x1900, 0x19ff).w(FUNC(boxer_state::led_w));
+	map(0x1a00, 0x1aff).w(FUNC(boxer_state::sound_w));
+	map(0x1b00, 0x1bff).w(FUNC(boxer_state::crowd_w));
+	map(0x1c00, 0x1cff).w(FUNC(boxer_state::irq_reset_w));
+	map(0x1d00, 0x1dff).w(FUNC(boxer_state::bell_w));
 	map(0x1e00, 0x1eff).writeonly().share("sprite_ram");
 	map(0x1f00, 0x1fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3000, 0x3fff).rom();
@@ -473,7 +474,7 @@ GFXDECODE_END
 
 void boxer_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_pot_interrupt = timer_alloc(TIMER_POT_INTERRUPT);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 

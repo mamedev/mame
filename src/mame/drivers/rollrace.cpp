@@ -72,17 +72,17 @@ void rollrace_state::rollrace_map(address_map &map)
 	map(0x8000, 0x9fff).rom();          /* only rollace2 */
 	map(0xc000, 0xcfff).ram();
 	map(0xd806, 0xd806).nopr(); /* looks like a watchdog, bit4 checked*/
-	map(0xd900, 0xd900).rw(this, FUNC(rollrace_state::fake_d800_r), FUNC(rollrace_state::fake_d800_w)); /* protection ??*/
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(rollrace_state::vram_w)).share("videoram");
-	map(0xe400, 0xe47f).ram().w(this, FUNC(rollrace_state::cram_w)).share("colorram");
+	map(0xd900, 0xd900).rw(FUNC(rollrace_state::fake_d800_r), FUNC(rollrace_state::fake_d800_w)); /* protection ??*/
+	map(0xe000, 0xe3ff).ram().w(FUNC(rollrace_state::vram_w)).share("videoram");
+	map(0xe400, 0xe47f).ram().w(FUNC(rollrace_state::cram_w)).share("colorram");
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xec00, 0xec0f).noprw(); /* Analog sound effects ?? ec00 sound enable ?*/
 	map(0xf000, 0xf0ff).ram().share("spriteram");
-	map(0xf400, 0xf400).w(this, FUNC(rollrace_state::backgroundcolor_w));
+	map(0xf400, 0xf400).w(FUNC(rollrace_state::backgroundcolor_w));
 	map(0xf800, 0xf800).portr("P1");
-	map(0xf801, 0xf801).portr("P2").w(this, FUNC(rollrace_state::bkgpen_w));
-	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(rollrace_state::backgroundpage_w));
-	map(0xf803, 0xf803).w(this, FUNC(rollrace_state::flipy_w));
+	map(0xf801, 0xf801).portr("P2").w(FUNC(rollrace_state::bkgpen_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(rollrace_state::backgroundpage_w));
+	map(0xf803, 0xf803).w(FUNC(rollrace_state::flipy_w));
 	map(0xf804, 0xf804).portr("DSW1");
 	map(0xf805, 0xf805).portr("DSW2");
 	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -93,7 +93,7 @@ void rollrace_state::rollrace_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(rollrace_state::sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(rollrace_state::sound_nmi_mask_w));
 	map(0x4000, 0x4001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x5000, 0x5001).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay3", FUNC(ay8910_device::address_data_w));

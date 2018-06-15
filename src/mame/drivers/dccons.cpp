@@ -270,6 +270,7 @@
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -368,18 +369,18 @@ void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
 	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//AM_READWRITE8(dc_flash_r,dc_flash_w, 0xffffffffffffffffU)
-	map(0x005f6800, 0x005f69ff).rw(this, FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
-	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)).umask64(0x0000ffff0000ffff);
-	map(0x005f7080, 0x005f709f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask64(0x0000ffff0000ffff);
-	map(0x005f7400, 0x005f74ff).rw(this, FUNC(dc_cons_state::dc_mess_g1_ctrl_r), FUNC(dc_cons_state::dc_mess_g1_ctrl_w));
-	map(0x005f7800, 0x005f78ff).rw(this, FUNC(dc_cons_state::dc_g2_ctrl_r), FUNC(dc_cons_state::dc_g2_ctrl_w));
+	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
+	map(0x005f7080, 0x005f709f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask64(0x0000ffff0000ffff);
+	map(0x005f7400, 0x005f74ff).rw(FUNC(dc_cons_state::dc_mess_g1_ctrl_r), FUNC(dc_cons_state::dc_mess_g1_ctrl_w));
+	map(0x005f7800, 0x005f78ff).rw(FUNC(dc_cons_state::dc_g2_ctrl_r), FUNC(dc_cons_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).rw(this, FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).rw(this, FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(this, FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
+	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -414,14 +415,14 @@ void dc_cons_state::dc_map(address_map &map)
 
 void dc_cons_state::dc_port(address_map &map)
 {
-	map(0x00000000, 0x00000007).rw(this, FUNC(dc_cons_state::dc_pdtra_r), FUNC(dc_cons_state::dc_pdtra_w));
+	map(0x00000000, 0x00000007).rw(FUNC(dc_cons_state::dc_pdtra_r), FUNC(dc_cons_state::dc_pdtra_w));
 }
 
 void dc_cons_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).ram().share("dc_sound_ram");        /* shared with SH-4 */
-	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
+	map(0x00800000, 0x00807fff).rw(FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
 }
 
 static INPUT_PORTS_START( dc )
@@ -642,7 +643,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1))
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 // known undumped or private BIOS revisions:
 // "MPR-21068 SEGA JAPAN / 9850 D" from VA0 837-13392-02 (171-7782B) NTSC-J unit

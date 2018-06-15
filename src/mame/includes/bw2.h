@@ -15,6 +15,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "video/msm6255.h"
+#include "emupal.h"
 #include "rendlay.h"
 
 #define Z80_TAG         "ic1"

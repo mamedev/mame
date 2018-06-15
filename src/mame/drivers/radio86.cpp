@@ -39,7 +39,7 @@ void radio86_state::radio86_mem(address_map &map)
 void radio86_state::radio86_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0xff).rw(this, FUNC(radio86_state::radio_io_r), FUNC(radio86_state::radio_io_w));
+	map(0x00, 0xff).rw(FUNC(radio86_state::radio_io_r), FUNC(radio86_state::radio_io_w));
 }
 
 void radio86_state::rk7007_io(address_map &map)
@@ -68,7 +68,7 @@ void radio86_state::radio86ram_mem(address_map &map)
 	map(0xf700, 0xf703).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf780, 0xf7bf).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)); // video
 	map(0xf684, 0xf687).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf688, 0xf688).w(this, FUNC(radio86_state::radio86_pagesel));
+	map(0xf688, 0xf688).w(FUNC(radio86_state::radio86_pagesel));
 	map(0xf800, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xf800, 0xffff).rom();  // System ROM page 1
 }
@@ -78,7 +78,7 @@ void radio86_state::radio86_16_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
 	map(0x1000, 0x3fff).ram();  // RAM
-	map(0x4000, 0x7fff).r(this, FUNC(radio86_state::radio_cpu_state_r));
+	map(0x4000, 0x7fff).r(FUNC(radio86_state::radio_cpu_state_r));
 	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
 	//AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
 	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
@@ -507,9 +507,9 @@ ROM_END
 ROM_START( radiorom )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "32k", "32 KB rom disk")
-	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(1))
+	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "64k", "64 KB rom disk")
-	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(2))
+	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(1))
 	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))

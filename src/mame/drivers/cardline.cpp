@@ -25,6 +25,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,7 +45,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -81,12 +82,12 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	output_finder<8> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 void cardline_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
 	for (int i=0; i < 0x2000; i++)
@@ -207,14 +208,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	m_lamp[5] = BIT(data, 0);
-	m_lamp[0] = BIT(data, 1);
-	m_lamp[1] = BIT(data, 2);
-	m_lamp[2] = BIT(data, 3);
-	m_lamp[3] = BIT(data, 4);
-	m_lamp[4] = BIT(data, 5);
-	m_lamp[6] = BIT(data, 6);
-	m_lamp[7] = BIT(data, 7);
+	m_lamps[5] = BIT(data, 0);
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 3);
+	m_lamps[3] = BIT(data, 4);
+	m_lamps[4] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 }
 
 void cardline_state::mem_prg(address_map &map)
@@ -228,18 +229,18 @@ void cardline_state::mem_io(address_map &map)
 	map(0x2003, 0x2003).portr("IN0");
 	map(0x2005, 0x2005).portr("IN1");
 	map(0x2006, 0x2006).portr("DSW");
-	map(0x2007, 0x2007).w(this, FUNC(cardline_state::lamps_w));
+	map(0x2007, 0x2007).w(FUNC(cardline_state::lamps_w));
 	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
 	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
-	map(0x2100, 0x213f).rw(this, FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
+	map(0x2100, 0x213f).rw(FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
 	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
 	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
 	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
-	map(0x3003, 0x3003).w(this, FUNC(cardline_state::a3003_w));
-	map(0xc000, 0xdfff).w(this, FUNC(cardline_state::vram_w)).share("videoram");
-	map(0xe000, 0xffff).w(this, FUNC(cardline_state::attr_w)).share("colorram");
+	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
+	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
+	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");
 }
 
 

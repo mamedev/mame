@@ -871,7 +871,7 @@ void ngen_state::ngen_mem(address_map &map)
 
 void ngen_state::ngen_io(address_map &map)
 {
-	map(0x0000, 0x0001).rw(this, FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
+	map(0x0000, 0x0001).rw(FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
 
 	// Floppy/Hard disk module
 //  AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
@@ -907,10 +907,10 @@ void ngen_state::ngen386i_mem(address_map &map)
 
 void ngen_state::ngen386_io(address_map &map)
 {
-	map(0x0000, 0x0001).rw(this, FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
+	map(0x0000, 0x0001).rw(FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
 //  AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
-	map(0xfd08, 0xfd0b).rw(this, FUNC(ngen_state::b38_crtc_r), FUNC(ngen_state::b38_crtc_w));
-	map(0xfd0c, 0xfd0f).rw(this, FUNC(ngen_state::b38_keyboard_r), FUNC(ngen_state::b38_keyboard_w));
+	map(0xfd08, 0xfd0b).rw(FUNC(ngen_state::b38_crtc_r), FUNC(ngen_state::b38_crtc_w));
+	map(0xfd0c, 0xfd0f).rw(FUNC(ngen_state::b38_keyboard_r), FUNC(ngen_state::b38_keyboard_w));
 }
 
 static INPUT_PORTS_START( ngen )
@@ -928,7 +928,7 @@ static void ngen_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(ngen_state::ngen)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(ngen_mem)
 	MCFG_DEVICE_IO_MAP(ngen_io)
 	MCFG_80186_CHIP_SELECT_CB(WRITE16(*this, ngen_state, cpu_peripheral_cb))
@@ -941,12 +941,12 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ngen_state, pit_out0_w))  // RS232 channel B baud rate
-	MCFG_PIT8253_CLK1(XTAL(14'745'600)/12)  // correct? - based on patent
+	MCFG_PIT8253_CLK1(14.7456_MHz_XTAL / 12)  // correct? - based on patent
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, ngen_state, pit_out1_w))  // RS232 channel A baud rate
-	MCFG_PIT8253_CLK2(XTAL(14'745'600)/12)
+	MCFG_PIT8253_CLK2(14.7456_MHz_XTAL / 12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ngen_state, pit_out2_w))
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL(14'745'600) / 3)  // NEC D8237A, divisor unknown
+	MCFG_DEVICE_ADD("dmac", AM9517A, 14.7456_MHz_XTAL / 3)  // NEC D8237A, divisor unknown
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, ngen_state, dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, ngen_state, dma_eop_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, ngen_state, dma_read_word))  // DMA is always 16-bit
@@ -1011,20 +1011,20 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_WD2797_ADD("fdc", XTAL(20'000'000) / 20)
+	MCFG_DEVICE_ADD("fdc", WD2797, 20_MHz_XTAL / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, ngen_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
-	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 20)
+	MCFG_PIT8253_CLK1(20_MHz_XTAL / 20)
 //  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
-	MCFG_PIT8253_CLK2(XTAL(20'000'000) / 20)
+	MCFG_PIT8253_CLK2(20_MHz_XTAL / 20)
 //  MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))
 
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_ADD("hdc", WD2010, 20_MHz_XTAL / 4)
 	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("pic",pic8259_device,ir2_w))
 	MCFG_WD2010_IN_BCS_CB(READ8(*this, ngen_state,hd_buffer_r))
 	MCFG_WD2010_OUT_BCS_CB(WRITE8(*this, ngen_state,hd_buffer_w))
@@ -1034,14 +1034,14 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	MCFG_WD2010_IN_TK000_CB(VCC)
 	MCFG_WD2010_IN_SC_CB(VCC)
 	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK2(XTAL(20'000'000) / 10)  // 2MHz
+	MCFG_PIT8253_CLK2(20_MHz_XTAL / 10)  // 2MHz
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_HARDDISK_ADD("hard0")
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngen386_state::ngen386)
-	MCFG_DEVICE_ADD("i386cpu", I386, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_ADD("i386cpu", I386, 50_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(ngen386_mem)
 	MCFG_DEVICE_IO_MAP(ngen386_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
@@ -1052,12 +1052,12 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ngen_state, pit_out0_w))  // RS232 channel B baud rate
-	MCFG_PIT8253_CLK1(XTAL(14'745'600)/12)  // correct? - based on patent
+	MCFG_PIT8253_CLK1(14.7456_MHz_XTAL / 12)  // correct? - based on patent
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, ngen_state, pit_out1_w))  // RS232 channel A baud rate
-	MCFG_PIT8253_CLK2(XTAL(14'745'600)/12)
+	MCFG_PIT8253_CLK2(14.7456_MHz_XTAL / 12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ngen_state, pit_out2_w))
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL(14'745'600) / 3)  // NEC D8237A, divisor unknown
+	MCFG_DEVICE_ADD("dmac", AM9517A, 14.7456_MHz_XTAL / 3)  // NEC D8237A, divisor unknown
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, ngen_state, dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, ngen_state, dma_eop_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, ngen_state, dma_read_word))  // DMA is always 16-bit
@@ -1122,20 +1122,20 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_WD2797_ADD("fdc", XTAL(20'000'000) / 20)
+	MCFG_DEVICE_ADD("fdc", WD2797, 20_MHz_XTAL / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, ngen_state,fdc_irq_w))
 //  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("i386cpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
-	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 20)
+	MCFG_PIT8253_CLK1(20_MHz_XTAL / 20)
 //  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
-	MCFG_PIT8253_CLK2(XTAL(20'000'000) / 20)
+	MCFG_PIT8253_CLK2(20_MHz_XTAL / 20)
 //  MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))
 
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_ADD("hdc", WD2010, 20_MHz_XTAL / 4)
 	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("pic",pic8259_device,ir2_w))
 	MCFG_WD2010_IN_BCS_CB(READ8(*this, ngen_state,hd_buffer_r))
 	MCFG_WD2010_OUT_BCS_CB(WRITE8(*this, ngen_state,hd_buffer_w))
@@ -1145,7 +1145,7 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_WD2010_IN_TK000_CB(VCC)
 	MCFG_WD2010_IN_SC_CB(VCC)
 	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK2(XTAL(20'000'000) / 10)  // 2MHz
+	MCFG_PIT8253_CLK2(20_MHz_XTAL / 10)  // 2MHz
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END

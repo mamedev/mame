@@ -132,6 +132,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -507,17 +508,17 @@ void nevada_state::nevada_map(address_map &map)
 	map(0x00010000, 0x00021fff).ram().share("backup");
 	map(0x00900001, 0x00900001).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x00908001, 0x00908001).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x00a00000, 0x00a00001).rw(this, FUNC(nevada_state::io_board_r), FUNC(nevada_state::io_board_w));
-	map(0x00a08000, 0x00a08001).w(this, FUNC(nevada_state::io_board_x));
+	map(0x00a00000, 0x00a00001).rw(FUNC(nevada_state::io_board_r), FUNC(nevada_state::io_board_w));
+	map(0x00a08000, 0x00a08001).w(FUNC(nevada_state::io_board_x));
 	map(0x00a10000, 0x00a10001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x00a20001, 0x00a20001).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x00a28001, 0x00a28001).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x00a30000, 0x00a30001).select(0xf0).rw(this, FUNC(nevada_state::rtc_r), FUNC(nevada_state::rtc_w)).umask16(0x00ff);
-	map(0x00a40000, 0x00a40001).rw(this, FUNC(nevada_state::nevada_sec_r), FUNC(nevada_state::nevada_sec_w));
-	map(0x00b00000, 0x00b03fff).ram().w(this, FUNC(nevada_state::vram_w)).share("vram");
-	map(0x00b10000, 0x00b10001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<1>), FUNC(nevada_state::duart_w<1>)).umask16(0x00ff); // Lower byte
-	map(0x00b20000, 0x00b20001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<2>), FUNC(nevada_state::duart_w<2>)).umask16(0x00ff); // Lower byte
-	map(0x00e00000, 0x00e00001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<0>), FUNC(nevada_state::duart_w<0>)).umask16(0xff00); // Upper byte
+	map(0x00a30000, 0x00a30001).select(0xf0).rw(FUNC(nevada_state::rtc_r), FUNC(nevada_state::rtc_w)).umask16(0x00ff);
+	map(0x00a40000, 0x00a40001).rw(FUNC(nevada_state::nevada_sec_r), FUNC(nevada_state::nevada_sec_w));
+	map(0x00b00000, 0x00b03fff).ram().w(FUNC(nevada_state::vram_w)).share("vram");
+	map(0x00b10000, 0x00b10001).select(0xf0).rw(FUNC(nevada_state::duart_r<1>), FUNC(nevada_state::duart_w<1>)).umask16(0x00ff); // Lower byte
+	map(0x00b20000, 0x00b20001).select(0xf0).rw(FUNC(nevada_state::duart_r<2>), FUNC(nevada_state::duart_w<2>)).umask16(0x00ff); // Lower byte
+	map(0x00e00000, 0x00e00001).select(0xf0).rw(FUNC(nevada_state::duart_r<0>), FUNC(nevada_state::duart_w<0>)).umask16(0xff00); // Upper byte
 	map(0x00fa0000, 0x00fbffff).ram();  // not used
 	map(0x00fc0000, 0x00ffffff).rom();  // ROM ext + ROM boot
 }

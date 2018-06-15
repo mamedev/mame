@@ -213,10 +213,10 @@ void fuuki32_state::fuuki32_map(address_map &map)
 	map(0x400000, 0x40ffff).ram();                                                                     // Work RAM
 	map(0x410000, 0x41ffff).ram();                                                                     // Work RAM (used by asurabus)
 
-	map(0x500000, 0x501fff).ram().w(this, FUNC(fuuki32_state::vram_w<0>)).share("vram.0");  // Tilemap 1
-	map(0x502000, 0x503fff).ram().w(this, FUNC(fuuki32_state::vram_w<1>)).share("vram.1");  // Tilemap 2
-	map(0x504000, 0x505fff).ram().w(this, FUNC(fuuki32_state::vram_w<2>)).share("vram.2");  // Tilemap bg
-	map(0x506000, 0x507fff).ram().w(this, FUNC(fuuki32_state::vram_w<3>)).share("vram.3");  // Tilemap bg2
+	map(0x500000, 0x501fff).ram().w(FUNC(fuuki32_state::vram_w<0>)).share("vram.0");  // Tilemap 1
+	map(0x502000, 0x503fff).ram().w(FUNC(fuuki32_state::vram_w<1>)).share("vram.1");  // Tilemap 2
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki32_state::vram_w<2>)).share("vram.2");  // Tilemap bg
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki32_state::vram_w<3>)).share("vram.3");  // Tilemap bg2
 	map(0x508000, 0x517fff).ram();                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
 	map(0x600000, 0x601fff).ram().rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)); // Sprites
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
@@ -226,10 +226,10 @@ void fuuki32_state::fuuki32_map(address_map &map)
 	map(0x880000, 0x880003).portr("880000");                                                     // Service + DIPS
 	map(0x890000, 0x890003).portr("890000");                                                     // More DIPS
 
-	map(0x8c0000, 0x8c001f).ram().w(this, FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
+	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
 	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
 	map(0x8e0000, 0x8e0003).ram().share("priority");                            // Controls layer order
-	map(0x903fe0, 0x903fff).rw(this, FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w)).umask32(0x00ff00ff);                                         // Shared with Z80
+	map(0x903fe0, 0x903fff).rw(FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w)).umask32(0x00ff00ff);                                         // Shared with Z80
 	map(0xa00000, 0xa00003).writeonly().share("tilebank");                      // Tilebank
 }
 
@@ -256,7 +256,7 @@ void fuuki32_state::fuuki32_sound_map(address_map &map)
 void fuuki32_state::fuuki32_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(fuuki32_state::sound_bw_w));
+	map(0x00, 0x00).w(FUNC(fuuki32_state::sound_bw_w));
 	map(0x30, 0x30).nopw(); // leftover/unused nmi handler related
 	map(0x40, 0x45).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 }

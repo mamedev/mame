@@ -4,6 +4,7 @@
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 #define HORZ_RES        32
 #define VERT_RES        24

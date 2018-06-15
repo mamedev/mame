@@ -491,7 +491,7 @@ WRITE8_MEMBER( tutor_state::tutor_printer_w )
 	{
 	case 0x10:
 		/* data */
-		m_cent_data_out->write(space, 0, data);
+		m_cent_data_out->write(data);
 		break;
 
 	case 0x40:
@@ -558,14 +558,14 @@ void tutor_state::tutor_memmap(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2").nopw();
 	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
-	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
-	map(0xe100, 0xe1ff).rw(this, FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
-	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
-	map(0xe800, 0xe8ff).rw(this, FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
-	map(0xee00, 0xeeff).nopr().w(this, FUNC(tutor_state::tutor_cassette_w));     /*cassette interface*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::command_w));    /*sound chip*/
+	map(0xe800, 0xe8ff).rw(FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
+	map(0xee00, 0xeeff).nopr().w(FUNC(tutor_state::tutor_cassette_w));     /*cassette interface*/
 
-	map(0xf000, 0xffff).r(this, FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
+	map(0xf000, 0xffff).r(FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
 }
 
 void tutor_state::pyuutajr_mem(address_map &map)
@@ -575,16 +575,16 @@ void tutor_state::pyuutajr_mem(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2").nopw();
 	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
-	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
-	map(0xe100, 0xe1ff).rw(this, FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
-	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::command_w));    /*sound chip*/
 	map(0xe800, 0xe800).portr("LINE0");
 	map(0xea00, 0xea00).portr("LINE1");
 	map(0xec00, 0xec00).portr("LINE2");
 	map(0xee00, 0xee00).portr("LINE3");
 
-	map(0xf000, 0xffff).r(this, FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
+	map(0xf000, 0xffff).r(FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
 }
 
 /*
@@ -599,8 +599,8 @@ void tutor_state::pyuutajr_mem(address_map &map)
 
 void tutor_state::tutor_io(address_map &map)
 {
-	map(0xec0, 0xec7).r(this, FUNC(tutor_state::key_r));               /*keyboard interface*/
-	map(0xed0, 0xed0).r(this, FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
+	map(0xec0, 0xec7).r(FUNC(tutor_state::key_r));               /*keyboard interface*/
+	map(0xed0, 0xed0).r(FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
 }
 
 /* tutor keyboard: 56 keys
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tutor_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

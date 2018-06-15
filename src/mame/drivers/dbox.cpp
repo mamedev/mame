@@ -574,8 +574,8 @@ void dbox_state::dbox_map(address_map &map)
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
 #if LOCALFLASH
-	map(0x000000, 0x3fffff).rom().r(this, FUNC(dbox_state::sysflash_r)).region("flash", 0);
-	map(0x000000, 0x3fffff).w(this, FUNC(dbox_state::sysflash_w));
+	map(0x000000, 0x3fffff).rom().r(FUNC(dbox_state::sysflash_r)).region("flash", 0);
+	map(0x000000, 0x3fffff).w(FUNC(dbox_state::sysflash_w));
 #else
 	map(0x000000, 0x3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 #endif
@@ -587,8 +587,8 @@ void dbox_state::dbox_map(address_map &map)
 // 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
 // 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	// AM_RANGE(0x780000, 0x7807ff)
-	map(0x780100, 0x7801ff).w(this, FUNC(dbox_state::sda5708_reset));
-	map(0x780600, 0x7806ff).w(this, FUNC(dbox_state::sda5708_clk));
+	map(0x780100, 0x7801ff).w(FUNC(dbox_state::sda5708_reset));
+	map(0x780600, 0x7806ff).w(FUNC(dbox_state::sda5708_clk));
 // CS1 - RAM area
 // 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
@@ -640,13 +640,13 @@ ROM_START( dbox )
 	ROM_DEFAULT_BIOS("b200uns")
 
 	ROM_SYSTEM_BIOS(0, "b200uns", "Nokia Bootloader B200uns")
-	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(1) )
+	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "b210uns", "Nokia Bootloader B210uns")
-	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(2) )
+	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
-	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
+	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(2) )
 ROM_END
 
 COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

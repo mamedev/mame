@@ -204,12 +204,12 @@ as well as PA0 (ST1), PA2 (ST2) and PA3 (ADB /INT)
 void lwriter_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x1fffff).rw(this, FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
+	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//AM_RANGE(0x300000, 0x3fffff) // open bus?
 	map(0x400000, 0x5fffff).ram().region("dram", 0).mirror(0x200000); // 2MB DRAM
-	map(0x800000, 0x800000).w(this, FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
-	map(0x800001, 0x800001).w(this, FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
 	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
 	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
@@ -349,13 +349,15 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
     m_via->write_ca1(state);
 }*/
 
-#define CPU_CLK (XTAL(22'321'000) / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
+#define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
 MACHINE_CONFIG_START(lwriter_state::lwriter)
 	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_SCC8530_ADD("scc", CPU_CLK, RXC_CLK, 0, RXC_CLK, 0)
+
+	MCFG_DEVICE_ADD("scc", SCC8530N, CPU_CLK)
+	MCFG_Z80SCC_OFFSETS(RXC_CLK, 0, RXC_CLK, 0)
 	/* Port A */
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
@@ -368,13 +370,13 @@ MACHINE_CONFIG_START(lwriter_state::lwriter)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE("via", via6522_device, write_ca1))
 	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, lwriter_state, scc_int))
 
-	MCFG_DEVICE_ADD ("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsa_w))
 
-	MCFG_DEVICE_ADD ("rs232b", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsb_w))
 
 #if TPI
 	MCFG_DEVICE_ADD("tpi", TPI6525, 0)

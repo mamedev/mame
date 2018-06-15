@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( d110 )
@@ -218,12 +219,12 @@ PALETTE_INIT_MEMBER(d110_state, d110)
 
 void d110_state::d110_map(address_map &map)
 {
-	map(0x0100, 0x0100).w(this, FUNC(d110_state::bank_w));
-	map(0x0200, 0x0200).w(this, FUNC(d110_state::so_w));
+	map(0x0100, 0x0100).w(FUNC(d110_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(d110_state::so_w));
 	map(0x021a, 0x021a).portr("SC0").nopw();
 	map(0x021c, 0x021c).portr("SC1");
-	map(0x0300, 0x0300).w(this, FUNC(d110_state::lcd_data_w));
-	map(0x0380, 0x0380).rw(this, FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
+	map(0x0300, 0x0300).w(FUNC(d110_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
 	map(0x8000, 0xbfff).bankrw("bank");
 	map(0xc000, 0xffff).bankrw("fixed");
@@ -231,8 +232,8 @@ void d110_state::d110_map(address_map &map)
 
 void d110_state::d110_io(address_map &map)
 {
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(this, FUNC(d110_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(this, FUNC(d110_state::port0_r));
+	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(d110_state::midi_w));
+	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(d110_state::port0_r));
 }
 
 MACHINE_CONFIG_START(d110_state::d110)
@@ -274,10 +275,10 @@ ROM_START( d110 )
 	ROM_DEFAULT_BIOS( "110" )
 
 	ROM_SYSTEM_BIOS( 0, "106", "Firmware 1.06" )
-	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(1) )
+	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "110", "Firmware 1.10" )
-	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(2) )
+	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(1) )
 
 	ROM_REGION( 0x20000, "presets", 0 )
 	ROM_LOAD(  "r15179873-lh5310-97.ic12.bin", 0,  0x20000, CRC(580a8f9e) SHA1(05587a0542b01625dcde37de5bb339880e47eb93) )

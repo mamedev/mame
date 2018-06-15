@@ -205,7 +205,7 @@ public:
 		, m_rombank1(*this, "bank1")
 		, m_ym2413(*this, "ymsnd")
 		, m_meters(*this, "meters")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{
 		for (auto &elem : m_lamps_old)
 			elem = 0;
@@ -322,7 +322,7 @@ private:
 	int m_e2data_to_read;
 	uint8_t m_codec_data[256];
 	uint8_t m_lamps_old[0x20];
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 };
 
 
@@ -710,7 +710,7 @@ WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 		int newbit = BIT(data, i);
 
 		if (oldbit != newbit)
-			m_lamp[off + i] = newbit;
+			m_lamps[off + i] = newbit;
 	}
 
 	m_lamps_old[offset] = data;
@@ -1535,44 +1535,44 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram"); //8k
 
-	map(0x2300, 0x230B).r(this, FUNC(bfm_sc2_state::mux_input_r));
-	map(0x2300, 0x231F).w(this, FUNC(bfm_sc2_state::mux_output_w));
-	map(0x2320, 0x2323).w(this, FUNC(bfm_sc2_state::dimas_w));              /* ?unknown dim related */
+	map(0x2300, 0x230B).r(FUNC(bfm_sc2_state::mux_input_r));
+	map(0x2300, 0x231F).w(FUNC(bfm_sc2_state::mux_output_w));
+	map(0x2320, 0x2323).w(FUNC(bfm_sc2_state::dimas_w));              /* ?unknown dim related */
 
-	map(0x2324, 0x2324).rw(this, FUNC(bfm_sc2_state::expansion_latch_r), FUNC(bfm_sc2_state::expansion_latch_w));
-	map(0x2325, 0x2327).w(this, FUNC(bfm_sc2_state::unknown_w));
-	map(0x2328, 0x2328).w(this, FUNC(bfm_sc2_state::muxena_w));
-	map(0x2329, 0x2329).rw(this, FUNC(bfm_sc2_state::timerirqclr_r), FUNC(bfm_sc2_state::timerirq_w));
-	map(0x232A, 0x232D).w(this, FUNC(bfm_sc2_state::unknown_w));
-	map(0x232E, 0x232E).r(this, FUNC(bfm_sc2_state::irqstatus_r));
+	map(0x2324, 0x2324).rw(FUNC(bfm_sc2_state::expansion_latch_r), FUNC(bfm_sc2_state::expansion_latch_w));
+	map(0x2325, 0x2327).w(FUNC(bfm_sc2_state::unknown_w));
+	map(0x2328, 0x2328).w(FUNC(bfm_sc2_state::muxena_w));
+	map(0x2329, 0x2329).rw(FUNC(bfm_sc2_state::timerirqclr_r), FUNC(bfm_sc2_state::timerirq_w));
+	map(0x232A, 0x232D).w(FUNC(bfm_sc2_state::unknown_w));
+	map(0x232E, 0x232E).r(FUNC(bfm_sc2_state::irqstatus_r));
 
-	map(0x232F, 0x232F).w(this, FUNC(bfm_sc2_state::coininhib_w));
-	map(0x2330, 0x2330).w(this, FUNC(bfm_sc2_state::payout_latch_w));
-	map(0x2331, 0x2331).w(this, FUNC(bfm_sc2_state::payout_triac_w));
+	map(0x232F, 0x232F).w(FUNC(bfm_sc2_state::coininhib_w));
+	map(0x2330, 0x2330).w(FUNC(bfm_sc2_state::payout_latch_w));
+	map(0x2331, 0x2331).w(FUNC(bfm_sc2_state::payout_triac_w));
 	map(0x2332, 0x2332).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2333, 0x2333).w(this, FUNC(bfm_sc2_state::mmtr_w));
-	map(0x2334, 0x2335).w(this, FUNC(bfm_sc2_state::unknown_w));
-	map(0x2336, 0x2336).w(this, FUNC(bfm_sc2_state::dimcnt_w));
-	map(0x2337, 0x2337).w(this, FUNC(bfm_sc2_state::volume_override_w));
-	map(0x2338, 0x2338).w(this, FUNC(bfm_sc2_state::payout_select_w));
-	map(0x2339, 0x2339).w(this, FUNC(bfm_sc2_state::unknown_w));
-	map(0x2400, 0x2400).rw(this, FUNC(bfm_sc2_state::uart1stat_r), FUNC(bfm_sc2_state::uart1ctrl_w)); /* mc6850 compatible uart */
-	map(0x2500, 0x2500).rw(this, FUNC(bfm_sc2_state::uart1data_r), FUNC(bfm_sc2_state::uart1data_w));
-	map(0x2600, 0x2600).rw(this, FUNC(bfm_sc2_state::uart2stat_r), FUNC(bfm_sc2_state::uart2ctrl_w)); /* mc6850 compatible uart */
-	map(0x2700, 0x2700).rw(this, FUNC(bfm_sc2_state::uart2data_r), FUNC(bfm_sc2_state::uart2data_w));
-	map(0x2800, 0x2800).w(this, FUNC(bfm_sc2_state::vfd1_bd1_w));                   /* vfd1 data */
-	map(0x2900, 0x2900).w(this, FUNC(bfm_sc2_state::vfd_reset_w));                  /* vfd1+vfd2 reset line */
-	map(0x2A00, 0x2AFF).w(this, FUNC(bfm_sc2_state::nec_latch_w));
-	map(0x2B00, 0x2BFF).w(this, FUNC(bfm_sc2_state::nec_reset_w));
-	map(0x2C00, 0x2C00).w(this, FUNC(bfm_sc2_state::unlock_w));                     /* custom chip unlock */
+	map(0x2333, 0x2333).w(FUNC(bfm_sc2_state::mmtr_w));
+	map(0x2334, 0x2335).w(FUNC(bfm_sc2_state::unknown_w));
+	map(0x2336, 0x2336).w(FUNC(bfm_sc2_state::dimcnt_w));
+	map(0x2337, 0x2337).w(FUNC(bfm_sc2_state::volume_override_w));
+	map(0x2338, 0x2338).w(FUNC(bfm_sc2_state::payout_select_w));
+	map(0x2339, 0x2339).w(FUNC(bfm_sc2_state::unknown_w));
+	map(0x2400, 0x2400).rw(FUNC(bfm_sc2_state::uart1stat_r), FUNC(bfm_sc2_state::uart1ctrl_w)); /* mc6850 compatible uart */
+	map(0x2500, 0x2500).rw(FUNC(bfm_sc2_state::uart1data_r), FUNC(bfm_sc2_state::uart1data_w));
+	map(0x2600, 0x2600).rw(FUNC(bfm_sc2_state::uart2stat_r), FUNC(bfm_sc2_state::uart2ctrl_w)); /* mc6850 compatible uart */
+	map(0x2700, 0x2700).rw(FUNC(bfm_sc2_state::uart2data_r), FUNC(bfm_sc2_state::uart2data_w));
+	map(0x2800, 0x2800).w(FUNC(bfm_sc2_state::vfd1_bd1_w));                   /* vfd1 data */
+	map(0x2900, 0x2900).w(FUNC(bfm_sc2_state::vfd_reset_w));                  /* vfd1+vfd2 reset line */
+	map(0x2A00, 0x2AFF).w(FUNC(bfm_sc2_state::nec_latch_w));
+	map(0x2B00, 0x2BFF).w(FUNC(bfm_sc2_state::nec_reset_w));
+	map(0x2C00, 0x2C00).w(FUNC(bfm_sc2_state::unlock_w));                     /* custom chip unlock */
 	map(0x2D00, 0x2D01).w(m_ym2413, FUNC(ym2413_device::write));
-	map(0x2E00, 0x2E00).w(this, FUNC(bfm_sc2_state::bankswitch_w));                 /* write bank (rom page select for 0x6000 - 0x7fff ) */
+	map(0x2E00, 0x2E00).w(FUNC(bfm_sc2_state::bankswitch_w));                 /* write bank (rom page select for 0x6000 - 0x7fff ) */
 	//AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)                /* vfd2 data (not usually connected!)*/
 
-	map(0x3FFE, 0x3FFE).r(this, FUNC(bfm_sc2_state::direct_input_r));
-	map(0x3FFF, 0x3FFF).r(this, FUNC(bfm_sc2_state::coin_input_r));
+	map(0x3FFE, 0x3FFE).r(FUNC(bfm_sc2_state::direct_input_r));
+	map(0x3FFF, 0x3FFF).r(FUNC(bfm_sc2_state::coin_input_r));
 	map(0x4000, 0x5FFF).rom();
-	map(0x4000, 0xFFFF).w(this, FUNC(bfm_sc2_state::unknown_w));            // contains unknown I/O registers
+	map(0x4000, 0xFFFF).w(FUNC(bfm_sc2_state::unknown_w));            // contains unknown I/O registers
 	map(0x6000, 0x7FFF).bankr("bank1");
 	map(0x8000, 0xFFFF).rom();
 }
@@ -1580,10 +1580,10 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 void bfm_sc2_novid_state::memmap_no_vid(address_map &map)
 {
 	sc2_basemap(map);
-	map(0x2000, 0x2000).r(this, FUNC(bfm_sc2_novid_state::vfd_status_r));
-	map(0x2000, 0x20FF).w(this, FUNC(bfm_sc2_novid_state::reel12_w));
-	map(0x2100, 0x21FF).w(this, FUNC(bfm_sc2_novid_state::reel34_w));
-	map(0x2200, 0x22FF).w(this, FUNC(bfm_sc2_novid_state::reel56_w));
+	map(0x2000, 0x2000).r(FUNC(bfm_sc2_novid_state::vfd_status_r));
+	map(0x2000, 0x20FF).w(FUNC(bfm_sc2_novid_state::reel12_w));
+	map(0x2100, 0x21FF).w(FUNC(bfm_sc2_novid_state::reel34_w));
+	map(0x2200, 0x22FF).w(FUNC(bfm_sc2_novid_state::reel56_w));
 }
 
 // memory map for scorpion2 board video addon /////////////////////////////
@@ -1592,13 +1592,13 @@ void bfm_sc2_vid_state::memmap_vid(address_map &map)
 {
 	sc2_basemap(map);
 
-	map(0x2000, 0x2000).r(this, FUNC(bfm_sc2_vid_state::vfd_status_hop_r));      // vfd status register
-	map(0x2000, 0x20FF).w(this, FUNC(bfm_sc2_vid_state::reel12_vid_w));
+	map(0x2000, 0x2000).r(FUNC(bfm_sc2_vid_state::vfd_status_hop_r));      // vfd status register
+	map(0x2000, 0x20FF).w(FUNC(bfm_sc2_vid_state::reel12_vid_w));
 	map(0x2100, 0x21FF).nopw();
 	map(0x2200, 0x22FF).nopw();
 
-	map(0x3C00, 0x3C07).r(this, FUNC(bfm_sc2_vid_state::key_r));
-	map(0x3C80, 0x3C80).w(this, FUNC(bfm_sc2_vid_state::e2ram_w));
+	map(0x3C00, 0x3C07).r(FUNC(bfm_sc2_vid_state::key_r));
+	map(0x3C80, 0x3C80).w(FUNC(bfm_sc2_vid_state::e2ram_w));
 
 	map(0x3E00, 0x3E00).rw("adder2", FUNC(bfm_adder2_device::vid_uart_ctrl_r), FUNC(bfm_adder2_device::vid_uart_ctrl_w));     // video uart control reg
 	map(0x3E01, 0x3E01).rw("adder2", FUNC(bfm_adder2_device::vid_uart_rx_r), FUNC(bfm_adder2_device::vid_uart_tx_w));       // video uart data  reg
@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_END
 
 void bfm_sc2_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != nullptr)
 		e2ram->set_base(m_e2ram, sizeof(m_e2ram));
@@ -3773,17 +3773,17 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<0>))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<1>))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<2>))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<3>))
-	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<4>))
-	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<5>))
 
 	_8meters(config);
@@ -3832,17 +3832,17 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
 	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, bfm_sc2_dmd_state, bfmdm01_busy))
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<0>))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<1>))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<2>))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<3>))
-	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<4>))
-	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<5>))
 
 	_8meters(config);

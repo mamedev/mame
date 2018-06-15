@@ -34,6 +34,7 @@ Year  Game                         Manufacturer    Notes
 #include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -55,7 +56,7 @@ public:
 		, m_bg_scroll2(*this, "bg_scroll2")
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
@@ -116,7 +117,7 @@ protected:
 	required_shared_ptr<uint8_t> m_bg_scroll2;
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
-	output_finder<7> m_led;
+	output_finder<7> m_leds;
 
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
@@ -408,7 +409,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin out mech
 
-	m_led[6] = BIT(data, 6);   // led for coin out / m_hopper active
+	m_leds[6] = BIT(data, 6);   // led for coin out / m_hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -418,8 +419,8 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(igs009_state::video_and_leds_w)
 {
-	m_led[4] = BIT(data, 0); // start?
-	m_led[5] = BIT(data, 2); // l_bet?
+	m_leds[4] = BIT(data, 0); // start?
+	m_leds[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable  =     data & 0x40;
 	m_hopper            =   (~data)& 0x80;
@@ -430,10 +431,10 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 
 WRITE8_MEMBER(igs009_state::leds_w)
 {
-	m_led[0] = BIT(data, 0);  // stop_1
-	m_led[1] = BIT(data, 1);  // stop_2
-	m_led[2] = BIT(data, 2);  // stop_3
-	m_led[3] = BIT(data, 3);  // stop
+	m_leds[0] = BIT(data, 0);  // stop_1
+	m_leds[1] = BIT(data, 1);  // stop_2
+	m_leds[2] = BIT(data, 2);  // stop_3
+	m_leds[3] = BIT(data, 3);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -490,19 +491,19 @@ void igs009_state::jingbell_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 
-	map(0x1000, 0x11ff).ram().w(this, FUNC(igs009_state::bg_scroll_w)).share("bg_scroll");
+	map(0x1000, 0x11ff).ram().w(FUNC(igs009_state::bg_scroll_w)).share("bg_scroll");
 
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	map(0x3000, 0x33ff).ram().w(this, FUNC(igs009_state::reel1_ram_w)).share("reel1_ram");
-	map(0x3400, 0x37ff).ram().w(this, FUNC(igs009_state::reel2_ram_w)).share("reel2_ram");
-	map(0x3800, 0x3bff).ram().w(this, FUNC(igs009_state::reel3_ram_w)).share("reel3_ram");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(igs009_state::reel4_ram_w)).share("reel4_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(igs009_state::reel1_ram_w)).share("reel1_ram");
+	map(0x3400, 0x37ff).ram().w(FUNC(igs009_state::reel2_ram_w)).share("reel2_ram");
+	map(0x3800, 0x3bff).ram().w(FUNC(igs009_state::reel3_ram_w)).share("reel3_ram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(igs009_state::reel4_ram_w)).share("reel4_ram");
 
 	map(0x4000, 0x407f).ram().share("bg_scroll2");
 
-	map(0x5000, 0x5fff).ram().w(this, FUNC(igs009_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(igs009_state::fg_tile_w)).share("fg_tile_ram");
 
 	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* NMI and coins (w), service (r), coins (r) */
 	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* buttons 1 (r), video and leds (w), leds (w) */
@@ -513,9 +514,9 @@ void igs009_state::jingbell_portmap(address_map &map)
 
 	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x64d0, 0x64d1).rw(this, FUNC(igs009_state::magic_r), FUNC(igs009_state::magic_w));    // DSW1-5
+	map(0x64d0, 0x64d1).rw(FUNC(igs009_state::magic_r), FUNC(igs009_state::magic_w));    // DSW1-5
 
-	map(0x7000, 0x7fff).ram().w(this, FUNC(igs009_state::fg_color_w)).share("fg_color_ram");
+	map(0x7000, 0x7fff).ram().w(FUNC(igs009_state::fg_color_w)).share("fg_color_ram");
 
 	map(0x8000, 0xffff).rom().region("data", 0);
 }
@@ -525,36 +526,36 @@ void igs009_state::gp98_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 
-	map(0x1000, 0x11ff).ram().w(this, FUNC(igs009_state::bg_scroll_w)).share("bg_scroll");
+	map(0x1000, 0x11ff).ram().w(FUNC(igs009_state::bg_scroll_w)).share("bg_scroll");
 
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	map(0x3000, 0x33ff).ram().w(this, FUNC(igs009_state::reel1_ram_w)).share("reel1_ram");
-	map(0x3400, 0x37ff).ram().w(this, FUNC(igs009_state::reel2_ram_w)).share("reel2_ram");
-	map(0x3800, 0x3bff).ram().w(this, FUNC(igs009_state::reel3_ram_w)).share("reel3_ram");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(igs009_state::reel4_ram_w)).share("reel4_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(igs009_state::reel1_ram_w)).share("reel1_ram");
+	map(0x3400, 0x37ff).ram().w(FUNC(igs009_state::reel2_ram_w)).share("reel2_ram");
+	map(0x3800, 0x3bff).ram().w(FUNC(igs009_state::reel3_ram_w)).share("reel3_ram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(igs009_state::reel4_ram_w)).share("reel4_ram");
 
 	map(0x4000, 0x407f).ram().share("bg_scroll2");
 
-	map(0x5000, 0x5fff).ram().w(this, FUNC(igs009_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(igs009_state::fg_tile_w)).share("fg_tile_ram");
 
 	// seems to lack PPI devices...
-	map(0x6480, 0x6480).w(this, FUNC(igs009_state::nmi_and_coins_w));
+	map(0x6480, 0x6480).w(FUNC(igs009_state::nmi_and_coins_w));
 	map(0x6481, 0x6481).portr("SERVICE");
 	map(0x6482, 0x6482).portr("COINS");
 	map(0x6490, 0x6490).portr("BUTTONS1");
-	map(0x6491, 0x6491).w(this, FUNC(igs009_state::video_and_leds_w));
-	map(0x6492, 0x6492).w(this, FUNC(igs009_state::leds_w));
+	map(0x6491, 0x6491).w(FUNC(igs009_state::video_and_leds_w));
+	map(0x6492, 0x6492).w(FUNC(igs009_state::leds_w));
 	map(0x64a0, 0x64a0).portr("BUTTONS2");
 
 	map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
 
 	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x64d0, 0x64d1).rw(this, FUNC(igs009_state::magic_r), FUNC(igs009_state::magic_w));    // DSW1-5
+	map(0x64d0, 0x64d1).rw(FUNC(igs009_state::magic_r), FUNC(igs009_state::magic_w));    // DSW1-5
 
-	map(0x7000, 0x7fff).ram().w(this, FUNC(igs009_state::fg_color_w)).share("fg_color_ram");
+	map(0x7000, 0x7fff).ram().w(FUNC(igs009_state::fg_color_w)).share("fg_color_ram");
 
 	map(0x8000, 0xffff).rom().region("data", 0);
 }
@@ -801,7 +802,7 @@ GFXDECODE_END
 
 void igs009_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 
 	save_item(NAME(m_video_enable));

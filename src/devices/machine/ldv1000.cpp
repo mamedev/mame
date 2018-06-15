@@ -72,9 +72,9 @@ void pioneer_ldv1000_device::ldv1000_map(address_map &map)
 void pioneer_ldv1000_device::ldv1000_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).mirror(0x38).rw(this, FUNC(pioneer_ldv1000_device::z80_decoder_display_port_r), FUNC(pioneer_ldv1000_device::z80_decoder_display_port_w));
-	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(pioneer_ldv1000_device::z80_controller_r));
-	map(0x80, 0x80).mirror(0x3f).w(this, FUNC(pioneer_ldv1000_device::z80_controller_w));
+	map(0x00, 0x07).mirror(0x38).rw(FUNC(pioneer_ldv1000_device::z80_decoder_display_port_r), FUNC(pioneer_ldv1000_device::z80_decoder_display_port_w));
+	map(0x40, 0x40).mirror(0x3f).r(FUNC(pioneer_ldv1000_device::z80_controller_r));
+	map(0x80, 0x80).mirror(0x3f).w(FUNC(pioneer_ldv1000_device::z80_controller_w));
 	map(0xc0, 0xc3).mirror(0x3c).rw("ldvctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 

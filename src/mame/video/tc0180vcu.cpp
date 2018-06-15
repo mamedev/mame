@@ -4,6 +4,7 @@
 
 #include "emu.h"
 #include "tc0180vcu.h"
+#include "screen.h"
 
 #define TC0180VCU_RAM_SIZE          0x10000
 #define TC0180VCU_SCROLLRAM_SIZE    0x0800
@@ -13,6 +14,7 @@ DEFINE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device, "tc0180vcu", "Taito TC0180VCU")
 
 tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0180VCU, tag, owner, clock),
+	device_video_interface(mconfig, *this),
 	m_ram(nullptr),
 	//m_scrollram(nullptr),
 	//m_bg_rambank(0),
@@ -23,8 +25,23 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *ta
 	m_bg_color_base(0),
 	m_fg_color_base(0),
 	m_tx_color_base(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_inth_callback(*this),
+	m_intl_callback(*this),
+	m_intl_timer(nullptr)
 {
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void tc0180vcu_device::device_resolve_objects()
+{
+	m_inth_callback.resolve_safe();
+	m_intl_callback.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -45,6 +62,9 @@ void tc0180vcu_device::device_start()
 
 	m_ram = make_unique_clear<uint16_t[]>(TC0180VCU_RAM_SIZE / 2);
 	m_scrollram = make_unique_clear<uint16_t[]>(TC0180VCU_SCROLLRAM_SIZE / 2);
+
+	screen().register_vblank_callback(vblank_state_delegate(&tc0180vcu_device::vblank_callback, this));
+	m_intl_timer = timer_alloc(TIMER_INTL);
 
 	save_pointer(NAME(m_ram.get()), TC0180VCU_RAM_SIZE / 2);
 	save_pointer(NAME(m_scrollram.get()), TC0180VCU_SCROLLRAM_SIZE / 2);
@@ -78,6 +98,45 @@ void tc0180vcu_device::device_reset()
 
 	m_framebuffer_page = 0;
 	m_video_control = 0;
+}
+
+//-------------------------------------------------
+//  vblank_callback - generate blanking-related
+//  interrupts
+//-------------------------------------------------
+
+void tc0180vcu_device::vblank_callback(screen_device &screen, bool state)
+{
+	// TODO: Measure the actual duty cycle of the INTH/"INT5" (pin 67)
+	// and INTL/"INT4" (pin 66) interrupt outputs (both of which are externally
+	// encoded and acknowledged through a PAL and additional flip-flops).
+	// Is their timing programmable at all? Most registers are accounted for...
+
+	// TODO: Verify that INTH indeed fires before INTL, and not vice versa.
+
+	if (state)
+	{
+		m_inth_callback(ASSERT_LINE);
+		m_intl_timer->adjust(screen.time_until_pos(screen.vpos() + 8));
+	}
+	else
+		m_intl_callback(CLEAR_LINE);
+}
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void tc0180vcu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTL:
+		m_inth_callback(CLEAR_LINE);
+		m_intl_callback(ASSERT_LINE);
+		break;
+	}
 }
 
 

@@ -12,6 +12,7 @@
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 class dynax_state : public driver_device

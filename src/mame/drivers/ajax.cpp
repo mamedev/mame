@@ -25,7 +25,7 @@
 
 void ajax_state::ajax_main_map(address_map &map)
 {
-	map(0x0000, 0x01c0).rw(this, FUNC(ajax_state::ls138_f10_r), FUNC(ajax_state::ls138_f10_w));   /* bankswitch + sound command + FIRQ command */
+	map(0x0000, 0x01c0).rw(FUNC(ajax_state::ls138_f10_r), FUNC(ajax_state::ls138_f10_w));   /* bankswitch + sound command + FIRQ command */
 	map(0x0800, 0x0807).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));                    /* sprite control registers */
 	map(0x0c00, 0x0fff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));                    /* sprite RAM 2128SL at J7 */
 	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");/* palette */
@@ -40,7 +40,7 @@ void ajax_state::ajax_sub_map(address_map &map)
 	map(0x0000, 0x07ff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));    /* 051316 zoom/rotation layer */
 	map(0x0800, 0x080f).w(m_k051316, FUNC(k051316_device::ctrl_w));              /* 051316 control registers */
 	map(0x1000, 0x17ff).r(m_k051316, FUNC(k051316_device::rom_r));                /* 051316 (ROM test) */
-	map(0x1800, 0x1800).w(this, FUNC(ajax_state::bankswitch_2_w));          /* bankswitch control */
+	map(0x1800, 0x1800).w(FUNC(ajax_state::bankswitch_2_w));          /* bankswitch control */
 	map(0x2000, 0x3fff).ram().share("share1");                      /* shared RAM with the 052001 */
 	map(0x4000, 0x7fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));        /* video RAM + color RAM + video registers */
 	map(0x8000, 0x9fff).bankr("subbank");                            /* banked ROM */
@@ -51,10 +51,10 @@ void ajax_state::ajax_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();                             /* ROM F6 */
 	map(0x8000, 0x87ff).ram();                             /* RAM 2128SL at D16 */
-	map(0x9000, 0x9000).w(this, FUNC(ajax_state::sound_bank_w));             /* 007232 bankswitch */
+	map(0x9000, 0x9000).w(FUNC(ajax_state::sound_bank_w));             /* 007232 bankswitch */
 	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));      /* 007232 registers (chip 1) */
 	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));      /* 007232 registers (chip 2) */
-	map(0xb80c, 0xb80c).w(this, FUNC(ajax_state::k007232_extvol_w));         /* extra volume, goes to the 007232 w/ A11 */
+	map(0xb80c, 0xb80c).w(FUNC(ajax_state::k007232_extvol_w));         /* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));       /* YM2151 */
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));

@@ -210,6 +210,7 @@
 //#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -316,8 +317,8 @@ void mpu12wbk_state::mpu12wbk_map(address_map &map)
 	map(0x1400, 0x1400).w("crtc", FUNC(mc6845_device::address_w));                      // OK
 	map(0x1401, 0x1401).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));     // OK
 	map(0x1e00, 0x1e01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // hmmmmm....
-	map(0x2000, 0x23ff).ram().w(this, FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");             // FIXME
-	map(0x2400, 0x27ff).ram().w(this, FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");             // FIXME
+	map(0x2000, 0x23ff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");             // FIXME
+	map(0x2400, 0x27ff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");             // FIXME
 	map(0x2800, 0x3fff).ram();                                                             // RAM (from 2000-3fff)
 	map(0x6000, 0x6000).portr("SW1");    // dummy, placeholder
 	map(0x6001, 0x6001).portr("SW2");    // dummy, placeholder

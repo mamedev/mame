@@ -329,9 +329,9 @@ void apf_state::apfimag_map(address_map &map)
 	apfm1000_map(map);
 	map(0x6000, 0x6003).mirror(0x03fc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	// These need to be confirmed, disk does not work
-	map(0x6400, 0x64ff).rw(this, FUNC(apf_state::serial_r), FUNC(apf_state::serial_w));
+	map(0x6400, 0x64ff).rw(FUNC(apf_state::serial_r), FUNC(apf_state::serial_w));
 	map(0x6500, 0x6503).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0x6600, 0x6600).w(this, FUNC(apf_state::apf_dischw_w));
+	map(0x6600, 0x6600).w(FUNC(apf_state::apf_dischw_w));
 	map(0xa000, 0xbfff).ram(); // standard
 	map(0xc000, 0xdfff).ram(); // expansion
 }
@@ -519,13 +519,13 @@ static void apf_cart(device_slot_interface &device)
 MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545) / 4 )  // divided by 4 in external clock circuit
+	MCFG_DEVICE_ADD("maincpu", M6800, 3.579545_MHz_XTAL / 4)  // divided by 4 in external clock circuit
 	MCFG_DEVICE_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, 3.579545_MHz_XTAL)
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, apf_state, videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("apf_cass")
 
-	MCFG_FD1771_ADD("fdc", 1000000) // guess
+	MCFG_DEVICE_ADD("fdc", FD1771, 1000000) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -593,20 +593,20 @@ MACHINE_CONFIG_END
 ROM_START(apfm1000)
 	ROM_REGION(0x1000,"roms", 0)
 	ROM_SYSTEM_BIOS( 0, "0", "Standard" )
-	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4), ROM_BIOS(1) )
+	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4), ROM_BIOS(0) )
 	ROM_RELOAD(0x0800, 0x0800)
 
 	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" ) // In Rocket Patrol, the ships are replaced by garbage trucks
-	ROMX_LOAD("trash-ii.bin", 0x0000, 0x1000, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(2) )
+	ROMX_LOAD("trash-ii.bin", 0x0000, 0x1000, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "mod", "Mod Bios" ) // (c) 1982 W.Lunquist - In Basic, CALL 18450 to get a machine-language monitor
-	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(3) )
+	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(2) )
 ROM_END
 
 #define rom_apfimag rom_apfm1000
 
 // old rom, has a bad byte at 0087.
-//ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(1) )
+//ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(0) )
 
 /***************************************************************************
 
@@ -614,6 +614,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME
 COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
 CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )

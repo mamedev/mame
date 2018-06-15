@@ -20,9 +20,9 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 
 void i8271_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(i8271_device::sr_r), FUNC(i8271_device::cmd_w));
-	map(0x1, 0x1).rw(this, FUNC(i8271_device::rr_r), FUNC(i8271_device::param_w));
-	map(0x2, 0x2).w(this, FUNC(i8271_device::reset_w));
+	map(0x0, 0x0).rw(FUNC(i8271_device::sr_r), FUNC(i8271_device::cmd_w));
+	map(0x1, 0x1).rw(FUNC(i8271_device::rr_r), FUNC(i8271_device::param_w));
+	map(0x2, 0x2).w(FUNC(i8271_device::reset_w));
 }
 
 void i8271_device::set_ready_line_connected(bool _ready)

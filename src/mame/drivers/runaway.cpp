@@ -38,7 +38,7 @@ TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 
 void runaway_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
 }
 
@@ -73,7 +73,7 @@ READ8_MEMBER(runaway_state::runaway_pot_r)
 
 WRITE8_MEMBER(runaway_state::runaway_led_w)
 {
-	m_led[offset] = BIT(~data, 0);
+	m_leds[offset] = BIT(~data, 0);
 }
 
 
@@ -86,18 +86,18 @@ WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 void runaway_state::runaway_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07bf).ram().w(this, FUNC(runaway_state::runaway_video_ram_w)).share("video_ram");
+	map(0x0400, 0x07bf).ram().w(FUNC(runaway_state::runaway_video_ram_w)).share("video_ram");
 	map(0x07c0, 0x07ff).ram().share("sprite_ram");
-	map(0x1000, 0x1000).w(this, FUNC(runaway_state::runaway_irq_ack_w));
+	map(0x1000, 0x1000).w(FUNC(runaway_state::runaway_irq_ack_w));
 	map(0x1400, 0x143f).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x1800, 0x1800).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
-	map(0x1c00, 0x1c0f).w(this, FUNC(runaway_state::runaway_paletteram_w));
+	map(0x1c00, 0x1c0f).w(FUNC(runaway_state::runaway_paletteram_w));
 	map(0x2000, 0x2000).nopw(); /* coin counter? */
 	map(0x2001, 0x2001).nopw(); /* coin counter? */
-	map(0x2003, 0x2004).w(this, FUNC(runaway_state::runaway_led_w));
-	map(0x2005, 0x2005).w(this, FUNC(runaway_state::runaway_tile_bank_w));
+	map(0x2003, 0x2004).w(FUNC(runaway_state::runaway_led_w));
+	map(0x2005, 0x2005).w(FUNC(runaway_state::runaway_tile_bank_w));
 
-	map(0x3000, 0x3007).r(this, FUNC(runaway_state::runaway_input_r));
+	map(0x3000, 0x3007).r(FUNC(runaway_state::runaway_input_r));
 	map(0x4000, 0x4000).portr("4000");
 	map(0x5000, 0x5000).r("earom", FUNC(atari_vg_earom_device::read));
 	map(0x6000, 0x600f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));

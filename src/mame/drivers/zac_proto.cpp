@@ -60,10 +60,10 @@ void zac_proto_state::zac_proto_map(address_map &map)
 	map(0x0e05, 0x0e05).portr("PL5");
 	map(0x0e06, 0x0e06).portr("PL6");
 	map(0x0e07, 0x0e07).portr("PL7");
-	map(0x0e00, 0x0e01).w(this, FUNC(zac_proto_state::out0_w));
-	map(0x0e02, 0x0e06).w(this, FUNC(zac_proto_state::digit_w));
-	map(0x0e07, 0x0e08).w(this, FUNC(zac_proto_state::sound_w));
-	map(0x0e09, 0x0e16).w(this, FUNC(zac_proto_state::out1_w));
+	map(0x0e00, 0x0e01).w(FUNC(zac_proto_state::out0_w));
+	map(0x0e02, 0x0e06).w(FUNC(zac_proto_state::digit_w));
+	map(0x0e07, 0x0e08).w(FUNC(zac_proto_state::sound_w));
+	map(0x0e09, 0x0e16).w(FUNC(zac_proto_state::out1_w));
 	map(0x1400, 0x1bff).rom();
 }
 

@@ -529,8 +529,8 @@ void asic65_device::asic65_program_map(address_map &map)
 
 void asic65_device::asic65_io_map(address_map &map)
 {
-	map(0, 0).mirror(6).rw(this, FUNC(asic65_device::m68k_r), FUNC(asic65_device::m68k_w));
-	map(1, 1).mirror(6).rw(this, FUNC(asic65_device::stat_r), FUNC(asic65_device::stat_w));
+	map(0, 0).mirror(6).rw(FUNC(asic65_device::m68k_r), FUNC(asic65_device::m68k_w));
+	map(1, 1).mirror(6).rw(FUNC(asic65_device::stat_r), FUNC(asic65_device::stat_w));
 }
 
 

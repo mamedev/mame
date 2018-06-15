@@ -144,119 +144,119 @@ READ8_MEMBER(bbc_state::bbc_fe_r)
 
 void bbc_state::bbca_mem(address_map &map)
 {
-	map.unmap_value_high();                                                                                           /*  Hardware marked with a # is not present in a Model A        */
-	map(0x0000, 0x3fff).bankrw("bank1");                                                                              /*    0000-3fff                 Regular RAM                     */
-	map(0x4000, 0x7fff).bankrw("bank3");                                                                              /*    4000-7fff                 Regular RAM mirrored            */
-	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                      /*    8000-bfff                 Paged ROM                       */
-	map(0xc000, 0xfbff).bankr("bank7");                                                                               /*    c000-fbff                 OS ROM                          */
-	map(0xfc00, 0xfdff).noprw();                                                                                      /*    fc00-fdff                 FRED & JIM Pages                */
-																																																										/*    fe00-feff                 SHEILA Address Page             */
-	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     /*    fe00-fe07  6845 CRTC      Video controller                */
+	map.unmap_value_high();                                                                                           //  Hardware marked with a # is not present in a Model A
+	map(0x0000, 0x3fff).bankrw("bank1");                                                                              //    0000-3fff                 Regular RAM
+	map(0x4000, 0x7fff).bankrw("bank3");                                                                              //    4000-7fff                 Regular RAM mirrored
+	map(0x8000, 0xbfff).bankr("bank4").w(FUNC(bbc_state::bbc_memoryb4_w));                                            //    8000-bfff                 Paged ROM
+	map(0xc000, 0xfbff).bankr("bank7");                                                                               //    c000-fbff                 OS ROM
+	map(0xfc00, 0xfdff).noprw();                                                                                      //    fc00-fdff                 FRED & JIM Pages
+																													  //    fe00-feff                 SHEILA Address Page
+	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           /*    fe08-fe0f  6850 ACIA      Serial controller               */
-	map(0xfe10, 0xfe17).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                        /*    fe10-fe17  Serial ULA     Serial system chip              */
-	map(0xfe18, 0xfe1f).noprw();                                                                                      /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
-	map(0xfe20, 0xfe2f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                         /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
-																																																										/* W: fe20-fe2f  Video ULA      Video system chip               */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::page_selecta_w));                         /* W: fe30-fe3f  74LS161        Paged ROM selector              */
-	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	map(0xfe60, 0xfe7f).noprw();                                                                                      /*    fe60-fe7f  6522 VIA       # USER VIA                      */
-	map(0xfe80, 0xfe9f).noprw();                                                                                      /*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
-	map(0xfea0, 0xfebf).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fea0-febf  68B54 ADLC     # ECONET controller             */
-	map(0xfec0, 0xfedf).noprw();                                                                                      /*    fec0-fedf  uPD7002        # Analogue to digital converter */
-	map(0xfee0, 0xfeff).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fee0-feff  Tube ULA       # Tube system interface         */
-	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                                   /*    ff00-ffff                 OS Rom (continued)              */
+	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           //    fe08-fe0f  6850 ACIA      Serial controller
+	map(0xfe10, 0xfe17).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                              //    fe10-fe17  Serial ULA     Serial system chip
+	map(0xfe18, 0xfe1f).noprw();                                                                                      //    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No.
+	map(0xfe20, 0xfe2f).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                               // R: fe20-fe2f  INTON          # ECONET Interrupt On
+																													  // W: fe20-fe2f  Video ULA      Video system chip
+	map(0xfe30, 0xfe3f).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::page_selecta_w));                               // W: fe30-fe3f  74LS161        Paged ROM selector
+	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0xfe60, 0xfe7f).noprw();                                                                                      //    fe60-fe7f  6522 VIA       # USER VIA
+	map(0xfe80, 0xfe9f).noprw();                                                                                      //    fe80-fe9f  8271/1770 FDC  # Floppy disc controller
+	map(0xfea0, 0xfebf).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fea0-febf  68B54 ADLC     # ECONET controller
+	map(0xfec0, 0xfedf).noprw();                                                                                      //    fec0-fedf  uPD7002        # Analogue to digital converter
+	map(0xfee0, 0xfeff).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fee0-feff  Tube ULA       # Tube system interface
+	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                                   //    ff00-ffff                 OS ROM (continued)
 }
 
 
 void bbc_state::bbc_base(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xc000, 0xfbff).bankr("bank7");                                                                               /*    c000-fbff                 OS ROM                          */
-	map(0xfc00, 0xfdff).noprw();                                                                                      /*    fc00-fdff                 FRED & JIM Pages                */
-	map(0xfe00, 0xfeff).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fe00-feff                 SHEILA Address Page             */
-	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     /*    fe00-fe07  6845 CRTC      Video controller                */
+	map(0xc000, 0xfbff).bankr("bank7");                                                                               //    c000-fbff                 OS ROM
+	map(0xfc00, 0xfdff).noprw();                                                                                      //    fc00-fdff                 FRED & JIM Pages
+	map(0xfe00, 0xfeff).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fe00-feff                 SHEILA Address Page
+	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           /*    fe08-fe0f  6850 ACIA      Serial controller               */
-	map(0xfe10, 0xfe17).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                        /*    fe10-fe17  Serial ULA     Serial system chip              */
-	map(0xfe18, 0xfe1f).portr("STATID");                                                                              /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
-	map(0xfe20, 0xfe2f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                         /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
-																																																										/* W: fe20-fe2f  Video ULA      Video system chip               */
-	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	map(0xfe60, 0xfe7f).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                     /*    fe60-fe7f  6522 VIA       USER VIA                        */
-																																																										/*    fe80-fe9f  FDC            Floppy disc controller          */
-	map(0xfea0, 0xfebf).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	map(0xfec0, 0xfedf).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                       /*    fec0-fedf  uPD7002        Analogue to digital converter   */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
-	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                                   /*    ff00-ffff                 OS ROM (continued)              */
+	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           //    fe08-fe0f  6850 ACIA      Serial controller
+	map(0xfe10, 0xfe17).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                              //    fe10-fe17  Serial ULA     Serial system chip
+	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
+	map(0xfe20, 0xfe2f).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                               // R: fe20-fe2f  INTON          ECONET Interrupt On
+																													  // W: fe20-fe2f  Video ULA      Video system chip
+	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0xfe60, 0xfe7f).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe60-fe7f  6522 VIA       USER VIA
+																													  //    fe80-fe9f  FDC            Floppy disc controller
+	map(0xfea0, 0xfebf).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fea0-febf  68B54 ADLC     ECONET controller
+	map(0xfec0, 0xfedf).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                       //    fec0-fedf  uPD7002        Analogue to digital converter
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           //    fee0-feff  Tube ULA       Tube system interface
+	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                                   //    ff00-ffff                 OS ROM (continued)
 }
 
 
 void bbc_state::bbcb_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x3fff).bankrw("bank1");                                                                              /*    0000-3fff                 Regular RAM                     */
-	map(0x4000, 0x7fff).bankrw("bank3");                                                                              /*    4000-7fff                 Regular RAM                     */
-	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                      /*    8000-bfff                 Paged ROM/RAM                   */
-	map(0xfe30, 0xfe3f).w(this, FUNC(bbc_state::page_selectb_w));                                                     /* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).m(m_i8271, FUNC(i8271_device::map));                                                          /*    fe80-fe83  8271 FDC       Floppy disc controller          */
-	map(0xfe84, 0xfe9f).rw(m_i8271, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));                          /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
+	map(0x0000, 0x3fff).bankrw("bank1");                                                                              //    0000-3fff                 Regular RAM
+	map(0x4000, 0x7fff).bankrw("bank3");                                                                              //    4000-7fff                 Regular RAM
+	map(0x8000, 0xbfff).bankr("bank4").w(FUNC(bbc_state::bbc_memoryb4_w));                                            //    8000-bfff                 Paged ROM/RAM
+	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::page_selectb_w));                                                           // W: fe30-fe3f  84LS161        Paged ROM selector
+	map(0xfe80, 0xfe83).m(m_i8271, FUNC(i8271_device::map));                                                          //    fe80-fe83  8271 FDC       Floppy disc controller
+	map(0xfe84, 0xfe9f).rw(m_i8271, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));                          //    fe84-fe9f  8271 FDC       Floppy disc controller
 }
 
 
 void bbc_state::bbcb_nofdc_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x3fff).bankrw("bank1");                                                                              /*    0000-3fff                 Regular RAM                     */
-	map(0x4000, 0x7fff).bankrw("bank3");                                                                              /*    4000-7fff                 Regular RAM                     */
-	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                      /*    8000-bfff                 Paged ROM/RAM                   */
-	map(0xfe30, 0xfe3f).w(this, FUNC(bbc_state::page_selectb_w));                                                     /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+	map(0x0000, 0x3fff).bankrw("bank1");                                                                              //    0000-3fff                 Regular RAM
+	map(0x4000, 0x7fff).bankrw("bank3");                                                                              //    4000-7fff                 Regular RAM
+	map(0x8000, 0xbfff).bankr("bank4").w(FUNC(bbc_state::bbc_memoryb4_w));                                            //    8000-bfff                 Paged ROM/RAM
+	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::page_selectb_w));                                                           // W: fe30-fe3f  84LS161        Paged ROM selector
 }
 
 
 void bbc_state::bbcbp_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x2fff).bankrw("bank1");                                                                              /*    0000-2fff                 Regular RAM                     */
-	map(0x3000, 0x7fff).bankrw("bank2");                                                                              /*    3000-7fff                 Video/Shadow RAM                */
-	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                                     /*    8000-afff                 Paged ROM or 12K of SWRAM       */
-	map(0xb000, 0xbfff).bankr("bank6").w(this, FUNC(bbc_state::bbc_memorybp6_w));                                     /*    b000-bfff                 Rest of paged ROM area          */
-	map(0xfe30, 0xfe3f).w(this, FUNC(bbc_state::page_selectbp_w));                                                    /* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).w(this, FUNC(bbc_state::bbc_wd1770_status_w));                                                /*    fe80-fe83  1770 FDC       Drive control register          */
-	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0x0000, 0x2fff).bankrw("bank1");                                                                              //    0000-2fff                 Regular RAM
+	map(0x3000, 0x7fff).bankrw("bank2");                                                                              //    3000-7fff                 Video/Shadow RAM
+	map(0x8000, 0xafff).bankr("bank4").w(FUNC(bbc_state::bbc_memorybp4_w));                                           //    8000-afff                 Paged ROM or 12K of SWRAM
+	map(0xb000, 0xbfff).bankr("bank6").w(FUNC(bbc_state::bbc_memorybp6_w));                                           //    b000-bfff                 Rest of paged ROM area
+	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::page_selectbp_w));                                                          // W: fe30-fe3f  84LS161        Paged ROM selector
+	map(0xfe80, 0xfe83).w(FUNC(bbc_state::bbc_wd1770_status_w));                                                      //    fe80-fe83  1770 FDC       Drive control register
+	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          //    fe84-fe9f  1770 FDC       Floppy disc controller
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           //    fee0-feff  Tube ULA       Tube system interface
 }
 
 
 void bbc_state::bbcbp128_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x2fff).bankrw("bank1");                                                                              /*    0000-2fff                 Regular RAM                     */
-	map(0x3000, 0x7fff).bankrw("bank2");                                                                              /*    3000-7fff                 Video/Shadow RAM                */
-	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                                     /*    8000-afff                 Paged ROM or 12K of SWRAM       */
-	map(0xb000, 0xbfff).bankr("bank6").w(this, FUNC(bbc_state::bbc_memorybp6_w));                                     /*    b000-bfff                 Rest of paged ROM area          */
-	map(0xfe30, 0xfe3f).w(this, FUNC(bbc_state::page_selectbp128_w));                                                 /* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).w(this, FUNC(bbc_state::bbc_wd1770_status_w));                                                /*    fe80-fe83  1770 FDC       Drive control register          */
-	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0x0000, 0x2fff).bankrw("bank1");                                                                              //    0000-2fff                 Regular RAM
+	map(0x3000, 0x7fff).bankrw("bank2");                                                                              //    3000-7fff                 Video/Shadow RAM
+	map(0x8000, 0xafff).bankr("bank4").w(FUNC(bbc_state::bbc_memorybp4_w));                                           //    8000-afff                 Paged ROM or 12K of SWRAM
+	map(0xb000, 0xbfff).bankr("bank6").w(FUNC(bbc_state::bbc_memorybp6_w));                                           //    b000-bfff                 Rest of paged ROM area
+	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::page_selectbp128_w));                                                       // W: fe30-fe3f  84LS161        Paged ROM selector
+	map(0xfe80, 0xfe83).w(FUNC(bbc_state::bbc_wd1770_status_w));                                                      //    fe80-fe83  1770 FDC       Drive control register
+	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          //    fe84-fe9f  1770 FDC       Floppy disc controller
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           //    fee0-feff  Tube ULA       Tube system interface
 }
 
 
 void bbc_state::reutapm_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x2fff).bankrw("bank1");                                                                              /*    0000-2fff                 Regular RAM                     */
-	map(0x3000, 0x7fff).bankrw("bank2");                                                                              /*    3000-7fff                 Video/Shadow RAM                */
-	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                                     /*    8000-afff                 Paged ROM or 12K of SWRAM       */
-	map(0xb000, 0xbfff).bankr("bank6").w(this, FUNC(bbc_state::bbc_memorybp6_w));                                     /*    b000-bfff                 Rest of paged ROM area          */
-	map(0xfe30, 0xfe3f).w(this, FUNC(bbc_state::page_selectbp_w));                                                    /* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0x0000, 0x2fff).bankrw("bank1");                                                                              //    0000-2fff                 Regular RAM
+	map(0x3000, 0x7fff).bankrw("bank2");                                                                              //    3000-7fff                 Video/Shadow RAM
+	map(0x8000, 0xafff).bankr("bank4").w(FUNC(bbc_state::bbc_memorybp4_w));                                           //    8000-afff                 Paged ROM or 12K of SWRAM
+	map(0xb000, 0xbfff).bankr("bank6").w(FUNC(bbc_state::bbc_memorybp6_w));                                           //    b000-bfff                 Rest of paged ROM area
+	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::page_selectbp_w));                                                          // W: fe30-fe3f  84LS161        Paged ROM selector
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           //    fee0-feff  Tube ULA       Tube system interface
 }
 
 
 void bbc_state::bbcbp_fetch(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(bbc_state::bbcbp_fetch_r));
+	map(0x0000, 0xffff).r(FUNC(bbc_state::bbcbp_fetch_r));
 }
 
 
@@ -288,16 +288,16 @@ void bbc_state::bbcm_mem(address_map &map)
 {
 	map(0x0000, 0x2fff).bankrw("bank1");                                           /*    0000-2fff                 Regular RAM                     */
 	map(0x3000, 0x7fff).bankrw("bank2");                                           /*    3000-7fff                 Video/Shadow RAM                */
-	map(0x8000, 0x8fff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybm4_w));  /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
-	map(0x9000, 0xbfff).bankr("bank5").w(this, FUNC(bbc_state::bbc_memorybm5_w));  /*    9000-bfff                 Rest of paged ROM/RAM area      */
-	map(0xc000, 0xdfff).bankr("bank7").w(this, FUNC(bbc_state::bbc_memorybm7_w));  /*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
+	map(0x8000, 0x8fff).bankr("bank4").w(FUNC(bbc_state::bbc_memorybm4_w));        /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
+	map(0x9000, 0xbfff).bankr("bank5").w(FUNC(bbc_state::bbc_memorybm5_w));        /*    9000-bfff                 Rest of paged ROM/RAM area      */
+	map(0xc000, 0xdfff).bankr("bank7").w(FUNC(bbc_state::bbc_memorybm7_w));        /*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
 	map(0xe000, 0xffff).rom().region("os", 0x2000);                                /*    e000-ffff                 OS ROM                          */
-	map(0xfc00, 0xfeff).bankr("bank8").w(this, FUNC(bbc_state::bbcm_w));           /*    processed directly because it can be ROM or hardware      */
+	map(0xfc00, 0xfeff).bankr("bank8").w(FUNC(bbc_state::bbcm_w));                 /*    processed directly because it can be ROM or hardware      */
 }
 
 void bbc_state::bbcm_fetch(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(bbc_state::bbcm_fetch_r));
+	map(0x0000, 0xffff).r(FUNC(bbc_state::bbcm_fetch_r));
 }
 
 
@@ -345,7 +345,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 
 	PORT_START("COL2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")                  PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $")                PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")                  PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")                  PORT_CODE(KEYCODE_X)            PORT_CHAR('X')
@@ -366,7 +366,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_START("COL4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")                 PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \\")               PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 '")                PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 &")                PORT_CODE(KEYCODE_6)            PORT_CHAR('6')      PORT_CHAR('&')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")                  PORT_CODE(KEYCODE_Y)            PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")                  PORT_CODE(KEYCODE_H)            PORT_CHAR('H')
@@ -571,7 +571,7 @@ static INPUT_PORTS_START(bbcb_links)
 	PORT_DIPSETTING(   0x28,  "40" )    PORT_DIPSETTING(   0x29,  "41" )    PORT_DIPSETTING(   0x2a,  "42" )    PORT_DIPSETTING(   0x2b,  "43" )    PORT_DIPSETTING(   0x2c,  "44" )
 	PORT_DIPSETTING(   0x2d,  "45" )    PORT_DIPSETTING(   0x2e,  "46" )    PORT_DIPSETTING(   0x2f,  "47" )    PORT_DIPSETTING(   0x30,  "48" )    PORT_DIPSETTING(   0x31,  "49" )
 	PORT_DIPSETTING(   0x32,  "50" )    PORT_DIPSETTING(   0x33,  "51" )    PORT_DIPSETTING(   0x34,  "52" )    PORT_DIPSETTING(   0x35,  "53" )    PORT_DIPSETTING(   0x36,  "54" )
-	PORT_DIPSETTING(   0x37,  "15" )    PORT_DIPSETTING(   0x38,  "56" )    PORT_DIPSETTING(   0x39,  "57" )    PORT_DIPSETTING(   0x3a,  "58" )    PORT_DIPSETTING(   0x3b,  "59" )
+	PORT_DIPSETTING(   0x37,  "55" )    PORT_DIPSETTING(   0x38,  "56" )    PORT_DIPSETTING(   0x39,  "57" )    PORT_DIPSETTING(   0x3a,  "58" )    PORT_DIPSETTING(   0x3b,  "59" )
 	PORT_DIPSETTING(   0x3c,  "60" )    PORT_DIPSETTING(   0x3d,  "61" )    PORT_DIPSETTING(   0x3e,  "62" )    PORT_DIPSETTING(   0x3f,  "63" )    PORT_DIPSETTING(   0x40,  "64" )
 	PORT_DIPSETTING(   0x41,  "65" )    PORT_DIPSETTING(   0x42,  "66" )    PORT_DIPSETTING(   0x43,  "67" )    PORT_DIPSETTING(   0x44,  "68" )    PORT_DIPSETTING(   0x45,  "69" )
 	PORT_DIPSETTING(   0x46,  "70" )    PORT_DIPSETTING(   0x47,  "71" )    PORT_DIPSETTING(   0x48,  "72" )    PORT_DIPSETTING(   0x49,  "73" )    PORT_DIPSETTING(   0x4a,  "74" )
@@ -629,7 +629,7 @@ static INPUT_PORTS_START(bbcbp_links)
 	PORT_DIPSETTING(   0x28,  "40" )    PORT_DIPSETTING(   0x29,  "41" )    PORT_DIPSETTING(   0x2a,  "42" )    PORT_DIPSETTING(   0x2b,  "43" )    PORT_DIPSETTING(   0x2c,  "44" )
 	PORT_DIPSETTING(   0x2d,  "45" )    PORT_DIPSETTING(   0x2e,  "46" )    PORT_DIPSETTING(   0x2f,  "47" )    PORT_DIPSETTING(   0x30,  "48" )    PORT_DIPSETTING(   0x31,  "49" )
 	PORT_DIPSETTING(   0x32,  "50" )    PORT_DIPSETTING(   0x33,  "51" )    PORT_DIPSETTING(   0x34,  "52" )    PORT_DIPSETTING(   0x35,  "53" )    PORT_DIPSETTING(   0x36,  "54" )
-	PORT_DIPSETTING(   0x37,  "15" )    PORT_DIPSETTING(   0x38,  "56" )    PORT_DIPSETTING(   0x39,  "57" )    PORT_DIPSETTING(   0x3a,  "58" )    PORT_DIPSETTING(   0x3b,  "59" )
+	PORT_DIPSETTING(   0x37,  "55" )    PORT_DIPSETTING(   0x38,  "56" )    PORT_DIPSETTING(   0x39,  "57" )    PORT_DIPSETTING(   0x3a,  "58" )    PORT_DIPSETTING(   0x3b,  "59" )
 	PORT_DIPSETTING(   0x3c,  "60" )    PORT_DIPSETTING(   0x3d,  "61" )    PORT_DIPSETTING(   0x3e,  "62" )    PORT_DIPSETTING(   0x3f,  "63" )    PORT_DIPSETTING(   0x40,  "64" )
 	PORT_DIPSETTING(   0x41,  "65" )    PORT_DIPSETTING(   0x42,  "66" )    PORT_DIPSETTING(   0x43,  "67" )    PORT_DIPSETTING(   0x44,  "68" )    PORT_DIPSETTING(   0x45,  "69" )
 	PORT_DIPSETTING(   0x46,  "70" )    PORT_DIPSETTING(   0x47,  "71" )    PORT_DIPSETTING(   0x48,  "72" )    PORT_DIPSETTING(   0x49,  "73" )    PORT_DIPSETTING(   0x4a,  "74" )
@@ -941,7 +941,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_READPB_HANDLER(READ8("userport", bbc_userport_slot_device, pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("userport", bbc_userport_slot_device, pb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
@@ -953,7 +953,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -964,7 +964,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
 	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(bbc_state::bbcbp)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_WD1770_ADD("wd1770", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1349,10 +1349,10 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* rtc and cmos */
-	MCFG_MC146818_ADD( "rtc", 32.768_kHz_XTAL )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -1407,14 +1407,14 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_READPB_HANDLER(READ8("userport", bbc_userport_slot_device, pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("userport", bbc_userport_slot_device, pb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* fdc */
-	MCFG_WD1770_ADD("wd1770", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1425,7 +1425,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
 	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
@@ -1613,7 +1613,7 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770")
 
-	MCFG_WD1772_ADD("wd1772", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1706,21 +1706,21 @@ ROM_START(bbca)
 	/* rom page 15 0c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
-	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
-	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 3  0c000 */
+	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(0)) // os
+	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 1, "os12b1", "OS 1.20 / BASIC1" )
-	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(2)) /* os */
-	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(2)) /* rom page 3  0c000 */
+	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) // os
+	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(1)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 2, "os10b2", "OS 1.00 / BASIC2" )
-	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) /* os */
-	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3)) /* rom page 3  0c000 */
+	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(2)) // os
+	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(2)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 3, "os10b1", "OS 1.00 / BASIC1" )
-	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
-	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 3  0c000 */
+	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) // os
+	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(3)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 4, "os01b1", "OS 0.10 / BASIC1" )
-	ROMX_LOAD("os01.rom",   0x10000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(5)) /* os */
-	/* OS0.1 does not support rom paging, load BASIC into all pages */
-	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(5)) /* rom page 0  00000 */
+	ROMX_LOAD("os01.rom",   0x10000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(4)) // os
+	// OS0.1 does not support rom paging, load BASIC into all pages
+	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) // rom page 0  00000
 	ROM_RELOAD(             0x04000, 0x4000 )
 	ROM_RELOAD(             0x08000, 0x4000 )
 	ROM_RELOAD(             0x0c000, 0x4000 )
@@ -1757,21 +1757,21 @@ ROM_START(bbcb)
 	/* rom page 15 3c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
-	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
-	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(0)) // os
+	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 1, "os12b1", "OS 1.20 / BASIC1" )
-	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(2)) /* os */
-	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(2)) /* rom page 15 3c000 */
+	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) // os
+	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(1)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 2, "os10b2", "OS 1.00 / BASIC2" )
-	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) /* os */
-	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3)) /* rom page 15 3c000 */
+	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(2)) // os
+	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(2)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 3, "os10b1", "OS 1.00 / BASIC1" )
-	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
-	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 15 3c000 */
+	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) // os
+	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(3)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 4, "os01b1", "OS 0.10 / BASIC1" )
-	ROMX_LOAD("os01.rom",   0x40000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(5)) /* os */
-	/* OS0.1 does not support rom paging, load BASIC into all pages */
-	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(5)) /* rom page 0 00000 */
+	ROMX_LOAD("os01.rom",   0x40000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(4)) // os
+	// OS0.1 does not support rom paging, load BASIC into all pages
+	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) // rom page 0 00000
 	ROM_RELOAD(             0x04000, 0x4000 )
 	ROM_RELOAD(             0x08000, 0x4000 )
 	ROM_RELOAD(             0x0c000, 0x4000 )
@@ -1783,7 +1783,7 @@ ROM_START(bbcb)
 
 	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
-	ROM_END
+ROM_END
 
 
 ROM_START(bbcb_de)
@@ -1808,8 +1808,8 @@ ROM_START(bbcb_de)
 	/* rom page 15 3c000 IC75 BASIC */
 	ROM_DEFAULT_BIOS("os12")
 	ROM_SYSTEM_BIOS( 0, "os12", "OS 1.20 / BASIC2" )
-	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(1))
-	ROMX_LOAD("basic2.rom",  0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(0))
+	ROMX_LOAD("basic2.rom",  0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // rom page 15 3c000
 
 	ROM_LOAD("dfs10.rom",    0x30000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
 
@@ -1843,8 +1843,8 @@ ROM_START(bbcb_us)
 	/* rom page 15 3c000 IC75 SPARE SOCKET */
 	ROM_DEFAULT_BIOS("os10b3")
 	ROM_SYSTEM_BIOS( 0, "os10b3", "OS A1.0 / BASIC3" )
-	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
-	ROMX_LOAD("usbasic3.rom", 0x38000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(0))
+	ROMX_LOAD("usbasic3.rom", 0x38000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(0)) // rom page 15 3c000
 
 	ROM_LOAD("viewa210.rom", 0x30000, 0x4000, CRC(4345359f) SHA1(88c93df1854f5fbe6cd6e5f0e29a8bf4ea3b5614))
 	ROM_LOAD("usdnfs10.rom", 0x34000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
@@ -1872,13 +1872,13 @@ ROM_START(torchf)
 
 	ROM_DEFAULT_BIOS("mcp120cbl")
 	ROM_SYSTEM_BIOS( 0, "mcp120cbl", "MCP120CBL" )
-	ROMX_LOAD("mcp120cbl.rom", 0x38000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(1))
+	ROMX_LOAD("mcp120cbl.rom", 0x38000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mcp101ci", "MCP101CI" )
-	ROMX_LOAD("mcp101ci.rom", 0x38000, 0x4000, NO_DUMP, ROM_BIOS(2))
+	ROMX_LOAD("mcp101ci.rom", 0x38000, 0x4000, NO_DUMP, ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "mcp041cbl", "MCP041CBL" )
-	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(3))
+	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "cpn071", "CPN71+" )
-	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(4))
+	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(3))
 	ROM_RELOAD(                0x3a000, 0x2000 )
 
 	ROM_REGION(0x4000, "os", 0)
@@ -1901,7 +1901,7 @@ ROM_START(bbcbp)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("os20")
 	ROM_SYSTEM_BIOS( 0, "os20", "OS 2.00" )
-	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(1)) /* rom page 15 3C000 BASIC */
+	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(0)) // rom page 15 3C000 BASIC
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
 	/* rom page 0  00000 SWRAM (B+ 128K only) */
 	/* rom page 1  04000 SWRAM (B+ 128K only) */
@@ -1939,17 +1939,17 @@ ROM_START(abc110)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos200")
 	ROM_SYSTEM_BIOS( 0, "mos200", "MOS2.00" )
-	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
-	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1))
+	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(0))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos123stor", "MOS1.23 + ViewStore" )
-	ROMX_LOAD("mos123stor.rom", 0x3c000, 0x4000, CRC(4e84f452) SHA1(145ee54f04b3eb4d0e5afaabe21915be48db3c54), ROM_BIOS(2)) /* rom page 15 3C000 ViewStore */
-	ROM_CONTINUE(               0x40000, 0x4000)  /* OS */
+	ROMX_LOAD("mos123stor.rom", 0x3c000, 0x4000, CRC(4e84f452) SHA1(145ee54f04b3eb4d0e5afaabe21915be48db3c54), ROM_BIOS(1)) // rom page 15 3C000 ViewStore
+	ROM_CONTINUE(               0x40000, 0x4000)  // OS
 	ROM_SYSTEM_BIOS( 2, "mos123", "MOS1.23" )
-	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(3))
-	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3))
+	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(2))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "mos120", "MOS1.20" )
-	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(4))
-	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(4))
+	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(3))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3))
 	/* rom page 0  00000 */
 	/* rom page 1  04000 IC71 selectable with link S13 */
 	/* rom page 2  08000 IC35 32K IN PAGE 3 */
@@ -1987,9 +1987,9 @@ ROM_START(acw443)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos210")
 	ROM_SYSTEM_BIOS( 0, "mos210", "MOS2.10" )
-	ROMX_LOAD("acwmos210.rom", 0x40000, 0x4000, CRC(168d6753) SHA1(dcd01d8f5f6e0cd92ae626ca52a3db71abf5d282), ROM_BIOS(1))
+	ROMX_LOAD("acwmos210.rom", 0x40000, 0x4000, CRC(168d6753) SHA1(dcd01d8f5f6e0cd92ae626ca52a3db71abf5d282), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos200", "MOS2.00" )
-	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(2))
+	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
 	/* rom page 0  00000 */
 	/* rom page 1  04000  IC71 selectable with link S13 */
 	/* rom page 2  08000  IC35 32K IN PAGE 3 */
@@ -2085,9 +2085,9 @@ ROM_START(bbcm)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
-	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(2))
+	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2113,8 +2113,8 @@ ROM_START(bbcm)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(1))
-	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(2))
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
+	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
 ROM_END
 
 
@@ -2128,7 +2128,7 @@ ROM_START(bbcmaiv)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2154,7 +2154,7 @@ ROM_START(bbcmaiv)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320aiv.cmos", 0x0E, 0x32, BAD_DUMP CRC(b9ae42a1) SHA1(abf3e94b013f24027ca36c96720963c3411e93f8), ROM_BIOS(1))
+	ROMX_LOAD("mos320aiv.cmos", 0x0E, 0x32, BAD_DUMP CRC(b9ae42a1) SHA1(abf3e94b013f24027ca36c96720963c3411e93f8), ROM_BIOS(0))
 ROM_END
 
 
@@ -2164,7 +2164,7 @@ ROM_START(bbcmet)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos400")
 	ROM_SYSTEM_BIOS( 0, "mos400", "Econet MOS 4.00" )
-	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(1))
+	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(0))
 	ROM_COPY("option", 0x34000, 0x24000, 0xC000) /* Mirror */
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xff)
@@ -2190,7 +2190,7 @@ ROM_START(bbcmet)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos400.cmos", 0x0E, 0x32, BAD_DUMP CRC(fff41cc5) SHA1(3607568758f90b3bd6c7dc9533e2aa24f9806ff3), ROM_BIOS(1))
+	ROMX_LOAD("mos400.cmos", 0x0E, 0x32, BAD_DUMP CRC(fff41cc5) SHA1(3607568758f90b3bd6c7dc9533e2aa24f9806ff3), ROM_BIOS(0))
 ROM_END
 
 
@@ -2200,7 +2200,7 @@ ROM_START(bbcmarm)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2226,7 +2226,7 @@ ROM_START(bbcmarm)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320arm.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(1))
+	ROMX_LOAD("mos320arm.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(0))
 ROM_END
 
 
@@ -2236,10 +2236,10 @@ ROM_START(bbcmc)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos510")
 	ROM_SYSTEM_BIOS( 0, "mos510", "Enhanced MOS 5.10" )
-	ROMX_LOAD("mos510.ic49", 0x30000, 0x10000, BAD_DUMP CRC(9a2a6086) SHA1(094ab37b0b6437c4f1653eaa0602ef102737adb6), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
+	ROMX_LOAD("mos510.ic49", 0x30000, 0x10000, BAD_DUMP CRC(9a2a6086) SHA1(094ab37b0b6437c4f1653eaa0602ef102737adb6), ROM_BIOS(0)) // Merged individual ROM bank dumps
 	ROM_SYSTEM_BIOS( 1, "mos500", "Original MOS 5.00" )
-	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(2))
-	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(1))
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -2268,9 +2268,9 @@ ROM_START(bbcmc_ar)
 
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos511i")
-	ROM_SYSTEM_BIOS( 0, "mos511i", "International MOS 5.11" )
-	ROMX_LOAD("mos511.ic49", 0x30000, 0x10000, BAD_DUMP CRC(8708803c) SHA1(d2170c8b9b536f3ad84a4a603a7fe712500cc751), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
-	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_SYSTEM_BIOS( 0, "mos511i", "International MOS 5.11i" )
+	ROMX_LOAD("mos511.ic49", 0x30000, 0x10000, BAD_DUMP CRC(8708803c) SHA1(d2170c8b9b536f3ad84a4a603a7fe712500cc751), ROM_BIOS(0)) // Merged individual ROM bank dumps
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -2302,8 +2302,8 @@ ROM_START(pro128s)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos510o")
 	ROM_SYSTEM_BIOS(0, "mos510o", "Olivetti MOS 5.10")
-	ROMX_LOAD("mos510o.ic49", 0x30000, 0x10000, CRC(c16858d3) SHA1(ad231ed21a55e493b553703285530d1cacd3de7a), ROM_BIOS(1))
-	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos510o.ic49", 0x30000, 0x10000, CRC(c16858d3) SHA1(ad231ed21a55e493b553703285530d1cacd3de7a), ROM_BIOS(0))
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -2327,14 +2327,49 @@ ROM_START(pro128s)
 ROM_END
 
 
+ROM_START(autoc15)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF) /* ROM MEMORY */
+
+	ROM_REGION(0x44000, "option", 0) /* ROM */
+	ROM_DEFAULT_BIOS("mos510i")
+	ROM_SYSTEM_BIOS(0, "mos510i", "Swedish MOS 5.10i")
+	ROMX_LOAD("swedish_mega_29-1.ic49", 0x20000, 0x20000, CRC(67512992) SHA1(5d04b6e53a3a75af22ab10c652cceb9a63b23a6d), ROM_BIOS(0))
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
+	ROM_FILL(0x20000, 0x4000, 0xff)
+	/* 00000 rom 0   IC38 SBII */
+	/* 04000 rom 1   IC38 SBII */
+	/* 08000 rom 2   IC23 APROMPT */
+	/* 0c000 rom 3   IC17 Swedish 16K ISO */
+	/* 10000 rom 4   SWRAM */
+	/* 14000 rom 5   SWRAM */
+	/* 18000 rom 6   SWRAM */
+	/* 1c000 rom 7   SWRAM */
+	/* 20000 rom 8   IC49 MODROM 0.47 */
+	/* 24000 rom 9   IC49 ADFS */
+	/* 28000 rom 10  IC49 BASIC */
+	/* 2c000 rom 11  IC49 Autocue Giant */
+	/* 30000 rom 12  IC49 Autocue Large */
+	/* 34000 rom 13  IC49 Autocue Medium */
+	/* 38000 rom 14  IC49 Autocue Small */
+	/* 3c000 rom 15  IC49 Utils */
+	ROM_LOAD("sbii-25-1-88.ic38",    0x00000, 0x8000, CRC(36af3215) SHA1(16d39f15b10b4e23e76bad23a53b4111ce877bc1))
+	ROM_LOAD("aprompt.ic23",         0x08000, 0x4000, NO_DUMP)
+	ROM_LOAD("swedish_16k_iso.ic17", 0x0c000, 0x4000, CRC(bd7716c0) SHA1(8a70f941f4de64d87e956e2086eb50287b8205b9))
+	ROM_LOAD("modrom0_47.ic29",      0x20000, 0x4000, CRC(0d7874cb) SHA1(3f467f0b1618fb6546a2b94ca22b9f58d58bbdce))
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+ROM_END
+
+
 ROM_START(discmon)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
@@ -2359,7 +2394,7 @@ ROM_START(discmon)
 
 	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(1))
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 ROM_END
 
 
@@ -2369,8 +2404,8 @@ ROM_START(discmate)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
@@ -2395,7 +2430,7 @@ ROM_START(discmate)
 
 	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(1))
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 ROM_END
 
 
@@ -2403,8 +2438,8 @@ ROM_START(cfa3000)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000, "option", 0) /* ROM */
-	ROM_LOAD("cfa3000_3_4_iss10.3.ic41",             0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973))
-	ROM_LOAD("cfa3000_sm_iss10.3.ic37",              0x18000, 0x08000, CRC(c07aee5f) SHA1(1994e3755dc15d1ea7e105bc19cd57893b719779))
+	ROM_LOAD("cfa3000_3_4_iss10.3.ic41",           0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973))
+	ROM_LOAD("cfa3000_sm_iss10.3.ic37",            0x18000, 0x08000, CRC(c07aee5f) SHA1(1994e3755dc15d1ea7e105bc19cd57893b719779))
 	ROM_LOAD("acorn_mos,tinsley_64k,iss10.3.ic24", 0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54))
 	ROM_COPY("option", 0x20000, 0x30000, 0x10000) /* Mirror MOS */
 	ROM_COPY("option", 0x30000, 0x40000, 0x04000) /* Move loaded roms into place */
@@ -2465,6 +2500,7 @@ COMP ( 1986, ltmpm,    bbcm,   0,     ltmpm,    ltmpm,  bbc_state,   init_bbc, "
 COMP ( 1986, bbcmc,    0,      bbcm,  bbcmc,    bbcm,   bbc_state,   init_bbc, "Acorn",           "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,  0,     bbcmc,    bbcm,   bbc_state,   init_bbc, "Acorn",           "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1987, pro128s,  bbcmc,  0,     pro128s,  bbcm,   bbc_state,   init_bbc, "Olivetti",        "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1988, autoc15,  bbcmc,  0,     bbcmc,    bbcm,   bbc_state,   init_bbc, "Autocue",         "Autocue 1500",                       MACHINE_NOT_WORKING)
 COMP ( 1988, discmon,  bbcm,   0,     discmon,  bbcm,   bbc_state,   init_bbc, "Arbiter Leisure", "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING)
 COMP ( 1988, discmate, bbcm,   0,     discmate, bbcm,   bbc_state,   init_bbc, "Arbiter Leisure", "Arbiter Discmate A-02",              MACHINE_NOT_WORKING)
 //COMP ( 1988, discmast, bbcm,   0,     discmast, bbcm,   bbc_state,   init_bbc, "Arbiter Leisure", "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING)

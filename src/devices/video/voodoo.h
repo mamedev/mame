@@ -1483,8 +1483,8 @@ public:
 	uint8_t             m_fbmem;
 	uint8_t             m_tmumem0;
 	uint8_t             m_tmumem1;
-	devcb_write_line	m_vblank;
-	devcb_write_line	m_stall;
+	devcb_write_line    m_vblank;
+	devcb_write_line    m_stall;
 	// This is for internally generated PCI interrupts in Voodoo3
 	devcb_write_line    m_pciint;
 
@@ -1881,7 +1881,7 @@ public:
 	uint8_t             index;                  // index of board
 	screen_device *     m_screen;               // the screen we are acting on
 	cpu_device *        m_cpu;                  // the CPU we interact with
-	const uint8_t		vd_type;                // type of system
+	const uint8_t       vd_type;                // type of system
 	uint8_t             chipmask;               // mask for which chips are available
 	uint32_t            freq;                   // operating frequency
 	attoseconds_t       attoseconds_per_cycle;  // attoseconds per cycle
@@ -1889,8 +1889,8 @@ public:
 	int                 trigger;                // trigger used for stalling
 
 	voodoo_reg          reg[0x400];             // raw registers
-	const uint8_t *		regaccess;              // register access array
-	const char *const *	regnames;               // register names array
+	const uint8_t *     regaccess;              // register access array
+	const char *const * regnames;               // register names array
 	uint8_t             alt_regmap;             // enable alternate register map?
 
 	pci_state           pci;                    // PCI state

@@ -27,6 +27,7 @@
 #include "sound/awacs.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAC_SCREEN_NAME "screen"

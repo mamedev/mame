@@ -59,10 +59,10 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[0] = BIT(data, 0);
-		m_led[1] = BIT(data, 1);
-		m_led[2] = BIT(data, 2);
-		m_led[3] = BIT(data, 3);
+		m_leds[0] = BIT(data, 0);
+		m_leds[1] = BIT(data, 1);
+		m_leds[2] = BIT(data, 2);
+		m_leds[3] = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
 	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
@@ -74,8 +74,8 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		m_led[0] = BIT(data, 1);
-		m_led[1] = BIT(data, 2);
+		m_leds[0] = BIT(data, 1);
+		m_leds[1] = BIT(data, 2);
 	}
 	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
@@ -99,12 +99,12 @@ void suna16_state::bssoccer_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // ROM
 	map(0x200000, 0x203fff).ram(); // RAM
-	map(0x400000, 0x4001ff).rw(this, FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w));  // Banked Palette
+	map(0x400000, 0x4001ff).rw(FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w));  // Banked Palette
 	map(0x400200, 0x400fff).ram(); //
 	map(0x600000, 0x61ffff).ram().share("spriteram");   // Sprites
-	map(0xa00000, 0xa00001).portr("P1").w(this, FUNC(suna16_state::soundlatch_w));   // To Sound CPU
-	map(0xa00002, 0xa00003).portr("P2").w(this, FUNC(suna16_state::flipscreen_w));   // Flip Screen
-	map(0xa00004, 0xa00005).portr("P3").w(this, FUNC(suna16_state::bssoccer_leds_w));   // Leds
+	map(0xa00000, 0xa00001).portr("P1").w(FUNC(suna16_state::soundlatch_w));   // To Sound CPU
+	map(0xa00002, 0xa00003).portr("P2").w(FUNC(suna16_state::flipscreen_w));   // Flip Screen
+	map(0xa00004, 0xa00005).portr("P3").w(FUNC(suna16_state::bssoccer_leds_w));   // Leds
 	map(0xa00006, 0xa00007).portr("P4").nopw(); // ? IRQ 1 Ack
 	map(0xa00008, 0xa00009).portr("DSW1").nopw();   // ? IRQ 2 Ack
 	map(0xa0000a, 0xa0000b).portr("DSW2");
@@ -156,17 +156,17 @@ void suna16_state::uballoon_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom(); // ROM
 	map(0x800000, 0x803fff).ram(); // RAM
-	map(0x200000, 0x2001ff).rw(this, FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w)); // Banked Palette
+	map(0x200000, 0x2001ff).rw(FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w)); // Banked Palette
 	map(0x200200, 0x200fff).ram(); //
 	map(0x400000, 0x41ffff).mirror(0x1e0000).ram().share("spriteram");   // Sprites
-	map(0x600000, 0x600001).portr("P1").w(this, FUNC(suna16_state::soundlatch_w));   // To Sound CPU
+	map(0x600000, 0x600001).portr("P1").w(FUNC(suna16_state::soundlatch_w));   // To Sound CPU
 	map(0x600002, 0x600003).portr("P2");
-	map(0x600004, 0x600005).portr("DSW1").w(this, FUNC(suna16_state::flipscreen_w)); // Flip Screen
+	map(0x600004, 0x600005).portr("DSW1").w(FUNC(suna16_state::flipscreen_w)); // Flip Screen
 	map(0x600006, 0x600007).portr("DSW2");
-	map(0x600008, 0x600009).w(this, FUNC(suna16_state::uballoon_leds_w));  // Leds
+	map(0x600008, 0x600009).w(FUNC(suna16_state::uballoon_leds_w));  // Leds
 	map(0x60000c, 0x60000d).nopw();    // ? IRQ 1 Ack
 	map(0x600010, 0x600011).nopw();    // ? IRQ 1 Ack
-	map(0xa00000, 0xa0ffff).rw(this, FUNC(suna16_state::uballoon_prot_r), FUNC(suna16_state::uballoon_prot_w)).umask16(0x00ff);    // Protection
+	map(0xa00000, 0xa0ffff).rw(FUNC(suna16_state::uballoon_prot_r), FUNC(suna16_state::uballoon_prot_w)).umask16(0x00ff);    // Protection
 }
 
 
@@ -177,11 +177,11 @@ void suna16_state::uballoon_map(address_map &map)
 void suna16_state::sunaq_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom(); // ROM
-	map(0x500000, 0x500001).portr("P1").w(this, FUNC(suna16_state::soundlatch_w));   // To Sound CPU
-	map(0x500002, 0x500003).portr("P2").w(this, FUNC(suna16_state::flipscreen_w));   // Flip Screen
+	map(0x500000, 0x500001).portr("P1").w(FUNC(suna16_state::soundlatch_w));   // To Sound CPU
+	map(0x500002, 0x500003).portr("P2").w(FUNC(suna16_state::flipscreen_w));   // Flip Screen
 	map(0x500004, 0x500005).portr("DSW1");
 	map(0x500006, 0x500007).portr("DSW2");               // (unused?)
-	map(0x540000, 0x5401ff).rw(this, FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w));
+	map(0x540000, 0x5401ff).rw(FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w));
 	map(0x540200, 0x540fff).ram();   // RAM
 	map(0x580000, 0x583fff).ram(); // RAM
 	map(0x5c0000, 0x5dffff).ram().share("spriteram");   // Sprites
@@ -212,12 +212,12 @@ void suna16_state::bestbest_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0xc0000);        // ROM
 	map(0x200000, 0x2fffff).rom().region("user1", 0);     // ROM
-	map(0x500000, 0x500001).portr("P1").w(this, FUNC(suna16_state::soundlatch_w));     // To Sound CPU
-	map(0x500002, 0x500003).portr("P2").w(this, FUNC(suna16_state::bestbest_flipscreen_w));   // P2 + Coins, Flip Screen
-	map(0x500004, 0x500005).portr("DSW").w(this, FUNC(suna16_state::bestbest_coin_w));        // Coin Counter
-	map(0x500009, 0x500009).w(this, FUNC(suna16_state::bestbest_prot_w));       // Protection
-	map(0x500019, 0x500019).r(this, FUNC(suna16_state::bestbest_prot_r));        // "
-	map(0x540000, 0x540fff).rw(this, FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w));  // Banked(?) Palette
+	map(0x500000, 0x500001).portr("P1").w(FUNC(suna16_state::soundlatch_w));     // To Sound CPU
+	map(0x500002, 0x500003).portr("P2").w(FUNC(suna16_state::bestbest_flipscreen_w));   // P2 + Coins, Flip Screen
+	map(0x500004, 0x500005).portr("DSW").w(FUNC(suna16_state::bestbest_coin_w));        // Coin Counter
+	map(0x500009, 0x500009).w(FUNC(suna16_state::bestbest_prot_w));       // Protection
+	map(0x500019, 0x500019).r(FUNC(suna16_state::bestbest_prot_r));        // "
+	map(0x540000, 0x540fff).rw(FUNC(suna16_state::paletteram_r), FUNC(suna16_state::paletteram_w));  // Banked(?) Palette
 	map(0x541000, 0x54ffff).ram();                                                       //
 	map(0x580000, 0x58ffff).ram();                           // RAM
 	map(0x5c0000, 0x5dffff).ram().share("spriteram"); // Sprites (Chip 1)
@@ -309,7 +309,7 @@ void suna16_state::bestbest_sound_map(address_map &map)
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
@@ -353,18 +353,18 @@ void suna16_state::bssoccer_pcm_1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));    // From The Sound Z80
-	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::write));
-	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(suna16_state::bssoccer_pcm_1_bankswitch_w));  // Rom Bank
+	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::data_w));
+	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(suna16_state::bssoccer_pcm_1_bankswitch_w));  // Rom Bank
 }
 
 void suna16_state::bssoccer_pcm_2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch3", FUNC(generic_latch_8_device::read));    // From The Sound Z80
-	map(0x00, 0x00).w("ldac2", FUNC(dac_byte_interface::write));
-	map(0x01, 0x01).w("rdac2", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(suna16_state::bssoccer_pcm_2_bankswitch_w));  // Rom Bank
+	map(0x00, 0x00).w("ldac2", FUNC(dac_byte_interface::data_w));
+	map(0x01, 0x01).w("rdac2", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(suna16_state::bssoccer_pcm_2_bankswitch_w));  // Rom Bank
 }
 
 
@@ -393,16 +393,16 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));    // From The Sound Z80
-	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::write));
-	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(suna16_state::uballoon_pcm_1_bankswitch_w));  // Rom Bank
+	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::data_w));
+	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(suna16_state::uballoon_pcm_1_bankswitch_w));  // Rom Bank
 }
 
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_prot));
 }
@@ -427,10 +427,10 @@ void suna16_state::bestbest_pcm_1_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));   // From The Sound Z80
-	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::write));
-	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::write));
-	map(0x02, 0x02).w("ldac2", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w("rdac2", FUNC(dac_byte_interface::write));
+	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::data_w));
+	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::data_w));
+	map(0x02, 0x02).w("ldac2", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w("rdac2", FUNC(dac_byte_interface::data_w));
 }
 
 /***************************************************************************

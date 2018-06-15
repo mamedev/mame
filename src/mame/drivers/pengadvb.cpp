@@ -103,7 +103,7 @@ WRITE8_MEMBER(pengadvb_state::megarom_bank_w)
 
 void pengadvb_state::program_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pengadvb_state::mem_r), FUNC(pengadvb_state::mem_w)); // 4 pages of 16KB
+	map(0x0000, 0xffff).rw(FUNC(pengadvb_state::mem_r), FUNC(pengadvb_state::mem_w)); // 4 pages of 16KB
 }
 
 void pengadvb_state::bank_mem(address_map &map)
@@ -116,7 +116,7 @@ void pengadvb_state::bank_mem(address_map &map)
 	map(0x16000, 0x17fff).bankr("bank1");
 	map(0x18000, 0x19fff).bankr("bank2");
 	map(0x1a000, 0x1bfff).bankr("bank3");
-	map(0x14000, 0x1bfff).w(this, FUNC(pengadvb_state::megarom_bank_w));
+	map(0x14000, 0x1bfff).w(FUNC(pengadvb_state::megarom_bank_w));
 
 	// slot 3, 16KB RAM
 	map(0x3c000, 0x3ffff).ram();
@@ -126,8 +126,8 @@ void pengadvb_state::io_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x98, 0x98).rw("tms9128", FUNC(tms9128_device::vram_read), FUNC(tms9128_device::vram_write));
-	map(0x99, 0x99).rw("tms9128", FUNC(tms9128_device::register_read), FUNC(tms9128_device::register_write));
+	map(0x98, 0x98).rw("tms9128", FUNC(tms9128_device::vram_r), FUNC(tms9128_device::vram_w));
+	map(0x99, 0x99).rw("tms9128", FUNC(tms9128_device::register_r), FUNC(tms9128_device::register_w));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));

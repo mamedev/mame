@@ -182,6 +182,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/netlist.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -389,14 +390,14 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
 void cocoloco_state::cocoloco_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).rw(this, FUNC(cocoloco_state::vram_r), FUNC(cocoloco_state::vram_w));     // 256 x 256 x 1
+	map(0x2000, 0x3fff).rw(FUNC(cocoloco_state::vram_r), FUNC(cocoloco_state::vram_w));     // 256 x 256 x 1
 	map(0x6001, 0x6001).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x6002, 0x6002).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6003, 0x6003).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0x8003, 0x8003).w(this, FUNC(cocoloco_state::vbank_w));
-	map(0x8005, 0x8005).w(this, FUNC(cocoloco_state::coincounter_w));
+	map(0x8003, 0x8003).w(FUNC(cocoloco_state::vbank_w));
+	map(0x8005, 0x8005).w(FUNC(cocoloco_state::coincounter_w));
 	map(0xa000, 0xa000).portr("IN0");
-	map(0xa005, 0xa005).w(this, FUNC(cocoloco_state::vram_clear_w));
+	map(0xa005, 0xa005).w(FUNC(cocoloco_state::vram_clear_w));
 	map(0xd000, 0xffff).rom();
 }
 

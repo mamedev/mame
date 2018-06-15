@@ -17,6 +17,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,6 +42,9 @@ public:
 		, m_irq_scanline_start(0)
 		, m_irq_scanline_end(0)
 		, m_coin2_lock_cnt(3)
+		, m_packet_buffer{}
+		, m_packet_write_pos(0)
+		, m_packet_reset(true)
 	{
 	}
 
@@ -55,6 +59,7 @@ public:
 	void base_master_map(address_map &map);
 	void markham_master_map(address_map &map);
 	void strnskil_master_map(address_map &map);
+	void banbam_master_map(address_map &map);
 	void markham_slave_map(address_map &map);
 	void strnskil_slave_map(address_map &map);
 
@@ -70,9 +75,9 @@ protected:
 	DECLARE_READ8_MEMBER(strnskil_d800_r);
 
 	// protection comms for banbam/pettanp
-	DECLARE_READ8_MEMBER(pettanp_protection_r);
 	DECLARE_READ8_MEMBER(banbam_protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_WRITE8_MEMBER(banbam_protection_w);
+	DECLARE_WRITE8_MEMBER(mcu_reset_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -112,7 +117,13 @@ private:
 	uint8_t m_irq_scanline_start;
 	uint8_t m_irq_scanline_end;
 
+	/* misc */
 	uint8_t m_coin2_lock_cnt;
+
+	/* banbam protection simulation */
+	uint8_t m_packet_buffer[2];
+	uint8_t m_packet_write_pos;
+	bool m_packet_reset;
 };
 
 #endif // MAME_INCLUDES_MARKHAM_H

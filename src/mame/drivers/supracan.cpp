@@ -80,6 +80,7 @@ DEBUG TRICKS:
 #include "cpu/m6502/m6502.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -1123,18 +1124,18 @@ WRITE16_MEMBER( supracan_state::vram_w )
 void supracan_state::supracan_mem(address_map &map)
 {
 	//AM_RANGE( 0x000000, 0x3fffff )        // mapped by the cartslot
-	map(0xe80000, 0xe8ffff).rw(this, FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
+	map(0xe80000, 0xe8ffff).rw(FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
 	map(0xe80200, 0xe80201).portr("P1");
 	map(0xe80202, 0xe80203).portr("P2");
 	map(0xe80208, 0xe80209).portr("P3");
 	map(0xe8020c, 0xe8020d).portr("P4");
-	map(0xe90000, 0xe9001f).rw(this, FUNC(supracan_state::sound_r), FUNC(supracan_state::sound_w));
-	map(0xe90020, 0xe9002f).w(this, FUNC(supracan_state::dma_channel0_w));
-	map(0xe90030, 0xe9003f).w(this, FUNC(supracan_state::dma_channel1_w));
+	map(0xe90000, 0xe9001f).rw(FUNC(supracan_state::sound_r), FUNC(supracan_state::sound_w));
+	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_channel0_w));
+	map(0xe90030, 0xe9003f).w(FUNC(supracan_state::dma_channel1_w));
 
-	map(0xf00000, 0xf001ff).rw(this, FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
+	map(0xf00000, 0xf001ff).rw(FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
 	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xf40000, 0xf5ffff).ram().w(this, FUNC(supracan_state::vram_w)).share("vram");
+	map(0xf40000, 0xf5ffff).ram().w(FUNC(supracan_state::vram_w)).share("vram");
 	map(0xfc0000, 0xfcffff).mirror(0x30000).ram(); /* System work ram */
 }
 
@@ -1234,7 +1235,7 @@ WRITE8_MEMBER( supracan_state::_6502_soundmem_w )
 
 void supracan_state::supracan_sound_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(supracan_state::_6502_soundmem_r), FUNC(supracan_state::_6502_soundmem_w)).share("soundram");
+	map(0x0000, 0xffff).rw(FUNC(supracan_state::_6502_soundmem_r), FUNC(supracan_state::_6502_soundmem_w)).share("soundram");
 }
 
 static INPUT_PORTS_START( supracan )

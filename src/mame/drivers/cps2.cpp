@@ -928,27 +928,27 @@ void cps2_state::cps2_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();                                                                         /* 68000 ROM */
 	map(0x400000, 0x40000b).ram().share("output");                                                      /* CPS2 object output */
-	map(0x618000, 0x619fff).rw(this, FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
+	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
 	map(0x660000, 0x663fff).ram();                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x664000, 0x664001).ram();                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	map(0x700000, 0x701fff).w(this, FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
-	map(0x708000, 0x709fff).mirror(0x006000).rw(this, FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
-	map(0x800100, 0x80013f).w(this, FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* mirror (sfa) */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share("cps_b_regs");            /* mirror (sfa) */
+	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
+	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
+	map(0x800100, 0x80013f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* mirror (sfa) */
+	map(0x800140, 0x80017f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share("cps_b_regs");            /* mirror (sfa) */
 	map(0x804000, 0x804001).portr("IN0");                                                            /* IN0 */
 	map(0x804010, 0x804011).portr("IN1");                                                            /* IN1 */
 	map(0x804020, 0x804021).portr("IN2");                                                            /* IN2 + EEPROM */
-	map(0x804030, 0x804031).r(this, FUNC(cps2_state::cps2_qsound_volume_r));                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	map(0x804040, 0x804041).w(this, FUNC(cps2_state::cps2_eeprom_port_w));                                                    /* EEPROM */
+	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                    /* EEPROM */
 	map(0x8040a0, 0x8040a1).nopw();                                                                    /* Unknown (reset once on startup) */
-	map(0x8040b0, 0x8040b3).r(this, FUNC(cps2_state::kludge_r));                                                               /* unknown (xmcotaj hangs if this is 0) */
-	map(0x8040e0, 0x8040e1).w(this, FUNC(cps2_state::cps2_objram_bank_w));                                                   /* bit 0 = Object ram bank swap */
-	map(0x804100, 0x80413f).w(this, FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                          /* CPS-A custom */
-	map(0x804140, 0x80417f).rw(this, FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
+	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                               /* unknown (xmcotaj hangs if this is 0) */
+	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                   /* bit 0 = Object ram bank swap */
+	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                          /* CPS-A custom */
+	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       /* CPS-B custom */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
 	map(0xff0000, 0xffffff).ram();                                                                         /* RAM */
 }
 
@@ -961,27 +961,27 @@ void cps2_state::dead_cps2_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();                                                                         /* 68000 ROM */
 	map(0x400000, 0x40000b).ram().share("output");                                                      /* CPS2 object output */
-	map(0x618000, 0x619fff).rw(this, FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
+	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
 	map(0x660000, 0x663fff).ram();                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x664000, 0x664001).ram();                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	map(0x700000, 0x701fff).w(this, FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
-	map(0x708000, 0x709fff).mirror(0x006000).rw(this, FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
-	map(0x800100, 0x80013f).w(this, FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* mirror (sfa) */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share("cps_b_regs");            /* mirror (sfa) */
+	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
+	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
+	map(0x800100, 0x80013f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* mirror (sfa) */
+	map(0x800140, 0x80017f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share("cps_b_regs");            /* mirror (sfa) */
 	map(0x804000, 0x804001).portr("IN0");                                                            /* IN0 */
 	map(0x804010, 0x804011).portr("IN1");                                                            /* IN1 */
 	map(0x804020, 0x804021).portr("IN2");                                                            /* IN2 + EEPROM */
-	map(0x804030, 0x804031).r(this, FUNC(cps2_state::cps2_qsound_volume_r));                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	map(0x804040, 0x804041).w(this, FUNC(cps2_state::cps2_eeprom_port_w));                                                    /* EEPROM */
+	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                    /* EEPROM */
 	map(0x8040a0, 0x8040a1).nopw();                                                                    /* Unknown (reset once on startup) */
-	map(0x8040b0, 0x8040b3).r(this, FUNC(cps2_state::kludge_r));                                                               /* unknown (xmcotaj hangs if this is 0) */
-	map(0x8040e0, 0x8040e1).w(this, FUNC(cps2_state::cps2_objram_bank_w));                                                   /* bit 0 = Object ram bank swap */
-	map(0x804100, 0x80413f).w(this, FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* CPS-A custom */
-	map(0x804140, 0x80417f).rw(this, FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
+	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                               /* unknown (xmcotaj hangs if this is 0) */
+	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                   /* bit 0 = Object ram bank swap */
+	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* CPS-A custom */
+	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       /* CPS-B custom */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
 	map(0xff0000, 0xffffef).ram();                                                                         /* RAM */
 	map(0xfffff0, 0xfffffb).ram().share("output");                                                      /* CPS2 output */
 	map(0xfffffc, 0xffffff).ram();
@@ -1316,7 +1316,7 @@ MACHINE_CONFIG_START(cps2_state::cps2)
 
 	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

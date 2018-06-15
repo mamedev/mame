@@ -51,6 +51,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -346,12 +347,12 @@ void dblcrown_state::dblcrown_map(address_map &map)
 	map(0x8000, 0x9fff).bankr("rom_bank");
 	map(0xa000, 0xb7ff).ram(); // work ram
 	map(0xb800, 0xbfff).ram().share("nvram");
-	map(0xc000, 0xdfff).rw(this, FUNC(dblcrown_state::vram_r), FUNC(dblcrown_state::vram_w));
-	map(0xf000, 0xf1ff).rw(this, FUNC(dblcrown_state::palette_r), FUNC(dblcrown_state::palette_w));
+	map(0xc000, 0xdfff).rw(FUNC(dblcrown_state::vram_r), FUNC(dblcrown_state::vram_w));
+	map(0xf000, 0xf1ff).rw(FUNC(dblcrown_state::palette_r), FUNC(dblcrown_state::palette_w));
 	map(0xfe00, 0xfeff).ram(); // ???
 	map(0xff00, 0xffff).ram(); // ???, intentional fall-through
-	map(0xff00, 0xff01).rw(this, FUNC(dblcrown_state::vram_bank_r), FUNC(dblcrown_state::vram_bank_w));
-	map(0xff04, 0xff04).rw(this, FUNC(dblcrown_state::irq_source_r), FUNC(dblcrown_state::irq_source_w));
+	map(0xff00, 0xff01).rw(FUNC(dblcrown_state::vram_bank_r), FUNC(dblcrown_state::vram_bank_w));
+	map(0xff04, 0xff04).rw(FUNC(dblcrown_state::irq_source_r), FUNC(dblcrown_state::irq_source_w));
 
 }
 
@@ -363,12 +364,12 @@ void dblcrown_state::dblcrown_io(address_map &map)
 	map(0x01, 0x01).portr("DSWB");
 	map(0x02, 0x02).portr("DSWC");
 	map(0x03, 0x03).portr("DSWD");
-	map(0x04, 0x04).r(this, FUNC(dblcrown_state::in_mux_r));
-	map(0x05, 0x05).r(this, FUNC(dblcrown_state::in_mux_type_r));
+	map(0x04, 0x04).r(FUNC(dblcrown_state::in_mux_r));
+	map(0x05, 0x05).r(FUNC(dblcrown_state::in_mux_type_r));
 	map(0x10, 0x13).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).w("ymz", FUNC(ymz284_device::address_data_w));
-	map(0x30, 0x30).w(this, FUNC(dblcrown_state::watchdog_w));
-	map(0x40, 0x40).w(this, FUNC(dblcrown_state::output_w));
+	map(0x30, 0x30).w(FUNC(dblcrown_state::watchdog_w));
+	map(0x40, 0x40).w(FUNC(dblcrown_state::output_w));
 }
 
 static INPUT_PORTS_START( dblcrown )

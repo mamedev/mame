@@ -693,19 +693,19 @@ WRITE32_MEMBER(namconb1_state::share_w)
 void namconb1_state::namconb1_am(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10001f).r(this, FUNC(namconb1_state::gunbulet_gun_r));
+	map(0x100000, 0x10001f).r(FUNC(namconb1_state::gunbulet_gun_r));
 	map(0x1c0000, 0x1cffff).ram();
-	map(0x1e4000, 0x1e4003).rw(this, FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
-	map(0x200000, 0x207fff).rw(this, FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
+	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
 	map(0x208000, 0x2fffff).ram();
-	map(0x400000, 0x40001f).rw(this, FUNC(namconb1_state::namconb1_cpureg_r), FUNC(namconb1_state::namconb1_cpureg_w));
+	map(0x400000, 0x40001f).rw(FUNC(namconb1_state::namconb1_cpureg_r), FUNC(namconb1_state::namconb1_cpureg_w));
 	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x600000, 0x61ffff).rw(this, FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
-	map(0x620000, 0x620007).rw(this, FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
-	map(0x640000, 0x64ffff).rw(this, FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
-	map(0x660000, 0x66003f).rw(this, FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
+	map(0x600000, 0x61ffff).rw(FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
+	map(0x620000, 0x620007).rw(FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
+	map(0x640000, 0x64ffff).rw(FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
+	map(0x660000, 0x66003f).rw(FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
 	map(0x680000, 0x68000f).ram().share("spritebank32");
-	map(0x6e0000, 0x6e001f).r(this, FUNC(namconb1_state::custom_key_r)).nopw();
+	map(0x6e0000, 0x6e001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
 	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 }
 
@@ -713,24 +713,24 @@ void namconb1_state::namconb2_am(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x1c0000, 0x1cffff).ram();
-	map(0x1e4000, 0x1e4003).rw(this, FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
-	map(0x200000, 0x207fff).rw(this, FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
+	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
 	map(0x208000, 0x2fffff).ram();
 	map(0x400000, 0x4fffff).rom().region("data", 0);
-	map(0x600000, 0x61ffff).rw(this, FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
-	map(0x620000, 0x620007).rw(this, FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
+	map(0x600000, 0x61ffff).rw(FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
+	map(0x620000, 0x620007).rw(FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
 	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
-	map(0x680000, 0x68ffff).rw(this, FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
-	map(0x6c0000, 0x6c003f).rw(this, FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
-	map(0x700000, 0x71ffff).rw(this, FUNC(namconb1_state::c169_roz_videoram_r), FUNC(namconb1_state::c169_roz_videoram_w)).share("rozvideoram");
-	map(0x740000, 0x74001f).rw(this, FUNC(namconb1_state::c169_roz_control_r), FUNC(namconb1_state::c169_roz_control_w));
+	map(0x680000, 0x68ffff).rw(FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
+	map(0x6c0000, 0x6c003f).rw(FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
+	map(0x700000, 0x71ffff).rw(FUNC(namconb1_state::c169_roz_videoram_r), FUNC(namconb1_state::c169_roz_videoram_w)).share("rozvideoram");
+	map(0x740000, 0x74001f).rw(FUNC(namconb1_state::c169_roz_control_r), FUNC(namconb1_state::c169_roz_control_w));
 	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 	map(0x900008, 0x90000f).ram().share("spritebank32");
 	map(0x940000, 0x94000f).ram().share("tilebank32");
-	map(0x980000, 0x98000f).rw(this, FUNC(namconb1_state::c169_roz_bank_r), FUNC(namconb1_state::c169_roz_bank_w));
+	map(0x980000, 0x98000f).rw(FUNC(namconb1_state::c169_roz_bank_r), FUNC(namconb1_state::c169_roz_bank_w));
 	map(0xa00000, 0xa007ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0xc00000, 0xc0001f).r(this, FUNC(namconb1_state::custom_key_r)).nopw();
-	map(0xf00000, 0xf0001f).rw(this, FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
+	map(0xc00000, 0xc0001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
+	map(0xf00000, 0xf0001f).rw(FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
 }
 
 WRITE16_MEMBER(namconb1_state::mcu_shared_w)
@@ -757,7 +757,7 @@ WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 void namconb1_state::namcoc75_am(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).ram().w(this, FUNC(namconb1_state::mcu_shared_w)).share("namconb_share");
+	map(0x004000, 0x00bfff).ram().w(FUNC(namconb1_state::mcu_shared_w)).share("namconb_share");
 	map(0x200000, 0x27ffff).rom().region("c75data", 0);
 }
 
@@ -840,16 +840,16 @@ READ8_MEMBER(namconb1_state::dac0_r)// bit 6
 
 void namconb1_state::namcoc75_io(address_map &map)
 {
-	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namconb1_state::port6_r), FUNC(namconb1_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).r(this, FUNC(namconb1_state::port7_r));
-	map(M37710_ADC7_L, M37710_ADC7_L).r(this, FUNC(namconb1_state::dac7_r));
-	map(M37710_ADC6_L, M37710_ADC6_L).r(this, FUNC(namconb1_state::dac6_r));
-	map(M37710_ADC5_L, M37710_ADC5_L).r(this, FUNC(namconb1_state::dac5_r));
-	map(M37710_ADC4_L, M37710_ADC4_L).r(this, FUNC(namconb1_state::dac4_r));
-	map(M37710_ADC3_L, M37710_ADC3_L).r(this, FUNC(namconb1_state::dac3_r));
-	map(M37710_ADC2_L, M37710_ADC2_L).r(this, FUNC(namconb1_state::dac2_r));
-	map(M37710_ADC1_L, M37710_ADC1_L).r(this, FUNC(namconb1_state::dac1_r));
-	map(M37710_ADC0_L, M37710_ADC0_L).r(this, FUNC(namconb1_state::dac0_r));
+	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namconb1_state::port6_r), FUNC(namconb1_state::port6_w));
+	map(M37710_PORT7, M37710_PORT7).r(FUNC(namconb1_state::port7_r));
+	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namconb1_state::dac7_r));
+	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namconb1_state::dac6_r));
+	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namconb1_state::dac5_r));
+	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namconb1_state::dac4_r));
+	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namconb1_state::dac3_r));
+	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namconb1_state::dac2_r));
+	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namconb1_state::dac1_r));
+	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namconb1_state::dac0_r));
 }
 
 
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
@@ -1145,7 +1145,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.

@@ -188,8 +188,6 @@ void ccastles_state::machine_start()
 {
 	rectangle visarea;
 
-	m_led.resolve();
-
 	/* initialize globals */
 	m_syncprom = memregion("proms")->base() + 0x000;
 
@@ -222,7 +220,6 @@ void ccastles_state::machine_start()
 
 	/* setup for save states */
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_nvram_store));
 }
 
 
@@ -250,21 +247,9 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 }
 
 
-WRITE8_MEMBER(ccastles_state::led_w)
+template<int C> WRITE_LINE_MEMBER(ccastles_state::ccounter_w)
 {
-	m_led[offset] = BIT(~data, 0);
-}
-
-
-WRITE8_MEMBER(ccastles_state::ccounter_w)
-{
-	machine().bookkeeping().coin_counter_w(offset, data & 1);
-}
-
-
-WRITE8_MEMBER(ccastles_state::bankswitch_w)
-{
-	membank("bank1")->set_entry(data & 1);
+	machine().bookkeeping().coin_counter_w(C, state);
 }
 
 
@@ -294,11 +279,10 @@ WRITE8_MEMBER(ccastles_state::nvram_recall_w)
 }
 
 
-WRITE8_MEMBER(ccastles_state::nvram_store_w)
+WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 {
-	m_nvram_store[offset] = data & 1;
-	m_nvram_4b->store(~m_nvram_store[0] & m_nvram_store[1]);
-	m_nvram_4a->store(~m_nvram_store[0] & m_nvram_store[1]);
+	m_nvram_4b->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
+	m_nvram_4a->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
 }
 
 
@@ -325,27 +309,24 @@ WRITE8_MEMBER(ccastles_state::nvram_w)
 /* complete memory map derived from schematics */
 void ccastles_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().w(this, FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
-	map(0x0000, 0x0001).w(this, FUNC(ccastles_state::ccastles_bitmode_addr_w));
-	map(0x0002, 0x0002).rw(this, FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
+	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
+	map(0x0000, 0x0001).w(FUNC(ccastles_state::ccastles_bitmode_addr_w));
+	map(0x0002, 0x0002).rw(FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
 	map(0x8000, 0x8fff).ram();
 	map(0x8e00, 0x8fff).share("spriteram");
-	map(0x9000, 0x90ff).mirror(0x0300).rw(this, FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
-	map(0x9400, 0x9403).mirror(0x01fc).r(this, FUNC(ccastles_state::leta_r));
+	map(0x9000, 0x90ff).mirror(0x0300).rw(FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
+	map(0x9400, 0x9403).mirror(0x01fc).r(FUNC(ccastles_state::leta_r));
 	map(0x9600, 0x97ff).portr("IN0");
 	map(0x9800, 0x980f).mirror(0x01f0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x9a00, 0x9a0f).mirror(0x01f0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x9c00, 0x9c7f).w(this, FUNC(ccastles_state::nvram_recall_w));
-	map(0x9c80, 0x9cff).w(this, FUNC(ccastles_state::ccastles_hscroll_w));
-	map(0x9d00, 0x9d7f).w(this, FUNC(ccastles_state::ccastles_vscroll_w));
-	map(0x9d80, 0x9dff).w(this, FUNC(ccastles_state::irq_ack_w));
+	map(0x9c00, 0x9c7f).w(FUNC(ccastles_state::nvram_recall_w));
+	map(0x9c80, 0x9cff).w(FUNC(ccastles_state::ccastles_hscroll_w));
+	map(0x9d00, 0x9d7f).w(FUNC(ccastles_state::ccastles_vscroll_w));
+	map(0x9d80, 0x9dff).w(FUNC(ccastles_state::irq_ack_w));
 	map(0x9e00, 0x9e7f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x9e80, 0x9e81).mirror(0x0078).w(this, FUNC(ccastles_state::led_w));
-	map(0x9e82, 0x9e83).mirror(0x0078).w(this, FUNC(ccastles_state::nvram_store_w));
-	map(0x9e85, 0x9e86).mirror(0x0078).w(this, FUNC(ccastles_state::ccounter_w));
-	map(0x9e87, 0x9e87).mirror(0x0078).w(this, FUNC(ccastles_state::bankswitch_w));
-	map(0x9f00, 0x9f07).mirror(0x0078).w(this, FUNC(ccastles_state::ccastles_video_control_w));
-	map(0x9f80, 0x9fbf).mirror(0x0040).w(this, FUNC(ccastles_state::ccastles_paletteram_w));
+	map(0x9e80, 0x9e87).mirror(0x0078).w("outlatch0", FUNC(ls259_device::write_d0));
+	map(0x9f00, 0x9f07).mirror(0x0078).w(FUNC(ccastles_state::ccastles_video_control_w));
+	map(0x9f80, 0x9fbf).mirror(0x0040).w(FUNC(ccastles_state::ccastles_paletteram_w));
 	map(0xa000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xffff).rom();
 }
@@ -462,6 +443,17 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
+	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // 8N
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ccastles_state, nvram_store_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ccastles_state, nvram_store_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ccastles_state, ccounter_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ccastles_state, ccounter_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(MEMBANK("bank1"))
+
+	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 6P
+
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
@@ -513,10 +505,10 @@ ROM_START( ccastles )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 

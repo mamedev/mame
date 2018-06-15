@@ -157,7 +157,7 @@ READ8_MEMBER(hp82937_io_card_device::dio_r)
 	if (m_dio_out) {
 		return 0xff;
 	} else {
-		return m_ieee488->dio_r();
+		return m_ieee488->read_dio();
 	}
 }
 
@@ -253,7 +253,7 @@ void hp82937_io_card_device::device_reset()
 
 void hp82937_io_card_device::update_data_out()
 {
-	m_ieee488->dio_w(m_dio_out ? m_cpu->p2_r(machine().dummy_space() , 0) : 0xff);
+	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r(machine().dummy_space() , 0) : 0xff);
 }
 
 void hp82937_io_card_device::update_signals()
@@ -267,40 +267,40 @@ void hp82937_io_card_device::update_signals()
 	uint8_t p1 = m_cpu->p1_r(machine().dummy_space() , 0);
 	m_iatn = BIT(p1 , P1_ATN_BIT);
 	if (ctrl_active) {
-		m_ieee488->atn_w(m_iatn);
-		m_ieee488->srq_w(1);
+		m_ieee488->host_atn_w(m_iatn);
+		m_ieee488->host_srq_w(1);
 	} else {
-		m_ieee488->atn_w(1);
+		m_ieee488->host_atn_w(1);
 		m_iatn = m_iatn && m_ieee488->atn_r();
-		m_ieee488->srq_w(BIT(p1 , P1_SRQ_BIT));
+		m_ieee488->host_srq_w(BIT(p1 , P1_SRQ_BIT));
 	}
 	m_talker_out = (ctrl_active && !m_iatn) || (BIT(m_latch , LATCH_TA_BIT) && m_iatn);
 	if (m_talker_out) {
-		m_ieee488->nrfd_w(1);
-		m_ieee488->dav_w(BIT(p1 , P1_DAV_BIT));
-		m_ieee488->eoi_w(BIT(p1 , P1_EOI_BIT));
-		m_ieee488->ndac_w(1);
+		m_ieee488->host_nrfd_w(1);
+		m_ieee488->host_dav_w(BIT(p1 , P1_DAV_BIT));
+		m_ieee488->host_eoi_w(BIT(p1 , P1_EOI_BIT));
+		m_ieee488->host_ndac_w(1);
 
 	} else {
-		m_ieee488->nrfd_w(BIT(p1 , P1_NRFD_BIT));
-		m_ieee488->dav_w(1);
-		m_ieee488->eoi_w(1);
+		m_ieee488->host_nrfd_w(BIT(p1 , P1_NRFD_BIT));
+		m_ieee488->host_dav_w(1);
+		m_ieee488->host_eoi_w(1);
 		bool ndac = BIT(p1 , P1_NDAC_BIT);
 		if (BIT(m_latch , LATCH_EN_NDAC_BIT) && !m_iatn) {
 			ndac = false;
 		}
-		m_ieee488->ndac_w(ndac);
+		m_ieee488->host_ndac_w(ndac);
 	}
 	bool iren = BIT(p1 , P1_REN_BIT);
 	if (BIT(m_sw1->read() , 5)) {
 		// System controller
-		m_ieee488->ren_w(iren);
-		m_ieee488->ifc_w(BIT(p1 , P1_IFC_BIT));
+		m_ieee488->host_ren_w(iren);
+		m_ieee488->host_ifc_w(BIT(p1 , P1_IFC_BIT));
 	} else {
 		// Not system controller
-		m_ieee488->ren_w(1);
+		m_ieee488->host_ren_w(1);
 		iren = iren && m_ieee488->ren_r();
-		m_ieee488->ifc_w(1);
+		m_ieee488->host_ifc_w(1);
 	}
 	bool not_u8_1 = m_iatn || m_ieee488->eoi_r();
 	m_dio_out = not_u8_1 && m_talker_out;
@@ -320,7 +320,7 @@ void hp82937_io_card_device::cpu_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x01).rw("xlator", FUNC(hp_1mb5_device::uc_r), FUNC(hp_1mb5_device::uc_w));
-	map(0x03, 0x03).rw(this, FUNC(hp82937_io_card_device::switch_r), FUNC(hp82937_io_card_device::latch_w));
+	map(0x03, 0x03).rw(FUNC(hp82937_io_card_device::switch_r), FUNC(hp82937_io_card_device::latch_w));
 }
 
 const tiny_rom_entry *hp82937_io_card_device::device_rom_region() const

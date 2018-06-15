@@ -56,6 +56,7 @@ Grndtour:
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -124,10 +125,10 @@ void iqblock_state::main_portmap(address_map &map)
 	map(0x5090, 0x5090).portr("SW0");
 	map(0x50a0, 0x50a0).portr("SW1");
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // UM3567_data_port_0_w
-	map(0x50c0, 0x50c0).w(this, FUNC(iqblock_state::irqack_w));
-	map(0x6000, 0x603f).w(this, FUNC(iqblock_state::fgscroll_w));
-	map(0x6800, 0x69ff).w(this, FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
-	map(0x7000, 0x7fff).ram().w(this, FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
+	map(0x50c0, 0x50c0).w(FUNC(iqblock_state::irqack_w));
+	map(0x6000, 0x603f).w(FUNC(iqblock_state::fgscroll_w));
+	map(0x6800, 0x69ff).w(FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
+	map(0x7000, 0x7fff).ram().w(FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
 	map(0x8000, 0xffff).rom().region("user1", 0);
 }
 

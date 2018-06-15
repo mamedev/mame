@@ -422,7 +422,7 @@ void taitox_state::superman_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x300000, 0x300001).nopw();    /* written each frame at $3a9c, mostly 0x10 */
 	map(0x400000, 0x400001).nopw();    /* written each frame at $3aa2, mostly 0x10 */
-	map(0x500000, 0x500007).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x500000, 0x500007).r(FUNC(taitox_state::superman_dsw_input_r));
 	map(0x600000, 0x600001).nopw();    /* written each frame at $3ab0, mostly 0x10 */
 	map(0x800000, 0x800001).nopr();
 	map(0x800001, 0x800001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
@@ -440,12 +440,12 @@ void taitox_state::daisenpu_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 //  map(0x400000, 0x400001).nopw();    /* written each frame at $2ac, values change */
-	map(0x500000, 0x50000f).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x500000, 0x50000f).r(FUNC(taitox_state::superman_dsw_input_r));
 //  map(0x600000, 0x600001).nopw();    /* written each frame at $2a2, values change */
 	map(0x800000, 0x800001).nopr();
 	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0x900000, 0x90000f).rw(this, FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
+	map(0x900000, 0x90000f).rw(FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
 	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -457,12 +457,12 @@ void taitox_state::gigandes_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x400001).nopw();    /* 0x1 written each frame at $d42, watchdog? */
-	map(0x500000, 0x500007).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x500000, 0x500007).r(FUNC(taitox_state::superman_dsw_input_r));
 	map(0x600000, 0x600001).nopw();    /* 0x1 written each frame at $d3c, watchdog? */
 	map(0x800000, 0x800001).nopr();
 	map(0x800001, 0x800001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x800003, 0x800003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x900000, 0x90000f).rw(this, FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
+	map(0x900000, 0x90000f).rw(FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
 	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -474,12 +474,12 @@ void taitox_state::ballbros_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x400001).nopw();    /* 0x1 written each frame at $c56, watchdog? */
-	map(0x500000, 0x50000f).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x500000, 0x50000f).r(FUNC(taitox_state::superman_dsw_input_r));
 	map(0x600000, 0x600001).nopw();    /* 0x1 written each frame at $c4e, watchdog? */
 	map(0x800000, 0x800001).nopr();
 	map(0x800001, 0x800001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x800003, 0x800003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x900000, 0x90000f).rw(this, FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
+	map(0x900000, 0x90000f).rw(FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
 	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -502,7 +502,7 @@ void taitox_state::sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(taitox_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(taitox_state::sound_bankswitch_w));
 }
 
 void taitox_state::daisenpu_sound_map(address_map &map)
@@ -517,7 +517,7 @@ void taitox_state::daisenpu_sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw();
-	map(0xf200, 0xf200).w(this, FUNC(taitox_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(taitox_state::sound_bankswitch_w));
 }
 
 

@@ -29,19 +29,19 @@
 
 #include "emu.h"
 #include "speaker.h"
-#include "video/k053250_ps.h"
-#include "machine/nvram.h"
-#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/k054539.h"
 #include "includes/konamigx.h" // TODO: WHY?
-#include "video/konami_helper.h"
-#include "machine/ticket.h"
 #include "machine/gen_latch.h"
 #include "machine/k053252.h"
-#include "video/k055555.h"
-#include "video/k054000.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "machine/timer.h"
+#include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
+#include "video/k053250_ps.h"
+#include "video/k054000.h"
+#include "video/k055555.h"
+#include "video/konami_helper.h"
 
 class piratesh_state : public driver_device
 {
@@ -56,6 +56,8 @@ public:
 	m_k055555(*this, "k055555"),
 //  m_k053246(*this, "k053246"),
 	m_k054539(*this, "k054539"),
+	m_tickets(*this, "ticket"),
+	m_hopper(*this, "hopper"),
 	m_spriteram(*this,"spriteram")
 	{ }
 
@@ -68,6 +70,9 @@ public:
 	required_device<k055555_device> m_k055555;
 	required_device<k054539_device> m_k054539;
 //  required_device<k053247_device> m_k053246;
+
+	required_device<ticket_dispenser_device> m_tickets;
+	required_device<ticket_dispenser_device> m_hopper;
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 
@@ -376,8 +381,8 @@ WRITE16_MEMBER(piratesh_state::control3_w)
 		printf("CTRL1 W: %x %x %x\n", offset, data, mem_mask);
 
 //  printf("CTRL 1: %x\n", data & 0x0010);
-	machine().device<ticket_dispenser_device>("ticket")->motor_w(data & 0x0010 ? 1 : 0);
-	machine().device<ticket_dispenser_device>("hopper")->motor_w(data & 0x0020 ? 1 : 0);
+	m_tickets->motor_w(data & 0x0010 ? 1 : 0);
+	m_hopper->motor_w(data & 0x0020 ? 1 : 0);
 
 	m_control = data;
 }
@@ -403,10 +408,10 @@ void piratesh_state::piratesh_map(address_map &map)
 	map(0x400004, 0x400005).portr("DSW1");
 	map(0x400006, 0x400007).portr("DSW2");
 	map(0x400008, 0x400009).portr("SPECIAL");
-	map(0x40000c, 0x40000d).w(this, FUNC(piratesh_state::control1_w));
-	map(0x400010, 0x400011).w(this, FUNC(piratesh_state::control2_w));
-	map(0x400014, 0x400015).w(this, FUNC(piratesh_state::control3_w));
-	map(0x500000, 0x50ffff).r(this, FUNC(piratesh_state::K056832_rom_r)); // VRAM ROM
+	map(0x40000c, 0x40000d).w(FUNC(piratesh_state::control1_w));
+	map(0x400010, 0x400011).w(FUNC(piratesh_state::control2_w));
+	map(0x400014, 0x400015).w(FUNC(piratesh_state::control3_w));
+	map(0x500000, 0x50ffff).r(FUNC(piratesh_state::K056832_rom_r)); // VRAM ROM
 	map(0x580000, 0x581fff).r(m_k053250, FUNC(k053250ps_device::rom_r)); // LVC ROM access
 	map(0x600000, 0x6004ff).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00); // SOUND
 	map(0x680000, 0x681fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // TILEMAP
@@ -618,7 +623,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(piratesh_state, piratesh_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
@@ -636,9 +641,8 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	//MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
 	//MCFG_K053246_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
 	MCFG_K054338_ALPHAINV(1)
-	MCFG_K054338_MIXER("k055555")
 
 	MCFG_VIDEO_START_OVERRIDE(piratesh_state, piratesh)
 

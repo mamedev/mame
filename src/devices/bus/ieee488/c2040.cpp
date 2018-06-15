@@ -137,13 +137,13 @@ ROM_START( c4040 ) // schematic ?
 	ROM_REGION( 0x3000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("dos20r2")
 	ROM_SYSTEM_BIOS( 0, "dos20r1", "DOS 2.0 Revision 1" )
-	ROMX_LOAD( "901468-11.uj1", 0x0000, 0x1000, CRC(b7157458) SHA1(8415f3159dea73161e0cef7960afa6c76953b6f8), ROM_BIOS(1) )
-	ROMX_LOAD( "901468-12.ul1", 0x1000, 0x1000, CRC(02c44ff9) SHA1(e8a94f239082d45f64f01b2d8e488d18fe659cbb), ROM_BIOS(1) )
-	ROMX_LOAD( "901468-13.uh1", 0x2000, 0x1000, CRC(cbd785b3) SHA1(6ada7904ac9d13c3f1c0a8715f9c4be1aa6eb0bb), ROM_BIOS(1) )
+	ROMX_LOAD( "901468-11.uj1", 0x0000, 0x1000, CRC(b7157458) SHA1(8415f3159dea73161e0cef7960afa6c76953b6f8), ROM_BIOS(0) )
+	ROMX_LOAD( "901468-12.ul1", 0x1000, 0x1000, CRC(02c44ff9) SHA1(e8a94f239082d45f64f01b2d8e488d18fe659cbb), ROM_BIOS(0) )
+	ROMX_LOAD( "901468-13.uh1", 0x2000, 0x1000, CRC(cbd785b3) SHA1(6ada7904ac9d13c3f1c0a8715f9c4be1aa6eb0bb), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "dos20r2", "DOS 2.0 Revision 2" )
-	ROMX_LOAD( "901468-14.uj1", 0x0000, 0x1000, CRC(bc4d4872) SHA1(ffb992b82ec913ddff7be964d7527aca3e21580c), ROM_BIOS(2) )
-	ROMX_LOAD( "901468-15.ul1", 0x1000, 0x1000, CRC(b6970533) SHA1(f702d6917fe8a798740ba4d467b500944ae7b70a), ROM_BIOS(2) )
-	ROMX_LOAD( "901468-16.uh1", 0x2000, 0x1000, CRC(1f5eefb7) SHA1(04b918cf4adeee8015b43383d3cea7288a7d0aa8), ROM_BIOS(2) )
+	ROMX_LOAD( "901468-14.uj1", 0x0000, 0x1000, CRC(bc4d4872) SHA1(ffb992b82ec913ddff7be964d7527aca3e21580c), ROM_BIOS(1) )
+	ROMX_LOAD( "901468-15.ul1", 0x1000, 0x1000, CRC(b6970533) SHA1(f702d6917fe8a798740ba4d467b500944ae7b70a), ROM_BIOS(1) )
+	ROMX_LOAD( "901468-16.uh1", 0x2000, 0x1000, CRC(1f5eefb7) SHA1(04b918cf4adeee8015b43383d3cea7288a7d0aa8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
 	// RIOT DOS 2
@@ -222,7 +222,7 @@ READ8_MEMBER( c2040_device::dio_r )
 
 	*/
 
-	return m_bus->dio_r();
+	return m_bus->read_dio();
 }
 
 WRITE8_MEMBER( c2040_device::dio_w )
@@ -365,13 +365,13 @@ WRITE8_MEMBER( c2040_device::riot1_pb_w )
 	*/
 
 	// activity led 1
-	m_led[LED_ACT1] = BIT(data, 3);
+	m_leds[LED_ACT1] = BIT(data, 3);
 
 	// activity led 0
-	m_led[LED_ACT0] = BIT(data, 4);
+	m_leds[LED_ACT0] = BIT(data, 4);
 
 	// error led
-	m_led[LED_ERR] = BIT(data, 5);
+	m_leds[LED_ERR] = BIT(data, 5);
 }
 
 
@@ -650,7 +650,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 	m_fdc(*this, FDC_TAG),
 	m_gcr(*this, "gcr"),
 	m_address(*this, "ADDRESS"),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
 	m_atna(1),
@@ -690,7 +690,7 @@ c4040_device::c4040_device(const machine_config &mconfig, const char *tag, devic
 
 void c2040_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	// install image callbacks
 	m_fdc->set_floppy(m_floppy0, m_floppy1);
 

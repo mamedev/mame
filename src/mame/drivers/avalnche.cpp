@@ -107,7 +107,7 @@ void avalnche_state::main_map(address_map &map)
 	map(0x2003, 0x2003).mirror(0x0ffc).nopr();
 	map(0x3000, 0x3000).mirror(0x0fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4000, 0x4007).mirror(0x0ff8).w("latch", FUNC(f9334_device::write_d0));
-	map(0x5000, 0x5000).mirror(0x0fff).w(this, FUNC(avalnche_state::avalnche_noise_amplitude_w));
+	map(0x5000, 0x5000).mirror(0x0fff).w(FUNC(avalnche_state::avalnche_noise_amplitude_w));
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -121,7 +121,7 @@ void avalnche_state::catch_map(address_map &map)
 	map(0x2003, 0x2003).mirror(0x0ffc).nopr();
 	map(0x3000, 0x3000).mirror(0x0fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4000, 0x4007).mirror(0x0ff8).w("latch", FUNC(f9334_device::write_d0));
-	map(0x6000, 0x6000).mirror(0x0fff).w(this, FUNC(avalnche_state::catch_coin_counter_w));
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(avalnche_state::catch_coin_counter_w));
 	map(0x7000, 0x7fff).rom();
 }
 

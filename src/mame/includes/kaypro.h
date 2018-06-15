@@ -13,6 +13,7 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class kaypro_state : public driver_device

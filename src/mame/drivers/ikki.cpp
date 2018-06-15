@@ -66,14 +66,14 @@ void ikki_state::ikki_cpu1(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd7ff).ram().share("videoram");
-	map(0xe000, 0xe000).r(this, FUNC(ikki_state::ikki_e000_r));
+	map(0xe000, 0xe000).r(FUNC(ikki_state::ikki_e000_r));
 	map(0xe001, 0xe001).portr("DSW1");
 	map(0xe002, 0xe002).portr("DSW2");
 	map(0xe003, 0xe003).portr("SYSTEM");
 	map(0xe004, 0xe004).portr("P1");
 	map(0xe005, 0xe005).portr("P2");
-	map(0xe008, 0xe008).w(this, FUNC(ikki_state::ikki_scrn_ctrl_w));
-	map(0xe009, 0xe009).w(this, FUNC(ikki_state::ikki_coin_counters));
+	map(0xe008, 0xe008).w(FUNC(ikki_state::ikki_scrn_ctrl_w));
+	map(0xe009, 0xe009).w(FUNC(ikki_state::ikki_coin_counters));
 	map(0xe00a, 0xe00b).writeonly().share("scroll");
 }
 
@@ -82,8 +82,8 @@ void ikki_state::ikki_cpu2(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
 }
 
 

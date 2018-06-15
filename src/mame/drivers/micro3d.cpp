@@ -209,17 +209,17 @@ void micro3d_state::hostmem(address_map &map)
 	map(0x000000, 0x143fff).rom();
 	map(0x200000, 0x20ffff).ram().share("nvram");
 	map(0x800000, 0x83ffff).ram().share("shared_ram");
-	map(0x900000, 0x900001).w(this, FUNC(micro3d_state::host_drmath_int_w));
+	map(0x900000, 0x900001).w(FUNC(micro3d_state::host_drmath_int_w));
 	map(0x920000, 0x920001).portr("INPUTS_C_D");
 	map(0x940000, 0x940001).portr("INPUTS_A_B");
-	map(0x960000, 0x960001).w(this, FUNC(micro3d_state::micro3d_reset_w));
+	map(0x960000, 0x960001).w(FUNC(micro3d_state::micro3d_reset_w));
 	map(0x980001, 0x980001).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
 	map(0x9a0000, 0x9a0007).rw(m_vgb, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x9c0000, 0x9c0001).noprw();                 /* Lamps */
 	map(0x9e0000, 0x9e002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0003f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
-	map(0xa20000, 0xa20001).r(this, FUNC(micro3d_state::micro3d_encoder_h_r));
-	map(0xa40002, 0xa40003).r(this, FUNC(micro3d_state::micro3d_encoder_l_r));
+	map(0xa20000, 0xa20001).r(FUNC(micro3d_state::micro3d_encoder_h_r));
+	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::micro3d_encoder_l_r));
 }
 
 
@@ -234,11 +234,11 @@ void micro3d_state::vgbmem(address_map &map)
 	map(0x00000000, 0x007fffff).ram().share("sprite_vram");
 	map(0x00800000, 0x00bfffff).ram();
 	map(0x00c00000, 0x00c0000f).portr("VGB_SW");
-	map(0x00e00000, 0x00e0000f).w(this, FUNC(micro3d_state::micro3d_xfer3dk_w));
+	map(0x00e00000, 0x00e0000f).w(FUNC(micro3d_state::micro3d_xfer3dk_w));
 	map(0x02000000, 0x0200ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // clut
-	map(0x02600000, 0x0260000f).w(this, FUNC(micro3d_state::micro3d_creg_w));
-	map(0x02c00000, 0x02c0003f).r(this, FUNC(micro3d_state::vgb_uart_r)).umask16(0x00ff);
-	map(0x02e00000, 0x02e0003f).w(this, FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
+	map(0x02600000, 0x0260000f).w(FUNC(micro3d_state::micro3d_creg_w));
+	map(0x02c00000, 0x02c0003f).r(FUNC(micro3d_state::vgb_uart_r)).umask16(0x00ff);
+	map(0x02e00000, 0x02e0003f).w(FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
 	map(0x03800000, 0x03dfffff).rom().region("tms_gfx", 0);
 	map(0x03e00000, 0x03ffffff).rom().region("tms34010", 0);
 	map(0xc0000000, 0xc00001ff).rw(m_vgb, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
@@ -260,16 +260,16 @@ void micro3d_state::drmath_prg(address_map &map)
 void micro3d_state::drmath_data(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("drmath", 0);
-	map(0x00800000, 0x0083ffff).rw(this, FUNC(micro3d_state::micro3d_shared_r), FUNC(micro3d_state::micro3d_shared_w));
+	map(0x00800000, 0x0083ffff).rw(FUNC(micro3d_state::micro3d_shared_r), FUNC(micro3d_state::micro3d_shared_w));
 	map(0x00400000, 0x004fffff).ram();
 	map(0x00500000, 0x005fffff).ram();
-	map(0x00a00000, 0x00a00003).w(this, FUNC(micro3d_state::drmath_int_w));
-	map(0x01000000, 0x01000003).w(this, FUNC(micro3d_state::micro3d_mac1_w));
-	map(0x01000004, 0x01000007).rw(this, FUNC(micro3d_state::micro3d_mac2_r), FUNC(micro3d_state::micro3d_mac2_w));
+	map(0x00a00000, 0x00a00003).w(FUNC(micro3d_state::drmath_int_w));
+	map(0x01000000, 0x01000003).w(FUNC(micro3d_state::micro3d_mac1_w));
+	map(0x01000004, 0x01000007).rw(FUNC(micro3d_state::micro3d_mac2_r), FUNC(micro3d_state::micro3d_mac2_w));
 	map(0x01200000, 0x01203fff).ram().share("mac_sram");
-	map(0x01400000, 0x01400003).rw(this, FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
-	map(0x01600000, 0x01600003).w(this, FUNC(micro3d_state::drmath_intr2_ack));
-	map(0x01800000, 0x01800003).w(this, FUNC(micro3d_state::micro3d_alt_fifo_w));
+	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
+	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
+	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
 	map(0x03fffff0, 0x03fffff7).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 }
 
@@ -288,9 +288,9 @@ void micro3d_state::soundmem_io(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0xfd00, 0xfd01).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfe00, 0xfe00).w(this, FUNC(micro3d_state::micro3d_upd7759_w));
-	map(0xff00, 0xff00).w(this, FUNC(micro3d_state::micro3d_snd_dac_a));
-	map(0xff01, 0xff01).w(this, FUNC(micro3d_state::micro3d_snd_dac_b));
+	map(0xfe00, 0xfe00).w(FUNC(micro3d_state::micro3d_upd7759_w));
+	map(0xff00, 0xff00).w(FUNC(micro3d_state::micro3d_snd_dac_a));
+	map(0xff01, 0xff01).w(FUNC(micro3d_state::micro3d_snd_dac_b));
 }
 
 
@@ -302,31 +302,31 @@ void micro3d_state::soundmem_io(address_map &map)
 
 MACHINE_CONFIG_START(micro3d_state::micro3d)
 
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(hostmem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
 
-	MCFG_DEVICE_ADD("vgb", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_ADD("vgb", TMS34010, 40_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(vgbmem)
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000) / 8) /* pixel clock */
+	MCFG_TMS340X0_PIXEL_CLOCK(40_MHz_XTAL / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, micro3d_state, tms_interrupt))
 
-	MCFG_DEVICE_ADD("drmath", AM29000, XTAL(32'000'000) / 2)
+	MCFG_DEVICE_ADD("drmath", AM29000, 32_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
 	MCFG_DEVICE_DATA_MAP(drmath_data)
 
-	MCFG_SCC8530_ADD("scc", XTAL(32'000'000) / 2 / 2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 32_MHz_XTAL / 2 / 2)
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("monitor_drmath", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE("scc", z80scc_device, dcdb_w)) MCFG_DEVCB_XOR(1)
 
-	MCFG_DEVICE_ADD("audiocpu", I8051, XTAL(11'059'200))
+	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
 	MCFG_DEVICE_IO_MAP(soundmem_io)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p1_r))
@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, micro3d_state, data_from_i8031))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, micro3d_state, data_to_i8031))
 
-	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("monitor_host", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, micro3d_state, duart_txb))
@@ -359,11 +359,11 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_PALETTE_FORMAT(BBBBBRRRRRGGGGGx)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/8*4, 192*4, 0, 144*4, 434, 0, 400)
+	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL(40'000'000) / 8) // actually SCN2651
+	MCFG_DEVICE_ADD("uart", MC2661, 40_MHz_XTAL / 8) // actually SCN2651
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("monitor_vgb", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("monitor_vgb", RS232_PORT, default_rs232_devices, nullptr)
@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 			.add_route(ALL_OUTPUTS, "lspeaker", 0.35)
 			.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	YM2151(config, "ym2151", XTAL(3'579'545))
+	YM2151(config, "ym2151", 3.579545_MHz_XTAL)
 			.add_route(0, "lspeaker", 0.35)
 			.add_route(1, "rspeaker", 0.35);
 

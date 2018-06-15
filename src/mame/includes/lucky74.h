@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class lucky74_state : public driver_device
 {
@@ -14,7 +16,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(custom_09R81P_port_r);
@@ -41,7 +43,7 @@ public:
 	void lucky74_portmap(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
@@ -63,5 +65,5 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<12> m_lamp;
+	output_finder<12> m_lamps;
 };

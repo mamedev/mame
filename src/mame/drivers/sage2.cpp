@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi0_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, sage2_state, ppi1_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi1_pc_w))
 
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, sage2_state, fdc_irq))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, sage2_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sage2_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, sage2_state, write_centronics_perror))

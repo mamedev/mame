@@ -133,10 +133,10 @@ void microdec_state::microdec_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf5, 0xf5).r(this, FUNC(microdec_state::portf5_r));
-	map(0xf6, 0xf6).rw(this, FUNC(microdec_state::portf6_r), FUNC(microdec_state::portf6_w));
-	map(0xf7, 0xf7).rw(this, FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
-	map(0xf8, 0xf8).w(this, FUNC(microdec_state::portf8_w));
+	map(0xf5, 0xf5).r(FUNC(microdec_state::portf5_r));
+	map(0xf6, 0xf6).rw(FUNC(microdec_state::portf6_r), FUNC(microdec_state::portf6_w));
+	map(0xf7, 0xf7).rw(FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
+	map(0xf8, 0xf8).w(FUNC(microdec_state::portf8_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xfc).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfd, 0xfd).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -235,25 +235,25 @@ MACHINE_CONFIG_END
 ROM_START( md2 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v13", "v1.3" )
-	ROMX_LOAD( "md2-13.bin",  0x0000, 0x0800, CRC(43f4c9ab) SHA1(48a35cbee4f341310e9cba5178c3fd6e74ef9748), ROM_BIOS(1))
+	ROMX_LOAD("md2-13.bin",  0x0000, 0x0800, CRC(43f4c9ab) SHA1(48a35cbee4f341310e9cba5178c3fd6e74ef9748), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v13a", "v1.3a" )
-	ROMX_LOAD( "md2-13a.bin", 0x0000, 0x0800, CRC(d7fcddfd) SHA1(cae29232b737ebb36a27b8ad17bc69e9968f1309), ROM_BIOS(2))
+	ROMX_LOAD("md2-13a.bin", 0x0000, 0x0800, CRC(d7fcddfd) SHA1(cae29232b737ebb36a27b8ad17bc69e9968f1309), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v13b", "v1.3b" )
-	ROMX_LOAD( "md2-13b.bin", 0x0000, 0x1000, CRC(a8b96835) SHA1(c6b111939aa7e725da507da1915604656540b24e), ROM_BIOS(3))
+	ROMX_LOAD("md2-13b.bin", 0x0000, 0x1000, CRC(a8b96835) SHA1(c6b111939aa7e725da507da1915604656540b24e), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v20", "v2.0" )
-	ROMX_LOAD( "md2-20.bin",  0x0000, 0x1000, CRC(a604735c) SHA1(db6e6e82a803f5cbf4f628f5778a93ae3e211fe1), ROM_BIOS(4))
+	ROMX_LOAD("md2-20.bin",  0x0000, 0x1000, CRC(a604735c) SHA1(db6e6e82a803f5cbf4f628f5778a93ae3e211fe1), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "v23", "v2.3" )
-	ROMX_LOAD( "md2-23.bin",  0x0000, 0x1000, CRC(49bae273) SHA1(00381a226fe250aa3636b0b740df0af63efb0d18), ROM_BIOS(5))
+	ROMX_LOAD("md2-23.bin",  0x0000, 0x1000, CRC(49bae273) SHA1(00381a226fe250aa3636b0b740df0af63efb0d18), ROM_BIOS(4))
 ROM_END
 
 ROM_START( md3 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v23a", "v2.3a" )
-	ROMX_LOAD( "md3-23a.bin", 0x0000, 0x1000, CRC(95d59980) SHA1(ae65a8e8e2823cf4cf6b1d74c0996248e290e9f1), ROM_BIOS(1))
+	ROMX_LOAD("md3-23a.bin", 0x0000, 0x1000, CRC(95d59980) SHA1(ae65a8e8e2823cf4cf6b1d74c0996248e290e9f1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v25", "v2.5" )
-	ROMX_LOAD( "md3-25.bin",  0x0000, 0x1000, CRC(14f86bc5) SHA1(82fe022c85f678744bb0340ca3f88b18901fdfcb), ROM_BIOS(2))
+	ROMX_LOAD("md3-25.bin",  0x0000, 0x1000, CRC(14f86bc5) SHA1(82fe022c85f678744bb0340ca3f88b18901fdfcb), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v31", "v3.1" )
-	ROMX_LOAD( "md3-31.bin",  0x0000, 0x1000, CRC(bd4014f6) SHA1(5b33220af34c64676756177db4915f97840b2996), ROM_BIOS(3))
+	ROMX_LOAD("md3-31.bin",  0x0000, 0x1000, CRC(bd4014f6) SHA1(5b33220af34c64676756177db4915f97840b2996), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

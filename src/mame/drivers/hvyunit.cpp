@@ -66,6 +66,7 @@ To Do:
 #include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -400,9 +401,9 @@ void hvyunit_state::master_memory(address_map &map)
 void hvyunit_state::master_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(hvyunit_state::master_bankswitch_w));
-	map(0x01, 0x01).w(this, FUNC(hvyunit_state::master_bankswitch_w)); // correct?
-	map(0x02, 0x02).w(this, FUNC(hvyunit_state::trigger_nmi_on_slave_cpu));
+	map(0x00, 0x00).w(FUNC(hvyunit_state::master_bankswitch_w));
+	map(0x01, 0x01).w(FUNC(hvyunit_state::master_bankswitch_w)); // correct?
+	map(0x02, 0x02).w(FUNC(hvyunit_state::trigger_nmi_on_slave_cpu));
 }
 
 
@@ -410,8 +411,8 @@ void hvyunit_state::slave_memory(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slave_bank");
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(hvyunit_state::videoram_w)).share("videoram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(hvyunit_state::colorram_w)).share("colorram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(hvyunit_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).ram().w(FUNC(hvyunit_state::colorram_w)).share("colorram");
 	map(0xd000, 0xdfff).ram();
 	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -421,14 +422,14 @@ void hvyunit_state::slave_memory(address_map &map)
 void hvyunit_state::slave_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(hvyunit_state::slave_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(hvyunit_state::slave_bankswitch_w));
 	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read));
 	map(0x04, 0x04).w(m_mermaidlatch, FUNC(generic_latch_8_device::write));
-	map(0x06, 0x06).w(this, FUNC(hvyunit_state::scrolly_w));
-	map(0x08, 0x08).w(this, FUNC(hvyunit_state::scrollx_w));
-	map(0x0c, 0x0c).r(this, FUNC(hvyunit_state::mermaid_status_r));
-	map(0x0e, 0x0e).w(this, FUNC(hvyunit_state::coin_count_w));
+	map(0x06, 0x06).w(FUNC(hvyunit_state::scrolly_w));
+	map(0x08, 0x08).w(FUNC(hvyunit_state::scrollx_w));
+	map(0x0c, 0x0c).r(FUNC(hvyunit_state::mermaid_status_r));
+	map(0x0e, 0x0e).w(FUNC(hvyunit_state::coin_count_w));
 
 //  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
 //  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
@@ -445,7 +446,7 @@ void hvyunit_state::sound_memory(address_map &map)
 void hvyunit_state::sound_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(hvyunit_state::sound_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(hvyunit_state::sound_bankswitch_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

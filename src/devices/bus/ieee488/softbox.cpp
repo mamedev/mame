@@ -47,14 +47,14 @@ ROM_START( softbox )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("19830609")
 	ROM_SYSTEM_BIOS( 0, "19810908", "8/9/81" )
-	ROMX_LOAD( "375.ic3", 0x000, 0x800, CRC(177580e7) SHA1(af6a97495de825b80cdc9fbf72329d5440826177), ROM_BIOS(1) )
-	ROMX_LOAD( "376.ic4", 0x800, 0x800, CRC(edfee5be) SHA1(5662e9071cc622a1c071d89b00272fc6ba122b9a), ROM_BIOS(1) )
+	ROMX_LOAD( "375.ic3", 0x000, 0x800, CRC(177580e7) SHA1(af6a97495de825b80cdc9fbf72329d5440826177), ROM_BIOS(0) )
+	ROMX_LOAD( "376.ic4", 0x800, 0x800, CRC(edfee5be) SHA1(5662e9071cc622a1c071d89b00272fc6ba122b9a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "19811027", "27-Oct-81" )
-	ROMX_LOAD( "379.ic3", 0x000, 0x800, CRC(7b5a737c) SHA1(2348590884b026b7647f6864af8c9ba1c6f8746b), ROM_BIOS(2) )
-	ROMX_LOAD( "380.ic4", 0x800, 0x800, CRC(65a13029) SHA1(46de02e6f04be298047efeb412e00a5714dc21b3), ROM_BIOS(2) )
+	ROMX_LOAD( "379.ic3", 0x000, 0x800, CRC(7b5a737c) SHA1(2348590884b026b7647f6864af8c9ba1c6f8746b), ROM_BIOS(1) )
+	ROMX_LOAD( "380.ic4", 0x800, 0x800, CRC(65a13029) SHA1(46de02e6f04be298047efeb412e00a5714dc21b3), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "19830609", "09-June-1983" )
-	ROMX_LOAD( "389.ic3", 0x000, 0x800, CRC(d66e581a) SHA1(2403e25c140c41b0e6d6975d39c9cd9d6f335048), ROM_BIOS(3) )
-	ROMX_LOAD( "390.ic4", 0x800, 0x800, CRC(abe6cb30) SHA1(4b26d5db36f828e01268f718799f145d09b449ad), ROM_BIOS(3) )
+	ROMX_LOAD( "389.ic3", 0x000, 0x800, CRC(d66e581a) SHA1(2403e25c140c41b0e6d6975d39c9cd9d6f335048), ROM_BIOS(2) )
+	ROMX_LOAD( "390.ic4", 0x800, 0x800, CRC(abe6cb30) SHA1(4b26d5db36f828e01268f718799f145d09b449ad), ROM_BIOS(2) )
 ROM_END
 
 
@@ -88,7 +88,7 @@ void softbox_device::softbox_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x08).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x09, 0x09).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0c, 0x0c).w(this, FUNC(softbox_device::dbrg_w));
+	map(0x0c, 0x0c).w(FUNC(softbox_device::dbrg_w));
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x18, 0x18).rw(CORVUS_HDC_TAG, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
@@ -102,7 +102,7 @@ void softbox_device::softbox_io(address_map &map)
 
 READ8_MEMBER( softbox_device::ppi0_pa_r )
 {
-	return m_bus->dio_r() ^ 0xff;
+	return m_bus->read_dio() ^ 0xff;
 }
 
 WRITE8_MEMBER( softbox_device::ppi0_pb_w )
@@ -215,9 +215,9 @@ WRITE8_MEMBER( softbox_device::ppi1_pc_w )
 
 	*/
 
-	m_led[LED_A] = BIT(~data, 0);
-	m_led[LED_B] = BIT(~data, 1);
-	m_led[LED_READY] = BIT(~data, 2);
+	m_leds[LED_A] = BIT(~data, 0);
+	m_leds[LED_B] = BIT(~data, 1);
+	m_leds[LED_READY] = BIT(~data, 2);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -324,7 +324,7 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 	, m_maincpu(*this, Z80_TAG)
 	, m_dbrg(*this, COM8116_TAG)
 	, m_hdc(*this, CORVUS_HDC_TAG)
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_ifc(0)
 {
 }
@@ -336,7 +336,7 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 
 void softbox_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 
@@ -383,6 +383,6 @@ void softbox_device::ieee488_ifc(int state)
 
 WRITE8_MEMBER( softbox_device::dbrg_w )
 {
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
+	m_dbrg->write_str(data & 0x0f);
+	m_dbrg->write_stt(data >> 4);
 }

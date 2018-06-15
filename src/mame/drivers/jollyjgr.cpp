@@ -120,6 +120,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -251,11 +252,11 @@ void jollyjgr_state::jollyjgr_map(address_map &map)
 	map(0x8ff9, 0x8ff9).portr("INPUTS");
 	map(0x8ff8, 0x8ff8).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x8ffa, 0x8ffa).portr("SYSTEM").w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x8ffc, 0x8ffc).w(this, FUNC(jollyjgr_state::jollyjgr_misc_w));
-	map(0x8ffd, 0x8ffd).w(this, FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
+	map(0x8ffc, 0x8ffc).w(FUNC(jollyjgr_state::jollyjgr_misc_w));
+	map(0x8ffd, 0x8ffd).w(FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
 	map(0x8fff, 0x8fff).portr("DSW2");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
-	map(0x9800, 0x983f).ram().w(this, FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
 	map(0x9840, 0x987f).ram().share("spriteram");
 	map(0x9880, 0x9bff).ram();
 	map(0xa000, 0xffff).ram().share("bitmap");
@@ -269,11 +270,11 @@ void jollyjgr_state::fspider_map(address_map &map)
 	map(0x8ff9, 0x8ff9).portr("INPUTS");
 	map(0x8ff8, 0x8ff8).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x8ffa, 0x8ffa).portr("SYSTEM").w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x8ffc, 0x8ffc).w(this, FUNC(jollyjgr_state::jollyjgr_misc_w));
-	map(0x8ffd, 0x8ffd).w(this, FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
+	map(0x8ffc, 0x8ffc).w(FUNC(jollyjgr_state::jollyjgr_misc_w));
+	map(0x8ffd, 0x8ffd).w(FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
 	map(0x8fff, 0x8fff).portr("DSW2");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
-	map(0x9800, 0x983f).ram().w(this, FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
 	map(0x9840, 0x987f).ram().share("spriteram");
 	map(0x9880, 0x989f).ram(); // ?
 	map(0x98a0, 0x98af).ram().share("bulletram");

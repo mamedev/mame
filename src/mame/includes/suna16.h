@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class suna16_state : public driver_device
@@ -21,7 +22,7 @@ public:
 		, m_spriteram2(*this, "spriteram2")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	// common
@@ -96,7 +97,7 @@ protected:
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 
 	std::unique_ptr<uint16_t[]> m_paletteram;
 	int m_color_bank;

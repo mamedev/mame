@@ -343,11 +343,11 @@ void xexex_state::main_map(address_map &map)
 	map(0x080000, 0x08ffff).ram().share("workram");         // work RAM
 
 #if XE_SKIPIDLE
-	map(0x080014, 0x080015).r(this, FUNC(xexex_state::xexex_waitskip_r));              // helps sound CPU by giving back control as early as possible
+	map(0x080014, 0x080015).r(FUNC(xexex_state::xexex_waitskip_r));              // helps sound CPU by giving back control as early as possible
 #endif
 
 	map(0x090000, 0x097fff).ram().share("spriteram");           // K053247 sprite RAM
-	map(0x098000, 0x09ffff).rw(this, FUNC(xexex_state::spriteram_mirror_r), FUNC(xexex_state::spriteram_mirror_w));   // K053247 sprite RAM mirror read
+	map(0x098000, 0x09ffff).rw(FUNC(xexex_state::spriteram_mirror_r), FUNC(xexex_state::spriteram_mirror_w));   // K053247 sprite RAM mirror read
 	map(0x0c0000, 0x0c003f).w(m_k056832, FUNC(k056832_device::word_w));              // VACSET (K054157)
 	map(0x0c2000, 0x0c2007).w(m_k053246, FUNC(k053247_device::k053246_word_w));              // OBJSET1
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_word_r));               // Passthrough to sprite roms
@@ -356,14 +356,14 @@ void xexex_state::main_map(address_map &map)
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
-	map(0x0d4000, 0x0d4001).w(this, FUNC(xexex_state::sound_irq_w));
+	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
 	map(0x0da000, 0x0da001).portr("P1");
 	map(0x0da002, 0x0da003).portr("P2");
 	map(0x0dc000, 0x0dc001).portr("SYSTEM");
 	map(0x0dc002, 0x0dc003).portr("EEPROM");
-	map(0x0de000, 0x0de001).rw(this, FUNC(xexex_state::control2_r), FUNC(xexex_state::control2_w));
+	map(0x0de000, 0x0de001).rw(FUNC(xexex_state::control2_r), FUNC(xexex_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
 	map(0x180000, 0x181fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x182000, 0x183fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
@@ -390,7 +390,7 @@ void xexex_state::sound_map(address_map &map)
 	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xec00, 0xec01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(xexex_state::sound_bankswitch_w));
+	map(0xf800, 0xf800).w(FUNC(xexex_state::sound_bankswitch_w));
 }
 
 
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(xexex_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)

@@ -266,7 +266,7 @@ void qsound_device::rom_bank_updated()
 void qsound_device::dsp_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).mirror(0x8000).r(this, FUNC(qsound_device::dsp_sample_r));
+	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(qsound_device::dsp_sample_r));
 }
 
 

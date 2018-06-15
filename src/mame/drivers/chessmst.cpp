@@ -116,7 +116,7 @@ void chessmst_state::chessmst_io(address_map &map)
 void chessmst_state::chessmstdm_io(address_map &map)
 {
 	chessmst_io(map);
-	map(0x4c, 0x4c).w(this, FUNC(chessmst_state::digits_w));
+	map(0x4c, 0x4c).w(FUNC(chessmst_state::digits_w));
 }
 
 WRITE_LINE_MEMBER( chessmst_state::timer_555_w )

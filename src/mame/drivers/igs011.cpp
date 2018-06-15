@@ -72,6 +72,7 @@ Notes:
 #include "sound/ics2115.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -2583,30 +2584,30 @@ void igs011_state::drgnwrld(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
-	map(0x400000, 0x401fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x500000, 0x500001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700003).w("ymsnd", FUNC(ym3812_device::write)).umask16(0x00ff);
 
-	map(0x800000, 0x800003).w(this, FUNC(igs011_state::drgnwrld_igs003_w));
-	map(0x800002, 0x800003).r(this, FUNC(igs011_state::drgnwrld_igs003_r));
+	map(0x800000, 0x800003).w(FUNC(igs011_state::drgnwrld_igs003_w));
+	map(0x800002, 0x800003).r(FUNC(igs011_state::drgnwrld_igs003_r));
 
-	map(0xa20000, 0xa20001).w(this, FUNC(igs011_state::igs011_priority_w));
-	map(0xa40000, 0xa40001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0xa50000, 0xa50001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	map(0xa58000, 0xa58001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(this, FUNC(igs011_state::igs_3_dips_r));
+	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
 }
 
 void igs011_state::drgnwrld_igs012(address_map &map)
@@ -2614,21 +2615,21 @@ void igs011_state::drgnwrld_igs012(address_map &map)
 	drgnwrld(map);
 
 	// IGS012
-	map(0x001600, 0x00160f).w(this, FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
-	map(0x001610, 0x00161f).r(this, FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 0)
-	map(0x001620, 0x00162f).w(this, FUNC(igs011_state::igs012_prot_dec_inc_w)).mirror(0x01c000); // dec  (aa), inc  (fa)
-	map(0x001630, 0x00163f).w(this, FUNC(igs011_state::igs012_prot_inc_w)).mirror(0x01c000); // inc  (ff)
-	map(0x001640, 0x00164f).w(this, FUNC(igs011_state::igs012_prot_copy_w)).mirror(0x01c000); // copy (22)
-	map(0x001650, 0x00165f).w(this, FUNC(igs011_state::igs012_prot_dec_copy_w)).mirror(0x01c000); // dec  (5a), copy (33)
-	map(0x001660, 0x00166f).r(this, FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 1)
-	map(0x001670, 0x00167f).w(this, FUNC(igs011_state::igs012_prot_mode_w)).mirror(0x01c000); // mode (cc / dd)
+	map(0x001600, 0x00160f).w(FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
+	map(0x001610, 0x00161f).r(FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 0)
+	map(0x001620, 0x00162f).w(FUNC(igs011_state::igs012_prot_dec_inc_w)).mirror(0x01c000); // dec  (aa), inc  (fa)
+	map(0x001630, 0x00163f).w(FUNC(igs011_state::igs012_prot_inc_w)).mirror(0x01c000); // inc  (ff)
+	map(0x001640, 0x00164f).w(FUNC(igs011_state::igs012_prot_copy_w)).mirror(0x01c000); // copy (22)
+	map(0x001650, 0x00165f).w(FUNC(igs011_state::igs012_prot_dec_copy_w)).mirror(0x01c000); // dec  (5a), copy (33)
+	map(0x001660, 0x00166f).r(FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 1)
+	map(0x001670, 0x00167f).w(FUNC(igs011_state::igs012_prot_mode_w)).mirror(0x01c000); // mode (cc / dd)
 
-	map(0x00d400, 0x00d43f).w(this, FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
-	map(0x00d440, 0x00d47f).w(this, FUNC(igs011_state::drgnwrld_igs011_prot2_swap_w));   // swap  (33)
-	map(0x00d480, 0x00d4bf).w(this, FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
-	map(0x00d4c0, 0x00d4ff).r(this, FUNC(igs011_state::drgnwrldv20j_igs011_prot2_r));   // read
+	map(0x00d400, 0x00d43f).w(FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
+	map(0x00d440, 0x00d47f).w(FUNC(igs011_state::drgnwrld_igs011_prot2_swap_w));   // swap  (33)
+	map(0x00d480, 0x00d4bf).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
+	map(0x00d4c0, 0x00d4ff).r(FUNC(igs011_state::drgnwrldv20j_igs011_prot2_r));   // read
 
-	map(0x902000, 0x902fff).w(this, FUNC(igs011_state::igs012_prot_reset_w));   // reset?
+	map(0x902000, 0x902fff).w(FUNC(igs011_state::igs012_prot_reset_w));   // reset?
 //  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
 }
 
@@ -2661,38 +2662,38 @@ void igs011_state::lhb(address_map &map)
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
 
-	map(0x010000, 0x010001).w(this, FUNC(igs011_state::lhb_okibank_w));
+	map(0x010000, 0x010001).w(FUNC(igs011_state::lhb_okibank_w));
 
-	map(0x010200, 0x0103ff).w(this, FUNC(igs011_state::igs011_prot2_inc_w));
-	map(0x010400, 0x0105ff).w(this, FUNC(igs011_state::lhb_igs011_prot2_swap_w));
-	map(0x010600, 0x0107ff).r(this, FUNC(igs011_state::lhb_igs011_prot2_r));
+	map(0x010200, 0x0103ff).w(FUNC(igs011_state::igs011_prot2_inc_w));
+	map(0x010400, 0x0105ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));
+	map(0x010600, 0x0107ff).r(FUNC(igs011_state::lhb_igs011_prot2_r));
 	// no reset
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
-	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700001).portr("COIN");
-	map(0x700002, 0x700005).r(this, FUNC(igs011_state::lhb_inputs_r));
-	map(0x700002, 0x700003).w(this, FUNC(igs011_state::lhb_inputs_w));
-	map(0x820000, 0x820001).w(this, FUNC(igs011_state::igs011_priority_w));
-	map(0x838000, 0x838001).w(this, FUNC(igs011_state::lhb_irq_enable_w));
-	map(0x840000, 0x840001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
+	map(0x700002, 0x700003).w(FUNC(igs011_state::lhb_inputs_w));
+	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
+	map(0x838000, 0x838001).w(FUNC(igs011_state::lhb_irq_enable_w));
+	map(0x840000, 0x840001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0x850000, 0x850001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0x850000, 0x850001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE(igs011_prot_fake_r )
 
-	map(0x858000, 0x858001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0x858800, 0x858801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0x859000, 0x859001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0x859800, 0x859801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0x85a000, 0x85a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0x85a800, 0x85a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0x85b000, 0x85b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0x85b800, 0x85b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0x85c000, 0x85c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
-	map(0x888000, 0x888001).r(this, FUNC(igs011_state::igs_5_dips_r));
+	map(0x858000, 0x858001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0x858800, 0x858801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0x859000, 0x859001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0x859800, 0x859801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0x85a000, 0x85a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0x85a800, 0x85a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0x85b000, 0x85b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
+	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_5_dips_r));
 }
 
 void igs011_state::xymg(address_map &map)
@@ -2703,37 +2704,37 @@ void igs011_state::xymg(address_map &map)
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
 
-	map(0x010000, 0x010001).w(this, FUNC(igs011_state::lhb_okibank_w));
+	map(0x010000, 0x010001).w(FUNC(igs011_state::lhb_okibank_w));
 
-	map(0x010200, 0x0103ff).w(this, FUNC(igs011_state::igs011_prot2_inc_w));   // inc  (33)
-	map(0x010400, 0x0105ff).w(this, FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap (33)
-	map(0x010600, 0x0107ff).r(this, FUNC(igs011_state::lhb_igs011_prot2_r));   // read
+	map(0x010200, 0x0103ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc  (33)
+	map(0x010400, 0x0105ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap (33)
+	map(0x010600, 0x0107ff).r(FUNC(igs011_state::lhb_igs011_prot2_r));   // read
 	// no reset
 
 	map(0x100000, 0x103fff).ram();
 	map(0x1f0000, 0x1f3fff).ram().share("nvram"); // extra ram
 	map(0x200000, 0x200fff).ram().share("priority_ram");
-	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700000, 0x700003).w(this, FUNC(igs011_state::xymg_igs003_w));
-	map(0x700002, 0x700003).r(this, FUNC(igs011_state::xymg_igs003_r));
-	map(0x820000, 0x820001).w(this, FUNC(igs011_state::igs011_priority_w));
-	map(0x840000, 0x840001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0x700000, 0x700003).w(FUNC(igs011_state::xymg_igs003_w));
+	map(0x700002, 0x700003).r(FUNC(igs011_state::xymg_igs003_r));
+	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
+	map(0x840000, 0x840001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0x850000, 0x850001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0x850000, 0x850001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE(igs011_prot_fake_r )
 
-	map(0x858000, 0x858001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0x858800, 0x858801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0x859000, 0x859001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0x859800, 0x859801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0x85a000, 0x85a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0x85a800, 0x85a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0x85b000, 0x85b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0x85b800, 0x85b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0x85c000, 0x85c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
-	map(0x888000, 0x888001).r(this, FUNC(igs011_state::igs_3_dips_r));
+	map(0x858000, 0x858001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0x858800, 0x858801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0x859000, 0x859001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0x859800, 0x859801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0x85a000, 0x85a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0x85a800, 0x85a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0x85b000, 0x85b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
+	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_3_dips_r));
 }
 
 void igs011_state::wlcc(address_map &map)
@@ -2742,36 +2743,36 @@ void igs011_state::wlcc(address_map &map)
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
 
-	map(0x518000, 0x5181ff).w(this, FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (33)
-	map(0x518200, 0x5183ff).w(this, FUNC(igs011_state::wlcc_igs011_prot2_swap_w));   // swap  (33)
-	map(0x518800, 0x5189ff).r(this, FUNC(igs011_state::igs011_prot2_reset_r));   // reset
-	map(0x519000, 0x5195ff).r(this, FUNC(igs011_state::lhb_igs011_prot2_r));   // read
+	map(0x518000, 0x5181ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (33)
+	map(0x518200, 0x5183ff).w(FUNC(igs011_state::wlcc_igs011_prot2_swap_w));   // swap  (33)
+	map(0x518800, 0x5189ff).r(FUNC(igs011_state::igs011_prot2_reset_r));   // reset
+	map(0x519000, 0x5195ff).r(FUNC(igs011_state::lhb_igs011_prot2_r));   // read
 
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
-	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x800000, 0x800003).w(this, FUNC(igs011_state::wlcc_igs003_w));
-	map(0x800002, 0x800003).r(this, FUNC(igs011_state::wlcc_igs003_r));
-	map(0xa20000, 0xa20001).w(this, FUNC(igs011_state::igs011_priority_w));
-	map(0xa40000, 0xa40001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0x800000, 0x800003).w(FUNC(igs011_state::wlcc_igs003_w));
+	map(0x800002, 0x800003).r(FUNC(igs011_state::wlcc_igs003_r));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0xa50000, 0xa50001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	map(0xa58000, 0xa58001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(this, FUNC(igs011_state::igs_4_dips_r));
+	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_4_dips_r));
 }
 
 
@@ -2784,36 +2785,36 @@ void igs011_state::lhb2(address_map &map)
 //  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
 
-	map(0x020000, 0x0201ff).w(this, FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
-	map(0x020200, 0x0203ff).w(this, FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
-	map(0x020400, 0x0205ff).r(this, FUNC(igs011_state::lhb2_igs011_prot2_r));   // read
-	map(0x020600, 0x0207ff).w(this, FUNC(igs011_state::igs011_prot2_reset_w));   // reset (55)
+	map(0x020000, 0x0201ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
+	map(0x020200, 0x0203ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
+	map(0x020400, 0x0205ff).r(FUNC(igs011_state::lhb2_igs011_prot2_r));   // read
+	map(0x020600, 0x0207ff).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (55)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208003).w(this, FUNC(igs011_state::lhb2_igs003_w));
-	map(0x208002, 0x208003).r(this, FUNC(igs011_state::lhb2_igs003_r));
+	map(0x208000, 0x208003).w(FUNC(igs011_state::lhb2_igs003_w));
+	map(0x208002, 0x208003).r(FUNC(igs011_state::lhb2_igs003_r));
 	map(0x20c000, 0x20cfff).ram().share("priority_ram");
-	map(0x210000, 0x211fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x210000, 0x211fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0xa20000, 0xa20001).w(this, FUNC(igs011_state::igs011_priority_w));
-	map(0xa40000, 0xa40001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0xa50000, 0xa50001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	map(0xa58000, 0xa58001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(this, FUNC(igs011_state::igs_3_dips_r));
+	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
 }
 
 
@@ -2827,37 +2828,37 @@ void igs011_state::nkishusp(address_map &map)
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
 
 	// to be done:
-	map(0x023000, 0x0231ff).w(this, FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
-	map(0x023200, 0x0233ff).w(this, FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
-	map(0x023400, 0x0235ff).r(this, FUNC(igs011_state::lhb2_igs011_prot2_r));   // read
-	map(0x023600, 0x0237ff).w(this, FUNC(igs011_state::igs011_prot2_reset_w));   // reset (55)
+	map(0x023000, 0x0231ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
+	map(0x023200, 0x0233ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
+	map(0x023400, 0x0235ff).r(FUNC(igs011_state::lhb2_igs011_prot2_r));   // read
+	map(0x023600, 0x0237ff).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (55)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208003).w(this, FUNC(igs011_state::lhb2_igs003_w));
-	map(0x208002, 0x208003).r(this, FUNC(igs011_state::lhb2_igs003_r));
+	map(0x208000, 0x208003).w(FUNC(igs011_state::lhb2_igs003_w));
+	map(0x208002, 0x208003).r(FUNC(igs011_state::lhb2_igs003_r));
 	map(0x20c000, 0x20cfff).ram().share("priority_ram");
-	map(0x210000, 0x211fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x210000, 0x211fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0xa20000, 0xa20001).w(this, FUNC(igs011_state::igs011_priority_w));
-	map(0xa38000, 0xa38001).w(this, FUNC(igs011_state::lhb_irq_enable_w));
-	map(0xa40000, 0xa40001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
+	map(0xa38000, 0xa38001).w(FUNC(igs011_state::lhb_irq_enable_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0xa50000, 0xa50001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	map(0xa58000, 0xa58001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(this, FUNC(igs011_state::igs_3_dips_r));
+	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
 }
 
 
@@ -2930,73 +2931,73 @@ void igs011_state::vbowl(address_map &map)
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
 
 	// IGS012
-	map(0x001600, 0x00160f).w(this, FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
-	map(0x001610, 0x00161f).r(this, FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 0)
-	map(0x001620, 0x00162f).w(this, FUNC(igs011_state::igs012_prot_dec_inc_w)).mirror(0x01c000); // dec  (aa), inc  (fa)
-	map(0x001630, 0x00163f).w(this, FUNC(igs011_state::igs012_prot_inc_w)).mirror(0x01c000); // inc  (ff)
-	map(0x001640, 0x00164f).w(this, FUNC(igs011_state::igs012_prot_copy_w)).mirror(0x01c000); // copy (22)
-	map(0x001650, 0x00165f).w(this, FUNC(igs011_state::igs012_prot_dec_copy_w)).mirror(0x01c000); // dec  (5a), copy (33)
-	map(0x001660, 0x00166f).r(this, FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 1)
-	map(0x001670, 0x00167f).w(this, FUNC(igs011_state::igs012_prot_mode_w)).mirror(0x01c000); // mode (cc / dd)
+	map(0x001600, 0x00160f).w(FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
+	map(0x001610, 0x00161f).r(FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 0)
+	map(0x001620, 0x00162f).w(FUNC(igs011_state::igs012_prot_dec_inc_w)).mirror(0x01c000); // dec  (aa), inc  (fa)
+	map(0x001630, 0x00163f).w(FUNC(igs011_state::igs012_prot_inc_w)).mirror(0x01c000); // inc  (ff)
+	map(0x001640, 0x00164f).w(FUNC(igs011_state::igs012_prot_copy_w)).mirror(0x01c000); // copy (22)
+	map(0x001650, 0x00165f).w(FUNC(igs011_state::igs012_prot_dec_copy_w)).mirror(0x01c000); // dec  (5a), copy (33)
+	map(0x001660, 0x00166f).r(FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 1)
+	map(0x001670, 0x00167f).w(FUNC(igs011_state::igs012_prot_mode_w)).mirror(0x01c000); // mode (cc / dd)
 
-	map(0x00d400, 0x00d43f).w(this, FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
-	map(0x00d440, 0x00d47f).w(this, FUNC(igs011_state::drgnwrld_igs011_prot2_swap_w));   // swap  (33)
-	map(0x00d480, 0x00d4bf).w(this, FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
-	map(0x00d4c0, 0x00d4ff).r(this, FUNC(igs011_state::drgnwrldv20j_igs011_prot2_r));   // read
+	map(0x00d400, 0x00d43f).w(FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
+	map(0x00d440, 0x00d47f).w(FUNC(igs011_state::drgnwrld_igs011_prot2_swap_w));   // swap  (33)
+	map(0x00d480, 0x00d4bf).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
+	map(0x00d4c0, 0x00d4ff).r(FUNC(igs011_state::drgnwrldv20j_igs011_prot2_r));   // read
 
-	map(0x50f000, 0x50f1ff).w(this, FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
-	map(0x50f200, 0x50f3ff).w(this, FUNC(igs011_state::vbowl_igs011_prot2_swap_w));   // swap  (33)
-	map(0x50f400, 0x50f5ff).w(this, FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
-	map(0x50f600, 0x50f7ff).r(this, FUNC(igs011_state::vbowl_igs011_prot2_r));   // read
+	map(0x50f000, 0x50f1ff).w(FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
+	map(0x50f200, 0x50f3ff).w(FUNC(igs011_state::vbowl_igs011_prot2_swap_w));   // swap  (33)
+	map(0x50f400, 0x50f5ff).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
+	map(0x50f600, 0x50f7ff).r(FUNC(igs011_state::vbowl_igs011_prot2_r));   // read
 
-	map(0x902000, 0x902fff).w(this, FUNC(igs011_state::igs012_prot_reset_w));   // reset?
+	map(0x902000, 0x902fff).w(FUNC(igs011_state::igs012_prot_reset_w));   // reset?
 //  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
-	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x520000, 0x520001).portr("COIN");
-	map(0x600000, 0x600007).rw(this, FUNC(igs011_state::ics2115_word_r), FUNC(igs011_state::ics2115_word_w));
+	map(0x600000, 0x600007).rw(FUNC(igs011_state::ics2115_word_r), FUNC(igs011_state::ics2115_word_w));
 	map(0x700000, 0x700003).ram().share("vbowl_trackball");
-	map(0x700004, 0x700005).w(this, FUNC(igs011_state::vbowl_pen_hi_w));
-	map(0x800000, 0x800003).w(this, FUNC(igs011_state::vbowl_igs003_w));
-	map(0x800002, 0x800003).r(this, FUNC(igs011_state::vbowl_igs003_r));
+	map(0x700004, 0x700005).w(FUNC(igs011_state::vbowl_pen_hi_w));
+	map(0x800000, 0x800003).w(FUNC(igs011_state::vbowl_igs003_w));
+	map(0x800002, 0x800003).r(FUNC(igs011_state::vbowl_igs003_r));
 
-	map(0xa00000, 0xa00001).w(this, FUNC(igs011_state::vbowl_link_0_w));
-	map(0xa08000, 0xa08001).w(this, FUNC(igs011_state::vbowl_link_1_w));
-	map(0xa10000, 0xa10001).w(this, FUNC(igs011_state::vbowl_link_2_w));
-	map(0xa18000, 0xa18001).w(this, FUNC(igs011_state::vbowl_link_3_w));
+	map(0xa00000, 0xa00001).w(FUNC(igs011_state::vbowl_link_0_w));
+	map(0xa08000, 0xa08001).w(FUNC(igs011_state::vbowl_link_1_w));
+	map(0xa10000, 0xa10001).w(FUNC(igs011_state::vbowl_link_2_w));
+	map(0xa18000, 0xa18001).w(FUNC(igs011_state::vbowl_link_3_w));
 
-	map(0xa20000, 0xa20001).w(this, FUNC(igs011_state::igs011_priority_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 //  AM_RANGE( 0xa38000, 0xa38001 ) AM_WRITE(lhb_irq_enable_w )
-	map(0xa40000, 0xa40001).w(this, FUNC(igs011_state::igs_dips_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
-	map(0xa48000, 0xa48001).w(this, FUNC(igs011_state::igs011_prot_addr_w));
+	map(0xa48000, 0xa48001).w(FUNC(igs011_state::igs011_prot_addr_w));
 //  AM_RANGE( 0xa48000, 0xa48005 ) AM_WRITE(igs011_prot_fake_r )
 
-	map(0xa58000, 0xa58001).w(this, FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(this, FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(this, FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(this, FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(this, FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(this, FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(this, FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(this, FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(this, FUNC(igs011_state::igs011_blit_depth_w));
+	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
+	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
+	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
+	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
+	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
+	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
+	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
+	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
+	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
 
-	map(0xa80000, 0xa80001).r(this, FUNC(igs011_state::vbowl_unk_r)); // comm
-	map(0xa88000, 0xa88001).r(this, FUNC(igs011_state::igs_4_dips_r));
-	map(0xa90000, 0xa90001).r(this, FUNC(igs011_state::vbowl_unk_r)); // comm
-	map(0xa98000, 0xa98001).r(this, FUNC(igs011_state::vbowl_unk_r)); // comm
+	map(0xa80000, 0xa80001).r(FUNC(igs011_state::vbowl_unk_r)); // comm
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_4_dips_r));
+	map(0xa90000, 0xa90001).r(FUNC(igs011_state::vbowl_unk_r)); // comm
+	map(0xa98000, 0xa98001).r(FUNC(igs011_state::vbowl_unk_r)); // comm
 }
 
 
 void igs011_state::vbowlhk(address_map &map)
 {
 	vbowl(map);
-	map(0x800000, 0x800003).w(this, FUNC(igs011_state::vbowlhk_igs003_w));
-	map(0x50f600, 0x50f7ff).r(this, FUNC(igs011_state::vbowlhk_igs011_prot2_r));   // read
+	map(0x800000, 0x800003).w(FUNC(igs011_state::vbowlhk_igs003_w));
+	map(0x50f600, 0x50f7ff).r(FUNC(igs011_state::vbowlhk_igs011_prot2_r));   // read
 }
 
 

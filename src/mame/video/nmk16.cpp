@@ -40,7 +40,7 @@ template<int Bank, int Gfx>
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_bg_tile_info)
 {
 	int code = m_nmk_bgvideoram[Bank][(m_tilerambank << 13)|tile_index];
-	SET_TILE_INFO_MEMBER(Gfx,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
+	SET_TILE_INFO_MEMBER(Gfx,(code & 0xfff) | (m_bgbank << 12),code >> 12,0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_tx_tile_info)

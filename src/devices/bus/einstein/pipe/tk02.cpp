@@ -26,7 +26,7 @@ void tk02_device::map(address_map &map)
 //  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
 	map(0x08, 0x08).mirror(0xff00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).mirror(0xff00).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x0c, 0x0c).mirror(0xff00).r(this, FUNC(tk02_device::status_r));
+	map(0x0c, 0x0c).mirror(0xff00).r(FUNC(tk02_device::status_r));
 }
 
 //-------------------------------------------------

@@ -11,7 +11,7 @@ MACHINE_CONFIG_START(voodoo_1_pci_device::device_add_mconfig)
 	MCFG_VOODOO_FBMEM(4)
 	MCFG_VOODOO_TMUMEM(1, 0)
 MACHINE_CONFIG_END
-	
+
 MACHINE_CONFIG_START(voodoo_2_pci_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(4)
@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(VOODOO_3_PCI, voodoo_3_pci_device, "voodoo_3_pci", "Voodoo 3 
 void voodoo_pci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x40, 0x5f).rw(this, FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
+	map(0x40, 0x5f).rw(FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
 }
 
 // VOODOO_1 & VOODOO_2 map

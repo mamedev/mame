@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 #include "vbiparse.h"
 #include "avhuff.h"

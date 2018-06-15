@@ -31,6 +31,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -72,10 +73,10 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	m_led[0] = BIT(data, 0);
-	m_led[1] = BIT(data, 1);
-	m_led[2] = BIT(data, 2);
-	m_led[3] = BIT(data, 3);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
+	m_leds[2] = BIT(data, 2);
+	m_leds[3] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
@@ -156,13 +157,13 @@ WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 
 void mainevt_state::mainevt_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
 
-	map(0x1f80, 0x1f80).w(this, FUNC(mainevt_state::mainevt_bankswitch_w));
+	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::mainevt_bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); /* probably */
-	map(0x1f88, 0x1f88).w(this, FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
+	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
 	map(0x1f8c, 0x1f8d).nopw();    /* ??? */
-	map(0x1f90, 0x1f90).w(this, FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
+	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -182,12 +183,12 @@ void mainevt_state::mainevt_map(address_map &map)
 
 void mainevt_state::devstors_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
 
-	map(0x1f80, 0x1f80).w(this, FUNC(mainevt_state::mainevt_bankswitch_w));
+	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::mainevt_bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); /* probably */
-	map(0x1f88, 0x1f88).w(this, FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
-	map(0x1f90, 0x1f90).w(this, FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
+	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
+	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -196,7 +197,7 @@ void mainevt_state::devstors_map(address_map &map)
 	map(0x1f98, 0x1f98).portr("DSW3");
 	map(0x1f9b, 0x1f9b).portr("DSW2");
 	map(0x1fa0, 0x1fbf).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
-	map(0x1fb2, 0x1fb2).w(this, FUNC(mainevt_state::dv_nmienable_w));
+	map(0x1fb2, 0x1fb2).w(FUNC(mainevt_state::dv_nmienable_w));
 
 	map(0x4000, 0x5dff).ram();
 	map(0x5e00, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -212,9 +213,9 @@ void mainevt_state::mainevt_sound_map(address_map &map)
 	map(0x9000, 0x9000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xd000, 0xd000).r(this, FUNC(mainevt_state::mainevt_sh_busy_r));
-	map(0xe000, 0xe000).w(this, FUNC(mainevt_state::mainevt_sh_irqcontrol_w));
-	map(0xf000, 0xf000).w(this, FUNC(mainevt_state::mainevt_sh_bankswitch_w));
+	map(0xd000, 0xd000).r(FUNC(mainevt_state::mainevt_sh_busy_r));
+	map(0xe000, 0xe000).w(FUNC(mainevt_state::mainevt_sh_irqcontrol_w));
+	map(0xf000, 0xf000).w(FUNC(mainevt_state::mainevt_sh_bankswitch_w));
 }
 
 void mainevt_state::devstors_sound_map(address_map &map)
@@ -224,8 +225,8 @@ void mainevt_state::devstors_sound_map(address_map &map)
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).w(this, FUNC(mainevt_state::devstor_sh_irqcontrol_w));
-	map(0xf000, 0xf000).w(this, FUNC(mainevt_state::dv_sh_bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(mainevt_state::devstor_sh_irqcontrol_w));
+	map(0xf000, 0xf000).w(FUNC(mainevt_state::dv_sh_bankswitch_w));
 }
 
 
@@ -388,7 +389,7 @@ WRITE8_MEMBER(mainevt_state::volume_callback)
 
 void mainevt_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_nmi_enable));

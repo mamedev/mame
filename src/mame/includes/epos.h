@@ -6,6 +6,8 @@
 
 **************************************************************************/
 
+#include "emupal.h"
+
 class epos_state : public driver_device
 {
 public:
@@ -15,7 +17,7 @@ public:
 		m_inputs(*this, { "INPUTS", "INPUTS2" }),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 		{ }
 
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
@@ -40,7 +42,7 @@ public:
 	void epos_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -55,5 +57,5 @@ protected:
 	bool     m_ay_porta_multiplex;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };

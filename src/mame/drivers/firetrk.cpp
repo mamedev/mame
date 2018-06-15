@@ -69,16 +69,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 {
 	/* BIT0 => START1 LAMP */
-	m_led[0] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 0);
 
 	/* BIT1 => START2 LAMP */
-	m_led[1]= BIT(~data, 1);
+	m_leds[1]= BIT(~data, 1);
 
 	/* BIT2 => FLASH       */
 	m_flash = data & 0x04;
 
 	/* BIT3 => TRACK LAMP  */
-	m_led[3] = BIT(~data, 3);
+	m_leds[3] = BIT(~data, 3);
 
 	/* BIT4 => ATTRACT     */
 	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
@@ -86,7 +86,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	machine().bookkeeping().coin_lockout_w(1, !(data & 0x10));
 
 	/* BIT5 => START3 LAMP */
-	m_led[2] = BIT(~data, 5);
+	m_leds[2] = BIT(~data, 5);
 
 	/* BIT6 => UNUSED      */
 
@@ -98,7 +98,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 WRITE8_MEMBER(firetrk_state::superbug_output_w)
 {
 	/* BIT0 => START LAMP */
-	m_led[0] = BIT(offset, 0);
+	m_leds[0] = BIT(offset, 0);
 
 	/* BIT1 => ATTRACT    */
 	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
@@ -109,17 +109,17 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 	m_flash = offset & 0x04;
 
 	/* BIT3 => TRACK LAMP */
-	m_led[1] = BIT(offset, 3);
+	m_leds[1] = BIT(offset, 3);
 }
 
 
 WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 {
 	/* BIT0 => START LAMP    */
-	m_led[0] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 0);
 
 	/* BIT1 => TRACK LAMP    */
-	m_led[1] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 1);
 
 	/* BIT2 => ATTRACT       */
 	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);
@@ -302,22 +302,22 @@ void firetrk_state::firetrk_map(address_map &map)
 	map(0x0800, 0x08ff).mirror(0x0700).ram().share("playfield_ram");
 	map(0x1000, 0x1000).mirror(0x001f).writeonly().share("scroll_y");
 	map(0x1020, 0x1020).mirror(0x001f).writeonly().share("scroll_x");
-	map(0x1040, 0x1040).mirror(0x001f).w(this, FUNC(firetrk_state::crash_reset_w));
-	map(0x1060, 0x1060).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_skid_reset_w));
+	map(0x1040, 0x1040).mirror(0x001f).w(FUNC(firetrk_state::crash_reset_w));
+	map(0x1060, 0x1060).mirror(0x001f).w(FUNC(firetrk_state::firetrk_skid_reset_w));
 	map(0x1080, 0x1080).mirror(0x001f).writeonly().share("car_rot");
-	map(0x10a0, 0x10a0).mirror(0x001f).w(this, FUNC(firetrk_state::steer_reset_w));
+	map(0x10a0, 0x10a0).mirror(0x001f).w(FUNC(firetrk_state::steer_reset_w));
 	map(0x10c0, 0x10c0).mirror(0x001f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x10e0, 0x10e0).mirror(0x001f).w(this, FUNC(firetrk_state::blink_on_w)).share("blink");
-	map(0x1400, 0x1400).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_motor_snd_w));
-	map(0x1420, 0x1420).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_crash_snd_w));
-	map(0x1440, 0x1440).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_skid_snd_w));
+	map(0x10e0, 0x10e0).mirror(0x001f).w(FUNC(firetrk_state::blink_on_w)).share("blink");
+	map(0x1400, 0x1400).mirror(0x001f).w(FUNC(firetrk_state::firetrk_motor_snd_w));
+	map(0x1420, 0x1420).mirror(0x001f).w(FUNC(firetrk_state::firetrk_crash_snd_w));
+	map(0x1440, 0x1440).mirror(0x001f).w(FUNC(firetrk_state::firetrk_skid_snd_w));
 	map(0x1460, 0x1460).mirror(0x001f).writeonly().share("drone_x");
 	map(0x1480, 0x1480).mirror(0x001f).writeonly().share("drone_y");
 	map(0x14a0, 0x14a0).mirror(0x001f).writeonly().share("drone_rot");
-	map(0x14c0, 0x14c0).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_output_w));
-	map(0x14e0, 0x14e0).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_xtndply_w));
-	map(0x1800, 0x1807).mirror(0x03f8).r(this, FUNC(firetrk_state::firetrk_input_r)).nopw();
-	map(0x1c00, 0x1c03).mirror(0x03fc).r(this, FUNC(firetrk_state::firetrk_dip_r));
+	map(0x14c0, 0x14c0).mirror(0x001f).w(FUNC(firetrk_state::firetrk_output_w));
+	map(0x14e0, 0x14e0).mirror(0x001f).w(FUNC(firetrk_state::firetrk_xtndply_w));
+	map(0x1800, 0x1807).mirror(0x03f8).r(FUNC(firetrk_state::firetrk_input_r)).nopw();
+	map(0x1c00, 0x1c03).mirror(0x03fc).r(FUNC(firetrk_state::firetrk_dip_r));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -328,19 +328,19 @@ void firetrk_state::superbug_map(address_map &map)
 	map(0x0000, 0x00ff).ram();
 	map(0x0100, 0x0100).mirror(0x001f).writeonly().share("scroll_y");
 	map(0x0120, 0x0120).mirror(0x001f).writeonly().share("scroll_x");
-	map(0x0140, 0x0140).mirror(0x001f).w(this, FUNC(firetrk_state::crash_reset_w));
-	map(0x0160, 0x0160).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_skid_reset_w));
+	map(0x0140, 0x0140).mirror(0x001f).w(FUNC(firetrk_state::crash_reset_w));
+	map(0x0160, 0x0160).mirror(0x001f).w(FUNC(firetrk_state::firetrk_skid_reset_w));
 	map(0x0180, 0x0180).mirror(0x001f).writeonly().share("car_rot");
-	map(0x01a0, 0x01a0).mirror(0x001f).w(this, FUNC(firetrk_state::steer_reset_w));
+	map(0x01a0, 0x01a0).mirror(0x001f).w(FUNC(firetrk_state::steer_reset_w));
 	map(0x01c0, 0x01c0).mirror(0x001f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x01e0, 0x01e0).mirror(0x001f).w(this, FUNC(firetrk_state::blink_on_w)).share("blink");
-	map(0x0200, 0x0207).mirror(0x0018).r(this, FUNC(firetrk_state::firetrk_input_r));
-	map(0x0220, 0x0220).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_xtndply_w));
-	map(0x0240, 0x0243).mirror(0x001c).r(this, FUNC(firetrk_state::firetrk_dip_r));
-	map(0x0260, 0x026f).mirror(0x0010).w(this, FUNC(firetrk_state::superbug_output_w));
-	map(0x0280, 0x0280).mirror(0x001f).w(this, FUNC(firetrk_state::superbug_motor_snd_w));
-	map(0x02a0, 0x02a0).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_crash_snd_w));
-	map(0x02c0, 0x02c0).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_skid_snd_w));
+	map(0x01e0, 0x01e0).mirror(0x001f).w(FUNC(firetrk_state::blink_on_w)).share("blink");
+	map(0x0200, 0x0207).mirror(0x0018).r(FUNC(firetrk_state::firetrk_input_r));
+	map(0x0220, 0x0220).mirror(0x001f).w(FUNC(firetrk_state::firetrk_xtndply_w));
+	map(0x0240, 0x0243).mirror(0x001c).r(FUNC(firetrk_state::firetrk_dip_r));
+	map(0x0260, 0x026f).mirror(0x0010).w(FUNC(firetrk_state::superbug_output_w));
+	map(0x0280, 0x0280).mirror(0x001f).w(FUNC(firetrk_state::superbug_motor_snd_w));
+	map(0x02a0, 0x02a0).mirror(0x001f).w(FUNC(firetrk_state::firetrk_crash_snd_w));
+	map(0x02c0, 0x02c0).mirror(0x001f).w(FUNC(firetrk_state::firetrk_skid_snd_w));
 	map(0x0400, 0x041f).ram().share("alpha_num_ram");
 	map(0x0500, 0x05ff).ram().share("playfield_ram");
 	map(0x0800, 0x1fff).rom();
@@ -354,22 +354,22 @@ void firetrk_state::montecar_map(address_map &map)
 	map(0x0800, 0x08ff).mirror(0x0700).ram().share("playfield_ram");
 	map(0x1000, 0x1000).mirror(0x001f).writeonly().share("scroll_y");
 	map(0x1020, 0x1020).mirror(0x001f).writeonly().share("scroll_x");
-	map(0x1040, 0x1040).mirror(0x001f).w(this, FUNC(firetrk_state::montecar_drone_reset_w));
-	map(0x1060, 0x1060).mirror(0x001f).w(this, FUNC(firetrk_state::montecar_car_reset_w));
+	map(0x1040, 0x1040).mirror(0x001f).w(FUNC(firetrk_state::montecar_drone_reset_w));
+	map(0x1060, 0x1060).mirror(0x001f).w(FUNC(firetrk_state::montecar_car_reset_w));
 	map(0x1080, 0x1080).mirror(0x001f).writeonly().share("car_rot");
-	map(0x10a0, 0x10a0).mirror(0x001f).w(this, FUNC(firetrk_state::steer_reset_w));
+	map(0x10a0, 0x10a0).mirror(0x001f).w(FUNC(firetrk_state::steer_reset_w));
 	map(0x10c0, 0x10c0).mirror(0x001f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x10e0, 0x10e0).mirror(0x001f).w(this, FUNC(firetrk_state::montecar_skid_reset_w));
-	map(0x1400, 0x1400).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_motor_snd_w));
-	map(0x1420, 0x1420).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_crash_snd_w));
-	map(0x1440, 0x1440).mirror(0x001f).w(this, FUNC(firetrk_state::firetrk_skid_snd_w));
+	map(0x10e0, 0x10e0).mirror(0x001f).w(FUNC(firetrk_state::montecar_skid_reset_w));
+	map(0x1400, 0x1400).mirror(0x001f).w(FUNC(firetrk_state::firetrk_motor_snd_w));
+	map(0x1420, 0x1420).mirror(0x001f).w(FUNC(firetrk_state::firetrk_crash_snd_w));
+	map(0x1440, 0x1440).mirror(0x001f).w(FUNC(firetrk_state::firetrk_skid_snd_w));
 	map(0x1460, 0x1460).mirror(0x001f).writeonly().share("drone_x");
 	map(0x1480, 0x1480).mirror(0x001f).writeonly().share("drone_y");
 	map(0x14a0, 0x14a0).mirror(0x001f).writeonly().share("drone_rot");
-	map(0x14c0, 0x14c0).mirror(0x001f).w(this, FUNC(firetrk_state::montecar_output_1_w));
-	map(0x14e0, 0x14e0).mirror(0x001f).w(this, FUNC(firetrk_state::montecar_output_2_w));
-	map(0x1800, 0x1807).mirror(0x03f8).r(this, FUNC(firetrk_state::montecar_input_r)).nopw();
-	map(0x1c00, 0x1c03).mirror(0x03fc).r(this, FUNC(firetrk_state::montecar_dip_r));
+	map(0x14c0, 0x14c0).mirror(0x001f).w(FUNC(firetrk_state::montecar_output_1_w));
+	map(0x14e0, 0x14e0).mirror(0x001f).w(FUNC(firetrk_state::montecar_output_2_w));
+	map(0x1800, 0x1807).mirror(0x03f8).r(FUNC(firetrk_state::montecar_input_r)).nopw();
+	map(0x1c00, 0x1c03).mirror(0x03fc).r(FUNC(firetrk_state::montecar_dip_r));
 	map(0x2000, 0x3fff).rom();
 }
 

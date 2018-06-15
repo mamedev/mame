@@ -43,6 +43,7 @@ To do:
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -60,7 +61,7 @@ public:
 		m_hopper(*this, "hopper"),
 		m_ticket(*this, "ticket"),
 		m_spriteram(*this, "spriteram"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	// devices
@@ -106,7 +107,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	output_finder<7> m_lamp;
+	output_finder<7> m_lamps;
 };
 
 /***************************************************************************
@@ -246,17 +247,17 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0,    (data & 0x0004));   // coin counter
-		m_lamp[0] = BIT(data, 3);   // you win
+		m_lamps[0] = BIT(data, 3);   // you win
 		if ((data & 0x0010)) machine().bookkeeping().increment_dispensed_tickets(1); // coin out
-		m_lamp[1] = BIT(data, 5);   // coin/hopper jam
+		m_lamps[1] = BIT(data, 5);   // coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		m_lamp[2] = BIT(data, 8);   // bet
-		m_lamp[3] = BIT(data, 11);   // start
-		m_lamp[4] = BIT(data, 12);   // ? select/choose
-		m_lamp[5] = BIT(data, 13);   // ? select/choose
-		m_lamp[6] = BIT(data, 15);   // look
+		m_lamps[2] = BIT(data, 8);   // bet
+		m_lamps[3] = BIT(data, 11);   // start
+		m_lamps[4] = BIT(data, 12);   // ? select/choose
+		m_lamps[5] = BIT(data, 13);   // ? select/choose
+		m_lamps[6] = BIT(data, 15);   // look
 	}
 //  popmessage("%04X",data);
 }
@@ -286,18 +287,18 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));   // key out |
 		m_hopper->motor_w(BIT(data, 3));                           // hopper motor?
 		//                                  BIT(data, 4)           // hopper?
-		m_lamp[0] = BIT(data, 5);                   // error lamp (coin/hopper jam: "call attendant")
+		m_lamps[0] = BIT(data, 5);                   // error lamp (coin/hopper jam: "call attendant")
 		m_ticket->motor_w(BIT(data, 7));                           // ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		m_lamp[1] = BIT(data, 8);    // select
-		m_lamp[2] = BIT(data, 10);   // take
-		m_lamp[3] = BIT(data, 11);   // bet
-		m_lamp[4] = BIT(data, 12);   // start
-		m_lamp[5] = BIT(data, 14);   // win / test
-		m_lamp[6] = BIT(data, 15);   // ticket?
+		m_lamps[1] = BIT(data, 8);    // select
+		m_lamps[2] = BIT(data, 10);   // take
+		m_lamps[3] = BIT(data, 11);   // bet
+		m_lamps[4] = BIT(data, 12);   // start
+		m_lamps[5] = BIT(data, 14);   // win / test
+		m_lamps[6] = BIT(data, 15);   // ticket?
 	}
 
 //  popmessage("%04X",data);
@@ -321,16 +322,16 @@ void astrocorp_state::showhand_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x050000, 0x050fff).ram().share("spriteram");
-	map(0x052000, 0x052001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x052000, 0x052001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
 	map(0x054000, 0x054001).portr("INPUTS");
-	map(0x058000, 0x058001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
-	map(0x05a000, 0x05a001).w(this, FUNC(astrocorp_state::showhand_outputs_w));
+	map(0x058000, 0x058001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x05a000, 0x05a001).w(FUNC(astrocorp_state::showhand_outputs_w));
 	map(0x05e000, 0x05e001).portr("EEPROMIN");
 	map(0x060000, 0x0601ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x070000, 0x073fff).ram().share("nvram"); // battery
-	map(0x080000, 0x080001).w(this, FUNC(astrocorp_state::astrocorp_sound_bank_w));
-	map(0x0a0000, 0x0a0001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0x0d0000, 0x0d0001).r(this, FUNC(astrocorp_state::astrocorp_unk_r));
+	map(0x080000, 0x080001).w(FUNC(astrocorp_state::astrocorp_sound_bank_w));
+	map(0x0a0000, 0x0a0001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x0d0000, 0x0d0001).r(FUNC(astrocorp_state::astrocorp_unk_r));
 	map(0x0d0000, 0x0d0000).w(m_oki, FUNC(okim6295_device::write));
 }
 
@@ -338,16 +339,16 @@ void astrocorp_state::showhanc_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x060000, 0x0601ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x070000, 0x070001).w(this, FUNC(astrocorp_state::astrocorp_sound_bank_w));
+	map(0x070000, 0x070001).w(FUNC(astrocorp_state::astrocorp_sound_bank_w));
 	map(0x080000, 0x080fff).ram().share("spriteram");
-	map(0x082000, 0x082001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x082000, 0x082001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
 	map(0x084000, 0x084001).portr("INPUTS");
-	map(0x088000, 0x088001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
-	map(0x08a000, 0x08a001).w(this, FUNC(astrocorp_state::showhand_outputs_w));
+	map(0x088000, 0x088001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x08a000, 0x08a001).w(FUNC(astrocorp_state::showhand_outputs_w));
 	map(0x08e000, 0x08e001).portr("EEPROMIN");
 	map(0x090000, 0x093fff).ram().share("nvram"); // battery
-	map(0x0a0000, 0x0a0001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0x0e0000, 0x0e0001).r(this, FUNC(astrocorp_state::astrocorp_unk_r));
+	map(0x0a0000, 0x0a0001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x0e0000, 0x0e0001).r(FUNC(astrocorp_state::astrocorp_unk_r));
 	map(0x0e0000, 0x0e0000).w(m_oki, FUNC(okim6295_device::write));
 }
 
@@ -355,15 +356,15 @@ void astrocorp_state::skilldrp_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x200fff).ram().share("spriteram");
-	map(0x202000, 0x202001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x202000, 0x202001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
 	map(0x204000, 0x204001).portr("INPUTS");
-	map(0x208000, 0x208001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
-	map(0x20a000, 0x20a001).w(this, FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x208000, 0x208001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x20a000, 0x20a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
 	map(0x20e000, 0x20e001).portr("EEPROMIN");
 	map(0x380000, 0x3801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x400001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x400000, 0x400001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
 	map(0x500000, 0x507fff).ram().share("nvram"); // battery
-	map(0x580000, 0x580001).w(this, FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	map(0x580000, 0x580001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -372,14 +373,14 @@ void astrocorp_state::speeddrp_map(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x280000, 0x283fff).ram().share("nvram"); // battery
 	map(0x380000, 0x380fff).ram().share("spriteram");
-	map(0x382000, 0x382001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x382000, 0x382001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
 	map(0x384000, 0x384001).portr("INPUTS");
-	map(0x388000, 0x388001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
-	map(0x38a000, 0x38a001).w(this, FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x388000, 0x388001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x38a000, 0x38a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
 	map(0x38e000, 0x38e001).portr("EEPROMIN");
 	map(0x480000, 0x4801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x500001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0x580000, 0x580001).w(this, FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	map(0x500000, 0x500001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x580000, 0x580001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -503,7 +504,7 @@ static const uint16_t showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x00
 
 void astrocorp_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 
@@ -527,8 +528,8 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -580,7 +581,7 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

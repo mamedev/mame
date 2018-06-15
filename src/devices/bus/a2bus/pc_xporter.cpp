@@ -102,9 +102,9 @@ void a2bus_pcxporter_device::pc_io(address_map &map)
 	map(0x0000, 0x000f).rw("dma8237", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x0060, 0x0065).rw(this, FUNC(a2bus_pcxporter_device::kbd_6502_r), FUNC(a2bus_pcxporter_device::kbd_6502_w));
-	map(0x0080, 0x008f).w(this, FUNC(a2bus_pcxporter_device::pc_page_w));
-	map(0x00a0, 0x00a1).w(this, FUNC(a2bus_pcxporter_device::nmi_enable_w));
+	map(0x0060, 0x0065).rw(FUNC(a2bus_pcxporter_device::kbd_6502_r), FUNC(a2bus_pcxporter_device::kbd_6502_w));
+	map(0x0080, 0x008f).w(FUNC(a2bus_pcxporter_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(FUNC(a2bus_pcxporter_device::nmi_enable_w));
 }
 
 /***************************************************************************

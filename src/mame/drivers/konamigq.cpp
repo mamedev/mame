@@ -171,7 +171,7 @@ void konamigq_state::konamigq_map(address_map &map)
 {
 	map(0x1f000000, 0x1f00001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
 	map(0x1f100000, 0x1f10001f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w)).umask32(0x00ff00ff);
-	map(0x1f180000, 0x1f180001).w(this, FUNC(konamigq_state::eeprom_w));
+	map(0x1f180000, 0x1f180001).w(FUNC(konamigq_state::eeprom_w));
 	map(0x1f198000, 0x1f198003).nopw();            /* cabinet lamps? */
 	map(0x1f1a0000, 0x1f1a0003).nopw();            /* indicates gun trigger */
 	map(0x1f200000, 0x1f200003).portr("GUNX1");
@@ -183,7 +183,7 @@ void konamigq_state::konamigq_map(address_map &map)
 	map(0x1f230000, 0x1f230003).portr("P1_P2");
 	map(0x1f230004, 0x1f230007).portr("P3_SERVICE");
 	map(0x1f238000, 0x1f238003).portr("DSW");
-	map(0x1f300000, 0x1f5fffff).rw(this, FUNC(konamigq_state::pcmram_r), FUNC(konamigq_state::pcmram_w)).umask32(0x00ff00ff);
+	map(0x1f300000, 0x1f5fffff).rw(FUNC(konamigq_state::pcmram_r), FUNC(konamigq_state::pcmram_w)).umask32(0x00ff00ff);
 	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
 	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
 }
@@ -237,9 +237,9 @@ void konamigq_state::konamigq_sound_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x2004ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
 	map(0x200000, 0x2004ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300001).rw(this, FUNC(konamigq_state::tms57002_data_word_r), FUNC(konamigq_state::tms57002_data_word_w));
+	map(0x300000, 0x300001).rw(FUNC(konamigq_state::tms57002_data_word_r), FUNC(konamigq_state::tms57002_data_word_w));
 	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
-	map(0x500000, 0x500001).rw(this, FUNC(konamigq_state::tms57002_status_word_r), FUNC(konamigq_state::tms57002_control_word_w));
+	map(0x500000, 0x500001).rw(FUNC(konamigq_state::tms57002_status_word_r), FUNC(konamigq_state::tms57002_control_word_w));
 	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
 }
 
@@ -349,8 +349,8 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq)
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(konamigq_def_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)

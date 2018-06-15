@@ -55,7 +55,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(mk1_f8_r);
@@ -74,7 +74,7 @@ private:
 	uint8_t m_led_data[4];
 	required_device<cpu_device> m_maincpu;
 	output_finder<4> m_digits;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 };
 
 
@@ -126,7 +126,7 @@ void mk1_state::mk1_mem(address_map &map)
 
 void mk1_state::mk1_io(address_map &map)
 {
-	map(0x0, 0x1).rw(this, FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
+	map(0x0, 0x1).rw(FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
@@ -172,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 	for (int i = 0; i < 4; i++)
 	{
 		m_digits[i] = m_led_data[i] >> 1;
-		m_led[i] = m_led_data[i] & 0x01;
+		m_leds[i] = m_led_data[i] & 0x01;
 		m_led_data[i] = 0;
 	}
 }
@@ -181,7 +181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 void mk1_state::machine_start()
 {
 	m_digits.resolve();
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 

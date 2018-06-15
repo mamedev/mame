@@ -41,6 +41,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -471,32 +472,32 @@ void firefox_state::machine_start()
 void firefox_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(firefox_state::tileram_w)).share("tileram");
+	map(0x1000, 0x1fff).ram().w(FUNC(firefox_state::tileram_w)).share("tileram");
 	map(0x2000, 0x27ff).ram().share("spriteram");
-	map(0x2800, 0x2aff).ram().w(this, FUNC(firefox_state::sprite_palette_w)).share("sprite_palette");
-	map(0x2b00, 0x2b00).mirror(0x04ff).w(this, FUNC(firefox_state::firefox_objram_bank_w));
-	map(0x2c00, 0x2eff).ram().w(this, FUNC(firefox_state::tile_palette_w)).share("tile_palette");
+	map(0x2800, 0x2aff).ram().w(FUNC(firefox_state::sprite_palette_w)).share("sprite_palette");
+	map(0x2b00, 0x2b00).mirror(0x04ff).w(FUNC(firefox_state::firefox_objram_bank_w));
+	map(0x2c00, 0x2eff).ram().w(FUNC(firefox_state::tile_palette_w)).share("tile_palette");
 	map(0x3000, 0x3fff).bankr("mainbank");
-	map(0x4000, 0x40ff).rw(this, FUNC(firefox_state::nvram_r), FUNC(firefox_state::nvram_w));                     /* NOVRAM */
+	map(0x4000, 0x40ff).rw(FUNC(firefox_state::nvram_r), FUNC(firefox_state::nvram_w));                     /* NOVRAM */
 	map(0x4100, 0x4100).mirror(0x00f8).portr("rdin0");            /* RDIN0 */
 	map(0x4101, 0x4101).mirror(0x00f8).portr("rdin1");            /* RDIN1 */
-	map(0x4102, 0x4102).mirror(0x00f8).r(this, FUNC(firefox_state::firefox_disc_status_r));   /* RDIN2 */
+	map(0x4102, 0x4102).mirror(0x00f8).r(FUNC(firefox_state::firefox_disc_status_r));   /* RDIN2 */
 	map(0x4103, 0x4103).mirror(0x00f8).portr("opt0");             /* OPT0 */
 	map(0x4104, 0x4104).mirror(0x00f8).portr("opt1");             /* OPT1 */
-	map(0x4105, 0x4105).mirror(0x00f8).r(this, FUNC(firefox_state::firefox_disc_data_r));     /* DREAD */
+	map(0x4105, 0x4105).mirror(0x00f8).r(FUNC(firefox_state::firefox_disc_data_r));     /* DREAD */
 	map(0x4106, 0x4106).mirror(0x00f8).r(m_soundlatch2, FUNC(generic_latch_8_device::read));         /* RDSOUND */
 	map(0x4107, 0x4107).mirror(0x00f8).r("adc", FUNC(adc0808_device::data_r));               /* ADC */
-	map(0x4200, 0x4200).mirror(0x0047).w(this, FUNC(firefox_state::main_irq_clear_w));       /* RSTIRQ */
-	map(0x4208, 0x4208).mirror(0x0047).w(this, FUNC(firefox_state::main_firq_clear_w));      /* RSTFIRQ */
+	map(0x4200, 0x4200).mirror(0x0047).w(FUNC(firefox_state::main_irq_clear_w));       /* RSTIRQ */
+	map(0x4208, 0x4208).mirror(0x0047).w(FUNC(firefox_state::main_firq_clear_w));      /* RSTFIRQ */
 	map(0x4210, 0x4210).mirror(0x0047).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* WDCLK */
-	map(0x4218, 0x4218).mirror(0x0047).w(this, FUNC(firefox_state::firefox_disc_read_w));    /* DSKREAD */
+	map(0x4218, 0x4218).mirror(0x0047).w(FUNC(firefox_state::firefox_disc_read_w));    /* DSKREAD */
 	map(0x4220, 0x4223).mirror(0x0044).w("adc", FUNC(adc0808_device::address_offset_start_w));       /* ADCSTART */
-	map(0x4230, 0x4230).mirror(0x0047).w(this, FUNC(firefox_state::self_reset_w));           /* AMUCK */
+	map(0x4230, 0x4230).mirror(0x0047).w(FUNC(firefox_state::self_reset_w));           /* AMUCK */
 	map(0x4280, 0x4287).mirror(0x0040).w("latch0", FUNC(ls259_device::write_d7));
 	map(0x4288, 0x428f).mirror(0x0040).w("latch1", FUNC(ls259_device::write_d7));
-	map(0x4290, 0x4290).mirror(0x0047).w(this, FUNC(firefox_state::rom_bank_w));             /* WRTREG */
+	map(0x4290, 0x4290).mirror(0x0047).w(FUNC(firefox_state::rom_bank_w));             /* WRTREG */
 	map(0x4298, 0x4298).mirror(0x0047).w(m_soundlatch, FUNC(generic_latch_8_device::write));        /* WRSOUND */
-	map(0x42a0, 0x42a0).mirror(0x0047).w(this, FUNC(firefox_state::firefox_disc_data_w));    /* DSKLATCH */
+	map(0x42a0, 0x42a0).mirror(0x0047).w(FUNC(firefox_state::firefox_disc_data_w));    /* DSKLATCH */
 	map(0x4400, 0xffff).rom();
 }
 

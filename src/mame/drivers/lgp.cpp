@@ -68,6 +68,7 @@ Dumping Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -166,7 +167,7 @@ void lgp_state::main_program_map(address_map &map)
 	map(0xe400, 0xe7ff).ram().share("tile_ctrl_ram");
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
-	map(0xef80, 0xef80).rw(this, FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
+	map(0xef80, 0xef80).rw(FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
 	map(0xefb8, 0xefb8).nopr(); // watchdog
 	map(0xefc0, 0xefc0).portr("DSWA");    /* Not tested */
 	map(0xefc8, 0xefc8).portr("DSWB");

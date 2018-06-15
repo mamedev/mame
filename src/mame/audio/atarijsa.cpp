@@ -101,13 +101,13 @@ void atari_jsa_i_device::atarijsa1_map(address_map &map)
 	map(0x2000, 0x2001).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2800, 0x2800).mirror(0x01f9);                                                                      // N/C
 	map(0x2802, 0x2802).mirror(0x01f9).r("soundcomm", FUNC(atari_sound_comm_device::sound_command_r));    // /RDP
-	map(0x2804, 0x2804).mirror(0x01f9).r(this, FUNC(atari_jsa_i_device::rdio_r));                                                      // /RDIO
+	map(0x2804, 0x2804).mirror(0x01f9).r(FUNC(atari_jsa_i_device::rdio_r));                                                      // /RDIO
 	map(0x2806, 0x2806).mirror(0x01f9).rw("soundcomm", FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));  // R/W=/IRQACK
-	map(0x2a00, 0x2a00).mirror(0x01f9).w(this, FUNC(atari_jsa_i_device::tms5220_voice));                                              // /VOICE
+	map(0x2a00, 0x2a00).mirror(0x01f9).w(FUNC(atari_jsa_i_device::tms5220_voice));                                              // /VOICE
 	map(0x2a02, 0x2a02).mirror(0x01f9).w("soundcomm", FUNC(atari_sound_comm_device::sound_response_w));  // /WRP
-	map(0x2a04, 0x2a04).mirror(0x01f9).w(this, FUNC(atari_jsa_i_device::wrio_w));                                                     // /WRIO
-	map(0x2a06, 0x2a06).mirror(0x01f9).w(this, FUNC(atari_jsa_i_device::mix_w));                                                      // /MIX
-	map(0x2c00, 0x2c0f).mirror(0x03f0).rw(this, FUNC(atari_jsa_i_device::pokey_r), FUNC(atari_jsa_i_device::pokey_w));
+	map(0x2a04, 0x2a04).mirror(0x01f9).w(FUNC(atari_jsa_i_device::wrio_w));                                                     // /WRIO
+	map(0x2a06, 0x2a06).mirror(0x01f9).w(FUNC(atari_jsa_i_device::mix_w));                                                      // /MIX
+	map(0x2c00, 0x2c0f).mirror(0x03f0).rw(FUNC(atari_jsa_i_device::pokey_r), FUNC(atari_jsa_i_device::pokey_w));
 	map(0x3000, 0x3fff).bankr("cpubank");
 	map(0x4000, 0xffff).rom();
 }
@@ -117,14 +117,14 @@ void atari_jsa_ii_device::atarijsa2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2800).mirror(0x01f9).r(this, FUNC(atari_jsa_ii_device::oki_r));                                                       // /RDV
+	map(0x2800, 0x2800).mirror(0x01f9).r(FUNC(atari_jsa_ii_device::oki_r));                                                       // /RDV
 	map(0x2802, 0x2802).mirror(0x01f9).r("soundcomm", FUNC(atari_sound_comm_device::sound_command_r));    // /RDP
-	map(0x2804, 0x2804).mirror(0x01f9).r(this, FUNC(atari_jsa_ii_device::rdio_r));                                                      // /RDIO
+	map(0x2804, 0x2804).mirror(0x01f9).r(FUNC(atari_jsa_ii_device::rdio_r));                                                      // /RDIO
 	map(0x2806, 0x2806).mirror(0x01f9).rw("soundcomm", FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));  // R/W=/IRQACK
-	map(0x2a00, 0x2a00).mirror(0x01f9).w(this, FUNC(atari_jsa_ii_device::oki_w));                                                      // /WRV
+	map(0x2a00, 0x2a00).mirror(0x01f9).w(FUNC(atari_jsa_ii_device::oki_w));                                                      // /WRV
 	map(0x2a02, 0x2a02).mirror(0x01f9).w("soundcomm", FUNC(atari_sound_comm_device::sound_response_w));  // /WRP
-	map(0x2a04, 0x2a04).mirror(0x01f9).w(this, FUNC(atari_jsa_ii_device::wrio_w));                                                     // /WRIO
-	map(0x2a06, 0x2a06).mirror(0x01f9).w(this, FUNC(atari_jsa_ii_device::mix_w));                                                      // /MIX
+	map(0x2a04, 0x2a04).mirror(0x01f9).w(FUNC(atari_jsa_ii_device::wrio_w));                                                     // /WRIO
+	map(0x2a06, 0x2a06).mirror(0x01f9).w(FUNC(atari_jsa_ii_device::mix_w));                                                      // /MIX
 	map(0x3000, 0x3fff).bankr("cpubank");
 	map(0x4000, 0xffff).rom();
 }
@@ -135,14 +135,14 @@ void atari_jsa_iii_device::atarijsa3_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).mirror(0x07fe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2801).mirror(0x05f8).rw(this, FUNC(atari_jsa_iii_device::oki_r), FUNC(atari_jsa_iii_device::overall_volume_w));                                // /RDV
+	map(0x2800, 0x2801).mirror(0x05f8).rw(FUNC(atari_jsa_iii_device::oki_r), FUNC(atari_jsa_iii_device::overall_volume_w));                                // /RDV
 	map(0x2802, 0x2802).mirror(0x05f9).r("soundcomm", FUNC(atari_sound_comm_device::sound_command_r));    // /RDP
-	map(0x2804, 0x2804).mirror(0x05f9).r(this, FUNC(atari_jsa_iii_device::rdio_r));                                                      // /RDIO
+	map(0x2804, 0x2804).mirror(0x05f9).r(FUNC(atari_jsa_iii_device::rdio_r));                                                      // /RDIO
 	map(0x2806, 0x2806).mirror(0x05f9).rw("soundcomm", FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));  // R/W=/IRQACK
-	map(0x2a00, 0x2a01).mirror(0x05f8).w(this, FUNC(atari_jsa_iii_device::oki_w));                                                      // /WRV
+	map(0x2a00, 0x2a01).mirror(0x05f8).w(FUNC(atari_jsa_iii_device::oki_w));                                                      // /WRV
 	map(0x2a02, 0x2a02).mirror(0x05f9).w("soundcomm", FUNC(atari_sound_comm_device::sound_response_w));  // /WRP
-	map(0x2a04, 0x2a04).mirror(0x05f9).w(this, FUNC(atari_jsa_iii_device::wrio_w));                                                     // /WRIO
-	map(0x2a06, 0x2a06).mirror(0x05f9).w(this, FUNC(atari_jsa_iii_device::mix_w));                                                      // /MIX
+	map(0x2a04, 0x2a04).mirror(0x05f9).w(FUNC(atari_jsa_iii_device::wrio_w));                                                     // /WRIO
+	map(0x2a06, 0x2a06).mirror(0x05f9).w(FUNC(atari_jsa_iii_device::mix_w));                                                      // /MIX
 	map(0x3000, 0x3fff).bankr("cpubank");
 	map(0x4000, 0xffff).rom();
 }

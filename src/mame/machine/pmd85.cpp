@@ -257,8 +257,8 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portb_w)
 WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portc_w)
 {
 	m_ppi_port_outputs[0][2] = data;
-	m_led[PMD85_LED_2] = BIT(data, 3);
-	m_led[PMD85_LED_3] = BIT(data, 2);
+	m_leds[PMD85_LED_2] = BIT(data, 3);
+	m_leds[PMD85_LED_3] = BIT(data, 2);
 }
 
 /*******************************************************************************
@@ -290,8 +290,8 @@ READ8_MEMBER(pmd85_state::mato_ppi_0_portc_r)
 WRITE8_MEMBER(pmd85_state::mato_ppi_0_portc_w)
 {
 	m_ppi_port_outputs[0][2] = data;
-	m_led[PMD85_LED_2] = BIT(data, 3);
-	m_led[PMD85_LED_3] = BIT(data, 2);
+	m_leds[PMD85_LED_2] = BIT(data, 3);
+	m_leds[PMD85_LED_3] = BIT(data, 2);
 }
 
 /*******************************************************************************

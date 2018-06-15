@@ -195,6 +195,7 @@
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -314,14 +315,14 @@ void gluck2_state::gluck2_map(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x084b).noprw(); /* see below */
-	map(0x1000, 0x13ff).ram().w(this, FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2d00, 0x2d01).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x3400, 0x3400).portr("IN0");
 	map(0x3500, 0x3500).portr("IN1");
 	map(0x3600, 0x3600).portr("IN2");
-	map(0x3700, 0x3700).w(this, FUNC(gluck2_state::counters_w));
+	map(0x3700, 0x3700).w(FUNC(gluck2_state::counters_w));
 	map(0x3d00, 0x3d01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x4000, 0xffff).rom();
 }

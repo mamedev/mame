@@ -5,6 +5,7 @@
 #include "machine/mb3773.h"
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class aquarium_state : public driver_device

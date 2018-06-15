@@ -28,6 +28,7 @@ lamps?
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -123,7 +124,7 @@ void dreambal_state::dreambal_map(address_map &map)
 	map(0x120000, 0x123fff).ram();
 	map(0x140000, 0x1403ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	map(0x160000, 0x163fff).rw(this, FUNC(dreambal_state::dreambal_protection_region_0_104_r), FUNC(dreambal_state::dreambal_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x160000, 0x163fff).rw(FUNC(dreambal_state::dreambal_protection_region_0_104_r), FUNC(dreambal_state::dreambal_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 	map(0x161000, 0x16100f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
 
@@ -134,7 +135,7 @@ void dreambal_state::dreambal_map(address_map &map)
 	map(0x163000, 0x163001).nopw(); // something on bit 1
 	map(0x164000, 0x164001).nopw(); // something on bit 1
 
-	map(0x165000, 0x165001).w(this, FUNC(dreambal_state::dreambal_eeprom_w)); // EEP Write?
+	map(0x165000, 0x165001).w(FUNC(dreambal_state::dreambal_eeprom_w)); // EEP Write?
 
 	map(0x16c002, 0x16c00d).nopw(); // writes 0000 to 0005 on startup
 	map(0x1a0000, 0x1a0003).nopw(); // RS-232C status / data ports (byte access)
@@ -327,7 +328,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93lc46b
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))

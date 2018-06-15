@@ -63,6 +63,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -279,7 +280,7 @@ void mcr68_state::mcr68_map(address_map &map)
 	map.global_mask(0x1fffff);
 	map(0x000000, 0x03ffff).rom();
 	map(0x060000, 0x063fff).ram();
-	map(0x070000, 0x070fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x070000, 0x070fff).ram().w(FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
 	map(0x071000, 0x071fff).ram();
 	map(0x080000, 0x080fff).ram().share("spriteram");
 	map(0x090000, 0x09007f).w("palette", FUNC(palette_device::write16)).share("palette");
@@ -303,16 +304,16 @@ void mcr68_state::pigskin_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x1fffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x08ffff).r(this, FUNC(mcr68_state::pigskin_port_1_r));
-	map(0x0a0000, 0x0affff).r(this, FUNC(mcr68_state::pigskin_port_2_r));
+	map(0x080000, 0x08ffff).r(FUNC(mcr68_state::pigskin_port_1_r));
+	map(0x0a0000, 0x0affff).r(FUNC(mcr68_state::pigskin_port_2_r));
 	map(0x0c0000, 0x0c007f).w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0effff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x100000, 0x100fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
-	map(0x120000, 0x120001).rw(this, FUNC(mcr68_state::pigskin_protection_r), FUNC(mcr68_state::pigskin_protection_w));
+	map(0x100000, 0x100fff).ram().w(FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x120000, 0x120001).rw(FUNC(mcr68_state::pigskin_protection_r), FUNC(mcr68_state::pigskin_protection_w));
 	map(0x140000, 0x143fff).ram();
 	map(0x160000, 0x1607ff).ram().share("spriteram");
 	map(0x180000, 0x18000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
-	map(0x1a0000, 0x1affff).w(this, FUNC(mcr68_state::archrivl_control_w));
+	map(0x1a0000, 0x1affff).w(FUNC(mcr68_state::archrivl_control_w));
 	map(0x1e0000, 0x1effff).portr("IN0");
 }
 
@@ -329,14 +330,14 @@ void mcr68_state::trisport_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x1fffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x08ffff).r(this, FUNC(mcr68_state::trisport_port_1_r));
+	map(0x080000, 0x08ffff).r(FUNC(mcr68_state::trisport_port_1_r));
 	map(0x0a0000, 0x0affff).portr("DSW");
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x120000, 0x12007f).w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x1407ff).ram().share("spriteram");
-	map(0x160000, 0x160fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x160000, 0x160fff).ram().w(FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
 	map(0x180000, 0x18000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
-	map(0x1a0000, 0x1affff).w(this, FUNC(mcr68_state::archrivl_control_w));
+	map(0x1a0000, 0x1affff).w(FUNC(mcr68_state::archrivl_control_w));
 	map(0x1c0000, 0x1cffff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x1e0000, 0x1effff).portr("IN0");
 }

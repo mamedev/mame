@@ -128,7 +128,7 @@ public:
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
 		m_meters(*this, "meters"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void init_toppoker();
@@ -176,7 +176,7 @@ protected:
 
 	void save_state();
 
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -215,7 +215,7 @@ private:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_device> m_vfd0;
 	required_device<meters_device> m_meters;
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 };
 
 #define VFD_RESET  0x20
@@ -472,8 +472,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 			for ( int i = 0; i < 8; i++ )
 			{
-				m_lamp[BFM_strcnv[offset  ]] = BIT(m_mux1_datalo, i);
-				m_lamp[BFM_strcnv[offset+8]] = BIT(m_mux1_datahi, i);
+				m_lamps[BFM_strcnv[offset  ]] = BIT(m_mux1_datalo, i);
+				m_lamps[BFM_strcnv[offset+8]] = BIT(m_mux1_datahi, i);
 				offset++;
 			}
 
@@ -541,8 +541,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 			for ( int i = 0; i < 8; i++ )
 			{
-				m_lamp[BFM_strcnv[offset  ]] = BIT(m_mux2_datalo, i);
-				m_lamp[BFM_strcnv[offset+8]] = BIT(m_mux2_datahi, i);
+				m_lamps[BFM_strcnv[offset  ]] = BIT(m_mux2_datalo, i);
+				m_lamps[BFM_strcnv[offset+8]] = BIT(m_mux2_datahi, i);
 				offset++;
 			}
 		}
@@ -669,32 +669,32 @@ void bfm_sc1_state::sc1_base(address_map &map)
 {
 
 	map(0x0000, 0x1FFF).ram().share("nvram"); //8k RAM
-	map(0x2000, 0x21FF).w(this, FUNC(bfm_sc1_state::reel34_w));             // reel 2+3 latch
-	map(0x2200, 0x23FF).w(this, FUNC(bfm_sc1_state::reel12_w));             // reel 1+2 latch
-	map(0x2400, 0x25FF).w(this, FUNC(bfm_sc1_state::vfd_w));                // vfd latch
+	map(0x2000, 0x21FF).w(FUNC(bfm_sc1_state::reel34_w));             // reel 2+3 latch
+	map(0x2200, 0x23FF).w(FUNC(bfm_sc1_state::reel12_w));             // reel 1+2 latch
+	map(0x2400, 0x25FF).w(FUNC(bfm_sc1_state::vfd_w));                // vfd latch
 
-	map(0x2600, 0x27FF).rw(this, FUNC(bfm_sc1_state::mmtr_r), FUNC(bfm_sc1_state::mmtr_w));    // mechanical meters
-	map(0x2800, 0x2800).rw(this, FUNC(bfm_sc1_state::triac_r), FUNC(bfm_sc1_state::triac_w));  // payslide triacs
+	map(0x2600, 0x27FF).rw(FUNC(bfm_sc1_state::mmtr_r), FUNC(bfm_sc1_state::mmtr_w));    // mechanical meters
+	map(0x2800, 0x2800).rw(FUNC(bfm_sc1_state::triac_r), FUNC(bfm_sc1_state::triac_w));  // payslide triacs
 
-	map(0x2A00, 0x2A00).rw(this, FUNC(bfm_sc1_state::mux1latch_r), FUNC(bfm_sc1_state::mux1latch_w)); // mux1
-	map(0x2A01, 0x2A01).rw(this, FUNC(bfm_sc1_state::mux1datlo_r), FUNC(bfm_sc1_state::mux1datlo_w));
-	map(0x2A02, 0x2A02).rw(this, FUNC(bfm_sc1_state::mux1dathi_r), FUNC(bfm_sc1_state::mux1dathi_w));
+	map(0x2A00, 0x2A00).rw(FUNC(bfm_sc1_state::mux1latch_r), FUNC(bfm_sc1_state::mux1latch_w)); // mux1
+	map(0x2A01, 0x2A01).rw(FUNC(bfm_sc1_state::mux1datlo_r), FUNC(bfm_sc1_state::mux1datlo_w));
+	map(0x2A02, 0x2A02).rw(FUNC(bfm_sc1_state::mux1dathi_r), FUNC(bfm_sc1_state::mux1dathi_w));
 
-	map(0x2E00, 0x2E00).r(this, FUNC(bfm_sc1_state::irqlatch_r));            // irq latch
+	map(0x2E00, 0x2E00).r(FUNC(bfm_sc1_state::irqlatch_r));            // irq latch
 
 	map(0x3001, 0x3001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3101, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 
-	map(0x3406, 0x3406).rw(this, FUNC(bfm_sc1_state::aciastat_r), FUNC(bfm_sc1_state::aciactrl_w));  // MC6850 status register
-	map(0x3407, 0x3407).rw(this, FUNC(bfm_sc1_state::aciadata_r), FUNC(bfm_sc1_state::aciadata_w));  // MC6850 data register
+	map(0x3406, 0x3406).rw(FUNC(bfm_sc1_state::aciastat_r), FUNC(bfm_sc1_state::aciactrl_w));  // MC6850 status register
+	map(0x3407, 0x3407).rw(FUNC(bfm_sc1_state::aciadata_r), FUNC(bfm_sc1_state::aciadata_w));  // MC6850 data register
 
-	map(0x3408, 0x3408).rw(this, FUNC(bfm_sc1_state::mux2latch_r), FUNC(bfm_sc1_state::mux2latch_w)); // mux2
-	map(0x3409, 0x3409).rw(this, FUNC(bfm_sc1_state::mux2datlo_r), FUNC(bfm_sc1_state::mux2datlo_w));
-	map(0x340A, 0x340A).rw(this, FUNC(bfm_sc1_state::mux2dathi_r), FUNC(bfm_sc1_state::mux2dathi_w));
+	map(0x3408, 0x3408).rw(FUNC(bfm_sc1_state::mux2latch_r), FUNC(bfm_sc1_state::mux2latch_w)); // mux2
+	map(0x3409, 0x3409).rw(FUNC(bfm_sc1_state::mux2datlo_r), FUNC(bfm_sc1_state::mux2datlo_w));
+	map(0x340A, 0x340A).rw(FUNC(bfm_sc1_state::mux2dathi_r), FUNC(bfm_sc1_state::mux2dathi_w));
 
-	map(0x3600, 0x3600).w(this, FUNC(bfm_sc1_state::bankswitch_w));         // write bank
-	map(0x3800, 0x39FF).w(this, FUNC(bfm_sc1_state::reel56_w));             // reel 5+6 latch
+	map(0x3600, 0x3600).w(FUNC(bfm_sc1_state::bankswitch_w));         // write bank
+	map(0x3800, 0x39FF).w(FUNC(bfm_sc1_state::reel56_w));             // reel 5+6 latch
 
 	map(0x4000, 0x5FFF).rom();                         // 8k  ROM
 	map(0x6000, 0x7FFF).bankr("bank1");                    // 8k  paged ROM (4 pages)
@@ -723,9 +723,9 @@ void bfm_sc1_state::sc1_viper(address_map &map)
 {
 	sc1_base(map);
 
-	map(0x3404, 0x3404).r(this, FUNC(bfm_sc1_state::dipcoin_r)); // coin input on gamecard
-	map(0x3801, 0x3801).r(this, FUNC(bfm_sc1_state::nec_r));
-	map(0x3800, 0x39FF).w(this, FUNC(bfm_sc1_state::nec_latch_w));
+	map(0x3404, 0x3404).r(FUNC(bfm_sc1_state::dipcoin_r)); // coin input on gamecard
+	map(0x3801, 0x3801).r(FUNC(bfm_sc1_state::nec_r));
+	map(0x3800, 0x39FF).w(FUNC(bfm_sc1_state::nec_latch_w));
 }
 
 // input ports for scorpion1 board //////////////////////////////////////////////////
@@ -1091,17 +1091,17 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vfd)
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<0>))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<1>))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<2>))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<3>))
-	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<4>))
-	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<5>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

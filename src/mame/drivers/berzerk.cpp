@@ -619,7 +619,7 @@ void berzerk_state::berzerk_map(address_map &map)
 	map(0x0800, 0x0bff).mirror(0x0400).ram().share("nvram");
 	map(0x1000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram().share("videoram");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(berzerk_state::magicram_w)).share("videoram");
+	map(0x6000, 0x7fff).ram().w(FUNC(berzerk_state::magicram_w)).share("videoram");
 	map(0x8000, 0x87ff).mirror(0x3800).ram().share("colorram");
 	map(0xc000, 0xffff).noprw();
 }
@@ -629,7 +629,7 @@ void berzerk_state::frenzy_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram().share("videoram");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(berzerk_state::magicram_w)).share("videoram");
+	map(0x6000, 0x7fff).ram().w(FUNC(berzerk_state::magicram_w)).share("videoram");
 	map(0x8000, 0x87ff).mirror(0x3800).ram().share("colorram");
 	map(0xc000, 0xcfff).rom();
 	map(0xf800, 0xfbff).mirror(0x0400).ram().share("nvram");
@@ -647,15 +647,15 @@ void berzerk_state::berzerk_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).noprw();
-	map(0x40, 0x47).rw(this, FUNC(berzerk_state::audio_r), FUNC(berzerk_state::audio_w));
+	map(0x40, 0x47).rw(FUNC(berzerk_state::audio_r), FUNC(berzerk_state::audio_w));
 	map(0x48, 0x48).portr("P1").nopw();
 	map(0x49, 0x49).portr("SYSTEM").nopw();
 	map(0x4a, 0x4a).portr("P2").nopw();
-	map(0x4b, 0x4b).nopr().w(this, FUNC(berzerk_state::magicram_control_w));
-	map(0x4c, 0x4c).rw(this, FUNC(berzerk_state::nmi_enable_r), FUNC(berzerk_state::nmi_enable_w));
-	map(0x4d, 0x4d).rw(this, FUNC(berzerk_state::nmi_disable_r), FUNC(berzerk_state::nmi_disable_w));
-	map(0x4e, 0x4e).r(this, FUNC(berzerk_state::intercept_v256_r)).nopw(); // note reading from here should clear pending frame interrupts, see zfb-1.tiff 74ls74 at 3D pin 13 /CLR
-	map(0x4f, 0x4f).nopr().w(this, FUNC(berzerk_state::irq_enable_w));
+	map(0x4b, 0x4b).nopr().w(FUNC(berzerk_state::magicram_control_w));
+	map(0x4c, 0x4c).rw(FUNC(berzerk_state::nmi_enable_r), FUNC(berzerk_state::nmi_enable_w));
+	map(0x4d, 0x4d).rw(FUNC(berzerk_state::nmi_disable_r), FUNC(berzerk_state::nmi_disable_w));
+	map(0x4e, 0x4e).r(FUNC(berzerk_state::intercept_v256_r)).nopw(); // note reading from here should clear pending frame interrupts, see zfb-1.tiff 74ls74 at 3D pin 13 /CLR
+	map(0x4f, 0x4f).nopr().w(FUNC(berzerk_state::irq_enable_w));
 	map(0x50, 0x57).noprw(); /* second sound board, initialized but not used */
 	map(0x58, 0x5f).noprw();
 	map(0x60, 0x60).mirror(0x18).portr("F3").nopw();
@@ -664,8 +664,8 @@ void berzerk_state::berzerk_io_map(address_map &map)
 	map(0x63, 0x63).mirror(0x18).portr("F5").nopw();
 	map(0x64, 0x64).mirror(0x18).portr("F4").nopw();
 	map(0x65, 0x65).mirror(0x18).portr("SW2").nopw();
-	map(0x66, 0x66).mirror(0x18).rw(this, FUNC(berzerk_state::led_off_r), FUNC(berzerk_state::led_off_w));
-	map(0x67, 0x67).mirror(0x18).rw(this, FUNC(berzerk_state::led_on_r), FUNC(berzerk_state::led_on_w));
+	map(0x66, 0x66).mirror(0x18).rw(FUNC(berzerk_state::led_off_r), FUNC(berzerk_state::led_off_w));
+	map(0x67, 0x67).mirror(0x18).rw(FUNC(berzerk_state::led_on_r), FUNC(berzerk_state::led_on_w));
 	map(0x80, 0xff).noprw();
 }
 
