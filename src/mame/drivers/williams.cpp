@@ -1860,6 +1860,8 @@ MACHINE_CONFIG_START(tshoot_state::tshoot)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
 
+	MCFG_MACHINE_START_OVERRIDE(tshoot_state,tshoot)
+
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
 	MCFG_PIA_READPA_HANDLER(READ8("mux", ls157_x2_device, output_r))

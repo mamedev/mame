@@ -457,6 +457,16 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
+MACHINE_START_MEMBER(tshoot_state,tshoot)
+{
+	MACHINE_START_CALL_MEMBER(williams2);
+	m_grenade_lamp.resolve();
+	m_gun_lamp.resolve();
+	m_p1_gun_recoil.resolve();
+	m_feather_blower.resolve();
+}
+
+
 CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
 {
 	int data = m_gun[(uintptr_t)param]->read();
@@ -474,13 +484,13 @@ WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 WRITE8_MEMBER(tshoot_state::lamp_w)
 {
 	/* set the grenade lamp */
-	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
+	m_grenade_lamp   = BIT(~data, 2);
 	/* set the gun lamp */
-	output().set_value("Gun_lamp", (~data & 0x8)>>3 );
+	m_gun_lamp       = BIT(~data, 3);
 	/* gun coil */
-	output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
+	m_p1_gun_recoil  = BIT(data, 4);
 	/* feather coil */
-	output().set_value("Feather_Blower", (data & 0x20)>>5 );
+	m_feather_blower = BIT(data, 5);
 }
 
 

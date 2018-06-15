@@ -236,17 +236,27 @@ public:
 class tshoot_state : public williams2_state
 {
 public:
-	tshoot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams2_state(mconfig, type, tag),
-		m_gun(*this, {"GUNX", "GUNY"}) { }
+	tshoot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams2_state(mconfig, type, tag),
+		m_gun(*this, {"GUNX", "GUNY"}),
+		m_grenade_lamp(*this, "Grenade_lamp"),
+		m_gun_lamp(*this, "Gun_lamp"),
+		m_p1_gun_recoil(*this, "Player1_Gun_Recoil"),
+		m_feather_blower(*this, "Feather_Blower") { }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
+	DECLARE_MACHINE_START(tshoot);
+
 	void tshoot(machine_config &config);
 private:
 	required_ioport_array<2> m_gun;
+	output_finder<> m_grenade_lamp;
+	output_finder<> m_gun_lamp;
+	output_finder<> m_p1_gun_recoil;
+	output_finder<> m_feather_blower;
 };
 
 class joust2_state : public williams2_state
