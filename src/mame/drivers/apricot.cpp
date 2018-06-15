@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_APRICOT_KEYBOARD_IN_HANDLER(WRITELINE("ic15", z80sio_device, rxb_w))
 
 	// centronics printer
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("ic15", z80sio_device, ctsb_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("ic15", z80sio_device, dcdb_w))

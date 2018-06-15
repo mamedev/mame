@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")
 
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */

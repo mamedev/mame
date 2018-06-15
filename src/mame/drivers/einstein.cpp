@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_ADC0844_CH4_CB(IOPORT("analogue_2_y"))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_a))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, einstein_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, einstein_state, write_centronics_perror))

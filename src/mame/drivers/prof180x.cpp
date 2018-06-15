@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

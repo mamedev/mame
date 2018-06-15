@@ -74,7 +74,7 @@ MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	//MCFG_VIA6522_READPB_HANDLER(READ8(*this, electron_m2105_device, m2105_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, electron_m2105_device, m2105_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* duart */
@@ -87,7 +87,7 @@ MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

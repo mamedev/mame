@@ -1158,7 +1158,7 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bullet_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, bullet_state, write_centronics_perror))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, bullet_state, write_centronics_select))
@@ -1242,7 +1242,7 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":8", bullet_35_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":9", bullet_35_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bullet_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

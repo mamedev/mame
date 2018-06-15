@@ -107,7 +107,7 @@ void rmnimbus_state::nimbus_iocpu_io(address_map &map)
 
 MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, I80186, 16000000) // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
+	MCFG_DEVICE_ADD(m_maincpu, I80186, 16000000) // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
 	MCFG_DEVICE_PROGRAM_MAP(nimbus_mem)
 	MCFG_DEVICE_IO_MAP(nimbus_io)
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, rmnimbus_state, cascade_callback))
@@ -185,10 +185,10 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, rmnimbus_state,nimbus_via_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(MAINCPU_TAG, i80186_cpu_device, int3_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(m_maincpu, i80186_cpu_device, int3_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(VIA_TAG, via6522_device, write_ca1)) MCFG_DEVCB_INVERT
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

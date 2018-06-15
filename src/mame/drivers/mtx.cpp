@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mtx_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, mtx_state, write_centronics_perror))

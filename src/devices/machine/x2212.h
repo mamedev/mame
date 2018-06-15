@@ -93,8 +93,8 @@ private:
 	optional_region_ptr<uint8_t> m_default_data;
 
 	// internal helpers
-	void store();
-	void recall();
+	void do_store();
+	void do_recall();
 
 	void x2212_e2prom_map(address_map &map);
 	void x2212_sram_map(address_map &map);

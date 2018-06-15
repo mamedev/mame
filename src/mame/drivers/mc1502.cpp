@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	WAVE(config, "wave", "cassette"); // FIXME: really no output routes for the cassette sound?
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))

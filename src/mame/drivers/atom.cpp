@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
@@ -746,7 +746,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
@@ -839,7 +839,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 

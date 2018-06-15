@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_busy))
 
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
