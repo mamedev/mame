@@ -76,26 +76,26 @@ class ace_state : public driver_device
 {
 public:
 	ace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ppi(*this, I8255_TAG),
-			m_z80pio(*this, Z80PIO_TAG),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_ram(*this, RAM_TAG),
-			m_sp0256(*this, SP0256AL2_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_char_ram(*this, "char_ram"),
-			m_a8(*this, "A8"),
-			m_a9(*this, "A9"),
-			m_a10(*this, "A10"),
-			m_a11(*this, "A11"),
-			m_a12(*this, "A12"),
-			m_a13(*this, "A13"),
-			m_a14(*this, "A14"),
-			m_a15(*this, "A15"),
-			m_joy(*this, "JOY")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_ppi(*this, I8255_TAG)
+		, m_z80pio(*this, Z80PIO_TAG)
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_sp0256(*this, SP0256AL2_TAG)
+		, m_video_ram(*this, "video_ram")
+		, m_char_ram(*this, "char_ram")
+		, m_a8(*this, "A8")
+		, m_a9(*this, "A9")
+		, m_a10(*this, "A10")
+		, m_a11(*this, "A11")
+		, m_a12(*this, "A12")
+		, m_a13(*this, "A13")
+		, m_a14(*this, "A14")
+		, m_a15(*this, "A15")
+		, m_joy(*this, "JOY")
 	{ }
 
 	virtual void machine_start() override;
@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// internal ram

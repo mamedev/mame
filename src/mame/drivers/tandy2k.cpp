@@ -859,7 +859,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_perror))

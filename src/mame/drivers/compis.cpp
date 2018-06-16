@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(I8274_TAG, z80dart_device, ctsb_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, compis_state, write_centronics_select))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

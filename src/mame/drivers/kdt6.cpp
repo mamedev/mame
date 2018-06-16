@@ -695,7 +695,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("pio", z80pio_device, pa2_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("pio", z80pio_device, pa3_w))

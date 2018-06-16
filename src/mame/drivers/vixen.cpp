@@ -577,28 +577,28 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 	*/
 
 	/* data valid */
-	m_ieee488->atn_w(BIT(data, 0));
+	m_ieee488->host_atn_w(BIT(data, 0));
 
 	/* end or identify */
-	m_ieee488->dav_w(BIT(data, 1));
+	m_ieee488->host_dav_w(BIT(data, 1));
 
 	/* remote enable */
-	m_ieee488->ndac_w(BIT(data, 2));
+	m_ieee488->host_ndac_w(BIT(data, 2));
 
 	/* attention */
-	m_ieee488->nrfd_w(BIT(data, 3));
+	m_ieee488->host_nrfd_w(BIT(data, 3));
 
 	/* interface clear */
-	m_ieee488->eoi_w(BIT(data, 4));
+	m_ieee488->host_eoi_w(BIT(data, 4));
 
 	/* service request */
-	m_ieee488->srq_w(BIT(data, 5));
+	m_ieee488->host_srq_w(BIT(data, 5));
 
 	/* not ready for data */
-	m_ieee488->ifc_w(BIT(data, 6));
+	m_ieee488->host_ifc_w(BIT(data, 6));
 
 	/* data not accepted */
-	m_ieee488->ren_w(BIT(data, 7));
+	m_ieee488->host_ren_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
@@ -743,7 +743,7 @@ void vixen_state::machine_reset()
 
 MACHINE_CONFIG_START(vixen_state::vixen)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z8400A_TAG, Z80, 23.9616_MHz_XTAL / 6)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, 23.9616_MHz_XTAL / 6)
 	MCFG_DEVICE_PROGRAM_MAP(vixen_mem)
 	MCFG_DEVICE_OPCODES_MAP(bios_mem)
 	MCFG_DEVICE_IO_MAP(vixen_io)
@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, i8155_pc_w))
 
 	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, 23.9616_MHz_XTAL / 6)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(m_ieee488, ieee488_device, host_dio_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, io_i8155_pb_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, io_i8155_pc_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, vixen_state, io_i8155_to_w))

@@ -176,6 +176,7 @@ Cisco Heat.
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
+#include "machine/nvram.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -825,7 +826,7 @@ void cischeat_state::captflag_map(address_map &map)
 	map(0x100040, 0x100041).portr("SW01");                                                   // DSW + Motor
 	map(0x100044, 0x100045).w(FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
 	map(0x100048, 0x100049).w(FUNC(cischeat_state::captflag_motor_command_right_w));                               // Motor Command (Right)
-	map(0x100060, 0x10007d).ram();                                                                 // 7-seg? NVRAM?
+	map(0x100060, 0x10007f).ram().share("nvram");      // NVRAM (even bytes only)
 }
 
 void cischeat_state::captflag_oki1_map(address_map &map)
@@ -2215,7 +2216,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	MCFG_WATCHDOG_ADD("watchdog")
-
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

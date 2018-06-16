@@ -21,39 +21,37 @@ Notes(general):
   adding a value to these RAM areas according to what button is pressed.
 
 TODO:
--kakumei2: unemulated RNG;
--Back layer pens looks ugly in some circumstances (i.e. suchiesp when you win, mjzoomin when coined up),
- static or controlled by something else?
--daireika: the ranking screen on the original pcb shows some hearts instead of the "0".
- Some investigation indicates that the game reads area "fe100" onwards for these to be filled.
- These are likely to be provided by one of the mcu snippets...
--kakumei/kakumei2:has weird text layer strings in test mode (like "#p control panel"),
- unsure if this one is somehow related to the above daireika bug, it's a BTANB or something else.
--Check if urashima has a "mode 3" for the layer 0 tilemap;
--There could be timing issues caused by MCU simulation at $80004;
--Fix the sound banking, protection-related for the first version of the MCU
- (should be somewhere on the work ram/shared ram)
--suchiesp: I need a side-by-side to understand if the PAL shuffling is correct with the OKI bgm rom.
--urashima: might use three/four layers instead of two.It can be checked when you win
- a match in particular circumstances because there's a write in the 94000-9bfff region;
--Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
- the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
--Video code could be optimized too (for example by calling the priority function only when
- priority number is updated), might also need a merging with Jaleco Mega System 1/NMK16 drivers;
+- kakumei2: unemulated RNG;
+- Back layer pens looks ugly in some circumstances (i.e. suchiesp when you win, mjzoomin when coined up),
+  static or controlled by something else?
+- daireika: the ranking screen on the original pcb shows some hearts instead of the "0".
+  Some investigation indicates that the game reads area "fe100" onwards for these to be filled.
+  These are likely to be provided by one of the mcu snippets...
+- kakumei/kakumei2: has weird text layer strings in test mode (like "#p control panel"),
+  unsure if this one is somehow related to the above daireika bug, it's a BTANB or something else.
+- Check if urashima has a "mode 3" for the layer 0 tilemap;
+- There could be timing issues caused by MCU simulation at $80004;
+- Fix the sound banking, protection-related for the first version of the MCU
+  (should be somewhere on the work ram/shared ram)
+- suchiesp: I need a side-by-side to understand if the PAL shuffling is correct with the OKI BGM ROM.
+- urashima: doesn't use the mega system 1 tilemap devices, MCU might actually be responsible 
+  for that too (cfr. notes).
+- Massive clean-ups needed for the MCU snippet programs and the input ports, also check if
+  the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
 
 Notes (1st MCU ver.):
--$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
- do that,returning the contents of D0 register seems enough for now...
- Update: Improved it for the new mcu simulation,now it pulls all the values from 0x00 to
- 0x0f, it seems to be a MCU call snippet for the $f0000 work ram;
--$f030e is a mirror for $f000e in urashima.
--I need more space for MCU code...that's why I've used an extra jmp when entering
- into mcu code,so we can debug the first version freely without being teased about
- memory space.
- BTW,the real HW is using a sort of bankswitch or I'm missing something?
--$f0020 is for the sound program,same for all games, for example mjzoomin hasn't any clear
- write to $80040 area and the program jumps to $f0020 when there should be a sample.
--Likewise, D0 upper byte is used but currently ignored.
+- $f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
+  do that,returning the contents of D0 register seems enough for now...
+  Update: Improved it for the new mcu simulation,now it pulls all the values from 0x00 to
+  0x0f, it seems to be a MCU call snippet for the $f0000 work ram;
+- $f030e is a mirror for $f000e in urashima.
+- I need more space for MCU code...that's why I've used an extra jmp when entering
+  into mcu code,so we can debug the first version freely without being teased about
+  memory space.
+  BTW,the real HW is using a sort of bankswitch or I'm missing something?
+- $f0020 is for the sound program,same for all games, for example mjzoomin hasn't any clear
+  write to $80040 area and the program jumps to $f0020 when there should be a sample.
+- Likewise, D0 upper byte is used but currently ignored.
 
 ============================================================================================
 Debug cheats:
@@ -119,6 +117,7 @@ OSC:    12.000MHz
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "video/ms1_tmap.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -129,67 +128,17 @@ class jalmah_state : public driver_device
 public:
 	jalmah_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_sc0_vram(*this, "sc0_vram"),
-		m_sc1_vram(*this, "sc1_vram"),
-		m_sc2_vram(*this, "sc2_vram"),
-		m_sc3_vram(*this, "sc3_vram"),
+		m_palette(*this, "palette"),
+		m_tmap(*this, "scroll%u", 0),
 		m_jm_shared_ram(*this, "jshared_ram"),
 		m_jm_mcu_code(*this, "jmcu_code"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_maincpu(*this, "maincpu")
+		{ }
 
-	tilemap_t *m_sc0_tilemap_0;
-	tilemap_t *m_sc0_tilemap_1;
-	tilemap_t *m_sc0_tilemap_2;
-	tilemap_t *m_sc0_tilemap_3;
-	tilemap_t *m_sc1_tilemap_0;
-	tilemap_t *m_sc1_tilemap_1;
-	tilemap_t *m_sc1_tilemap_2;
-	tilemap_t *m_sc1_tilemap_3;
-	tilemap_t *m_sc2_tilemap_0;
-	tilemap_t *m_sc2_tilemap_1;
-	tilemap_t *m_sc2_tilemap_2;
-	tilemap_t *m_sc2_tilemap_3;
-	tilemap_t *m_sc3_tilemap_0;
-	tilemap_t *m_sc3_tilemap_2;
-	tilemap_t *m_sc3_tilemap_3;
-	required_shared_ptr<uint16_t> m_sc0_vram;
-	optional_shared_ptr<uint16_t> m_sc1_vram;
-	optional_shared_ptr<uint16_t> m_sc2_vram;
-	required_shared_ptr<uint16_t> m_sc3_vram;
-	std::unique_ptr<uint16_t[]>m_jm_scrollram;
-	std::unique_ptr<uint16_t[]> m_jm_vregs;
-	uint16_t m_sc0bank;
-	uint16_t m_pri;
-	uint8_t m_sc0_prin;
-	uint8_t m_sc1_prin;
-	uint8_t m_sc2_prin;
-	uint8_t m_sc3_prin;
-	required_shared_ptr<uint16_t> m_jm_shared_ram;
-	required_shared_ptr<uint16_t> m_jm_mcu_code;
-	uint8_t m_mcu_prg;
-	int m_respcount;
-	uint8_t m_test_mode;
-	uint16_t m_dma_old;
-	uint16_t m_prg_prot;
-	uint8_t m_oki_rom;
-	uint8_t m_oki_bank;
-	uint8_t m_oki_za;
-	DECLARE_WRITE16_MEMBER(sc0_vram_w);
-	DECLARE_WRITE16_MEMBER(sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(sc1_vram_w);
-	DECLARE_WRITE16_MEMBER(sc2_vram_w);
-	DECLARE_WRITE16_MEMBER(jalmah_tilebank_w);
-	DECLARE_WRITE16_MEMBER(jalmah_scroll_w);
-	DECLARE_WRITE16_MEMBER(urashima_bank_w);
-	DECLARE_WRITE16_MEMBER(urashima_sc0_vram_w);
-	DECLARE_WRITE16_MEMBER(urashima_sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(urashima_vregs_w);
-	DECLARE_WRITE16_MEMBER(urashima_dma_w);
-	DECLARE_WRITE16_MEMBER(jalmah_okirom_w);
-	DECLARE_WRITE16_MEMBER(jalmah_okibank_w);
-	DECLARE_WRITE16_MEMBER(jalmah_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(tilebank_w);
+	DECLARE_WRITE16_MEMBER(okirom_w);
+	DECLARE_WRITE16_MEMBER(okibank_w);
+	DECLARE_WRITE16_MEMBER(flip_screen_w);
 	DECLARE_READ16_MEMBER(urashima_mcu_r);
 	DECLARE_WRITE16_MEMBER(urashima_mcu_w);
 	DECLARE_READ16_MEMBER(daireika_mcu_r);
@@ -204,41 +153,97 @@ public:
 	void init_kakumei2();
 	void init_daireika();
 	void init_mjzoomin();
-	TILEMAP_MAPPER_MEMBER(range0_16x16);
-	TILEMAP_MAPPER_MEMBER(range1_16x16);
-	TILEMAP_MAPPER_MEMBER(range2_16x16);
-	TILEMAP_MAPPER_MEMBER(range3_16x16);
-	TILEMAP_MAPPER_MEMBER(range2_8x8);
-	TILEMAP_MAPPER_MEMBER(range3_8x8);
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_VIDEO_START(urashima);
 	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
-	void jalmah_priority_system();
-	void draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sc2_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
+	void refresh_priority_system();
 	void daireika_palette_dma(uint16_t val);
 	void daireika_mcu_run();
 	void mjzoomin_mcu_run();
 	void urashima_mcu_run();
 	void second_mcu_run();
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void urashima(machine_config &config);
 	void jalmah(machine_config &config);
-	void jalmah(address_map &map);
-	void urashima(address_map &map);
+	void jalmah_map(address_map &map);
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	
+	required_device<palette_device> m_palette;
+	optional_device_array<megasys1_tilemap_device, 4> m_tmap;
+
+	uint16_t m_tile_bank;
+	uint16_t m_pri;
+	void mcu_check_test_mode();
+
+private:
+	required_shared_ptr<uint16_t> m_jm_shared_ram;
+	required_shared_ptr<uint16_t> m_jm_mcu_code;
+	required_device<cpu_device> m_maincpu;
+
+	uint8_t m_sc0_prin;
+	uint8_t m_sc1_prin;
+	uint8_t m_sc2_prin;
+	uint8_t m_sc3_prin;
+
+	uint8_t m_mcu_prg;
+	int m_respcount;
+	uint8_t m_test_mode;
+	uint16_t m_dma_old;
+	uint16_t m_prg_prot;
+	uint8_t m_oki_rom;
+	uint8_t m_oki_bank;
+	uint8_t m_oki_za;
+	
+	// arbitrary numbering scheme for the MCU sims
+	enum {
+		URASHIMA_MCU = 0x11,
+		DAIREIKA_MCU = 0x12,
+		MJZOOMIN_MCU = 0x13,
+		KAKUMEI_MCU = 0x21,
+		KAKUMEI2_MCU = 0x22,
+		SUCHIESP_MCU = 0x23
+	};
 };
 
+class urashima_state : public jalmah_state
+{
+public:
+	urashima_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jalmah_state(mconfig, type, tag),
+		  m_videoram(*this, "videoram%u", 0U),
+   	  	  m_gfxdecode(*this, "gfxdecode")
+	{}
+
+	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vregs_r);
+	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vregs_w);
+
+	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vram_r);
+	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vram_w);
+
+	DECLARE_WRITE16_MEMBER(urashima_vreg_log_w);
+	DECLARE_WRITE16_MEMBER(urashima_priority_w);
+
+	template<int TileChip> TILE_GET_INFO_MEMBER(get_tile_info_urashima);
+
+	void urashima(machine_config &config);
+	void urashima_map(address_map &map);
+
+	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(urashima_bank_w);
+
+protected:
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
+	uint16_t m_vreg[2][0x800];
+	tilemap_t *m_layer[2];
+	
+	TILEMAP_MAPPER_MEMBER(range0_16x16);
+	TILEMAP_MAPPER_MEMBER(range3_8x8);
+};
 
 /******************************************************************************************
 
@@ -246,140 +251,48 @@ Video Hardware start
 
 ******************************************************************************************/
 
-/*4096x512 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range0_16x16)
+void jalmah_state::video_start()
+{
+	// ...
+}
+
+template<int TileChip>
+TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
+{
+	int code = m_videoram[TileChip][tile_index];
+	uint16_t tile = code & 0xfff;
+	
+	if(TileChip == 0)
+		tile |= m_tile_bank << 12;
+	
+	SET_TILE_INFO_MEMBER(TileChip,
+			tile,
+			code >> 12,
+			0);
+}
+
+TILEMAP_MAPPER_MEMBER(urashima_state::range0_16x16)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-/*2048x1024 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range1_16x16)
+TILEMAP_MAPPER_MEMBER(urashima_state::range3_8x8)
 {
-	/* logical (col,row) -> memory offset */
-	return (row & 0x0f) + ((col & 0x7f) << 4) + ((row & 0xf0) << 7);
+	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x20) * 0x40);
 }
 
-/*1024x2048 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range2_16x16)
+void urashima_state::video_start()
 {
-	/* logical (col,row) -> memory offset */
-	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x1f0) << 6);
-}
+	jalmah_state::video_start();
+	
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
+	// range confirmed with title screen transition in attract mode
+	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,64);
 
-/*512x4096 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range3_16x16)
-{
-	/* logical (col,row) -> memory offset */
-	return (row & 0x0f) + ((col & 0x1f) << 4) + ((row & 0x3f0) << 5);
-}
-
-
-/*1024x512 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range2_8x8)
-{
-	/* logical (col,row) -> memory offset */
-	return (row & 0x1f) + ((col & 0x7f) * 0x20) + ((row & 0x20) * 0x80);
-}
-
-/*512x1024 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range3_8x8)
-{
-	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x60) * 0x40);
-}
-
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc0_tile_info)
-{
-	int code = m_sc0_vram[tile_index];
-	SET_TILE_INFO_MEMBER(3,
-			(code & 0xfff) + ((m_sc0bank & 3) << 12),
-			code >> 12,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc1_tile_info)
-{
-	int code = m_sc1_vram[tile_index];
-	SET_TILE_INFO_MEMBER(2,
-			code & 0xfff,
-			code >> 12,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc2_tile_info)
-{
-	int code = m_sc2_vram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
-			code & 0xfff,
-			code >> 12,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc3_tile_info)
-{
-	int code = m_sc3_vram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
-			code & 0xfff,
-			code >> 12,
-			0);
-}
-
-void jalmah_state::video_start()
-{
-	m_sc0_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
-	m_sc0_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range1_16x16),this),16,16,128,64);
-	m_sc0_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_16x16),this),16,16,64,128);
-	m_sc0_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range3_16x16),this),16,16,32,256);
-
-	m_sc1_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc1_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
-	m_sc1_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc1_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range1_16x16),this),16,16,128,64);
-	m_sc1_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc1_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_16x16),this),16,16,64,128);
-	m_sc1_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc1_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range3_16x16),this),16,16,32,256);
-
-	m_sc2_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc2_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
-	m_sc2_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc2_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range1_16x16),this),16,16,128,64);
-	m_sc2_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc2_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_16x16),this),16,16,64,128);
-	m_sc2_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc2_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range3_16x16),this),16,16,32,256);
-
-	m_sc3_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),TILEMAP_SCAN_COLS,8,8,256,32);
-	//m_sc3_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),TILEMAP_SCAN_COLS,8,8,256,32);
-	m_sc3_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
-	m_sc3_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range3_8x8),this),8,8,64,128);
-
-	m_jm_scrollram = std::make_unique<uint16_t[]>(0x80/2);
-	m_jm_vregs = std::make_unique<uint16_t[]>(0x40/2);
-
-	m_sc0_tilemap_0->set_transparent_pen(15);
-	m_sc0_tilemap_1->set_transparent_pen(15);
-	m_sc0_tilemap_2->set_transparent_pen(15);
-	m_sc0_tilemap_3->set_transparent_pen(15);
-
-	m_sc1_tilemap_0->set_transparent_pen(15);
-	m_sc1_tilemap_1->set_transparent_pen(15);
-	m_sc1_tilemap_2->set_transparent_pen(15);
-	m_sc1_tilemap_3->set_transparent_pen(15);
-
-	m_sc2_tilemap_0->set_transparent_pen(15);
-	m_sc2_tilemap_1->set_transparent_pen(15);
-	m_sc2_tilemap_2->set_transparent_pen(15);
-	m_sc2_tilemap_3->set_transparent_pen(15);
-
-	m_sc3_tilemap_0->set_transparent_pen(15);
-	//m_sc3_tilemap_1->set_transparent_pen(15);
-	m_sc3_tilemap_2->set_transparent_pen(15);
-	m_sc3_tilemap_3->set_transparent_pen(15);
-}
-
-VIDEO_START_MEMBER(jalmah_state,urashima)
-{
-	m_sc0_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
-	m_sc3_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
-
-	m_jm_scrollram = std::make_unique<uint16_t[]>(0x80/2);
-	m_jm_vregs = std::make_unique<uint16_t[]>(0x40/2);
-
-	m_sc0_tilemap_0->set_transparent_pen(15);
-	m_sc3_tilemap_0->set_transparent_pen(15);
+	for(int i=0;i<2;i++)
+		m_layer[i]->set_transparent_pen(15);
 }
 
 
@@ -392,7 +305,7 @@ etc.)
 In the end the final results always are one bit assigned to each priority (i.e. most
 priority = 8, then 4, 2 and finally 1).
 ***************************************************************************************/
-void jalmah_state::jalmah_priority_system()
+void jalmah_state::refresh_priority_system()
 {
 	uint8_t *pri_rom = memregion("user1")->base();
 	uint8_t i;
@@ -416,291 +329,136 @@ void jalmah_state::jalmah_priority_system()
 	//popmessage("%02x %02x %02x %02x",m_sc0_prin,m_sc1_prin,m_sc2_prin,m_sc3_prin);
 }
 
-void jalmah_state::draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	switch(m_jm_vregs[0] & 3)
-	{
-		case 0: m_sc0_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
-		case 1: m_sc0_tilemap_1->draw(screen, bitmap, cliprect, 0,0); break;
-		case 2: m_sc0_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
-		case 3: m_sc0_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
-	}
-}
-
-void jalmah_state::draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	switch(m_jm_vregs[1] & 3)
-	{
-		case 0: m_sc1_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
-		case 1: m_sc1_tilemap_1->draw(screen, bitmap, cliprect, 0,0); break;
-		case 2: m_sc1_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
-		case 3: m_sc1_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
-	}
-}
-
-void jalmah_state::draw_sc2_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	switch(m_jm_vregs[2] & 3)
-	{
-		case 0: m_sc2_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
-		case 1: m_sc2_tilemap_1->draw(screen, bitmap, cliprect, 0,0); break;
-		case 2: m_sc2_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
-		case 3: m_sc2_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
-	}
-}
-
-void jalmah_state::draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	switch(m_jm_vregs[3] & 3)
-	{
-		case 0:
-		case 1: m_sc3_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
-		case 2: m_sc3_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
-		case 3: m_sc3_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
-	}
-}
 
 uint32_t jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *jm_scrollram = m_jm_scrollram.get();
-	uint8_t cur_prin;
-	jalmah_priority_system();
-
-	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
-	m_sc0_tilemap_1->set_scrollx(0, jm_scrollram[0] & 0x7ff);
-	m_sc0_tilemap_2->set_scrollx(0, jm_scrollram[0] & 0x3ff);
-	m_sc0_tilemap_3->set_scrollx(0, jm_scrollram[0] & 0x1ff);
-
-	m_sc1_tilemap_0->set_scrollx(0, jm_scrollram[1] & 0xfff);
-	m_sc1_tilemap_1->set_scrollx(0, jm_scrollram[1] & 0x7ff);
-	m_sc1_tilemap_2->set_scrollx(0, jm_scrollram[1] & 0x3ff);
-	m_sc1_tilemap_3->set_scrollx(0, jm_scrollram[1] & 0x1ff);
-
-	m_sc2_tilemap_0->set_scrollx(0, jm_scrollram[2] & 0xfff);
-	m_sc2_tilemap_1->set_scrollx(0, jm_scrollram[2] & 0x7ff);
-	m_sc2_tilemap_2->set_scrollx(0, jm_scrollram[2] & 0x3ff);
-	m_sc2_tilemap_3->set_scrollx(0, jm_scrollram[2] & 0x1ff);
-
-	m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3] & 0x7ff);
-//  empty
-	m_sc3_tilemap_2->set_scrollx(0, jm_scrollram[3] & 0x3ff);
-	m_sc3_tilemap_3->set_scrollx(0, jm_scrollram[3] & 0x1ff);
-
-
-	m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4] & 0x1ff);
-	m_sc0_tilemap_1->set_scrolly(0, jm_scrollram[4] & 0x3ff);
-	m_sc0_tilemap_2->set_scrolly(0, jm_scrollram[4] & 0x7ff);
-	m_sc0_tilemap_3->set_scrolly(0, jm_scrollram[4] & 0xfff);
-
-	m_sc1_tilemap_0->set_scrolly(0, jm_scrollram[5] & 0x1ff);
-	m_sc1_tilemap_1->set_scrolly(0, jm_scrollram[5] & 0x3ff);
-	m_sc1_tilemap_2->set_scrolly(0, jm_scrollram[5] & 0x7ff);
-	m_sc1_tilemap_3->set_scrolly(0, jm_scrollram[5] & 0xfff);
-
-	m_sc2_tilemap_0->set_scrolly(0, jm_scrollram[6] & 0x1ff);
-	m_sc2_tilemap_1->set_scrolly(0, jm_scrollram[6] & 0x3ff);
-	m_sc2_tilemap_2->set_scrolly(0, jm_scrollram[6] & 0x7ff);
-	m_sc2_tilemap_3->set_scrolly(0, jm_scrollram[6] & 0xfff);
-
-	m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7] & 0xff);
-//  empty
-	m_sc3_tilemap_2->set_scrolly(0, jm_scrollram[7] & 0x1ff);
-	m_sc3_tilemap_3->set_scrolly(0, jm_scrollram[7] & 0x3ff);
-
 	bitmap.fill(m_palette->pen(0xff), cliprect); //selectable by a ram address?
 
-	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
+	for(uint8_t cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
-		if(cur_prin==m_sc0_prin) { draw_sc0_layer(screen,bitmap,cliprect); }
-		if(cur_prin==m_sc1_prin) { draw_sc1_layer(screen,bitmap,cliprect); }
-		if(cur_prin==m_sc2_prin) { draw_sc2_layer(screen,bitmap,cliprect); }
-		if(cur_prin==m_sc3_prin) { draw_sc3_layer(screen,bitmap,cliprect); }
+		if(cur_prin==m_sc0_prin) { m_tmap[0]->draw(screen,bitmap,cliprect,0,0); }
+		if(cur_prin==m_sc1_prin) { m_tmap[1]->draw(screen,bitmap,cliprect,0,0); }
+		if(cur_prin==m_sc2_prin) { m_tmap[2]->draw(screen,bitmap,cliprect,0,0); }
+		if(cur_prin==m_sc3_prin) { m_tmap[3]->draw(screen,bitmap,cliprect,0,0); }
 	}
 
 	return 0;
 }
 
-uint32_t jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *jm_scrollram = m_jm_scrollram.get();
-	/*this game doesn't use the RANGE register at all.*/
-	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0]);
-	m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3]);
-	m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4]);
-	m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7]);
+	rectangle clip;
+	uint16_t sx[2],sy[2];
 
-	bitmap.fill(m_palette->pen(0x1ff), cliprect);//selectable by a ram address?
-	if(m_jm_vregs[0] & 1) { m_sc0_tilemap_0->draw(screen, bitmap, cliprect, 0,0); }
-	if(m_jm_vregs[3] & 1) { m_sc3_tilemap_0->draw(screen, bitmap, cliprect, 0,0); }
+	// reset scroll latches
+	sx[0] = sx[1] = sy[0] = sy[1] = 0;
+	
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
+	
+	bitmap.fill(m_palette->pen(0x1ff), cliprect); //selectable by a ram address?
+	
+	for(int y = cliprect.min_y; y < cliprect.max_y; y++)
+	{
+		clip.min_y = clip.max_y = y;
+		
+		// Urashima tilemaps interrogate the video register area to make row and column scrolling
+		// for every scanline the format is:
+		// ---- ---- ---- ---- [0] unused?
+		// ---- ---- ---- ---x [1] latches new scroll values
+		// ---- xxxx xxxx xxxx [2] new scroll x value
+		// ---- yyyy yyyy yyyy [3] new scroll y value
+		// this is notably used by the big puntos winning animations.
+		for(int layer_num=0;layer_num<2;layer_num++)
+		{
+			// latches fetch go in reverse order when flip screen is enabled
+			int y_base = flip_screen() ? 0x3fc-(y*4) : y*4;
+			
+			// is there a new latch?
+			if(m_vreg[layer_num][1+y_base] & 1)
+			{
+				sx[layer_num] = m_vreg[layer_num][2+y_base];
+				sy[layer_num] = m_vreg[layer_num][3+y_base];
+			}
+			
+			// set scroll values for this layer
+			m_layer[layer_num]->set_scrollx(0,sx[layer_num]);
+			m_layer[layer_num]->set_scrolly(0,sy[layer_num]);
+		}
+
+		if(m_pri & 1)
+		{
+			m_layer[0]->draw(screen,bitmap,clip,0,0);
+			m_layer[1]->draw(screen,bitmap,clip,0,0);		
+		}
+		else
+		{
+			m_layer[1]->draw(screen,bitmap,clip,0,0);
+			m_layer[0]->draw(screen,bitmap,clip,0,0);
+		}
+	}
+
 	return 0;
 }
 
-WRITE16_MEMBER(jalmah_state::sc0_vram_w)
-{
-	COMBINE_DATA(&m_sc0_vram[offset]);
-	/*2048x256 tilemap*/
-	m_sc0_tilemap_0->mark_tile_dirty(offset);
-	/*1024x512 tilemap*/
-	m_sc0_tilemap_1->mark_tile_dirty(offset);
-	/*512x1024 tilemap*/
-	m_sc0_tilemap_2->mark_tile_dirty(offset);
-	/*256x2048 tilemap*/
-	m_sc0_tilemap_3->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(jalmah_state::sc3_vram_w)
-{
-	COMBINE_DATA(&m_sc3_vram[offset]);
-	/*2048x256 tilemap*/
-	m_sc3_tilemap_0->mark_tile_dirty(offset);
-	/*1024x512 tilemap*/
-	m_sc3_tilemap_2->mark_tile_dirty(offset);
-	/*512x1024 tilemap*/
-	m_sc3_tilemap_3->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(jalmah_state::sc1_vram_w)
-{
-	COMBINE_DATA(&m_sc1_vram[offset]);
-	/*2048x256 tilemap*/
-	m_sc1_tilemap_0->mark_tile_dirty(offset);
-	/*1024x512 tilemap*/
-	m_sc1_tilemap_1->mark_tile_dirty(offset);
-	/*512x1024 tilemap*/
-	m_sc1_tilemap_2->mark_tile_dirty(offset);
-	/*256x2048 tilemap*/
-	m_sc1_tilemap_3->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(jalmah_state::sc2_vram_w)
-{
-	COMBINE_DATA(&m_sc2_vram[offset]);
-	/*2048x256 tilemap*/
-	m_sc2_tilemap_0->mark_tile_dirty(offset);
-	/*1024x512 tilemap*/
-	m_sc2_tilemap_1->mark_tile_dirty(offset);
-	/*512x1024 tilemap*/
-	m_sc2_tilemap_2->mark_tile_dirty(offset);
-	/*256x2048 tilemap*/
-	m_sc2_tilemap_3->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
+WRITE8_MEMBER(jalmah_state::tilebank_w)
 {
 	/*
-	 xxxx ---- fg bank (used by suchiesp)
+	 --xx ---- fg bank (used by suchiesp)
 	 ---- xxxx Priority number (trusted,see mjzoomin)
 	*/
-	//popmessage("Write to tilebank %02x",data);
-	if (ACCESSING_BITS_0_7)
+	if (m_tile_bank != ((data & 0x30) >> 4))
 	{
-		if (m_sc0bank != ((data & 0xf0) >> 4))
-		{
-			m_sc0bank = (data & 0xf0) >> 4;
-			m_sc0_tilemap_0->mark_all_dirty();
-			m_sc0_tilemap_1->mark_all_dirty();
-			m_sc0_tilemap_2->mark_all_dirty();
-			m_sc0_tilemap_3->mark_all_dirty();
-		}
-		if (m_pri != (data & 0x0f))
-			m_pri = data & 0x0f;
+		m_tile_bank = (data & 0x30) >> 4;
+		m_tmap[0]->set_tilebank(m_tile_bank);
+	}
+	if (m_pri != (data & 0x0f))
+	{
+		m_pri = data & 0x0f;
+		refresh_priority_system();
 	}
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
+WRITE8_MEMBER(urashima_state::urashima_bank_w)
 {
-	uint16_t *jm_scrollram = m_jm_scrollram.get();
-	uint16_t *jm_vregs = m_jm_vregs.get();
-	//logerror("[%04x]<-%04x\n",(offset+0x10)*2,data);
-	switch(offset+(0x10))
+	if (m_tile_bank != (data & 0x0f))
 	{
-		/*These 4 are just video regs,see mjzoomin test*/
-		/*
-		    ---x ---- Always on with layer 3, 8x8 tiles switch?
-		    ---- --xx RANGE registers
-		*/
-		case (0x24/2): jm_vregs[0] = data; break;
-		case (0x2c/2): jm_vregs[1] = data; break;
-		case (0x34/2): jm_vregs[2] = data; break;
-		case (0x3c/2): jm_vregs[3] = data; break;
-
-		case (0x20/2): jm_scrollram[0] = data; break;
-		case (0x28/2): jm_scrollram[1] = data; break;
-		case (0x30/2): jm_scrollram[2] = data; break;
-		case (0x38/2): jm_scrollram[3] = data; break;
-		case (0x22/2): jm_scrollram[4] = data; break;
-		case (0x2a/2): jm_scrollram[5] = data; break;
-		case (0x32/2): jm_scrollram[6] = data; break;
-		case (0x3a/2): jm_scrollram[7] = data; break;
-		//default:    popmessage("[%04x]<-%04x",offset+0x10,data);
+		m_tile_bank = (data & 0x0f);
+		m_layer[0]->mark_all_dirty();
 	}
 }
 
-WRITE16_MEMBER(jalmah_state::urashima_bank_w)
+template<int TileChip>
+READ16_MEMBER(urashima_state::urashima_vram_r)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (m_sc0bank != (data & 0x0f))
-		{
-			m_sc0bank = (data & 0x0f);
-			m_sc0_tilemap_0->mark_all_dirty();
-			//m_sc0_tilemap_2->mark_all_dirty();
-			//m_sc0_tilemap_3->mark_all_dirty();
-		}
-	}
+	return m_videoram[TileChip][offset];
 }
 
-WRITE16_MEMBER(jalmah_state::urashima_sc0_vram_w)
+template<int TileChip>
+WRITE16_MEMBER(urashima_state::urashima_vram_w)
 {
-	COMBINE_DATA(&m_sc0_vram[offset]);
-	m_sc0_tilemap_0->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[TileChip][offset]);
+	m_layer[TileChip]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
+template<int TileChip>
+READ16_MEMBER(urashima_state::urashima_vregs_r)
 {
-	COMBINE_DATA(&m_sc3_vram[offset]);
-	m_sc3_tilemap_0->mark_tile_dirty(offset);
+	return m_vreg[TileChip][offset];
 }
 
-/*Urashima Mahjong uses a bigger (and mostly unused/wasted) video register ram.*/
-WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
+template<int TileChip>
+WRITE16_MEMBER(urashima_state::urashima_vregs_w)
+{	
+	COMBINE_DATA(&m_vreg[TileChip][offset]);
+}
+
+// Urashima Mahjong uses a bigger video register area (mostly mirrored?)
+// we use this fallback so that it doesn't pollute logerror and get the info we want
+WRITE16_MEMBER(urashima_state::urashima_vreg_log_w)
 {
-	uint16_t *jm_scrollram = m_jm_scrollram.get();
-	uint16_t *jm_vregs = m_jm_vregs.get();
-	//logerror("[%04x]<-%04x\n",(offset)*2,data);
-	switch(offset)
-	{
-		case 0x082/2: jm_vregs[0] = data;     break; //sc0 plane enable
-		case 0x084/2: jm_scrollram[0] = data; break; //sc0 x offset
-		case 0x086/2: jm_scrollram[4] = data; break; //sc0 y offset
-
-//      case 0x182/2: jm_vregs[0] = data;     break;
-//      case 0x184/2: jm_scrollram[0] = data; break;
-//      case 0x186/2: jm_scrollram[4] = data; break;
-
-//      case 0x382/2: jm_vregs[0] = data;     break;
-//      case 0x384/2: jm_scrollram[0] = data; break;
-//      case 0x386/2: jm_scrollram[4] = data; break;
-
-		case 0x882/2: jm_vregs[3] = data;     break; //sc3 plane enable
-		case 0x884/2: jm_scrollram[3] = data; break; //sc3 x offset
-		case 0x886/2: jm_scrollram[7] = data; break; //sc3 y offset
-
-		/*WRONG!*/
-		case 0x602/2: jm_vregs[0] = data;     break;
-		case 0x604/2: jm_scrollram[0] = data; break;
-		case 0x606/2: jm_scrollram[4] = data; break;
-
-		case 0x77a/2: jm_vregs[0] = data;     break; //sc0 plane enable,flip screen
-		case 0x77c/2: jm_scrollram[0] = data; break; //sc0 x offset,flip screen
-		case 0x77e/2: jm_scrollram[4] = data; break; //sc0 y offset,flip screen
-
-		case 0xf7a/2: jm_vregs[3] = data;     break; //sc3 plane enable,flip screen
-		case 0xf7c/2: jm_scrollram[3] = data; break; //sc3 x offset,flip screen
-		case 0xf7e/2: jm_scrollram[7] = data; break; //sc3 y offset,flip screen
-		default: break;
-	}
-	//popmessage("%04x %04x %04x %04x %02x %02x",jm_scrollram[0],jm_scrollram[4],jm_scrollram[3],jm_scrollram[7],jm_vregs[0],jm_vregs[3]);
+	if(data)
+		logerror("Warning vreg write to [%04x] -> %04x\n",offset*2,data);
 }
 
 /******************************************************************************************
@@ -710,42 +468,12 @@ Protection file start
 ******************************************************************************************/
 
 
-/*
-MCU program number,different for each game(n.b. the numbering scheme is *mine*,do not
-take it seriously...):
-0x11 = daireika
-0x12 = urashima
-0x13 = mjzoomin
-0x21 = kakumei
-0x22 = kakumei2
-0x23 = suchiesp
-
-xxxx ---- MCU program revision
----- xxxx MCU program number assignment for each game.
-*/
-
-#define DAIREIKA_MCU (0x11)
-#define URASHIMA_MCU (0x12)
-#define MJZOOMIN_MCU (0x13)
-#define KAKUMEI_MCU  (0x21)
-#define KAKUMEI2_MCU (0x22)
-#define SUCHIPI_MCU  (0x23)
-
-
 #define MCU_READ(tag, _bit_, _offset_, _retval_) \
 if((0xffff - ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
 
-/*Funky "DMA" / protection thing*/
-/*---- -x-- "DMA" execute.*/
-/*---- ---x used too very often,I don't have any clue of what it is,it might just be the source or the destination address.*/
-WRITE16_MEMBER(jalmah_state::urashima_dma_w)
+WRITE16_MEMBER(urashima_state::urashima_priority_w)
 {
-	if(data & 4)
-	{
-		uint32_t i;
-		for(i = 0; i < 0x200; i += 2)
-			space.write_word(0x88200 + i, space.read_word(0x88400 + i));
-	}
+	m_pri = data & 1;
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
@@ -951,24 +679,16 @@ void jalmah_state::second_mcu_run()
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::jalmah_mcu_sim)
+TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::mcu_sim)
 {
 	switch(m_mcu_prg)
 	{
-		/*
-		    #define DAIREIKA_MCU (0x11)
-		    #define URASHIMA_MCU (0x12)
-		    #define MJZOOMIN_MCU (0x13)
-		    #define KAKUMEI_MCU  (0x21)
-		    #define KAKUMEI2_MCU (0x22)
-		    #define SUCHIPI_MCU  (0x23)
-		*/
 			case MJZOOMIN_MCU: mjzoomin_mcu_run(); break;
 			case DAIREIKA_MCU: daireika_mcu_run(); break;
 			case URASHIMA_MCU: urashima_mcu_run(); break;
 			case KAKUMEI_MCU:
 			case KAKUMEI2_MCU:
-			case SUCHIPI_MCU:  second_mcu_run(); break;
+			case SUCHIESP_MCU:  second_mcu_run(); break;
 	}
 }
 
@@ -979,7 +699,7 @@ Basic driver start
 ******************************************************************************************/
 
 
-WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
+WRITE16_MEMBER(jalmah_state::okirom_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -996,7 +716,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
+WRITE16_MEMBER(jalmah_state::okibank_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -1010,7 +730,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
+WRITE16_MEMBER(jalmah_state::flip_screen_w)
 {
 	/*---- ----x flip screen*/
 	flip_screen_set(data & 1);
@@ -1018,56 +738,58 @@ WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 //  popmessage("%04x",data);
 }
 
-void jalmah_state::jalmah(address_map &map)
+void jalmah_state::jalmah_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("DSW");
-	//       0x080004, 0x080005  MCU read,different for each game
-	map(0x080010, 0x080011).w(FUNC(jalmah_state::jalmah_flip_screen_w));
-	//       0x080012, 0x080013  MCU write related,same for each game
-	//       0x080014, 0x080015  MCU write related,same for each game
-/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::jalmah_tilebank_w));
-	map(0x080018, 0x080019).w(FUNC(jalmah_state::jalmah_okibank_w));
-	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::jalmah_okirom_w));
-/**/map(0x080020, 0x08003f).ram().w(FUNC(jalmah_state::jalmah_scroll_w));
+//      0x080004, 0x080005  MCU read, different for each game
+	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
+//      0x080012, 0x080013  MCU write related,same for each game
+//      0x080014, 0x080015  MCU write related (handshake), same for each game
+	map(0x080016, 0x080017).w(FUNC(jalmah_state::tilebank_w)).umask16(0x00ff);
+	map(0x080018, 0x080019).w(FUNC(jalmah_state::okibank_w));
+	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::okirom_w));
+	map(0x080020, 0x080025).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x080028, 0x08002d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x080030, 0x080035).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x080038, 0x08003d).rw("scroll3", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//       0x084000, 0x084001  ?
+//      0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x090000, 0x093fff).ram().w(FUNC(jalmah_state::sc0_vram_w)).share("sc0_vram");
-	map(0x094000, 0x097fff).ram().w(FUNC(jalmah_state::sc1_vram_w)).share("sc1_vram");
-	map(0x098000, 0x09bfff).ram().w(FUNC(jalmah_state::sc2_vram_w)).share("sc2_vram");
-	map(0x09c000, 0x09ffff).ram().w(FUNC(jalmah_state::sc3_vram_w)).share("sc3_vram");
+	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0"); // Scroll RAM 0
+	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1"); // Scroll RAM 1
+	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2"); // Scroll RAM 2
+	map(0x09c000, 0x09ffff).ram().w("scroll3", FUNC(megasys1_tilemap_device::write)).share("scroll3"); // Scroll RAM 3
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
 	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 }
 
-void jalmah_state::urashima(address_map &map)
+void urashima_state::urashima_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("DSW");
-	//       0x080004, 0x080005  MCU read,different for each game
-	map(0x080010, 0x080011).w(FUNC(jalmah_state::jalmah_flip_screen_w));
-	//       0x080012, 0x080013  MCU write related,same for each game
-	//       0x080014, 0x080015  MCU write related,same for each game
-/**/map(0x080016, 0x080017).ram().w(FUNC(jalmah_state::urashima_dma_w));
-	map(0x080018, 0x080019).w(FUNC(jalmah_state::jalmah_okibank_w));
-	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::jalmah_okirom_w));
-/**/map(0x08001c, 0x08001d).ram().w(FUNC(jalmah_state::urashima_bank_w));
+//      0x080004, 0x080005  MCU read, different for each game
+	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
+//      0x080012, 0x080013  MCU write related, same for each game
+	map(0x080014, 0x080015).noprw(); // MCU handshake
+/**/map(0x080016, 0x080017).ram().w(FUNC(urashima_state::urashima_priority_w));
+	map(0x080018, 0x080019).w(FUNC(jalmah_state::okibank_w));
+	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::okirom_w));
+/**/map(0x08001c, 0x08001d).ram().w(FUNC(urashima_state::urashima_bank_w)).umask16(0x00ff);
 	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//       0x084000, 0x084001  ?
-	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x090000, 0x093fff).ram().w(FUNC(jalmah_state::urashima_sc0_vram_w)).share("sc0_vram");
-	map(0x094000, 0x097fff).ram().w(FUNC(jalmah_state::urashima_sc0_vram_w));
-	map(0x098000, 0x09bfff).ram().w(FUNC(jalmah_state::urashima_sc0_vram_w));
-//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
-//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
-	/*$9c000-$9cfff Video Registers*/
-/**/map(0x09c000, 0x09dfff).w(FUNC(jalmah_state::urashima_vregs_w));
-/**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE(urashima_sc2vregs_w)
-	map(0x09e000, 0x0a1fff).ram().w(FUNC(jalmah_state::urashima_sc3_vram_w)).share("sc3_vram");
+//      0x084000, 0x084001  ?
+	map(0x088000, 0x0887ff).mirror(0x800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
+	map(0x090000, 0x093fff).mirror(0x4000).rw(FUNC(urashima_state::urashima_vram_r<0>),FUNC(urashima_state::urashima_vram_w<0>)).share("videoram0");
+//	map(0x098000, 0x09bfff) unused mirror?
+	map(0x09c000, 0x09c7ff).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>));
+	map(0x09c800, 0x09cfff).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>));
+	map(0x09d000, 0x09dfff).nopr().w(FUNC(urashima_state::urashima_vreg_log_w)); // cleared at POST then unused
+
+	// likely only 0x9e000-0x9ffff is connected (0xa0000-0xa1fff cleared at POST and nowhere else)
+	map(0x09e000, 0x0a1fff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
 	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
@@ -1365,6 +1087,77 @@ static INPUT_PORTS_START( suchiesp )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+void jalmah_state::mcu_check_test_mode()
+{
+	m_respcount = 0;
+
+	/*check if we are into service or normal mode*/
+	switch(m_mcu_prg)
+	{
+		case MJZOOMIN_MCU:
+		case DAIREIKA_MCU:
+			m_test_mode = (~(ioport("SYSTEM")->read()) & 0x0008) ? (1) : (0);
+			break;
+		case URASHIMA_MCU:
+			m_test_mode = ((~(ioport("SYSTEM")->read()) & 0x0008) || (~(ioport("DSW")->read()) & 0x8000)) ? (1) : (0);
+			break;
+		case KAKUMEI_MCU:
+		case KAKUMEI2_MCU:
+		case SUCHIESP_MCU:
+			m_test_mode = (~(ioport("DSW")->read()) & 0x0004) ? (1) : (0);
+			break;
+	}
+}
+
+void jalmah_state::machine_reset()
+{
+	m_pri = 0;
+	refresh_priority_system();
+	
+	mcu_check_test_mode();
+}
+
+void urashima_state::machine_reset()
+{
+//	m_pri = 0;
+	
+	// initialize tilemap vram to sane defaults (test mode cares)
+	for(int i=0;i<0x4000/2;i++)
+	{
+		m_videoram[0][i] = 0xffff;
+		m_videoram[1][i] = 0xffff;
+	}
+	
+	mcu_check_test_mode();
+}
+
+MACHINE_CONFIG_START(jalmah_state::jalmah)
+	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000/2) // assume same as Mega System 1
+	MCFG_DEVICE_PROGRAM_MAP(jalmah_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
+
+	//M50747 MCU
+
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x0000)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 0x0100)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x0200)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll3", "palette", 0x0300)
+	
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(12000000/2,406,0,256,263,16,240) // assume same as nmk16 & mega system 1
+	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, mcu_sim, attotime::from_hz(10000))
+
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -1389,80 +1182,30 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( gfx_jalmah )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x300, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x200, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x000, 16 )
-GFXDECODE_END
-
-/*different color offsets*/
 static GFXDECODE_START( gfx_urashima )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll0", 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll3", 0, charlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "scroll1", 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll2", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
 
-void jalmah_state::machine_reset()
-{
-	m_respcount = 0;
-	/*check if we are into service or normal mode*/
-	switch(m_mcu_prg)
-	{
-		case MJZOOMIN_MCU:
-		case DAIREIKA_MCU:
-			m_test_mode = (~(ioport("SYSTEM")->read()) & 0x0008) ? (1) : (0);
-			break;
-		case URASHIMA_MCU:
-			m_test_mode = ((~(ioport("SYSTEM")->read()) & 0x0008) || (~(ioport("DSW")->read()) & 0x8000)) ? (1) : (0);
-			break;
-		case KAKUMEI_MCU:
-		case KAKUMEI2_MCU:
-		case SUCHIPI_MCU:
-			m_test_mode = (~(ioport("DSW")->read()) & 0x0004) ? (1) : (0);
-			break;
-	}
-}
-
-MACHINE_CONFIG_START(jalmah_state::jalmah)
-	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
-	MCFG_DEVICE_PROGRAM_MAP(jalmah)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
-
-	//M50747 MCU
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jalmah)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, jalmah_mcu_sim, attotime::from_hz(10000))
-
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(jalmah_state::urashima)
+MACHINE_CONFIG_START(urashima_state::urashima)
 	jalmah(config);
-
+	
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(urashima)
+	MCFG_DEVICE_PROGRAM_MAP(urashima_map)
+	
+	// Urashima seems to use an earlier version of the Jaleco tilemaps (without range etc.)
+	// and with per-scanline video registers
+	MCFG_DEVICE_REMOVE("scroll0")
+	MCFG_DEVICE_REMOVE("scroll1")
+	MCFG_DEVICE_REMOVE("scroll2")	
+	MCFG_DEVICE_REMOVE("scroll3")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
-
-	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_urashima)
+	
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_urashima)
+	MCFG_SCREEN_UPDATE_DRIVER(urashima_state, screen_update_urashima)
 MACHINE_CONFIG_END
 
 /*
@@ -1486,25 +1229,27 @@ ROM_START ( urashima )
 	ROM_LOAD( "um-3.22c",      0x40000, 0x80000, CRC(9fd8c8fa) SHA1(0346f74c03a4daa7a84b64c9edf0e54297c82fd9) )
 	ROM_COPY( "oki" ,          0x40000, 0x00000, 0x40000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "um-5.22j",       0x000000, 0x020000, CRC(991776a2) SHA1(56740553d7d26aaeb9bec8557727030950bb01f7) )  /* 8x8 tiles */
-
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x16 Tiles */
-	ROM_LOAD( "um-6.2l",    0x000000, 0x080000, CRC(076be5b5) SHA1(77444025f149a960137d3c79abecf9b30defa341) )
-
-	ROM_REGION( 0x080000, "gfx3", 0 )
+	
+	ROM_REGION( 0x080000, "scroll1", 0 )
 	ROM_LOAD( "um-7.4l",    0x000000, 0x080000, CRC(d2a68cfb) SHA1(eb6cb1fad306b697b2035a31ad48e8996722a032) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 ) /* BG3 */
+	ROM_REGION( 0x080000, "scroll2", 0 ) /* 16x16 Tiles */
+	ROM_LOAD( "um-6.2l",    0x000000, 0x080000, CRC(076be5b5) SHA1(77444025f149a960137d3c79abecf9b30defa341) )
+
+	ROM_REGION( 0x200000, "scroll0", 0 )
 	/*0*/
-	ROM_COPY( "gfx2" , 0x000000, 0x000000, 0x40000 )
-	ROM_COPY( "gfx2",  0x040000, 0x040000, 0x40000 )
+	ROM_COPY( "scroll2" , 0x000000, 0x000000, 0x40000 )
+	ROM_COPY( "scroll2",  0x040000, 0x040000, 0x40000 )
 	/*1*/
-	ROM_COPY( "gfx2",  0x000000, 0x080000, 0x40000 )
-	ROM_COPY( "gfx3",  0x000000, 0x0c0000, 0x40000 )
+	ROM_COPY( "scroll2",  0x000000, 0x080000, 0x40000 )
+	ROM_COPY( "scroll1",  0x000000, 0x0c0000, 0x40000 )
 	/*2*/
-	ROM_COPY( "gfx2",  0x000000, 0x100000, 0x40000 )
-	ROM_COPY( "gfx3",  0x040000, 0x140000, 0x40000 )
+	ROM_COPY( "scroll2",  0x000000, 0x100000, 0x40000 )
+	ROM_COPY( "scroll1",  0x040000, 0x140000, 0x40000 )
+
+	ROM_REGION( 0x20000, "scroll3", 0 )
+	ROM_LOAD( "um-5.22j",       0x000000, 0x020000, CRC(991776a2) SHA1(56740553d7d26aaeb9bec8557727030950bb01f7) )  /* 8x8 tiles */
+
 
 	ROM_REGION( 0x0240, "user1", 0 )
 	ROM_LOAD( "um-10.2b",      0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )   /* unknown */
@@ -1534,20 +1279,20 @@ ROM_START( daireika )
 	ROM_LOAD( "mj3.bin", 0x40000, 0x80000, CRC(65bb350c) SHA1(e77866f2d612a0973adc616717e7c89a37d6c48e) )
 	ROM_COPY( "oki" ,    0x40000, 0x00000, 0x40000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
-	ROM_LOAD( "mj14.bin", 0x00000, 0x10000, CRC(c84c5577) SHA1(6437368d3be39739d62158590ecd373aa070a9b2) )
-	ROM_LOAD( "mj13.bin", 0x10000, 0x10000, CRC(c54bca14) SHA1(ee9c99858817aedd70bd6266b7a71c3c5ad00607) )
-
-	ROM_REGION( 0x80000, "gfx4", 0 ) /* BG3 */
+	ROM_REGION( 0x80000, "scroll0", 0 ) /* BG3 */
 	ROM_LOAD( "mj10.bin", 0x00000, 0x80000, CRC(1f5509a5) SHA1(4dcdee0e159956cf73f5f85ce278479be2a9ca9f) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
-//  ROM_COPY( "gfx4",     0x20000, 0x20000, 0x20000 )/*mj10.bin*/
+	ROM_REGION( 0x40000, "scroll1", 0 ) /* BG2 */
+//  ROM_COPY( "scroll3",     0x20000, 0x20000, 0x20000 )/*mj10.bin*/
 	ROM_LOAD( "mj11.bin", 0x00000, 0x20000, CRC(14867c51) SHA1(b282b5048a55c9ad72ceb0d23f010a0fee78704f) )
 	ROM_LOAD( "mj12.bin", 0x20000, 0x20000, CRC(236f809f) SHA1(9e15dd8a810a9d4f7f75f084d6bd277ea7d0e40a) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 ) /* BG1 */
-	ROM_COPY( "gfx1",     0x10000, 0x00000, 0x10000 )/*mj12.bin*/
+	ROM_REGION( 0x10000, "scroll2", 0 ) /* BG1 */
+	ROM_LOAD( "mj13.bin", 0x00000, 0x10000, CRC(c54bca14) SHA1(ee9c99858817aedd70bd6266b7a71c3c5ad00607) )
+
+	ROM_REGION( 0x20000, "scroll3", 0 ) /* BG0 */
+	ROM_LOAD( "mj14.bin", 0x00000, 0x10000, CRC(c84c5577) SHA1(6437368d3be39739d62158590ecd373aa070a9b2) )
+	ROM_COPY( "scroll2",     0x00000, 0x10000, 0x10000 )
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1576,17 +1321,17 @@ ROM_START( mjzoomin )
 	ROM_LOAD( "zoomin-3.bin", 0x40000, 0x80000, CRC(07d7b8cd) SHA1(e05ce80ffb945b04f93f8c49d0c840b0bff6310b) )
 	ROM_COPY( "oki" ,         0x40000, 0x00000, 0x40000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
-	ROM_LOAD( "zoomin14.bin", 0x00000, 0x20000, CRC(4e32aa45) SHA1(450a3449ca8b4f0dfe8b62cceaee9366eaf3dc3d) )
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "zoomin10.bin", 0x00000, 0x80000, CRC(40aec575) SHA1(ef7a3c7a94523c5967ab774936b873c9629e0e44) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG1 */
-	ROM_LOAD( "zoomin13.bin", 0x00000, 0x20000, CRC(888d79fe) SHA1(eb9671d4c7608edd1231dc0cae47aab2430cbd66) )
-
-	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
+	ROM_REGION( 0x40000, "scroll1", 0 )
 	ROM_LOAD( "zoomin12.bin", 0x00000, 0x40000, CRC(b0b94554) SHA1(10490b7475810910140ce075e62f604b914e5511) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) /* BG3 */
-	ROM_LOAD( "zoomin10.bin", 0x00000, 0x80000, CRC(40aec575) SHA1(ef7a3c7a94523c5967ab774936b873c9629e0e44) )
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "zoomin13.bin", 0x00000, 0x20000, CRC(888d79fe) SHA1(eb9671d4c7608edd1231dc0cae47aab2430cbd66) )
+
+	ROM_REGION( 0x20000, "scroll3", 0 )
+	ROM_LOAD( "zoomin14.bin", 0x00000, 0x20000, CRC(4e32aa45) SHA1(450a3449ca8b4f0dfe8b62cceaee9366eaf3dc3d) )
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1616,17 +1361,17 @@ ROM_START( kakumei )
 	ROM_LOAD( "rom3.bin", 0x00000, 0x40000, CRC(c9b7a526) SHA1(edec57e66d4ff601c8fdef7b1405af84a3f3d883) )
 	ROM_RELOAD(           0x40000, 0x40000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
-	ROM_LOAD( "rom14.bin", 0x00000, 0x20000, CRC(63e88dd6) SHA1(58734c8caf1b1ddc4cf0437ffd8109292b76c4e1) )
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "rom10.bin", 0x00000, 0x80000, CRC(88366377) SHA1(163a08415a631c8a09a0a55bc2819988d850f2ad) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG1 */
-	ROM_LOAD( "rom13.bin", 0x00000, 0x20000, CRC(9bef4fc2) SHA1(6598ab9dba513efcda01e47cc7752b47a97f2c6a) )
-
-	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
+	ROM_REGION( 0x40000, "scroll1", 0 )
 	ROM_LOAD( "rom12.bin", 0x00000, 0x40000, CRC(31620a61) SHA1(11593ca7760e1a628e63aa48d9ad3800cf7af275) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) /* BG3 */
-	ROM_LOAD( "rom10.bin", 0x00000, 0x80000, CRC(88366377) SHA1(163a08415a631c8a09a0a55bc2819988d850f2ad) )
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "rom13.bin", 0x00000, 0x20000, CRC(9bef4fc2) SHA1(6598ab9dba513efcda01e47cc7752b47a97f2c6a) )
+
+	ROM_REGION( 0x20000, "scroll3", 0 )
+	ROM_LOAD( "rom14.bin", 0x00000, 0x20000, CRC(63e88dd6) SHA1(58734c8caf1b1ddc4cf0437ffd8109292b76c4e1) )
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1653,17 +1398,17 @@ ROM_START( kakumei2 )
 	ROM_LOAD( "92000-01.3", 0x040000, 0x80000, CRC(4b0ed440) SHA1(11961d217a41f92b60d5083a5e346c245f7db620) )
 	ROM_COPY( "oki" ,       0x040000, 0x00000, 0x40000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
-	ROM_LOAD( "mj-8956.14", 0x00000, 0x20000, CRC(2b2fe999) SHA1(d9d601e2c008791f5bff6e7b1340f754dd094201) )
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "92000-02.10", 0x00000, 0x80000, CRC(338fa9b2) SHA1(05ba4b3c44249cf92be238bf53d6345dc49b0881) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG1 */
-	ROM_LOAD( "mj-8956.13", 0x00000, 0x20000, CRC(afe93cf4) SHA1(1973dc5821c6df68e20f8a84b5c9ae281dd3f85f) )
-
-	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
+	ROM_REGION( 0x40000, "scroll1", 0 )
 	ROM_LOAD( "mj-8956.12", 0x00000, 0x40000, CRC(4a088f69) SHA1(468c446d1f345dfd628cdd66ca71cf82e02abe6f) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) /* BG3 */
-	ROM_LOAD( "92000-02.10", 0x00000, 0x80000, CRC(338fa9b2) SHA1(05ba4b3c44249cf92be238bf53d6345dc49b0881) )
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "mj-8956.13", 0x00000, 0x20000, CRC(afe93cf4) SHA1(1973dc5821c6df68e20f8a84b5c9ae281dd3f85f) )
+
+	ROM_REGION( 0x20000, "scroll3", 0 )
+	ROM_LOAD( "mj-8956.14", 0x00000, 0x20000, CRC(2b2fe999) SHA1(d9d601e2c008791f5bff6e7b1340f754dd094201) )
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1738,20 +1483,20 @@ ROM_START( suchiesp )
 	ROM_COPY( "oki_data" , 0x80000, 0x080000+0x40000, 0x40000 )
 	ROM_COPY( "oki_data" , 0xc0000, 0x0c0000+0x40000, 0x40000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
-	ROM_LOAD( "14.bin", 0x00000, 0x20000, CRC(e465a540) SHA1(10e19599ab90b0c0b6ef6ee41f16620bd1ba6800) )
-
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG1 */
-	ROM_LOAD( "13.bin", 0x00000, 0x20000, CRC(99466044) SHA1(ca31b58a5d4656f95d80ddb9bc1f9a53f5f2446c) )
-
-	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
-	ROM_LOAD( "12.bin", 0x00000, 0x40000, CRC(146596eb) SHA1(f85e92e6dc9ebef5e67d28f1d450225cd2a2abaa) )
-
-	ROM_REGION( 0x200000, "gfx4", 0 ) /* BG3 */
+	ROM_REGION( 0x200000, "scroll0", 0 )
 	ROM_LOAD( "7.bin",  0x000000, 0x80000, CRC(18caf6f3) SHA1(3df6b257867487adcba1a05c8745413d9a15c3d7) )
 	ROM_LOAD( "8.bin",  0x080000, 0x80000, CRC(0403399a) SHA1(8d39a68b3a1a431afe93ff485e837389a4502d0c) )
 	ROM_LOAD( "9.bin",  0x100000, 0x80000, CRC(8a348246) SHA1(13516c48bdbe8d78e7517473ef2835a4dea2ce93) )
 	ROM_LOAD( "10.bin", 0x180000, 0x80000, CRC(2b0d1afd) SHA1(40009b450901567052aa63c4629a2f7a10343e63) )
+
+	ROM_REGION( 0x40000, "scroll1", 0 )
+	ROM_LOAD( "12.bin", 0x00000, 0x40000, CRC(146596eb) SHA1(f85e92e6dc9ebef5e67d28f1d450225cd2a2abaa) )
+
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "13.bin", 0x00000, 0x20000, CRC(99466044) SHA1(ca31b58a5d4656f95d80ddb9bc1f9a53f5f2446c) )
+
+	ROM_REGION( 0x20000, "scroll3", 0 )
+	ROM_LOAD( "14.bin", 0x00000, 0x20000, CRC(e465a540) SHA1(10e19599ab90b0c0b6ef6ee41f16620bd1ba6800) )
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1832,23 +1577,38 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 		jm_shared_ram[0x03d0/2] = 0x4ef9;
 		jm_shared_ram[0x03d2/2] = 0x0010;
 		jm_shared_ram[0x03d4/2] = 0x0000;//jmp $100000
-		jm_mcu_code[0x0000/2] = 0x4E71;//0x33fc;//CAREFUL!!!
-		jm_mcu_code[0x0002/2] = 0x4E71;//0x0400;
-		jm_mcu_code[0x0004/2] = 0x4E71;//0x0008;
-		jm_mcu_code[0x0006/2] = 0x4E71;//0x0038;
-		/*priority = 5(Something that shows the text layer,to be checked after that the priority works )*/
-		jm_mcu_code[0x0008/2] = 0x33fc;
-		jm_mcu_code[0x000a/2] = 0x0005;
-		jm_mcu_code[0x000c/2] = 0x0008;
-		jm_mcu_code[0x000e/2] = 0x0016;//move.w #
-		jm_mcu_code[0x0010/2] = 0xd0fc;
-		jm_mcu_code[0x0012/2] = 0x0060;//adda.w $60,A0
-		jm_mcu_code[0x0014/2] = 0x92fc;
-		jm_mcu_code[0x0016/2] = 0x0200;//suba.w $200,A1
-		jm_mcu_code[0x0018/2] = 0x32d8;//move.w (A0)+,(A1)+
-		jm_mcu_code[0x001a/2] = 0x51c9;
-		jm_mcu_code[0x001c/2] = 0xfffc;//dbra D1,f00ca
-		jm_mcu_code[0x001e/2] = 0x4e75;//rts
+		jm_mcu_code[0x0000/2] = 0x33fc;
+		jm_mcu_code[0x0002/2] = 0x0001;
+		jm_mcu_code[0x0004/2] = 0x0008;
+		jm_mcu_code[0x0006/2] = 0x0016; // move.w #1,#$80016 (set priority)
+		jm_mcu_code[0x0008/2] = 0x4E71; // nop
+		jm_mcu_code[0x000a/2] = 0x303c;
+		jm_mcu_code[0x000c/2] = 0x000f; // move.w #$0f, D0
+		// first get the new palette RAM colors
+		jm_mcu_code[0x000e/2] = 0x23C8;
+		jm_mcu_code[0x0010/2] = 0x0010; 
+		jm_mcu_code[0x0012/2] = 0x0400; // move.l A0, $100400 (stack push)
+		jm_mcu_code[0x0014/2] = 0x2050; // move.l (A0), A0
+		jm_mcu_code[0x0016/2] = 0x4EB9;
+		jm_mcu_code[0x0018/2] = 0x0010;
+		jm_mcu_code[0x001a/2] =	0x002e; // jsr $10002e
+		jm_mcu_code[0x001c/2] = 0x4e71; // nop
+		jm_mcu_code[0x001e/2] = 0x2079;
+		jm_mcu_code[0x0020/2] = 0x0010;
+		jm_mcu_code[0x0022/2] = 0x0400; // movea.l $100400, A0 (stack pop)
+		jm_mcu_code[0x0024/2] = 0xD0FC;
+        jm_mcu_code[0x0026/2] = 0x0004; // adda.l $#4, A0
+		jm_mcu_code[0x0028/2] = 0x51c8;
+		jm_mcu_code[0x002a/2] = 0xffe4; // dbra D0, $-0x1c
+
+		jm_mcu_code[0x002c/2] = 0x4e75; //rts
+
+		jm_mcu_code[0x002e/2] = 0x323c;
+		jm_mcu_code[0x0030/2] = 0x000f; // move.w #$0f, D1
+		jm_mcu_code[0x0032/2] = 0x32d8; //move.w (A0)+,(A1)+
+		jm_mcu_code[0x0034/2] = 0x51c9;
+		jm_mcu_code[0x0036/2] = 0xfffc; //dbra D1, $-4
+		jm_mcu_code[0x0038/2] = 0x4e75; //rts
 
 		/*******************************************************
 		2nd M68k code uploaded by the MCU (tile upload)
@@ -2448,7 +2208,7 @@ void jalmah_state::init_urashima()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
 
-	m_mcu_prg = 0x12;
+	m_mcu_prg = URASHIMA_MCU;
 }
 
 void jalmah_state::init_daireika()
@@ -2456,7 +2216,7 @@ void jalmah_state::init_daireika()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
 
-	m_mcu_prg = 0x11;
+	m_mcu_prg = DAIREIKA_MCU;
 }
 
 void jalmah_state::init_mjzoomin()
@@ -2464,34 +2224,35 @@ void jalmah_state::init_mjzoomin()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
 
-	m_mcu_prg = 0x13;
+	m_mcu_prg = MJZOOMIN_MCU;
 }
 
 void jalmah_state::init_kakumei()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
-	m_mcu_prg = 0x21;
+
+	m_mcu_prg = KAKUMEI_MCU;
 }
 
 void jalmah_state::init_kakumei2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 
-	m_mcu_prg = 0x22;
+	m_mcu_prg = KAKUMEI2_MCU;
 }
 
 void jalmah_state::init_suchiesp()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchiesp_mcu_r), this));
 
-	m_mcu_prg = 0x23;
+	m_mcu_prg = SUCHIESP_MCU;
 }
 
 /*First version of the MCU*/
-GAME( 1989, urashima, 0, urashima,  urashima, jalmah_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state, init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state, init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
-GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state, init_kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state, init_kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1993, suchiesp, 0, jalmah,    suchiesp, jalmah_state, init_suchiesp, ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state,   init_kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   init_kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1993, suchiesp, 0, jalmah,    suchiesp, jalmah_state,   init_suchiesp, ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )

@@ -31,8 +31,8 @@
 class clcd_state : public driver_device
 {
 public:
-	clcd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	clcd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_acia(*this, "acia"),
 		m_via0(*this, "via0"),
@@ -755,7 +755,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, clcd_state, via1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, clcd_state, via1_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, clcd_state, write_irq_via1))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 2000000)
@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("via1", via6522_device, write_pb4))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, nullptr)
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, nullptr)
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)

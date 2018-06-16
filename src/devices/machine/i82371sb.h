@@ -181,8 +181,6 @@ private:
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #define MCFG_I82371SB_IDE_IRQ_PRI_CB(_devcb) \
 	devcb = &downcast<i82371sb_ide_device &>(*device).set_irq_pri_callback(DEVCB_##_devcb);
 

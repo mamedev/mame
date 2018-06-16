@@ -1374,7 +1374,7 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1526,7 +1526,7 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1583,7 +1583,7 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", amstrad_centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, amstrad_centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
 
 	/* snapshot */
@@ -1081,7 +1081,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
 
 	/* snapshot */

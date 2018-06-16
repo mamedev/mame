@@ -309,20 +309,20 @@ void hp98034_io_card_device::update_data_out()
 void hp98034_io_card_device::update_ctrl_out()
 {
 	if (m_clr_hpib) {
-		m_ieee488->dav_w(1);
-		m_ieee488->nrfd_w(1);
-		m_ieee488->eoi_w(1);
-		m_ieee488->ndac_w(0);
+		m_ieee488->host_dav_w(1);
+		m_ieee488->host_nrfd_w(1);
+		m_ieee488->host_eoi_w(1);
+		m_ieee488->host_ndac_w(0);
 	} else {
-		m_ieee488->dav_w(BIT(m_dc , 2));
-		m_ieee488->nrfd_w(BIT(m_dc , 1));
-		m_ieee488->eoi_w(!BIT(m_ctrl_out , 4));
-		m_ieee488->ndac_w(BIT(m_dc , 6));
+		m_ieee488->host_dav_w(BIT(m_dc , 2));
+		m_ieee488->host_nrfd_w(BIT(m_dc , 1));
+		m_ieee488->host_eoi_w(!BIT(m_ctrl_out , 4));
+		m_ieee488->host_ndac_w(BIT(m_dc , 6));
 	}
-	m_ieee488->srq_w(!BIT(m_ctrl_out , 0));
-	m_ieee488->ren_w(!BIT(m_ctrl_out , 1));
-	m_ieee488->atn_w(!BIT(m_ctrl_out , 2));
-	m_ieee488->ifc_w(!BIT(m_ctrl_out , 3));
+	m_ieee488->host_srq_w(!BIT(m_ctrl_out , 0));
+	m_ieee488->host_ren_w(!BIT(m_ctrl_out , 1));
+	m_ieee488->host_atn_w(!BIT(m_ctrl_out , 2));
+	m_ieee488->host_ifc_w(!BIT(m_ctrl_out , 3));
 }
 
 void hp98034_io_card_device::update_clr_hpib()

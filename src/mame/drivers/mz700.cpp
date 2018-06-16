@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz_state, mz800_z80pio_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

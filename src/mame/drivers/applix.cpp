@@ -60,8 +60,8 @@
 class applix_state : public driver_device
 {
 public:
-	applix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	applix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_base(*this, "base"),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, applix_state, applix_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via6522", via6522_device, write_pa0))
 
