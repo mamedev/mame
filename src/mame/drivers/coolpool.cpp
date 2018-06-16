@@ -164,8 +164,7 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 	if (!memcmp(nvram_unlock_seq, m_nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		m_nvram_write_enable = 1;
-		timer_device *nvram_timer = machine().device<timer_device>("nvram_timer");
-		nvram_timer->adjust(attotime::from_msec(1000));
+		m_nvram_timer->adjust(attotime::from_msec(1000));
 	}
 }
 
@@ -738,7 +737,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -783,7 +782,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

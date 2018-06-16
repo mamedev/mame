@@ -21,6 +21,7 @@ public:
 		atarigen_state(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_playfield_tilemap(*this, "playfield"),
+		m_scan_timer(*this, "scan_timer"),
 		m_spriteram(*this, "spriteram"),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -46,6 +47,7 @@ protected:
 private:
 	required_device<x2212_device> m_nvram;
 	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<timer_device> m_scan_timer;
 
 	double          m_rweights[3];
 	double          m_gweights[3];

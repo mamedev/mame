@@ -800,7 +800,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::marble)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 103)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 103, true)
 
 	// No joystick
 	MCFG_DEVICE_REMOVE("adc")
@@ -809,7 +809,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::peterpak)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
@@ -821,7 +821,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::indytemp)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 105)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, true)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
@@ -833,7 +833,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadrunn)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 108)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, true)
 
 	// Hall-effect analog joystick
 	MCFG_DEVICE_MODIFY("adc")
@@ -843,7 +843,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadb109)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 109)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, true)
 
 	// Road Blasters gas pedal
 	MCFG_DEVICE_MODIFY("adc")
@@ -852,7 +852,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadb110)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 110)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, true)
 
 	// Road Blasters gas pedal
 	MCFG_DEVICE_MODIFY("adc")

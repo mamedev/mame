@@ -161,8 +161,6 @@ void kcgd_state::machine_reset()
 
 void kcgd_state::video_start()
 {
-//  screen_device *screen = machine().device<screen_device>("screen");
-
 	// 64 kwords, word size is 17 bits
 	m_videoram = std::make_unique<uint32_t[]>(65536);
 
@@ -170,10 +168,10 @@ void kcgd_state::video_start()
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 /*
     m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
-    m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
+    m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
 
     m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
-    m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+    m_vsync_off_timer->adjust(m_screen->time_until_pos(16, 0), 0, m_screen->frame_period());
 */
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
