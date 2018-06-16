@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "includes/ninjakd2.h"
 
-#include <algorithm>
-
 /*************************************
  *
  *  Callbacks for the TileMap code
@@ -213,19 +211,17 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-
 void ninjakd2_state::bg_ctrl(int offset, int data, tilemap_t* tilemap)
 {
 	int scrollx = tilemap->scrollx(0);
 	int scrolly = tilemap->scrolly(0);
-	int mask = std::max(1,m_vram_bank_mask) << 8;
 
 	switch (offset)
 	{
-		case 0: scrollx = ((scrollx &  mask) | data);        break;
-		case 1: scrollx = ((scrollx & 0x0ff) | (data << 8)); break;
-		case 2: scrolly = ((scrolly & 0x100) | data);        break;
-		case 3: scrolly = ((scrolly & 0x0ff) | (data << 8)); break;
+		case 0: scrollx = ((scrollx & ~0xff) | data);        break;
+		case 1: scrollx = ((scrollx &  0xff) | (data << 8)); break;
+		case 2: scrolly = ((scrolly & ~0xff) | data);        break;
+		case 3: scrolly = ((scrolly &  0xff) | (data << 8)); break;
 		case 4: tilemap->enable(data & 1); break;
 	}
 

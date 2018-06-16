@@ -166,8 +166,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 private:
-	required_ioport m_dsw_io;
-	required_ioport m_pad_io;
+	required_ioport_array<2> m_dsw_io;
+	required_ioport_array<2> m_pad_io;
 
 	void io_protection_start();
 	void io_protection_reset();
