@@ -242,14 +242,14 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 
 	*/
 
-	m_ieee->atn_w(!BIT(data, 0));
-	m_ieee->dav_w(!BIT(data, 1));
-	m_ieee->ndac_w(!BIT(data, 2));
-	m_ieee->nrfd_w(!BIT(data, 3));
-	m_ieee->eoi_w(!BIT(data, 4));
-	m_ieee->srq_w(!BIT(data, 5));
-	m_ieee->ren_w(!BIT(data, 6));
-	m_ieee->ifc_w(!BIT(data, 7));
+	m_ieee->host_atn_w(!BIT(data, 0));
+	m_ieee->host_dav_w(!BIT(data, 1));
+	m_ieee->host_ndac_w(!BIT(data, 2));
+	m_ieee->host_nrfd_w(!BIT(data, 3));
+	m_ieee->host_eoi_w(!BIT(data, 4));
+	m_ieee->host_srq_w(!BIT(data, 5));
+	m_ieee->host_ren_w(!BIT(data, 6));
+	m_ieee->host_ifc_w(!BIT(data, 7));
 }
 
 READ8_MEMBER( softbox_state::ppi1_pc_r )

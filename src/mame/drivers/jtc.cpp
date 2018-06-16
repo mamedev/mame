@@ -29,12 +29,13 @@ class jtc_state : public driver_device
 {
 public:
 	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, UB8830D_TAG),
-			m_cassette(*this, "cassette"),
-			m_speaker(*this, "speaker"),
-			m_centronics(*this, CENTRONICS_TAG),
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, UB8830D_TAG)
+		, m_cassette(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -745,7 +746,7 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 

@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
 
 	// printer connector
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, nullptr)
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
 
 	// cassette

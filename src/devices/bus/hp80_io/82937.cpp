@@ -267,40 +267,40 @@ void hp82937_io_card_device::update_signals()
 	uint8_t p1 = m_cpu->p1_r(machine().dummy_space() , 0);
 	m_iatn = BIT(p1 , P1_ATN_BIT);
 	if (ctrl_active) {
-		m_ieee488->atn_w(m_iatn);
-		m_ieee488->srq_w(1);
+		m_ieee488->host_atn_w(m_iatn);
+		m_ieee488->host_srq_w(1);
 	} else {
-		m_ieee488->atn_w(1);
+		m_ieee488->host_atn_w(1);
 		m_iatn = m_iatn && m_ieee488->atn_r();
-		m_ieee488->srq_w(BIT(p1 , P1_SRQ_BIT));
+		m_ieee488->host_srq_w(BIT(p1 , P1_SRQ_BIT));
 	}
 	m_talker_out = (ctrl_active && !m_iatn) || (BIT(m_latch , LATCH_TA_BIT) && m_iatn);
 	if (m_talker_out) {
-		m_ieee488->nrfd_w(1);
-		m_ieee488->dav_w(BIT(p1 , P1_DAV_BIT));
-		m_ieee488->eoi_w(BIT(p1 , P1_EOI_BIT));
-		m_ieee488->ndac_w(1);
+		m_ieee488->host_nrfd_w(1);
+		m_ieee488->host_dav_w(BIT(p1 , P1_DAV_BIT));
+		m_ieee488->host_eoi_w(BIT(p1 , P1_EOI_BIT));
+		m_ieee488->host_ndac_w(1);
 
 	} else {
-		m_ieee488->nrfd_w(BIT(p1 , P1_NRFD_BIT));
-		m_ieee488->dav_w(1);
-		m_ieee488->eoi_w(1);
+		m_ieee488->host_nrfd_w(BIT(p1 , P1_NRFD_BIT));
+		m_ieee488->host_dav_w(1);
+		m_ieee488->host_eoi_w(1);
 		bool ndac = BIT(p1 , P1_NDAC_BIT);
 		if (BIT(m_latch , LATCH_EN_NDAC_BIT) && !m_iatn) {
 			ndac = false;
 		}
-		m_ieee488->ndac_w(ndac);
+		m_ieee488->host_ndac_w(ndac);
 	}
 	bool iren = BIT(p1 , P1_REN_BIT);
 	if (BIT(m_sw1->read() , 5)) {
 		// System controller
-		m_ieee488->ren_w(iren);
-		m_ieee488->ifc_w(BIT(p1 , P1_IFC_BIT));
+		m_ieee488->host_ren_w(iren);
+		m_ieee488->host_ifc_w(BIT(p1 , P1_IFC_BIT));
 	} else {
 		// Not system controller
-		m_ieee488->ren_w(1);
+		m_ieee488->host_ren_w(1);
 		iren = iren && m_ieee488->ren_r();
-		m_ieee488->ifc_w(1);
+		m_ieee488->host_ifc_w(1);
 	}
 	bool not_u8_1 = m_iatn || m_ieee488->eoi_r();
 	m_dio_out = not_u8_1 && m_talker_out;

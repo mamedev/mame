@@ -1080,7 +1080,7 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txb))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, cat_state, cat_duart_output))
 
-	MCFG_CENTRONICS_ADD("ctx", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_ctx, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, cat_state, prn_ack_ff))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")

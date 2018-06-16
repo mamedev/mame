@@ -835,9 +835,8 @@ MACHINE_CONFIG_START(squale_state::squale)
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "squale_cart")
-	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(squale_state, squale_cart)
-
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "squale_cart")
 MACHINE_CONFIG_END
 
 /* ROM definition */

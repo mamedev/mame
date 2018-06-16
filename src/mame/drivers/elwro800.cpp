@@ -37,8 +37,8 @@
 class elwro800_state : public spectrum_state
 {
 public:
-	elwro800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag),
+	elwro800_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spectrum_state(mconfig, type, tag),
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, elwro800_state, i8255_port_c_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, elwro800_state, write_centronics_ack))
 

@@ -1515,7 +1515,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	// centronics printer
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, px4_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, px4_state, centronics_perror_w))
 

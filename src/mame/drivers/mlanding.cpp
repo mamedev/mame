@@ -577,7 +577,7 @@ void mlanding_state::msm5205_update(int chip)
 	uint8_t data = rom[m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
-	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	msm->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];

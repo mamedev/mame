@@ -56,7 +56,6 @@
 #define M6522_3_TAG     "14l"
 #define DAC0808_0_TAG   "5b"
 #define DAC0808_1_TAG   "5c"
-#define CENTRONICS_TAG  "centronics"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
@@ -81,7 +80,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, FDC_TAG),
-		m_centronics(*this, CENTRONICS_TAG),
+		m_centronics(*this, "centronics"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_palette(*this, "palette"),
@@ -432,14 +431,14 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 	m_centronics->write_strobe(BIT(data, 0));
 
 	// IEEE-488
-	m_ieee488->dav_w(BIT(data, 0));
-	m_ieee488->eoi_w(BIT(data, 1));
-	m_ieee488->ren_w(BIT(data, 2));
-	m_ieee488->atn_w(BIT(data, 3));
-	m_ieee488->ifc_w(BIT(data, 4));
-	m_ieee488->srq_w(BIT(data, 5));
-	m_ieee488->nrfd_w(BIT(data, 6));
-	m_ieee488->ndac_w(BIT(data, 7));
+	m_ieee488->host_dav_w(BIT(data, 0));
+	m_ieee488->host_eoi_w(BIT(data, 1));
+	m_ieee488->host_ren_w(BIT(data, 2));
+	m_ieee488->host_atn_w(BIT(data, 3));
+	m_ieee488->host_ifc_w(BIT(data, 4));
+	m_ieee488->host_srq_w(BIT(data, 5));
+	m_ieee488->host_nrfd_w(BIT(data, 6));
+	m_ieee488->host_ndac_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::codec_vol_w )
@@ -758,7 +757,7 @@ MACHINE_CONFIG_START(victor9k_state::victor9k)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, victor9k_state, via3_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, victor9k_state, via3_irq_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb5))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb6))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb7))
