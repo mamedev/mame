@@ -332,9 +332,8 @@ WRITE8_MEMBER(nmk16_state::nmk_scroll_w)
 		{
 			int newbank = (m_scroll[Layer][0] >> 4) & ((m_nmk_bgvideoram[Layer].bytes() >> 14)-1);
 			if (m_tilerambank != newbank)
-			{
 				m_tilerambank = newbank;
-			}
+
 		}
 		m_bg_tilemap[Layer]->set_scrollx(0,((m_scroll[Layer][0] << 8) | m_scroll[Layer][1]) - m_videoshift);
 	}
