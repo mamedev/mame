@@ -92,7 +92,7 @@ public:
 	DECLARE_READ16_MEMBER(tdragonb_prot_r);
 	DECLARE_READ16_MEMBER(afega_unknown_r);
 	template<int Scroll> DECLARE_WRITE16_MEMBER(afega_scroll_w);
-	template<int Bank> DECLARE_WRITE16_MEMBER(nmk_bgvideoram_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(nmk_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(nmk_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(mustang_scroll_w);
 	DECLARE_WRITE16_MEMBER(raphero_scroll_w);
@@ -125,7 +125,7 @@ public:
 	void init_bjtwin();
 	void init_atombjt();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
-	template<int Bank, int Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
+	template<int Layer, int Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(common_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bioship_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);

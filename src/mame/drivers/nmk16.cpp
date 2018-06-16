@@ -303,12 +303,12 @@ WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_w)
 
 ***************************************************************************/
 
-template<int Bank>
+template<int Layer>
 WRITE16_MEMBER(nmk16_state::nmk_bgvideoram_w)
 {
-	COMBINE_DATA(&m_nmk_bgvideoram[Bank][offset]);
+	COMBINE_DATA(&m_nmk_bgvideoram[Layer][offset]);
 	if ((offset >> 13) == m_tilerambank)
-		m_bg_tilemap[Bank]->mark_tile_dirty(offset & 0x1fff);
+		m_bg_tilemap[Layer]->mark_tile_dirty(offset & 0x1fff);
 }
 
 WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
