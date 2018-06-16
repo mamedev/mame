@@ -4,7 +4,7 @@
 	<software name="basic4">
 		<description>HP BASIC 4.0</description>
 		<year>1985</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="bas4sys" interface="floppy_3_5">
 			<feature name="part_id" value="System Disc" />
@@ -48,7 +48,7 @@
 	<software name="basic51">
 		<description>HP BASIC 5.1</description>
 		<year>1987</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 		<part name="bas5sys" interface="floppy_3_5">
 			<dataarea name="flop" size="293815">
 				<rom name="BAS5SYS.TD0" size="293815" crc="c2ea7e12" sha1="ad5c86e1043d4ce593b506c0b1ad7aafd671a0a5" offset="0"/>
@@ -88,7 +88,7 @@
 	<software name="basic64">
 		<description>HP BASIC 6.4</description>
 		<year>1993</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="b64sys" interface="floppy_3_5">
 			<feature name="part_id" value="System Disc" />
@@ -124,7 +124,7 @@
 	<software name="pascal322">
 		<description>HP Pascal 3.22</description>
 		<year>1989</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 		<part name="p32boot2" interface="floppy_3_5">
 			<dataarea name="flop" size="290890">
 				<rom name="P32BOOT2.TD0" size="290890" crc="f6be33f8" sha1="21b2c1e1eceeaccb9c4a825df65eca2e4b5183af" offset="0"/>
@@ -175,7 +175,7 @@
 	<software name="hpux51">
 		<description>HP-UX 5.1</description>
 		<year>1985</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="515pe1b" interface="floppy_3_5">
 			<dataarea name="flop" size="724672">
@@ -392,7 +392,7 @@
 	<software name="300test">
 		<description>300 series Mainframe Tests</description>
 		<year>1990</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="300test" interface="floppy_3_5">
 			<dataarea name="flop" size="262773">
@@ -403,7 +403,7 @@
 	<software name="temed300">
 		<description>300 series Terminal Emulator</description>
 		<year>1985</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="temed300" interface="floppy_3_5">
 			<feature name="part_id" value="Series 300 Terminal Emulator Environment" />
@@ -433,7 +433,7 @@
 	<software name="cs80exer">
 		<description>CS/80 Exerciser</description>
 		<year>1984</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="cs80exer" interface="floppy_3_5">
 			<dataarea name="flop" size="291792">
@@ -466,7 +466,7 @@
 	<software name="techwrit">
 		<description>Techwriter</description>
 		<year>1984</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="216696">
@@ -477,7 +477,7 @@
 	<software name="textedbm">
 		<description>Texteditor for 200/300 series</description>
 		<year>1984</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="textedbm" interface="floppy_3_5">
 			<feature name="part_id" value="Master disk"/>
@@ -495,7 +495,7 @@
 	<software name="bas5boot">
 		<description>HP Museum Basic 5 Boot Disc</description>
 		<year>1988</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="631033">
@@ -533,7 +533,7 @@
 	<software name="200dfilt">
 		<description>Digital Filter Design</description>
 		<year>1982</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="200dfilt" interface="floppy_3_5">
 			<dataarea name="flop" size="358291">
@@ -544,7 +544,7 @@
 	<software name="itg">
 		<description>Interactive Test Generator</description>
 		<year>1988</year>
-		<publisher>HP</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="itg1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc 1/4" />

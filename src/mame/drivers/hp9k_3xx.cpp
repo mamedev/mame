@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, atn_w))
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","hp9k3xx_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, atn_w))
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","hp9k3xx_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, atn_w))
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","hp9k3xx_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
