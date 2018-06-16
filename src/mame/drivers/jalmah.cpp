@@ -368,7 +368,7 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 	
 	bitmap.fill(m_palette->pen(0x1ff), cliprect); //selectable by a ram address?
 	
-	for(int y = cliprect.min_y; y < cliprect.max_y; y++)
+	for(int y = cliprect.min_y; y < cliprect.max_y+1; y++)
 	{
 		clip.min_y = clip.max_y = y;
 		
@@ -700,9 +700,9 @@ WRITE16_MEMBER(jalmah_state::okibank_w)
 	if(ACCESSING_BITS_0_7)
 	{
 		uint8_t *oki = memregion("oki")->base();
-
+		
 		m_oki_bank = data & 3;
-
+		
 		memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
 
@@ -725,7 +725,7 @@ void jalmah_state::jalmah_map(address_map &map)
 //      0x080004, 0x080005  MCU read, different for each game
 	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
 //      0x080012, 0x080013  MCU write related,same for each game
-//      0x080014, 0x080015  MCU write related (handshake), same for each game
+	map(0x080014, 0x080015).noprw(); // MCU handshake
 	map(0x080016, 0x080017).w(FUNC(jalmah_state::tilebank_w)).umask16(0x00ff);
 	map(0x080018, 0x080019).w(FUNC(jalmah_state::okibank_w));
 	map(0x08001a, 0x08001b).w(FUNC(jalmah_state::okirom_w));
@@ -1201,10 +1201,10 @@ MACHINE_CONFIG_END
 
 // fake ROM containing 68k snippets
 // the original MCU actually uploads these into shared work ram area
-// 
+// we actually compile it using EASy68k tool
 #define LOAD_FAKE_MCU_ROM \
 	ROM_REGION( 0x10000, "jmcu_rom", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(43100728) SHA1(96ad65cd30026f7b58e8d3637b3109a221cafa4f)) \
+	ROM_LOAD16_WORD_SWAP( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
 
 
 /*
