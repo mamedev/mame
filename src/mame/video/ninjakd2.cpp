@@ -74,7 +74,7 @@ TILEMAP_MAPPER_MEMBER(omegaf_state::omegaf_bg_scan)
 }
 
 template<int Layer>
-TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info<0>)
+TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info)
 {
 	int const lo = m_robokid_bg_videoram[Layer][(tile_index << 1)];
 	int const hi = m_robokid_bg_videoram[Layer][(tile_index << 1) | 1];
