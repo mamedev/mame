@@ -16,8 +16,8 @@
 class ninjakd2_state : public driver_device
 {
 public:
-	ninjakd2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ninjakd2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_pcm(*this, "pcm"),
@@ -28,7 +28,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,6 +43,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	required_memory_bank m_mainbank;
 
 	const int16_t* m_sampledata;
 	int m_next_sprite_overdraw_enabled;
@@ -93,9 +96,9 @@ protected:
 class mnight_state : public ninjakd2_state
 {
 public:
-	mnight_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ninjakd2_state(mconfig, type, tag)
-	{}
+	mnight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ninjakd2_state(mconfig, type, tag)
+	{ }
 
 	void arkarea(machine_config &config);
 	void mnight(machine_config &config);
@@ -112,32 +115,22 @@ public:
 class robokid_state : public mnight_state
 {
 public:
-	robokid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mnight_state(mconfig, type, tag)
-	{}
+	robokid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mnight_state(mconfig, type, tag)
+	{ }
 
 	void robokid(machine_config &config);
 	void robokid_main_cpu(address_map &map);
 
 	DECLARE_READ8_MEMBER(motion_error_verbose_r);
 	
-	DECLARE_READ8_MEMBER(robokid_bg0_videoram_r);
-	DECLARE_READ8_MEMBER(robokid_bg1_videoram_r);
-	DECLARE_READ8_MEMBER(robokid_bg2_videoram_r);
-	DECLARE_WRITE8_MEMBER(robokid_bg0_videoram_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg1_videoram_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg2_videoram_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg0_ctrl_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg0_bank_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg1_bank_w);
-	DECLARE_WRITE8_MEMBER(robokid_bg2_bank_w);
+	template<int Layer> DECLARE_READ8_MEMBER(robokid_bg_videoram_r);
+	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_videoram_w);
+	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_ctrl_w);
+	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_bank_w);
 
 	TILEMAP_MAPPER_MEMBER(robokid_bg_scan);
-	TILE_GET_INFO_MEMBER(robokid_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(robokid_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(robokid_get_bg2_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(robokid_get_bg_tile_info);
 	DECLARE_VIDEO_START(robokid);
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -146,27 +139,22 @@ public:
 
 protected:
 	void video_init_banked(uint32_t vram_alloc_size);
-	tilemap_t* m_bg0_tilemap;
-	tilemap_t* m_bg1_tilemap;
-	tilemap_t* m_bg2_tilemap;
+	tilemap_t* m_robokid_tilemap[3];
 
 private:
 	void motion_error_kludge(uint16_t offset);
-	uint8_t m_robokid_bg0_bank;
-	uint8_t m_robokid_bg1_bank;
-	uint8_t m_robokid_bg2_bank;
-	std::unique_ptr<uint8_t[]> m_robokid_bg0_videoram;
-	std::unique_ptr<uint8_t[]> m_robokid_bg1_videoram;
-	std::unique_ptr<uint8_t[]> m_robokid_bg2_videoram;
-	void robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram);
+	uint8_t m_robokid_bg_bank[3];
+	std::unique_ptr<uint8_t[]> m_robokid_bg_videoram[3];
 };
 
 class omegaf_state : public robokid_state
 {
 public:
-	omegaf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: robokid_state(mconfig, type, tag)
-	{}
+	omegaf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		robokid_state(mconfig, type, tag),
+		m_dsw_io(*this, "DIPSW%u", 1U),
+		m_pad_io(*this, "PAD%u", 1U)
+	{ }
 	
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(io_protection_r);
@@ -183,6 +171,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 private:
+	required_ioport_array<2> m_dsw_io;
+	required_ioport_array<2> m_pad_io;
+
 	void io_protection_start();
 	void io_protection_reset();
 

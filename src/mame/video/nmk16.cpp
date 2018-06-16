@@ -36,10 +36,10 @@ TILEMAP_MAPPER_MEMBER(nmk16_state::tilemap_scan_pages)
 	return  (row & 0xf) | ((col & 0xff) << 4) | ((row & 0x10) << 8);
 }
 
-template<int Bank, int Gfx>
+template<int Layer, int Gfx>
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_bg_tile_info)
 {
-	int code = m_nmk_bgvideoram[Bank][(m_tilerambank << 13)|tile_index];
+	int code = m_nmk_bgvideoram[Layer][(m_tilerambank << 13)|tile_index];
 	SET_TILE_INFO_MEMBER(Gfx,(code & 0xfff) | (m_bgbank << 12),code >> 12,0);
 }
 
@@ -237,8 +237,8 @@ WRITE8_MEMBER(nmk16_state::nmk_tilebank_w)
 	if (m_bgbank != data)
 	{
 		m_bgbank = data;
-		for (int bank = 0; bank < 2; bank++)
-			if (m_bg_tilemap[bank]) m_bg_tilemap[bank]->mark_all_dirty();
+		for (int layer = 0; layer < 2; layer++)
+			if (m_bg_tilemap[layer]) m_bg_tilemap[layer]->mark_all_dirty();
 
 	}
 }

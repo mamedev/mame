@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 	uint8_t *ROM = memregion("adpcm1")->base();
 	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
 
-	m_adpcm1->data_w(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm1->write_data(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[0] += m_adpcm_sel[0];
 	m_adpcm_sel[0] ^= 1;
 }
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 	uint8_t *ROM = memregion("adpcm2")->base();
 	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];
 
-	m_adpcm2->data_w(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm2->write_data(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[1] += m_adpcm_sel[1];
 	m_adpcm_sel[1] ^= 1;
 }
