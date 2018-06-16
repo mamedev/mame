@@ -137,7 +137,8 @@ public:
 		m_okibank(*this, "okibank"),
 		m_key_io(*this, "KEY%u", 0U),
 		m_system_io(*this, "SYSTEM"),
-		m_dsw_io(*this, "DSW") { }
+		m_dsw_io(*this, "DSW")
+		{ }
 
 	DECLARE_WRITE8_MEMBER(tilebank_w);
 	DECLARE_WRITE8_MEMBER(okirom_w);
