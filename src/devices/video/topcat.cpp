@@ -35,7 +35,7 @@ void topcat_device::device_start()
 	save_item(NAME(m_fb_write_enable));
 	save_item(NAME(m_enable_blink_planes));
 	save_item(NAME(m_enable_alt_frame));
-	save_item(NAME(m_cursor_ctrl));
+	save_item(NAME(m_cursor_plane_enable));
 	save_item(NAME(m_move_replacement_rule));
 	save_item(NAME(m_pixel_replacement_rule));
 	save_item(NAME(m_source_x_pixel));
@@ -83,30 +83,33 @@ WRITE16_MEMBER(topcat_device::vram_w)
 		modify_vram_offset(offset * 2, (data & m_plane_mask << 8));
 }
 
+void topcat_device::get_cursor_pos(int *startx, int *starty, int *endx, int *endy)
+{
+	if (m_cursor_state && ((m_cursor_plane_enable >> 8) & m_plane_mask)) {
+		*startx = m_cursor_x_pos;
+		*starty = m_cursor_y_pos;
+		*endx = m_cursor_x_pos + m_cursor_width;
+		*endy = m_cursor_y_pos;
+
+	} else {
+		*startx = 0;
+		*starty = 0;
+		*endx = 0;
+		*endy = 0;
+	}
+}
+
 TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 {
 	m_cursor_timer->adjust(attotime::from_hz(5));
 	m_cursor_state ^= true;
-
-	if ((m_cursor_ctrl >> 8) & m_plane_mask) {
-		for(int i = 0; i < m_cursor_width; i++) {
-			modify_vram(m_cursor_x_pos+i, m_cursor_y_pos, m_cursor_state);
-			modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-1, m_cursor_state);
-			modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-2, m_cursor_state);
-		}
-	}
 }
 
-void topcat_device::update_cursor(int x, int y, uint8_t ctrl, uint8_t width)
+void topcat_device::update_cursor(int x, int y, uint16_t ctrl, uint8_t width)
 {
-	for(int i = 0; i < m_cursor_width; i++) {
-		modify_vram(m_cursor_x_pos+i, m_cursor_y_pos, false);
-		modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-1, false);
-		modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-2, false);
-	}
 	m_cursor_x_pos = (std::min)(x, m_fb_width - m_cursor_width);
 	m_cursor_y_pos = (std::max)((std::min)(y, m_fb_height), 2);
-	m_cursor_ctrl = ctrl;
+	m_cursor_plane_enable = ctrl;
 	m_cursor_width = width;
 }
 
@@ -220,7 +223,6 @@ void topcat_device::window_move(void)
 
 READ16_MEMBER(topcat_device::ctrl_r)
 {
-
 	uint16_t ret = 0xffff;
 
 	if (!m_read_enable)
@@ -260,8 +262,8 @@ READ16_MEMBER(topcat_device::ctrl_r)
 	case TOPCAT_REG_ENABLE_ALT_FRAME:
 		ret = m_enable_alt_frame;
 		break;
-	case TOPCAT_REG_CURSOR_CNTL:
-		ret = m_cursor_ctrl;
+	case TOPCAT_REG_CURSOR_PLANE_ENABLE:
+		ret = m_cursor_plane_enable;
 		break;
 	case TOPCAT_REG_PIXEL_REPLACE_RULE:
 		ret = m_pixel_replacement_rule;
@@ -296,6 +298,7 @@ READ16_MEMBER(topcat_device::ctrl_r)
 
 WRITE16_MEMBER(topcat_device::ctrl_w)
 {
+
 	data &= mem_mask;
 
 	if (offset == TOPCAT_REG_WRITE_ENABLE_PLANE) {
@@ -363,17 +366,17 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	case TOPCAT_REG_BLOCK_MOVER_PIXEL_HEIGHT:
 		m_block_mover_pixel_height = data;
 		break;
-	case TOPCAT_REG_CURSOR_CNTL:
+	case TOPCAT_REG_CURSOR_PLANE_ENABLE:
 		update_cursor(m_cursor_x_pos, m_cursor_y_pos, data, m_cursor_width);
 		break;
 	case TOPCAT_REG_CURSOR_X_POS:
-		update_cursor(data, m_cursor_y_pos, m_cursor_ctrl, m_cursor_width);
+		update_cursor(data, m_cursor_y_pos, m_cursor_plane_enable, m_cursor_width);
 		break;
 	case TOPCAT_REG_CURSOR_Y_POS:
-		update_cursor(m_cursor_x_pos, data, m_cursor_ctrl, m_cursor_width);
+		update_cursor(m_cursor_x_pos, data, m_cursor_plane_enable, m_cursor_width);
 		break;
 	case TOPCAT_REG_CURSOR_WIDTH:
-		update_cursor(m_cursor_x_pos, m_cursor_y_pos, m_cursor_ctrl, data);
+		update_cursor(m_cursor_x_pos, m_cursor_y_pos, m_cursor_plane_enable, data);
 		break;
 	default:
 		logerror("unknown register: %02X = %04x\n", offset, data, mem_mask);
