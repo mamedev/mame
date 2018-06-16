@@ -285,11 +285,11 @@ WRITE8_MEMBER(hp9122c_device::cmd_w)
 
 	 if (m_ds0) {
 		 floppy0->mon_w(0);
-		 floppy0->ss_w(!!!(data & REG_CNTL_HEADSEL));
+		 floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
 		 m_fdc->set_floppy(floppy0);
 	 } else if (m_ds1) {
 		 floppy1->mon_w(0);
-		 floppy1->ss_w(!!!(data & REG_CNTL_HEADSEL));
+		 floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
 		 m_fdc->set_floppy(floppy1);
 	}
 
@@ -319,8 +319,8 @@ WRITE8_MEMBER(hp9122c_device::clridx_w)
 }
 
 ROM_START(hp9122c)
-	ROM_REGION(0x10000 , "cpu" , 0)
-	ROM_LOAD("09122-15515.bin" , 0xc000, 0x4000 , CRC(d385e488) SHA1(93b2015037d76cc68b6252df03d6f184104605b9))
+	ROM_REGION(0x4000 , "cpu" , 0)
+	ROM_LOAD("09122-15515.bin" , 0x0000, 0x4000 , CRC(d385e488) SHA1(93b2015037d76cc68b6252df03d6f184104605b9))
 ROM_END
 
 static void hp9122c_floppies(device_slot_interface &device)
@@ -347,7 +347,7 @@ void hp9122c_device::cpu_map(address_map &map)
 	map(0x4000, 0x4007).m("i8291a", FUNC(i8291a_device::map)).mirror(0x1ff8);
 	map(0x6000, 0x7fff).rw(FUNC(hp9122c_device::status_r), FUNC(hp9122c_device::cmd_w));
 	map(0x8000, 0x8001).w(FUNC(hp9122c_device::clridx_w));
-	map(0xc000, 0xffff).rom();
+	map(0xc000, 0xffff).rom().region("cpu", 0);
 }
 
 MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
 	// will not work
 	MCFG_QUANTUM_PERFECT_CPU("cpu")
 
-    MCFG_DEVICE_ADD("mb8876", MB8876, 8_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("mb8876", MB8876, 8_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp9122c_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this,hp9122c_device, fdc_drq_w))
 

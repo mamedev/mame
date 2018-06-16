@@ -382,16 +382,7 @@ private:
 	static const char *get_state_name(serial_poll_state state);
 	static const char *get_state_name(remote_local_state state);
 
-	template<typename T> void update_state(T &name, T state, int timeout = 0)
-	{
-			if (name != state) {
-				m_state_changed = true;
-				//logerror("%s: %s -> %s\n", __FUNCTION__,
-				//		get_state_name(name),
-				//		get_state_name(state));
-				name = state;
-			}
-	}
+	template<typename T> void update_state(T &name, T state);
 
 	source_handshake_state m_sh_state;
 	acceptor_handshake_state m_ah_state;

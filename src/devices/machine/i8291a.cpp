@@ -13,21 +13,28 @@
 
 #include "i8291a.h"
 
+#define LOG_STATE  (LOG_GENERAL << 1)
+#define LOG_REG    (LOG_STATE << 1)
+#define LOG_INT    (LOG_REG << 1)
+#define LOG_CMD    (LOG_INT << 1)
+
 #define VERBOSE 0
 
 #include "logmacro.h"
+DEFINE_DEVICE_TYPE(I8291A, i8291a_device, "i8291a", "Intel I8291A GPIB Talker/Listener")
 
-#define LOG_STATE_MASK  (LOG_GENERAL << 1)
-#define LOG_STATE(...)  LOGMASKED(LOG_STATE_MASK, __VA_ARGS__)
-#define LOG_REG_MASK    (LOG_STATE_MASK << 1)
-#define LOG_REG(...)    LOGMASKED(LOG_REG_MASK, __VA_ARGS__)
-#define LOG_INT_MASK    (LOG_REG_MASK << 1)
-#define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
-#define LOG_CMD_MASK	(LOG_INT_MASK << 1)
-#define LOG_CMD(...)	LOGMASKED(LOG_CMD_MASK, __VA_ARGS__)
-
-
-DEFINE_DEVICE_TYPE(I8291A, i8291a_device, "i8291a", "I8291A")
+ALLOW_SAVE_TYPE(i8291a_device::listener_state);
+ALLOW_SAVE_TYPE(i8291a_device::talker_state);
+ALLOW_SAVE_TYPE(i8291a_device::talker_primary_state);
+ALLOW_SAVE_TYPE(i8291a_device::listener_primary_state);
+ALLOW_SAVE_TYPE(i8291a_device::parallel_poll_state);
+ALLOW_SAVE_TYPE(i8291a_device::device_trigger_state);
+ALLOW_SAVE_TYPE(i8291a_device::device_clear_state);
+ALLOW_SAVE_TYPE(i8291a_device::talker_serial_poll_state);
+ALLOW_SAVE_TYPE(i8291a_device::serial_poll_state);
+ALLOW_SAVE_TYPE(i8291a_device::remote_local_state);
+ALLOW_SAVE_TYPE(i8291a_device::source_handshake_state);
+ALLOW_SAVE_TYPE(i8291a_device::acceptor_handshake_state);
 
 i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 		device_t *owner, uint32_t clock) :
@@ -133,11 +140,23 @@ void i8291a_device::device_start()
 	save_item(NAME(m_send_eoi));
 	save_item(NAME(m_intr_out));
 	save_item(NAME(m_dreq_out));
+	save_item(NAME(m_sh_state));
+	save_item(NAME(m_ah_state));
+	save_item(NAME(m_t_state));
+	save_item(NAME(m_tp_state));
+	save_item(NAME(m_tsp_state));
+	save_item(NAME(m_l_state));
+	save_item(NAME(m_lp_state));
+	save_item(NAME(m_rl_state));
+	save_item(NAME(m_sp_state));
+	save_item(NAME(m_pp_state));
+	save_item(NAME(m_dc_state));
+	save_item(NAME(m_dt_state));
 }
 
 READ8_MEMBER(i8291a_device::din_r)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, m_din);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, m_din);
 	if (!machine().side_effects_disabled()) {
 		m_din_flag = false;
 		m_ints1 &= ~REG_INTS1_BI;
@@ -153,7 +172,7 @@ void i8291a_device::update_int()
 			((m_ie2 & REG_IE2_DMAI)  && (m_ints1 & REG_INTS1_BI));
 
 	if (m_dreq_out != dreq) {
-		LOG_INT("%s: dreq %s\n", __FUNCTION__, dreq ? "true" : "false");
+		LOGMASKED(LOG_INT, "%s: dreq %s\n", __FUNCTION__, dreq ? "true" : "false");
 		m_dreq_write_func(dreq);
 		m_dreq_out = dreq;
 	}
@@ -175,7 +194,7 @@ void i8291a_device::update_int()
 	}
 
 	if (m_intr_out != intr) {
-		LOG_INT("%s: intr %s\n", __FUNCTION__, intr ? "true" : "false");
+		LOGMASKED(LOG_INT, "%s: intr %s\n", __FUNCTION__, intr ? "true" : "false");
 		m_int_write_func(intr);
 		m_intr_out = intr;
 	}
@@ -186,7 +205,7 @@ READ8_MEMBER(i8291a_device::ints1_r)
 	uint8_t ret = m_ints1;
 
 	if (!machine().side_effects_disabled()) {
-		LOG_REG("%s: %02X\n", __FUNCTION__, ret);
+		LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, ret);
 		m_ints1 = 0;
 		update_int();
 	}
@@ -198,7 +217,7 @@ READ8_MEMBER(i8291a_device::ints2_r)
 	uint8_t ret = m_ints2;
 
 	if (!machine().side_effects_disabled()) {
-		LOG_REG("%s: %02X\n", __FUNCTION__, ret);
+		LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, ret);
 		m_ints2 = 0;
 		update_int();
 	}
@@ -207,37 +226,37 @@ READ8_MEMBER(i8291a_device::ints2_r)
 
 READ8_MEMBER(i8291a_device::spoll_stat_r)
 {
-	LOG_REG("%s\n", __FUNCTION__);
+	LOGMASKED(LOG_REG, "%s\n", __FUNCTION__);
 	return 0;
 }
 
 READ8_MEMBER(i8291a_device::addr_stat_r)
 {
-	LOG_REG("%s = %02X\n", __FUNCTION__, m_address_status);
+	LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address_status);
 	return m_address_status;
 }
 
 READ8_MEMBER(i8291a_device::cpt_r)
 {
-	LOG_REG("%s\n", __FUNCTION__);
+	LOGMASKED(LOG_REG, "%s\n", __FUNCTION__);
 	return m_cpt;
 }
 
 READ8_MEMBER(i8291a_device::addr0_r)
 {
-	//LOG_REG("%s = %02X\n", __FUNCTION__, m_address0);
+	//LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address0);
 	return m_address0;
 }
 
 READ8_MEMBER(i8291a_device::addr1_r)
 {
-	LOG_REG("%s = %02X\n", __FUNCTION__, m_address1);
+	LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address1);
 	return m_address1;
 }
 
 WRITE8_MEMBER(i8291a_device::dout_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (m_nba)
 		return;
 	m_dout = data;
@@ -247,90 +266,90 @@ WRITE8_MEMBER(i8291a_device::dout_w)
 
 WRITE8_MEMBER(i8291a_device::ie1_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_ie1 = data;
 	run_fsm();
 }
 
 WRITE8_MEMBER(i8291a_device::ie2_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_ie2 = data;
 	run_fsm();
 }
 
 WRITE8_MEMBER(i8291a_device::spoll_mode_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_spoll_mode = data;
 	run_fsm();
 }
 
 WRITE8_MEMBER(i8291a_device::addr_mode_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_address_mode = data & 3;
 	run_fsm();
 }
 
 WRITE8_MEMBER(i8291a_device::aux_mode_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	switch (data >> 5) {
 	case 0:
 		switch (data) {
 		case AUXCMD_IMMEDIATE_EXEC_PON:
-			LOG_REG("AUXCMD_IMMEDIATE_EXEC_PON\n");
+			LOGMASKED(LOG_REG, "AUXCMD_IMMEDIATE_EXEC_PON\n");
 			m_pon = 0;
 			m_rdy = 1;
 			break;
 
 		case AUXCMD_CLEAR_PP:
-			LOG_REG("AUXCMD_CLEAR_PP\n");
+			LOGMASKED(LOG_REG, "AUXCMD_CLEAR_PP\n");
 			m_ist = false;
 			break;
 
 		case AUXCMD_CHIP_RESET:
-			LOG_REG("AUXCMD_CHIP_RESET\n");
+			LOGMASKED(LOG_REG, "AUXCMD_CHIP_RESET\n");
 			device_reset();
 			break;
 
 		case AUXCMD_FINISH_HANDSHAKE:
-			LOG_REG("AUXCMD_FINISH_HANDSHAKE\n");
+			LOGMASKED(LOG_REG, "AUXCMD_FINISH_HANDSHAKE\n");
 			break;
 
 		case AUXCMD_TRIGGER:
-			LOG_REG("AUXCMD_TRIGGER\n");
+			LOGMASKED(LOG_REG, "AUXCMD_TRIGGER\n");
 			update_state(m_dt_state, device_trigger_state::DTAS);
 			break;
 
 		case AUXCMD_CLEAR_RTL:
-			LOG_REG("AUXCMD_CLEAR_RTL\n");
+			LOGMASKED(LOG_REG, "AUXCMD_CLEAR_RTL\n");
 			m_rtl = false;
 			break;
 
 		case AUXCMD_SET_RTL:
-			LOG_REG("AUXCMD_SET_RTL\n");
+			LOGMASKED(LOG_REG, "AUXCMD_SET_RTL\n");
 			m_rtl = true;
 			break;
 
 		case AUXCMD_SET_PP:
-			LOG_REG("AUXCMD_SET_PP\n");
+			LOGMASKED(LOG_REG, "AUXCMD_SET_PP\n");
 			m_ist = true;
 			break;
 
 		case AUXCMD_SEND_EOI:
-			LOG_REG("AUXCMD_SEND_EOI\n");
+			LOGMASKED(LOG_REG, "AUXCMD_SEND_EOI\n");
 			m_send_eoi = true;
 			break;
 
 		case AUXCMD_NON_VALID_SA:
-			LOG_REG("AUXCMD_NON_VALID_SA\n");
+			LOGMASKED(LOG_REG, "AUXCMD_NON_VALID_SA\n");
 			m_apt_flag = false;
 			break;
 
 		case AUXCMD_VALID_SA:
-			LOG_REG("AUXCMD_VALID_SA: APT %d\n", m_apt_flag);
+			LOGMASKED(LOG_REG, "AUXCMD_VALID_SA: APT %d\n", m_apt_flag);
 			if (m_tp_state == talker_primary_state::TPAS)
 				update_state(m_t_state, talker_state::TADS);
 
@@ -349,7 +368,7 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 			break;
 
 		case AUXCMD_PON:
-			LOG_REG("AUXCMD_PON\n");
+			LOGMASKED(LOG_REG, "AUXCMD_PON\n");
 			device_reset();
 			break;
 		}
@@ -357,16 +376,16 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 			/* preset internal clock counter */
 			break;
 		case 4:
-			LOG_REG("AUXA = %02X\n", data & 0x1f);
+			LOGMASKED(LOG_REG, "AUXA = %02X\n", data & 0x1f);
 			/* AUXA write */
 			m_auxa = data;
 			break;
 		case 5:
-			LOG_REG("AUXB = %02X\n", data & 0x1f);
+			LOGMASKED(LOG_REG, "AUXB = %02X\n", data & 0x1f);
 			m_auxb = data;
 			break;
 		case 3:
-			LOG_REG("PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
+			LOGMASKED(LOG_REG, "PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
 			m_lpe = !!!(data & 0x10);
 			m_pp_sense = data & 0x08;
 			m_pp_line = data & 7;
@@ -380,7 +399,7 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 
 WRITE8_MEMBER(i8291a_device::addr01_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (data & REG_ADDRESS01_ARS)
 		m_address1 = data & ~REG_ADDRESS01_ARS;
 	else
@@ -390,7 +409,7 @@ WRITE8_MEMBER(i8291a_device::addr01_w)
 
 WRITE8_MEMBER(i8291a_device::eos_w)
 {
-	LOG_REG("%s: %02X\n", __FUNCTION__, data);
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_eos = data;
 	run_fsm();
 }
@@ -535,11 +554,11 @@ void i8291a_device::handle_command()
 	if (m_din <= 0x1f) {
 		switch (m_din) {
 		case IFCMD_DCL:
-			LOG_CMD("DCL\n");
+			LOGMASKED(LOG_CMD, "DCL\n");
 			update_state(m_dc_state, device_clear_state::DCAS);
 			break;
 		case IFCMD_GTL:
-			LOG_CMD("GTL\n");
+			LOGMASKED(LOG_CMD, "GTL\n");
 			if (m_l_state == listener_state::LADS)
 				update_state(m_rl_state, remote_local_state::LWLS);
 			if (m_rl_state == remote_local_state::REMS &&
@@ -547,26 +566,26 @@ void i8291a_device::handle_command()
 				update_state(m_rl_state, remote_local_state::LOCS);
 			break;
 		case IFCMD_SDC:
-			LOG_CMD("SDC\n");
+			LOGMASKED(LOG_CMD, "SDC\n");
 			if (m_l_state == listener_state::LADS)
 				update_state(m_dc_state, device_clear_state::DCAS);
 			break;
 		case IFCMD_GET:
-			LOG_CMD("GET\n");
+			LOGMASKED(LOG_CMD, "GET\n");
 			break;
 		case IFCMD_LLO:
-			LOG_CMD("LLO\n");
+			LOGMASKED(LOG_CMD, "LLO\n");
 			if (m_rl_state == remote_local_state::LOCS)
 				update_state(m_rl_state, remote_local_state::LWLS);
 			if (m_rl_state == remote_local_state::REMS)
 				update_state(m_rl_state, remote_local_state::RWLS);
 			break;
 		case IFCMD_SPE:
-			LOG_CMD("SPE\n");
+			LOGMASKED(LOG_CMD, "SPE\n");
 			update_state(m_tsp_state, talker_serial_poll_state::SPMS);
 			break;
 		case IFCMD_SPD:
-			LOG_CMD("SPD\n");
+			LOGMASKED(LOG_CMD, "SPD\n");
 			update_state(m_tsp_state, talker_serial_poll_state::SPIS);
 			break;
 		case 0:
@@ -581,7 +600,7 @@ void i8291a_device::handle_command()
 		}
 	} else if (m_din >= 0x20 && m_din <= 0x3f) {
 		bool addr_matched = false;
-		LOG_CMD("MLA%d - mode %d, my addr0 %s%s%02x addr1 %s%s%02x\n", m_din & 0x1f,
+		LOGMASKED(LOG_CMD, "MLA%d - mode %d, my addr0 %s%s%02x addr1 %s%s%02x\n", m_din & 0x1f,
 				m_address_mode & 3,
 				(m_address0 & REG_ADDRESS_DT) ? "DT " : "",
 				(m_address0 & REG_ADDRESS_DL) ? "DL " : "",
@@ -591,13 +610,13 @@ void i8291a_device::handle_command()
 						m_address1 & 0x1f);
 
 		if ((m_din & 0x1f) == (m_address0 & 0x1f) && !(m_address0 & REG_ADDRESS_DL)) {
-			LOG_CMD("Address 0 matched (mode %02X)\n", m_address_mode);
+			LOGMASKED(LOG_CMD, "Address 0 matched (mode %02X)\n", m_address_mode);
 			m_address_status &= ~REG_ADDRESS_STATUS_MJMN;
 			addr_matched = true;
 		}
 
 		if ((m_address_mode & 3) != 2 && (m_din & 0x1f) == (m_address1 & 0x1f) && !(m_address1 & REG_ADDRESS_DL)) {
-			LOG_CMD("Address 1 matched (mode %02X)\n", m_address_mode);
+			LOGMASKED(LOG_CMD, "Address 1 matched (mode %02X)\n", m_address_mode);
 			m_address_status |= REG_ADDRESS_STATUS_MJMN;
 			addr_matched = true;
 		}
@@ -617,16 +636,16 @@ void i8291a_device::handle_command()
 	} else if (m_din >= 0x40 && m_din <= 0x5f) {
 		bool addr_matched = false;
 
-		LOG_CMD("MTA%d\n", m_din & 0x1f);
+		LOGMASKED(LOG_CMD, "MTA%d\n", m_din & 0x1f);
 
 		if ((m_din & 0x1f) == (m_address0 & 0x1f) && !(m_address0 & REG_ADDRESS_DT)) {
-			LOG_STATE("Address 0 matched (mode %02X)\n", m_address_mode);
+			LOGMASKED(LOG_STATE, "Address 0 matched (mode %02X)\n", m_address_mode);
 			m_address_status &= ~REG_ADDRESS_STATUS_MJMN;
 			addr_matched = true;
 		}
 
 		if ((m_address_mode & 3) != 2 && (m_din & 0x1f) == (m_address1 & 0x1f) && !(m_address1 & REG_ADDRESS_DT)) {
-			LOG_STATE("Address 1 matched (mode %02X)\n", m_address_mode);
+			LOGMASKED(LOG_STATE, "Address 1 matched (mode %02X)\n", m_address_mode);
 			m_address_status |= REG_ADDRESS_STATUS_MJMN;
 			addr_matched = true;
 		}
@@ -641,7 +660,7 @@ void i8291a_device::handle_command()
 		}
 
 	} else if (m_din >= 0x60 && m_din <= 0x7f) {
-		LOG_CMD("MSA%d\n", m_din & 0x1f);
+		LOGMASKED(LOG_CMD, "MSA%d\n", m_din & 0x1f);
 		if ((m_address_mode & 3) == 2 && m_t_state == talker_state::TIDS)
 			update_state(m_t_state, talker_state::TADS);
 
@@ -662,7 +681,7 @@ void i8291a_device::run_ah_fsm()
 	bool f2 = m_atn || m_l_state == listener_state::LACS || m_l_state == listener_state::LADS;
 
 	if ((m_pon || !f2) && m_ah_state != acceptor_handshake_state::AIDS) {
-		LOG_STATE("reset AH: pon %d f2 %d\n", m_pon, f2);
+		LOGMASKED(LOG_STATE, "reset AH: pon %d f2 %d\n", m_pon, f2);
 		update_state(m_ah_state, acceptor_handshake_state::AIDS);
 		set_nrfd(false);
 		set_ndac(false);
@@ -1127,4 +1146,15 @@ void i8291a_device::map(address_map &map)
 	map(0x06, 0x06).rw(FUNC(i8291a_device::addr0_r), FUNC(i8291a_device::addr01_w));
 	map(0x07, 0x07).rw(FUNC(i8291a_device::addr1_r), FUNC(i8291a_device::eos_w));
 
+}
+
+template<typename T> void i8291a_device::update_state(T &name, T state)
+{
+		if (name != state) {
+			m_state_changed = true;
+			LOGMASKED(LOG_STATE, "%s: %s -> %s\n", __FUNCTION__,
+					get_state_name(name),
+					get_state_name(state));
+			name = state;
+		}
 }
