@@ -56,7 +56,7 @@ Setting it up:
     Fire button. SPLAT would normally require 4 joysticks, but since the WMG only has 2, it is
     limited to a one-player game. Cocktail mode is not supported, WMG must be played on an upright
     only. After playing a game, returning to the menu will return to the place you left from. You
-    can force a return to the Setup by holding F1 and pressing F3. You can also clear out the
+    can force a return to the Setup by Auto Up and pressing F3. You can also clear out the
     menu's NVRAM (not the game's NVRAM), by holding down L and pressing F3.
 
 ToDo:
@@ -158,10 +158,10 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "1")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
