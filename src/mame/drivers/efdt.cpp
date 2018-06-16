@@ -7,6 +7,11 @@
 
   Driver by Elsemi & Roberto Fresca.
 
+  TODO:
+  - missing starfield
+  - missing background gradient?
+  - look into moving to galaxian driver, or at least a derived class
+
 ***********************************************************************************
 
   Specs:
@@ -294,15 +299,6 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 			gfx->transpen(bitmap, cliprect, code + 2, pal, 1, 1, x + 8, y, 0);
 			gfx->transpen(bitmap, cliprect, code + 1, pal, 1, 1, x + 0, y + 8, 0);
 			gfx->transpen(bitmap, cliprect, code + 0, pal, 1, 1, x + 8, y + 8, 0);
-
-		}
-		else if (xtra & 0x80)
-		{
-			gfx->transpen(bitmap, cliprect, code + 2, pal, 0, 1, x, y, 0);
-			gfx->transpen(bitmap, cliprect, code + 3, pal, 0, 1, x + 8, y, 0);
-			gfx->transpen(bitmap, cliprect, code + 0, pal, 0, 1, x + 0, y + 8, 0);
-			gfx->transpen(bitmap, cliprect, code + 1, pal, 0, 1, x + 8, y + 8, 0);
-
 		}
 		else
 		{
@@ -623,4 +619,4 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME    PARENT  MACHINE   INPUT    STATE        INIT        ROT     COMPANY   FULLNAME            FLAGS
-GAME( 1981, efdt,   0,      efdt,     efdt,    efdt_state,  empty_init, ROT90, "Niemer", "El Fin Del Tiempo", 0 )
+GAME( 1981, efdt,   0,      efdt,     efdt,    efdt_state,  empty_init, ROT90, "Niemer", "El Fin Del Tiempo", MACHINE_IMPERFECT_GRAPHICS )
