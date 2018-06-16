@@ -412,7 +412,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 	primrage_update_mode(offset);
 
 	/* check for certain read sequences */
-	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(m_protdata.get()) * 2)
+	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + (0x800 * 2))
 		m_protdata[(offset - 0xdc7800) >> 1] = data;
 
 	if (m_protmode == 2)
