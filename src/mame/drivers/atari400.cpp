@@ -2375,7 +2375,7 @@ MACHINE_CONFIG_START(a400_state::a5200)
 
 	// FIXME: should there be anything connected where other system have the fdc?
 	MCFG_DEVICE_MODIFY("pokey")
-	MCFG_POKEY_SERIN_R_CB(NOOP)
+	MCFG_POKEY_SERIN_R_CB(CONSTANT(0))
 	MCFG_POKEY_SEROUT_W_CB(NOOP)
 	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
 	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
@@ -2389,8 +2389,8 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_ANTIC_GTIA("gtia")
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_READPA_HANDLER(NOOP) // FIXME: is there anything connected here
-	MCFG_PIA_READPB_HANDLER(NOOP) // FIXME: is there anything connected here
+	MCFG_PIA_READPA_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
+	MCFG_PIA_READPB_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
 	MCFG_PIA_CB2_HANDLER(NOOP) // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
