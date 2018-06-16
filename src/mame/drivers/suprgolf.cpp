@@ -35,13 +35,14 @@
 class suprgolf_state : public driver_device
 {
 public:
-	suprgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	suprgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
@@ -461,12 +462,12 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
+		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	}
 	else
 	{
-		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
+		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
 	}
 }
 

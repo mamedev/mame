@@ -29,7 +29,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_mainbank(*this, "mainbank") { }
+		m_mainbank(*this, "mainbank")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -96,7 +97,8 @@ class mnight_state : public ninjakd2_state
 {
 public:
 	mnight_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ninjakd2_state(mconfig, type, tag) { }
+		ninjakd2_state(mconfig, type, tag)
+	{ }
 
 	void arkarea(machine_config &config);
 	void mnight(machine_config &config);
@@ -114,7 +116,8 @@ class robokid_state : public mnight_state
 {
 public:
 	robokid_state(const machine_config &mconfig, device_type type, const char *tag) :
-		mnight_state(mconfig, type, tag) { }
+		mnight_state(mconfig, type, tag)
+	{ }
 
 	void robokid(machine_config &config);
 	void robokid_main_cpu(address_map &map);
@@ -150,7 +153,8 @@ public:
 	omegaf_state(const machine_config &mconfig, device_type type, const char *tag) :
 		robokid_state(mconfig, type, tag),
 		m_dsw_io(*this, "DIPSW%u", 1U),
-		m_pad_io(*this, "PAD%u", 1U) { }
+		m_pad_io(*this, "PAD%u", 1U)
+	{ }
 	
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(io_protection_r);
