@@ -157,7 +157,7 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	int startx[TOPCAT_COUNT], starty[TOPCAT_COUNT];
 	int endx[TOPCAT_COUNT], endy[TOPCAT_COUNT];
 
-	for(int i = 0; i < TOPCAT_COUNT; i++)
+	for (int i = 0; i < TOPCAT_COUNT; i++)
 		m_topcat[i]->get_cursor_pos(&startx[i], &starty[i], &endx[i], &endy[i]);
 
 	for (int y = 0; y < m_v_pix; y++) {
@@ -165,7 +165,7 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		for (int x = 0; x < m_h_pix; x++) {
 			uint8_t tmp = m_vram[y * m_h_pix + x];
-			for(int i = 0; i < TOPCAT_COUNT; i++) {
+			for (int i = 0; i < TOPCAT_COUNT; i++) {
 				if (y >= starty[i] && y <= endy[i] && x >= startx[i] && x <= endx[i]) {
 					tmp |= 1 << i;
 				}
