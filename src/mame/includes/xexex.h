@@ -17,6 +17,7 @@
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class xexex_state : public driver_device

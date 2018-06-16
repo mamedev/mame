@@ -25,6 +25,7 @@ rom 5 and 6 are prg roms
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

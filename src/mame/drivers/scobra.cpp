@@ -1269,6 +1269,7 @@ ROM_END
 
     CPU/Video Board: A969 (Has various wire mods)
     Sound Board:     ?
+    Interface Card:  A2372
 */
 
 ROM_START( rescue )

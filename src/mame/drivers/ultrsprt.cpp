@@ -13,6 +13,7 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -243,7 +244,7 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("P1X")

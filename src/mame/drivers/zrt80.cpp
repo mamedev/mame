@@ -22,6 +22,7 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

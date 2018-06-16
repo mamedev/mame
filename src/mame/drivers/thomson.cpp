@@ -579,22 +579,22 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_0_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_0), state);
+	thomson_index_callback(0, state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_1_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_1), state);
+	thomson_index_callback(1, state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_2_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_2), state);
+	thomson_index_callback(2, state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
 {
-	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_3), state);
+	thomson_index_callback(3, state);
 }
 
 static const floppy_interface thomson_floppy_interface =
@@ -677,16 +677,16 @@ MACHINE_CONFIG_START(thomson_state::to7)
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
 
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_0_w))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[1], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_1_w))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[2], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_2_w))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_ADD(m_floppy_image[3], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
@@ -1502,7 +1502,7 @@ MACHINE_CONFIG_START(thomson_state::to9)
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9_timer_port_out))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	/* internal ram */
@@ -1723,7 +1723,7 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_MODIFY("mc6846")
@@ -1890,7 +1890,7 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_MODIFY("mc6846")
@@ -2249,7 +2249,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_game_cb2_out))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2518,7 +2518,7 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 

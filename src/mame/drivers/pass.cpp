@@ -109,6 +109,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

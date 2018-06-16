@@ -746,6 +746,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/busmouse.h,MACHINES["BUSMOUSE"] = true
+---------------------------------------------------
+
+if (MACHINES["BUSMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/busmouse.cpp",
+		MAME_DIR .. "src/devices/machine/busmouse.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/cdp1852.h,MACHINES["CDP1852"] = true
 ---------------------------------------------------
 

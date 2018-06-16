@@ -67,6 +67,7 @@ TODO:
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1109,7 +1110,7 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 	MCFG_DEVICE_PROGRAM_MAP(common_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	// various games require fast timing to save settings, probably because our Hyperstone core timings are incorrect
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
@@ -1299,7 +1300,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_DEVICE_IO_MAP(aoh_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

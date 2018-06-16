@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/tiaintf.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

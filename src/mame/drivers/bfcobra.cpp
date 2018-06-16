@@ -84,6 +84,7 @@
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

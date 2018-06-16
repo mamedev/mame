@@ -83,6 +83,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -905,7 +906,7 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
 

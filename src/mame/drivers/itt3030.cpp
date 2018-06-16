@@ -197,6 +197,7 @@ Beeper Circuit, all ICs shown:
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"          //Display hardware
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"

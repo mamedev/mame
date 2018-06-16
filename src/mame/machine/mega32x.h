@@ -11,6 +11,7 @@
 #include "cpu/sh/sh2comn.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class sega_32x_device : public device_t
 {

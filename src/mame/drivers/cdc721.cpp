@@ -20,6 +20,7 @@ Control Data Corporation CDC 721 Terminal (Viking)
 #include "machine/output_latch.h"
 #include "machine/z80ctc.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 
 

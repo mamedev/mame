@@ -16,6 +16,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

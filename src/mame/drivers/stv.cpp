@@ -1100,7 +1100,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) /* Actually AK93C45F */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

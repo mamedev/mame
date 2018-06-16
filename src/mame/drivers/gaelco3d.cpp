@@ -150,6 +150,7 @@ REF. 970429
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32031/tms32031.h"
+#include "emupal.h"
 
 #include "speaker.h"
 
@@ -938,8 +939,7 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
 	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
-	MCFG_EEPROM_SERIAL_93C66_ADD(m_eeprom)
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C66_16BIT, eeprom_serial_streaming::ENABLE)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

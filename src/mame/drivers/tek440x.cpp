@@ -49,6 +49,7 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -202,6 +202,7 @@ foreground and not behind the moving elevator layer.
 #include "machine/nvram.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

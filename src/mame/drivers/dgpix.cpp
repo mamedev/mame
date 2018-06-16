@@ -154,6 +154,7 @@ Notes:
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 

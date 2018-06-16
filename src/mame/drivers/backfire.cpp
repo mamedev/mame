@@ -23,6 +23,7 @@
 #include "cpu/arm/arm.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -425,7 +426,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MCFG_DEVICE_PROGRAM_MAP(backfire_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 1000000) // unknown clock
 	MCFG_ADC0808_IN0_CB(IOPORT("PADDLE0"))

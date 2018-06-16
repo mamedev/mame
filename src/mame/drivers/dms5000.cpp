@@ -12,6 +12,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/74259.h"
 //#include "machine/z80sio.h"
+#include "emupal.h"
 #include "screen.h"
 
 

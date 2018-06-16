@@ -57,6 +57,7 @@ Usage of terminal:
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 

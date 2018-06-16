@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_DEVICE_PROGRAM_MAP(zeropnt2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

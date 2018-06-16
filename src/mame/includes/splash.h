@@ -5,6 +5,7 @@
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class splash_state : public driver_device
 {

@@ -33,6 +33,7 @@
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 

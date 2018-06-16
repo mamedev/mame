@@ -70,6 +70,7 @@ we currently simulate this as the PIC is read protected.
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

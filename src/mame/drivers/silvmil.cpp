@@ -30,6 +30,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -25,6 +25,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

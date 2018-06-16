@@ -59,6 +59,7 @@ Twenty four 8116 rams.
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

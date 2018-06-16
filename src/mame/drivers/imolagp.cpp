@@ -84,6 +84,7 @@ www.andys-arcade.com
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

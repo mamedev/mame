@@ -96,6 +96,7 @@ Notes:
 #include "machine/tmp68301.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -632,7 +633,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_TMS_29F040_ADD("cart.u12")
 
 	// devices
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 

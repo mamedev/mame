@@ -154,6 +154,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6502/m65c02.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"

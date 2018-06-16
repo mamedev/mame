@@ -30,6 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

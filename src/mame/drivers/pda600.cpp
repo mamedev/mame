@@ -59,6 +59,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 

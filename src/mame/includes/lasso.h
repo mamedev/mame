@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 
 class lasso_state : public driver_device
 {

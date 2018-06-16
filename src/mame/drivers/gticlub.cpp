@@ -236,6 +236,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/k001006.h"
 #include "video/k001604.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -971,7 +972,7 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
@@ -1083,7 +1084,7 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)

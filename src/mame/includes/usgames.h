@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Nicola Salmoria
+
+#include "emupal.h"
+
 class usgames_state : public driver_device
 {
 public:

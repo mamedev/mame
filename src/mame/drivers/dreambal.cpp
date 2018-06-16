@@ -28,6 +28,7 @@ lamps?
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -327,7 +328,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93lc46b
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))

@@ -12,6 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 

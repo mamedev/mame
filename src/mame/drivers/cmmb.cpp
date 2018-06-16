@@ -52,6 +52,7 @@ OSC @ 72.576MHz
 #include "emu.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/at29x.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAIN_CLOCK XTAL(72'576'000)

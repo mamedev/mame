@@ -51,6 +51,7 @@
 //#include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

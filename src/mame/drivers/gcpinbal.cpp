@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

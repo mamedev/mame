@@ -123,6 +123,8 @@ private:
 	int cycles_to_ready();
 	int int_read();
 	void process(int16_t *buffer, unsigned int size);
+	int16_t clip_analog(int16_t cliptemp) const;
+	int32_t matrix_multiply(int32_t a, int32_t b) const;
 	int32_t lattice_filter();
 	void process_command(unsigned char cmd);
 	void parse_frame();
@@ -135,6 +137,9 @@ private:
 	bool NEW_FRAME_STOP_FLAG() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
 	bool NEW_FRAME_SILENCE_FLAG() const { return m_new_frame_energy_idx == 0; } // ditto as above
 	bool NEW_FRAME_UNVOICED_FLAG() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+
+	// debugging helper
+	void printbits(long data, int num);
 
 	// internal state
 

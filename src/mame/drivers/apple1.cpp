@@ -80,6 +80,7 @@
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -494,7 +495,7 @@ WRITE8_MEMBER(apple1_state::pia_display_w)
 // and to the display hardware
 WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 {
-	m_pia->portb_w((state << 7) ^ 0x80);
+	m_pia->write_portb((state << 7) ^ 0x80);
 
 	// falling edge means start the display timer
 	if (state == CLEAR_LINE)

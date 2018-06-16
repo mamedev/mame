@@ -23,6 +23,7 @@ Other:  BMC B816140 (CPLD)
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -34,6 +34,7 @@ TODO:
 #include "sound/volt_reg.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

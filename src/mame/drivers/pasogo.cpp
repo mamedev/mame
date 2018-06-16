@@ -109,6 +109,7 @@ TODO:
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

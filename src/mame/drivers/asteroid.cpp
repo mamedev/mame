@@ -50,9 +50,69 @@ For kit 08-0303008 (from rev 02) swap the following:
 
 There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in any known Atari docs found to date.
 
+
+****************************************************************************
+
+For revision 3 of Asteroids Deluxe:
+
+U.S. Update
+New Program with Easier Game Play for Asteroids Deluxe
+
+The read-only memories (ROMs) in this kit contain a new program that changes the Asteroids Deluxe
+game play. To attract new players, the game play is now operator-adjustable to be either easy for
+approximately the first 30,000 points or hard through-out the game.
+
+The technical manual describes the game play correctly if the game PCB option switch at R5 is set
+to "hard". If you set the switch to "easy", then the following game-play changes happen:
+
+* FOUR large asteroids begin the game. The second wave of asteroids begins with FIVE, and the
+  subsequent waves start with SIX through NINE large asteroids. In addition, the asteriods move
+  much more slowly across the screen. (If the option switch is set to hard, the waves begin with
+  SIX to NINE large asteriods.)
+* The large ships ("death stars") when shot will break up into three slowly-moving diamonds. (If
+  the option switch is set to hard, diamonds would immediatly begin chasing the player's
+  spaceship at high speed.)
+
+After installing these five ROMs, we recommend you set your game to easy game play.  To do so, refer
+to the figure that follows. You should note also that the self-test now deisplays and addition 0 or 1
+to represent your game difficulty selection.
+
+
+ROM kit for Asteroids Deluxe Game PCB Assembly A036471-03 and -04  F
+
+Part Number   PCB Location
+--------------------------------
+036430-02      D1
+036431-02      E/F1
+036432-02      H1
+036433-03      J1
+036800-02      R2
+
+***********************
+
+Self-Test screen shows:
+
+ 0000     (left to right: Coin Bonus Adder, Left Mech Mutiplier, Right Mech Multiplier & Game Price)
+
+ 01000    (left to right: Game Language, Ships at Game Start, Minimum Plays, Difficulty, Bonus Ship)
+
+ ^^       (Graphic display of the number of ships per game [up to 7])
+
+ 10000    (Point score at which a bonus ship is granted, blank is no bonus ship)
+
+
+NOTE: Previous program versions, for the second line would only show 4 digits.  The 6th switch has
+      a currently unknown effect in the game. However, on the Minimum Number of Plays display (on the
+      Self-Test screen) changes the values shown from 0 for a 1-Play Minimum to show a 2 and from
+      1 for a 2-Play Minimum to show a 3. Known documentation for ealier game versions state the 6th
+      switch is "Unused"
+
+****************************************************************************
+
     Asteroids-deluxe state-prom added by HIGHWAYMAN.
     The prom pcb location is:C8 and is 256x4
     (i need to update the dump, this one is read in 8bit-mode)
+
 ****************************************************************************
 
     Asteroids Memory Map (preliminary)
@@ -486,9 +546,9 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPNAME( 0x10, 0x00, "Minimum Plays" )         PORT_DIPLOCATION("R5:5")
 	PORT_DIPSETTING (   0x00, "1" )
 	PORT_DIPSETTING (   0x10, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" */
-	PORT_DIPSETTING (   0x00, DEF_STR( Hard ) )
-	PORT_DIPSETTING (   0x20, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" for pre Revision 03 versions */
+	PORT_DIPSETTING (   0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("R5:7,8")
 	PORT_DIPSETTING (   0x00, "10000" )
 	PORT_DIPSETTING (   0x40, "12000" )

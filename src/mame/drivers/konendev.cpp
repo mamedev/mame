@@ -40,6 +40,7 @@
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -327,7 +328,7 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_NVRAM_ADD_0FILL("nvram0")
 	MCFG_NVRAM_ADD_0FILL("nvram1")
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -53,6 +53,7 @@
 #include "video/zeus2.h"
 #include "machine/timekpr.h"
 #include "coreutil.h"
+#include "emupal.h"
 
 // Reset bits
 #define RESET_IOASIC        0x01

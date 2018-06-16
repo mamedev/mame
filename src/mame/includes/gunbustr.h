@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail, David Graves
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
+#include "emupal.h"
 
 struct gb_tempsprite
 {

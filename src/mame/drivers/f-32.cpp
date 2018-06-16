@@ -32,6 +32,7 @@ f5
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -172,7 +173,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_DEVICE_IO_MAP(mosaicf2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
@@ -251,7 +252,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_DEVICE_IO_MAP(royalpk2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 

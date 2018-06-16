@@ -327,6 +327,7 @@
 #include "video/rgbutil.h"
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #define GFXFIFO_IN_VERBOSE          0

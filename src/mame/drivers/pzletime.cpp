@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -353,7 +354,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 
 	/* sound hardware */

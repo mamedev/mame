@@ -1236,6 +1236,8 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1253,7 +1255,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
@@ -1287,6 +1289,8 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1306,7 +1310,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
@@ -1340,6 +1344,8 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1360,7 +1366,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
@@ -1394,6 +1400,8 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1413,7 +1421,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
@@ -1447,6 +1455,8 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1466,7 +1476,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
@@ -1501,6 +1511,8 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1520,7 +1532,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 

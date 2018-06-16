@@ -19,6 +19,7 @@
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

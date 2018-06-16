@@ -51,6 +51,7 @@
 /* Devices */
 #include "imagedev/cassette.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

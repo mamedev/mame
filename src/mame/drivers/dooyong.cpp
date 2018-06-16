@@ -83,6 +83,7 @@ are almost identical, except for much darker BG layer colors).
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 class _4enraya_state : public driver_device
 {

@@ -33,6 +33,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/namco.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

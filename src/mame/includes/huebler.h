@@ -19,6 +19,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
+#include "emupal.h"
 
 class amu880_state : public driver_device
 {

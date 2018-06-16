@@ -25,6 +25,7 @@
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 #define ABC80_HTOTAL    384
 #define ABC80_HBEND     30

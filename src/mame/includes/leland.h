@@ -13,6 +13,7 @@
 #include "machine/eepromser.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000

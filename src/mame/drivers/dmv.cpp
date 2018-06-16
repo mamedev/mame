@@ -19,6 +19,7 @@
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"

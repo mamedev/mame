@@ -82,6 +82,7 @@ CHIP #  POSITION   TYPE
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "audio/flower.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

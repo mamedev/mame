@@ -366,6 +366,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/timer.h"
 
 #include "machine/ds1315.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 

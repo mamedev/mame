@@ -51,6 +51,7 @@ TODO:
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

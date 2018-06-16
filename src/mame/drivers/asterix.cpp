@@ -21,6 +21,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,7 +270,7 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

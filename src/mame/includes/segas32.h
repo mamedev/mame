@@ -13,6 +13,7 @@
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 

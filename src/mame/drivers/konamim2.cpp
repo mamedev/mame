@@ -193,6 +193,7 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "machine/terminal.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 

@@ -73,6 +73,7 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/rtc4543.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -310,7 +311,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 
 	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 

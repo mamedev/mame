@@ -18,6 +18,7 @@
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

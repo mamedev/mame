@@ -4,6 +4,7 @@
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class galpani2_state : public driver_device
 {

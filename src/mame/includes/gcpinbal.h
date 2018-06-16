@@ -6,6 +6,7 @@
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
+#include "emupal.h"
 
 class gcpinbal_state : public driver_device
 {

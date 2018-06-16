@@ -58,6 +58,7 @@
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -635,7 +636,7 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 	MCFG_DEVICE_PROGRAM_MAP(livequiz_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -664,7 +665,7 @@ MACHINE_CONFIG_START(midas_state::hammer)
 	MCFG_DEVICE_PROGRAM_MAP(hammer_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

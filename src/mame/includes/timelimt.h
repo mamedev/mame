@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 
+#include "emupal.h"
+
 class timelimt_state : public driver_device
 {
 public:

@@ -177,7 +177,7 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, model1io2_device, io_pf_w))
 	MCFG_315_5338A_OUT_PG_CB(WRITE8(*this, model1io2_device, io_pg_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // 93C45
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // 93C45
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

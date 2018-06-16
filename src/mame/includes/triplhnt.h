@@ -14,6 +14,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -38,6 +38,7 @@
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

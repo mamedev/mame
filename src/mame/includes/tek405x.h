@@ -21,6 +21,8 @@
 
 #include "video/vector.h"
 
+#include "emupal.h"
+
 
 #define MC6800_TAG          "u61"
 #define MC6820_Y_TAG        "u561"

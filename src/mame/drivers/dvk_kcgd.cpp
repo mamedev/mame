@@ -22,6 +22,7 @@
 #include "machine/clock.h"
 #include "machine/ms7004.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 

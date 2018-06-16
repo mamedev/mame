@@ -12,6 +12,7 @@
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/mc68681.h"
 #include "machine/ram.h"
+#include "emupal.h"
 #include "screen.h"
 
 

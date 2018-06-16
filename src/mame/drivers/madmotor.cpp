@@ -26,6 +26,7 @@
 #include "sound/okim6295.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

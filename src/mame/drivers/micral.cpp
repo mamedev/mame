@@ -53,6 +53,7 @@ Other things...
 #include "cpu/z80/z80.h"
 #include "video/tms9927.h"
 //#include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"

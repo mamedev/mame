@@ -164,6 +164,7 @@ Quick Jack administration/service mode:
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

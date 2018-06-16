@@ -151,6 +151,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class z100_state : public driver_device

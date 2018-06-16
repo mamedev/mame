@@ -12,6 +12,7 @@
 #include "video/hd61830.h"
 #include "video/i8275.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

@@ -367,6 +367,7 @@ VIDEOS["MB88303"] = true
 
 MACHINES["AKIKO"] = true
 MACHINES["AUTOCONFIG"] = true
+MACHINES["BUSMOUSE"] = true
 MACHINES["CR511B"] = true
 MACHINES["DMAC"] = true
 MACHINES["GAYLE"] = true
@@ -442,6 +443,7 @@ MACHINES["I8255"] = true
 MACHINES["I8257"] = true
 MACHINES["I8271"] = true
 MACHINES["I8279"] = true
+MACHINES["I8291A"] = true
 MACHINES["I8355"] = true
 MACHINES["IDE"] = true
 MACHINES["IE15"] = true
@@ -1663,6 +1665,10 @@ files {
 createMESSProjects(_target, _subtarget, "booth")
 files {
 	MAME_DIR .. "src/mame/drivers/apexc.cpp",
+	MAME_DIR .. "src/mame/includes/apexc.h",
+	MAME_DIR .. "src/mame/machine/apexc.h",
+	MAME_DIR .. "src/mame/machine/apexc.cpp",
+	MAME_DIR .. "src/mame/video/apexc.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "camputers")
@@ -3432,6 +3438,7 @@ createMESSProjects(_target, _subtarget, "visual")
 files {
 	MAME_DIR .. "src/mame/drivers/v100.cpp",
 	MAME_DIR .. "src/mame/drivers/v102.cpp",
+	MAME_DIR .. "src/mame/drivers/v550.cpp",
 	MAME_DIR .. "src/mame/drivers/v1050.cpp",
 	MAME_DIR .. "src/mame/includes/v1050.h",
 	MAME_DIR .. "src/mame/machine/v1050kb.cpp",

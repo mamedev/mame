@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(CGENIE_PRINTER, cgenie_printer_device, "cgenie_printer", "Pri
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cgenie_printer_device::device_add_mconfig)
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, cgenie_printer_device, busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, cgenie_printer_device, perror_w))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, cgenie_printer_device, select_w))

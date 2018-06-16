@@ -3735,8 +3735,8 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(spacegun_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(spacegun_default_eeprom, 128)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // clock unknown
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("sub", 5))

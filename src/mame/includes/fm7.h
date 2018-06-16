@@ -18,6 +18,7 @@
 #include "sound/2203intf.h"
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
+#include "emupal.h"
 
 
 // Interrupt flags

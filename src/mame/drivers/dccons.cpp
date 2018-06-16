@@ -270,6 +270,7 @@
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
