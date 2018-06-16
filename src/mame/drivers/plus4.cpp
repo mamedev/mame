@@ -709,13 +709,13 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
 
 	// serial data
-	m_iec->data_w(!BIT(data, 0));
+	m_iec->host_data_w(!BIT(data, 0));
 
 	// serial clock
-	m_iec->clk_w(!BIT(data, 1));
+	m_iec->host_clk_w(!BIT(data, 1));
 
 	// serial attention
-	m_iec->atn_w(!BIT(data, 2));
+	m_iec->host_atn_w(!BIT(data, 2));
 
 	// cassette motor
 	m_cassette->motor_w(BIT(data, 3));
@@ -758,7 +758,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		uint8_t joy_a = m_joy1->joy_r();
+		uint8_t joy_a = m_joy1->read_joy();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -766,7 +766,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	if (!BIT(offset, 1))
 	{
-		uint8_t joy_b = m_joy2->joy_r();
+		uint8_t joy_b = m_joy2->read_joy();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
@@ -914,37 +914,37 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, plus4_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p2)) // cassette sense
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p3))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p4))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p5))
-	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxc))
-	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p0))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p7))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p6))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p1))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	MCFG_DEVICE_ADD(m_user, PET_USER_PORT, plus4_user_port_cards, nullptr)
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p2)) // cassette sense
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p3))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p4))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p5))
+	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxc))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p0))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxd))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p7))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(m_acia, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p6))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p1))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(m_acia, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
 
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
+	MCFG_DEVICE_ADD(m_acia, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_RXC_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_MOS6551_RXC_HANDLER(WRITELINE(m_user, pet_user_port_device, write_8))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE(m_user, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE(m_user, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(m_user, pet_user_port_device, write_m))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, plus4_state, acia_irq_w))
 
-	MCFG_DEVICE_ADD(MOS6529_USER_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_MOS6529_P1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_k))
-	MCFG_MOS6529_P2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6529_P3_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6529_P4_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6529_P5_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6529_P6_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_j))
-	MCFG_MOS6529_P7_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_f))
+	MCFG_DEVICE_ADD(m_spi_user, MOS6529, 0)
+	MCFG_MOS6529_P0_HANDLER(WRITELINE(m_user, pet_user_port_device, write_b))
+	MCFG_MOS6529_P1_HANDLER(WRITELINE(m_user, pet_user_port_device, write_k))
+	MCFG_MOS6529_P2_HANDLER(WRITELINE(m_user, pet_user_port_device, write_4))
+	MCFG_MOS6529_P3_HANDLER(WRITELINE(m_user, pet_user_port_device, write_5))
+	MCFG_MOS6529_P4_HANDLER(WRITELINE(m_user, pet_user_port_device, write_6))
+	MCFG_MOS6529_P5_HANDLER(WRITELINE(m_user, pet_user_port_device, write_7))
+	MCFG_MOS6529_P6_HANDLER(WRITELINE(m_user, pet_user_port_device, write_j))
+	MCFG_MOS6529_P7_HANDLER(WRITELINE(m_user, pet_user_port_device, write_f))
 
 	MCFG_DEVICE_ADD(MOS6529_KB_TAG, MOS6529, 0)
 	MCFG_MOS6529_P0_HANDLER(WRITELINE(*this, plus4_state, write_kb0))
@@ -959,7 +959,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NOOP)
 
 	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(m_user, pet_user_port_device, write_9))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")

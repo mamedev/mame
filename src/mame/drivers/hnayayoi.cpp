@@ -81,7 +81,7 @@ WRITE8_MEMBER(hnayayoi_state::keyboard_w)
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 }
 
 

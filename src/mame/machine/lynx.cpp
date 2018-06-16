@@ -1887,10 +1887,10 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 	 * when these are safe in the cpu */
 	m_memory_config = data;
 
-	m_bank_fc00->set_bank((data & 1) ? 1 : 0);
-	m_bank_fd00->set_bank((data & 2) ? 1 : 0);
-	m_bank_fe00->set_entry((data & 4) ? 1 : 0);
-	m_bank_fffa->set_entry((data & 8) ? 1 : 0);
+	m_bank_fc00->set_bank(BIT(data, 0));
+	m_bank_fd00->set_bank(BIT(data, 1));
+	m_bank_fe00->set_entry(BIT(data, 2));
+	m_bank_fffa->set_entry(BIT(data, 3));
 }
 
 void lynx_state::machine_reset()

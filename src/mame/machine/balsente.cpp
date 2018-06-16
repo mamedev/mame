@@ -327,6 +327,12 @@ WRITE8_MEMBER(balsente_state::novram_8bit_w)
  *
  *************************************/
 
+WRITE8_MEMBER(balsente_state::acia_w)
+{
+	// Ugly workaround: suppress soft reset command in order to avert race condition
+	m_acia->write(space, offset, (BIT(offset, 0) && data == 0xe0) ? 0 : data);
+}
+
 WRITE_LINE_MEMBER(balsente_state::uint_w)
 {
 	m_uint = bool(state);

@@ -142,7 +142,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		device->reset_w(1);
 	else if (m_adpcm_data[num] != -1)
 	{
-		device->data_w(m_adpcm_data[num] & 0x0f);
+		device->write_data(m_adpcm_data[num] & 0x0f);
 		m_adpcm_data[num] = -1;
 	}
 	else
@@ -150,7 +150,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * num;
 
 		m_adpcm_data[num] = ROM[m_adpcm_pos[num]++];
-		device->data_w(m_adpcm_data[num] >> 4);
+		device->write_data(m_adpcm_data[num] >> 4);
 	}
 }
 
