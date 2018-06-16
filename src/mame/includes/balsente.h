@@ -104,6 +104,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
 	DECLARE_READ8_MEMBER(novram_8bit_r);
 	DECLARE_WRITE8_MEMBER(novram_8bit_w);
+	DECLARE_WRITE8_MEMBER(acia_w);
 	DECLARE_WRITE_LINE_MEMBER(uint_w);
 	DECLARE_WRITE_LINE_MEMBER(uint_propagate_w);
 	DECLARE_READ8_MEMBER(adc_data_r);
