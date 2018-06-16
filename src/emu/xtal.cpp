@@ -55,6 +55,7 @@ const double XTAL::known_xtals[] = {
     Frequency       Sugarvassed            Examples
     -----------  ----------------------    ---------------------------------------- */
 		 32'768, /* 32.768_kHz_XTAL        Used to drive RTC chips */
+		 38'400, /* 38.4_kHz_XTAL          Resonator */
 		384'000, /* 384_kHz_XTAL           Resonator - Commonly used for driving OKI MSM5205 */
 		400'000, /* 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w */
 		430'000, /* 430_kHz_XTAL           Resonator */

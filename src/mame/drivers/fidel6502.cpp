@@ -20,7 +20,6 @@
       the addressbus at read or write accesses.
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
-    - PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
 
 ******************************************************************************
 
@@ -1285,7 +1284,7 @@ void fidel6502_state::eag_map(address_map &map)
 void fidel6502_state::pc_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).ram();
+	map(0x0000, 0x17ff).ram();
 	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
 	map(0x7000, 0x7000).w(FUNC(fidel6502_state::eas_ppi_porta_w));
 	map(0x7010, 0x7010).r(FUNC(fidel6502_state::eas_ppi_portb_r));
@@ -1808,7 +1807,9 @@ MACHINE_CONFIG_START(fidel6502_state::csc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
 	MCFG_DEVICE_PROGRAM_MAP(csc_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400Hz/64
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(*this, fidel6502_state, csc_pia0_pb_r))
@@ -1854,9 +1855,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P4
 	MCFG_DEVICE_PROGRAM_MAP(eas_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidel6502_state, eas_ppi_porta_w))
@@ -1887,39 +1890,26 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::pc)
+	eas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R65C02, 4_MHz_XTAL)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
 	MCFG_DEVICE_PROGRAM_MAP(pc_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEVICE_REMOVE("ppi8255")
+	MCFG_DEVICE_REMOVE("nvram")
+
 	MCFG_DEFAULT_LAYOUT(layout_fidel_pc)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
-
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-
-	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
-	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::eag)
 	eas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(5_MHz_XTAL) // R65C02P4
 	MCFG_DEVICE_PROGRAM_MAP(eag_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
