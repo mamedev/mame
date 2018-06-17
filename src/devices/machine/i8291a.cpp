@@ -976,10 +976,10 @@ void i8291a_device::run_fsm()
 const char *i8291a_device::get_state_name(device_clear_state state)
 {
 	switch (state) {
-		case device_clear_state::DCIS:
-			return "DICS";
-		case device_clear_state::DCAS:
-			return "DCAS";
+	case device_clear_state::DCIS:
+		return "DICS";
+	case device_clear_state::DCAS:
+		return "DCAS";
 	}
 	return "Unknown";
 }
