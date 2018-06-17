@@ -144,8 +144,8 @@ private:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_int(void);
-	void handle_command(void);
+	void update_int();
+	void handle_command();
 	void run_fsm();
 	void run_sh_fsm();
 	void run_ah_fsm();
@@ -296,14 +296,14 @@ private:
 	static constexpr uint8_t IFCMD_UNL        = 0x3f;  // Unlisten
 	static constexpr uint8_t IFCMD_UNT        = 0x5f;  // Untalk
 
-	enum class source_handshake_state {
+	enum class source_handshake_state : uint8_t {
 		SIDS,
 		SGNS,
 		SDYS,
 		STRS
 	};
 
-	enum class acceptor_handshake_state {
+	enum class acceptor_handshake_state : uint8_t {
 		AIDS,
 		ANRS,
 		ACRS,
@@ -312,59 +312,59 @@ private:
 		ACDS
 	};
 
-	enum class talker_state {
+	enum class talker_state : uint8_t {
 		TIDS,
 		TADS,
 		SPAS,
 		TACS
 	};
 
-	enum class talker_primary_state {
+	enum class talker_primary_state : uint8_t {
 		TPIS,
 		TPAS
 	};
 
-	enum class listener_primary_state {
+	enum class listener_primary_state : uint8_t {
 		LPIS,
 		LPAS
 	};
 
-	enum class talker_serial_poll_state {
+	enum class talker_serial_poll_state : uint8_t {
 		SPIS,
 		SPMS
 	};
 
-	enum class serial_poll_state {
+	enum class serial_poll_state : uint8_t {
 		NPRS,
 		SRQS,
 		APRS
 	};
 
-	enum class listener_state {
+	enum class listener_state : uint8_t {
 		LIDS,
 		LADS,
 		LACS
 	};
 
-	enum class remote_local_state {
+	enum class remote_local_state : uint8_t {
 		LOCS,
 		REMS,
 		RWLS,
 		LWLS
 	};
 
-	enum class parallel_poll_state {
+	enum class parallel_poll_state : uint8_t {
 		PPIS,
 		PPSS,
 		PPAS
 	};
 
-	enum class device_clear_state {
+	enum class device_clear_state : uint8_t {
 		DCIS,
 		DCAS
 	};
 
-	enum class device_trigger_state {
+	enum class device_trigger_state : uint8_t {
 		DTIS,
 		DTAS
 	};
