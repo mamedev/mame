@@ -200,7 +200,6 @@ private:
 	uint8_t m_mcu_prg;
 	int m_respcount;
 	uint8_t m_test_mode;
-	uint16_t m_dma_old;
 	uint16_t m_prg_prot;
 	uint8_t m_oki_rom;
 	uint8_t m_oki_bank;
@@ -1119,10 +1118,8 @@ void jalmah_state::machine_start()
 		m_okibank->configure_entries(0,max,memregion("oki")->base() + 0x40000,0x20000);
 	}
 
-	save_item(NAME(m_mcu_prg));
 	save_item(NAME(m_respcount));
 	save_item(NAME(m_test_mode));
-	save_item(NAME(m_dma_old));
 	save_item(NAME(m_prg_prot));
 	save_item(NAME(m_oki_rom));
 	save_item(NAME(m_oki_bank));
