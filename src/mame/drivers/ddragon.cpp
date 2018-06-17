@@ -453,7 +453,7 @@ void ddragon_state::dd_adpcm_int( msm5205_device *device, int chip )
 	}
 	else if (m_adpcm_data[chip] != -1)
 	{
-		device->data_w(m_adpcm_data[chip] & 0x0f);
+		device->write_data(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 	}
 	else
@@ -461,7 +461,7 @@ void ddragon_state::dd_adpcm_int( msm5205_device *device, int chip )
 		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
-		device->data_w(m_adpcm_data[chip] >> 4);
+		device->write_data(m_adpcm_data[chip] >> 4);
 	}
 }
 

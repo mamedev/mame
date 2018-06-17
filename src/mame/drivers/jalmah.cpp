@@ -138,6 +138,7 @@ public:
 		m_key_io(*this, "KEY%u", 0U),
 		m_system_io(*this, "SYSTEM"),
 		m_dsw_io(*this, "DSW")
+		m_maincpu(*this, "maincpu")
 		{ }
 
 	DECLARE_WRITE8_MEMBER(tilebank_w);
@@ -161,14 +162,15 @@ public:
 	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
 	void refresh_priority_system();
-	void daireika_palette_dma(uint16_t val);
 	void daireika_mcu_run();
 	void mjzoomin_mcu_run();
 	void urashima_mcu_run();
 	void second_mcu_run();
 	void jalmah(machine_config &config);
+	void jalmahv1(machine_config &config);
 	void jalmah_map(address_map &map);
 	void jalmah_oki_map(address_map &map);
+	void jalmahv1_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -183,7 +185,6 @@ protected:
 
 private:
 	required_shared_ptr<uint16_t> m_jm_shared_ram;
-	required_shared_ptr<uint16_t> m_jm_mcu_code;
 	required_device<cpu_device> m_maincpu;
 
 	optional_region_ptr<uint8_t> m_prirom;
@@ -213,6 +214,17 @@ private:
 		KAKUMEI_MCU = 0x21,
 		KAKUMEI2_MCU = 0x22,
 		SUCHIESP_MCU = 0x23
+	};
+	
+	enum {
+		SNIPPET_PALETTE1 = 0x0000,
+		SNIPPET_SOUND = 0x0800,
+		SNIPPET_TILE = 0x1000,
+		SNIPPET_PALETTE2 = 0x1800,
+		SNIPPET_RNG = 0x2000,
+		SNIPPET_CLR_LAYER0 = 0x2800,
+		SNIPPET_CLR_LAYER1 = 0x2880,
+		SNIPPET_CLR_LAYER2 = 0x2900
 	};
 };
 
@@ -277,8 +289,9 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 
 	// Tile bank is only affected when bit 11 is on,
 	// and Each bank is 256KB(0x40000) each
-	if ((TileChip == 0) && (tile & 0x800))
-		tile += m_tile_bank << 11;
+	if (TileChip == 0)
+		tile |= m_tile_bank << 12;
+//		tile = (tile & 0x800) ? ((m_tile_bank+1) << 11) | (tile & 0x7ff) : tile;
 
 	SET_TILE_INFO_MEMBER(TileChip,
 			tile,
@@ -377,7 +390,7 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 	
 	bitmap.fill(m_palette->pen(0x1ff), cliprect); //selectable by a ram address?
 	
-	for(int y = cliprect.min_y; y < cliprect.max_y; y++)
+	for(int y = cliprect.min_y; y < cliprect.max_y+1; y++)
 	{
 		clip.min_y = clip.max_y = y;
 		
@@ -495,42 +508,11 @@ WRITE16_MEMBER(urashima_state::urashima_priority_w)
 	m_pri = data & 1;
 }
 
-/*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
-// TODO: hackish, how the MCU actually do this?
-void jalmah_state::daireika_palette_dma(uint16_t val)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t index_1, index_2, src_addr, tmp_addr;
-	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
-	/*a1=88000*/
-	if(val == 0)
-		return;
-
-	src_addr = 0x301c0 + (val * 0x40);
-//  popmessage("%08x",src_addr);
-	for(index_1 = 0; index_1 < 0x200; index_1 += 0x20)
-	{
-		tmp_addr = src_addr;
-		src_addr = space.read_dword(src_addr);
-
-		for(index_2 = 0; index_2 < 0x20; index_2 += 2)
-			space.write_word(0x88000 + index_2 + index_1, space.read_word(src_addr + index_2));
-
-		src_addr = tmp_addr + 4;
-	}
-}
-
 /*RAM-based protection handlings*/
 void jalmah_state::daireika_mcu_run()
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
-
-	if((jm_shared_ram[0x540/2] & 0xf00) != m_dma_old && jm_shared_ram[0x54e/2] == 1)
-	{
-		m_dma_old = jm_shared_ram[0x540/2] & 0xf00;
-		daireika_palette_dma(((jm_shared_ram[0x540/2] & 0x0f00) >> 8));
-	}
-
+	
 	if(m_test_mode)  //service_mode
 	{
 		jm_shared_ram[0x000/2] = m_key_io[0]->read();
@@ -755,7 +737,7 @@ void jalmah_state::jalmah_map(address_map &map)
 //      0x080004, 0x080005  MCU read, different for each game
 	map(0x080010, 0x080011).w(FUNC(jalmah_state::flip_screen_w));
 //      0x080012, 0x080013  MCU write related,same for each game
-//      0x080014, 0x080015  MCU write related (handshake), same for each game
+	map(0x080014, 0x080015).noprw(); // MCU handshake
 	map(0x080017, 0x080017).w(FUNC(jalmah_state::tilebank_w));
 	map(0x080019, 0x080019).w(FUNC(jalmah_state::okibank_w));
 	map(0x08001b, 0x08001b).w(FUNC(jalmah_state::okirom_w));
@@ -772,7 +754,12 @@ void jalmah_state::jalmah_map(address_map &map)
 	map(0x09c000, 0x09ffff).ram().w("scroll3", FUNC(megasys1_tilemap_device::write)).share("scroll3"); // Scroll RAM 3
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
-	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+}
+
+void jalmah_state::jalmahv1_map(address_map &map)
+{
+	jalmah_map(map);
+	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0); // extended ROM functions (not on real HW)
 }
 
 void jalmah_state::jalmah_oki_map(address_map &map)
@@ -807,7 +794,7 @@ void urashima_state::urashima_map(address_map &map)
 	map(0x09e000, 0x0a1fff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
-	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0);/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 }
 
 static INPUT_PORTS_START( common )
@@ -1206,7 +1193,7 @@ static const gfx_layout charlayout =
 static const gfx_layout tilelayout =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	0x4000,//RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
 	{ STEP8(0,4), STEP8(4*8*16,4) },
@@ -1215,9 +1202,17 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_urashima )
-	GFXDECODE_ENTRY( "scroll0", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll1", 0, charlayout, 0x000, 16 )
+//	GFXDECODE_ENTRY( "scroll0",        0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll0", 0x100000, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll1",        0, charlayout, 0x000, 16 )
 GFXDECODE_END
+
+MACHINE_CONFIG_START(jalmah_state::jalmahv1)
+	jalmah(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jalmahv1_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(urashima_state::urashima)
 	jalmah(config);
@@ -1238,6 +1233,14 @@ MACHINE_CONFIG_START(urashima_state::urashima)
 	MCFG_SCREEN_UPDATE_DRIVER(urashima_state, screen_update_urashima)
 MACHINE_CONFIG_END
 
+// fake ROM containing 68k snippets
+// the original MCU actually uploads these into shared work ram area
+// we actually compile it using EASy68k tool
+#define LOAD_FAKE_MCU_ROM \
+	ROM_REGION( 0x10000, "jmcu_rom", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
+
+
 /*
 
 Urashima Mahjong
@@ -1255,13 +1258,23 @@ ROM_START ( urashima )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
+	LOAD_FAKE_MCU_ROM
+
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "um-3.22c",      0x40000, 0x80000, CRC(9fd8c8fa) SHA1(0346f74c03a4daa7a84b64c9edf0e54297c82fd9) )
 	ROM_COPY( "oki" ,          0x40000, 0x00000, 0x40000 )
 
-	ROM_REGION( 0x200000, "scroll0", 0 )
+	ROM_REGION( 0x300000, "scroll0", ROMREGION_ERASEFF )
 	ROM_LOAD( "um-6.2l",    0x000000, 0x080000, CRC(076be5b5) SHA1(77444025f149a960137d3c79abecf9b30defa341) )
 	ROM_LOAD( "um-7.4l",    0x080000, 0x080000, CRC(d2a68cfb) SHA1(eb6cb1fad306b697b2035a31ad48e8996722a032) )
+
+	// Second half of 16x16 Tilemap is actually bankswitched, Each bank is 256KB Boundary.
+	ROM_COPY( "scroll0",    0x000000, 0x100000, 0x40000 ) // Bank 0
+	ROM_COPY( "scroll0",    0x040000, 0x140000, 0x40000 )
+	ROM_COPY( "scroll0",    0x000000, 0x180000, 0x40000 ) // Bank 1
+	ROM_COPY( "scroll0",    0x080000, 0x1c0000, 0x40000 )
+	ROM_COPY( "scroll0",    0x000000, 0x200000, 0x40000 ) // Bank 2
+	ROM_COPY( "scroll0",    0x0c0000, 0x240000, 0x40000 )
 
 	ROM_REGION( 0x20000, "scroll1", 0 )
 	ROM_LOAD( "um-5.22j",       0x000000, 0x020000, CRC(991776a2) SHA1(56740553d7d26aaeb9bec8557727030950bb01f7) )  /* 8x8 tiles */
@@ -1290,6 +1303,8 @@ ROM_START( daireika )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
+	LOAD_FAKE_MCU_ROM
+	
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "mj3.bin", 0x40000, 0x80000, CRC(65bb350c) SHA1(e77866f2d612a0973adc616717e7c89a37d6c48e) )
 	ROM_COPY( "oki" ,    0x40000, 0x00000, 0x40000 )
@@ -1332,6 +1347,8 @@ ROM_START( mjzoomin )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
+	LOAD_FAKE_MCU_ROM
+	
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "zoomin-3.bin", 0x40000, 0x80000, CRC(07d7b8cd) SHA1(e05ce80ffb945b04f93f8c49d0c840b0bff6310b) )
 	ROM_COPY( "oki" ,         0x40000, 0x00000, 0x40000 )
@@ -1548,214 +1565,41 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 	return res;
 }
 
+#define MCU_JMP(_workram_,_data_) \
+	jm_shared_ram[_workram_]   = 0x4ef9; \
+	jm_shared_ram[_workram_+1] = 0x0010; \
+	jm_shared_ram[_workram_+2] = _data_; \
+
+
 /*
-data value is REQ under mjzoomin video test menu.It is related to the MCU?
+data value is REQ under mjzoomin video test menu. Is it related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
-	uint16_t *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
 		1st M68k code uploaded by the MCU (sound prg)
 		*******************************************************/
-		jm_shared_ram[0x0320/2] = 0x4ef9;
-		jm_shared_ram[0x0322/2] = 0x0010;
-		jm_shared_ram[0x0324/2] = 0x2000;//jmp $102000
-
-		jm_mcu_code[0x2000/2] = 0x0040;
-		jm_mcu_code[0x2002/2] = 0x0080;//ori $80,D0
-		jm_mcu_code[0x2004/2] = 0x33c0;
-		jm_mcu_code[0x2006/2] = 0x0008;
-		jm_mcu_code[0x2008/2] = 0x0040;
-		jm_mcu_code[0x200a/2] = 0x4e71;//0x6100;
-		jm_mcu_code[0x200c/2] = 0x4e71;//0x000c;
-		jm_mcu_code[0x200e/2] = 0x33fc;
-		jm_mcu_code[0x2010/2] = 0x0010;
-		jm_mcu_code[0x2012/2] = 0x0008;
-		jm_mcu_code[0x2014/2] = 0x0040;
-		jm_mcu_code[0x2016/2] = 0x4e75;
-		jm_mcu_code[0x2018/2] = 0x3239;
-		jm_mcu_code[0x201a/2] = 0x0008;
-		jm_mcu_code[0x201c/2] = 0x0040;
-		jm_mcu_code[0x201e/2] = 0x0241;
-		jm_mcu_code[0x2020/2] = 0x0001;
-		jm_mcu_code[0x2022/2] = 0x66f4;
-		jm_mcu_code[0x2024/2] = 0x4e75;
+		MCU_JMP(0x320/2,SNIPPET_SOUND);
 		/*******************************************************
 		1st alt M68k code uploaded by the MCU (Input test mode)
 		*******************************************************/
 		/*similar to mjzoomin but with offset summed with 0x300?*/
 		/*tx scrollx = $200*/
-		jm_shared_ram[0x03c6/2] = 0x6008;//bra $+10
-		jm_shared_ram[0x03d0/2] = 0x4ef9;
-		jm_shared_ram[0x03d2/2] = 0x0010;
-		jm_shared_ram[0x03d4/2] = 0x0000;//jmp $100000
-		jm_mcu_code[0x0000/2] = 0x33fc;
-		jm_mcu_code[0x0002/2] = 0x0001;
-		jm_mcu_code[0x0004/2] = 0x0008;
-		jm_mcu_code[0x0006/2] = 0x0016; // move.w #1,#$80016 (set priority)
-		jm_mcu_code[0x0008/2] = 0x4E71; // nop
-		jm_mcu_code[0x000a/2] = 0x303c;
-		jm_mcu_code[0x000c/2] = 0x000f; // move.w #$0f, D0
-		// first get the new palette RAM colors
-		jm_mcu_code[0x000e/2] = 0x23C8;
-		jm_mcu_code[0x0010/2] = 0x0010; 
-		jm_mcu_code[0x0012/2] = 0x0400; // move.l A0, $100400 (stack push)
-		jm_mcu_code[0x0014/2] = 0x2050; // move.l (A0), A0
-		jm_mcu_code[0x0016/2] = 0x4EB9;
-		jm_mcu_code[0x0018/2] = 0x0010;
-		jm_mcu_code[0x001a/2] =	0x002e; // jsr $10002e
-		jm_mcu_code[0x001c/2] = 0x4e71; // nop
-		jm_mcu_code[0x001e/2] = 0x2079;
-		jm_mcu_code[0x0020/2] = 0x0010;
-		jm_mcu_code[0x0022/2] = 0x0400; // movea.l $100400, A0 (stack pop)
-		jm_mcu_code[0x0024/2] = 0xD0FC;
-        jm_mcu_code[0x0026/2] = 0x0004; // adda.l $#4, A0
-		jm_mcu_code[0x0028/2] = 0x51c8;
-		jm_mcu_code[0x002a/2] = 0xffe4; // dbra D0, $-0x1c
-
-		jm_mcu_code[0x002c/2] = 0x4e75; //rts
-
-		jm_mcu_code[0x002e/2] = 0x323c;
-		jm_mcu_code[0x0030/2] = 0x000f; // move.w #$0f, D1
-		jm_mcu_code[0x0032/2] = 0x32d8; //move.w (A0)+,(A1)+
-		jm_mcu_code[0x0034/2] = 0x51c9;
-		jm_mcu_code[0x0036/2] = 0xfffc; //dbra D1, $-4
-		jm_mcu_code[0x0038/2] = 0x4e75; //rts
+		jm_shared_ram[0x03c6/2] = 0x6008; //bra $+10
+		MCU_JMP(0x3d0/2,SNIPPET_PALETTE1);
 
 		/*******************************************************
 		2nd M68k code uploaded by the MCU (tile upload)
 		*******************************************************/
-		jm_shared_ram[0x03ca/2] = 0x4ef9;
-		jm_shared_ram[0x03cc/2] = 0x0010;
-		jm_shared_ram[0x03ce/2] = 0x0800;//jmp $100800
-		jm_mcu_code[0x0800/2] = 0x32da;
-		jm_mcu_code[0x0802/2] = 0x51c8;
-		jm_mcu_code[0x0804/2] = 0xfffc;
-		jm_mcu_code[0x0806/2] = 0x4e75;
+		MCU_JMP(0x3ca/2,SNIPPET_TILE);
+
 		/*******************************************************
 		3rd M68k code uploaded by the MCU (palette upload)
 		*******************************************************/
-		jm_shared_ram[0x03c0/2] = 0x4ef9;
-		jm_shared_ram[0x03c2/2] = 0x0010;
-		jm_shared_ram[0x03c4/2] = 0x1000;//jmp $101000
-
-
-		jm_mcu_code[0x1000/2] = 0x4e71;//0x92fc;
-		jm_mcu_code[0x1002/2] = 0x4e71;//0x0200;//suba.w $200,A1
-		jm_mcu_code[0x1004/2] = 0xb3fc;
-		jm_mcu_code[0x1006/2] = 0x0008;
-		jm_mcu_code[0x1008/2] = 0x8200;
-		jm_mcu_code[0x100a/2] = 0x673c;//beq :x//0x6d00;
-		jm_mcu_code[0x100c/2] = 0x4e71;//nop//0x003c;
-		jm_mcu_code[0x100e/2] = 0x33c2;     jm_mcu_code[0x1010/2] = 0x0010;     jm_mcu_code[0x1012/2] = 0x17fe; //move.w D2,$1017fe
-		jm_mcu_code[0x1014/2] = 0x33c1;     jm_mcu_code[0x1016/2] = 0x0010;     jm_mcu_code[0x1018/2] = 0x17fc; //move.w D1,$1017fc
-		jm_mcu_code[0x101a/2] = 0x720f;
-		jm_mcu_code[0x101c/2] = 0x740f; //moveq $07,D2
-		jm_mcu_code[0x101e/2] = 0x23c8;
-		jm_mcu_code[0x1020/2] = 0x0010;
-		jm_mcu_code[0x1022/2] = 0x17f0;
-		jm_mcu_code[0x1024/2] = 0x2050; //movea (A0),A0
-		jm_mcu_code[0x1026/2] = 0x32d8;
-		jm_mcu_code[0x1028/2] = 0x51ca;
-		jm_mcu_code[0x102a/2] = 0xfffc;
-		jm_mcu_code[0x102c/2] = 0x2079;
-		jm_mcu_code[0x102e/2] = 0x0010;
-		jm_mcu_code[0x1030/2] = 0x17f0;
-		jm_mcu_code[0x1032/2] = 0xd0fc;
-		jm_mcu_code[0x1034/2] = 0x0004;//adda.w $4,A0
-		jm_mcu_code[0x1036/2] = 0x51c9;
-		jm_mcu_code[0x1038/2] = 0xffe4;
-		jm_mcu_code[0x103a/2] = 0x3439;
-		jm_mcu_code[0x103c/2] = 0x0010;
-		jm_mcu_code[0x103e/2] = 0x17fe;
-		jm_mcu_code[0x1040/2] = 0x3239;
-		jm_mcu_code[0x1042/2] = 0x0010;
-		jm_mcu_code[0x1044/2] = 0x17fc;
-		jm_mcu_code[0x1046/2] = 0x4e75;
-
-		jm_mcu_code[0x1048/2] = 0x23CD;
-		jm_mcu_code[0x104a/2] = 0x0010;
-		jm_mcu_code[0x104c/2] = 0x17C0;
-		jm_mcu_code[0x104e/2] = 0x2A7C;
-		jm_mcu_code[0x1050/2] = 0x0010;
-		jm_mcu_code[0x1052/2] = 0x17E0;
-		jm_mcu_code[0x1054/2] = 0x33C6;
-		jm_mcu_code[0x1056/2] = 0x0010;
-		jm_mcu_code[0x1058/2] = 0x17B0;
-		jm_mcu_code[0x105a/2] = 0x3C39;
-		jm_mcu_code[0x105c/2] = 0x000F;
-		jm_mcu_code[0x105e/2] = 0x201A;
-		jm_mcu_code[0x1060/2] = 0x3A86;
-		jm_mcu_code[0x1062/2] = 0x6700;
-		jm_mcu_code[0x1064/2] = 0x0074;
-		jm_mcu_code[0x1066/2] = 0x33C2;
-		jm_mcu_code[0x1068/2] = 0x0010;
-		jm_mcu_code[0x106a/2] = 0x17FE;
-		jm_mcu_code[0x106c/2] = 0x33C1;
-		jm_mcu_code[0x106e/2] = 0x0010;
-		jm_mcu_code[0x1070/2] = 0x17FC;
-		jm_mcu_code[0x1072/2] = 0x23C8;
-		jm_mcu_code[0x1074/2] = 0x0010;
-		jm_mcu_code[0x1076/2] = 0x17F0;
-		jm_mcu_code[0x1078/2] = 0x23C9;
-		jm_mcu_code[0x107a/2] = 0x0010;
-		jm_mcu_code[0x107c/2] = 0x17D0;
-		jm_mcu_code[0x107e/2] = 0x41F9;
-		jm_mcu_code[0x1080/2] = 0x0002;
-		jm_mcu_code[0x1082/2] = 0xA2C0;
-		jm_mcu_code[0x1084/2] = 0x3c15;
-		jm_mcu_code[0x1086/2] = 0xd1fc;
-		jm_mcu_code[0x1088/2] = 0x0000;
-		jm_mcu_code[0x108a/2] = 0x0040;
-		jm_mcu_code[0x108c/2] = 0x5346;
-		jm_mcu_code[0x108e/2] = 0x6704;
-		jm_mcu_code[0x1090/2] = 0x4e71;
-		jm_mcu_code[0x1092/2] = 0x60F2;
-		jm_mcu_code[0x1094/2] = 0x23c8;
-		jm_mcu_code[0x1096/2] = 0x0010;
-		jm_mcu_code[0x1098/2] = 0x17a0;//store here the A0 reg,1017a0
-		jm_mcu_code[0x109a/2] = 0xd3fc;
-		jm_mcu_code[0x109c/2] = 0x0000;
-		jm_mcu_code[0x109e/2] = 0x0200;
-		jm_mcu_code[0x10a0/2] = 0x720F;
-		jm_mcu_code[0x10a2/2] = 0x740F;
-		jm_mcu_code[0x10a4/2] = 0x2050;
-		jm_mcu_code[0x10a6/2] = 0x32D8;
-		jm_mcu_code[0x10a8/2] = 0x51CA;
-		jm_mcu_code[0x10aa/2] = 0xFFFC;
-		jm_mcu_code[0x10ac/2] = 0x2079;//1017a0,not 1017f0
-		jm_mcu_code[0x10ae/2] = 0x0010;
-		jm_mcu_code[0x10b0/2] = 0x17a0;
-		jm_mcu_code[0x10b2/2] = 0xD0FC;
-		jm_mcu_code[0x10b4/2] = 0x0004;
-		jm_mcu_code[0x10b6/2] = 0x23c8;
-		jm_mcu_code[0x10b8/2] = 0x0010;
-		jm_mcu_code[0x10ba/2] = 0x17a0;
-		jm_mcu_code[0x10bc/2] = 0x51C9;
-		jm_mcu_code[0x10be/2] = 0xffe4;
-		jm_mcu_code[0x10c0/2] = 0x3439;
-		jm_mcu_code[0x10c2/2] = 0x0010;
-		jm_mcu_code[0x10c4/2] = 0x17FE;
-		jm_mcu_code[0x10c6/2] = 0x3239;
-		jm_mcu_code[0x10c8/2] = 0x0010;
-		jm_mcu_code[0x10ca/2] = 0x17FC;
-		jm_mcu_code[0x10cc/2] = 0x2079;
-		jm_mcu_code[0x10ce/2] = 0x0010;
-		jm_mcu_code[0x10d0/2] = 0x17F0;
-		jm_mcu_code[0x10d2/2] = 0x2279;
-		jm_mcu_code[0x10d4/2] = 0x0010;
-		jm_mcu_code[0x10d6/2] = 0x17D0;
-		jm_mcu_code[0x10d8/2] = 0x2A79;
-		jm_mcu_code[0x10da/2] = 0x0010;
-		jm_mcu_code[0x10dc/2] = 0x17c0;
-		jm_mcu_code[0x10de/2] = 0x3C39;
-		jm_mcu_code[0x10e0/2] = 0x0010;
-		jm_mcu_code[0x10e2/2] = 0x17B0;
-		jm_mcu_code[0x10e4/2] = 0x6000;
-		jm_mcu_code[0x10e6/2] = 0xFF26;
+		MCU_JMP(0x3c0/2,SNIPPET_PALETTE2);
 	}
 }
 
@@ -1781,17 +1625,9 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 	return res;
 }
 
-/*
-data value is REQ under mjzoomin video test menu.It is related to the MCU?
-*/
-static const uint16_t dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
-											0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
-
 WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
-	uint16_t *jm_mcu_code = m_jm_mcu_code;
-	uint16_t i;
 
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1799,243 +1635,42 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 		1st M68k code uploaded by the MCU.
 		random number generator (guess)
 		*******************************************************/
-		jm_shared_ram[0x0140/2] = 0x4ef9;
-		jm_shared_ram[0x0142/2] = 0x0010;
-		jm_shared_ram[0x0144/2] = 0x0800;
-
-		/*
-		33c5 0010 07fe move.w  D5, $1007fe.l
-		3A39 000F 000C move.w  $f000c, D5
-		da86           add.w   D6,D5
-		0245 003f      and.w   $3f,D5
-		33C5 000F 000C move.w  D5, $f000c.l
-		3a39 0010 07fe move.w  $1007fe, D5
-		4e75           rts
-		*/
-		for(i=0;i<0x11;i++)
-			jm_mcu_code[(0x0800/2)+i] = dai_mcu_code[i];
+		MCU_JMP(0x0140/2,SNIPPET_RNG);
 
 		/*******************************************************
-		2nd M68k code uploaded by the MCU.
+		2nd M68k code uploaded by the MCU. (sound playback)
 		*******************************************************/
-		jm_shared_ram[0x0020/2] = 0x4ef9;
-		jm_shared_ram[0x0022/2] = 0x0010;
-		jm_shared_ram[0x0024/2] = 0x2000;//jmp $102000
-		jm_mcu_code[0x2000/2] = 0x0040;
-		jm_mcu_code[0x2002/2] = 0x0080;//ori $80,D0
-		jm_mcu_code[0x2004/2] = 0x33c0;
-		jm_mcu_code[0x2006/2] = 0x0008;
-		jm_mcu_code[0x2008/2] = 0x0040;
-		jm_mcu_code[0x200a/2] = 0x6100;
-		jm_mcu_code[0x200c/2] = 0x000c;
-		jm_mcu_code[0x200e/2] = 0x33fc;
-		jm_mcu_code[0x2010/2] = 0x0010;
-		jm_mcu_code[0x2012/2] = 0x0008;
-		jm_mcu_code[0x2014/2] = 0x0040;
-		jm_mcu_code[0x2016/2] = 0x4e75;
-		jm_mcu_code[0x2018/2] = 0x3239;
-		jm_mcu_code[0x201a/2] = 0x0008;
-		jm_mcu_code[0x201c/2] = 0x0040;
-		jm_mcu_code[0x201e/2] = 0x0241;
-		jm_mcu_code[0x2020/2] = 0x0001;
-		jm_mcu_code[0x2022/2] = 0x66f4;
-		jm_mcu_code[0x2024/2] = 0x4e75;
+		MCU_JMP(0x0020/2,SNIPPET_SOUND);
+		
 		/*******************************************************
 		3rd M68k code uploaded by the MCU.
 		see mjzoomin_mcu_w
 		*******************************************************/
-		jm_shared_ram[0x00c6/2] = 0x6000;
-		jm_shared_ram[0x00c8/2] = 0x0008;//bra +$8,needed because we have only two bytes here
-									//and we need three...
-		jm_shared_ram[0x00d0/2] = 0x4ef9;
-		jm_shared_ram[0x00d2/2] = 0x0010;
-		jm_shared_ram[0x00d4/2] = 0x0000;//jmp $100000
-		//jm_shared_ram[0x00cc/2] = 0x4e75;//rts //needed? we can use jmp instead of jsr...
-		jm_mcu_code[0x0000/2] = 0x2050;//movea.l (A0),A0
-		jm_mcu_code[0x0002/2] = 0x32d8;//move.w (A0)+,(A1)+
-		jm_mcu_code[0x0004/2] = 0x51c9;
-		jm_mcu_code[0x0006/2] = 0xfffc;//dbra D1,f00ca
-		jm_mcu_code[0x0008/2] = 0x4e75;//rts
+		jm_shared_ram[0x00c6/2] = 0x6008; //bra +$8, we need this due of clash with SNIPPET_TILE
+		MCU_JMP(0x00d0/2,SNIPPET_PALETTE1);
+
 		/*******************************************************
 		4th M68k code uploaded by the MCU
 		They seem video code cleaning functions
 		*******************************************************/
-		//108800
-		jm_shared_ram[0x0100/2] = 0x4ef9;
-		jm_shared_ram[0x0102/2] = 0x0010;
-		jm_shared_ram[0x0104/2] = 0x8800;
-
-		jm_mcu_code[0x8800/2] = 0x4df9;
-		jm_mcu_code[0x8802/2] = 0x0009;
-		jm_mcu_code[0x8804/2] = 0x0000; //lea.w #90000,A6
-		jm_mcu_code[0x8806/2] = 0x323c;
-		jm_mcu_code[0x8808/2] = 0x1fff; //move.w #$1fff,D1
-		jm_mcu_code[0x880a/2] = 0x3cbc;
-		jm_mcu_code[0x880c/2] = 0x00ff; //move.w #$0000,(A6)
-		jm_mcu_code[0x880e/2] = 0xdcfc;
-		jm_mcu_code[0x8810/2] = 0x0002; //adda.w #$0002,A6
-		jm_mcu_code[0x8812/2] = 0x51c9;
-		jm_mcu_code[0x8814/2] = 0xfff6; //dbra D1
-		jm_mcu_code[0x8816/2] = 0x4df9;
-		jm_mcu_code[0x8818/2] = 0x0000;
-		jm_mcu_code[0x881a/2] = 0x0000; //lea.w #0,A6
-		jm_mcu_code[0x881c/2] = 0x323c;
-		jm_mcu_code[0x881e/2] = 0x0000; //move.w #$0,D1
-		jm_mcu_code[0x8820/2] = 0x4e75; //rts
-
-		//108880
-		jm_shared_ram[0x0108/2] = 0x4ef9;
-		jm_shared_ram[0x010a/2] = 0x0010;
-		jm_shared_ram[0x010c/2] = 0x8880;
-
-		jm_mcu_code[0x8880/2] = 0x4df9;
-		jm_mcu_code[0x8882/2] = 0x0009;
-		jm_mcu_code[0x8884/2] = 0x4000; //lea.w #94000,A6
-		jm_mcu_code[0x8886/2] = 0x323c;
-		jm_mcu_code[0x8888/2] = 0x1fff; //move.w #$1fff,D1
-		jm_mcu_code[0x888a/2] = 0x3cbc;
-		jm_mcu_code[0x888c/2] = 0x00ff; //move.w #$0000,(A6)
-		jm_mcu_code[0x888e/2] = 0xdcfc;
-		jm_mcu_code[0x8890/2] = 0x0002; //adda.w #$0002,A6
-		jm_mcu_code[0x8892/2] = 0x51c9;
-		jm_mcu_code[0x8894/2] = 0xfff6; //dbra D1
-		jm_mcu_code[0x8896/2] = 0x4df9;
-		jm_mcu_code[0x8898/2] = 0x0000;
-		jm_mcu_code[0x889a/2] = 0x0000; //lea.w #0,A6
-		jm_mcu_code[0x889c/2] = 0x323c;
-		jm_mcu_code[0x889e/2] = 0x0000; //move.w #$0,D1
-		jm_mcu_code[0x88a0/2] = 0x4e75; //rts
-
-		//108900
-		jm_shared_ram[0x0110/2] = 0x4ef9;
-		jm_shared_ram[0x0112/2] = 0x0010;
-		jm_shared_ram[0x0114/2] = 0x8900;
-
-		jm_mcu_code[0x8900/2] = 0x4df9;
-		jm_mcu_code[0x8902/2] = 0x0009;
-		jm_mcu_code[0x8904/2] = 0x8000; //lea.w #98000,A6
-		jm_mcu_code[0x8906/2] = 0x323c;
-		jm_mcu_code[0x8908/2] = 0x1fff; //move.w #$1fff,D1
-		jm_mcu_code[0x890a/2] = 0x3cbc;
-		jm_mcu_code[0x890c/2] = 0xf0ff; //move.w #$f0ff,(A6)
-		jm_mcu_code[0x890e/2] = 0xdcfc;
-		jm_mcu_code[0x8910/2] = 0x0002; //adda.w #$0002,A6
-		jm_mcu_code[0x8912/2] = 0x51c9;
-		jm_mcu_code[0x8914/2] = 0xfff6; //dbra D1
-		jm_mcu_code[0x8916/2] = 0x4df9;
-		jm_mcu_code[0x8918/2] = 0x0000;
-		jm_mcu_code[0x891a/2] = 0x0000; //lea.w #0,A6
-		jm_mcu_code[0x891c/2] = 0x323c;
-		jm_mcu_code[0x891e/2] = 0x0000; //move.w #$0,D1
-		jm_mcu_code[0x8920/2] = 0x4e75; //rts
-
-		/*TX function?*/
+		MCU_JMP(0x100/2,SNIPPET_CLR_LAYER0);
+		MCU_JMP(0x108/2,SNIPPET_CLR_LAYER1);
+		MCU_JMP(0x110/2,SNIPPET_CLR_LAYER2);
+		
+		/* layer 3 clear function is already in 68k ROM program???*/
 		jm_shared_ram[0x0126/2] = 0x4ef9;
-		jm_shared_ram[0x0128/2] = 0x0000;//0x0010;
-		jm_shared_ram[0x012a/2] = 0x2684;//0x8980;
+		jm_shared_ram[0x0128/2] = 0x0000;
+		jm_shared_ram[0x012a/2] = 0x2684;
 
-		//m_pri $f0590
-		jm_mcu_code[0x8980/2] = 0x33fc;
-		jm_mcu_code[0x8982/2] = 0x0006;
-		jm_mcu_code[0x8984/2] = 0x000f;
-		jm_mcu_code[0x8986/2] = 0x0590; //move.w #$6,$f0590 (m_pri n)
-		jm_mcu_code[0x8988/2] = 0x4df9;
-		jm_mcu_code[0x898a/2] = 0x0009;
-		jm_mcu_code[0x898c/2] = 0xc000; //lea.w #9c000,A6
-		jm_mcu_code[0x898e/2] = 0x323c;
-		jm_mcu_code[0x8990/2] = 0x1fff; //move.w #$1fff,D1
-		jm_mcu_code[0x8992/2] = 0x3cbc;
-		jm_mcu_code[0x8994/2] = 0x0020; //move.w #$0020,(A6)
-		jm_mcu_code[0x8996/2] = 0xdcfc;
-		jm_mcu_code[0x8998/2] = 0x0002; //adda.w #$0002,A6
-		jm_mcu_code[0x899a/2] = 0x51c9;
-		jm_mcu_code[0x899c/2] = 0xfff6; //dbra D1
-		jm_mcu_code[0x899e/2] = 0x4df9;
-		jm_mcu_code[0x89a0/2] = 0x0000;
-		jm_mcu_code[0x89a2/2] = 0x0000; //lea.w #0,A6
-		jm_mcu_code[0x89a4/2] = 0x323c;
-		jm_mcu_code[0x89a6/2] = 0x0000; //move.w #$0,D1
-		jm_mcu_code[0x89a8/2] = 0x4e75; //rts
-
-/*
-        jm_shared_ram[0x0100/2] = 0x4ef9;
-        jm_shared_ram[0x0102/2] = 0x0010;
-        jm_shared_ram[0x0104/2] = 0x1000;//jmp $101000
-        //jm_shared_ram[0x00c6/2] = 0x4e75;//rts
-        jm_mcu_code[0x1000/2] = 0x33c2;
-        jm_mcu_code[0x1002/2] = 0x0010;
-        jm_mcu_code[0x1004/2] = 0x17fe; //move.w D2,$1017fe
-        jm_mcu_code[0x1006/2] = 0x23c8;
-        jm_mcu_code[0x1008/2] = 0x0010;
-        jm_mcu_code[0x100a/2] = 0x17f0;
-        jm_mcu_code[0x100c/2] = 0x2050; //movea (A0),A0
-        jm_mcu_code[0x100e/2] = 0x22d8;
-        jm_mcu_code[0x1010/2] = 0x51ca;
-        jm_mcu_code[0x1012/2] = 0xfffc;
-        jm_mcu_code[0x1014/2] = 0x3439;
-        jm_mcu_code[0x1016/2] = 0x0010;
-        jm_mcu_code[0x1018/2] = 0x17fe;
-        jm_mcu_code[0x101a/2] = 0x2079;
-        jm_mcu_code[0x101c/2] = 0x0010;
-        jm_mcu_code[0x101e/2] = 0x17f0;
-        jm_mcu_code[0x1020/2] = 0xd0fc;
-        jm_mcu_code[0x1022/2] = 0x0004;//adda.w $4,A0
-        jm_mcu_code[0x1024/2] = 0x4e75;*/
 		/*******************************************************
 		5th M68k code uploaded by the MCU (palette upload)
 		*******************************************************/
-		jm_shared_ram[0x00c0/2] = 0x4ef9;
-		jm_shared_ram[0x00c2/2] = 0x0010;
-		jm_shared_ram[0x00c4/2] = 0x1000;//jmp $101000
-		//jm_shared_ram[0x00c6/2] = 0x4e75;//rts
-		jm_mcu_code[0x1000/2] = 0x33c2;
-		jm_mcu_code[0x1002/2] = 0x0010;
-		jm_mcu_code[0x1004/2] = 0x17fe; //move.w D2,$1017fe
-		jm_mcu_code[0x1006/2] = 0x33c1;
-		jm_mcu_code[0x1008/2] = 0x0010;
-		jm_mcu_code[0x100a/2] = 0x17fc; //move.w D1,$1017fc
-		jm_mcu_code[0x100c/2] = 0x720f;
-		jm_mcu_code[0x100e/2] = 0x740f; //moveq $0f,D2
-		jm_mcu_code[0x1010/2] = 0x23c8;
-		jm_mcu_code[0x1012/2] = 0x0010;
-		jm_mcu_code[0x1014/2] = 0x17f0;
-		jm_mcu_code[0x1016/2] = 0x2050; //movea (A0),A0
-		jm_mcu_code[0x1018/2] = 0x32d8;
-		jm_mcu_code[0x101a/2] = 0x51ca;
-		jm_mcu_code[0x101c/2] = 0xfffc;
-		jm_mcu_code[0x101e/2] = 0x2079;
-		jm_mcu_code[0x1020/2] = 0x0010;
-		jm_mcu_code[0x1022/2] = 0x17f0;
-		jm_mcu_code[0x1024/2] = 0xd0fc;
-		jm_mcu_code[0x1026/2] = 0x0004;//adda.w $4,A0
-		jm_mcu_code[0x1028/2] = 0x51c9;
-		jm_mcu_code[0x102a/2] = 0xffe4;
-		jm_mcu_code[0x102c/2] = 0x3439;
-		jm_mcu_code[0x102e/2] = 0x0010;
-		jm_mcu_code[0x1030/2] = 0x17fe;
-		jm_mcu_code[0x1032/2] = 0x3239;
-		jm_mcu_code[0x1034/2] = 0x0010;
-		jm_mcu_code[0x1036/2] = 0x17fc;
-		jm_mcu_code[0x1038/2] = 0x4e75;
+		MCU_JMP(0x00c0/2,SNIPPET_PALETTE2);
+
 		/*******************************************************
 		6th M68k code uploaded by the MCU (tile upload)
 		*******************************************************/
-		jm_shared_ram[0x00ca/2] = 0x4ef9;
-		jm_shared_ram[0x00cc/2] = 0x0010;
-		jm_shared_ram[0x00ce/2] = 0x1800;//jmp $101800
-		//jm_shared_ram[0x00c6/2] = 0x4e75;//rts
-
-		jm_mcu_code[0x1800/2] = 0x22da;//move.l (A2)+,(A1)+
-		jm_mcu_code[0x1802/2] = 0xb5fc;
-		jm_mcu_code[0x1804/2] = 0x0002;
-		jm_mcu_code[0x1806/2] = 0x6600;
-		jm_mcu_code[0x1808/2] = 0x6706;
-		jm_mcu_code[0x180a/2] = 0x51c8;
-		jm_mcu_code[0x180c/2] = 0xfff4;//dbra D0,f00ca
-		jm_mcu_code[0x180e/2] = 0x4e75;//rts
-		jm_mcu_code[0x1810/2] = 0xd4fc;
-		jm_mcu_code[0x1812/2] = 0x0a00;
-		jm_mcu_code[0x1814/2] = 0x60ea;
+		MCU_JMP(0x00ca/2,SNIPPET_TILE);
 	}
 }
 
@@ -2066,7 +1701,7 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
-	uint16_t *jm_mcu_code = m_jm_mcu_code;
+
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/******************************************************
@@ -2079,100 +1714,18 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 		(A0) is the vector number for take the real palette
 		address.
 		******************************************************/
-		jm_shared_ram[0x00c6/2] = 0x4ef9;
-		jm_shared_ram[0x00c8/2] = 0x0010;
-		jm_shared_ram[0x00ca/2] = 0x0000;//jsr $100000
-		//jm_shared_ram[0x00cc/2] = 0x4e75;//rts //needed? we can use jmp instead of jsr...
-		jm_mcu_code[0x0000/2] = 0x2050;//movea.l (A0),A0
-		jm_mcu_code[0x0002/2] = 0x32d8;//move.w (A0)+,(A1)+
-		jm_mcu_code[0x0004/2] = 0x51c9;
-		jm_mcu_code[0x0006/2] = 0xfffc;//dbra D1,f00ca
-		jm_mcu_code[0x0008/2] = 0x4e75;//rts
+		MCU_JMP(0x00c6/2,SNIPPET_PALETTE1);
+		
 		/*******************************************************
 		2nd M68k code uploaded by the MCU (Sound read/write)
 		(Note:copied from suchiesp,check here the sound banking)
 		*******************************************************/
-		jm_shared_ram[0x0020/2] = 0x4ef9;
-		jm_shared_ram[0x0022/2] = 0x0010;
-		jm_shared_ram[0x0024/2] = 0x1800;//jmp $101800
+		MCU_JMP(0x0020/2,SNIPPET_SOUND);
 
-		/*Wrong,it reads from the rom...*/
-		//0x33c2 0011 80fe move.w D2,$1180fe
-		//0x0642 addi.w $1,D2
-		//0x0001
-		//0x0242 andi.w $3,D2 ;might be not needed
-		//0x0003
-
-		//0x33c2 move.w D2,$80018 ;sound bank
-		//0x0008
-		//0x0018
-		//0x3439 0011 80fe move.w $1180fe,D2
-		jm_mcu_code[0x1800/2] = 0x33c2;
-		jm_mcu_code[0x1802/2] = 0x0011;
-		jm_mcu_code[0x1804/2] = 0x80fe;
-		jm_mcu_code[0x1806/2] = 0x0642;
-		jm_mcu_code[0x1808/2] = 0x0001;
-		jm_mcu_code[0x180a/2] = 0x0242;
-		jm_mcu_code[0x180c/2] = 0x0003;
-		jm_mcu_code[0x180e/2] = 0x33c2;
-		jm_mcu_code[0x1810/2] = 0x0008;
-		jm_mcu_code[0x1812/2] = 0x0018;
-		jm_mcu_code[0x1814/2] = 0x0040;
-		jm_mcu_code[0x1816/2] = 0x0080;//ori $80,D0
-		jm_mcu_code[0x1818/2] = 0x33c0;//move.w D0,$80040
-		jm_mcu_code[0x181a/2] = 0x0008;
-		jm_mcu_code[0x181c/2] = 0x0040;
-		jm_mcu_code[0x181e/2] = 0x33fc;//move.w $10,$80040
-		jm_mcu_code[0x1820/2] = 0x0010;
-		jm_mcu_code[0x1822/2] = 0x0008;
-		jm_mcu_code[0x1824/2] = 0x0040;
-		jm_mcu_code[0x1826/2] = 0x3439;
-		jm_mcu_code[0x1828/2] = 0x0011;
-		jm_mcu_code[0x182a/2] = 0x80fe;
-		jm_mcu_code[0x182c/2] = 0x4e75;
-		//jm_mcu_code[0x1818/2] = 0x3239;
-		//jm_mcu_code[0x181a/2] = 0x0008;
-		//jm_mcu_code[0x181c/2] = 0x0040;
-		//jm_mcu_code[0x181e/2] = 0x0241;
-		//jm_mcu_code[0x1820/2] = 0x0001;
-		//jm_mcu_code[0x1822/2] = 0x66f4;
-		//jm_mcu_code[0x1824/2] = 0x4e75;
 		/*******************************************************
-		3rd M68k code uploaded by the MCU(palette upload)
+		3rd M68k code uploaded by the MCU (in-game palette upload)
 		*******************************************************/
-		jm_shared_ram[0x00c0/2] = 0x4ef9;
-		jm_shared_ram[0x00c2/2] = 0x0010;
-		jm_shared_ram[0x00c4/2] = 0x1000;//jmp $101000
-		//jm_shared_ram[0x00c6/2] = 0x4e75;//rts
-		jm_mcu_code[0x1000/2] = 0x33c2;
-		jm_mcu_code[0x1002/2] = 0x0010;
-		jm_mcu_code[0x1004/2] = 0x17fe; //move.w D2,$1017fe
-		jm_mcu_code[0x1006/2] = 0x33c1;
-		jm_mcu_code[0x1008/2] = 0x0010;
-		jm_mcu_code[0x100a/2] = 0x17fc; //move.w D1,$1017fc
-		jm_mcu_code[0x100c/2] = 0x720f;
-		jm_mcu_code[0x100e/2] = 0x740f; //moveq $07,D2
-		jm_mcu_code[0x1010/2] = 0x23c8;
-		jm_mcu_code[0x1012/2] = 0x0010;
-		jm_mcu_code[0x1014/2] = 0x17f0;
-		jm_mcu_code[0x1016/2] = 0x2050; //movea (A0),A0
-		jm_mcu_code[0x1018/2] = 0x32d8;
-		jm_mcu_code[0x101a/2] = 0x51ca;
-		jm_mcu_code[0x101c/2] = 0xfffc;
-		jm_mcu_code[0x101e/2] = 0x2079;
-		jm_mcu_code[0x1020/2] = 0x0010;
-		jm_mcu_code[0x1022/2] = 0x17f0;
-		jm_mcu_code[0x1024/2] = 0xd0fc;
-		jm_mcu_code[0x1026/2] = 0x0004;//adda.w $4,A0
-		jm_mcu_code[0x1028/2] = 0x51c9;
-		jm_mcu_code[0x102a/2] = 0xffe4;
-		jm_mcu_code[0x102c/2] = 0x3439;
-		jm_mcu_code[0x102e/2] = 0x0010;
-		jm_mcu_code[0x1030/2] = 0x17fe;
-		jm_mcu_code[0x1032/2] = 0x3239;
-		jm_mcu_code[0x1034/2] = 0x0010;
-		jm_mcu_code[0x1036/2] = 0x17fc;
-		jm_mcu_code[0x1038/2] = 0x4e75;
+		MCU_JMP(0x00c0/2,SNIPPET_PALETTE2);
 	}
 }
 
@@ -2265,8 +1818,8 @@ void jalmah_state::init_suchiesp()
 
 /*First version of the MCU*/
 GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, daireika, 0, jalmahv1,    daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, mjzoomin, 0, jalmahv1,    mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
 GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state,   init_kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   init_kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

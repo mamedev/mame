@@ -47,7 +47,8 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
@@ -212,9 +213,9 @@ READ8_MEMBER(rmhaihai_state::samples_r)
 
 WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 {
-	m_msm->data_w(data);         /* bit0..3  */
-	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
-	m_msm->vclk_w(BIT(data, 4)); /* bit4     */
+	m_msm->write_data(data);        // bit0..3
+	m_msm->reset_w(BIT(data, 5));   // bit 5
+	m_msm->vclk_w(BIT(data, 4));    // bit4
 }
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)

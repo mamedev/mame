@@ -9537,6 +9537,31 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "capx2354.u43", 0x0000, 0x0200, CRC(c16e03ed) SHA1(59c0e98b40353e012f2dc2ce25dd46433449e8cc) )
 ROM_END
 
+ROM_START( pex0057pf ) /* Superboard : Deuces Wild Poker (X000057P+XP000038) */
+/*
+                                        w/D     w/oD
+PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
+------------------------------------------------------------
+  P34A      1    2    2   3   5   9  15  25 200 250    800
+  % Range: 96.8-98.8%  Optimum: 100.8%  Hit Frequency: 45.3%
+     Programs Available: PP0057, X000057P
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /*  09/05/95   @ IGT  L95-2452 */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000057p.u66",   0x00000, 0x10000, CRC(2046710a) SHA1(3fcc7c3069ea54d0e4982814aca1d7b327bb2074) ) /* Deuces Wild Poker - 05/04/95   @ IGT  L95-1143 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2234.u77",  0x00000, 0x8000, CRC(4cb29a46) SHA1(95e1a473a97f6c847b8a257bc0a3c2d8efc23f4b) ) /* Custom Stratosphere card backs - 02/28/96   @ IGT  L96-0554  */
+	ROM_LOAD( "mgo-cg2234.u78",  0x08000, 0x8000, CRC(6732a59e) SHA1(569c76785eb1f2d646436339185b17ef65e31307) ) /* Compatible with most "standard" game sets */
+	ROM_LOAD( "mbo-cg2234.u79",  0x10000, 0x8000, CRC(d6a99a75) SHA1(f5fa053275c523e7d05e383f13ed8e5e05a14690) )
+	ROM_LOAD( "mxo-cg2234.u80",  0x18000, 0x8000, CRC(2c4531be) SHA1(9edcb749617b167f62ba2e0080391acf47ea0caf) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2234.u43", 0x0000, 0x0200, CRC(519000fa) SHA1(31cd72643ca74a778418f944045e9e03937143d6) )
+ROM_END
+
 ROM_START( pex0060p ) /* Superboard : Standard Draw Poker (X000060P+XP000038) - PSR Verified */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
@@ -11698,7 +11723,7 @@ SA$ - Sequential ACE$ pays the same as RF
 	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, CRC(cc9d64e4) SHA1(4bf78e49150ca6fb4a05f3320f712bbbabcacf56) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Philips N82S147N */
+	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) )
 ROM_END
 
 ROM_START( pex2172pa ) /* Superboard : Ace$ Bonus Poker (X002172P+XP000038) - PSR Verified */
@@ -11727,7 +11752,7 @@ SA$ - Sequential ACE$ pays the same as RF
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2399.u43", 0x0000, 0x0200, NO_DUMP ) /* Should be CAPX2399 */
-	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Wrong!! Should be CAPX2399 - Philips N82S147N */
+	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Wrong!! Should be CAPX2399 - likely same data as CAPX2172 & CAPX2325 */
 ROM_END
 
 ROM_START( pex2173p ) /* Superboard : Ace$ Bonus Poker (X002173P+XP000038) - PSR Verified */
@@ -11755,7 +11780,7 @@ SA$ - Sequential ACE$ pays the same as RF
 	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, CRC(cc9d64e4) SHA1(4bf78e49150ca6fb4a05f3320f712bbbabcacf56) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Philips N82S147N */
+	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) )
 ROM_END
 
 ROM_START( pex2178p ) /* Superboard : Double Bonus Poker (X002178P+XP000119) - PSR Verified */
@@ -14576,6 +14601,7 @@ GAMEL( 1995, pex0057pb, pex0057p, peplus, peplus_poker,  peplus_state, init_pepl
 GAMEL( 1995, pex0057pc, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Horseshoe)", 0, layout_pe_poker )
 GAMEL( 1995, pex0057pd, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Wild Wild West Casino)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2389 not dumped */
 GAMEL( 1995, pex0057pe, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Sunset Station Hotel-Casino)", 0, layout_pe_poker )
+GAMEL( 1995, pex0057pf, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Stratosphere Players Club)", 0, layout_pe_poker )
 GAMEL( 1995, pex0060p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000060P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
 GAMEL( 1995, pex0124p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000124P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL( 1995, pex0150p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000150P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
