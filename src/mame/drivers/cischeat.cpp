@@ -147,10 +147,6 @@ Common Issues:
 
 - Some ROMs aren't used (priorities?)
 - Screen control register (priorities, layers enabling etc.) - Where is it?
-- In cischeat & bigrun, at the start of some levels, you can see the empty
-  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
-  are correct in a few places (e.g. in the attract mode, where cars move
-  horizontally, the wheels don't follow for this reason, I think
 - Sound communication not quite right: see Test Mode
 
 To Do:
@@ -159,8 +155,21 @@ To Do:
 - Use the Tilemap Manager for the road layers (when this kind of layers
   will be supported) for performance and better priority support.
   A line based zooming is additionally needed for f1gpstar.
+- Wild Pilot road needs some serious work (empty gaps, ship "floating" 
+  in stage 6 etc.);
 - Force feedback :)
+- Major cleanups needed, especially in video file;
+- Split the non-road games into own driver, merge them with Alien Command, 
+  device-ify the sprite chip;
 
+BTANBs:
+- In cischeat & bigrun, at the start of some levels, you can see the empty
+  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
+  are correct in a few places (e.g. in the attract mode, where cars move
+  horizontally, the wheels don't follow for this reason, I think)
+  Update: this happens on real HW as well (at least for Big Run);
+- Some serious sprite popups happening in Big Run, again this happens on 
+  the reference video too so not a bug.
 
 2008-08
 Dip locations verified for Big Run with the manual. Also added missing dips
@@ -3636,7 +3645,7 @@ void cischeat_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)",  MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
 GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
