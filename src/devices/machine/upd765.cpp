@@ -13,14 +13,15 @@
 #define LOG_REGS    (1U << 6)   // Digital input/output register and data rate select
 #define LOG_FIFO    (1U << 7)   // FIFO operations
 #define LOG_COMMAND (1U << 8)   // Commands
-#define LOG_DONE    (1U << 9)   // Command done
-#define LOG_RW      (1U << 10)  // Read/write sector or track
-#define LOG_LIVERW  (1U << 11)  // Reading/writing in the live states
-#define LOG_MATCH   (1U << 12)  // Sector matching
+#define LOG_RW      (1U << 9)   // Read/write sector or track
+#define LOG_MATCH   (1U << 10)  // Sector matching
+#define LOG_STATE   (1U << 11)  // State machine
+#define LOG_LIVE    (1U << 12)  // Live states
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
+#include <iomanip>      // std::setw
 
 #define LOGWARN(...)     LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGSHIFT(...)    LOGMASKED(LOG_SHIFT, __VA_ARGS__)
@@ -30,10 +31,10 @@
 #define LOGREGS(...)     LOGMASKED(LOG_REGS, __VA_ARGS__)
 #define LOGFIFO(...)     LOGMASKED(LOG_FIFO, __VA_ARGS__)
 #define LOGCOMMAND(...)  LOGMASKED(LOG_COMMAND, __VA_ARGS__)
-#define LOGDONE(...)     LOGMASKED(LOG_DONE, __VA_ARGS__)
 #define LOGRW(...)       LOGMASKED(LOG_RW, __VA_ARGS__)
-#define LOGLIVERW(...)   LOGMASKED(LOG_LIVERW, __VA_ARGS__)
 #define LOGMATCH(...)    LOGMASKED(LOG_MATCH, __VA_ARGS__)
+#define LOGSTATE(...)    LOGMASKED(LOG_STATE, __VA_ARGS__)
+#define LOGLIVE(...)     LOGMASKED(LOG_LIVE, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
@@ -774,6 +775,7 @@ void upd765_family_device::live_run(attotime limit)
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
+				LOGLIVE("%s: Found A1\n", tts(cur_live.tm).c_str());
 			}
 
 			if(!mfm && cur_live.shift_reg == 0xf57e) {
@@ -781,6 +783,7 @@ void upd765_family_device::live_run(attotime limit)
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
 				cur_live.state = READ_ID_BLOCK;
+				LOGLIVE("%s: Found IDAM\n", tts(cur_live.tm).c_str());
 			}
 			break;
 
@@ -807,9 +810,12 @@ void upd765_family_device::live_run(attotime limit)
 			if(slot < 3) {
 				if(cur_live.shift_reg != 0x4489)
 					cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
+				else
+					LOGLIVE("%s: Found A1\n", tts(cur_live.tm).c_str());
 				break;
 			}
 			if(cur_live.data_reg != 0xfe) {
+				LOGLIVE("%s: No ident byte found after triple-A1, continue search\n", tts(cur_live.tm).c_str());
 				cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
 				break;
 			}
@@ -827,7 +833,7 @@ void upd765_family_device::live_run(attotime limit)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
 
-			LOGHEADER("%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
+			LOGLIVE("%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);
@@ -1459,10 +1465,7 @@ void upd765_family_device::execute_command(int cmd)
 
 void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 {
-	LOGDONE("command done (%s) -", data_completion ? "data" : "seek");
-	for(int i=0; i != result_pos; i++)
-		LOGDONE(" %02x", result[i]);
-	LOGDONE("\n");
+	LOGCOMMAND("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
 	if(data_completion)
 		data_irq = true;
@@ -1506,6 +1509,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 	for(;;) {
 		switch(fi.sub_state) {
 		case SEEK_MOVE:
+			LOGSTATE("SEEK_MOVE\n");
 			if(fi.dev) {
 				fi.dev->dir_w(fi.dir);
 				fi.dev->stp_w(0);
@@ -1515,9 +1519,11 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			LOGSTATE("SEEK_WAIT_STEP_SIGNAL_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			LOGSTATE("SEEK_WAIT_STEP_SIGNAL_TIME_DONE\n");
 			if(fi.dev)
 				fi.dev->stp_w(1);
 
@@ -1532,12 +1538,15 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
+			LOGSTATE("SEEK_WAIT_STEP_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE: {
+			LOGSTATE("SEEK_WAIT_STEP_TIME_DONE\n");
 			bool done = false;
 			switch(fi.main_state) {
 			case RECALIBRATE:
+				LOGSTATE("RECALIBRATE\n");
 				fi.counter--;
 				done = fi.dev && !fi.dev->trk00_r();
 				if(done)
@@ -1549,6 +1558,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				}
 				break;
 			case SEEK:
+				LOGSTATE("SEEK\n");
 				done = fi.pcn == command[2];
 				break;
 			}
@@ -1563,6 +1573,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 		}
 
 		case SEEK_WAIT_DONE:
+			LOGSTATE("SEEK_WAIT_DONE\n");
 			fi.st0 |= ST0_SE | fi.id;
 			command_end(fi, false);
 			return;
@@ -1665,6 +1676,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 	for(;;) {
 		switch(fi.sub_state) {
 		case HEAD_LOAD_DONE:
+			LOGSTATE("HEAD_LOAD_DONE\n");
 			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
 				fi.sub_state = SEEK_DONE;
 				break;
@@ -1679,9 +1691,11 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			LOGSTATE("SEEK_WAIT_STEP_SIGNAL_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			LOGSTATE("SEEK_WAIT_STEP_SIGNAL_TIME_DONE\n");
 			if(fi.dev)
 				fi.dev->stp_w(1);
 
@@ -1690,9 +1704,11 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
+			LOGSTATE("SEEK_WAIT_STEP_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE:
+			LOGSTATE("SEEK_WAIT_STEP_TIME_DONE\n");
 			if(fi.pcn > command[2])
 				fi.pcn--;
 			else
@@ -1701,12 +1717,15 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			break;
 
 		case SEEK_DONE:
+			LOGSTATE("SEEK_DONE\n");
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
+			LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			LOGSTATE("SCAN_ID\n");
 			if(cur_live.crc) {
 				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE|ST1_ND;
@@ -1721,6 +1740,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 					else
 						st2 |= ST2_WC;
 				}
+				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
@@ -1735,16 +1755,23 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			else
 				fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
+			LOGSTATE("SEARCH_ADDRESS_MARK_DATA\n");
 			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
 			return;
 
 		case SCAN_ID_FAILED:
+			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			st1 |= ST1_ND;
+			// MZ: The HX5102 does not correctly detect a FM/MFM mismatch
+			// when the ND bit is set, because in the firmware the ND bit wins
+			// against MA, and thus concludes that the format is correct
+			// but the sector is missing.
+			// st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case SECTOR_READ: {
+			LOGSTATE("SECTOR_READ\n");
 			if(st2 & ST2_MD) {
 				fi.st0 |= ST0_FAIL;
 				fi.sub_state = COMMAND_DONE;
@@ -1786,6 +1813,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		}
 
 		case COMMAND_DONE:
+			LOGSTATE("COMMAND_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
 			result[1] = st1;
@@ -1852,13 +1880,17 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 	for(;;) {
 		switch(fi.sub_state) {
 		case HEAD_LOAD_DONE:
+			LOGSTATE("HEAD_LOAD_DONE\n");
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
+			LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			LOGSTATE("SCAN_ID\n");
 			if(!sector_matches()) {
+				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
@@ -1872,16 +1904,19 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, true);
 			fi.sub_state = SECTOR_WRITTEN;
+			LOGSTATE("WRITE_SECTOR_SKIP_GAP2\n");
 			live_start(fi, WRITE_SECTOR_SKIP_GAP2);
 			return;
 
 		case SCAN_ID_FAILED:
+			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			st1 |= ST1_ND;
+			// st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case SECTOR_WRITTEN: {
+			LOGSTATE("SECTOR_WRITTEN\n");
 			bool done = tc_done;
 			if(command[4] == command[6]) {
 				if(command[0] & 0x80) {
@@ -1911,6 +1946,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 		}
 
 		case COMMAND_DONE:
+			LOGSTATE("COMMAND_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
 			result[1] = st1;
@@ -1975,6 +2011,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 	for(;;) {
 		switch(fi.sub_state) {
 		case HEAD_LOAD_DONE:
+			LOGSTATE("HEAD_LOAD_DONE\n");
 			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
 				fi.sub_state = SEEK_DONE;
 				break;
@@ -1989,9 +2026,11 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			LOGSTATE("SEEK_WAIT_STEP_SIGNAL_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			LOGSTATE("SEEK_WAIT_STEP_SIGNAL_TIME_DONE\n");
 			if(fi.dev)
 				fi.dev->stp_w(1);
 
@@ -2000,9 +2039,11 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
+			LOGSTATE("SEEK_WAIT_STEP_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE:
+			LOGSTATE("SEEK_WAIT_STEP_TIME_DONE\n");
 			if(fi.pcn > command[2])
 				fi.pcn--;
 			else
@@ -2011,20 +2052,24 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			break;
 
 		case SEEK_DONE:
+			LOGSTATE("SEEK_DONE\n");
 			fi.counter = 0;
 			fi.sub_state = WAIT_INDEX;
 			return;
 
 		case WAIT_INDEX:
+			LOGSTATE("WAIT_INDEX\n");
 			return;
 
 		case WAIT_INDEX_DONE:
-			LOGRW("index found, reading track\n");
+			LOGSTATE("WAIT_INDEX_DONE\n");
 			fi.sub_state = SCAN_ID;
+			LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			LOGSTATE("SCAN_ID\n");
 			if(cur_live.crc) {
 				st1 |= ST1_DE;
 			}
@@ -2042,16 +2087,19 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
+			LOGSTATE("SEARCH_ADDRESS_MARK_DATA\n");
 			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
 			return;
 
 		case SCAN_ID_FAILED:
+			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			st1 |= ST1_ND;
+			// st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case SECTOR_READ: {
+			LOGSTATE("SECTOR_READ\n");
 			if(st2 & ST2_MD) {
 				fi.st0 |= ST0_FAIL;
 				fi.sub_state = COMMAND_DONE;
@@ -2079,6 +2127,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 		}
 
 		case COMMAND_DONE:
+			LOGSTATE("COMMAND_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
 			result[1] = st1;
@@ -2137,20 +2186,24 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 	for(;;) {
 		switch(fi.sub_state) {
 		case HEAD_LOAD_DONE:
+			LOGSTATE("HEAD_LOAD_DONE\n");
 			fi.sub_state = WAIT_INDEX;
 			break;
 
 		case WAIT_INDEX:
+			LOGSTATE("WAIT_INDEX\n");
 			return;
 
 		case WAIT_INDEX_DONE:
-			LOGRW("index found, writing track\n");
+			LOGSTATE("WAIT_INDEX_DONE\n");
 			fi.sub_state = TRACK_DONE;
 			cur_live.pll.start_writing(machine().time());
+			LOGSTATE("WRITE_TRACK_PRE_SECTORS\n");
 			live_start(fi, WRITE_TRACK_PRE_SECTORS);
 			return;
 
 		case TRACK_DONE:
+			LOGSTATE("TRACK_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
 			result[1] = 0;
@@ -2210,12 +2263,15 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 	for(;;) {
 		switch(fi.sub_state) {
 		case HEAD_LOAD_DONE:
+			LOGSTATE("HEAD_LOAD_DONE\n");
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
+			LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			LOGSTATE("SCAN_ID\n");
 			if(cur_live.crc) {
 				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_MA|ST1_DE|ST1_ND;
@@ -2224,12 +2280,15 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 			break;
 
 		case SCAN_ID_FAILED:
+			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			st1 |= ST1_ND|ST1_MA;
+			// st1 |= ST1_ND|ST1_MA;
+			st1 = ST1_MA;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case COMMAND_DONE:
+			LOGSTATE("COMMAND_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
 			result[1] = st1;
@@ -2276,6 +2335,21 @@ std::string upd765_family_device::tts(attotime t)
 	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
 	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
+}
+
+std::string upd765_family_device::results()
+{
+	std::stringstream stream;
+	stream << "results=(";
+	if (result_pos==0) stream << "none";
+	else
+		for (int i=0; i < result_pos; i++)
+		{
+			stream << std::hex << std::setw(2) << std::setfill('0') << (int)result[i];
+			if (i < result_pos-1) stream << ',';
+		}
+	stream << ')';
+	return stream.str();
 }
 
 std::string upd765_family_device::ttsn()
@@ -2328,6 +2402,8 @@ void upd765_family_device::run_drive_ready_polling()
 
 void upd765_family_device::index_callback(floppy_image_device *floppy, int state)
 {
+	LOGSTATE("Index pulse %d\n", state);
+	LOGLIVE("%s: Pulse %d\n", ttsn().c_str(), state);
 	for(floppy_info & fi : flopi) {
 		if(fi.dev != floppy)
 			continue;
@@ -2459,7 +2535,7 @@ bool upd765_family_device::write_one_bit(const attotime &limit)
 
 void upd765_family_device::live_write_raw(uint16_t raw)
 {
-	LOGLIVERW("write %04x %04x\n", raw, cur_live.crc);
+	LOGLIVE("%s: write %04x %04x\n", tts(cur_live.tm).c_str(), raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -2479,7 +2555,7 @@ void upd765_family_device::live_write_mfm(uint8_t mfm)
 	cur_live.data_reg = mfm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	LOGLIVERW("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+	LOGLIVE("%s: write %02x   %04x %04x\n", tts(cur_live.tm).c_str(), mfm, cur_live.crc, raw);
 }
 
 void upd765_family_device::live_write_fm(uint8_t fm)
@@ -2491,7 +2567,7 @@ void upd765_family_device::live_write_fm(uint8_t fm)
 	cur_live.data_reg = fm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = fm & 1;
-	LOGLIVERW("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
+	LOGLIVE("%s: write %02x   %04x %04x\n", tts(cur_live.tm).c_str(), fm, cur_live.crc, raw);
 }
 
 bool upd765_family_device::sector_matches() const
@@ -2657,10 +2733,7 @@ void i82072_device::execute_command(int cmd)
  */
 void i82072_device::command_end(floppy_info &fi, bool data_completion)
 {
-	LOGDONE("command done (%s) -", data_completion ? "data" : "seek");
-	for(int i=0; i != result_pos; i++)
-		LOGDONE(" %02x", result[i]);
-	LOGDONE("\n");
+	LOGCOMMAND("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.sub_state = IDLE;
 	if(data_completion) {
 		fi.main_state = IDLE;

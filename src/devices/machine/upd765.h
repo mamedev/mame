@@ -345,6 +345,7 @@ protected:
 	emu_timer *poll_timer;
 
 	static std::string tts(attotime t);
+	std::string results();
 	std::string ttsn();
 
 	enum {
