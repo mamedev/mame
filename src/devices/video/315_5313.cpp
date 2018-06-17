@@ -253,11 +253,11 @@ void sega315_5313_device::device_start()
 	memset(m_internal_sprite_attribute_table.get(), 0x00, 0x400);
 
 
-	save_pointer(NAME(m_vram.get()), 0x10000/2);
-	save_pointer(NAME(m_cram.get()), 0x80/2);
-	save_pointer(NAME(m_vsram.get()), 0x80/2);
-	save_pointer(NAME(m_regs.get()), 0x40/2);
-	save_pointer(NAME(m_internal_sprite_attribute_table.get()), 0x400/2);
+	save_pointer(NAME(m_vram), 0x10000/2);
+	save_pointer(NAME(m_cram), 0x80/2);
+	save_pointer(NAME(m_vsram), 0x80/2);
+	save_pointer(NAME(m_regs), 0x40/2);
+	save_pointer(NAME(m_internal_sprite_attribute_table), 0x400/2);
 
 	save_item(NAME(m_command_pending));
 	save_item(NAME(m_command_part1));
@@ -305,16 +305,16 @@ void sega315_5313_device::device_start()
 
 	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved,
 	// but better safe than sorry...
-	save_pointer(NAME(m_sprite_renderline.get()), 1024);
-	save_pointer(NAME(m_highpri_renderline.get()), 320);
-	save_pointer(NAME(m_video_renderline.get()), 320/4);
-	save_pointer(NAME(m_palette_lookup.get()), 0x40);
-	save_pointer(NAME(m_palette_lookup_sprite.get()), 0x40);
-	save_pointer(NAME(m_palette_lookup_shadow.get()), 0x40);
-	save_pointer(NAME(m_palette_lookup_highlight.get()), 0x40);
-	save_pointer(NAME(m_render_line_raw.get()), 320/2);
+	save_pointer(NAME(m_sprite_renderline), 1024);
+	save_pointer(NAME(m_highpri_renderline), 320);
+	save_pointer(NAME(m_video_renderline), 320/4);
+	save_pointer(NAME(m_palette_lookup), 0x40);
+	save_pointer(NAME(m_palette_lookup_sprite), 0x40);
+	save_pointer(NAME(m_palette_lookup_shadow), 0x40);
+	save_pointer(NAME(m_palette_lookup_highlight), 0x40);
+	save_pointer(NAME(m_render_line_raw), 320/2);
 	if (m_use_alt_timing)
-		save_pointer(NAME(m_render_line.get()), 320/2);
+		save_pointer(NAME(m_render_line), 320/2);
 
 	m_irq6_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq6_on_timer_callback), this));
 	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));

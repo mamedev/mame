@@ -53,10 +53,10 @@ void kaneko_grap2_device::device_start()
 	m_framebuffer_unk1 = make_unique_clear<uint16_t[]>(0x400/2);
 	m_framebuffer_unk2 = make_unique_clear<uint16_t[]>(0x400/2);
 
-	save_pointer(NAME(m_framebuffer.get()), 0x80000/2);
-	save_pointer(NAME(m_framebuffer_palette.get()), 0x101);
-	save_pointer(NAME(m_framebuffer_unk1.get()), 0x400/2);
-	save_pointer(NAME(m_framebuffer_unk2.get()), 0x400/2);
+	save_pointer(NAME(m_framebuffer), 0x80000/2);
+	save_pointer(NAME(m_framebuffer_palette), 0x101);
+	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
+	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
 
 	save_item(NAME(m_framebuffer_scrolly));
 	save_item(NAME(m_framebuffer_scrollx));

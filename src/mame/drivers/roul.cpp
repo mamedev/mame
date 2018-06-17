@@ -248,7 +248,7 @@ void roul_state::video_start()
 	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
-	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
+	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 

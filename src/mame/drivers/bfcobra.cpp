@@ -1621,8 +1621,8 @@ void bfcobra_state::init_bfcobra()
 	save_item(NAME(m_z80_int));
 	save_item(NAME(m_z80_inten));
 	save_item(NAME(m_bank_data));
-	save_pointer(NAME(m_work_ram.get()), 0xc0000);
-	save_pointer(NAME(m_video_ram.get()), 0x20000);
+	save_pointer(NAME(m_work_ram), 0xc0000);
+	save_pointer(NAME(m_video_ram), 0x20000);
 }
 
 /* TODO */

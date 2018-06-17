@@ -692,10 +692,10 @@ void nes_vt_state::machine_start()
 	save_item(NAME(m_timer_val));
 
 	m_ntram = std::make_unique<uint8_t[]>(0x2000);
-	save_pointer(NAME(m_ntram.get()), 0x2000);
+	save_pointer(NAME(m_ntram), 0x2000);
 
 	m_chrram = std::make_unique<uint8_t[]>(0x2000);
-	save_pointer(NAME(m_chrram.get()), 0x2000);
+	save_pointer(NAME(m_chrram), 0x2000);
 
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::scanline_irq),this));
 	m_ppu->set_hblank_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::hblank_irq),this));

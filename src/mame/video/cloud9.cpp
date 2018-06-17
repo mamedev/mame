@@ -40,7 +40,7 @@ void cloud9_state::video_start()
 	m_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
-	save_pointer(NAME(m_videoram.get()), 0x8000);
+	save_pointer(NAME(m_videoram), 0x8000);
 	save_item(NAME(m_bitmode_addr));
 }
 

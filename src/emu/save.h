@@ -87,8 +87,8 @@ class rewinder;
 class save_manager
 {
 	// type_checker is a set of templates to identify valid save types
-	template<typename _ItemType> struct type_checker { static const bool is_atom = false; static const bool is_pointer = false; };
-	template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
+	template<typename ItemType> struct type_checker { static const bool is_atom = false; static const bool is_pointer = false; };
+	template<typename ItemType> struct type_checker<ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 	friend class ram_state;
 	friend class rewinder;
@@ -119,43 +119,51 @@ public:
 	void save_memory(device_t *device, const char *module, const char *tag, u32 index, const char *name, void *val, u32 valsize, u32 valcount = 1);
 
 	// templatized wrapper for general objects
-	template<typename _ItemType>
-	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType &value, const char *valname)
+	template<typename ItemType>
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
 	{
-		if (type_checker<_ItemType>::is_pointer) throw emu_fatalerror("Called save_item on a pointer with no count!");
-		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, &value, sizeof(value));
+		if (type_checker<ItemType>::is_pointer) throw emu_fatalerror("Called save_item on a pointer with no count!");
+		if (!type_checker<ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
+		save_memory(device, module, tag, index, valname, &value, sizeof(ItemType));
 	}
 
 	// templatized wrapper for 1-dimensional arrays
-	template<typename _ItemType, std::size_t N>
-	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType (&value)[N], const char *valname)
+	template<typename ItemType, std::size_t N>
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType (&value)[N], const char *valname)
 	{
-		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, &value[0], sizeof(value[0]), N);
+		if (!type_checker<ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
+		save_memory(device, module, tag, index, valname, &value[0], sizeof(ItemType), N);
 	}
 
 	// templatized wrapper for 2-dimensional arrays
-	template<typename _ItemType, std::size_t M, std::size_t N>
-	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType (&value)[M][N], const char *valname)
+	template<typename ItemType, std::size_t M, std::size_t N>
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType (&value)[M][N], const char *valname)
 	{
-		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, &value[0][0], sizeof(value[0][0]), M * N);
+		if (!type_checker<ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
+		save_memory(device, module, tag, index, valname, &value[0][0], sizeof(ItemType), M * N);
 	}
 
 	// templatized wrapper for pointers
-	template<typename _ItemType>
-	void save_pointer(device_t *device, const char *module, const char *tag, int index, _ItemType *value, const char *valname, u32 count)
+	template<typename ItemType>
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
 	{
-		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, value, sizeof(*value), count);
+		if (!type_checker<ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
+		save_memory(device, module, tag, index, valname, value, sizeof(ItemType), count);
+	}
+
+	// templatized wrapper for std::unique_ptr
+	template<typename ItemType>
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, std::unique_ptr<ItemType[]> &value, const char *valname, u32 count)
+	{
+		if (!type_checker<ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
+		save_memory(device, module, tag, index, valname, value.get(), sizeof(ItemType), count);
 	}
 
 	// global memory registration
-	template<typename _ItemType>
-	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
-	template<typename _ItemType>
-	void save_pointer(_ItemType *value, const char *valname, u32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
+	template<typename ItemType>
+	void save_item(ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
+	template<typename ItemType>
+	void save_pointer(ItemType *value, const char *valname, u32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
 
 	// file processing
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));

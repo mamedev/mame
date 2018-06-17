@@ -78,8 +78,8 @@ void fortyl_state::video_start()
 
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_pix_color));
-	save_pointer(NAME(m_pixram1.get()), 0x4000);
-	save_pointer(NAME(m_pixram2.get()), 0x4000);
+	save_pointer(NAME(m_pixram1), 0x4000);
+	save_pointer(NAME(m_pixram2), 0x4000);
 	save_item(NAME(*m_tmp_bitmap1));
 	save_item(NAME(*m_tmp_bitmap2));
 	save_item(NAME(m_pixram_sel));

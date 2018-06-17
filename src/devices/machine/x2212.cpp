@@ -53,8 +53,8 @@ void x2212_device::device_start()
 
 	save_item(NAME(m_store));
 	save_item(NAME(m_array_recall));
-	save_pointer(NAME(m_sram.get()), m_size_data);
-	save_pointer(NAME(m_e2prom.get()), m_size_data);
+	save_pointer(NAME(m_sram), m_size_data);
+	save_pointer(NAME(m_e2prom), m_size_data);
 }
 
 

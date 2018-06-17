@@ -1728,7 +1728,7 @@ MACHINE_START_MEMBER(model1_state,model1)
 	m_digits.resolve();
 	m_copro_ram_data = std::make_unique<u32[]>(0x8000);
 
-	save_pointer(NAME(m_copro_ram_data.get()), 0x8000);
+	save_pointer(NAME(m_copro_ram_data), 0x8000);
 	save_item(NAME(m_v60_copro_ram_adr));
 	save_item(NAME(m_copro_hle_ram_scan_adr));
 	save_item(NAME(m_v60_copro_ram_latch));

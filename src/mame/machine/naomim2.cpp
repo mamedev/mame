@@ -125,7 +125,7 @@ void naomi_m2_board::device_start()
 	ram = std::make_unique<uint8_t[]>(RAM_SIZE);
 
 	save_item(NAME(rom_cur_address));
-	save_pointer(NAME(ram.get()), RAM_SIZE);
+	save_pointer(NAME(ram), RAM_SIZE);
 }
 
 void naomi_m2_board::device_reset()
