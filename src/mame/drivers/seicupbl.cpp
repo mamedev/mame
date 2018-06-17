@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicupbl_state,  irq4_line_hold) /* VBL */
 
-	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
+	MCFG_DEVICE_ADD("seibucop_boot", SEIBU_COP_BOOTLEG, "maincpu")
 
 	/*Different Sound hardware*/
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)
