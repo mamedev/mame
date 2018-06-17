@@ -72,6 +72,7 @@ of save-state is also needed.
 #include "includes/williams.h"
 
 #include "cpu/m6800/m6800.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -135,7 +136,7 @@ void wmg_state::wmg_cpu2(address_map &map)
 {
 	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
-	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 /* These next 2 are actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xd000, 0xefff).ram().share("nvram");
@@ -391,17 +392,14 @@ WRITE8_MEMBER( wmg_state::wmg_d000_w )
 	if (data == 0)
 	{
 		/* install the i/o devices into c000-cfff */
-		pia6821_device *pia0 = m_pia_0;
-		pia6821_device *pia1 = m_pia_1;
-
 		space.unmap_read(0xc000, 0xcfff); // throw out bank7
 		space.install_write_bank       (0xc000, 0xc00f, "bank4");
-		membank("bank4")->set_base(m_generic_paletteram_8);
+		membank("bank4")->set_base(m_paletteram);
 		space.install_write_handler    (0xc010, 0xc01f, write8_delegate(FUNC(williams_state::defender_video_control_w),this));
 		space.install_write_handler    (0xc400, 0xc400, write8_delegate(FUNC(wmg_state::wmg_c400_w),this));
 		space.install_write_handler    (0xc401, 0xc401, write8_delegate(FUNC(wmg_state::wmg_sound_reset_w),this));
-		space.install_readwrite_handler(0xc804, 0xc807, read8_delegate(FUNC(wmg_state::wmg_pia_0_r),this), write8_delegate(FUNC(pia6821_device::write), pia0));
-		space.install_readwrite_handler(0xc80c, 0xc80f, read8_delegate(FUNC(pia6821_device::read), pia1), write8_delegate(FUNC(pia6821_device::write), pia1));
+		space.install_readwrite_handler(0xc804, 0xc807, read8_delegate(FUNC(wmg_state::wmg_pia_0_r),this), write8_delegate(FUNC(pia6821_device::write), m_pia[0].target()));
+		space.install_readwrite_handler(0xc80c, 0xc80f, read8_delegate(FUNC(pia6821_device::read), m_pia[1].target()), write8_delegate(FUNC(pia6821_device::write), m_pia[1].target()));
 		space.install_write_handler    (0xc900, 0xc9ff, write8_delegate(FUNC(wmg_state::wmg_vram_select_w),this));
 		space.install_write_handler    (0xca00, 0xca07, write8_delegate(FUNC(williams_state::williams_blitter_w),this));
 		space.install_write_handler    (0xcbff, 0xcbff, write8_delegate(FUNC(williams_state::williams_watchdog_reset_w),this));
@@ -457,7 +455,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
-	uint8_t data = m_pia_0->read(space, offset);
+	uint8_t data = m_pia[0]->read(space, offset);
 
 	if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{
@@ -526,6 +524,12 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
@@ -534,13 +538,13 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_any_high_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_any_high_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<1>))
 MACHINE_CONFIG_END
 
 /*************************************

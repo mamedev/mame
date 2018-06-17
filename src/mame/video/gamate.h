@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 DECLARE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device)
 
 #define MCFG_GAMATE_VIDEO_ADD(_tag) \

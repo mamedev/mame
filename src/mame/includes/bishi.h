@@ -11,6 +11,7 @@
 #include "video/k055555.h"
 #include "video/k054338.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define CPU_CLOCK       (XTAL(24'000'000) / 2)        /* 68000 clock */

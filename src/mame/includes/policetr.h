@@ -9,6 +9,7 @@
 #include "cpu/mips/r3000.h"
 #include "machine/eepromser.h"
 #include "sound/bsmt2000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

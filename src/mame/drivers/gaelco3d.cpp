@@ -150,6 +150,7 @@ REF. 970429
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32031/tms32031.h"
+#include "emupal.h"
 
 #include "speaker.h"
 

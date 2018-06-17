@@ -22,6 +22,7 @@
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 
 #define AVIGO_NUM_COLOURS 2
 

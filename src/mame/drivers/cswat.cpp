@@ -26,6 +26,7 @@ TODO:
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "emupal.h"
 #include "screen.h"
 
 

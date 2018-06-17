@@ -19,6 +19,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* screen dimensions */

@@ -123,6 +123,23 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 	}
 }
 
+INPUT_CHANGED_MEMBER( headonsa_state::headonsa_coin_inserted )
+{	
+	if (newval)
+	{
+		/* increment the coin counter */
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
+		
+		// hooked up to NMI instead of RESET line
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+		// checks for coin status in a much shorter time frame
+		// check headon2s at 0x5f80 onward
+		m_coin_status = 1;
+		m_coinstate_timer->adjust(attotime::from_msec(10));
+	}
+}
 
 #define PORT_COIN_DEFAULT                               \
 	PORT_START("COIN")                                  \
@@ -675,6 +692,30 @@ static INPUT_PORTS_START( headons )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
 INPUT_PORTS_END
 
+// e7f1: coin counter
+static INPUT_PORTS_START( headonsa )
+	PORT_INCLUDE( headons )
+
+	// flipped activeness, added a start button while at it
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_4WAY
+	
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, headonsa_state, headonsa_coin_inserted, nullptr)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( supcrash )
 	PORT_START("IN0")
@@ -886,37 +927,36 @@ void vicdual_state::digger_io_map(address_map &map)
 
 static INPUT_PORTS_START( headon2 )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME(0x18, 0x08, DEF_STR( Lives ))
-	PORT_DIPSETTING(   0x08, "4" )
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME(0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPSETTING(   0x18, "4" )
 	PORT_DIPSETTING(   0x10, "5" )
-	PORT_DIPSETTING(   0x18, "5" )
+//	PORT_DIPSETTING(   0x08, "5" )
 	PORT_DIPSETTING(   0x00, "6" )
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME(0x02, 0x02, DEF_STR( Demo_Sounds ))
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x02, DEF_STR( On ))
-	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME(0x02, 0x02, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x02, DEF_STR( On ) )
+	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
-/* this actually seems to ignore the dipswitches and is hardcoded to 2 coins 1 credit, and 2 lives */
 static INPUT_PORTS_START( car2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -930,25 +970,34 @@ static INPUT_PORTS_START( car2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x18, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	/*PORT_DIPSETTING(    0x08, "5" )*/
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
-
+	// seems to ignore lives dip-switches (hardcoded to 3 lives)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( headon2s )
+	PORT_INCLUDE( car2 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, headonsa_state, headonsa_coin_inserted, nullptr)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( digger )
 	PORT_START("IN0")
@@ -3834,12 +3883,12 @@ GAME( 1979, headon,     0,        headon,    headon,    vicdual_state, empty_ini
 GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state, empty_init, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state, empty_init, ROT270, "Nintendo", "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonsa,   headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
+GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state,empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state, empty_init, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state, empty_init, ROT0,   "bootleg (VGG)", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hocrash,    headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state, empty_init, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2s,   headon2,  headon2bw, car2,      vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
+GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state, empty_init, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state, empty_init, ROT270, "Sega", "Invinco / Head On 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,    empty_init, ROT270, "Sega", "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped

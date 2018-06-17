@@ -28,6 +28,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "cpu/upd7810/upd7811.h"
 #include "video/hd44780.h"

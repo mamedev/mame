@@ -11,6 +11,7 @@ this is Gaelco's first game, although there should be a 1986 release too, likely
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/nvram.h"

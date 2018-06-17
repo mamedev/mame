@@ -9,6 +9,7 @@
 #include "sound/discrete.h"
 #include "sound/ay8910.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

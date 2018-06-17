@@ -35,6 +35,7 @@
 #include "sound/k053260.h"
 #include "sound/ym2151.h"
 #include "video/k053250.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "overdriv.lh"

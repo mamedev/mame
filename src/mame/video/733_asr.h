@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 #define asr733_chr_region ":gfx1"
 

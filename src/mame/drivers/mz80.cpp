@@ -31,6 +31,7 @@ MZ80B
 #include "emu.h"
 #include "includes/mz80.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

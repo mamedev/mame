@@ -21,6 +21,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;

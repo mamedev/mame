@@ -111,6 +111,7 @@ video z80
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "video/mb_vcu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

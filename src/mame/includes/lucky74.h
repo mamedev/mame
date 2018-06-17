@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class lucky74_state : public driver_device
 {

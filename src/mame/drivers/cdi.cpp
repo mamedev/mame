@@ -35,6 +35,7 @@ TODO:
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

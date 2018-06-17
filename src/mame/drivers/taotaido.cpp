@@ -70,6 +70,7 @@ zooming might be wrong
 #include "cpu/m68000/m68000.h"
 #include "machine/vs9209.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

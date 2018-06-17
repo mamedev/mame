@@ -6,6 +6,7 @@
 #pragma once
 
 #include "k055555.h"
+#include "emupal.h"
 
 #define K338_REG_BGC_R      0
 #define K338_REG_BGC_GB     1

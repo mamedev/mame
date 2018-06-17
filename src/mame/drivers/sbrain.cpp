@@ -47,6 +47,7 @@ To Do:
 #include "machine/timer.h"
 #include "sound/beep.h"
 //#include "video/dp8350.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

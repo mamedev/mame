@@ -15,6 +15,7 @@
 #include "machine/z80dma.h"
 #include "sound/discrete.h"
 #include "sound/tms5110.h"
+#include "emupal.h"
 #include "screen.h"
 
 

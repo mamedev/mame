@@ -12,6 +12,7 @@
 #include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
+#include "emupal.h"
 
 class gijoe_state : public driver_device
 {

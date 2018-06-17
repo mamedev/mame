@@ -148,9 +148,6 @@ class memory_share;
 // declared in emuopts.h
 class emu_options;
 
-// declared in emupal.h
-class palette_device;
-
 // declared in gamedrv.h
 class game_driver;
 

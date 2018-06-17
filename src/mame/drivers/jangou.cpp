@@ -35,6 +35,7 @@ $c088-$c095 player tiles
 #include "sound/msm5205.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -300,10 +301,10 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
-		m_msm->data_w(m_adpcm_byte >> 4);
+		m_msm->write_data(m_adpcm_byte >> 4);
 	else
 	{
-		m_msm->data_w(m_adpcm_byte & 0xf);
+		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_cpu_1->set_input_line(0, HOLD_LINE);
 	}
 

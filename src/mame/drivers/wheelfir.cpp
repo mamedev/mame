@@ -175,6 +175,7 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

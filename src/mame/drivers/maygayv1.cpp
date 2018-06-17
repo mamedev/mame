@@ -138,6 +138,7 @@ Find lamps/reels after UPD changes.
 #include "sound/upd7759.h"
 #include "sound/ym2413.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

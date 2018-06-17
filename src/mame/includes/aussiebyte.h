@@ -31,6 +31,9 @@
 
 #include "imagedev/snapquik.h"
 
+#include "emupal.h"
+
+
 
 /***********************************************************
 

@@ -34,6 +34,7 @@ You can get into the setup menu by pressing Ctrl+Shift+Enter.
 #include "machine/7474.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 //#include "logmacro.h"

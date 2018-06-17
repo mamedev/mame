@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
+
+#include "emupal.h"
+
 class pitnrun_state : public driver_device
 {
 public:

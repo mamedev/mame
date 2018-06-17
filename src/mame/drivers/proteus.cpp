@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
 
-	MCFG_CENTRONICS_ADD("parallel", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
 

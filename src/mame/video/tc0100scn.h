@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 class tc0100scn_device : public device_t
 {
 public:

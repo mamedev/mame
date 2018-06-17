@@ -46,6 +46,7 @@ PROMs : NEC B406 (1kx4) x2
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -209,6 +209,7 @@
 #include "cpu/tms9900/tms9980a.h"
 #include "sound/sn76477.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

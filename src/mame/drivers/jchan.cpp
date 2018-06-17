@@ -163,6 +163,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "video/sknsspr.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -632,7 +633,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 

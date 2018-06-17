@@ -19,6 +19,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6800/m6801.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class banctec_state : public driver_device

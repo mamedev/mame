@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail, David Haywood
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class dynduke_state : public driver_device
 {

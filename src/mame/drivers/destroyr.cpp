@@ -16,6 +16,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "destroyr.lh"

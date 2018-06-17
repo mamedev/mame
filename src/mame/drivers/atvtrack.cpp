@@ -103,6 +103,7 @@ TODO:
 #include "emu.h"
 #include "cpu/sh/sh4.h"
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class tehkanwc_state : public driver_device
 {

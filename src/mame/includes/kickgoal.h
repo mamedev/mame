@@ -8,6 +8,7 @@
 
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 
 class kickgoal_state : public driver_device
 {

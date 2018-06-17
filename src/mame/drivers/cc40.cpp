@@ -81,6 +81,7 @@
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

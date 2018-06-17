@@ -15,6 +15,7 @@
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class trackfld_state : public driver_device

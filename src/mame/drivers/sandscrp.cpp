@@ -82,6 +82,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
 #include "video/kaneko_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

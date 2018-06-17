@@ -39,6 +39,7 @@ This is not a bug (real machine behaves the same).
 #include "emu.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 
 #define DEBUG_CHAR
 

@@ -7,10 +7,15 @@
 
   Driver by Elsemi & Roberto Fresca.
 
+  TODO:
+  - missing starfield
+  - missing background gradient?
+  - look into moving to galaxian driver, or at least a derived class
+
 ***********************************************************************************
 
   Specs:
-  
+
   1x Zilog Z8400A PS (Z80A) CPU.
   1x Fairchild F6802P CPU.
 
@@ -22,11 +27,11 @@
   1x 2516 EPROM.
   17x 2532 EPROMs.
   1x TBP28L22N (256 x 8-bits) bipolar PROM.
-   
+
   2x 6-DIP switches banks.
 
   1x Xtal @ 14.318 MHz. (used for 6802 CPU & AY8910 sound devices).
-  1x Xtal @ 18.4320 MHz. (used for Z80 CPU). 
+  1x Xtal @ 18.4320 MHz. (used for Z80 CPU).
 
 
 ***********************************************************************************
@@ -55,7 +60,7 @@
   E000-FFFF  R   ROM Space.
 
 
-  There are 2 tilemaps: 
+  There are 2 tilemaps:
 	A 32x32 3BPP one with tile column scroll.
 	A 32x32 1BPP one fixed.
 
@@ -72,7 +77,7 @@
 
 
   VIDEO RAM STRUCTURE
-  
+
   A000-A3FF - 3bpp Tile layer tile code
   A400-A7FF - ?? doesn't seem used
   A800-A83F	- Tile column scroll on even bytes. Tile column palette on odd bytes.
@@ -102,7 +107,7 @@
   B405 - Tile column scroll on/off. Almost, but not, because it's set to 0 on the galaxian stage, and it has scrolling on the top rows
   B406 - 1bpp tilemap on/off ?. Almost but not, because it's set to 0 on the title screen and the niemer text is on the 1bpp layer and must appear
   B407 - Tile bank
-  
+
   B800 -\-- these 2 values contain ror(Tilebank,1), ror(Tilebank,2). Sprites bank? always set to the same than Tile bank reg
   B801 -/
   B802 -\	these 3 registers usually contain x, ror(x,1), ror(x,2) and are related to the 1bpp bitmap palette color. 2 is red, used for the "galaxian" level lines
@@ -136,7 +141,7 @@
                 +5V |06| F| +5V
        Coin Counter |07| G| Audio Out (not amplified)
                 N/C |08| H| N/C
-  Player 1 Button 2 |09| I| Coin Counter 
+  Player 1 Button 2 |09| I| Coin Counter
              Coin 1 |10| J| Player 1 Button 1
     Start 2 Players |11| K| Coin 2
       Player 1 Left |12| L| Player 1 Right
@@ -161,8 +166,8 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK     XTAL(18'432'000)
-#define SEC_CLOCK      XTAL(14'318'000)
+#define MAIN_CLOCK     18.432_MHz_XTAL
+#define SEC_CLOCK      14.318181_MHz_XTAL
 
 #define Z80_CLOCK      MAIN_CLOCK / 6    // 3.0720 MHz. (measured 3.06850).
 #define F6802_CLOCK    SEC_CLOCK / 4     // 3.5795 MHz. (measured 3.57488).
@@ -182,7 +187,7 @@ PALETTE_INIT_MEMBER(efdt_state, efdt)
 		uint8_t r, g, b;
 
 		uint8_t v = color_prom[i];
-		
+
 		g = (v & 7) << 5;
 		r = ((v >> 3) & 7) << 5;
 		b = ((v >> 6) & 3) << 6;
@@ -239,12 +244,12 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(0, cliprect);
 
 	m_tilemap[0]->set_scroll_cols(32);
-	
+
 	for (int i = 0; i < 32; ++i)
 	{
 		m_tilemap[0]->set_scrolly(i, m_videoram[2 * i + 0x800]);
 	}
-	
+
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -286,7 +291,7 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 			gfx->transpen(bitmap, cliprect, code + 3, pal, 0, 1, x + 8, y, 0);
 			gfx->transpen(bitmap, cliprect, code + 0, pal, 0, 1, x + 0, y + 8, 0);
 			gfx->transpen(bitmap, cliprect, code + 1, pal, 0, 1, x + 8, y + 8, 0);
-			
+
 		}
 		else if ((xtra & 0xc0) == 0xc0)
 		{
@@ -294,15 +299,6 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 			gfx->transpen(bitmap, cliprect, code + 2, pal, 1, 1, x + 8, y, 0);
 			gfx->transpen(bitmap, cliprect, code + 1, pal, 1, 1, x + 0, y + 8, 0);
 			gfx->transpen(bitmap, cliprect, code + 0, pal, 1, 1, x + 8, y + 8, 0);
-
-		}
-		else if (xtra & 0x80)
-		{
-			gfx->transpen(bitmap, cliprect, code + 2, pal, 0, 1, x, y, 0);
-			gfx->transpen(bitmap, cliprect, code + 3, pal, 0, 1, x + 8, y, 0);
-			gfx->transpen(bitmap, cliprect, code + 0, pal, 0, 1, x + 0, y + 8, 0);
-			gfx->transpen(bitmap, cliprect, code + 1, pal, 0, 1, x + 8, y + 8, 0);
-
 		}
 		else
 		{
@@ -310,7 +306,7 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 			gfx->transpen(bitmap, cliprect, code + 1, pal, 0, 0, x + 8, y, 0);
 			gfx->transpen(bitmap, cliprect, code + 2, pal, 0, 0, x + 0, y + 8, 0);
 			gfx->transpen(bitmap, cliprect, code + 3, pal, 0, 0, x + 8, y + 8, 0);
-			
+
 		}
 	}
 
@@ -503,7 +499,7 @@ static const gfx_layout tilelayout3bpp =
 {
 	8,8,
 	RGN_FRAC(1,3),
-	3,  
+	3,
 	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
@@ -545,7 +541,7 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 
 	MCFG_DEVICE_ADD("audiocpu", M6802, F6802_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(efdt_snd_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(efdt_state, irq0_line_hold, 3574880 / 8192)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(efdt_state, irq0_line_hold, F6802_CLOCK / 8192)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -571,7 +567,7 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, efdt_state, soundlatch_1_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_0_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_1_w))
-	
+
 	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, efdt_state, soundlatch_2_r))
@@ -595,7 +591,7 @@ ROM_START( efdt )
 	ROM_LOAD( "22801.a10", 0x4000, 0x1000, CRC(ea646049) SHA1(bca30cb2dde8b5c78f6108cb9a43e0dce697f761))
 	ROM_LOAD( "22802.a9",  0x5000, 0x1000, CRC(74457952) SHA1(f5f4ece564cbdb650204ccd5abdf39d0d3c595b3))
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD(   "1811.d8",   0xE000, 0x1000, CRC(0ff5d0c2) SHA1(93df487d3236284765dd3d690474c130464e3e27))
 	ROM_LOAD(   "1812.d7",   0xF000, 0x1000, CRC(48e5a4ac) SHA1(9da4800215c91b2be9df3375f9601b19353c0ec0))
 
@@ -609,7 +605,7 @@ ROM_START( efdt )
 	ROM_LOAD( "12816.j9", 0x8000, 0x1000, CRC(69664044) SHA1(57465c4c37be2b4846b49a13dec9e354dabb155a) )
 	ROM_LOAD( "12815.j10", 0x7000, 0x1000, CRC(abe7a7b6) SHA1(e3bc6aa3a741fcfa2eafb1464be3cb5437d5fd90) )
 	ROM_LOAD( "12814.j11", 0x6000, 0x1000, CRC(6c06f746) SHA1(c7e80c5dde733e9ef520b9afa78bed902f04b74d) )
-	
+
 	ROM_REGION( 0x800, "gfx2", 0 )
 	ROM_LOAD( "12813.h10", 0x0000, 0x0800, CRC(ea03c5a8) SHA1(7ce385b43a24cbbc780162ed89031d1cc1b0b9ef))
 
@@ -623,4 +619,4 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME    PARENT  MACHINE   INPUT    STATE        INIT        ROT     COMPANY   FULLNAME            FLAGS
-GAME( 1981, efdt,   0,      efdt,     efdt,    efdt_state,  empty_init, ROT90, "Niemer", "El Fin Del Tiempo", 0 )
+GAME( 1981, efdt,   0,      efdt,     efdt,    efdt_state,  empty_init, ROT90, "Niemer", "El Fin Del Tiempo", MACHINE_IMPERFECT_GRAPHICS )

@@ -22,6 +22,7 @@
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 

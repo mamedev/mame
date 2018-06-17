@@ -261,6 +261,7 @@ ToDo:
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -40,6 +40,7 @@ Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on P
 
 #include "cpu/z180/z180.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

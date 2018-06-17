@@ -64,6 +64,7 @@
 #include "machine/upd765.h"
 #include "sound/beep.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

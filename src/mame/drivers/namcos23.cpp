@@ -1264,6 +1264,7 @@ Notes:
 #include "machine/rtc4543.h"
 #include "sound/c352.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include <float.h>

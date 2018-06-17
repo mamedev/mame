@@ -21,6 +21,7 @@
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 

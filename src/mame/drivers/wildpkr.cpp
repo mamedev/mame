@@ -167,6 +167,7 @@
 #include "sound/volt_reg.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

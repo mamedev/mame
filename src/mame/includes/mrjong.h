@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class mrjong_state : public driver_device
 {
 public:

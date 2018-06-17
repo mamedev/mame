@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
 #include "audio/m72.h"
+#include "emupal.h"
 
 class vigilant_state : public driver_device
 {

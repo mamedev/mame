@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/z80ctc.h"
+#include "emupal.h"
 
 class pbaction_state : public driver_device
 {

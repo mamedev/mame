@@ -7,6 +7,7 @@
 #pragma once
 
 #include "pci.h"
+#include "machine/pci-ide.h"
 
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"
@@ -179,5 +180,74 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
+
+#define MCFG_I82371SB_IDE_IRQ_PRI_CB(_devcb) \
+	devcb = &downcast<i82371sb_ide_device &>(*device).set_irq_pri_callback(DEVCB_##_devcb);
+
+#define MCFG_I82371SB_IDE_IRQ_SEC_CB(_devcb) \
+	devcb = &downcast<i82371sb_ide_device &>(*device).set_irq_sec_callback(DEVCB_##_devcb);
+
+#define MCFG_I82371SB_IDE_INTERRUPTS(_tag, _dev, _irq_pri, _irq_sec) \
+	MCFG_I82371SB_IDE_IRQ_PRI_CB(WRITELINE(_tag, _dev, _irq_pri)) \
+	MCFG_I82371SB_IDE_IRQ_SEC_CB(WRITELINE(_tag, _dev, _irq_sec))
+
+class i82371sb_ide_device : public pci_device {
+public:
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> devcb_base &set_irq_pri_callback(Object &&cb) { return m_irq_pri_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_sec_callback(Object &&cb) { return m_irq_sec_callback.set_callback(std::forward<Object>(cb)); }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void reset_all_mappings() override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	virtual void config_map(address_map &map) override;
+
+	DECLARE_WRITE_LINE_MEMBER(primary_int);
+	DECLARE_WRITE_LINE_MEMBER(secondary_int);
+
+private:
+	DECLARE_READ16_MEMBER(command_r);
+	DECLARE_WRITE16_MEMBER(command_w);
+	DECLARE_READ32_MEMBER(bmiba_r);
+	DECLARE_WRITE32_MEMBER(bmiba_w);
+	DECLARE_READ16_MEMBER(idetim_primary_r);
+	DECLARE_WRITE16_MEMBER(idetim_primary_w);
+	DECLARE_READ16_MEMBER(idetim_secondary_r);
+	DECLARE_WRITE16_MEMBER(idetim_secondary_w);
+	DECLARE_READ8_MEMBER(sidetim_r);
+	DECLARE_WRITE8_MEMBER(sidetim_w);
+
+	DECLARE_READ32_MEMBER(ide1_read32_cs0_r);
+	DECLARE_WRITE32_MEMBER(ide1_write32_cs0_w);
+	DECLARE_READ32_MEMBER(ide2_read32_cs0_r);
+	DECLARE_WRITE32_MEMBER(ide2_write32_cs0_w);
+	DECLARE_READ8_MEMBER(ide1_read_cs1_r);
+	DECLARE_WRITE8_MEMBER(ide1_write_cs1_w);
+	DECLARE_READ8_MEMBER(ide2_read_cs1_r);
+	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
+
+	void internal_io_map(address_map &map);
+
+	uint16_t command;
+	uint32_t bmiba;
+	int idetim_primary, idetim_secondary;
+	int sidetim;
+
+	devcb_write_line m_irq_pri_callback;
+	devcb_write_line m_irq_sec_callback;
+
+	required_device<bus_master_ide_controller_device> m_ide1;
+	required_device<bus_master_ide_controller_device> m_ide2;
+};
+
+DECLARE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device)
 
 #endif // MAME_MACHINE_I82371SB_H

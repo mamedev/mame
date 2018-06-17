@@ -19,6 +19,7 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

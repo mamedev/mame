@@ -58,6 +58,7 @@
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 
 #define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 

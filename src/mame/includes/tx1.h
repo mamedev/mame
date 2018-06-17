@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 #include "audio/tx1.h"
 

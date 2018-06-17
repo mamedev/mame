@@ -152,6 +152,7 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

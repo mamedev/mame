@@ -42,6 +42,7 @@
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"

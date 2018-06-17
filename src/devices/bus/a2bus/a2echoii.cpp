@@ -4,15 +4,32 @@
 
     a2echoii.c
 
-    Implementation of the Street Electronics Echo II speech card
-    Ready logic traced by Jonathan Gevaryahu
+    Implementation of the Street Electronics Echo II and EchoIIb speech card
+    Ready logic traced by Lord Nightmare and Tony Diaz
 
+    Notes from Tony Diaz:
+        Capacitor values:
+        C1,C2 - .47nF  C3,C4 - 16v 10uF   C5 - 16v 100uF   C7,C7,C8 .1uF
+
+    Pictures:
+    Original EchoII card, S/N 789 with ?original? TMS5200: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/SEC%20-%20Echo%20II%20rev.A%20-%20Front.jpg
+    Original EchoII card, S/N 103, with a much later 1987 non-original TSP5220C installed: https://upload.wikimedia.org/wikipedia/en/e/ee/Echo2Card.jpg
+    Later EchoII without the VSM socket footprints, and with the 'FREQ' potentiometer: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/Echo%20II%20-%20Front.jpg
+    EchoIIb, similar to later EchoII but without the 'FREQ' potentiometer and with the 74LS92 clock divider: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/Echo%20IIb%20-%20Front.jpg
+
+    TODO: separate cards for the EchoII(both the freq adjustable and the older non-adjustable version, and maybe a tms5200 version?), EchoIIb (tms5220c)
+    TODO: echo+ is in a2mockinboard.cpp and really should be a sub-device inherited from here, to reduce duplicated code.
 *********************************************************************/
 
 #include "emu.h"
 #include "a2echoii.h"
 #include "sound/tms5220.h"
 #include "speaker.h"
+
+#undef DEBUG_ECHOII_READYQ
+#undef DEBUG_ECHOII_READ
+#undef DEBUG_ECHOII_WRITE
+
 
 /***************************************************************************
     PARAMETERS
@@ -36,8 +53,13 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device, "a2echoii", "Street Electr
 
 MACHINE_CONFIG_START(a2bus_echoii_device::device_add_mconfig)
 	SPEAKER(config, "echoii").front_center();
-	MCFG_DEVICE_ADD(TMS_TAG, TMS5220, 640000) // Note the Echo II card has a "FREQ" potentiometer which can be used to adjust the tms5220's clock frequency; 640khz is the '8khz' value according to the tms5220 datasheet
-	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(*this, a2bus_echoii_device, ready_w))
+	MCFG_DEVICE_ADD(TMS_TAG, TMS5220, 640000) // Note the Echo II card has an R/C circuit (and sometimes a 'FREQ' potentiometer) to control the tms5220[c]'s clock frequency; 640khz is the nominal '8khz' value according to the TMS5220 datasheet.
+	// The EchoIIb card however has a 74LS92 which divides the apple2's Q3 ((14.318/7)MHz asymmetrical) clock by 6 to produce a 681.809khz/2 clock, which doesn't actually make sense, since the tms5220, unless it has a mask option (mentioned on the datasheet) to use a ceramic resonator instead of an r/c circuit, needs a clock at twice that speed. Could it be that the EchoIIb uses tsp5220C chips with a special mask option?
+	// Some Old EchoII cards shipped with TMS5200(really?), some with TMS5220. Many (most?) were retrofitted with a TMS5220 or TMS5220C later.
+	// The later VSM-socket-less EchoII shipped with a TMS5220.
+	// The EchoIIb and later cards shipped with a TMS5220C
+	//MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, a2bus_echoii_device, tms_irq_callback))
+	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(*this, a2bus_echoii_device, tms_readyq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echoii", 1.0)
 MACHINE_CONFIG_END
 
@@ -63,65 +85,87 @@ a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, const ch
 
 void a2bus_echoii_device::device_start()
 {
-	m_timer = timer_alloc(0);
-	m_timer->adjust(attotime::never);
-
-	save_item(NAME(m_latch));
-	save_item(NAME(m_ready));
-	save_item(NAME(m_byte_in_latch));
+	m_writelatch_data = 0xff;
+	m_readlatch_flag = true; // /RESET presets this latch
+	m_writelatch_flag = true; // not initialized but we need to set it somewhere.
+	save_item(NAME(m_writelatch_data));
+	save_item(NAME(m_readlatch_flag));
+	save_item(NAME(m_writelatch_flag));
 }
 
 void a2bus_echoii_device::device_reset()
 {
-	m_byte_in_latch = false;
-	m_ready = 0;
-	m_latch = 0;
+	m_readlatch_flag = true; // /RESET presets this latch
+	m_tms->rsq_w(m_readlatch_flag); // update the rsq pin
+}
+
+/*
+WRITE_LINE_MEMBER(a2bus_echoii_device::tms_irq_callback)
+{
+	update_irq_to_maincpu();
+}
+*/
+
+WRITE_LINE_MEMBER(a2bus_echoii_device::tms_readyq_callback)
+{
+	if (state == ASSERT_LINE)
+	{
+#ifdef DEBUG_ECHOII_READYQ
+		logerror("ReadyQ callback called with state of %d! NOT READY\n", state);
+#endif
+		// the rising edge of /READY doesn't really do anything.
+	}
+	else
+	{
+#ifdef DEBUG_ECHOII_READYQ
+		logerror("ReadyQ callback called with state of %d! READY\n", state);
+#endif
+		m_writelatch_flag = true;
+		m_tms->wsq_w(m_writelatch_flag);
+	}
 }
 
 uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 {
-	switch (offset)
+	// offset is completely ignored, the same register maps to the entire space.
+	uint8_t retval = 0xff; // pull-up resistor pack on the tms5220 bus
+
+	// upon the falling edge of /DEVREAD, the active part of the read...
+	if (m_readlatch_flag == false) // /RS was low, so we need to return a value from the tms5220
 	{
-		case 0:
-			return 0x1f | m_tms->read_status();
+		retval = 0x1f | m_tms->status_r(machine().dummy_space(), 0, 0xff);
+#ifdef DEBUG_ECHOII_READ
+		logerror("Returning status of speech chip, which is %02x\n", retval);
+	}
+	else
+	{
+		logerror("chip status read on odd cycle, returning pull-up value of %02x\n", retval);
+#endif
 	}
 
-	return 0;
+	// upon the rising edge of /DEVREAD, i.e. after the read has finished (so no updating retval after this)
+	m_readlatch_flag = (!m_readlatch_flag); // latch inverts itself upon each read...
+	m_tms->rsq_w(m_readlatch_flag); // update the /RS pin
+	return retval;
 }
 
 void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	switch (offset)
-	{
-		case 0:
-			m_latch = data;
-			if (!m_ready)
-				m_tms->write_data(m_latch);
-			else
-				m_byte_in_latch = true;
-			break;
-	}
+	// offset is completely ignored, the same register maps to the entire space.
+	if (m_writelatch_flag == false)
+		logerror("Data in echoii latch (%02x) was clobbered with new write (%02x) before being read by speech chip!\n", m_writelatch_data, data);
+#ifdef DEBUG_ECHOII_WRITE
+	else
+		logerror("Data written to latch of %02x\n", data);
+#endif
+	m_writelatch_data = data;
+
+	m_writelatch_flag = false; // /DEVWRITE clears the latch on its falling edge
+	m_tms->wsq_w(m_writelatch_flag);
+	m_tms->data_w(machine().dummy_space(), 0, m_writelatch_data);
 }
 
 bool a2bus_echoii_device::take_c800()
 {
 	return false;
-}
-
-void a2bus_echoii_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	m_tms->write_data(m_latch);
-	m_byte_in_latch = false;
-	m_timer->adjust(attotime::never);
-}
-
-WRITE_LINE_MEMBER( a2bus_echoii_device::ready_w )
-{
-	// if /Ready falls, write the byte in the latch if there is one
-	if ((m_ready) && (!state) && (m_byte_in_latch))
-	{
-		m_timer->adjust(attotime::zero);
-	}
-
-	m_ready = state;
 }

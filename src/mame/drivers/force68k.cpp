@@ -441,22 +441,26 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a24_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a24_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a16_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a16_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
 /*
@@ -588,10 +592,10 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(16'000'000) / 2)
 	MCFG_PIT68230_PA_OUTPUT_CB (WRITE8 ("cent_data_out", output_latch_device, bus_w))
-	MCFG_PIT68230_H2_CB (WRITELINE ("centronics", centronics_device, write_strobe))
+	MCFG_PIT68230_H2_CB (WRITELINE (m_centronics, centronics_device, write_strobe))
 
 	// Centronics
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, force68k_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, force68k_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, force68k_state, centronics_perror_w))

@@ -5,6 +5,10 @@
     Atari Star Wars hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_STARWARS_H
+#define MAME_INCLUDES_STARWARS_H
+
+#pragma once
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
@@ -17,8 +21,8 @@
 class starwars_state : public driver_device
 {
 public:
-	starwars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	starwars_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_soundlatch(*this, "soundlatch"),
 		m_mainlatch(*this, "mainlatch"),
 		m_riot(*this, "riot"),
@@ -29,7 +33,7 @@ public:
 		m_tms(*this, "tms"),
 		m_novram(*this, "x2212"),
 		m_slapstic_device(*this, "slapstic")
-		{ }
+	{ }
 
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
@@ -93,3 +97,5 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_STARWARS_H

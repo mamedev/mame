@@ -104,6 +104,7 @@ Game is V30 based, with rom banking (2Mb)
 #include "sound/okim6376.h"
 #include "video/ramdac.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

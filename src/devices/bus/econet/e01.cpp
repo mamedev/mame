@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(econet_e01_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_formats_afs)
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_e01", "e01_flop")
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

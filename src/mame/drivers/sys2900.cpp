@@ -47,6 +47,7 @@ Status:
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 //#include "bus/s100/s100.h"
+#include "emupal.h"
 #include "screen.h"
 
 

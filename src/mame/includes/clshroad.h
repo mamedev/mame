@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "emupal.h"
+
 class clshroad_state : public driver_device
 {
 public:

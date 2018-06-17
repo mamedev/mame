@@ -18,6 +18,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,21 +28,24 @@ class pkscram_state : public driver_device
 public:
 	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
-		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
-		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_scan_timer(*this, "scan_timer"),
+		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
+		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
+		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram")
+	{ }
 
-	uint16_t m_out;
-	uint8_t m_interrupt_line_active;
-	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
-	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
-	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_bg_tilemap;
+	void pkscramble(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void pkscramble_map(address_map &map);
+
 	DECLARE_WRITE16_MEMBER(pkscramble_fgtilemap_w);
 	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
 	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
@@ -49,17 +53,24 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	void pkscramble(machine_config &config);
-	void pkscramble_map(address_map &map);
+	required_device<timer_device> m_scan_timer;
+	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
+
+	uint16_t m_out;
+	uint8_t m_interrupt_line_active;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_md_tilemap;
+	tilemap_t *m_bg_tilemap;
 };
 
 
@@ -237,14 +248,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 	{
 		if (m_out & 0x2000)
 			m_maincpu->set_input_line(1, ASSERT_LINE);
-		timer.adjust(m_screen->time_until_pos(param + 1), param+1);
+		m_scan_timer->adjust(m_screen->time_until_pos(param + 1), param+1);
 		m_interrupt_line_active = 1;
 	}
 	else
 	{
 		if (m_interrupt_line_active)
 			m_maincpu->set_input_line(1, CLEAR_LINE);
-		timer.adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+		m_scan_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		m_interrupt_line_active = 0;
 	}
 }
@@ -299,8 +310,7 @@ void pkscram_state::machine_reset()
 {
 	m_out = 0;
 	m_interrupt_line_active=0;
-	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
-	scanline_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+	m_scan_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
 MACHINE_CONFIG_START(pkscram_state::pkscramble)

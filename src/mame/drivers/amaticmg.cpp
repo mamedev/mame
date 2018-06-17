@@ -416,6 +416,7 @@
 #include "sound/3812intf.h"
 #include "video/mc6845.h"
 //#include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

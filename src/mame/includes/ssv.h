@@ -8,6 +8,7 @@
 #include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/es5506.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ssv_state : public driver_device

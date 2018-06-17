@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 
 struct duart_t
 {

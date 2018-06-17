@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

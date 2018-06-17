@@ -21,6 +21,7 @@
 
 #include "formats/nanos_dsk.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

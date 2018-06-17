@@ -4,6 +4,7 @@
 #include "machine/timer.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class circus_state : public driver_device
 {

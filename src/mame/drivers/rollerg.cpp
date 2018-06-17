@@ -21,6 +21,7 @@
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 

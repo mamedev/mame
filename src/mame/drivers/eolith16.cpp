@@ -18,6 +18,7 @@
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 

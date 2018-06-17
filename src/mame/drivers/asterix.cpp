@@ -21,6 +21,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

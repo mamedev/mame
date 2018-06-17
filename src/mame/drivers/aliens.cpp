@@ -17,6 +17,7 @@ Preliminary driver by:
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

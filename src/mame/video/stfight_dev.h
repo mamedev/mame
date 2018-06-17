@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include "emupal.h"
+
+
 
 DECLARE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device)
 

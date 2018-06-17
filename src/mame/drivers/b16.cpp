@@ -17,6 +17,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/am9517a.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
