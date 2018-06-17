@@ -2423,8 +2423,8 @@ ROM_START( grally )
 	ROM_LOAD( "gr-niemer-cboard-82s123.15t",   0x1020, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
 
 	/* sound (P)ROM data */
-	ROM_REGION( 0x0100, "namco", 0 ) // not dumped for this board
-	ROM_LOAD( "bboard-2p.9e",    0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
+	ROM_REGION( 0x0100, "namco", 0 )
+	ROM_LOAD( "gr_niemer_bboard-fus2p-82s129.9e",    0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
 
 	ROM_REGION( 0x4000, "engine", 0 )
 	ROM_LOAD( "gr_niemer_bboard-8p-2764.8a",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
@@ -2434,8 +2434,8 @@ ROM_START( grally )
 	/* the bootleg has a TMS5220, NOT the Namco 52xx */
 
 	/* unknown or unused (P)ROM data */
-	ROM_REGION( 0x0100, "user1", 0 )  // not dumped for this board
-	ROM_LOAD( "bboard-1p.14c",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "gr_niemer_bboard-fus1p-82s129.14c",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
 	/* this is used for the Spanish speech with a TMS5220 */
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
