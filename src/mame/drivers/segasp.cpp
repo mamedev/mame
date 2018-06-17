@@ -183,26 +183,26 @@ void segasp_state::segasp_map(address_map &map)
 	/* Area 0 */
 	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0); // BIOS
 
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_g2_ctrl_r), FUNC(segasp_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_g2_ctrl_r), FUNC(segasp_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_modem_r), FUNC(segasp_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_aica_reg_r), FUNC(segasp_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_modem_r), FUNC(segasp_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(segasp_state::dc_aica_reg_r), FUNC(segasp_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
 
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(segasp_state::sh4_soundram_r), FUNC(segasp_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(segasp_state::sh4_soundram_r), FUNC(segasp_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
 	map(0x01000000, 0x0100ffff).ram(); // banked access to ROM/NET board address space, mainly backup SRAM and ATA
-	map(0x01010000, 0x01010007).rw(this, FUNC(segasp_state::sp_bank_r), FUNC(segasp_state::sp_bank_w));
+	map(0x01010000, 0x01010007).rw(FUNC(segasp_state::sp_bank_r), FUNC(segasp_state::sp_bank_w));
 //  AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
-	map(0x01010100, 0x01010127).r(this, FUNC(segasp_state::sp_io_r));
-	map(0x01010128, 0x0101012f).rw(this, FUNC(segasp_state::sp_eeprom_r), FUNC(segasp_state::sp_eeprom_w));
-	map(0x01010150, 0x01010157).r(this, FUNC(segasp_state::sp_rombdflg_r));
+	map(0x01010100, 0x01010127).r(FUNC(segasp_state::sp_io_r));
+	map(0x01010128, 0x0101012f).rw(FUNC(segasp_state::sp_eeprom_r), FUNC(segasp_state::sp_eeprom_w));
+	map(0x01010150, 0x01010157).r(FUNC(segasp_state::sp_rombdflg_r));
 //  AM_RANGE(0x01010180, 0x010101af) custom UART 1
 //  AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
 
@@ -235,7 +235,7 @@ void segasp_state::segasp_map(address_map &map)
 
 void segasp_state::onchip_port(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(segasp_state::sn_93c46a_r), FUNC(segasp_state::sn_93c46a_w));
+	map(0x00, 0x0f).rw(FUNC(segasp_state::sn_93c46a_r), FUNC(segasp_state::sn_93c46a_w));
 }
 
 
@@ -300,25 +300,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segasp_state::segasp)
 	naomi_aw_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(segasp_map)
-	MCFG_CPU_IO_MAP(onchip_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(segasp_map)
+	MCFG_DEVICE_IO_MAP(onchip_port)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("sp_eeprom")
+	MCFG_DEVICE_ADD("main_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_DEVICE_ADD("sp_eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(segasp_state, segasp)
+void segasp_state::init_segasp()
 {
 	set_drc_options();
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 #define SEGASP_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
@@ -564,16 +564,16 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
 
-GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
+GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
-GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
-GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
-GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
-GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
-GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
-GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
+GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
+GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
+GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
+GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
+GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
+GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 // These use a CF card
-GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
-GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
-GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
-GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )
+GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
+GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
+GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
+GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

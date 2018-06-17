@@ -164,6 +164,7 @@ Quick Jack administration/service mode:
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -309,7 +310,7 @@ void adp_state::skattv_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x800080, 0x800081).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x800082, 0x800083).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
-	map(0x800100, 0x800101).rw(this, FUNC(adp_state::input_r), FUNC(adp_state::input_w));
+	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xffc000, 0xffffff).ram().share("nvram");
@@ -359,7 +360,7 @@ void adp_state::fstation_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x800080, 0x800081).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x800082, 0x800083).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
-	map(0x800100, 0x800101).rw(this, FUNC(adp_state::input_r), FUNC(adp_state::input_w));
+	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfc0000, 0xffffff).ram().share("nvram");
@@ -550,24 +551,24 @@ void adp_state::fstation_hd63484_map(address_map &map)
 
 MACHINE_CONFIG_START(adp_state::quickjac)
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(quickjac_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(adp_state, duart_iack_handler)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(quickjac_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(adp_state, duart_iack_handler)
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_DEVICE_ADD( "duart", MC68681, XTAL(8'664'000) / 2 )
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart", mc68681_device, rx_a_w) )
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(adp_state, rtc_irq))
+	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, adp_state, rtc_irq))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -583,8 +584,8 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 
 	MCFG_HD63484_ADD("acrtc", 0, adp_hd63484_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, 3686400/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("PA"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -592,14 +593,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(adp_state::skattv)
 	quickjac(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(skattv_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(skattv_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(adp_state::skattva)
 	quickjac(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(skattva_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(skattva_mem)
 
 	MCFG_NVRAM_REPLACE_CUSTOM_DRIVER("nvram", adp_state, skattva_nvram_init)
 MACHINE_CONFIG_END
@@ -617,8 +618,8 @@ void adp_state::ramdac_map(address_map &map)
 
 MACHINE_CONFIG_START(adp_state::funland)
 	quickjac(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(funland_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(funland_mem)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
@@ -630,8 +631,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(adp_state::fstation)
 	funland(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fstation_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fstation_mem)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(640, 480)
@@ -723,10 +724,10 @@ ROM_START( fstation )
 ROM_END
 
 
-GAME( 1993, quickjac,  0,        quickjac,    quickjac, adp_state, 0, ROT0,  "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
-GAME( 1994, skattv,    0,        skattv,      skattv,   adp_state, 0, ROT0,  "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
-GAME( 1995, skattva,   skattv,   skattva,     skattva,  adp_state, 0, ROT0,  "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )
-GAME( 1997, fashiong,  0,        fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 1)",           MACHINE_NOT_WORKING )
-GAME( 1997, fashiong2, fashiong, fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 2)",           MACHINE_NOT_WORKING )
-GAME( 1999, funlddlx,  0,        funland,     skattv,   adp_state, 0, ROT0,  "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
-GAME( 2000, fstation,  0,        fstation,    fstation, adp_state, 0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )
+GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
+GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
+GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )
+GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           MACHINE_NOT_WORKING )
+GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           MACHINE_NOT_WORKING )
+GAME( 1999, funlddlx,  0,        funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
+GAME( 2000, fstation,  0,        fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )

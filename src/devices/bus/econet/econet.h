@@ -63,8 +63,8 @@ public:
 	void add_device(device_t *target, int address);
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( data_w );
+	DECLARE_WRITE_LINE_MEMBER( host_clk_w );
+	DECLARE_WRITE_LINE_MEMBER( host_data_w );
 
 	// writes for peripherals (device_t)
 	void clk_w(device_t *device, int state);
@@ -160,8 +160,6 @@ DECLARE_DEVICE_TYPE(ECONET,      econet_device)
 DECLARE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( econet_devices );
-
-
+void econet_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ECONET_ECONET_H

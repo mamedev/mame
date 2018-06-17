@@ -60,28 +60,28 @@ void aussiebyte_state::aussiebyte_io(address_map &map)
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).noprw(); // winchester interface
 	map(0x10, 0x13).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
-	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0x15, 0x15).w(this, FUNC(aussiebyte_state::port15_w)); // boot rom disable
-	map(0x16, 0x16).w(this, FUNC(aussiebyte_state::port16_w)); // fdd select
-	map(0x17, 0x17).w(this, FUNC(aussiebyte_state::port17_w)); // DMA mux
-	map(0x18, 0x18).w(this, FUNC(aussiebyte_state::port18_w)); // fdc select
-	map(0x19, 0x19).r(this, FUNC(aussiebyte_state::port19_r)); // info port
-	map(0x1a, 0x1a).w(this, FUNC(aussiebyte_state::port1a_w)); // membank
-	map(0x1b, 0x1b).w(this, FUNC(aussiebyte_state::port1b_w)); // winchester control
-	map(0x1c, 0x1f).w(this, FUNC(aussiebyte_state::port1c_w)); // gpebh select
+	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x15, 0x15).w(FUNC(aussiebyte_state::port15_w)); // boot rom disable
+	map(0x16, 0x16).w(FUNC(aussiebyte_state::port16_w)); // fdd select
+	map(0x17, 0x17).w(FUNC(aussiebyte_state::port17_w)); // DMA mux
+	map(0x18, 0x18).w(FUNC(aussiebyte_state::port18_w)); // fdc select
+	map(0x19, 0x19).r(FUNC(aussiebyte_state::port19_r)); // info port
+	map(0x1a, 0x1a).w(FUNC(aussiebyte_state::port1a_w)); // membank
+	map(0x1b, 0x1b).w(FUNC(aussiebyte_state::port1b_w)); // winchester control
+	map(0x1c, 0x1f).w(FUNC(aussiebyte_state::port1c_w)); // gpebh select
 	map(0x20, 0x23).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x24, 0x27).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x28, 0x28).r(this, FUNC(aussiebyte_state::port28_r)).w(m_votrax, FUNC(votrax_sc01_device::write));
+	map(0x28, 0x28).r(FUNC(aussiebyte_state::port28_r)).w(m_votrax, FUNC(votrax_sc01_device::write));
 	map(0x2c, 0x2c).w(m_votrax, FUNC(votrax_sc01_device::inflection_w));
-	map(0x30, 0x30).w(this, FUNC(aussiebyte_state::address_w));
+	map(0x30, 0x30).w(FUNC(aussiebyte_state::address_w));
 	map(0x31, 0x31).r(m_crtc, FUNC(mc6845_device::status_r));
-	map(0x32, 0x32).w(this, FUNC(aussiebyte_state::register_w));
-	map(0x33, 0x33).r(this, FUNC(aussiebyte_state::port33_r));
-	map(0x34, 0x34).w(this, FUNC(aussiebyte_state::port34_w)); // video control
-	map(0x35, 0x35).w(this, FUNC(aussiebyte_state::port35_w)); // data to vram and aram
-	map(0x36, 0x36).r(this, FUNC(aussiebyte_state::port36_r)); // data from vram and aram
-	map(0x37, 0x37).r(this, FUNC(aussiebyte_state::port37_r)); // read dispen flag
-	map(0x40, 0x4f).rw(this, FUNC(aussiebyte_state::rtc_r), FUNC(aussiebyte_state::rtc_w));
+	map(0x32, 0x32).w(FUNC(aussiebyte_state::register_w));
+	map(0x33, 0x33).r(FUNC(aussiebyte_state::port33_r));
+	map(0x34, 0x34).w(FUNC(aussiebyte_state::port34_w)); // video control
+	map(0x35, 0x35).w(FUNC(aussiebyte_state::port35_w)); // data to vram and aram
+	map(0x36, 0x36).r(FUNC(aussiebyte_state::port36_r)); // data from vram and aram
+	map(0x37, 0x37).r(FUNC(aussiebyte_state::port37_r)); // read dispen flag
+	map(0x40, 0x4f).rw(FUNC(aussiebyte_state::rtc_r), FUNC(aussiebyte_state::rtc_w));
 }
 
 /***********************************************************
@@ -341,7 +341,7 @@ static const gfx_layout crt8002_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( crt8002 )
+static GFXDECODE_START( gfx_crt8002 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, crt8002_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -419,9 +419,10 @@ WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
 		m_dma->rdy_w(state);
 }
 
-static SLOT_INTERFACE_START( aussiebyte_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void aussiebyte_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 /***********************************************************
@@ -496,9 +497,9 @@ void aussiebyte_state::machine_reset()
 
 MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)
-	MCFG_CPU_IO_MAP(aussiebyte_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(aussiebyte_map)
+	MCFG_DEVICE_IO_MAP(aussiebyte_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* video hardware */
@@ -507,90 +508,90 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crt8002)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720kHz? needs verify */
-	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(aussiebyte_state, votrax_w))
+	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(*this, aussiebyte_state, votrax_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(aussiebyte_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, aussiebyte_state, write_centronics_busy))
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 4)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 4.9152_MHz_XTAL / 4)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 16_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80sio_device, rxtxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(aussiebyte_state, ctc_z2_w))    // SIO2 Ch B, CTC Ch 3
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio1", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio1", z80sio_device, rxtxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio2", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio2", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, aussiebyte_state, ctc_z2_w))    // SIO2 Ch B, CTC Ch 3
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio2", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("dma", Z80DMA, 16_MHz_XTAL / 4)
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(aussiebyte_state, busreq_w))
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, aussiebyte_state, busreq_w))
 	// BAO, not used
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(aussiebyte_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(aussiebyte_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(aussiebyte_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(aussiebyte_state, io_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, aussiebyte_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, aussiebyte_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, aussiebyte_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, aussiebyte_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_INVERT
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(m_centronics, centronics_device, write_strobe)) MCFG_DEVCB_INVERT
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("pio2", Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(aussiebyte_state, port20_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, aussiebyte_state, port20_w))
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("sio1", Z80SIO, 16_MHz_XTAL / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio1_rdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio1_rdyb_w))
+	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(*this, aussiebyte_state, sio1_rdya_w))
+	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(*this, aussiebyte_state, sio1_rdyb_w))
 
-	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("sio2", Z80SIO, 16_MHz_XTAL / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio2_rdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio2_rdyb_w))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(*this, aussiebyte_state, sio2_rdya_w))
+	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(*this, aussiebyte_state, sio2_rdyb_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio2", z80sio_device, rxa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxa_w))
 
-	MCFG_WD2797_ADD("fdc", XTAL(16'000'000) / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_drq_w))
+	MCFG_DEVICE_ADD("fdc", WD2797, 16_MHz_XTAL / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aussiebyte_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aussiebyte_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(16'000'000) / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(aussiebyte_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(aussiebyte_state, crtc_update_addr)
 
-	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", 3)
@@ -632,5 +633,5 @@ ROM_START(aussieby)
 	ROM_REGION(0x00800, "aram", ROMREGION_ERASEFF) // attribute ram, 2k static
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT        CLASS             INIT        COMPANY         FULLNAME           FLAGS
-COMP( 1984, aussieby,     0,        0,  aussiebyte, aussiebyte,  aussiebyte_state, 0,          "SME Systems",  "Aussie Byte II" , MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY        FULLNAME          FLAGS
+COMP( 1984, aussieby, 0,      0,      aussiebyte, aussiebyte, aussiebyte_state, empty_init, "SME Systems", "Aussie Byte II", MACHINE_IMPERFECT_GRAPHICS )

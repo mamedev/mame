@@ -36,7 +36,7 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	, m_sense_handler(*this)
 	, m_flag_handler(*this), m_intack_handler(*this)
 	, m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
-	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0), m_direct(nullptr)
+	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0), m_cache(nullptr)
 	, m_debugger_temp(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -266,7 +266,7 @@ inline int s2650_device::check_irq_line()
  ***************************************************************/
 inline uint8_t s2650_device::ROP()
 {
-	uint8_t result = m_direct->read_byte(m_page + m_iar);
+	uint8_t result = m_cache->read_byte(m_page + m_iar);
 	m_iar = (m_iar + 1) & PMSK;
 	return result;
 }
@@ -277,7 +277,7 @@ inline uint8_t s2650_device::ROP()
  ***************************************************************/
 inline uint8_t s2650_device::ARG()
 {
-	uint8_t result = m_direct->read_byte(m_page + m_iar);
+	uint8_t result = m_cache->read_byte(m_page + m_iar);
 	m_iar = (m_iar + 1) & PMSK;
 	return result;
 }
@@ -826,7 +826,7 @@ void s2650_device::device_start()
 	m_flag_handler.resolve_safe();
 	m_intack_handler.resolve_safe();
 
-	m_direct = space(AS_PROGRAM).direct<0>();
+	m_cache = space(AS_PROGRAM).cache<0, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_page));

@@ -129,7 +129,7 @@ public:
 #define UAPCE_SOUND_EN  NODE_10
 #define UAPCE_TONE_752  NODE_11
 
-static DISCRETE_SOUND_START(uapce)
+static DISCRETE_SOUND_START(uapce_discrete)
 	DISCRETE_INPUT_LOGIC(UAPCE_SOUND_EN)
 	DISCRETE_SQUAREWFIX(UAPCE_TONE_752, UAPCE_SOUND_EN, 752, DEFAULT_TTL_V_LOGIC_1, 50, DEFAULT_TTL_V_LOGIC_1, 0)   // 752Hz
 	DISCRETE_OUTPUT(UAPCE_TONE_752, 100)
@@ -247,10 +247,10 @@ void uapce_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x07FF).rom();
 	map(0x0800, 0x0FFF).ram();
-	map(0x1000, 0x17FF).w(this, FUNC(uapce_state::jamma_if_control_latch_w));
-	map(0x1800, 0x1FFF).r(this, FUNC(uapce_state::jamma_if_read_dsw));
+	map(0x1000, 0x17FF).w(FUNC(uapce_state::jamma_if_control_latch_w));
+	map(0x1800, 0x1FFF).r(FUNC(uapce_state::jamma_if_read_dsw));
 	map(0x2000, 0x27FF).portr("COIN");
-	map(0x2800, 0x2FFF).r(this, FUNC(uapce_state::jamma_if_control_latch_r));
+	map(0x2800, 0x2FFF).r(FUNC(uapce_state::jamma_if_control_latch_r));
 }
 
 
@@ -295,7 +295,7 @@ void uapce_state::pce_mem(address_map &map)
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(uapce_state::pce_joystick_r), FUNC(uapce_state::pce_joystick_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(uapce_state::pce_joystick_r), FUNC(uapce_state::pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
@@ -307,12 +307,12 @@ void uapce_state::pce_io(address_map &map)
 
 MACHINE_CONFIG_START(uapce_state::uapce)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
+	MCFG_DEVICE_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
+	MCFG_DEVICE_IO_MAP(pce_io)
 
-	MCFG_CPU_ADD("sub", Z80, 1400000)
-	MCFG_CPU_PROGRAM_MAP(z80_map)
+	MCFG_DEVICE_ADD("sub", Z80, 1400000)
+	MCFG_DEVICE_PROGRAM_MAP(z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -320,25 +320,25 @@ MACHINE_CONFIG_START(uapce_state::uapce)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(uapce)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, uapce_discrete)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
@@ -377,7 +377,7 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, uapce_state, pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )

@@ -23,7 +23,7 @@
 #define MCFG_ES8712_MSM_WRITE_CALLBACK(_devcb) \
 	devcb = &downcast<es8712_device &>(*device).set_msm_write_callback(DEVCB_##_devcb);
 #define MCFG_ES8712_MSM_TAG(_msmtag) \
-	downcast<es8712_device &>(*device).set_msm_tag(("^" _msmtag));
+	downcast<es8712_device &>(*device).set_msm_tag(_msmtag);
 
 
 //**************************************************************************

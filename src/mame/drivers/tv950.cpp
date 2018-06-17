@@ -99,7 +99,7 @@ void tv950_state::tv950_mem(address_map &map)
 	map(0x2000, 0x3fff).ram().share("vram"); // VRAM
 	map(0x8100, 0x8100).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8101, 0x8101).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
-	map(0x9000, 0x9000).w(this, FUNC(tv950_state::row_addr_w));
+	map(0x9000, 0x9000).w(FUNC(tv950_state::row_addr_w));
 	map(0x9300, 0x9303).rw(ACIA1_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9500, 0x9503).rw(ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9900, 0x9903).rw(ACIA3_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
@@ -272,8 +272,8 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 
 MACHINE_CONFIG_START(tv950_state::tv950)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/14)
-	MCFG_CPU_PROGRAM_MAP(tv950_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/14)
+	MCFG_DEVICE_PROGRAM_MAP(tv950_mem)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )   // not real values
@@ -285,17 +285,17 @@ MACHINE_CONFIG_START(tv950_state::tv950)
 	MCFG_MC6845_CHAR_WIDTH(14)
 	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
-	MCFG_MC6845_OUT_HSYNC_CB(DEVWRITELINE(VIA_TAG, via6522_device, write_pb6))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tv950_state, crtc_vs_w))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(VIA_TAG, via6522_device, write_pb6))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv950_state, crtc_vs_w))
 	MCFG_VIDEO_SET_SCREEN(nullptr)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(tv950_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(tv950_state, via_b_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8(tv950_state, via_b_r))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(tv950_state, via_crtc_reset_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(tv950_state, via_blink_rate_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, tv950_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, tv950_state, via_b_w))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, tv950_state, via_b_r))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, tv950_state, via_crtc_reset_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, tv950_state, via_blink_rate_w))
 
 	MCFG_DEVICE_ADD(ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
@@ -332,5 +332,5 @@ ROM_START( tv950 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "Model 950 Video Display Terminal",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME                            FLAGS
+COMP( 1981, tv950, 0,      0,      tv950,   tv950, tv950_state, empty_init, "TeleVideo", "Model 950 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

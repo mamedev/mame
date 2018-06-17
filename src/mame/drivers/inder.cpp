@@ -81,8 +81,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
-	DECLARE_DRIVER_INIT(inder);
-	DECLARE_DRIVER_INIT(inder1);
+	void init_inder();
+	void init_inder1();
 	void inder(machine_config &config);
 	void brvteam(machine_config &config);
 	void canasta(machine_config &config);
@@ -121,24 +121,24 @@ private:
 void inder_state::brvteam_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x20ff).w(this, FUNC(inder_state::disp_w));
+	map(0x2000, 0x20ff).w(FUNC(inder_state::disp_w));
 	map(0x4000, 0x43ff).ram(); // pair of 2114
 	map(0x4400, 0x44ff).ram().share("nvram"); // pair of 5101, battery-backed
-	map(0x4800, 0x480a).rw(this, FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
-	map(0x4900, 0x4900).w(this, FUNC(inder_state::sol_brvteam_w));
-	map(0x4901, 0x4907).w(this, FUNC(inder_state::lamp_w));
-	map(0x4b00, 0x4b00).w(this, FUNC(inder_state::sn_w));
+	map(0x4800, 0x480a).rw(FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
+	map(0x4900, 0x4900).w(FUNC(inder_state::sol_brvteam_w));
+	map(0x4901, 0x4907).w(FUNC(inder_state::lamp_w));
+	map(0x4b00, 0x4b00).w(FUNC(inder_state::sn_w));
 }
 
 void inder_state::canasta_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x20ff).w(this, FUNC(inder_state::disp_w));
+	map(0x2000, 0x20ff).w(FUNC(inder_state::disp_w));
 	map(0x4000, 0x43ff).ram(); // pair of 2114
 	map(0x4400, 0x44ff).ram().share("nvram"); // pair of 5101, battery-backed
-	map(0x4800, 0x480a).rw(this, FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
-	map(0x4900, 0x4900).w(this, FUNC(inder_state::sol_canasta_w));
-	map(0x4901, 0x4907).w(this, FUNC(inder_state::lamp_w));
+	map(0x4800, 0x480a).rw(FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
+	map(0x4900, 0x4900).w(FUNC(inder_state::sol_canasta_w));
+	map(0x4901, 0x4907).w(FUNC(inder_state::lamp_w));
 	map(0x4b00, 0x4b00).w("ay", FUNC(ay8910_device::address_w));
 	map(0x4b01, 0x4b01).r("ay", FUNC(ay8910_device::data_r));
 	map(0x4b02, 0x4b02).w("ay", FUNC(ay8910_device::data_w));
@@ -147,13 +147,13 @@ void inder_state::canasta_map(address_map &map)
 void inder_state::lapbylap_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x20ff).w(this, FUNC(inder_state::disp_w));
+	map(0x2000, 0x20ff).w(FUNC(inder_state::disp_w));
 	map(0x4000, 0x43ff).ram(); // pair of 2114
 	map(0x4400, 0x44ff).ram().share("nvram"); // pair of 5101, battery-backed
-	map(0x4800, 0x480a).rw(this, FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
-	map(0x4900, 0x4900).w(this, FUNC(inder_state::sol_canasta_w));
-	map(0x4901, 0x4907).w(this, FUNC(inder_state::lamp_w));
-	map(0x4b00, 0x4b00).w(this, FUNC(inder_state::sndcmd_lapbylap_w));
+	map(0x4800, 0x480a).rw(FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
+	map(0x4900, 0x4900).w(FUNC(inder_state::sol_canasta_w));
+	map(0x4901, 0x4907).w(FUNC(inder_state::lamp_w));
+	map(0x4b00, 0x4b00).w(FUNC(inder_state::sndcmd_lapbylap_w));
 }
 
 void inder_state::lapbylap_sub_map(address_map &map)
@@ -176,8 +176,8 @@ void inder_state::inder_map(address_map &map)
 	map(0x6400, 0x6403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6c20, 0x6c3f).mirror(0x1300).w(this, FUNC(inder_state::sndcmd_w));
-	map(0x6c60, 0x6c7f).mirror(0x1300).w(this, FUNC(inder_state::disp_w));
+	map(0x6c20, 0x6c3f).mirror(0x1300).w(FUNC(inder_state::sndcmd_w));
+	map(0x6c60, 0x6c7f).mirror(0x1300).w(FUNC(inder_state::disp_w));
 	map(0x6ce0, 0x6ce0).nopw();
 }
 
@@ -186,8 +186,8 @@ void inder_state::inder_sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x27ff).mirror(0x1800).ram(); // 6116
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(inder_state::sndbank_w));
-	map(0x8000, 0x8000).r(this, FUNC(inder_state::sndcmd_r));
+	map(0x6000, 0x6000).w(FUNC(inder_state::sndbank_w));
+	map(0x8000, 0x8000).r(FUNC(inder_state::sndcmd_r));
 }
 
 static INPUT_PORTS_START( brvteam )
@@ -1140,13 +1140,13 @@ WRITE8_MEMBER( inder_state::sw_w )
 
 WRITE8_MEMBER( inder_state::sn_w )
 {
-	m_sn->write(space, 0, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
+	m_sn->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER( inder_state::sndcmd_lapbylap_w )
 {
 	m_sndcmd = data;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( inder_state::sndcmd_w )
@@ -1265,9 +1265,9 @@ WRITE8_MEMBER( inder_state::sndbank_w )
 void inder_state::update_mus()
 {
 	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
-		m_13->ba_w(m_p_speech[m_sound_addr]);
+		m_13->write_ba(m_p_speech[m_sound_addr]);
 	else
-		m_13->ba_w(0);
+		m_13->write_ba(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
@@ -1330,7 +1330,7 @@ void inder_state::machine_reset()
 	}
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder )
+void inder_state::init_inder()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
@@ -1342,7 +1342,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder1 )
+void inder_state::init_inder1()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
@@ -1356,9 +1356,9 @@ DRIVER_INIT_MEMBER( inder_state, inder1 )
 
 MACHINE_CONFIG_START(inder_state::brvteam)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(brvteam_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(brvteam_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1367,16 +1367,16 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("snvol")
-	MCFG_SOUND_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
+	SPEAKER(config, "snvol").front_center();
+	MCFG_DEVICE_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::canasta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(canasta_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(canasta_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1385,19 +1385,19 @@ MACHINE_CONFIG_START(inder_state::canasta)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL(4'000'000) / 2)
+	SPEAKER(config, "ayvol").front_center();
+	MCFG_DEVICE_ADD("ay", AY8910, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(lapbylap_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lapbylap_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(lapbylap_sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1406,22 +1406,22 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
+	SPEAKER(config, "ayvol").front_center();
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
-	MCFG_AY8910_PORT_A_READ_CB(READ8(inder_state, sndcmd_r))
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, inder_state, sndcmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::inder)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(inder_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(inder_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(inder_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(inder_sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1430,66 +1430,66 @@ MACHINE_CONFIG_START(inder_state::inder)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("msmvol")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
+	SPEAKER(config, "msmvol").front_center();
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("9a", ttl7474_device, clock_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
 
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(inder_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi60c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi60a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi60a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi60b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi60b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, sw_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi60c_w))
 
 	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi64c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi64a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi64a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi64b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi64b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi64c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi64c_w))
 
 	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi68c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi68a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi68a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi68b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi68b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi68c_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi68c_w))
 
 	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi6cc_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi6ca_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi6ca_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi6cb_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi6cb_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi6cc_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi6cc_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppia_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppia_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppib_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppic_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppia_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppia_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppib_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppib_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppic_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppic_w))
 
 	MCFG_DEVICE_ADD("7a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc7a_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc7a_w))
 
 	MCFG_DEVICE_ADD("9a", TTL7474, 0) // HCT74
-	MCFG_7474_OUTPUT_CB(WRITELINE(inder_state, q9a_w))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, inder_state, q9a_w))
 
 	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc9b_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc9b_w))
 
 	MCFG_DEVICE_ADD("13", HCT157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 
@@ -1650,21 +1650,21 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,    0,    brvteam,  brvteam,  inder_state, 0,      ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, 0,      ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, 0,      ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1988,  pinclown,   0,    inder,    pinclown, inder_state, inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1989,  corsario,   0,    inder,    corsario, inder_state, inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1990,  mundial,    0,    inder,    mundial,  inder_state, inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1991,  atleta,     0,    inder,    atleta,   inder_state, inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1992,  ind250cc,   0,    inder,    ind250cc, inder_state, inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, later revision of msm5205 sound board
-GAME(1992,  metalman,   0,    inder,    metalman, inder_state, inder,  ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  metalman, 0, inder,    metalman, inder_state, init_inder,  ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL)

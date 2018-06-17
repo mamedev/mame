@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_SSYSTEM3_H
 
 #include "machine/6522via.h"
+#include "emupal.h"
 
 
 struct playfield_t
@@ -50,7 +51,7 @@ public:
 		, m_matrix(*this, "matrix.%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(ssystem3);
+	void init_ssystem3();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssystem3);
 	uint32_t screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

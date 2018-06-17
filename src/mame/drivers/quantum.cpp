@@ -54,8 +54,8 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
 #include "sound/discrete.h"
-#include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "machine/x2212.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -66,14 +66,18 @@ public:
 	quantum_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_avg(*this, "avg")
+		m_avg(*this, "avg"),
+		m_nvram(*this, "nvram"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void quantum(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
+	DECLARE_WRITE16_MEMBER(nvram_recall_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_READ8_MEMBER(input_2_r);
 	void main_map(address_map &map);
@@ -81,6 +85,8 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
+	required_device<x2212_device> m_nvram;
+	output_finder<2> m_leds;
 };
 
 
@@ -127,16 +133,24 @@ WRITE16_MEMBER(quantum_state::led_w)
 		machine().bookkeeping().coin_counter_w(0, data & 2);
 		machine().bookkeeping().coin_counter_w(1, data & 1);
 
+		m_nvram->store(BIT(data, 2));
+
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		output().set_led_value(0, data & 0x10);
-		output().set_led_value(1, data & 0x20);
+		m_leds[0] = BIT(data, 4);
+		m_leds[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
 		m_avg->set_flip_x (data & 0x40);
 		m_avg->set_flip_y (data & 0x80);
 	}
+}
+
+WRITE16_MEMBER(quantum_state::nvram_recall_w)
+{
+	m_nvram->recall(1);
+	m_nvram->recall(0);
 }
 
 
@@ -154,12 +168,12 @@ void quantum_state::main_map(address_map &map)
 	map(0x800000, 0x801fff).ram().share("vectorram");
 	map(0x840000, 0x84001f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x840020, 0x84003f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
-	map(0x900000, 0x9001ff).ram().share("nvram");
-	map(0x940000, 0x940001).r(this, FUNC(quantum_state::trackball_r)); /* trackball */
+	map(0x900000, 0x9001ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
+	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); /* trackball */
 	map(0x948000, 0x948001).portr("SYSTEM");
 	map(0x950000, 0x95001f).writeonly().share("colorram");
-	map(0x958000, 0x958001).w(this, FUNC(quantum_state::led_w));
-	map(0x960000, 0x960001).nopw();
+	map(0x958000, 0x958001).w(FUNC(quantum_state::led_w));
+	map(0x960000, 0x960001).w(FUNC(quantum_state::nvram_recall_w));
 	map(0x968000, 0x968001).w(m_avg, FUNC(avg_quantum_device::reset_word_w));
 	map(0x970000, 0x970001).w(m_avg, FUNC(avg_quantum_device::go_word_w));
 	map(0x978000, 0x978001).nopr().w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -248,7 +262,7 @@ static discrete_mixer_desc quantum_mixer = {
 		1.0                         /* gain */
 };
 
-static DISCRETE_SOUND_START(quantum)
+static DISCRETE_SOUND_START(quantum_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -275,11 +289,11 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(quantum_state::quantum)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_X2212_ADD("nvram") // "137288-001" in parts list and schematic diagram
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -295,35 +309,33 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 600000)
-	MCFG_POKEY_POT0_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT1_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT2_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT3_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT4_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT5_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT6_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT7_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_1_r))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 600000)
-	MCFG_POKEY_POT0_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT1_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT2_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT3_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT4_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT5_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT6_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT7_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_DEVICE_ADD("pokey2", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_2_r))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(quantum)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -405,6 +417,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )

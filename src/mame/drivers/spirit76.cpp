@@ -54,8 +54,8 @@ void spirit76_state::maincpu_map(address_map &map)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
 	map(0x0000, 0x00ff).ram(); // 2x 2112
 	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
-	map(0x2400, 0x2400).r(this, FUNC(spirit76_state::unk_r));
-	map(0x2401, 0x2401).w(this, FUNC(spirit76_state::unk_w));
+	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));
+	map(0x2401, 0x2401).w(FUNC(spirit76_state::unk_w));
 	map(0x0600, 0x0fff).rom().region("roms", 0);
 	map(0xfe00, 0xffff).rom().region("roms", 0x800);
 }
@@ -121,8 +121,8 @@ void spirit76_state::machine_reset()
 
 MACHINE_CONFIG_START(spirit76_state::spirit76)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 500000)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 500000)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", spirit76_state, irq, attotime::from_hz(120))
 
 	/* video hardware */
@@ -130,12 +130,12 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 
 	//6821pia
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spirit76_state, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spirit76_state, portb_w))
-	MCFG_PIA_READPA_HANDLER(READ8(spirit76_state, porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(spirit76_state, portb_r))
-//  MCFG_PIA_CA2_HANDLER(WRITELINE(spirit76_state, pia22_ca2_w))
-//  MCFG_PIA_CB2_HANDLER(WRITELINE(spirit76_state, pia22_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, spirit76_state, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spirit76_state, portb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, spirit76_state, porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, spirit76_state, portb_r))
+//  MCFG_PIA_CA2_HANDLER(WRITELINE(*this, spirit76_state, pia22_ca2_w))
+//  MCFG_PIA_CB2_HANDLER(WRITELINE(*this, spirit76_state, pia22_cb2_w))
 //  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 //  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
@@ -159,4 +159,4 @@ ROM_START(spirit76)
 ROM_END
 
 
-GAME( 1975, spirit76, 0, spirit76, spirit76, spirit76_state, 0, ROT0, "Mirco", "Spirit of 76", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1975, spirit76, 0, spirit76, spirit76, spirit76_state, empty_init, ROT0, "Mirco", "Spirit of 76", MACHINE_IS_SKELETON_MECHANICAL )

@@ -50,9 +50,9 @@ static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vectrix_state::vectrix)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 MACHINE_CONFIG_END
@@ -63,4 +63,4 @@ ROM_START( vectrix )
 	ROM_LOAD( "vectrixr.bin", 0x2000, 0x2000, CRC(33f9b06b) SHA1(6a1dffe5c2c0254824a8dddb8543f86d9ad8f173) )
 ROM_END
 
-COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, 0, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, empty_init, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )

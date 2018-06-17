@@ -67,7 +67,7 @@ void supstarf_state::main_map(address_map &map)
 void supstarf_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).w(this, FUNC(supstarf_state::driver_clk_w));
+	map(0x00, 0xff).w(FUNC(supstarf_state::driver_clk_w));
 }
 
 void supstarf_state::sound_map(address_map &map)
@@ -77,7 +77,7 @@ void supstarf_state::sound_map(address_map &map)
 
 void supstarf_state::sound_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(supstarf_state::psg_latch_r), FUNC(supstarf_state::psg_latch_w));
+	map(0x00, 0xff).rw(FUNC(supstarf_state::psg_latch_r), FUNC(supstarf_state::psg_latch_w));
 }
 
 READ8_MEMBER(supstarf_state::psg_latch_r)
@@ -173,18 +173,18 @@ void supstarf_state::machine_start()
 }
 
 MACHINE_CONFIG_START(supstarf_state::supstarf)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'068'800))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_I8085A_SID(READLINE(supstarf_state, contacts_r))
-	MCFG_I8085A_SOD(WRITELINE(supstarf_state, displays_w))
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'068'800))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_I8085A_SID(READLINE(*this, supstarf_state, contacts_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, supstarf_state, displays_w))
 
-	MCFG_CPU_ADD("soundcpu", I8035, XTAL(5'068'800) / 2) // from 8085 pin 37 (CLK OUT)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(supstarf_state, port1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(supstarf_state, port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(supstarf_state, phase_detect_r))
+	MCFG_DEVICE_ADD("soundcpu", I8035, XTAL(5'068'800) / 2) // from 8085 pin 37 (CLK OUT)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, supstarf_state, port1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, supstarf_state, port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, supstarf_state, phase_detect_r))
 
 	MCFG_DEVICE_ADD("soundlatch1", I8212, 0)
 	MCFG_I8212_MD_CALLBACK(GND)
@@ -195,14 +195,14 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(supstarf_state, lights_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(supstarf_state, lights_b_w))
+	MCFG_DEVICE_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supstarf_state, lights_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, supstarf_state, lights_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("psg2", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
+	MCFG_DEVICE_ADD("psg2", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JO"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("I1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -256,4 +256,4 @@ ROM_START(supstarf)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15) BAD_DUMP) // D6 stuck high and probably totally garbage
 ROM_END
 
-GAME( 1986, supstarf,   0,      supstarf,   supstarf,   supstarf_state,  0,      ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, supstarf, 0, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )

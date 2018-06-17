@@ -43,6 +43,7 @@
 #include "bus/centronics/digiblst.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -131,6 +132,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "ay"),
 		m_fdc(*this, "upd765"),
+		m_floppy(*this, "upd765:%u", 0U),
 		m_crtc(*this, "mc6845"),
 		m_ppi(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
@@ -171,6 +173,7 @@ public:
 	required_device<z80_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
 	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
+	optional_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
 	optional_device<centronics_device> m_centronics;  // not on a GX4000
@@ -335,7 +338,7 @@ protected:
 /*----------- defined in machine/amstrad.c -----------*/
 
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
-SLOT_INTERFACE_EXTERN(cpcplus_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
+void cpcplus_exp_cards(device_slot_interface &device);
 
 #endif // MAME_INCLUDES_AMSTRAD_H

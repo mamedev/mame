@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class tumbleb_state : public driver_device
 {
@@ -79,19 +80,19 @@ public:
 	DECLARE_WRITE16_MEMBER(pangpang_pf1_data_w);
 	DECLARE_WRITE16_MEMBER(pangpang_pf2_data_w);
 	DECLARE_WRITE16_MEMBER(tumbleb2_soundmcu_w);
-	DECLARE_DRIVER_INIT(dquizgo);
-	DECLARE_DRIVER_INIT(jumpkids);
-	DECLARE_DRIVER_INIT(htchctch);
-	DECLARE_DRIVER_INIT(wlstar);
-	DECLARE_DRIVER_INIT(suprtrio);
-	DECLARE_DRIVER_INIT(tumblepb);
-	DECLARE_DRIVER_INIT(tumblepba);
-	DECLARE_DRIVER_INIT(bcstory);
-	DECLARE_DRIVER_INIT(wondl96);
-	DECLARE_DRIVER_INIT(tumbleb2);
-	DECLARE_DRIVER_INIT(chokchok);
-	DECLARE_DRIVER_INIT(fncywld);
-	DECLARE_DRIVER_INIT(carket);
+	void init_dquizgo();
+	void init_jumpkids();
+	void init_htchctch();
+	void init_wlstar();
+	void init_suprtrio();
+	void init_tumblepb();
+	void init_tumblepba();
+	void init_bcstory();
+	void init_wondl96();
+	void init_tumbleb2();
+	void init_chokchok();
+	void init_fncywld();
+	void init_carket();
 	TILEMAP_MAPPER_MEMBER(tumblep_scan);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);

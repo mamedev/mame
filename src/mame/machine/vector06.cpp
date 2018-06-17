@@ -74,7 +74,7 @@ READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
-		return m_ay->ay8910_read_ym();
+		return m_ay->read_data();
 }
 
 WRITE8_MEMBER(vector06_state::vector06_romdisk_portb_w)
@@ -90,7 +90,7 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
 WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 {
 	if (data & 4)
-		m_ay->ay8910_write_ym((data >> 1) & 1, m_aylatch);
+		m_ay->address_data_w(space, (data >> 1) & 1, m_aylatch);
 	m_romdisk_msb = data;
 }
 

@@ -13,6 +13,7 @@
 #include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class mitchell_state : public driver_device
 {
@@ -103,25 +104,25 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE8_MEMBER(eeprom_serial_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	DECLARE_DRIVER_INIT(mgakuen2);
-	DECLARE_DRIVER_INIT(block);
-	DECLARE_DRIVER_INIT(pangb);
-	DECLARE_DRIVER_INIT(qtono1);
-	DECLARE_DRIVER_INIT(mgakuen);
-	DECLARE_DRIVER_INIT(hatena);
-	DECLARE_DRIVER_INIT(mstworld);
-	DECLARE_DRIVER_INIT(spangbl);
-	DECLARE_DRIVER_INIT(pkladiesbl);
-	DECLARE_DRIVER_INIT(spang);
-	DECLARE_DRIVER_INIT(cworld);
-	DECLARE_DRIVER_INIT(spangj);
-	DECLARE_DRIVER_INIT(qsangoku);
-	DECLARE_DRIVER_INIT(marukin);
-	DECLARE_DRIVER_INIT(pang);
-	DECLARE_DRIVER_INIT(sbbros);
-	DECLARE_DRIVER_INIT(pkladies);
-	DECLARE_DRIVER_INIT(blockbl);
-	DECLARE_DRIVER_INIT(dokaben);
+	void init_mgakuen2();
+	void init_block();
+	void init_pangb();
+	void init_qtono1();
+	void init_mgakuen();
+	void init_hatena();
+	void init_mstworld();
+	void init_spangbl();
+	void init_pkladiesbl();
+	void init_spang();
+	void init_cworld();
+	void init_spangj();
+	void init_qsangoku();
+	void init_marukin();
+	void init_pang();
+	void init_sbbros();
+	void init_pkladies();
+	void init_blockbl();
+	void init_dokaben();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(mitchell);
 	DECLARE_MACHINE_RESET(mitchell);

@@ -30,6 +30,7 @@
 #include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -270,20 +271,20 @@ void quickpick5_state::quickpick5_main(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).ram().share("nvram");
 	map(0xdc00, 0xdc0f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
-	map(0xdc40, 0xdc4f).rw(this, FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
+	map(0xdc40, 0xdc4f).rw(FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
 	map(0xdc80, 0xdc80).portr("DSW3");
 	map(0xdc81, 0xdc81).portr("DSW4");
 	map(0xdcc0, 0xdcc0).portr("DSW1");
 	map(0xdcc1, 0xdcc1).portr("DSW2");
 	map(0xdd00, 0xdd00).nopw();
 	map(0xdd40, 0xdd40).noprw();
-	map(0xdd80, 0xdd80).rw(this, FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
+	map(0xdd80, 0xdd80).rw(FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
 	map(0xddc0, 0xddc0).nopw();
 	map(0xde00, 0xde00).nopw();
 	map(0xde40, 0xde40).w(m_oki, FUNC(okim6295_device::write));
-	map(0xe000, 0xefff).rw(this, FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
+	map(0xe000, 0xefff).rw(FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
 	map(0xf000, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xffff).rw(this, FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
+	map(0xf800, 0xffff).rw(FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
 }
 
 static INPUT_PORTS_START( quickpick5 )
@@ -400,14 +401,14 @@ void quickpick5_state::machine_reset()
 
 MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(32'000'000)/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
-	MCFG_CPU_PROGRAM_MAP(quickpick5_main)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(32'000'000)/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(quickpick5_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) /* K053252, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(quickpick5_state, vbl_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(quickpick5_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(quickpick5_state, ccu_int_time_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, quickpick5_state, vbl_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, quickpick5_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(*this, quickpick5_state, ccu_int_time_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,16 +428,16 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_K05324X_OFFSETS(-(44+80), 20)
 	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_K051649_ADD("k051649", XTAL(32'000'000)/18)  // xtal is verified, divider is not
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/18, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -463,5 +464,5 @@ ROM_START( quickp5 )
 
 ROM_END
 
-GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, 0, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
+GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
 

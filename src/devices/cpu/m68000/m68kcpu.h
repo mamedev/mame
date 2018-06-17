@@ -198,7 +198,7 @@ static constexpr uint32_t ROR_32(uint32_t A, uint32_t C)    { return MASK_OUT_AB
 /* Access the CPU registers */
 inline uint32_t (&REG_DA())[16]    { return m_dar; } /* easy access to data and address regs */
 inline uint32_t (&REG_D())[16]     { return m_dar; }
-inline uint32_t (*REG_A())         { return (m_dar+8); }
+inline uint32_t *REG_A()         { return (m_dar+8); }
 inline uint32_t (&REG_SP_BASE())[7]{ return m_sp; }
 inline uint32_t &REG_USP()         { return m_sp[0]; }
 inline uint32_t &REG_ISP()         { return m_sp[4]; }

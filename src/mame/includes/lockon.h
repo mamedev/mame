@@ -8,6 +8,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Calculated from CRT controller writes */
@@ -25,26 +26,28 @@ class lockon_state : public driver_device
 {
 public:
 	lockon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_char_ram(*this, "char_ram"),
-		m_hud_ram(*this, "hud_ram"),
-		m_scene_ram(*this, "scene_ram"),
-		m_ground_ram(*this, "ground_ram"),
-		m_object_ram(*this, "object_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_ground(*this, "ground"),
-		m_object(*this, "object"),
-		m_watchdog(*this, "watchdog"),
-		m_f2203_1l(*this, "f2203.1l"),
-		m_f2203_2l(*this, "f2203.2l"),
-		m_f2203_3l(*this, "f2203.3l"),
-		m_f2203_1r(*this, "f2203.1r"),
-		m_f2203_2r(*this, "f2203.2r"),
-		m_f2203_3r(*this, "f2203.3r"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_char_ram(*this, "char_ram")
+		, m_hud_ram(*this, "hud_ram")
+		, m_scene_ram(*this, "scene_ram")
+		, m_ground_ram(*this, "ground_ram")
+		, m_object_ram(*this, "object_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ground(*this, "ground")
+		, m_object(*this, "object")
+		, m_watchdog(*this, "watchdog")
+		, m_f2203_1l(*this, "f2203.1l")
+		, m_f2203_2l(*this, "f2203.2l")
+		, m_f2203_3l(*this, "f2203.3l")
+		, m_f2203_1r(*this, "f2203.1r")
+		, m_f2203_2r(*this, "f2203.2r")
+		, m_f2203_3r(*this, "f2203.3r")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_lamp(*this, "lamp1")
+	{ }
 
 	void lockon(machine_config &config);
 
@@ -106,6 +109,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<> m_lamp;
 
 	DECLARE_READ16_MEMBER(lockon_crtc_r);
 	DECLARE_WRITE16_MEMBER(lockon_crtc_w);

@@ -18,8 +18,10 @@
 #define LOG_WRITE   (1U << 10) // Show write operation on image
 #define LOG_TRANSITION  (1U << 11) // Show transitions
 #define LOG_STATE   (1U << 12) // Show state machine
+#define LOG_LIVE    (1U << 13) // Live states
+#define LOG_FUNC    (1U << 14) // Function calls
 
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP| LOG_COMMAND | LOG_STATE | LOG_LINES )
+#define VERBOSE (LOG_GENERAL )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -36,6 +38,8 @@
 #define LOGWRITE(...)   LOGMASKED(LOG_WRITE, __VA_ARGS__)
 #define LOGTRANSITION(...) LOGMASKED(LOG_TRANSITION, __VA_ARGS__)
 #define LOGSTATE(...) LOGMASKED(LOG_STATE, __VA_ARGS__)
+#define LOGLIVE(...) LOGMASKED(LOG_LIVE, __VA_ARGS__)
+#define LOGFUNC(...) LOGMASKED(LOG_FUNC, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -244,7 +248,7 @@ void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int 
 
 void wd_fdc_device_base::command_end()
 {
-	LOGCOMMAND("%s\n", FUNCNAME);
+	LOGFUNC("%s\n", FUNCNAME);
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
@@ -640,7 +644,7 @@ void wd_fdc_device_base::read_id_start()
 
 void wd_fdc_device_base::read_id_continue()
 {
-	LOG("%s\n", FUNCNAME);
+	LOGFUNC("%s\n", FUNCNAME);
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
@@ -949,7 +953,7 @@ void wd_fdc_device_base::interrupt_start()
 
 void wd_fdc_device_base::general_continue()
 {
-	LOG("%s\n", FUNCNAME);
+	LOGFUNC("%s\n", FUNCNAME);
 	if(cur_live.state != IDLE) {
 		live_run();
 		if(cur_live.state != IDLE)
@@ -1079,7 +1083,7 @@ void wd_fdc_device_base::do_cmd_w()
 	}
 }
 
-void wd_fdc_device_base::cmd_w(uint8_t val)
+void wd_fdc_device_base::write_cmd(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 	LOGCOMP("Initiating command %02x\n", val);
@@ -1109,7 +1113,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	}
 }
 
-uint8_t wd_fdc_device_base::status_r()
+uint8_t wd_fdc_device_base::read_status()
 {
 	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
@@ -1158,7 +1162,7 @@ void wd_fdc_device_base::do_track_w()
 	track_buffer = -1;
 }
 
-void wd_fdc_device_base::track_w(uint8_t val)
+void wd_fdc_device_base::write_track(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1170,7 +1174,7 @@ void wd_fdc_device_base::track_w(uint8_t val)
 	delay_cycles(t_track, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
-uint8_t wd_fdc_device_base::track_r()
+uint8_t wd_fdc_device_base::read_track()
 {
 	uint8_t val = track;
 	if (inverted_bus) val ^= 0xff;
@@ -1184,7 +1188,7 @@ void wd_fdc_device_base::do_sector_w()
 	sector_buffer = -1;
 }
 
-void wd_fdc_device_base::sector_w(uint8_t val)
+void wd_fdc_device_base::write_sector(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1202,7 +1206,7 @@ void wd_fdc_device_base::sector_w(uint8_t val)
 		delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
-uint8_t wd_fdc_device_base::sector_r()
+uint8_t wd_fdc_device_base::read_sector()
 {
 	uint8_t val = sector;
 	if (inverted_bus) val ^= 0xff;
@@ -1210,7 +1214,7 @@ uint8_t wd_fdc_device_base::sector_r()
 	return val;
 }
 
-void wd_fdc_device_base::data_w(uint8_t val)
+void wd_fdc_device_base::write_data(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1218,7 +1222,7 @@ void wd_fdc_device_base::data_w(uint8_t val)
 	drop_drq();
 }
 
-uint8_t wd_fdc_device_base::data_r()
+uint8_t wd_fdc_device_base::read_data()
 {
 	drop_drq();
 
@@ -1230,22 +1234,22 @@ uint8_t wd_fdc_device_base::data_r()
 
 void wd_fdc_device_base::gen_w(int reg, uint8_t val)
 {
-	LOGSETUP("%s %02x: %02x\n", FUNCNAME, reg, val);
+	LOGFUNC("%s %02x: %02x\n", FUNCNAME, reg, val);
 	switch(reg) {
-	case 0: cmd_w(val); break;
-	case 1: track_w(val); break;
-	case 2: sector_w(val); break;
-	case 3: data_w(val); break;
+	case 0: write_cmd(val); break;
+	case 1: write_track(val); break;
+	case 2: write_sector(val); break;
+	case 3: write_data(val); break;
 	}
 }
 
 uint8_t wd_fdc_device_base::gen_r(int reg)
 {
 	switch(reg) {
-	case 0: return status_r();
-	case 1: return track_r();
-	case 2: return sector_r();
-	case 3: return data_r();
+	case 0: return read_status();
+	case 1: return read_track();
+	case 2: return read_sector();
+	case 3: return read_data();
 	}
 	return 0xff;
 }
@@ -1404,7 +1408,7 @@ READ_LINE_MEMBER(wd_fdc_device_base::enp_r)
 
 void wd_fdc_device_base::live_start(int state)
 {
-	LOG("%s\n", FUNCNAME);
+	LOGFUNC("%s\n", FUNCNAME);
 	cur_live.tm = machine().time();
 	cur_live.state = state;
 	cur_live.next_state = -1;
@@ -1429,7 +1433,7 @@ void wd_fdc_device_base::live_start(int state)
 
 void wd_fdc_device_base::checkpoint()
 {
-	LOG("%s\n", FUNCNAME);
+	LOGFUNC("%s\n", FUNCNAME);
 	pll_commit(floppy, cur_live.tm);
 	checkpoint_live = cur_live;
 	pll_save_checkpoint();
@@ -1582,7 +1586,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 	for(;;) {
 		switch(cur_live.state) {
 		case SEARCH_ADDRESS_MARK_HEADER:
-			//LOG("%s - SEARCH_ADDRESS_MARK_HEADER\n", FUNCNAME);
+			LOGLIVE("%s - SEARCH_ADDRESS_MARK_HEADER\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 
@@ -1616,7 +1620,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			break;
 
 		case READ_HEADER_BLOCK_HEADER: {
-			LOG("%s - READ_HEADER_BLOCK_HEADER\n", FUNCNAME);
+			LOGLIVE("%s - READ_HEADER_BLOCK_HEADER\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 
@@ -1657,7 +1661,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 		}
 
 		case READ_ID_BLOCK_TO_LOCAL: {
-			LOG("%s - READ_ID_BLOCK_TO_LOCAL\n", FUNCNAME);
+			LOGLIVE("%s - READ_ID_BLOCK_TO_LOCAL\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1673,7 +1677,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 		}
 
 		case READ_ID_BLOCK_TO_DMA:
-			LOG("%s - READ_ID_BLOCK_TO_DMA\n", FUNCNAME);
+			LOGLIVE("%s - READ_ID_BLOCK_TO_DMA\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1682,7 +1686,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			return;
 
 		case READ_ID_BLOCK_TO_DMA_BYTE:
-			LOG("%s - READ_ID_BLOCK_TO_DMA_BYTE\n", FUNCNAME);
+			LOGLIVE("%s - READ_ID_BLOCK_TO_DMA_BYTE\n", FUNCNAME);
 			data = cur_live.data_reg;
 			if(cur_live.bit_counter == 16)
 				sector = data;
@@ -1703,7 +1707,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			break;
 
 		case SEARCH_ADDRESS_MARK_DATA:
-			LOG("%s - SEARCH_ADDRESS_MARK_DATA\n", FUNCNAME);
+			LOGLIVE("%s - SEARCH_ADDRESS_MARK_DATA\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 
@@ -1755,7 +1759,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			break;
 
 		case READ_DATA_BLOCK_HEADER: {
-			LOG("%s - READ_DATA_BLOCK_HEADER\n", FUNCNAME);
+			LOGLIVE("%s - READ_DATA_BLOCK_HEADER\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 
@@ -1795,13 +1799,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 		}
 
 		case SEARCH_ADDRESS_MARK_DATA_FAILED:
-			LOG("%s - SEARCH_ADDRESS_MARK_DATA_FAILED\n", FUNCNAME);
+			LOGLIVE("%s - SEARCH_ADDRESS_MARK_DATA_FAILED\n", FUNCNAME);
 			status |= S_RNF;
 			cur_live.state = IDLE;
 			return;
 
 		case READ_SECTOR_DATA: {
-			LOG("%s - READ_SECTOR_DATA\n", FUNCNAME);
+			LOGLIVE("%s - READ_SECTOR_DATA\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1823,7 +1827,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 		}
 
 		case READ_SECTOR_DATA_BYTE:
-			LOG("%s - READ_SECTOR_DATA_BYTE\n", FUNCNAME);
+			LOGLIVE("%s - READ_SECTOR_DATA_BYTE\n", FUNCNAME);
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_SECTOR_DATA;
@@ -1831,13 +1835,21 @@ void wd_fdc_device_base::live_run(attotime limit)
 			break;
 
 		case READ_TRACK_DATA: {
-			LOG("%s - READ_TRACK_DATA\n", FUNCNAME);
+			LOGLIVE("%s - READ_TRACK_DATA\n", FUNCNAME);
 			if(read_one_bit(limit))
 				return;
+
 			if(cur_live.bit_counter != 16
-				&& cur_live.shift_reg != 0x4489
-				&& cur_live.shift_reg != 0x5224)
+				// MFM resyncs
+				&& !(!dden && (cur_live.shift_reg == 0x4489
+							|| cur_live.shift_reg == 0x5224))
+				// FM resyncs
+				&& !(dden && (cur_live.shift_reg == 0xf57e      // FM IDAM
+							|| cur_live.shift_reg == 0xf56f     // FM DAM
+							|| cur_live.shift_reg == 0xf56a))   // FM DDAM
+				)
 				break;
+
 
 			// Incorrect, hmmm
 			// Probably >2 + not just after a sync if <16
@@ -1848,7 +1860,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 			//  8: 00.00.0a.a1   9: ff.ff.e1.a1  10: 00.00.14.a1  11: ff.ff.ce.a1
 			// 12: 00.00.14.a1  13: ff.ff.c2.a1  14: 00.00.14.a1  15: ff.ff.c2.a1
 
-			bool output_byte = cur_live.bit_counter > 5;
+			// MZ: TI99 "DISkASSEMBLER" copy protection requires a threshold of 8
+			bool output_byte = cur_live.bit_counter > 8;
 
 			cur_live.data_separator_phase = false;
 			cur_live.bit_counter = 0;
@@ -1861,7 +1874,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 		}
 
 		case READ_TRACK_DATA_BYTE:
-			LOG("%s - READ_TRACK_DATA_BYTE\n", FUNCNAME);
+			LOGLIVE("%s - READ_TRACK_DATA_BYTE\n", FUNCNAME);
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_TRACK_DATA;
@@ -2307,7 +2320,7 @@ int wd_fdc_digital_device_base::digital_pll_t::get_next_bit(attotime &tm, floppy
 	        LOGTRANSITION("transition_time=%s\n", tts(when).c_str());
 	*/
 	for(;;) {
-		// LOGTRANSITION)("slot=%2d, counter=%03x\n", slot, counter);
+		// LOGTRANSITION("slot=%2d, counter=%03x\n", slot, counter);
 		attotime etime = ctime+delays[slot];
 		// LOGTRANSITION("etime=%s\n", tts(etime).c_str());
 		if(etime > limit)

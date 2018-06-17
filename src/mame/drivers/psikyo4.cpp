@@ -138,7 +138,7 @@ ROMs -
 
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 
-static GFXDECODE_START( ps4 )
+static GFXDECODE_START( gfx_ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
@@ -326,20 +326,20 @@ void psikyo4_state::ps4_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom();     // program ROM (1 meg)
 	map(0x02000000, 0x021fffff).rom().region("maincpu", 0x100000); // data ROM
 	map(0x03000000, 0x030037ff).ram().share("spriteram");
-	map(0x03003fe0, 0x03003fe3).rw(this, FUNC(psikyo4_state::ps4_eeprom_r), FUNC(psikyo4_state::ps4_eeprom_w));
-	map(0x03003fe4, 0x03003fef).ram().w(this, FUNC(psikyo4_state::ps4_vidregs_w)).share("vidregs"); // vid regs?
+	map(0x03003fe0, 0x03003fe3).rw(FUNC(psikyo4_state::ps4_eeprom_r), FUNC(psikyo4_state::ps4_eeprom_w));
+	map(0x03003fe4, 0x03003fef).ram().w(FUNC(psikyo4_state::ps4_vidregs_w)).share("vidregs"); // vid regs?
 	map(0x03003fe4, 0x03003fe7).nopr(); // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	map(0x03003ff0, 0x03003ff3).w(this, FUNC(psikyo4_state::ps4_screen1_brt_w)); // screen 1 brightness
-	map(0x03003ff4, 0x03003ff7).w(this, FUNC(psikyo4_state::ps4_bgpen_1_dword_w)).share("bgpen_1"); // screen 1 clear colour
-	map(0x03003ff8, 0x03003ffb).w(this, FUNC(psikyo4_state::ps4_screen2_brt_w)); // screen 2 brightness
-	map(0x03003ffc, 0x03003fff).w(this, FUNC(psikyo4_state::ps4_bgpen_2_dword_w)).share("bgpen_2"); // screen 2 clear colour
-	map(0x03004000, 0x03005fff).ram().w(this, FUNC(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)).share("paletteram"); // palette
+	map(0x03003ff0, 0x03003ff3).w(FUNC(psikyo4_state::ps4_screen1_brt_w)); // screen 1 brightness
+	map(0x03003ff4, 0x03003ff7).w(FUNC(psikyo4_state::ps4_bgpen_1_dword_w)).share("bgpen_1"); // screen 1 clear colour
+	map(0x03003ff8, 0x03003ffb).w(FUNC(psikyo4_state::ps4_screen2_brt_w)); // screen 2 brightness
+	map(0x03003ffc, 0x03003fff).w(FUNC(psikyo4_state::ps4_bgpen_2_dword_w)).share("bgpen_2"); // screen 2 clear colour
+	map(0x03004000, 0x03005fff).ram().w(FUNC(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)).share("paletteram"); // palette
 	map(0x03006000, 0x03007fff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 	map(0x05800000, 0x05800003).portr("P1_P2");
 	map(0x05800004, 0x05800007).portr("P3_P4");
-	map(0x05800008, 0x0580000b).w(this, FUNC(psikyo4_state::io_select_w)); // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
+	map(0x05800008, 0x0580000b).w(FUNC(psikyo4_state::io_select_w)); // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 
 	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
 }
@@ -654,16 +654,16 @@ void psikyo4_state::machine_reset()
 MACHINE_CONFIG_START(psikyo4_state::ps4big)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(ps4_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(ps4_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
-	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", ps4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
 	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
 	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
 
@@ -688,9 +688,10 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, ps4_ymf_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -913,12 +914,12 @@ ROM_START( hotdebut )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    MACHINE    INPUT     INIT              MONITOR COMPANY          FULLNAME                                        FLAGS
-GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick Kairakuten (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick 3 Digital Surfing (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick 4 Ever (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Mahjong Hot Gimmick Integral (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, loderndf, 0,        ps4small,  loderndf, psikyo4_state, 0, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. B)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, psikyo4_state, 0, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. A)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, psikyo4_state, 0, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)",              MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE          INIT        MONITOR COMPANY          FULLNAME                                        FLAGS
+GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick Kairakuten (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick 3 Digital Surfing (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick 4 Ever (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Mahjong Hot Gimmick Integral (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, loderndf, 0,        ps4small,  loderndf, psikyo4_state, empty_init, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. B)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, psikyo4_state, empty_init, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. A)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, psikyo4_state, empty_init, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)",              MACHINE_SUPPORTS_SAVE )

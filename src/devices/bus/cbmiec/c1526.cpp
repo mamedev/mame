@@ -34,13 +34,13 @@ DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "C4023 Printer")
 ROM_START( c1526 )
 	ROM_REGION( 0x2000, M6504_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "r05", "Revision 5" )
-	ROMX_LOAD( "325341-05.u8d", 0x0000, 0x2000, CRC(3ef63c59) SHA1(a71be83a476d2777d33dddb0103c036a047975ba), ROM_BIOS(1) )
+	ROMX_LOAD( "325341-05.u8d", 0x0000, 0x2000, CRC(3ef63c59) SHA1(a71be83a476d2777d33dddb0103c036a047975ba), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r07c", "Revision 7c" )
-	ROMX_LOAD( "325341-08.u8d", 0x0000, 0x2000, CRC(38f85b4a) SHA1(25880091979b21fdaf713b53ef2f1cb8063a3505), ROM_BIOS(2) )
+	ROMX_LOAD( "325341-08.u8d", 0x0000, 0x2000, CRC(38f85b4a) SHA1(25880091979b21fdaf713b53ef2f1cb8063a3505), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r07b", "Revision 7b (Swe/Fin)" )
-	ROMX_LOAD( "cbm 1526 vers. 1.0 skand.gen.u8d", 0x0000, 0x2000, CRC(21051f69) SHA1(7e622fc39985ebe9333d2b546b3c85fd6ab17a53), ROM_BIOS(3) )
+	ROMX_LOAD( "cbm 1526 vers. 1.0 skand.gen.u8d", 0x0000, 0x2000, CRC(21051f69) SHA1(7e622fc39985ebe9333d2b546b3c85fd6ab17a53), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "grafik", "MPS802 GrafikROM II v60.12" )
-	ROMX_LOAD( "mps802 grafikrom ii v60.12.u8d", 0x0000, 0x2000, CRC(9f5e6b18) SHA1(8b7f620a8f85e250b142d72b812a67fd0e292d68), ROM_BIOS(4) )
+	ROMX_LOAD( "mps802 grafikrom ii v60.12.u8d", 0x0000, 0x2000, CRC(9f5e6b18) SHA1(8b7f620a8f85e250b142d72b812a67fd0e292d68), ROM_BIOS(3) )
 ROM_END
 
 
@@ -78,9 +78,10 @@ const tiny_rom_entry *c4023_device::device_rom_region() const
 //  ADDRESS_MAP( c1526_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1526_device_base::c1526_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
-ADDRESS_MAP_END
+void c1526_device_base::c1526_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region(M6504_TAG, 0);
+}
 
 
 //-------------------------------------------------
@@ -88,8 +89,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1526_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(c1526_mem)
+	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 
 
@@ -98,8 +99,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c4023_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(c1526_mem)
+	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 
 

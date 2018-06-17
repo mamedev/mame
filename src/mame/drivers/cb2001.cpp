@@ -46,6 +46,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "cpu/nec/v25.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -573,7 +574,7 @@ void cb2001_state::cb2001_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0x20fff).ram().share("vrafg");
-	map(0x21000, 0x21fff).ram().w(this, FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
+	map(0x21000, 0x21fff).ram().w(FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
 	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
 }
 
@@ -584,9 +585,9 @@ void cb2001_state::cb2001_io(address_map &map)
 	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	map(0x30, 0x30).r(this, FUNC(cb2001_state::irq_ack_r));
-	map(0x30, 0x31).w(this, FUNC(cb2001_state::cb2001_vidctrl_w));
-	map(0x32, 0x33).w(this, FUNC(cb2001_state::cb2001_vidctrl2_w));
+	map(0x30, 0x30).r(FUNC(cb2001_state::irq_ack_r));
+	map(0x30, 0x31).w(FUNC(cb2001_state::cb2001_vidctrl_w));
+	map(0x32, 0x33).w(FUNC(cb2001_state::cb2001_vidctrl2_w));
 }
 
 static INPUT_PORTS_START( cb2001 )
@@ -786,7 +787,7 @@ static const gfx_layout cb2001_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( cb2001 )
+static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 32 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
@@ -821,11 +822,11 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 }
 
 MACHINE_CONFIG_START(cb2001_state::cb2001)
-	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	MCFG_DEVICE_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_V25_CONFIG(cb2001_decryption_table)
-	MCFG_CPU_PROGRAM_MAP(cb2001_map)
-	MCFG_CPU_IO_MAP(cb2001_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
+	MCFG_DEVICE_PROGRAM_MAP(cb2001_map)
+	MCFG_DEVICE_IO_MAP(cb2001_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -837,7 +838,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -850,8 +851,8 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_PALETTE_INIT_OWNER(cb2001_state, cb2001)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) // wrong
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) // wrong
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -882,5 +883,5 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
-GAME( 2001, cb2001,    0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym,  0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 2001, cb2001,   0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2001, scherrym, 0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)

@@ -3,6 +3,7 @@
 
 #include "audio/t5182.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class darkmist_state : public driver_device
@@ -56,7 +57,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(darkmist);
+	void init_darkmist();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(darkmist);
 

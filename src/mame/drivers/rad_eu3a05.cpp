@@ -154,6 +154,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6502/m65c02.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
@@ -912,35 +913,35 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 	map(0x4800, 0x49ff).ram().share("palram");
 
 	// 500x system regs?
-	map(0x5003, 0x5003).r(this, FUNC(radica_eu3a05_state::radicasi_5003_r));
-	map(0x500b, 0x500b).r(this, FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(this, FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
-	map(0x500d, 0x500d).rw(this, FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
+	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::radicasi_5003_r));
+	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
+	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
 
 	// 501x DMA controller
-	map(0x500F, 0x500F).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
-	map(0x5010, 0x5010).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
-	map(0x5011, 0x5011).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
+	map(0x500F, 0x500F).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
+	map(0x5010, 0x5010).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
+	map(0x5011, 0x5011).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
 
-	map(0x5012, 0x5012).rw(this, FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
-	map(0x5013, 0x5013).rw(this, FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
+	map(0x5012, 0x5012).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
+	map(0x5013, 0x5013).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
 
-	map(0x5014, 0x5014).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
-	map(0x5015, 0x5015).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
+	map(0x5014, 0x5014).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
+	map(0x5015, 0x5015).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
 
-	map(0x5016, 0x5016).rw(this, FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
+	map(0x5016, 0x5016).rw(FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
 
 	// 502x - 503x video regs area?
 	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).w(this, FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
+	map(0x5027, 0x5027).w(FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
 
-	map(0x5029, 0x5029).rw(this, FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(this, FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
+	map(0x5029, 0x5029).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
+	map(0x502a, 0x502a).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
 
-	map(0x502b, 0x502b).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
+	map(0x502b, 0x502b).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
+	map(0x502c, 0x502c).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
 
-	map(0x5031, 0x5032).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
+	map(0x5031, 0x5032).rw(FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
 
 
 	// 504x GPIO area?
@@ -958,7 +959,7 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 
-	map(0x50a9, 0x50a9).rw(this, FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
+	map(0x50a9, 0x50a9).rw(FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
 
 	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
@@ -966,8 +967,8 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
 	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(this, FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
-	map(0xfffe, 0xffff).r(this, FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
+	map(0xfffa, 0xfffb).r(FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
+	map(0xfffe, 0xffff).r(FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
 }
 
 
@@ -1125,7 +1126,7 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
-static GFXDECODE_START( radicasi_fake )
+static GFXDECODE_START( gfx_radicasi_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
@@ -1142,16 +1143,16 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 	m_custom_nmi = 1;
 	m_custom_nmi_vector = 0xffd4;
 
-	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	*/
 }
 
 MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
-	MCFG_CPU_PROGRAM_MAP(radicasi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
+	MCFG_DEVICE_PROGRAM_MAP(radicasi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
@@ -1171,15 +1172,15 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radicasi_fake)
 
 	MCFG_DEVICE_ADD("gpio", RADICA6502_GPIO, 0)
 	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
-	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(radica_eu3a05_state, read_full_space))
+	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(*this, radica_eu3a05_state, read_full_space))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1200,5 +1201,5 @@ ROM_START( rad_sinv )
 	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
-CONS( 2004, rad_sinv,  0,   0,  radicasi,  rad_sinv, radica_eu3a05_state, 0, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
-CONS( 2004, rad_tetr,  0,   0,  radicasi,  rad_tetr, radica_eu3a05_state, 0, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_sinv, 0, 0, radicasi, rad_sinv, radica_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_tetr, 0, 0, radicasi, rad_tetr, radica_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"

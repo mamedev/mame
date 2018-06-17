@@ -31,6 +31,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -77,7 +78,7 @@ void actfancr_state::actfan_map(address_map &map)
 	map(0x070010, 0x07001f).w(m_tilegen2, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
 	map(0x072000, 0x0727ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
 	map(0x100000, 0x1007ff).ram().share("spriteram");
-	map(0x110000, 0x110001).w(this, FUNC(actfancr_state::actfancr_buffer_spriteram_w));
+	map(0x110000, 0x110001).w(FUNC(actfancr_state::actfancr_buffer_spriteram_w));
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x130000, 0x130000).portr("P1");
 	map(0x130001, 0x130001).portr("P2");
@@ -100,12 +101,12 @@ void actfancr_state::triothep_map(address_map &map)
 	map(0x064000, 0x0647ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
 	map(0x066400, 0x0667ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
 	map(0x100000, 0x100000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x110000, 0x110001).w(this, FUNC(actfancr_state::actfancr_buffer_spriteram_w));
+	map(0x110000, 0x110001).w(FUNC(actfancr_state::actfancr_buffer_spriteram_w));
 	map(0x120000, 0x1207ff).ram().share("spriteram");
 	map(0x130000, 0x1305ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x140000, 0x140001).nopr(); /* Value doesn't matter */
 	map(0x1f0000, 0x1f3fff).ram().share("main_ram"); /* Main ram */
-	map(0x1ff000, 0x1ff001).rw(this, FUNC(actfancr_state::triothep_control_r), FUNC(actfancr_state::triothep_control_select_w));
+	map(0x1ff000, 0x1ff001).rw(FUNC(actfancr_state::triothep_control_r), FUNC(actfancr_state::triothep_control_select_w));
 	map(0x1ff400, 0x1ff403).w(m_maincpu, FUNC(h6280_device::irq_status_w));
 }
 
@@ -260,13 +261,13 @@ static const gfx_layout sprites =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( actfan )
+static GFXDECODE_START( gfx_actfan )
 	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprites,   512, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, tiles,     256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( triothep )
+static GFXDECODE_START( gfx_triothep )
 	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprites,   256, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, tiles,     512, 16 )
@@ -289,12 +290,12 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
-	MCFG_CPU_PROGRAM_MAP(actfan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
+	MCFG_DEVICE_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
+	MCFG_DEVICE_PROGRAM_MAP(actfan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 
-	MCFG_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
-	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+	MCFG_DEVICE_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -305,7 +306,7 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actfan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -322,34 +323,34 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",H6280,XTAL(21'477'272)/3) /* XIN=21.4772Mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(triothep_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
+	MCFG_DEVICE_ADD("maincpu",H6280,XTAL(21'477'272)/3) /* XIN=21.4772Mhz, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(triothep_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 
-	MCFG_CPU_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+	MCFG_DEVICE_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
 	MCFG_MACHINE_START_OVERRIDE(actfancr_state,triothep)
 	MCFG_MACHINE_RESET_OVERRIDE(actfancr_state,triothep)
@@ -363,7 +364,7 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triothep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -380,22 +381,22 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
@@ -602,9 +603,9 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, actfancr,  0,        actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr2, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr1, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancrj, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothep,  0,        triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothepj, triothep, triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr,  0,        actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr2, actfancr, actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr1, actfancr, actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancrj, actfancr, actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothep,  0,        triothep, triothep, actfancr_state, empty_init, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothepj, triothep, triothep, triothep, actfancr_state, empty_init, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )

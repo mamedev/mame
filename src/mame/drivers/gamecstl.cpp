@@ -70,6 +70,7 @@
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -92,7 +93,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(gamecstl);
+	void init_gamecstl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -354,7 +355,7 @@ void gamecstl_state::gamecstl_map(address_map &map)
 	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
 	map(0x000e0000, 0x000effff).ram();
 	map(0x000f0000, 0x000fffff).bankr("bank1");
-	map(0x000f0000, 0x000fffff).w(this, FUNC(gamecstl_state::bios_ram_w));
+	map(0x000f0000, 0x000fffff).w(FUNC(gamecstl_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -364,12 +365,12 @@ void gamecstl_state::gamecstl_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x00e8, 0x00eb).noprw();
 	map(0x00ec, 0x00ef).noprw();
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 	map(0x0300, 0x03af).noprw();
 	map(0x03b0, 0x03df).noprw();
-	map(0x0278, 0x027b).w(this, FUNC(gamecstl_state::pnp_config_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
-	map(0x0a78, 0x0a7b).w(this, FUNC(gamecstl_state::pnp_data_w));
+	map(0x0278, 0x027b).w(FUNC(gamecstl_state::pnp_config_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
+	map(0x0a78, 0x0a7b).w(FUNC(gamecstl_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
@@ -389,7 +390,7 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
+static GFXDECODE_START( gfx_cga )
 /* Support up to four CGA fonts */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
@@ -442,10 +443,10 @@ void gamecstl_state::machine_reset()
 
 MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000)
-	MCFG_CPU_PROGRAM_MAP(gamecstl_map)
-	MCFG_CPU_IO_MAP(gamecstl_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 200000000)
+	MCFG_DEVICE_PROGRAM_MAP(gamecstl_map)
+	MCFG_DEVICE_IO_MAP(gamecstl_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -454,7 +455,7 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, gamecstl_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -465,13 +466,13 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 	MCFG_PALETTE_ADD("palette", 16)
 
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
+void gamecstl_state::init_gamecstl()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 
@@ -505,5 +506,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, init_gamecstl, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, init_gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

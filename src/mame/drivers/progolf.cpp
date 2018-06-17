@@ -59,6 +59,7 @@ Twenty four 8116 rams.
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -264,12 +265,12 @@ WRITE8_MEMBER(progolf_state::videoram_w)
 void progolf_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x5fff).ram();
-	map(0x6000, 0x7fff).ram().w(this, FUNC(progolf_state::charram_w)).share("fbram");
-	map(0x8000, 0x8fff).rw(this, FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
-	map(0x9000, 0x9000).portr("IN2").w(this, FUNC(progolf_state::char_vregs_w));
-	map(0x9200, 0x9200).portr("P1").w(this, FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
-	map(0x9400, 0x9400).portr("P2").w(this, FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
-	map(0x9600, 0x9600).portr("IN0").w(this, FUNC(progolf_state::flip_screen_w));   /* VBLANK */
+	map(0x6000, 0x7fff).ram().w(FUNC(progolf_state::charram_w)).share("fbram");
+	map(0x8000, 0x8fff).rw(FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9000).portr("IN2").w(FUNC(progolf_state::char_vregs_w));
+	map(0x9200, 0x9200).portr("P1").w(FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
+	map(0x9400, 0x9400).portr("P2").w(FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
+	map(0x9600, 0x9600).portr("IN0").w(FUNC(progolf_state::flip_screen_w));   /* VBLANK */
 	map(0x9800, 0x9800).portr("DSW1");
 	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));
@@ -381,7 +382,7 @@ static const gfx_layout charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( progolf )
+static GFXDECODE_START( gfx_progolf )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 ) /* sprites */
 GFXDECODE_END
 
@@ -417,11 +418,11 @@ PALETTE_INIT_MEMBER(progolf_state, progolf)
 
 MACHINE_CONFIG_START(progolf_state::progolf)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 500000)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 500000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -438,7 +439,7 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", progolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_progolf)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
 
@@ -447,20 +448,20 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(progolf_state::progolfa)
 	progolf(config);
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
-	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 MACHINE_CONFIG_END
 
 
@@ -513,6 +514,6 @@ ROM_END
 
 
 // this uses DECO222 style encryption
-GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, empty_init, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-7 style)
-GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, empty_init, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

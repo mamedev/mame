@@ -12,6 +12,7 @@
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
+#include "emupal.h"
 #include "screen.h"
 
 class gaiden_state : public driver_device
@@ -99,12 +100,12 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_DRIVER_INIT(raiga);
-	DECLARE_DRIVER_INIT(drgnbowl);
-	DECLARE_DRIVER_INIT(drgnbowla);
-	DECLARE_DRIVER_INIT(mastninj);
-	DECLARE_DRIVER_INIT(shadoww);
-	DECLARE_DRIVER_INIT(wildfang);
+	void init_raiga();
+	void init_drgnbowl();
+	void init_drgnbowla();
+	void init_mastninj();
+	void init_shadoww();
+	void init_wildfang();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);

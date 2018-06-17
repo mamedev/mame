@@ -91,7 +91,7 @@ void harddriv_sound_board_device::update_68k_interrupts()
 READ16_MEMBER(harddriv_sound_board_device::hd68k_snd_data_r)
 {
 	m_soundflag = 0;
-	logerror("%06X:main read from sound=%04X\n", space.device().safe_pcbase(), m_sounddata);
+	logerror("%s:main read from sound=%04X\n", machine().describe_context(), m_sounddata);
 	return m_sounddata;
 }
 
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER( harddriv_sound_board_device::delayed_68k_w )
 WRITE16_MEMBER(harddriv_sound_board_device::hd68k_snd_data_w)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_sound_board_device::delayed_68k_w), this), data);
-	logerror("%06X:main write to sound=%04X\n", space.device().safe_pcbase(), data);
+	logerror("%s:main write to sound=%04X\n", machine().describe_context(), data);
 }
 
 
@@ -123,7 +123,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hd68k_snd_reset_w)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_mainflag = m_soundflag = 0;
 	update_68k_interrupts();
-	logerror("%06X:Reset sound\n", space.device().safe_pcbase());
+	logerror("%s:Reset sound\n", machine().describe_context());
 }
 
 
@@ -138,7 +138,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_data_r)
 {
 	m_mainflag = 0;
 	update_68k_interrupts();
-	logerror("%06X:sound read from main=%04X\n", space.device().safe_pcbase(), m_maindata);
+	logerror("%s:sound read from main=%04X\n", machine().describe_context(), m_maindata);
 	return m_maindata;
 }
 
@@ -147,7 +147,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_data_w)
 {
 	COMBINE_DATA(&m_sounddata);
 	m_soundflag = 1;
-	logerror("%06X:sound write to main=%04X\n", space.device().safe_pcbase(), data);
+	logerror("%s:sound write to main=%04X\n", machine().describe_context(), data);
 }
 
 
@@ -160,14 +160,14 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_data_w)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_switches_r)
 {
-	logerror("%06X:hdsnd68k_switches_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_switches_r(%04X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320port_r)
 {
-	logerror("%06X:hdsnd68k_320port_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_320port_r(%04X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
@@ -179,7 +179,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_status_r)
 //            D14 = 'Sound Flag'
 //            D13 = Test Switch
 //            D12 = 5220 Ready Flag (0=Ready)
-	logerror("%06X:hdsnd68k_status_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_status_r(%04X)\n", machine().describe_context(), offset);
 	return (m_mainflag << 15) | (m_soundflag << 14) | 0x2000 | 0;//((ioport("IN0")->read() & 0x0020) << 8) | 0;
 }
 
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(harddriv_sound_board_device::led_w)
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_speech_w)
 {
-	logerror("%06X:hdsnd68k_speech_w(%04X)=%04X\n", space.device().safe_pcbase(), offset, data);
+	logerror("%s:hdsnd68k_speech_w(%04X)=%04X\n", machine().describe_context(), offset, data);
 }
 
 
@@ -281,7 +281,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320com_r)
 	if (m_cramen)
 		return m_comram[offset & 0x1ff];
 
-	logerror("%06X:hdsnd68k_320com_r(%04X) -- not allowed\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_320com_r(%04X) -- not allowed\n", machine().describe_context(), offset);
 	return 0xffff;
 }
 
@@ -291,7 +291,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320com_w)
 	if (m_cramen)
 		COMBINE_DATA(&m_comram[offset & 0x1ff]);
 	else
-		logerror("%06X:hdsnd68k_320com_w(%04X)=%04X -- not allowed\n", space.device().safe_pcbase(), offset, data);
+		logerror("%s:hdsnd68k_320com_w(%04X)=%04X -- not allowed\n", machine().describe_context(), offset, data);
 }
 
 
@@ -336,14 +336,14 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_dac_w)
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_comport_w)
 {
 	/* COM port TD0-7 */
-	logerror("%06X:hdsnddsp_comport_w=%d\n", space.device().safe_pcbase(), data);
+	logerror("%s:hdsnddsp_comport_w=%d\n", machine().describe_context(), data);
 }
 
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_mute_w)
 {
 	/* mute DAC audio, D0=1 */
-	logerror("%06X:mute DAC=%d\n", space.device().safe_pcbase(), data);
+	logerror("%s:mute DAC=%d\n", machine().describe_context(), data);
 }
 
 
@@ -387,7 +387,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_comram_r)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_compare_r)
 {
-	logerror("%06X:hdsnddsp_compare_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnddsp_compare_r(%04X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
@@ -395,13 +395,13 @@ void harddriv_sound_board_device::driversnd_68k_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x01ffff).rom();
-	map(0xff0000, 0xff0fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_data_r), FUNC(harddriv_sound_board_device::hdsnd68k_data_w));
-	map(0xff1000, 0xff1fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_switches_r), FUNC(harddriv_sound_board_device::hdsnd68k_latches_w));
-	map(0xff2000, 0xff2fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320port_r), FUNC(harddriv_sound_board_device::hdsnd68k_speech_w));
-	map(0xff3000, 0xff3fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_status_r), FUNC(harddriv_sound_board_device::hdsnd68k_irqclr_w));
-	map(0xff4000, 0xff5fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320ram_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ram_w));
-	map(0xff6000, 0xff7fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320ports_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ports_w));
-	map(0xff8000, 0xffbfff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320com_r), FUNC(harddriv_sound_board_device::hdsnd68k_320com_w));
+	map(0xff0000, 0xff0fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_data_r), FUNC(harddriv_sound_board_device::hdsnd68k_data_w));
+	map(0xff1000, 0xff1fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_switches_r), FUNC(harddriv_sound_board_device::hdsnd68k_latches_w));
+	map(0xff2000, 0xff2fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320port_r), FUNC(harddriv_sound_board_device::hdsnd68k_speech_w));
+	map(0xff3000, 0xff3fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_status_r), FUNC(harddriv_sound_board_device::hdsnd68k_irqclr_w));
+	map(0xff4000, 0xff5fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320ram_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ram_w));
+	map(0xff6000, 0xff7fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320ports_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ports_w));
+	map(0xff8000, 0xffbfff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320com_r), FUNC(harddriv_sound_board_device::hdsnd68k_320com_w));
 	map(0xffc000, 0xffffff).ram();
 }
 
@@ -417,14 +417,14 @@ void harddriv_sound_board_device::driversnd_dsp_program_map(address_map &map)
 
 void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 {
-	map(0, 0).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_rom_r)).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_dac_w));
-	map(1, 1).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_comram_r));
-	map(2, 2).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_compare_r));
+	map(0, 0).r(FUNC(harddriv_sound_board_device::hdsnddsp_rom_r)).w(FUNC(harddriv_sound_board_device::hdsnddsp_dac_w));
+	map(1, 1).r(FUNC(harddriv_sound_board_device::hdsnddsp_comram_r));
+	map(2, 2).r(FUNC(harddriv_sound_board_device::hdsnddsp_compare_r));
 	map(1, 2).nopw();
-	map(3, 3).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_comport_w));
-	map(4, 4).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
-	map(5, 5).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
-	map(6, 7).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
+	map(3, 3).w(FUNC(harddriv_sound_board_device::hdsnddsp_comport_w));
+	map(4, 4).w(FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
+	map(5, 5).w(FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
+	map(6, 7).w(FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
 }
 
 
@@ -435,27 +435,27 @@ void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
+	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(driversnd_68k_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_rate_w)) // SPRATE
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(harddriv_sound_board_device, cram_enable_w)) // CRAMEN
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_rate_w)) // SPRATE
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, cram_enable_w)) // CRAMEN
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(harddriv_sound_board_device, led_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, led_w))
 
-	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
+	MCFG_DEVICE_ADD("sounddsp", TMS32010, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(harddriv_sound_board_device, hdsnddsp_get_bio))
+	MCFG_DEVICE_IO_MAP(driversnd_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, harddriv_sound_board_device, hdsnddsp_get_bio))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // ls374d.75e + ls374d.90e + am6012
+	MCFG_DEVICE_ADD("dac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // ls374d.75e + ls374d.90e + am6012
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

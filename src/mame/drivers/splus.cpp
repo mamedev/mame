@@ -26,6 +26,7 @@
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,7 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(splus_registers_r);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
-	DECLARE_DRIVER_INIT(splus);
+	void init_splus();
 	void splus(machine_config &config);
 	void splus_iomap(address_map &map);
 	void splus_map(address_map &map);
@@ -112,7 +113,7 @@ private:
 	uint8_t m_stop_pos[5];
 
 	virtual void machine_start() override
-	{ 
+	{
 		m_digits.resolve();
 		m_leds.resolve();
 	}
@@ -569,7 +570,7 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(splus_state,splus)
+void splus_state::init_splus()
 {
 	uint8_t *reel_data = memregion( "reeldata" )->base();
 
@@ -590,32 +591,32 @@ void splus_state::splus_map(address_map &map)
 void splus_state::splus_iomap(address_map &map)
 {
 	// Serial I/O
-	map(0x0000, 0x0000).r(this, FUNC(splus_state::splus_serial_r)).w(this, FUNC(splus_state::splus_serial_w));
+	map(0x0000, 0x0000).r(FUNC(splus_state::splus_serial_r)).w(FUNC(splus_state::splus_serial_w));
 
 	// Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
 	map(0x1000, 0x1fff).ram().share("cmosl");
 
 	// Watchdog, 7-segment Display
-	map(0x2000, 0x2000).rw(this, FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
+	map(0x2000, 0x2000).rw(FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
 
 	// DUART
-	map(0x3000, 0x300f).rw(this, FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
+	map(0x3000, 0x300f).rw(FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
 
 	// Dip Switches, Sound
 	map(0x4000, 0x4000).portr("SW1").w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x4001, 0x4001).w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Reel Optics, EEPROM
-	map(0x5000, 0x5000).r(this, FUNC(splus_state::splus_reel_optics_r)).w(this, FUNC(splus_state::i2c_nvram_w));
+	map(0x5000, 0x5000).r(FUNC(splus_state::splus_reel_optics_r)).w(FUNC(splus_state::i2c_nvram_w));
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	map(0x6000, 0x6000).rw(this, FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
+	map(0x6000, 0x6000).rw(FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
 
 	// Battery-backed RAM (Upper 4K)
 	map(0x7000, 0x7fff).ram().share("cmosh");
 
 	// SSxxxx Reel Chip
-	map(0x8000, 0x9fff).r(this, FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
+	map(0x8000, 0x9fff).r(FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
 }
 
 /*************************
@@ -674,11 +675,11 @@ INPUT_PORTS_END
 *************************/
 
 MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(splus_map)
-	MCFG_CPU_IO_MAP(splus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(splus_state, splus_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(splus_state, splus_p3_r))
+	MCFG_DEVICE_ADD("maincpu", I80C32, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(splus_map)
+	MCFG_DEVICE_IO_MAP(splus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, splus_state, splus_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
 
 	// Fill NVRAM
 	MCFG_NVRAM_ADD_0FILL("cmosl")
@@ -697,9 +698,9 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -719,5 +720,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME        PARENT  MACHINE  INPUT  STATE         INIT     ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
-GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )
+//     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
+GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

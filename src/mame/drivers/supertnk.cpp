@@ -118,7 +118,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(supertnk);
+	void init_supertnk();
 	void supertnk(machine_config &config);
 
 protected:
@@ -322,7 +322,7 @@ void supertnk_state::supertnk_map(address_map &map)
 	map(0x1efe, 0x1eff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x1efe, 0x1efe).portr("DSW");
 	map(0x1eff, 0x1eff).portr("UNK");
-	map(0x2000, 0x3fff).rw(this, FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
+	map(0x2000, 0x3fff).rw(FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
 }
 
 
@@ -336,11 +336,11 @@ void supertnk_state::supertnk_map(address_map &map)
 void supertnk_state::supertnk_io_map(address_map &map)
 {
 	map(0x0000, 0x0000).nopw();
-	map(0x0400, 0x0400).w(this, FUNC(supertnk_state::supertnk_bitplane_select_0_w));
-	map(0x0401, 0x0401).w(this, FUNC(supertnk_state::supertnk_bitplane_select_1_w));
-	map(0x0402, 0x0402).w(this, FUNC(supertnk_state::supertnk_bankswitch_0_w));
-	map(0x0404, 0x0404).w(this, FUNC(supertnk_state::supertnk_bankswitch_1_w));
-	map(0x0406, 0x0406).w(this, FUNC(supertnk_state::supertnk_interrupt_ack_w));
+	map(0x0400, 0x0400).w(FUNC(supertnk_state::supertnk_bitplane_select_0_w));
+	map(0x0401, 0x0401).w(FUNC(supertnk_state::supertnk_bitplane_select_1_w));
+	map(0x0402, 0x0402).w(FUNC(supertnk_state::supertnk_bankswitch_0_w));
+	map(0x0404, 0x0404).w(FUNC(supertnk_state::supertnk_bankswitch_1_w));
+	map(0x0406, 0x0406).w(FUNC(supertnk_state::supertnk_interrupt_ack_w));
 	map(0x0407, 0x0407).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -437,7 +437,7 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -451,9 +451,9 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	MCFG_SCREEN_UPDATE_DRIVER(supertnk_state, screen_update_supertnk)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -491,18 +491,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(supertnk_state,supertnk)
+void supertnk_state::init_supertnk()
 {
 	/* decode the TMS9980 ROMs */
-	offs_t offs;
 	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
-	for (offs = 0; offs < len; offs++)
+	for (offs_t offs = 0; offs < len; offs++)
 	{
 		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
 	}
 }
 
 
-GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )
+GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )

@@ -84,22 +84,22 @@ void hp2620_state::mem_map(address_map &map)
 void hp2620_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).rw(this, FUNC(hp2620_state::nvram_r), FUNC(hp2620_state::nvram_w)).share("nvram");
-	map(0x80, 0x80).r(this, FUNC(hp2620_state::keystat_r));
-	map(0x90, 0x90).r(this, FUNC(hp2620_state::sysstat_r));
+	map(0x00, 0x7f).rw(FUNC(hp2620_state::nvram_r), FUNC(hp2620_state::nvram_w)).share("nvram");
+	map(0x80, 0x80).r(FUNC(hp2620_state::keystat_r));
+	map(0x90, 0x90).r(FUNC(hp2620_state::sysstat_r));
 	map(0xa0, 0xa3).w("acia", FUNC(mos6551_device::write));
 	map(0xa4, 0xa7).r("acia", FUNC(mos6551_device::read));
-	map(0xa8, 0xa8).w(this, FUNC(hp2620_state::modem_w));
-	map(0xb8, 0xb8).w(this, FUNC(hp2620_state::keydisp_w));
+	map(0xa8, 0xa8).w(FUNC(hp2620_state::modem_w));
+	map(0xb8, 0xb8).w(FUNC(hp2620_state::keydisp_w));
 }
 
 static INPUT_PORTS_START( hp2622 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(hp2620_state::hp2622)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(25'771'500) / 7) // 3.68 MHz
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(25'771'500) / 7) // 3.68 MHz
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (A7 tied to GND) + battery (+ wait states)
 
@@ -133,4 +133,4 @@ ROM_START( hp2622a )
 	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
 ROM_END
 
-COMP( 1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, 0, "HP", "HP-2622A", MACHINE_IS_SKELETON )
+COMP( 1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_IS_SKELETON )

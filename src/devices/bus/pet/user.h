@@ -27,11 +27,6 @@
 #pragma once
 
 
-
-#define MCFG_PET_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PET_USER_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 #define MCFG_PET_USER_PORT_2_HANDLER(_devcb) \
 	devcb = &downcast<pet_user_port_device &>(*device).set_2_handler(DEVCB_##_devcb);
 
@@ -100,6 +95,15 @@ class pet_user_port_device : public device_t,
 	friend class device_pet_user_port_interface;
 
 public:
+	template <typename T>
+	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: pet_user_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_2_handler(Object &&cb) { return m_2_handler.set_callback(std::forward<Object>(cb)); }
@@ -226,6 +230,6 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( pet_user_port_cards );
+void pet_user_port_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_USER_H

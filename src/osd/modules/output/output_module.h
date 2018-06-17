@@ -17,6 +17,9 @@
 
 #define OSD_OUTPUT_PROVIDER   "output"
 
+#define IM_MAME_PAUSE               0
+#define IM_MAME_SAVESTATE           1
+
 class output_module
 {
 public:

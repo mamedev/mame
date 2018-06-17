@@ -246,19 +246,19 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
 
 MACHINE_CONFIG_START(eacc_state::eacc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
-	MCFG_CPU_PROGRAM_MAP(eacc_mem)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
+	MCFG_DEVICE_PROGRAM_MAP(eacc_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_eacc)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(eacc_state, eacc_keyboard_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(eacc_state, eacc_distance_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(eacc_state, eacc_cb1_r))
-	MCFG_PIA_READCA2_HANDLER(READLINE(eacc_state, eacc_fuel_sensor_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eacc_state, eacc_segment_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(eacc_state, eacc_digit_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(eacc_state, eacc_cb2_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, eacc_state, eacc_keyboard_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, eacc_state, eacc_distance_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, eacc_state, eacc_cb1_r))
+	MCFG_PIA_READCA2_HANDLER(READLINE(*this, eacc_state, eacc_fuel_sensor_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, eacc_state, eacc_segment_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, eacc_state, eacc_digit_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, eacc_state, eacc_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 
@@ -283,5 +283,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                  FULLNAME           FLAGS
-COMP( 1982, eacc,   0,      0,      eacc,    eacc,  eacc_state, 0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME           FLAGS
+COMP( 1982, eacc, 0,      0,      eacc,    eacc,  eacc_state, empty_init, "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)

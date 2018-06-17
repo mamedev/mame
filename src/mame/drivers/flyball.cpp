@@ -21,6 +21,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
@@ -44,7 +45,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
-		m_playfield_ram(*this, "playfield_ram")
+		m_playfield_ram(*this, "playfield_ram"),
+		m_lamp(*this, "lamp0")
 	{ }
 
 	void flyball(machine_config &config);
@@ -88,6 +90,8 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
+
+	output_finder<> m_lamp;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -288,7 +292,7 @@ WRITE8_MEMBER(flyball_state::misc_w)
 
 WRITE_LINE_MEMBER(flyball_state::lamp_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -303,16 +307,16 @@ void flyball_state::flyball_map(address_map &map)
 	map.global_mask(0x1fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
 	map(0x0800, 0x0800).noprw();
-	map(0x0801, 0x0801).w(this, FUNC(flyball_state::pitcher_pic_w));
-	map(0x0802, 0x0802).r(this, FUNC(flyball_state::scanline_r));
-	map(0x0803, 0x0803).r(this, FUNC(flyball_state::potsense_r));
-	map(0x0804, 0x0804).w(this, FUNC(flyball_state::ball_vert_w));
-	map(0x0805, 0x0805).w(this, FUNC(flyball_state::ball_horz_w));
-	map(0x0806, 0x0806).w(this, FUNC(flyball_state::pitcher_vert_w));
-	map(0x0807, 0x0807).w(this, FUNC(flyball_state::pitcher_horz_w));
-	map(0x0900, 0x0900).w(this, FUNC(flyball_state::potmask_w));
-	map(0x0a00, 0x0a07).w(this, FUNC(flyball_state::misc_w));
-	map(0x0b00, 0x0b00).r(this, FUNC(flyball_state::input_r));
+	map(0x0801, 0x0801).w(FUNC(flyball_state::pitcher_pic_w));
+	map(0x0802, 0x0802).r(FUNC(flyball_state::scanline_r));
+	map(0x0803, 0x0803).r(FUNC(flyball_state::potsense_r));
+	map(0x0804, 0x0804).w(FUNC(flyball_state::ball_vert_w));
+	map(0x0805, 0x0805).w(FUNC(flyball_state::ball_horz_w));
+	map(0x0806, 0x0806).w(FUNC(flyball_state::pitcher_vert_w));
+	map(0x0807, 0x0807).w(FUNC(flyball_state::pitcher_horz_w));
+	map(0x0900, 0x0900).w(FUNC(flyball_state::potmask_w));
+	map(0x0a00, 0x0a07).w(FUNC(flyball_state::misc_w));
+	map(0x0b00, 0x0b00).r(FUNC(flyball_state::input_r));
 	map(0x0d00, 0x0eff).writeonly().share("playfield_ram");
 	map(0x1000, 0x1fff).rom().region("maincpu", 0);
 }
@@ -396,7 +400,7 @@ static const gfx_layout flyball_sprites_layout =
 	0x100     /* increment */
 };
 
-static GFXDECODE_START( flyball )
+static GFXDECODE_START( gfx_flyball )
 	GFXDECODE_ENTRY( "gfx1", 0, flyball_tiles_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, flyball_sprites_layout, 2, 2 )
 GFXDECODE_END
@@ -431,6 +435,7 @@ void flyball_state::machine_start()
 		m_pot_assert_timer[i] = timer_alloc(TIMER_POT_ASSERT);
 	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
 	m_quarter_timer = timer_alloc(TIMER_QUARTER);
+	m_lamp.resolve();
 
 	save_item(NAME(m_pitcher_vert));
 	save_item(NAME(m_pitcher_horz));
@@ -458,11 +463,11 @@ void flyball_state::machine_reset()
 MACHINE_CONFIG_START(flyball_state::flyball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(flyball_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(flyball_map)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(flyball_state, lamp_w)) // 1 player lamp
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, flyball_state, lamp_w)) // 1 player lamp
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on
@@ -478,7 +483,7 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flyball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flyball)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
 
@@ -543,5 +548,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, 0, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, 0, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -76,12 +76,12 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
 
 	*/
 
-	m_bus->ren_w(BIT(data, 2));
-	m_bus->atn_w(BIT(data, 3));
-	m_bus->dav_w(BIT(data, 4));
-	m_bus->eoi_w(BIT(data, 5));
-	m_bus->ndac_w(BIT(data, 6));
-	m_bus->nrfd_w(BIT(data, 7));
+	m_bus->host_ren_w(BIT(data, 2));
+	m_bus->host_atn_w(BIT(data, 3));
+	m_bus->host_dav_w(BIT(data, 4));
+	m_bus->host_eoi_w(BIT(data, 5));
+	m_bus->host_ndac_w(BIT(data, 6));
+	m_bus->host_nrfd_w(BIT(data, 7));
 }
 
 READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
@@ -128,8 +128,8 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 
 	*/
 
-	m_bus->ifc_w(BIT(data, 0));
-	m_bus->srq_w(BIT(data, 1));
+	m_bus->host_ifc_w(BIT(data, 0));
+	m_bus->host_srq_w(BIT(data, 1));
 
 	m_exrom = !BIT(data, 3);
 
@@ -143,12 +143,12 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 
 MACHINE_CONFIG_START(c64_ieee488_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(c64_ieee488_device, tpi_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(c64_ieee488_device, tpi_pa_w))
-	MCFG_TPI6525_IN_PB_CB(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_TPI6525_OUT_PB_CB(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(c64_ieee488_device, tpi_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(c64_ieee488_device, tpi_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, c64_ieee488_device, tpi_pa_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c64_ieee488_device, tpi_pa_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, c64_ieee488_device, tpi_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c64_ieee488_device, tpi_pc_w))
 
 	MCFG_CBM_IEEE488_ADD(nullptr)
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()

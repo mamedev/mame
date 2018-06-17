@@ -11,7 +11,7 @@
 #include "formats/asst128_dsk.h"
 
 
-extern const device_type ASST128_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device)
 
 class asst128_mb_device : public ibm5150_mb_device
 {
@@ -25,13 +25,14 @@ public:
 	void map(address_map &map);
 };
 
-ADDRESS_MAP_START(asst128_mb_device::map)
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_WRITE(pc_page_w)
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
-ADDRESS_MAP_END
+void asst128_mb_device::map(address_map &map)
+{
+	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0080, 0x008f).w(FUNC(asst128_mb_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(FUNC(asst128_mb_device::nmi_enable_w));
+}
 
 DEFINE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device, "asst128_mb", "ASST128_MOTHERBOARD")
 
@@ -81,13 +82,14 @@ void asst128_state::asst128_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(asst128_mb_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x03f2, 0x03f3).w(this, FUNC(asst128_state::asst128_fdc_dor_w));
+	map(0x03f2, 0x03f3).w(FUNC(asst128_state::asst128_fdc_dor_w));
 	map(0x03f4, 0x03f5).m("fdc:upd765", FUNC(upd765a_device::map));
 }
 
-static SLOT_INTERFACE_START( asst128_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void asst128_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 FLOPPY_FORMATS_MEMBER( asst128_state::asst128_formats )
 	FLOPPY_ASST128_FORMAT
@@ -98,25 +100,26 @@ static DEVICE_INPUT_DEFAULTS_START( asst128 )
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(asst128_state::asst128)
-	MCFG_CPU_ADD("maincpu", I8086, 4772720)
-	MCFG_CPU_PROGRAM_MAP(asst128_map)
-	MCFG_CPU_IO_MAP(asst128_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(asst128_map)
+	MCFG_DEVICE_IO_MAP(asst128_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	downcast<asst128_mb_device &>(*device).set_cputag("^maincpu");
+	downcast<asst128_mb_device &>(*device).set_cputag("maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_MODIFY("mb:cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "board0", pc_isa8_cards, "cga_mc1502", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "board1", pc_isa8_cards, "lpt", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true)
+	MCFG_DEVICE_ADD("board1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(DEVWRITELINE("mb:pic8259", pic8259_device, ir6_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE("mb:pic8259", pic8259_device, ir6_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 
@@ -138,5 +141,5 @@ ROM_START( asst128 )
 	ROM_LOAD( "asst128cg.bin", 0, 0x2000, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT   STATE          INIT  COMPANY      FULLNAME         FLAGS
-COMP( 198?, asst128,    ibm5150,    0,          asst128,    0,      asst128_state, 0,    "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY      FULLNAME         FLAGS
+COMP( 198?, asst128, ibm5150, 0,      asst128, 0,     asst128_state, empty_init, "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)

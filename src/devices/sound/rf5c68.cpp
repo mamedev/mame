@@ -2,6 +2,9 @@
 // copyright-holders:Olivier Galibert,Aaron Giles
 /*********************************************************/
 /*    ricoh RF5C68(or clone) PCM controller              */
+/*                                                       */
+/*    TODO : RF5C164 (Sega CD/Mega CD)                   */
+/*           has difference?                             */
 /*********************************************************/
 
 #include "emu.h"
@@ -21,14 +24,15 @@ DEFINE_DEVICE_TYPE(RF5C68, rf5c68_device, "rf5c68", "Ricoh RF5C68")
 //-------------------------------------------------
 
 rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RF5C68, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_cbank(0),
-		m_wbank(0),
-		m_enable(0)
+	: device_t(mconfig, RF5C68, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16) // 15 bit Address + 2 Memory select outputs(total 64KB), PSRAM/SRAM/ROM
+	, m_stream(nullptr)
+	, m_cbank(0)
+	, m_wbank(0)
+	, m_enable(0)
 {
-	std::fill(std::begin(m_data), std::end(m_data), 0);
 }
 
 
@@ -38,15 +42,38 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 
 void rf5c68_device::device_start()
 {
+	m_data = &space(0);
+	// Find our direct access
+	m_cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
 	m_sample_end_cb.bind_relative_to(*owner());
-
-	/* allocate memory for the chip */
-	memset(m_data, 0xff, sizeof(m_data));
 
 	/* allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);
+
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
+		save_item(NAME(m_chan[ch].enable), ch);
+		save_item(NAME(m_chan[ch].env), ch);
+		save_item(NAME(m_chan[ch].pan), ch);
+		save_item(NAME(m_chan[ch].start), ch);
+		save_item(NAME(m_chan[ch].addr), ch);
+		save_item(NAME(m_chan[ch].step), ch);
+		save_item(NAME(m_chan[ch].loopst), ch);
+	}
+	save_item(NAME(m_cbank));
+	save_item(NAME(m_wbank));
+	save_item(NAME(m_enable));
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector rf5c68_device::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -87,11 +114,11 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 
 				/* fetch the sample and handle looping */
-				sample = m_data[(chan.addr >> 11) & 0xffff];
+				sample = m_cache->read_byte((chan.addr >> 11) & 0xffff);
 				if (sample == 0xff)
 				{
 					chan.addr = chan.loopst << 11;
-					sample = m_data[(chan.addr >> 11) & 0xffff];
+					sample = m_cache->read_byte((chan.addr >> 11) & 0xffff);
 
 					/* if we loop to a loop point, we're effectively dead */
 					if (sample == 0xff)
@@ -195,7 +222,7 @@ WRITE8_MEMBER( rf5c68_device::rf5c68_w )
 			if (data & 0x40)
 				m_cbank = data & 7;
 			else
-				m_wbank = data & 15;
+				m_wbank = (data & 0xf) << 12;
 			break;
 
 		case 0x08:  /* channel on/off reg */
@@ -216,7 +243,7 @@ WRITE8_MEMBER( rf5c68_device::rf5c68_w )
 
 READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 {
-	return m_data[m_wbank * 0x1000 + offset];
+	return m_cache->read_byte(m_wbank | offset);
 }
 
 
@@ -226,5 +253,5 @@ READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 
 WRITE8_MEMBER( rf5c68_device::rf5c68_mem_w )
 {
-	m_data[m_wbank * 0x1000 + offset] = data;
+	m_data->write_byte(m_wbank | offset, data);
 }

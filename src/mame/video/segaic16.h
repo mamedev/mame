@@ -98,11 +98,15 @@ public:
 		std::unique_ptr<uint16_t[]>        buffer;                         /* buffered data */
 	};
 
+	template <typename T> segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&decode_tag)
+		: segaic16_video_device(mconfig, tag, owner, clock)
+	{
+		m_gfxdecode.set_tag(std::forward<T>(decode_tag));
+	}
 
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb) { m_pagelatch_cb = newtilecb; }
 
 	uint8_t m_display_enable;
@@ -160,11 +164,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device)
-
-#define MCFG_SEGAIC16VID_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0)
-
-#define MCFG_SEGAIC16VID_GFXDECODE(_gfxtag) \
-	downcast<segaic16_video_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #endif // MAME_VIDEO_SEGAIC16_H

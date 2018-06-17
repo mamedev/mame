@@ -29,6 +29,7 @@
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -45,7 +46,7 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
-	DECLARE_DRIVER_INIT(gameking);
+	void init_gameking();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(gameking);
@@ -150,11 +151,11 @@ READ8_MEMBER(gameking_state::lcd_r)
 
 void gameking_state::gameking_mem(address_map &map)
 {
-	map(0x0000, 0x007f).rw(this, FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
+	map(0x0000, 0x007f).rw(FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
 	map(0x0080, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
 
-	map(0x0600, 0x077f).rw(this, FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
+	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
 	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
 //  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 
@@ -210,7 +211,7 @@ uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_in
 }
 
 
-DRIVER_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::init_gameking()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer), this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer2), this));
@@ -283,9 +284,9 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 
 MACHINE_CONFIG_START(gameking_state::gameking)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 6000000)
-	MCFG_CPU_PROGRAM_MAP(gameking_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(gameking_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -327,9 +328,9 @@ ROM_START(gamekin3)
 	ROM_LOAD("gm220.bin", 0x10000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
-CONS( 2003,  gameking,    0,  0,  gameking1,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS( 2003,  gamekin3,    0,  0,  gameking3,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gamekin3, 0, 0, gameking3, gameking, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it

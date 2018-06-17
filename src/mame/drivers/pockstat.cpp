@@ -47,6 +47,7 @@ If you do nothing for about 20 secs, it turns itself off (screen goes white).
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -844,18 +845,18 @@ WRITE32_MEMBER(pockstat_state::ps_audio_w)
 void pockstat_state::pockstat_mem(address_map &map)
 {
 	map(0x00000000, 0x000007ff).ram();
-	map(0x02000000, 0x02ffffff).r(this, FUNC(pockstat_state::ps_rombank_r));
+	map(0x02000000, 0x02ffffff).r(FUNC(pockstat_state::ps_rombank_r));
 	map(0x04000000, 0x04003fff).rom().region("maincpu", 0);
-	map(0x06000000, 0x06000307).rw(this, FUNC(pockstat_state::ps_ftlb_r), FUNC(pockstat_state::ps_ftlb_w));
-	map(0x08000000, 0x0801ffff).rw(this, FUNC(pockstat_state::ps_flash_r), FUNC(pockstat_state::ps_flash_w));
-	map(0x0a000000, 0x0a000013).rw(this, FUNC(pockstat_state::ps_intc_r), FUNC(pockstat_state::ps_intc_w));
-	map(0x0a800000, 0x0a80002b).rw(this, FUNC(pockstat_state::ps_timer_r), FUNC(pockstat_state::ps_timer_w));
-	map(0x0b000000, 0x0b000007).rw(this, FUNC(pockstat_state::ps_clock_r), FUNC(pockstat_state::ps_clock_w));
-	map(0x0b800000, 0x0b80000f).rw(this, FUNC(pockstat_state::ps_rtc_r), FUNC(pockstat_state::ps_rtc_w));
-	map(0x0d000000, 0x0d000003).rw(this, FUNC(pockstat_state::ps_lcd_r), FUNC(pockstat_state::ps_lcd_w));
+	map(0x06000000, 0x06000307).rw(FUNC(pockstat_state::ps_ftlb_r), FUNC(pockstat_state::ps_ftlb_w));
+	map(0x08000000, 0x0801ffff).rw(FUNC(pockstat_state::ps_flash_r), FUNC(pockstat_state::ps_flash_w));
+	map(0x0a000000, 0x0a000013).rw(FUNC(pockstat_state::ps_intc_r), FUNC(pockstat_state::ps_intc_w));
+	map(0x0a800000, 0x0a80002b).rw(FUNC(pockstat_state::ps_timer_r), FUNC(pockstat_state::ps_timer_w));
+	map(0x0b000000, 0x0b000007).rw(FUNC(pockstat_state::ps_clock_r), FUNC(pockstat_state::ps_clock_w));
+	map(0x0b800000, 0x0b80000f).rw(FUNC(pockstat_state::ps_rtc_r), FUNC(pockstat_state::ps_rtc_w));
+	map(0x0d000000, 0x0d000003).rw(FUNC(pockstat_state::ps_lcd_r), FUNC(pockstat_state::ps_lcd_w));
 	map(0x0d000100, 0x0d00017f).ram().share("lcd_buffer");
-	map(0x0d80000c, 0x0d80000f).rw(this, FUNC(pockstat_state::ps_audio_r), FUNC(pockstat_state::ps_audio_w));
-	map(0x0d800014, 0x0d800015).w("dac", FUNC(dac_word_interface::write));
+	map(0x0d80000c, 0x0d80000f).rw(FUNC(pockstat_state::ps_audio_r), FUNC(pockstat_state::ps_audio_w));
+	map(0x0d800014, 0x0d800015).w("dac", FUNC(dac_word_interface::data_w));
 }
 
 /* Input ports */
@@ -977,8 +978,8 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 
 MACHINE_CONFIG_START(pockstat_state::pockstat)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pockstat_mem)
+	MCFG_DEVICE_ADD("maincpu", ARM7, DEFAULT_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pockstat_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -990,10 +991,10 @@ MACHINE_CONFIG_START(pockstat_state::pockstat)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockstat_cart")
@@ -1011,5 +1012,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     STATE           INIT  COMPANY                            FULLNAME              FLAGS
-CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, pockstat_state, 0,    "Sony Computer Entertainment Inc", "Sony PocketStation", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                            FULLNAME              FLAGS
+CONS( 1999, pockstat, 0,      0,      pockstat, pockstat, pockstat_state, empty_init, "Sony Computer Entertainment Inc", "Sony PocketStation", MACHINE_SUPPORTS_SAVE )

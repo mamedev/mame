@@ -25,6 +25,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,7 +59,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_DRIVER_INIT(metlfrzr);
+	void init_metlfrzr();
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
@@ -195,7 +196,7 @@ void metlfrzr_state::metlfrzr_map(address_map &map)
 	map(0xd604, 0xd604).portr("DSW2");
 	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	map(0xd700, 0xd700).w(this, FUNC(metlfrzr_state::output_w));
+	map(0xd700, 0xd700).w(FUNC(metlfrzr_state::output_w));
 	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist
@@ -343,7 +344,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START(metlfrzr)
+static GFXDECODE_START(gfx_metlfrzr)
 	GFXDECODE_ENTRY("gfx1", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx2", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx3", 0, sprite_layout, 0, 16)
@@ -365,9 +366,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(metlfrzr_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -376,7 +377,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlfrzr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlfrzr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -388,10 +389,10 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)    /* 3.579545 MHz */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -434,7 +435,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
+void metlfrzr_state::init_metlfrzr()
 {
 	// same as cshooter.cpp
 	uint8_t *rom = memregion("maincpu")->base();
@@ -467,4 +468,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state, init_metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

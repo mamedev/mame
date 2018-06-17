@@ -3,13 +3,28 @@
 
 <softwarelist name="coco_flop" description="Tandy Radio Shack Color Computer disk images">
 
+	<!-- coco2 only -->
+	<software name="asmdemo">
+		<description>Tandy Assembly Demo 2017</description>
+		<year>2017</year>
+		<publisher>Simon Jonassen</publisher>
+		<info name="author" value="Simon Jonassen" />
+		<info name="usage" value="LOADM&quot;ASM-AUTO.BIN&quot;" />
+		<sharedfeat name="compatibility" value="COCO" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="asmdemo.dsk" size="161280" crc="6e2533f7" sha1="ebf6edfc4df71c0c450d4a72bac45f1308cf66ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<!-- RUN"DONKEY" -->
 	<software name="dkong" supported ="partial">
 		<description>Donkey Kong (Sock Master's Donkey Kong Emulator for CoCo 3) (512Kb)</description>
 		<year>2007</year>
 		<publisher>Sock Master</publisher>
 		<info name="author" value="Sock Master" />
+		<info name="usage" value="RUN&quot;DONKEY&quot;" />
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
@@ -19,13 +34,12 @@
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<!-- LOADM"DKREMIX" -->
-	<!-- EXEC -->
 	<software name="dkremix" supported ="partial">
 		<description>Donkey Kong Remix (Sock Master's Donkey Kong Remix Emulator for CoCo 3) (512Kb)</description>
 		<year>2015</year>
 		<publisher>Sock Master</publisher>
 		<info name="author" value="Sock Master" />
+		<info name="usage" value="LOADM&quot;DKREMIX&quot;:EXEC" />
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
@@ -35,12 +49,12 @@
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<!-- RUN"PACMAN" -->
 	<software name="pacman" supported ="partial">
 		<description>Pacman (z80 to 6809 Transcoded - v1.01) (512kb)</description>
 		<year>2017</year>
 		<publisher>Glen Hewlett</publisher>
 		<info name="author" value="Glen Hewlett" />
+		<info name="usage" value="RUN&quot;PACMAN&quot;" />
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">

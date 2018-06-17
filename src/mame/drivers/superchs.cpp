@@ -125,7 +125,7 @@ void superchs_state::superchs_map(address_map &map)
 	map(0x180000, 0x18ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
 	map(0x1b0000, 0x1b002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
 	map(0x200000, 0x20ffff).ram().share("shared_ram");
-	map(0x240000, 0x240003).w(this, FUNC(superchs_state::cpua_ctrl_w));
+	map(0x240000, 0x240003).w(FUNC(superchs_state::cpua_ctrl_w));
 	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x2c0000, 0x2c07ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x300000, 0x300007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
@@ -137,7 +137,7 @@ void superchs_state::superchs_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
-	map(0x800000, 0x80ffff).rw(this, FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
+	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
 	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
 
@@ -147,7 +147,7 @@ void superchs_state::chase3_cpub_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x400000, 0x40ffff).ram();
 	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
-	map(0x800000, 0x80ffff).rw(this, FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
+	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
 	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
 
@@ -213,7 +213,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( superchs )
+static GFXDECODE_START( gfx_superchs )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 GFXDECODE_END
@@ -226,32 +226,32 @@ GFXDECODE_END
 MACHINE_CONFIG_START(superchs_state::superchs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(superchs_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(superchs_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(superchs_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
 	MCFG_ADC0808_IN0_CB(IOPORT("WHEEL"))
 	MCFG_ADC0808_IN1_CB(IOPORT("ACCEL"))
-	MCFG_ADC0808_IN2_CB(READ8(superchs_state, volume_r))
+	MCFG_ADC0808_IN2_CB(READ8(*this, superchs_state, volume_r))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("SWITCHES"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(superchs_state, coin_word_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, superchs_state, coin_word_w))
 	// there are 'vibration' control bits somewhere!
 
 	/* video hardware */
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superchs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superchs)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -281,9 +281,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(superchs_state::chase3)
 	superchs(config);
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(chase3_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -575,15 +575,15 @@ READ16_MEMBER(superchs_state::sub_cycle_r)
 	return m_ram[2]&0xffff;
 }
 
-DRIVER_INIT_MEMBER(superchs_state,superchs)
+void superchs_state::init_superchs()
 {
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
 }
 
-GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O
-GAMEL( 1992, superchsu, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2A
-GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs ) // 1993/02/16 11:29:18 SUPER CHASE VER 1.2J
-GAMEL( 1992, superchsp, superchs, chase3,   superchs, superchs_state, 0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
-GAMEL( 1992, superchsp2,superchs, chase3,   superchs, superchs_state, 0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/01/18 18:29:18 CHASE 3 VER 1.3O, prototype)", 0, layout_superchs )
+GAMEL( 1992, superchs,   0,        superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O
+GAMEL( 1992, superchsu,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2A
+GAMEL( 1992, superchsj,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs ) // 1993/02/16 11:29:18 SUPER CHASE VER 1.2J
+GAMEL( 1992, superchsp,  superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
+GAMEL( 1992, superchsp2, superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/01/18 18:29:18 CHASE 3 VER 1.3O, prototype)", 0, layout_superchs )

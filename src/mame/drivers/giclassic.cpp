@@ -50,6 +50,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -150,8 +151,8 @@ void giclassic_state::satellite_main(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x801fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x900000, 0x90003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
-	map(0xb00000, 0xb01fff).r(this, FUNC(giclassic_state::vrom_r));
-	map(0xc00000, 0xc00001).w(this, FUNC(giclassic_state::control_w));
+	map(0xb00000, 0xb01fff).r(FUNC(giclassic_state::vrom_r));
+	map(0xc00000, 0xc00001).w(FUNC(giclassic_state::control_w));
 	map(0xd00000, 0xd0003f).ram(); // these must read/write or 26S (LCD controller) fails
 	map(0xe00000, 0xe0001f).w(m_k056832, FUNC(k056832_device::b_w)).umask16(0xff00);
 	map(0xf00000, 0xf00001).noprw().nopw(); // watchdog reset
@@ -279,7 +280,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x320000, 0x32001f).rw("k053252a", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC 1
 	map(0x320000, 0x32001f).rw("k053252b", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00); // CRTC 2
 	map(0x380000, 0x380001).nopw();    // watchdog reset
-	map(0x398000, 0x398001).rw(this, FUNC(giclassicsvr_state::control_r), FUNC(giclassicsvr_state::control_w));
+	map(0x398000, 0x398001).rw(FUNC(giclassicsvr_state::control_r), FUNC(giclassicsvr_state::control_w));
 	map(0x400000, 0x41ffff).ram();
 }
 
@@ -297,9 +298,9 @@ void giclassicsvr_state::machine_reset()
 MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	MCFG_CPU_PROGRAM_MAP(satellite_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,16 +317,16 @@ MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassic_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
-	MCFG_CPU_PROGRAM_MAP(server_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
+	MCFG_DEVICE_PROGRAM_MAP(server_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,7 +343,7 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
@@ -379,5 +380,5 @@ ROM_START( giclassvr )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
 
-GAME( 1998, giclasex,  0, giclassic, giclassic, giclassic_state,    0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
-GAME( 1998, giclassvr, 0, giclassvr, giclassvr, giclassicsvr_state, 0, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex, 0, giclassic, giclassic, giclassic_state,    empty_init, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclassvr,0, giclassvr, giclassvr, giclassicsvr_state, empty_init, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

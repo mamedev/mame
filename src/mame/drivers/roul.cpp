@@ -67,6 +67,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -76,26 +77,19 @@ Stephh's notes (based on the game Z80 code and some tests) :
 class roul_state : public driver_device
 {
 public:
-	roul_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	roul_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_soundlatch(*this, "soundlatch") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<generic_latch_8_device> m_soundlatch;
-
-	uint8_t m_reg[0x10];
-	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp_old;
+		m_soundlatch(*this, "soundlatch"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(roul);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -104,6 +98,20 @@ public:
 	void roul_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<256> m_lamps;
+
+	uint8_t m_reg[0x10];
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp_old;
 };
 
 
@@ -199,8 +207,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	output().set_lamp_value(data, 1);
-	output().set_lamp_value(m_lamp_old, 0);
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = lamp;
 }
 
@@ -213,13 +221,13 @@ void roul_state::roul_map(address_map &map)
 void roul_state::roul_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
-	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
+	map(0xf0, 0xf4).w(FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(FUNC(roul_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("DSW");
-	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
+	map(0xf9, 0xf9).w(FUNC(roul_state::ball_w));
 	map(0xfa, 0xfa).portr("IN0");
 	map(0xfd, 0xfd).portr("IN1");
-	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
+	map(0xfe, 0xfe).w(FUNC(roul_state::sound_latch_w));
 }
 
 void roul_state::sound_map(address_map &map)
@@ -305,14 +313,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(roul_state::roul)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(roul_map)
-	MCFG_CPU_IO_MAP(roul_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", roul_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(roul_map)
+	MCFG_DEVICE_IO_MAP(roul_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -325,15 +332,16 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(roul_state, roul)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -350,4 +358,4 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u38",   0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
 
-GAMEL( 1990, roul,  0,   roul, roul, roul_state, 0, ROT0, "bootleg", "Super Lucky Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_roul )
+GAMEL( 1990, roul, 0, roul, roul, roul_state, empty_init, ROT0, "bootleg", "Super Lucky Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_roul )

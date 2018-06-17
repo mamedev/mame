@@ -1023,6 +1023,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="gunship">
+		<description>Gunship</description>
+		<year>1987</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="429.05" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Gunship v429.05 [Microprose] [1987] [5.25DD] [Disk 1 of 2].img" size="368640" crc="74ef4447" sha1="c31b6df82fdb09e68ebae6e19f4aac525c21b948" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Gunship v429.05 [Microprose] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="edcb863f" sha1="3391538e151626280ae59875619dcb9bfafaf1c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hacker">
 		<description>Hacker</description>
 		<year>1985</year>
@@ -3392,6 +3410,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="spntass2">
+		<description>Spontaneous Assembly (Version 2.0)</description>
+		<year>1990</year>
+		<publisher>BaseTwo Development</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="TINY/SMALL/MEDIUM/COMPACT Model Libraries"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Spontaneous_Assembly_2_disk_1_of_2.img" size="737280" crc="a263026a" sha1="5ed457ac4930866deecb7e87b683e4189519cb3d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="LARGE Model Libraries, Include/Source/Miscellaneous"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Spontaneous_Assembly_2_disk_2_of_2.img" size="737280" crc="acc152a6" sha1="ceeb980916fcb44d514b8c834a04d317cece2545" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strecalc">
 		<description>StretchCalc</description>
 		<year>1983</year>
@@ -4622,6 +4658,65 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="109434">
 				<rom name="cpm8611.td0" size="109434" crc="c1b7a3f9" sha1="28c3e3edc9698680a63e0fa9ce6d58d6829fdc68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdos6fr">
+		<description>DR DOS 6.0 (French)</description>
+		<year>1991</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 1 of 4].img" size="737280" crc="cb8cab12" sha1="9f27a6985463c91d5eba12e9acc6a4c1ef601abd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Utilitaires-1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 2 of 4].img" size="737280" crc="ae9e312a" sha1="a7ed8bd407f0b26d8ecc0010449701434acf0de7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilitaires-2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 3 of 4].img" size="737280" crc="fbe9927f" sha1="df823afe328fe72cd3be0cbaf87ce9fcea89540d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="ViewMAX" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS 6.00 FR [3.5DD] [Disk 4 of 4].img" size="737280" crc="7328e77d" sha1="49d2306f70c09128cad23db7e6882e86da90a20c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdos6fru">
+		<description>DR DOS 6.0 Business Update (French, 5.25")</description>
+		<year>1992</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 1 of 2].img" size="368640" crc="747dfe34" sha1="fc1b19f48ceb4a7c8c5e912582c6eb8889c231fb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 2 of 2].img" size="368640" crc="02a45926" sha1="88a93294606904c2aac270c81d401ee90cd1ad6f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdos6fru35" cloneof="drdos6fru">
+		<description>DR DOS 6.0 Business Update (French, 3.5")</description>
+		<year>1992</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] DR DOS  6.00 Business Update FR [3.5DD] [Disk 1 of 1].img" size="737280" crc="ce6fe2d7" sha1="684b4a184557b5932ea3c97146b483827e4a6d4d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7024,6 +7119,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="breach2">
+		<description>Breach 2</description>
+		<year>1990</year>
+		<publisher>Mindcraft Software</publisher>
+		<info name="developer" value="Omnitrend Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Breach 2 [Mindcraft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6f60695e" sha1="beb951a4e9df014f1e3226333e3b2625e386f8b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1989</year>
@@ -7569,6 +7676,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Future Wars - Adventures in Time (1990)(Interplay)(Disk 3 of 3).dsk" size="368640" crc="2f54bdc2" sha1="33fd871aa3607bcb1bad4c3939edf6c06045c29e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futurwar35" cloneof="futurwar">
+		<description>Future Wars - Adventures in Time (3.5")</description>
+		<year>1990</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Future Wars [Interplay] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="c0fa70bd" sha1="14c2fc05da4959da3c8bb63d445695f0cf553972" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Future Wars [Interplay] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="fb6d55bc" sha1="62f879d61334684222c72473e8a83eb2fcd32efe" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8315,7 +8439,8 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="lombrall">
+	<!-- black square glitches behind sprites -->
+	<software name="lombrall" supported="partial">
 		<description>Lombard RAC Rally</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
@@ -8750,6 +8875,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="monumars">
+		<description>The Monuments of Mars!</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Scenerio Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Monuments of Mars [Apogee Software] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5750f887" sha1="40eacb771aad0a017aece21be734f1fd4253d1a7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nightmar">
 		<description>A Nightmare on Elm Street</description>
 		<year>1989</year>
@@ -8936,6 +9073,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcgames3">
+		<description>PC Games #3</description>
+		<year>1988</year>
+		<publisher>I.B. Magazette</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Games #3.img" size="368640" crc="4d2c6ea3" sha1="c9599c1c528f1390d9f1b6b4120516a667997717" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppursuit">
 		<description>Pharaoh's Pursuit</description>
 		<year>1990</year>
@@ -8966,8 +9114,9 @@ has been replaced with an all-zero block. -->
 		<year>1991</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<!-- High score file modified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" offset="0"/>
+				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9727,6 +9876,60 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="EGA disk"/>
 			<dataarea name="flop" size = "368640">
 				<rom name="Star Goose (EGA disk) [Logotron] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="97a0ef81" sha1="003161f2ff764acdfeb82983a878e0ef5a2a3f49" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strek5">
+		<description>Star Trek V: The Final Frontier (5.25")</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Level Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 1 of 5].img" size="368640" crc="5f008ffa" sha1="3509e6226bca964eb7efc2549941fe1d15723e3e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 2 of 5].img" size="368640" crc="99d69632" sha1="67e13f98d5f63043987791e821674b1d9c2e5537" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 3 of 5].img" size="368640" crc="3118530c" sha1="a287047840da0fe60f0368380f56e773d5c6c400" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 4 of 5].img" size="368640" crc="2901f94e" sha1="94bfa2d6d9c3d879cc457675745bde8491dcfc74" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 5 of 5].img" size="368640" crc="a3108408" sha1="6f09d3d9bd27ae0a367c57ff06f1ba71b02a7d43" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strek5_35" cloneof="strek5">
+		<description>Star Trek V: The Final Frontier (3.5")</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Level Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 1 of 3].img" size="737280" crc="fd3aee07" sha1="bf31b7d7b5fe968324316eaa54a96448fa5a3377" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 2 of 3].img" size="737280" crc="69997864" sha1="af8fa9245752ba7273ce12d4f804faf0ddd7c147" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="c2de0c66" sha1="9dfd73c44c828b67f408eb5273b73b42e871964d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

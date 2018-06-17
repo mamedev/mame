@@ -106,6 +106,7 @@ Notes:
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
 #include <algorithm>
@@ -143,7 +144,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cop_w);
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
-	DECLARE_DRIVER_INIT(speglsht);
+	void init_speglsht();
 	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
@@ -187,7 +188,7 @@ void speglsht_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	map(0xe1, 0xe1).w(this, FUNC(speglsht_state::st0016_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(speglsht_state::st0016_rom_bank_w));
 	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
@@ -267,17 +268,17 @@ void speglsht_state::speglsht_mem(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram();
 	map(0x01000000, 0x01007fff).ram(); //tested - STATIC RAM
-	map(0x01600000, 0x0160004f).rw(this, FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share("cop_ram");
-	map(0x01800200, 0x01800203).w(this, FUNC(speglsht_state::videoreg_w));
+	map(0x01600000, 0x0160004f).rw(FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share("cop_ram");
+	map(0x01800200, 0x01800203).w(FUNC(speglsht_state::videoreg_w));
 	map(0x01800300, 0x01800303).portr("IN0");
 	map(0x01800400, 0x01800403).portr("IN1");
 	map(0x01a00000, 0x01afffff).ram().share("framebuffer");
 	map(0x01b00000, 0x01b07fff).ram(); //cleared ...  video related ?
 	map(0x01c00000, 0x01dfffff).rom().region("user2", 0);
-	map(0x0a000000, 0x0a003fff).rw(this, FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
+	map(0x0a000000, 0x0a003fff).rw(FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
 	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("user1", 0);
 	map(0x1eff0000, 0x1eff001f).ram();
-	map(0x1eff003c, 0x1eff003f).r(this, FUNC(speglsht_state::irq_ack_clear));
+	map(0x1eff003c, 0x1eff003f).r(FUNC(speglsht_state::irq_ack_clear));
 }
 
 static INPUT_PORTS_START( speglsht )
@@ -352,7 +353,7 @@ static INPUT_PORTS_START( speglsht )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static GFXDECODE_START( speglsht )
+static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
@@ -410,16 +411,16 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 
 MACHINE_CONFIG_START(speglsht_state::speglsht)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
+	MCFG_DEVICE_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", R3051, 25000000)
+	MCFG_DEVICE_ADD("sub", R3051, 25000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_CPU_PROGRAM_MAP(speglsht_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
+	MCFG_DEVICE_PROGRAM_MAP(speglsht_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
@@ -432,7 +433,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
 	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speglsht)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speglsht)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
@@ -455,10 +456,10 @@ ROM_START( speglsht )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speglsht_state,speglsht)
+void speglsht_state::init_speglsht()
 {
 	m_maincpu->set_st0016_game_flag(3);
 }
 
 
-GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, init_speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

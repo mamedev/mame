@@ -1190,22 +1190,22 @@ void atarigx2_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
 	map(0xc80000, 0xc80fff).ram();
-	map(0xd00000, 0xd0000f).r(this, FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
+	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd40fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xd70000, 0xd7ffff).ram();
 	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
 	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(this, FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd7a200, 0xd7a203).w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
 	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
-	map(0xe08000, 0xe08003).w(this, FUNC(atarigx2_state::latch_w));
-	map(0xe0c000, 0xe0c003).w(this, FUNC(atarigx2_state::video_int_ack_w));
+	map(0xe08000, 0xe08003).w(FUNC(atarigx2_state::latch_w));
+	map(0xe0c000, 0xe0c003).w(FUNC(atarigx2_state::video_int_ack_w));
 	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
 	map(0xe80000, 0xe80003).portr("P1_P2");
-	map(0xe82000, 0xe82003).r(this, FUNC(atarigx2_state::special_port2_r));
-	map(0xe82004, 0xe82007).r(this, FUNC(atarigx2_state::special_port3_r));
+	map(0xe82000, 0xe82003).r(FUNC(atarigx2_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(FUNC(atarigx2_state::special_port3_r));
 	map(0xe86000, 0xe86000).r(m_jsa, FUNC(atari_jsa_iiis_device::main_response_r));
 	map(0xff8000, 0xffffff).ram();
 }
@@ -1436,7 +1436,7 @@ static const gfx_layout anlayout =
 	32*8
 };
 
-static GFXDECODE_START( atarigx2 )
+static GFXDECODE_START( gfx_atarigx2 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -1487,8 +1487,8 @@ static const atari_rle_objects_config modesc_0x400 =
 MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
 	MCFG_ADC0808_IN0_CB(IOPORT("A2D0"))
@@ -1504,7 +1504,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigx2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -1518,10 +1518,11 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarigx2_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigx2_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
 	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
@@ -2251,7 +2252,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarigx2_state,spclords)
+void atarigx2_state::init_spclords()
 {
 	m_playfield_base = 0x000;
 
@@ -2260,7 +2261,7 @@ DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 }
 
 
-DRIVER_INIT_MEMBER(atarigx2_state,motofren)
+void atarigx2_state::init_motofren()
 {
 	m_playfield_base = 0x400;
 /*
@@ -2288,7 +2289,7 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
 }
 
-DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
+void atarigx2_state::init_rrreveng()
 {
 	m_playfield_base = 0x000;
 
@@ -2303,16 +2304,16 @@ DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
  *
  *************************************/
 
-GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev C)", 0 )
-GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev B)", 0 )
-GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", 0 )
-GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev A)", 0 )
+GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", 0 )
+GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", 0 )
+GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", 0 )
+GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", 0 )
 
-GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
-GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
-GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
-GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
+GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
+GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
+GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
+GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
 
-GAME( 1993, rrreveng,  0,         atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevenga, rrreveng,  atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevengb, rrreveng,  atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

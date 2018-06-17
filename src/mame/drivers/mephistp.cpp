@@ -112,7 +112,7 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0x16000, 0x16000).w(this, FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x16000, 0x16000).w(FUNC(mephisto_pinball_state::shift_load_w));
 	map(0x17000, 0x17001).nopw(); //???
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -126,15 +126,16 @@ void mephisto_pinball_state::mephisto_8051_map(address_map &map)
 void mephisto_pinball_state::mephisto_8051_io(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(this, FUNC(mephisto_pinball_state::sound_rombank_w));
-	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::write));
+	map(0x0800, 0x0800).w(FUNC(mephisto_pinball_state::sound_rombank_w));
+	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::data_w));
 }
 
 #ifdef UNUSED_DEFINITION
-ADDRESS_MAP_START(mephisto_pinball_state::sport2k_8051_io)
-	AM_IMPORT_FROM(mephisto_8051_data)
-	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void mephisto_pinball_state::sport2k_8051_io(address_map &map)
+{
+	mephisto_8051_data(map);
+	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 #endif
 
 static INPUT_PORTS_START( mephisto )
@@ -159,9 +160,9 @@ void mephisto_pinball_state::machine_reset()
 
 MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(18'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(mephisto_map)
-	//MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(18'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(mephisto_map)
+	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -170,39 +171,39 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	//MCFG_I8256_TXD_HANDLER(INPUTLINE("audiocpu", MCS51_RX_LINE))
 
 	MCFG_DEVICE_ADD("ic20", I8155, XTAL(18'000'000)/6)
-	//MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("muart", i8256_device, write_txc))
+	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("muart", i8256_device, write_txc))
 
 	MCFG_DEVICE_ADD("ic9", I8155, XTAL(18'000'000)/6)
-	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(mephisto_pinball_state, clk_shift_w))
+	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, mephisto_pinball_state, clk_shift_w))
 
-	MCFG_CPU_ADD("soundcpu", I8051, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
-	MCFG_CPU_IO_MAP(mephisto_8051_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(mephisto_pinball_state, ay8910_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(mephisto_pinball_state, ay8910_write))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(mephisto_pinball_state, t0_t1_w))
+	MCFG_DEVICE_ADD("soundcpu", I8051, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
+	MCFG_DEVICE_IO_MAP(mephisto_8051_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, mephisto_pinball_state, ay8910_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, mephisto_pinball_state, ay8910_write))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
 	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mephisto_pinball_state, ay8910_columns_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mephisto_pinball_state, ay8910_inputs_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mephisto_pinball_state, ay8910_columns_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mephisto_pinball_state, ay8910_inputs_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC08, 0)
+	MCFG_DEVICE_ADD("dac", DAC08, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION
 static MACHINE_CONFIG_START(sport2k)
 	mephisto(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sport2k_8051_io)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sport2k_8051_io)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 #endif
@@ -247,6 +248,6 @@ ROM_START(mephistp1)
 ROM_END
 
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
-//GAME(1988,  sport2k,    0,         sport2k,   sport2k, mephisto_pinball_state,   0,  ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
+//GAME(1988,  sport2k,    0,         sport2k,   sport2k,  mephisto_pinball_state, empty_init, ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)

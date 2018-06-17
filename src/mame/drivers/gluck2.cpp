@@ -195,6 +195,7 @@
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -314,14 +315,14 @@ void gluck2_state::gluck2_map(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x084b).noprw(); /* see below */
-	map(0x1000, 0x13ff).ram().w(this, FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2d00, 0x2d01).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x3400, 0x3400).portr("IN0");
 	map(0x3500, 0x3500).portr("IN1");
 	map(0x3600, 0x3600).portr("IN2");
-	map(0x3700, 0x3700).w(this, FUNC(gluck2_state::counters_w));
+	map(0x3700, 0x3700).w(FUNC(gluck2_state::counters_w));
 	map(0x3d00, 0x3d01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x4000, 0xffff).rom();
 }
@@ -465,7 +466,7 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( gluck2 )
+static GFXDECODE_START( gfx_gluck2 )
 	GFXDECODE_ENTRY( "gfx", 0x0000, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx", 0x0800, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, tilelayout, 0, 16 )
@@ -483,8 +484,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gluck2_state::gluck2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(gluck2_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(gluck2_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -501,7 +502,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gluck2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gluck2)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
@@ -510,9 +511,9 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW2"))
 /*  Output ports have a minimal activity during init.
@@ -520,7 +521,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, SND_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -550,5 +551,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE         INIT   ROT    COMPANY          FULLNAME       FLAGS...
-GAME( 1992, gluck2,   0,      gluck2,   gluck2,   gluck2_state, 0,     ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME       FLAGS...
+GAME( 1992, gluck2, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )

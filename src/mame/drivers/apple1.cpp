@@ -80,6 +80,7 @@
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -434,7 +435,7 @@ WRITE8_MEMBER(apple1_state::ram_w)
 
 void apple1_state::apple1_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
+	map(0x0000, 0xbfff).rw(FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
 	map(0xd010, 0xd013).mirror(0x0fec).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe000, 0xefff).ram().share(A1_BASICRAM_TAG);
 	map(0xff00, 0xffff).rom().region(A1_CPU_TAG, 0);
@@ -494,7 +495,7 @@ WRITE8_MEMBER(apple1_state::pia_display_w)
 // and to the display hardware
 WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 {
-	m_pia->portb_w((state << 7) ^ 0x80);
+	m_pia->write_portb((state << 7) ^ 0x80);
 
 	// falling edge means start the display timer
 	if (state == CLEAR_LINE)
@@ -588,31 +589,32 @@ static INPUT_PORTS_START( apple1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(apple1_cards)
-	SLOT_INTERFACE("cassette", A1BUS_CASSETTE)
-	SLOT_INTERFACE("cffa", A1BUS_CFFA)
-SLOT_INTERFACE_END
+static void apple1_cards(device_slot_interface &device)
+{
+	device.option_add("cassette", A1BUS_CASSETTE);
+	device.option_add("cffa", A1BUS_CFFA);
+}
 
 MACHINE_CONFIG_START(apple1_state::apple1)
-	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
-	MCFG_CPU_PROGRAM_MAP(apple1_map)
+	MCFG_DEVICE_ADD(m_maincpu, M6502, 960000)        // effective CPU speed
+	MCFG_DEVICE_PROGRAM_MAP(apple1_map)
 
 	// video timings are identical to the Apple II, unsurprisingly
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD( A1_PIA_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(apple1_state, pia_keyboard_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apple1_state, pia_display_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(apple1_state, pia_display_gate_w))
+	MCFG_DEVICE_ADD(m_pia, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, apple1_state, pia_keyboard_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apple1_state, pia_display_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, apple1_state, pia_display_gate_w))
 
 	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
-	MCFG_A1BUS_CPU("maincpu")
-	MCFG_A1BUS_SLOT_ADD(A1_BUS_TAG, "exp", apple1_cards, "cassette")
+	MCFG_A1BUS_CPU(m_maincpu)
+	MCFG_DEVICE_ADD("exp", A1BUS_SLOT, 0, A1_BUS_TAG, apple1_cards, "cassette")
 
 	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
@@ -631,5 +633,5 @@ ROM_START(apple1)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE          INIT  COMPANY            FULLNAME */
-COMP( 1976, apple1,  0,     0,      apple1,     apple1, apple1_state,  0,    "Apple Computer",  "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME */
+COMP( 1976, apple1, 0,      0,      apple1,  apple1, apple1_state, empty_init, "Apple Computer", "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

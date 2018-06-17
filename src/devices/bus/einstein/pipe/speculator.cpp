@@ -33,7 +33,7 @@ MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
 	MCFG_TTL74123_A_PIN_VALUE(1)
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(einstein_speculator_device, ic5a_q_w))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, einstein_speculator_device, ic5a_q_w))
 
 	MCFG_DEVICE_ADD("ic5b", TTL74123, 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
@@ -42,15 +42,13 @@ MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
 	MCFG_TTL74123_A_PIN_VALUE(1)
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(einstein_speculator_device, ic5b_q_w))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, einstein_speculator_device, ic5b_q_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_ADD(m_cassette)
 	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("spectrum_cass")

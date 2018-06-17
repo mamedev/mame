@@ -244,9 +244,9 @@ INPUT_PORTS_END
 *********************************************/
 
 MACHINE_CONFIG_START(manohman_state::manohman)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) // MC68000P8
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000)) // MC68000P8
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
 
 	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(8'000'000)) // MC68230P8
 	MCFG_PIT68230_TIMER_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
@@ -258,8 +258,8 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram") // KM6264BL-10 x2 + MAX696CFL + battery
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, XTAL(8'000'000) / 2) // clock not verified
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("saa", SAA1099, XTAL(8'000'000) / 2) // clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -285,6 +285,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY   FULLNAME         FLAGS
-GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME( 1990, backgamn, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Backgammon",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME         FLAGS
+GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamn, 0,      manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Backgammon",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

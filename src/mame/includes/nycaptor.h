@@ -5,6 +5,7 @@
 #include "machine/input_merger.h"
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class nycaptor_state : public driver_device
 {
@@ -83,10 +84,10 @@ public:
 	DECLARE_READ8_MEMBER(nycaptor_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_DRIVER_INIT(cyclshtg);
-	DECLARE_DRIVER_INIT(colt);
-	DECLARE_DRIVER_INIT(bronx);
-	DECLARE_DRIVER_INIT(nycaptor);
+	void init_cyclshtg();
+	void init_colt();
+	void init_bronx();
+	void init_nycaptor();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

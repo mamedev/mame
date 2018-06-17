@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
+
 #include "sound/samples.h"
+#include "emupal.h"
+
 class tankbatt_state : public driver_device
 {
 public:
@@ -25,8 +28,6 @@ public:
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE_LINE_MEMBER(led0_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
 	DECLARE_READ8_MEMBER(dsw_r);

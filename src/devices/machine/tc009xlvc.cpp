@@ -156,16 +156,17 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
 	tx_tilemap->mark_all_dirty();
 }
 
-ADDRESS_MAP_START(tc0091lvc_device::tc0091lvc_map8)
-	AM_RANGE(0x014000, 0x017fff) AM_READWRITE(tc0091lvc_pcg1_r, tc0091lvc_pcg1_w)
-	AM_RANGE(0x018000, 0x018fff) AM_READWRITE(tc0091lvc_vram0_r, tc0091lvc_vram0_w)
-	AM_RANGE(0x019000, 0x019fff) AM_READWRITE(tc0091lvc_vram1_r, tc0091lvc_vram1_w)
-	AM_RANGE(0x01a000, 0x01afff) AM_READWRITE(tc0091lvc_tvram_r, tc0091lvc_tvram_w)
-	AM_RANGE(0x01b000, 0x01bfff) AM_READWRITE(tc0091lvc_spr_r, tc0091lvc_spr_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_READWRITE(tc0091lvc_pcg2_r, tc0091lvc_pcg2_w)
-	AM_RANGE(0x040000, 0x05ffff) AM_READWRITE(tc0091lvc_bitmap_r, tc0091lvc_bitmap_w)
-	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(tc0091lvc_paletteram_r,tc0091lvc_paletteram_w)
-ADDRESS_MAP_END
+void tc0091lvc_device::tc0091lvc_map8(address_map &map)
+{
+	map(0x014000, 0x017fff).rw(FUNC(tc0091lvc_device::tc0091lvc_pcg1_r), FUNC(tc0091lvc_device::tc0091lvc_pcg1_w));
+	map(0x018000, 0x018fff).rw(FUNC(tc0091lvc_device::tc0091lvc_vram0_r), FUNC(tc0091lvc_device::tc0091lvc_vram0_w));
+	map(0x019000, 0x019fff).rw(FUNC(tc0091lvc_device::tc0091lvc_vram1_r), FUNC(tc0091lvc_device::tc0091lvc_vram1_w));
+	map(0x01a000, 0x01afff).rw(FUNC(tc0091lvc_device::tc0091lvc_tvram_r), FUNC(tc0091lvc_device::tc0091lvc_tvram_w));
+	map(0x01b000, 0x01bfff).rw(FUNC(tc0091lvc_device::tc0091lvc_spr_r), FUNC(tc0091lvc_device::tc0091lvc_spr_w));
+	map(0x01c000, 0x01ffff).rw(FUNC(tc0091lvc_device::tc0091lvc_pcg2_r), FUNC(tc0091lvc_device::tc0091lvc_pcg2_w));
+	map(0x040000, 0x05ffff).rw(FUNC(tc0091lvc_device::tc0091lvc_bitmap_r), FUNC(tc0091lvc_device::tc0091lvc_bitmap_w));
+	map(0x080000, 0x0801ff).rw(FUNC(tc0091lvc_device::tc0091lvc_paletteram_r), FUNC(tc0091lvc_device::tc0091lvc_paletteram_w));
+}
 
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0091LVC, tag, owner, clock)

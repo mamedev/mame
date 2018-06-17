@@ -349,16 +349,16 @@ WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 void opwolf_state::opwolf_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(this, FUNC(opwolf_state::opwolf_cchip_data_r));
-	map(0x0f0802, 0x0f0803).mirror(0xf000).r(this, FUNC(opwolf_state::opwolf_cchip_status_r));
-	map(0x0ff000, 0x0ff7ff).w(this, FUNC(opwolf_state::opwolf_cchip_data_w));
-	map(0x0ff802, 0x0ff803).w(this, FUNC(opwolf_state::opwolf_cchip_status_w));
-	map(0x0ffc00, 0x0ffc01).w(this, FUNC(opwolf_state::opwolf_cchip_bank_w));
+	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
+	map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
+	map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
+	map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
+	map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
-	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -375,13 +375,13 @@ void opwolf_state::opwolf_map(address_map &map)
 void opwolf_state::opwolfb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0008, 0x0f000b).r(this, FUNC(opwolf_state::opwolf_in_r));           /* coins and buttons */
-	map(0x0ff000, 0x0fffff).rw(this, FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
+	map(0x0f0008, 0x0f000b).r(FUNC(opwolf_state::opwolf_in_r));           /* coins and buttons */
+	map(0x0ff000, 0x0fffff).rw(FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
-	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -400,9 +400,9 @@ void opwolf_state::opwolfp_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
-	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 (AND INPUTS) */
+	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 (AND INPUTS) */
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -423,9 +423,9 @@ void opwolf_state::opwolfp_map(address_map &map)
 void opwolf_state::opwolfb_sub_z80_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8800, 0x8800).r(this, FUNC(opwolf_state::z80_input1_r));  /* read at PC=$637: poked to $c004 */
+	map(0x8800, 0x8800).r(FUNC(opwolf_state::z80_input1_r));  /* read at PC=$637: poked to $c004 */
 	map(0x9000, 0x9000).nopw();            /* unknown write, 0 then 1 each interrupt */
-	map(0x9800, 0x9800).r(this, FUNC(opwolf_state::z80_input2_r));  /* read at PC=$631: poked to $c005 */
+	map(0x9800, 0x9800).r(FUNC(opwolf_state::z80_input2_r));  /* read at PC=$631: poked to $c005 */
 	map(0xa000, 0xa000).nopw();    /* IRQ acknowledge (unimplemented) */
 	map(0xc000, 0xc7ff).ram().share("cchip_ram");
 }
@@ -476,7 +476,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 {
 	if (m_adpcm_data[chip] != -1)
 	{
-		device->data_w(m_adpcm_data[chip] & 0x0f);
+		device->write_data(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
 		{
@@ -488,7 +488,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 	{
 		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
 		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
-		device->data_w(m_adpcm_data[chip] >> 4);
+		device->write_data(m_adpcm_data[chip] >> 4);
 	}
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
@@ -566,10 +566,10 @@ void opwolf_state::opwolf_sound_z80_map(address_map &map)
 	map(0x9002, 0x9100).nopr();
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb006).w(this, FUNC(opwolf_state::opwolf_adpcm_b_w));
-	map(0xc000, 0xc006).w(this, FUNC(opwolf_state::opwolf_adpcm_c_w));
-	map(0xd000, 0xd000).w(this, FUNC(opwolf_state::opwolf_adpcm_d_w));
-	map(0xe000, 0xe000).w(this, FUNC(opwolf_state::opwolf_adpcm_e_w));
+	map(0xb000, 0xb006).w(FUNC(opwolf_state::opwolf_adpcm_b_w));
+	map(0xc000, 0xc006).w(FUNC(opwolf_state::opwolf_adpcm_c_w));
+	map(0xd000, 0xd000).w(FUNC(opwolf_state::opwolf_adpcm_d_w));
+	map(0xe000, 0xe000).w(FUNC(opwolf_state::opwolf_adpcm_e_w));
 }
 
 /***********************************************************
@@ -767,12 +767,12 @@ static const gfx_layout tilelayout_b =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( opwolf )
+static GFXDECODE_START( gfx_opwolf )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 128 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 128 )   /* scr tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( opwolfb )
+static GFXDECODE_START( gfx_opwolfb )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_b,  0, 128 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 128 ) /* scr tiles */
 GFXDECODE_END
@@ -785,12 +785,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(opwolf_state::opwolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf_sound_z80_map)
 
 	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz measured on pin 20 */
 
@@ -807,7 +807,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opwolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -820,22 +820,23 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK )  /* 4 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)  /* 4 MHz */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(opwolf_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
@@ -850,8 +851,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolfp)
 	opwolf(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu") /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolfp_map)
+	MCFG_DEVICE_MODIFY("maincpu") /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolfp_map)
 
 	MCFG_DEVICE_REMOVE("cchip")
 MACHINE_CONFIG_END
@@ -861,16 +862,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(opwolfb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(opwolfb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )  /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(opwolfb_sub_z80_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", opwolf_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, SOUND_CPU_CLOCK )  /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(opwolfb_sub_z80_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -884,7 +885,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opwolfb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolfb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -897,22 +898,23 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK )
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(opwolf_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
@@ -1144,7 +1146,7 @@ ROM_START( opwolfb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolf)
+void opwolf_state::init_opwolf()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1160,7 +1162,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 }
 
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
+void opwolf_state::init_opwolfb()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1173,7 +1175,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
+void opwolf_state::init_opwolfp()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1191,10 +1193,10 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 // MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 
 //    year  rom       parent    machine   inp      state          init
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

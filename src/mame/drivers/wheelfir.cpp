@@ -175,6 +175,7 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -429,7 +430,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 			{
 				vpage=LAYER_BG;
 /*
-                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,space.device().safe_pc());
+                printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
 
                 for(int i=0;i<16;++i)
                 {
@@ -538,8 +539,8 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
-		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
+		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context().c_str(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
+		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context().c_str(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
 		m_eeprom->di_write(BIT(data, 9));
 		m_eeprom->clk_write(BIT(data, 8));
 		m_eeprom->cs_write(BIT(data, 10));
@@ -561,7 +562,7 @@ READ16_MEMBER(wheelfir_state::wheelfir_7c0000_r)
 	{
 		data |= (machine().rand() & 0x2000); // ?
 		data |= m_eeprom->do_read() << 15;
-		//printf("%s eeprom read %04x %04x\n", machine().describe_context(), data, mem_mask);
+		//printf("%s eeprom read %04x %04x\n", machine().describe_context().c_str(), data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -584,15 +585,15 @@ void wheelfir_state::wheelfir_main(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 
-	map(0x700000, 0x70001f).w(this, FUNC(wheelfir_state::wheelfir_blit_w));
+	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w));
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x720003, 0x720003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
 	map(0x740000, 0x740001).w("soundlatch", FUNC(generic_latch_16_device::write));
-	map(0x760000, 0x760001).w(this, FUNC(wheelfir_state::coin_cnt_w));
+	map(0x760000, 0x760001).w(FUNC(wheelfir_state::coin_cnt_w));
 	map(0x780000, 0x78000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x7a0000, 0x7a0001).w(this, FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
-	map(0x7c0000, 0x7c0001).rw(this, FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
+	map(0x7a0000, 0x7a0001).w(FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
+	map(0x7c0000, 0x7c0001).rw(FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
 	map(0x7e0000, 0x7e0001).portr("P1");
 	map(0x7e0002, 0x7e0003).portr("P2");
 }
@@ -605,8 +606,8 @@ void wheelfir_state::wheelfir_sub(address_map &map)
 
 	map(0x780000, 0x780001).r("soundlatch", FUNC(generic_latch_16_device::read));
 
-	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::write));
-	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::write));
+	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::data_w));
+	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::data_w));
 }
 
 
@@ -733,16 +734,16 @@ void wheelfir_state::ramdac_map(address_map &map)
 
 MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP(wheelfir_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(wheelfir_main)
 
-	MCFG_CPU_ADD("subcpu", M68000, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP(wheelfir_sub)
+	MCFG_DEVICE_ADD("subcpu", M68000, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(wheelfir_sub)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(WRITELINE(wheelfir_state, adc_eoc_w))
+	MCFG_ADC0808_EOC_FF_CB(WRITELINE(*this, wheelfir_state, adc_eoc_w))
 	MCFG_ADC0808_IN0_CB(IOPORT("STEERING"))
 	MCFG_ADC0808_IN1_CB(IOPORT("ACCELERATOR"))
 	MCFG_ADC0808_IN2_CB(IOPORT("BRAKE"))
@@ -754,23 +755,24 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wheelfir_state, screen_vblank_wheelfir))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wheelfir_state, screen_vblank_wheelfir))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -797,4 +799,4 @@ ROM_START( wheelfir )
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
 ROM_END
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, 0, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)

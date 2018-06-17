@@ -40,6 +40,7 @@
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "sbrkout.lh"
@@ -307,28 +308,6 @@ WRITE8_MEMBER(sbrkout_state::output_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(sbrkout_state::start_1_led_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(sbrkout_state::start_2_led_w)
-{
-	output().set_led_value(1, state);
-}
-
-
-WRITE_LINE_MEMBER(sbrkout_state::serve_led_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(sbrkout_state::serve_2_led_w)
-{
-	output().set_led_value(1, !state);
-}
-
 WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -422,16 +401,16 @@ void sbrkout_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x007f).mirror(0x380).bankrw("bank1");
-	map(0x0400, 0x07ff).ram().w(this, FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
-	map(0x0800, 0x083f).r(this, FUNC(sbrkout_state::switches_r));
+	map(0x0400, 0x07ff).ram().w(FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
+	map(0x0800, 0x083f).r(FUNC(sbrkout_state::switches_r));
 	map(0x0840, 0x0840).mirror(0x003f).portr("COIN");
 	map(0x0880, 0x0880).mirror(0x003f).portr("START");
 	map(0x08c0, 0x08c0).mirror(0x003f).portr("SERVICE");
-	map(0x0c00, 0x0c00).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync_r));
-	map(0x0c00, 0x0c7f).w(this, FUNC(sbrkout_state::output_latch_w));
+	map(0x0c00, 0x0c00).mirror(0x03ff).r(FUNC(sbrkout_state::sync_r));
+	map(0x0c00, 0x0c7f).w(FUNC(sbrkout_state::output_latch_w));
 	map(0x0c80, 0x0c80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0e00, 0x0e00).mirror(0x007f).w(this, FUNC(sbrkout_state::irq_ack_w));
-	map(0x1000, 0x1000).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync2_r));
+	map(0x0e00, 0x0e00).mirror(0x007f).w(FUNC(sbrkout_state::irq_ack_w));
+	map(0x1000, 0x1000).mirror(0x03ff).r(FUNC(sbrkout_state::sync2_r));
 	map(0x2800, 0x3fff).rom();
 }
 
@@ -565,7 +544,7 @@ static const gfx_layout balllayout =
 };
 
 
-static GFXDECODE_START( sbrkout )
+static GFXDECODE_START( gfx_sbrkout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, balllayout, 0, 1 )
 GFXDECODE_END
@@ -581,22 +560,25 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16)       /* 375 KHz? Should be 750KHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502,MAIN_CLOCK/16)       /* 375 KHz? Should be 750KHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // H8
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sbrkout_state, serve_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sbrkout_state, start_1_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sbrkout_state, start_2_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sbrkout_state, pot_mask1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sbrkout_state, pot_mask2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(sbrkout_state, coincount_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // SERV LED (active low)
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("lamp0")) // LAMP1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("lamp1")) // LAMP2
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, sbrkout_state, pot_mask1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sbrkout_state, pot_mask2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, sbrkout_state, coincount_w))
+	// Note that connecting pin 15 to a pullup, as shown on the schematics, may result in spurious
+	// coin counter activity as stated in Atari bulletin B-0054 (which recommends tying it to the
+	// CPU reset line instead).
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbrkout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
@@ -606,10 +588,10 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -617,7 +599,7 @@ MACHINE_CONFIG_START(sbrkoutct_state::sbrkoutct)
 	sbrkout(config);
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sbrkoutct_state, serve_2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 2nd serve LED
 MACHINE_CONFIG_END
 
 /*************************************
@@ -714,7 +696,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   sbrkout_state,   0, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   sbrkout_state,   0, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  sbrkout_state,   0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, sbrkoutct_state, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   sbrkout_state,   empty_init, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   sbrkout_state,   empty_init, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  sbrkout_state,   empty_init, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, sbrkoutct_state, empty_init, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )

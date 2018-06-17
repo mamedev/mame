@@ -192,9 +192,7 @@
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "sound/tms5220.h"
-#include "sound/pokey.h"
-#include "machine/nvram.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
@@ -211,24 +209,20 @@ Address: 543210
 */
 READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
 {
-	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset & 0x7) | control;
-	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-	return pokey->read(pokey_reg);
+	return m_pokey[pokey_num]->read(space, pokey_reg);
 }
 
 WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
 {
-	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset & 0x7) | control;
-	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-	pokey->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(space, pokey_reg, data);
 }
 
 
@@ -251,10 +245,7 @@ READ8_MEMBER(mhavoc_state::dual_pokey_r)
 	int control = (offset & 0x10) >> 1;
 	int pokey_reg = (offset & 0x7) | control;
 
-	if (pokey_num == 0)
-		return machine().device<pokey_device>("pokey1")->read(pokey_reg);
-	else
-		return machine().device<pokey_device>("pokey2")->read(pokey_reg);
+	return m_pokey[pokey_num]->read(space, pokey_reg);
 }
 
 
@@ -264,10 +255,7 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
 	int control = (offset & 0x10) >> 1;
 	int pokey_reg = (offset & 0x7) | control;
 
-	if (pokey_num == 0)
-		machine().device<pokey_device>("pokey1")->write(pokey_reg, data);
-	else
-		machine().device<pokey_device>("pokey2")->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(space, pokey_reg, data);
 }
 
 
@@ -283,17 +271,17 @@ void mhavoc_state::alpha_map(address_map &map)
 	map(0x0200, 0x07ff).bankrw("bank1").share("zram0");
 	map(0x0800, 0x09ff).ram();
 	map(0x0a00, 0x0fff).bankrw("bank1").share("zram1");
-	map(0x1000, 0x1000).r(this, FUNC(mhavoc_state::mhavoc_gamma_r));            /* Gamma Read Port */
+	map(0x1000, 0x1000).r(FUNC(mhavoc_state::mhavoc_gamma_r));            /* Gamma Read Port */
 	map(0x1200, 0x1200).portr("IN0").nopw();    /* Alpha Input Port 0 */
 	map(0x1400, 0x141f).ram().share("colorram");    /* ColorRAM */
-	map(0x1600, 0x1600).w(this, FUNC(mhavoc_state::mhavoc_out_0_w));           /* Control Signals */
+	map(0x1600, 0x1600).w(FUNC(mhavoc_state::mhavoc_out_0_w));           /* Control Signals */
 	map(0x1640, 0x1640).w("avg", FUNC(avg_mhavoc_device::go_w));               /* Vector Generator GO */
 	map(0x1680, 0x1680).w("watchdog", FUNC(watchdog_timer_device::reset_w));         /* Watchdog Clear */
 	map(0x16c0, 0x16c0).w("avg", FUNC(avg_mhavoc_device::reset_w));            /* Vector Generator Reset */
-	map(0x1700, 0x1700).w(this, FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
-	map(0x1740, 0x1740).w(this, FUNC(mhavoc_state::mhavoc_rom_banksel_w));     /* Program ROM Page Select */
-	map(0x1780, 0x1780).w(this, FUNC(mhavoc_state::mhavoc_ram_banksel_w));     /* Program RAM Page Select */
-	map(0x17c0, 0x17c0).w(this, FUNC(mhavoc_state::mhavoc_gamma_w));           /* Gamma Communication Write Port */
+	map(0x1700, 0x1700).w(FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
+	map(0x1740, 0x1740).w(FUNC(mhavoc_state::mhavoc_rom_banksel_w));     /* Program ROM Page Select */
+	map(0x1780, 0x1780).w(FUNC(mhavoc_state::mhavoc_ram_banksel_w));     /* Program RAM Page Select */
+	map(0x17c0, 0x17c0).w(FUNC(mhavoc_state::mhavoc_gamma_w));           /* Gamma Communication Write Port */
 	map(0x1800, 0x1fff).ram();                             /* Shared Beta Ram */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
 	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000);    /* Vector Generator RAM */
@@ -333,16 +321,16 @@ a15 a14 a13 a12 a11 a10 a09 a08 a07 a06 a05 a04 a03 a02 a01 a00
 void mhavoc_state::gamma_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().mirror(0x1800);                   /* Program RAM (2K) */
-	map(0x2000, 0x203f).rw(this, FUNC(mhavoc_state::quad_pokeyn_r), FUNC(mhavoc_state::quad_pokeyn_w)).mirror(0x07C0); /* Quad Pokey read/write  */
+	map(0x2000, 0x203f).rw(FUNC(mhavoc_state::quad_pokeyn_r), FUNC(mhavoc_state::quad_pokeyn_w)).mirror(0x07C0); /* Quad Pokey read/write  */
 	map(0x2800, 0x2800).portr("IN1").mirror(0x07ff);      /* Gamma Input Port */
-	map(0x3000, 0x3000).r(this, FUNC(mhavoc_state::mhavoc_alpha_r)).mirror(0x07ff);  /* Alpha Comm. Read Port */
+	map(0x3000, 0x3000).r(FUNC(mhavoc_state::mhavoc_alpha_r)).mirror(0x07ff);  /* Alpha Comm. Read Port */
 	map(0x3800, 0x3803).portr("DIAL").mirror(0x07fc);     /* Roller Controller Input */
-	map(0x4000, 0x4000).portr("DSW2").w(this, FUNC(mhavoc_state::mhavoc_gamma_irq_ack_w)).mirror(0x07ff); /* DSW at 8S, IRQ Acknowledge */
-	map(0x4800, 0x4800).w(this, FUNC(mhavoc_state::mhavoc_out_1_w)).mirror(0x07ff); /* Coin Counters    */
-	map(0x5000, 0x5000).w(this, FUNC(mhavoc_state::mhavoc_alpha_w)).mirror(0x07ff); /* Alpha Comm. Write Port */
+	map(0x4000, 0x4000).portr("DSW2").w(FUNC(mhavoc_state::mhavoc_gamma_irq_ack_w)).mirror(0x07ff); /* DSW at 8S, IRQ Acknowledge */
+	map(0x4800, 0x4800).w(FUNC(mhavoc_state::mhavoc_out_1_w)).mirror(0x07ff); /* Coin Counters    */
+	map(0x5000, 0x5000).w(FUNC(mhavoc_state::mhavoc_alpha_w)).mirror(0x07ff); /* Alpha Comm. Write Port */
 	//AM_RANGE(0x5800, 0x5800) AM_WRITE(mhavocrv_speech_data_w) AM_MIRROR(0x06ff) /* TMS5220 data write */
 	//AM_RANGE(0x5900, 0x5900) AM_WRITE(mhavocrv_speech_strobe_w) AM_MIRROR(0x06ff) /* TMS5220 /WS strobe write */
-	map(0x6000, 0x61ff).ram().share("nvram").mirror(0x1e00); /* EEROM */
+	map(0x6000, 0x61ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).mirror(0x1e00); /* EEROM */
 	map(0x8000, 0xbfff).rom().mirror(0x4000);                   /* Program ROM (16K) */
 }
 
@@ -361,19 +349,19 @@ void mhavoc_state::alphaone_map(address_map &map)
 	map(0x0200, 0x07ff).bankrw("bank1").share("zram0");
 	map(0x0800, 0x09ff).ram();
 	map(0x0a00, 0x0fff).bankrw("bank1").share("zram1");
-	map(0x1020, 0x103f).rw(this, FUNC(mhavoc_state::dual_pokey_r), FUNC(mhavoc_state::dual_pokey_w));
+	map(0x1020, 0x103f).rw(FUNC(mhavoc_state::dual_pokey_r), FUNC(mhavoc_state::dual_pokey_w));
 	map(0x1040, 0x1040).portr("IN0").nopw();    /* Alpha Input Port 0 */
 	map(0x1060, 0x1060).portr("IN1");                /* Gamma Input Port */
 	map(0x1080, 0x1080).portr("DIAL");               /* Roller Controller Input*/
-	map(0x10a0, 0x10a0).w(this, FUNC(mhavoc_state::alphaone_out_0_w));         /* Control Signals */
+	map(0x10a0, 0x10a0).w(FUNC(mhavoc_state::alphaone_out_0_w));         /* Control Signals */
 	map(0x10a4, 0x10a4).w("avg", FUNC(avg_mhavoc_device::go_w));               /* Vector Generator GO */
 	map(0x10a8, 0x10a8).w("watchdog", FUNC(watchdog_timer_device::reset_w));         /* Watchdog Clear */
 	map(0x10ac, 0x10ac).w("avg", FUNC(avg_mhavoc_device::reset_w));            /* Vector Generator Reset */
-	map(0x10b0, 0x10b0).w(this, FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
-	map(0x10b4, 0x10b4).w(this, FUNC(mhavoc_state::mhavoc_rom_banksel_w));
-	map(0x10b8, 0x10b8).w(this, FUNC(mhavoc_state::mhavoc_ram_banksel_w));
-	map(0x10e0, 0x10ff).writeonly().share("colorram");  /* ColorRAM */
-	map(0x1800, 0x18ff).ram().share("nvram");   /* EEROM */
+	map(0x10b0, 0x10b0).w(FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
+	map(0x10b4, 0x10b4).w(FUNC(mhavoc_state::mhavoc_rom_banksel_w));
+	map(0x10b8, 0x10b8).w(FUNC(mhavoc_state::mhavoc_ram_banksel_w));
+	map(0x10e0, 0x10ff).nopr().writeonly().share("colorram");  /* ColorRAM */
+	map(0x1800, 0x18ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));   /* EEROM */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
 	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000); /* Vector Generator RAM */
 	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
@@ -532,13 +520,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(alpha_map)
+	MCFG_DEVICE_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alpha_map)
 
-	MCFG_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(gamma_map)
+	MCFG_DEVICE_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gamma_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_EEPROM_2804_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
 
@@ -556,7 +544,7 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: Outputs 1,2,3 are tied together
 	 * This signal and Output 4 are processed separately.
@@ -564,20 +552,20 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	 * ==> DISCRETE emulation, below is just an approximation.
 	 */
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -586,7 +574,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
 	mhavoc(config);
 
-	MCFG_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
+	MCFG_DEVICE_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -595,18 +583,18 @@ MACHINE_CONFIG_START(mhavoc_state::alphaone)
 	mhavoc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("alpha")
-	MCFG_CPU_PROGRAM_MAP(alphaone_map)
+	MCFG_DEVICE_MODIFY("alpha")
+	MCFG_DEVICE_PROGRAM_MAP(alphaone_map)
 	MCFG_DEVICE_REMOVE("gamma")
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_REMOVE("pokey3")
@@ -810,9 +798,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, init_mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, empty_init,    ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, empty_init,    ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )

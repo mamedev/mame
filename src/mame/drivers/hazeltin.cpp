@@ -35,6 +35,7 @@ References:
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -478,18 +479,18 @@ void hazl1500_state::hazl1500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-	map(0x3000, 0x377f).rw(this, FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
+	map(0x3000, 0x377f).rw(FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
 	map(0x3780, 0x37ff).ram();
 }
 
 void hazl1500_state::hazl1500_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).rw(this, FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
-	map(0xbf, 0xbf).rw(this, FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
-	map(0xdf, 0xdf).r(this, FUNC(hazl1500_state::kbd_encoder_r));
-	map(0xef, 0xef).rw(this, FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
-	map(0xf7, 0xf7).r(this, FUNC(hazl1500_state::kbd_status_latch_r));
+	map(0x7f, 0x7f).rw(FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
+	map(0xbf, 0xbf).rw(FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
+	map(0xdf, 0xdf).r(FUNC(hazl1500_state::kbd_encoder_r));
+	map(0xef, 0xef).rw(FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
+	map(0xf7, 0xf7).r(FUNC(hazl1500_state::kbd_status_latch_r));
 }
 
 	/*
@@ -686,15 +687,15 @@ static const gfx_layout hazl1500_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( hazl1500 )
+static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
-	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
-	MCFG_CPU_IO_MAP(hazl1500_io)
+	MCFG_DEVICE_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
+	MCFG_DEVICE_PROGRAM_MAP(hazl1500_mem)
+	MCFG_DEVICE_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
@@ -711,14 +712,14 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
 	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay51013_device, write_tcp))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", ay51013_device, write_rcp))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay51013_device, write_tcp))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", ay51013_device, write_rcp))
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
-	MCFG_AY51013_WRITE_DAV_CB(DEVWRITELINE("mainint", input_merger_device, in_w<0>))
+	MCFG_AY51013_WRITE_DAV_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
@@ -769,9 +770,9 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(hazl1500_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(hazl1500_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(hazl1500_state, ay3600_data_ready_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, hazl1500_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, hazl1500_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, hazl1500_state, ay3600_data_ready_w))
 MACHINE_CONFIG_END
 
 
@@ -793,5 +794,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME          FLAGS
+COMP( 1977, hazl1500, 0,      0,      hazl1500, hazl1500, hazl1500_state, empty_init, "Hazeltine Corporation", "Hazeltine 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

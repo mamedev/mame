@@ -51,6 +51,7 @@
 //#include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -156,7 +157,7 @@ void nibble_state::nibble_map(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).w(this, FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
+	map(0xc000, 0xc3ff).w(FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
 //  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 }
@@ -297,7 +298,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( nibble )
+static GFXDECODE_START( gfx_nibble )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -309,7 +310,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nibble_state::nibble)
 
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -320,7 +321,7 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 	MCFG_SCREEN_UPDATE_DRIVER(nibble_state, screen_update_nibble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nibble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nibble)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nibble_state, nibble)
@@ -364,5 +365,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY   FULLNAME    FLAGS
-GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, 0,    ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY   FULLNAME    FLAGS
+GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, empty_init, ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

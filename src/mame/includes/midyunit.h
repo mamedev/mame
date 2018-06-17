@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 /* protection data types */
 struct protection_data
@@ -55,6 +56,7 @@ public:
 		, m_adpcm_sound(*this, "adpcm")
 		, m_soundlatch(*this, "soundlatch")
 		, m_term2_adc(*this, "adc")
+		, m_nvram(*this, "nvram")
 		, m_generic_paletteram_16(*this, "paletteram")
 		, m_gfx_rom(*this, "gfx_rom", 16)
 		, m_mainram(*this, "mainram")
@@ -72,6 +74,7 @@ public:
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<adc0844_device> m_term2_adc;
+	required_device<nvram_device> m_nvram;
 
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint8_t> m_gfx_rom;
@@ -126,20 +129,20 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-	DECLARE_DRIVER_INIT(smashtv);
-	DECLARE_DRIVER_INIT(strkforc);
-	DECLARE_DRIVER_INIT(narc);
-	DECLARE_DRIVER_INIT(term2);
-	DECLARE_DRIVER_INIT(term2la1);
-	DECLARE_DRIVER_INIT(term2la3);
-	DECLARE_DRIVER_INIT(mkyunit);
-	DECLARE_DRIVER_INIT(trog);
-	DECLARE_DRIVER_INIT(totcarn);
-	DECLARE_DRIVER_INIT(mkyawdim);
-	DECLARE_DRIVER_INIT(shimpact);
-	DECLARE_DRIVER_INIT(hiimpact);
-	DECLARE_DRIVER_INIT(mkyturbo);
-	DECLARE_DRIVER_INIT(term2la2);
+	void init_smashtv();
+	void init_strkforc();
+	void init_narc();
+	void init_term2();
+	void init_term2la1();
+	void init_term2la3();
+	void init_mkyunit();
+	void init_trog();
+	void init_totcarn();
+	void init_mkyawdim();
+	void init_shimpact();
+	void init_hiimpact();
+	void init_mkyturbo();
+	void init_term2la2();
 	DECLARE_MACHINE_RESET(midyunit);
 	DECLARE_VIDEO_START(midzunit);
 	DECLARE_VIDEO_START(midyunit_4bit);

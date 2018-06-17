@@ -39,6 +39,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -143,7 +144,7 @@ void ms0515_state::ms0515_mem(address_map &map)
 
 	map(0160000, 0177377).rom().nopw();
 
-	map(0177400, 0177437).w(this, FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
+	map(0177400, 0177437).w(FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
 
 	map(0177440, 0177440).r(m_i8251kbd, FUNC(i8251_device::data_r));
 	map(0177442, 0177442).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -171,7 +172,7 @@ void ms0515_state::ms0515_mem(address_map &map)
 	map(0177720, 0177720).w(m_i8251line, FUNC(i8251_device::data_w));
 	map(0177722, 0177722).w(m_i8251line, FUNC(i8251_device::control_w));
 
-	map(0177770, 0177771).rw(this, FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
+	map(0177770, 0177771).rw(FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
 }
 
 /*
@@ -374,9 +375,10 @@ FLOPPY_FORMATS_MEMBER( ms0515_state::floppy_formats )
 	FLOPPY_MS0515_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ms0515_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void ms0515_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -520,15 +522,15 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 
 MACHINE_CONFIG_START(ms0515_state::ms0515)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, XTAL(15'000'000) / 2) // actual CPU is T11 clone, KR1807VM1
+	MCFG_DEVICE_ADD("maincpu", T11, XTAL(15'000'000) / 2) // actual CPU is T11 clone, KR1807VM1
 	MCFG_T11_INITIAL_MODE(0xf2ff)
-	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
+	MCFG_DEVICE_PROGRAM_MAP(ms0515_mem)
 
 	/* video hardware -- 50 Hz refresh rate */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 958,0,640, 313,0,200 )
 	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ms0515_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ms0515_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_ms0515)
 
@@ -542,47 +544,47 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ms0515_state, ms0515_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(ms0515_state, ms0515_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ms0515_state, ms0515_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ms0515_state, ms0515_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ms0515_state, ms0515_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ms0515_state, ms0515_portc_w))
 
 	// serial connection to printer
 	MCFG_DEVICE_ADD( "i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(ms0515_state, irq9_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(ms0515_state, irq8_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, ms0515_state, irq9_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, ms0515_state, irq8_w))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
 
 //  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
-//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ms0515_state, write_line_clock))
+//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
 
 	// serial connection to MS7004 keyboard
 	MCFG_DEVICE_ADD("i8251kbd", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(ms0515_state, irq5_w))
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("ms7004", ms7004_device, write_rxd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, ms0515_state, irq5_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("ms7004", ms7004_device, write_rxd))
 
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_rxd))
-	MCFG_MS7004_RTS_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_cts))
+	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
+	MCFG_MS7004_RTS_HANDLER(WRITELINE("i8251kbd", i8251_device, write_cts))
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ms0515_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(2'000'000))
-//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ms0515_state, write_keyboard_clock))
+//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
 	MCFG_PIT8253_CLK1(XTAL(2'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ms0515_state, write_line_clock))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
 	MCFG_PIT8253_CLK2(XTAL(2'000'000))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ms0515_state, pit8253_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ms0515_state, pit8253_out2_changed))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	/* internal ram */
@@ -595,14 +597,14 @@ ROM_START( ms0515 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "b" )
 	ROM_SYSTEM_BIOS( 0, "a", "Version A" )
-	ROMX_LOAD( "7004l.bin", 0xc000, 0x2000, CRC(b08b3b73) SHA1(c12fd4672598cdf499656dcbb4118d787769d589), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "7004h.bin", 0xc001, 0x2000, CRC(515dcf99) SHA1(edd34300fd642c89ce321321e1b12493cd16b7a5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "7004l.bin", 0xc000, 0x2000, CRC(b08b3b73) SHA1(c12fd4672598cdf499656dcbb4118d787769d589), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "7004h.bin", 0xc001, 0x2000, CRC(515dcf99) SHA1(edd34300fd642c89ce321321e1b12493cd16b7a5), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "b", "Version B" )
-	ROMX_LOAD( "0515l.rf4", 0xc000, 0x2000, CRC(85b608a4) SHA1(5b1bb0586d8f7a8a21de69200b08e0b28a318999), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "0515h.rf4", 0xc001, 0x2000, CRC(e3ff6da9) SHA1(3febccf40abc2e3ca7db3f6f3884be117722dd8b), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "0515l.rf4", 0xc000, 0x2000, CRC(85b608a4) SHA1(5b1bb0586d8f7a8a21de69200b08e0b28a318999), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "0515h.rf4", 0xc001, 0x2000, CRC(e3ff6da9) SHA1(3febccf40abc2e3ca7db3f6f3884be117722dd8b), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE         INIT  COMPANY        FULLNAME   FLAGS
-COMP( 1990, ms0515, 0,      0,       ms0515,    ms0515,  ms0515_state, 0,    "Elektronika", "MS 0515", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME   FLAGS
+COMP( 1990, ms0515, 0,      0,      ms0515,  ms0515, ms0515_state, empty_init, "Elektronika", "MS 0515", 0 )

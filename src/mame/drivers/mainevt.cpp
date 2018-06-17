@@ -31,6 +31,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -72,10 +73,10 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
-	output().set_led_value(2, data & 0x04);
-	output().set_led_value(3, data & 0x08);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
+	m_leds[2] = BIT(data, 2);
+	m_leds[3] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
@@ -156,13 +157,13 @@ WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 
 void mainevt_state::mainevt_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
 
-	map(0x1f80, 0x1f80).w(this, FUNC(mainevt_state::mainevt_bankswitch_w));
+	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::mainevt_bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); /* probably */
-	map(0x1f88, 0x1f88).w(this, FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
+	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
 	map(0x1f8c, 0x1f8d).nopw();    /* ??? */
-	map(0x1f90, 0x1f90).w(this, FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
+	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -182,12 +183,12 @@ void mainevt_state::mainevt_map(address_map &map)
 
 void mainevt_state::devstors_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
 
-	map(0x1f80, 0x1f80).w(this, FUNC(mainevt_state::mainevt_bankswitch_w));
+	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::mainevt_bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); /* probably */
-	map(0x1f88, 0x1f88).w(this, FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
-	map(0x1f90, 0x1f90).w(this, FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
+	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
+	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -196,7 +197,7 @@ void mainevt_state::devstors_map(address_map &map)
 	map(0x1f98, 0x1f98).portr("DSW3");
 	map(0x1f9b, 0x1f9b).portr("DSW2");
 	map(0x1fa0, 0x1fbf).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
-	map(0x1fb2, 0x1fb2).w(this, FUNC(mainevt_state::dv_nmienable_w));
+	map(0x1fb2, 0x1fb2).w(FUNC(mainevt_state::dv_nmienable_w));
 
 	map(0x4000, 0x5dff).ram();
 	map(0x5e00, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -212,9 +213,9 @@ void mainevt_state::mainevt_sound_map(address_map &map)
 	map(0x9000, 0x9000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xd000, 0xd000).r(this, FUNC(mainevt_state::mainevt_sh_busy_r));
-	map(0xe000, 0xe000).w(this, FUNC(mainevt_state::mainevt_sh_irqcontrol_w));
-	map(0xf000, 0xf000).w(this, FUNC(mainevt_state::mainevt_sh_bankswitch_w));
+	map(0xd000, 0xd000).r(FUNC(mainevt_state::mainevt_sh_busy_r));
+	map(0xe000, 0xe000).w(FUNC(mainevt_state::mainevt_sh_irqcontrol_w));
+	map(0xf000, 0xf000).w(FUNC(mainevt_state::mainevt_sh_bankswitch_w));
 }
 
 void mainevt_state::devstors_sound_map(address_map &map)
@@ -224,8 +225,8 @@ void mainevt_state::devstors_sound_map(address_map &map)
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).w(this, FUNC(mainevt_state::devstor_sh_irqcontrol_w));
-	map(0xf000, 0xf000).w(this, FUNC(mainevt_state::dv_sh_bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(mainevt_state::devstor_sh_irqcontrol_w));
+	map(0xf000, 0xf000).w(FUNC(mainevt_state::dv_sh_bankswitch_w));
 }
 
 
@@ -388,6 +389,7 @@ WRITE8_MEMBER(mainevt_state::volume_callback)
 
 void mainevt_state::machine_start()
 {
+	m_leds.resolve();
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_nmi_enable));
@@ -401,7 +403,7 @@ void mainevt_state::machine_reset()
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_sound_timer_irq)
 {
 	if(m_sound_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
@@ -413,13 +415,13 @@ INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 MACHINE_CONFIG_START(mainevt_state::mainevt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, 3000000)  /* ?? */
-	MCFG_CPU_PROGRAM_MAP(mainevt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainevt_state,  mainevt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, 3000000)  /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(mainevt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainevt_state,  mainevt_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3.579545_MHz_XTAL)  /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(mainevt_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mainevt_state, mainevt_sound_timer_irq, 8*60)  /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3.579545_MHz_XTAL)  /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mainevt_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainevt_state, mainevt_sound_timer_irq, 8*60)  /* ??? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -444,16 +446,16 @@ MACHINE_CONFIG_START(mainevt_state::mainevt)
 	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232", K007232, 3.579545_MHz_XTAL)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(mainevt_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -461,13 +463,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mainevt_state::devstors)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, 24_MHz_XTAL / 8) // E & Q generated by 052109
-	MCFG_CPU_PROGRAM_MAP(devstors_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainevt_state,  dv_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, 24_MHz_XTAL / 8) // E & Q generated by 052109
+	MCFG_DEVICE_PROGRAM_MAP(devstors_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainevt_state,  dv_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3.579545_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(devstors_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mainevt_state, devstors_sound_timer_irq, 4*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3.579545_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(devstors_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainevt_state, devstors_sound_timer_irq, 4*60) /* ??? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -494,16 +496,16 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3.579545_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3.579545_MHz_XTAL)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(mainevt_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -724,11 +726,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )

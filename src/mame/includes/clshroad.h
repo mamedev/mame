@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "emupal.h"
+
 class clshroad_state : public driver_device
 {
 public:
@@ -44,7 +47,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fb1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	DECLARE_DRIVER_INIT(firebatl);
+	void init_firebatl();
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(firebatl);
 	DECLARE_PALETTE_INIT(firebatl);

@@ -3,6 +3,7 @@
 
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tecmo_state : public driver_device
@@ -61,10 +62,10 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_vol_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	DECLARE_DRIVER_INIT(silkworm);
-	DECLARE_DRIVER_INIT(rygar);
-	DECLARE_DRIVER_INIT(backfirt);
-	DECLARE_DRIVER_INIT(gemini);
+	void init_silkworm();
+	void init_rygar();
+	void init_backfirt();
+	void init_gemini();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -82,9 +83,11 @@ public:
 	void silkworm(machine_config &config);
 	void gemini(machine_config &config);
 	void rygar(machine_config &config);
+	void silkwormp(machine_config &config);
 	void gemini_map(address_map &map);
 	void rygar_map(address_map &map);
 	void rygar_sound_map(address_map &map);
 	void silkworm_map(address_map &map);
 	void tecmo_sound_map(address_map &map);
+	void silkwormp_sound_map(address_map &map);
 };

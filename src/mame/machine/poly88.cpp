@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 }
 
 
-DRIVER_INIT_MEMBER(poly88_state,poly88)
+void poly88_state::init_poly88()
 {
 	m_previous_level = 0;
 	m_clk_level = m_clk_level_tape = 1;
@@ -327,6 +327,6 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 		}
 		pos+=recordLen;
 	}
-	machine().device("uart")->reset();
+	m_uart->reset();
 	return image_init_result::PASS;
 }

@@ -20,7 +20,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port78_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
 	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_DRIVER_INIT(ts816);
+	void init_ts816();
 
 	void ts816(machine_config &config);
 	void ts816_io(address_map &map);
@@ -85,21 +85,21 @@ void ts816_state::ts816_io(address_map &map)
 	map(0x40, 0x43).rw("sio4", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 4 for user 7 & 8
 	map(0x48, 0x4b).rw("sio8", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 8 for user 15 & 16
 	//AM_RANGE(0x50, 0x53) // SIO 0 for RS232 1 and part of tape interface
-	map(0x50, 0x50).r(this, FUNC(ts816_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x52, 0x52).r(this, FUNC(ts816_state::status_r));
+	map(0x50, 0x50).r(FUNC(ts816_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x52, 0x52).r(FUNC(ts816_state::status_r));
 	map(0x58, 0x5b).rw("sio9", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 9 for RS232 2 & 3
 	map(0x60, 0x60).portr("DSW");
-	map(0x68, 0x68).w(this, FUNC(ts816_state::port68_w)); // set 2nd bank latch
-	map(0x70, 0x78).w(this, FUNC(ts816_state::port78_w)); // reset 2nd bank latch (manual can't decide between 70 and 78, so we take both)
+	map(0x68, 0x68).w(FUNC(ts816_state::port68_w)); // set 2nd bank latch
+	map(0x70, 0x78).w(FUNC(ts816_state::port78_w)); // reset 2nd bank latch (manual can't decide between 70 and 78, so we take both)
 	map(0x80, 0x83).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // CTC 1 (ch 0 baud A)
-	map(0x90, 0x93).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // DMA
+	map(0x90, 0x93).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // DMA
 	map(0xA0, 0xA0); // WDC status / command
 	map(0xA1, 0xA1); // WDC data
 	map(0xB0, 0xB0).noprw(); // undocumented, written to at @0707 and @0710
 	map(0xC0, 0xC3).rw("ctc2", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // CTC 2 (ch 0 baud B, ch 1 baud C)
 	map(0xD0, 0xD3).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xE0, 0xE0).w(this, FUNC(ts816_state::porte0_w)); // set ENDRAM memory banking
-	map(0xF0, 0xF0).w(this, FUNC(ts816_state::portf0_w)); // reset ENDRAM memory banking
+	map(0xE0, 0xE0).w(FUNC(ts816_state::porte0_w)); // set ENDRAM memory banking
+	map(0xF0, 0xF0).w(FUNC(ts816_state::portf0_w)); // reset ENDRAM memory banking
 }
 
 
@@ -241,7 +241,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-DRIVER_INIT_MEMBER( ts816_state, ts816 )
+void ts816_state::init_ts816()
 {
 	uint8_t *roms = memregion("roms")->base();
 	uint8_t *rams = memregion("rams")->base();
@@ -262,9 +262,9 @@ DRIVER_INIT_MEMBER( ts816_state, ts816 )
 
 MACHINE_CONFIG_START(ts816_state::ts816)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(ts816_mem)
-	MCFG_CPU_IO_MAP(ts816_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ts816_mem)
+	MCFG_DEVICE_IO_MAP(ts816_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
@@ -294,9 +294,9 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80PIO_IN_PA_CB(READ8(ts816_state, porta_r))
-	//MCFG_Z80PIO_IN_PB_CB(READ8(ts816_state, portb_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(ts816_state, portb_w))
+	//MCFG_Z80PIO_IN_PA_CB(READ8(*this, ts816_state, porta_r))
+	//MCFG_Z80PIO_IN_PB_CB(READ8(*this, ts816_state, portb_r))
+	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, ts816_state, portb_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
-	//MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(ts816_state, busreq_w))
+	//MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, ts816_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
@@ -318,5 +318,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT       COMPANY      FULLNAME  FLAGS
-COMP( 1980, ts816,  0,      0,       ts816,     ts816, ts816_state,  ts816,    "Televideo", "TS816",  MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1980, ts816, 0,      0,      ts816,   ts816, ts816_state, init_ts816, "Televideo", "TS816",  MACHINE_IS_SKELETON )

@@ -163,6 +163,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "video/sknsspr.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -205,7 +206,7 @@ public:
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
 
-	DECLARE_DRIVER_INIT(jchan);
+	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -464,12 +465,12 @@ void jchan_state::jchan_main(address_map &map)
 	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* 1st sprite layer */
-	map(0x500000, 0x503fff).ram().w(this, FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
-	map(0x600000, 0x60003f).ram().w(this, FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
+	map(0x500000, 0x503fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
+	map(0x600000, 0x60003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
 
 	map(0x700000, 0x70ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette
 
-	map(0xf00000, 0xf00007).rw(this, FUNC(jchan_state::ctrl_r), FUNC(jchan_state::ctrl_w)).share("ctrl");
+	map(0xf00000, 0xf00007).rw(FUNC(jchan_state::ctrl_r), FUNC(jchan_state::ctrl_w)).share("ctrl");
 
 	map(0xf80000, 0xf80001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 }
@@ -487,8 +488,8 @@ void jchan_state::jchan_sub(address_map &map)
 	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 
 	/* background sprites */
-	map(0x700000, 0x703fff).ram().w(this, FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
-	map(0x780000, 0x78003f).ram().w(this, FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
+	map(0x700000, 0x703fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
+	map(0x780000, 0x78003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
 
 	map(0x800000, 0x800003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff); // sound
 
@@ -509,7 +510,7 @@ static const gfx_layout tilelayout =
 
 // we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.cpp */
 
-static GFXDECODE_START( jchan )
+static GFXDECODE_START( gfx_jchan )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
 GFXDECODE_END
 
@@ -602,16 +603,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(jchan_state::jchan)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jchan_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(jchan_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jchan_state, vblank, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jchan_sub)
+	MCFG_DEVICE_ADD("sub", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(jchan_sub)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -632,14 +633,15 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -725,7 +727,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT_MEMBER( jchan_state, jchan )
+void jchan_state::init_jchan()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
@@ -733,5 +735,5 @@ DRIVER_INIT_MEMBER( jchan_state, jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan,  jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,  0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2, 0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

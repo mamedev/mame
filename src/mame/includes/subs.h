@@ -5,8 +5,11 @@
     Atari Subs hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SUBS_H
+#define MAME_INCLUDES_SUBS_H
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define SUBS_SONAR1_EN          NODE_01
@@ -21,14 +24,15 @@
 class subs_state : public driver_device
 {
 public:
-	subs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	subs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -49,8 +53,6 @@ public:
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(options_r);
-	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp2_w);
 	DECLARE_WRITE_LINE_MEMBER(invert1_w);
 	DECLARE_WRITE_LINE_MEMBER(invert2_w);
 	DECLARE_WRITE8_MEMBER(noise_reset_w);
@@ -72,4 +74,6 @@ public:
 
 /*----------- defined in audio/subs.c -----------*/
 
-DISCRETE_SOUND_EXTERN( subs );
+DISCRETE_SOUND_EXTERN( subs_discrete );
+
+#endif // MAME_INCLUDES_SUBS_H

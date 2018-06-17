@@ -278,7 +278,7 @@ Few other notes:
 #include "includes/m5.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -719,10 +719,10 @@ void m5_state::m5_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x30, 0x30).mirror(0x08).portr("Y0").w(this, FUNC(m5_state::mem64KBF_w)); // 64KBF paging
+	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x30, 0x30).mirror(0x08).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
 	map(0x31, 0x31).mirror(0x08).portr("Y1");
 	map(0x32, 0x32).mirror(0x08).portr("Y2");
 	map(0x33, 0x33).mirror(0x08).portr("Y3");
@@ -730,12 +730,12 @@ void m5_state::m5_io(address_map &map)
 	map(0x35, 0x35).mirror(0x08).portr("Y5");
 	map(0x36, 0x36).mirror(0x08).portr("Y6");
 	map(0x37, 0x37).mirror(0x08).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x50).mirror(0x0f).rw(this, FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
 //  AM_RANGE(0x60, 0x63) SIO
-	map(0x6c, 0x6c).rw(this, FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
+	map(0x6c, 0x6c).rw(FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
 	map(0x70, 0x73) /*.mirror(0x0c) don't know if necessary mirror this*/ .rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7f, 0x7f).w(this, FUNC(m5_state::mem64KRX_w)); //64KRD/64KRX paging
+	map(0x7f, 0x7f).w(FUNC(m5_state::mem64KRX_w)); //64KRD/64KRX paging
 }
 
 
@@ -758,11 +758,11 @@ void m5_state::fd5_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x10, 0x10).rw(this, FUNC(m5_state::fd5_data_r), FUNC(m5_state::fd5_data_w));
-	map(0x20, 0x20).w(this, FUNC(m5_state::fd5_com_w));
-	map(0x30, 0x30).r(this, FUNC(m5_state::fd5_com_r));
-	map(0x40, 0x40).w(this, FUNC(m5_state::fd5_ctrl_w));
-	map(0x50, 0x50).w(this, FUNC(m5_state::fd5_tc_w));
+	map(0x10, 0x10).rw(FUNC(m5_state::fd5_data_r), FUNC(m5_state::fd5_data_w));
+	map(0x20, 0x20).w(FUNC(m5_state::fd5_com_w));
+	map(0x30, 0x30).r(FUNC(m5_state::fd5_com_r));
+	map(0x40, 0x40).w(FUNC(m5_state::fd5_ctrl_w));
+	map(0x50, 0x50).w(FUNC(m5_state::fd5_tc_w));
 }
 
 
@@ -980,14 +980,16 @@ FLOPPY_FORMATS_MEMBER( m5_state::floppy_formats )
 	FLOPPY_M5_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( m5_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void m5_floppies(device_slot_interface &device)
+{
+		device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START(m5_cart)
-	SLOT_INTERFACE_INTERNAL("std",  M5_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ram",  M5_ROM_RAM)
-SLOT_INTERFACE_END
+static void m5_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",  M5_ROM_STD);
+	device.option_add_internal("ram",  M5_ROM_RAM);
+}
 
 //-------------------------------------------------
 //  z80_daisy_config m5_daisy_chain
@@ -1039,9 +1041,9 @@ void brno_state::brno_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
 	map(0x30, 0x30).portr("Y0");
 	map(0x31, 0x31).portr("Y1");
 	map(0x32, 0x32).portr("Y2");
@@ -1050,15 +1052,15 @@ void brno_state::brno_io(address_map &map)
 	map(0x35, 0x35).portr("Y5");
 	map(0x36, 0x36).portr("Y6");
 	map(0x37, 0x37).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x50).mirror(0x0f).rw(this, FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x50).mirror(0x0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
 //  AM_RANGE(0x60, 0x63)                                                                            //  SIO
-	map(0x64, 0x67).rw(this, FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                                                 //  MMU - page select (ramdisk memory paging)
-	map(0x68, 0x6b).rw(this, FUNC(brno_state::ramsel_r), FUNC(brno_state::ramsel_w));                                           //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
-	map(0x6c, 0x6f).rw(this, FUNC(brno_state::romsel_r), FUNC(brno_state::romsel_w));                                           //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
+	map(0x64, 0x67).rw(FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                           //  MMU - page select (ramdisk memory paging)
+	map(0x68, 0x6b).rw(FUNC(brno_state::ramsel_r), FUNC(brno_state::ramsel_w));                     //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
+	map(0x6c, 0x6f).rw(FUNC(brno_state::romsel_r), FUNC(brno_state::romsel_w));                     //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
 //  AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)     //  PIO
-	map(0x78, 0x7b).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));               //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
-	map(0x7c, 0x7c).rw(this, FUNC(brno_state::fd_r), FUNC(brno_state::fd_w));                                                   //  drive select
+	map(0x78, 0x7b).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));     //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
+	map(0x7c, 0x7c).rw(FUNC(brno_state::fd_r), FUNC(brno_state::fd_w));                             //  drive select
 }
 
 
@@ -1211,9 +1213,10 @@ FLOPPY_FORMATS_MEMBER( brno_state::floppy_formats )
 	FLOPPY_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( brno_floppies )
-		SLOT_INTERFACE("35hd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void brno_floppies(device_slot_interface &device)
+{
+		device.option_add("35hd", FLOPPY_35_DD);
+}
 
 
 //**************************************************************************
@@ -1404,28 +1407,28 @@ void brno_state::machine_reset()
 
 MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(m5_mem)
-	MCFG_CPU_IO_MAP(m5_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(m5_mem)
+	MCFG_DEVICE_IO_MAP(m5_io)
 	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
-	MCFG_CPU_ADD(Z80_FD5_TAG, Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(fd5_mem)
-	MCFG_CPU_IO_MAP(fd5_io)
+	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, 14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
+	MCFG_DEVICE_IO_MAP(fd5_io)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(14'318'181)/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 14.318181_MHz_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 14.318181_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, m5_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -1435,11 +1438,11 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_CASSETTE_INTERFACE("m5_cass")
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(m5_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(m5_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(m5_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(m5_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, m5_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, m5_state, ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, m5_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, m5_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, m5_state, ppi_pc_w))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
@@ -1468,9 +1471,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m5_state::ntsc)
 	m5(config);
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, 10.738635_MHz_XTAL / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1483,9 +1486,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m5_state::pal)
 	m5(config);
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1499,9 +1502,9 @@ MACHINE_CONFIG_START(brno_state::brno)
 	m5(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(m5_mem_brno)
-	MCFG_CPU_IO_MAP(brno_io)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(m5_mem_brno)
+	MCFG_DEVICE_IO_MAP(brno_io)
 //  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
 
@@ -1511,15 +1514,15 @@ MACHINE_CONFIG_START(brno_state::brno)
 	MCFG_DEVICE_REMOVE(UPD765_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 
 	// floppy
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats)
@@ -1588,7 +1591,7 @@ ROM_END
 //  ROM( ntsc )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(m5_state,ntsc)
+void m5_state::init_ntsc()
 {
 }
 
@@ -1597,7 +1600,7 @@ DRIVER_INIT_MEMBER(m5_state,ntsc)
 //  ROM( pal )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(m5_state,pal)
+void m5_state::init_pal()
 {
 }
 
@@ -1605,7 +1608,7 @@ DRIVER_INIT_MEMBER(m5_state,pal)
 //  ROM( BRNO )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(brno_state,brno)
+void brno_state::init_brno()
 {
 //  logerror("Driver init entered\n" );
 }
@@ -1615,7 +1618,7 @@ DRIVER_INIT_MEMBER(brno_state,brno)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY     FULLNAME                 FLAGS
-COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   ntsc,   "Sord",     "m.5 (Japan)",           0 )
-COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   pal,    "Sord",     "m.5 (Europe)",          0 )
-COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, brno,   "Sord",     "m.5 (Europe) BRNO mod", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY  FULLNAME                 FLAGS
+COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   init_ntsc, "Sord",  "m.5 (Japan)",           0 )
+COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   init_pal,  "Sord",  "m.5 (Europe)",          0 )
+COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, init_brno, "Sord",  "m.5 (Europe) BRNO mod", 0 )

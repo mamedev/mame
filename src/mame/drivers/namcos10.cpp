@@ -40,6 +40,7 @@ Point Blank 3 (GNN2 Ver. A)                        (C) Namco, 2000
 *Ren-ai Quiz High School Angel                     (C) Namco, 2002
 Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
+Shamisen Brothers                                  (C) Kato/Konami, 2003
 Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
 *Taiko No Tatsujin                                 (C) Namco, 2001
 Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
@@ -473,17 +474,17 @@ private:
 
 	void i2c_update();
 public:
-	DECLARE_DRIVER_INIT(knpuzzle);
-	DECLARE_DRIVER_INIT(panikuru);
-	DECLARE_DRIVER_INIT(mrdrilr2);
-	DECLARE_DRIVER_INIT(startrgn);
-	DECLARE_DRIVER_INIT(gunbalna);
-	DECLARE_DRIVER_INIT(nflclsfb);
-	DECLARE_DRIVER_INIT(gjspace);
-	DECLARE_DRIVER_INIT(gamshara);
-	DECLARE_DRIVER_INIT(mrdrilrg);
-	DECLARE_DRIVER_INIT(chocovdr);
-	DECLARE_DRIVER_INIT(konotako);
+	void init_knpuzzle();
+	void init_panikuru();
+	void init_mrdrilr2();
+	void init_startrgn();
+	void init_gunbalna();
+	void init_nflclsfb();
+	void init_gjspace();
+	void init_gamshara();
+	void init_mrdrilrg();
+	void init_chocovdr();
+	void init_konotako();
 	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;
@@ -496,10 +497,10 @@ void namcos10_state::namcos10_map(address_map &map)
 	map(0x9f500000, 0x9f501fff).ram().share("share3"); /* ram? stores block numbers */
 	map(0xbf500000, 0xbf501fff).ram().share("share3"); /* ram? stores block numbers */
 
-	map(0x1fba0000, 0x1fba000f).rw(this, FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
-	map(0x1fba0002, 0x1fba0003).rw(this, FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
-	map(0x1fba0008, 0x1fba0009).rw(this, FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
-	map(0x1fba000a, 0x1fba000b).rw(this, FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
+	map(0x1fba0000, 0x1fba000f).rw(FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
+	map(0x1fba0002, 0x1fba0003).rw(FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
+	map(0x1fba0008, 0x1fba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
+	map(0x1fba000a, 0x1fba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
 }
 
 
@@ -681,9 +682,9 @@ void namcos10_state::namcos10_memm_map(address_map &map)
 {
 	namcos10_map(map);
 
-	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f400000, 0x1f5fffff).r(this, FUNC(namcos10_state::range_r));
-	map(0x1fb40000, 0x1fb4000f).w(this, FUNC(namcos10_state::bank_w));
+	map(0x1f300000, 0x1f300001).w(FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f5fffff).r(FUNC(namcos10_state::range_r));
+	map(0x1fb40000, 0x1fb4000f).w(FUNC(namcos10_state::bank_w));
 }
 
 
@@ -777,15 +778,15 @@ void namcos10_state::namcos10_memn_map(address_map &map)
 {
 	namcos10_map(map);
 
-	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f380000, 0x1f380001).w(this, FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f400000, 0x1f400001).r(this, FUNC(namcos10_state::nand_status_r));
-	map(0x1f410000, 0x1f410000).w(this, FUNC(namcos10_state::nand_address1_w));
-	map(0x1f420000, 0x1f420000).w(this, FUNC(namcos10_state::nand_address2_w));
-	map(0x1f430000, 0x1f430000).w(this, FUNC(namcos10_state::nand_address3_w));
-	map(0x1f440000, 0x1f440000).w(this, FUNC(namcos10_state::nand_address4_w));
-	map(0x1f450000, 0x1f450001).r(this, FUNC(namcos10_state::nand_data_r));
-	map(0x1fb60000, 0x1fb60001).rw(this, FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
+	map(0x1f300000, 0x1f300001).w(FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f380000, 0x1f380001).w(FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f400001).r(FUNC(namcos10_state::nand_status_r));
+	map(0x1f410000, 0x1f410000).w(FUNC(namcos10_state::nand_address1_w));
+	map(0x1f420000, 0x1f420000).w(FUNC(namcos10_state::nand_address2_w));
+	map(0x1f430000, 0x1f430000).w(FUNC(namcos10_state::nand_address3_w));
+	map(0x1f440000, 0x1f440000).w(FUNC(namcos10_state::nand_address4_w));
+	map(0x1f450000, 0x1f450001).r(FUNC(namcos10_state::nand_data_r));
+	map(0x1fb60000, 0x1fb60001).rw(FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
 }
 
 void namcos10_state::memn_driver_init(  )
@@ -812,7 +813,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
+void namcos10_state::init_mrdrilr2()
 {
 	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
 
@@ -821,7 +822,7 @@ DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gjspace)
+void namcos10_state::init_gjspace()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
@@ -830,14 +831,14 @@ DRIVER_INIT_MEMBER(namcos10_state,gjspace)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,mrdrilrg)
+void namcos10_state::init_mrdrilrg()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
+void namcos10_state::init_knpuzzle()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
@@ -846,7 +847,7 @@ DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,startrgn)
+void namcos10_state::init_startrgn()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -855,7 +856,7 @@ DRIVER_INIT_MEMBER(namcos10_state,startrgn)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gamshara)
+void namcos10_state::init_gamshara()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
@@ -864,14 +865,14 @@ DRIVER_INIT_MEMBER(namcos10_state,gamshara)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gunbalna)
+void namcos10_state::init_gunbalna()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
+void namcos10_state::init_chocovdr()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
@@ -880,14 +881,14 @@ DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,panikuru)
+void namcos10_state::init_panikuru()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
+void namcos10_state::init_nflclsfb()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -896,7 +897,7 @@ DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,konotako)
+void namcos10_state::init_konotako()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
@@ -918,8 +919,8 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 
 MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
-	MCFG_CPU_PROGRAM_MAP( namcos10_memm_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos10_memm_map )
 
 	// The bios first configures the rom window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
@@ -937,13 +938,14 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
-	MCFG_CPU_PROGRAM_MAP( namcos10_memn_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos10_memn_map )
 
 	// The bios first configures the rom window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
@@ -961,7 +963,8 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos10_state::ns10_mrdrilr2)
@@ -1240,20 +1243,20 @@ ROM_START( sekaikh )
 ROM_END
 
 
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, 0,        ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, chocovdr,  0,        ns10_chocovdr, namcos10, namcos10_state, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10, namcos10_state, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
-GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, 0,        ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, init_gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, init_knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, chocovdr,  0,        ns10_chocovdr, namcos10, namcos10_state, init_chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10, namcos10_state, init_startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, init_panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
+GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

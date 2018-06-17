@@ -16,6 +16,7 @@
 #include "machine/nmk112.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cave_state : public driver_device
@@ -67,27 +68,10 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_soundlatch(*this, "soundlatch") { }
-
-	/* memory pointers */
-	optional_shared_ptr_array<uint16_t, 4> m_videoregs;
-	optional_shared_ptr_array<uint16_t, 4> m_vram;
-	optional_shared_ptr_array<uint16_t, 4> m_vctrl;
-	optional_shared_ptr_array<uint16_t, 4> m_spriteram;
-	optional_shared_ptr_array<uint16_t, 4> m_paletteram;
-
-	/* memory regions */
-	optional_memory_region_array<4> m_spriteregion;
-	optional_memory_region_array<4> m_tileregion;
-	optional_memory_region_array<2> m_okiregion;
-	optional_memory_region          m_z80region;
-	optional_memory_bank            m_z80bank;
-	optional_memory_bank_array<2>   m_okibank_lo;
-	optional_memory_bank_array<2>   m_okibank_hi;
-
-	/* video-related */
-	std::unique_ptr<sprite_cave []> m_sprite[4];
-	sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1];
+		, m_soundlatch(*this, "soundlatch")
+		, m_startup(*this, "startup")
+		, m_led_outputs(*this, "led%u", 0U)
+	{ }
 
 	struct
 	{
@@ -102,71 +86,6 @@ public:
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
-	tilemap_t    *m_tilemap[4];
-	int          m_tiledim[4];
-	int          m_old_tiledim[4];
-
-	bitmap_ind16 m_sprite_zbuf;
-	uint16_t     m_sprite_zbuf_baseval;
-
-	int          m_num_sprites[4];
-
-	int          m_spriteram_bank[4];
-	int          m_spriteram_bank_delay[4];
-
-	std::unique_ptr<uint16_t[]>      m_palette_map[4];
-
-	int          m_layers_offs_x;
-	int          m_layers_offs_y;
-	int          m_row_effect_offs_n;
-	int          m_row_effect_offs_f;
-	int          m_background_pen;
-
-	int          m_spritetype[2];
-	int          m_kludge;
-	emu_timer *m_vblank_end_timer;
-
-
-	/* misc */
-	int          m_time_vblank_irq;
-	uint8_t      m_irq_level;
-	uint8_t      m_vblank_irq;
-	uint8_t      m_sound_irq;
-	uint8_t      m_unknown_irq;
-	uint8_t      m_agallet_vblank_irq;
-
-	/* sound related */
-	int          m_soundbuf_wptr;
-	int          m_soundbuf_rptr;
-	uint8_t      m_soundbuf_data[32];
-	bool         m_soundbuf_empty;
-	//uint8_t    m_sound_flag1;
-	//uint8_t    m_sound_flag2;
-
-	/* game specific */
-	// sailormn
-	int          m_sailormn_tilebank;
-	// korokoro
-	uint16_t     m_leds[2];
-	int          m_hopper;
-	// ppsatan
-	uint16_t     m_ppsatan_io_mux;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device_array<okim6295_device, 2> m_oki;
-	required_device<timer_device> m_int_timer;
-	optional_device<timer_device> m_int_timer_left;
-	optional_device<timer_device> m_int_timer_right;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<generic_latch_16_device> m_soundlatch;
-
-	int m_rasflag;
-	int m_old_rasflag;
 	DECLARE_READ16_MEMBER(cave_irq_cause_r);
 	DECLARE_READ8_MEMBER(soundflags_r);
 	DECLARE_READ16_MEMBER(soundflags_ack_r);
@@ -203,27 +122,26 @@ public:
 	DECLARE_READ16_MEMBER(ppsatan_touch2_r);
 	DECLARE_WRITE16_MEMBER(ppsatan_out_w);
 	uint16_t ppsatan_touch_r(int player);
-	DECLARE_DRIVER_INIT(uopoko);
-	DECLARE_DRIVER_INIT(donpachi);
-	DECLARE_DRIVER_INIT(mazinger);
-	DECLARE_DRIVER_INIT(gaia);
-	DECLARE_DRIVER_INIT(pwrinst2);
-	DECLARE_DRIVER_INIT(ddonpach);
-	DECLARE_DRIVER_INIT(agallet);
-	DECLARE_DRIVER_INIT(hotdogst);
-	DECLARE_DRIVER_INIT(tjumpman);
-	DECLARE_DRIVER_INIT(korokoro);
-	DECLARE_DRIVER_INIT(esprade);
-	DECLARE_DRIVER_INIT(pwrinst2j);
-	DECLARE_DRIVER_INIT(guwange);
-	DECLARE_DRIVER_INIT(feversos);
-	DECLARE_DRIVER_INIT(sailormn);
-	DECLARE_DRIVER_INIT(dfeveron);
-	DECLARE_DRIVER_INIT(metmqstr);
-	DECLARE_DRIVER_INIT(ppsatan);
+	void init_uopoko();
+	void init_donpachi();
+	void init_mazinger();
+	void init_gaia();
+	void init_pwrinst2();
+	void init_ddonpach();
+	void init_agallet();
+	void init_hotdogst();
+	void init_tjumpman();
+	void init_korokoro();
+	void init_esprade();
+	void init_pwrinst2j();
+	void init_guwange();
+	void init_feversos();
+	void init_sailormn();
+	void init_dfeveron();
+	void init_metmqstr();
+	void init_ppsatan();
 	TILE_GET_INFO_MEMBER(sailormn_get_tile_info_2);
 	template<int Chip> TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_MACHINE_START(cave);
 	DECLARE_MACHINE_RESET(cave);
 	DECLARE_MACHINE_RESET(sailormn);
 	DECLARE_VIDEO_START(cave_2_layers);
@@ -314,6 +232,97 @@ public:
 	void tekkencw_map(address_map &map);
 	void tjumpman_map(address_map &map);
 	void uopoko_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+
+	/* memory pointers */
+	optional_shared_ptr_array<uint16_t, 4> m_videoregs;
+	optional_shared_ptr_array<uint16_t, 4> m_vram;
+	optional_shared_ptr_array<uint16_t, 4> m_vctrl;
+	optional_shared_ptr_array<uint16_t, 4> m_spriteram;
+	optional_shared_ptr_array<uint16_t, 4> m_paletteram;
+
+	/* memory regions */
+	optional_memory_region_array<4> m_spriteregion;
+	optional_memory_region_array<4> m_tileregion;
+	optional_memory_region_array<2> m_okiregion;
+	optional_memory_region          m_z80region;
+	optional_memory_bank            m_z80bank;
+	optional_memory_bank_array<2>   m_okibank_lo;
+	optional_memory_bank_array<2>   m_okibank_hi;
+
+	/* video-related */
+	std::unique_ptr<sprite_cave []> m_sprite[4];
+	sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1];
+
+	tilemap_t    *m_tilemap[4];
+	int          m_tiledim[4];
+	int          m_old_tiledim[4];
+
+	bitmap_ind16 m_sprite_zbuf;
+	uint16_t     m_sprite_zbuf_baseval;
+
+	int          m_num_sprites[4];
+
+	int          m_spriteram_bank[4];
+	int          m_spriteram_bank_delay[4];
+
+	std::unique_ptr<uint16_t[]>      m_palette_map[4];
+
+	int          m_layers_offs_x;
+	int          m_layers_offs_y;
+	int          m_row_effect_offs_n;
+	int          m_row_effect_offs_f;
+	int          m_background_pen;
+
+	int          m_spritetype[2];
+	int          m_kludge;
+	emu_timer *m_vblank_end_timer;
+
+
+	/* misc */
+	int          m_time_vblank_irq;
+	uint8_t      m_irq_level;
+	uint8_t      m_vblank_irq;
+	uint8_t      m_sound_irq;
+	uint8_t      m_unknown_irq;
+	uint8_t      m_agallet_vblank_irq;
+
+	/* sound related */
+	int          m_soundbuf_wptr;
+	int          m_soundbuf_rptr;
+	uint8_t      m_soundbuf_data[32];
+	bool         m_soundbuf_empty;
+	//uint8_t    m_sound_flag1;
+	//uint8_t    m_sound_flag2;
+
+	/* game specific */
+	// sailormn
+	int          m_sailormn_tilebank;
+	// korokoro
+	uint16_t     m_leds[2];
+	int          m_hopper;
+	// ppsatan
+	uint16_t     m_ppsatan_io_mux;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device_array<okim6295_device, 2> m_oki;
+	required_device<timer_device> m_int_timer;
+	optional_device<timer_device> m_int_timer_left;
+	optional_device<timer_device> m_int_timer_right;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_16_device> m_soundlatch;
+	optional_device<timer_device> m_startup;
+	output_finder<9> m_led_outputs;
+
+	int m_rasflag;
+	int m_old_rasflag;
+
 private:
 	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t priority, uint32_t priority2, int GFX );
 	void set_pens(int chip);

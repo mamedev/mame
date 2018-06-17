@@ -54,9 +54,9 @@ public:
 	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pet_expansion_slot_device();
 
-	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
-		m_read_dma.set_callback(rd);
-		m_write_dma.set_callback(wr);
+	template <class Read, class Write> void set_callbacks(Read &&rd, Write &&wr) {
+		m_read_dma.set_callback(std::forward<Read>(rd));
+		m_write_dma.set_callback(std::forward<Write>(wr));
 	}
 
 	// computer interface
@@ -133,6 +133,6 @@ protected:
 DECLARE_DEVICE_TYPE(PET_EXPANSION_SLOT, pet_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( pet_expansion_cards );
+void pet_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_EXP_H

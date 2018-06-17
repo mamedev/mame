@@ -18,6 +18,7 @@
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -34,7 +35,7 @@ public:
 
 	void eolith16(machine_config &config);
 
-	DECLARE_DRIVER_INIT(eolith16);
+	void init_eolith16();
 
 protected:
 	virtual void video_start() override;
@@ -78,8 +79,8 @@ void eolith16_state::eolith16_map(address_map &map)
 	map(0x90000000, 0x9000002f).nopw(); //?
 	map(0xff000000, 0xff1fffff).rom().region("maindata", 0);
 	map(0xffe40001, 0xffe40001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xffe80000, 0xffe80001).w(this, FUNC(eolith16_state::eeprom_w));
-	map(0xffea0000, 0xffea0001).r(this, FUNC(eolith16_state::eolith16_custom_r));
+	map(0xffe80000, 0xffe80001).w(FUNC(eolith16_state::eeprom_w));
+	map(0xffea0000, 0xffea0001).r(FUNC(eolith16_state::eolith16_custom_r));
 	map(0xffea0002, 0xffea0003).portr("SYSTEM");
 	map(0xffec0000, 0xffec0001).nopr(); // not used?
 	map(0xffec0002, 0xffec0003).portr("INPUTS");
@@ -159,11 +160,11 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 MACHINE_CONFIG_START(eolith16_state::eolith16)
-	MCFG_CPU_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(eolith16_map)
+	MCFG_DEVICE_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -178,9 +179,10 @@ MACHINE_CONFIG_START(eolith16_state::eolith16)
 
 	MCFG_PALETTE_INIT_OWNER(eolith16_state,eolith16)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -244,9 +246,9 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-DRIVER_INIT_MEMBER(eolith16_state,eolith16)
+void eolith16_state::init_eolith16()
 {
 	init_speedup();
 }
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, init_eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_SUPPORTS_SAVE )

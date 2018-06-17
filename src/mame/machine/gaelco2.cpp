@@ -46,7 +46,7 @@ void gaelco2_state::gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(gaelco2_state,alighunt)
+void gaelco2_state::init_alighunt()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -80,7 +80,7 @@ DRIVER_INIT_MEMBER(gaelco2_state,alighunt)
 }
 
 
-DRIVER_INIT_MEMBER(gaelco2_state,touchgo)
+void gaelco2_state::init_touchgo()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -108,7 +108,7 @@ DRIVER_INIT_MEMBER(gaelco2_state,touchgo)
 }
 
 
-DRIVER_INIT_MEMBER(gaelco2_state,snowboar)
+void gaelco2_state::init_snowboar()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -133,6 +133,28 @@ DRIVER_INIT_MEMBER(gaelco2_state,snowboar)
 
 	/* split ROM sb46 */
 	gaelco2_ROM16_split_gfx("gfx2", "gfx1", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
+}
+
+
+void gaelco2_state::init_wrally2()
+{
+	/*
+	For "gfx2" we have this memory map:
+	    0x0000000-0x03fffff ROM wr2_ic69.ic69
+	    0x0400000-0x05fffff ROM wr2_ic70.ic70
+
+	and we are going to construct this one for "gfx1":
+	    0x0000000-0x01fffff ROM wr2_ic69.ic69 even bytes
+	    0x0200000-0x03fffff ROM wr2_ic69.ic69 odd bytes
+	    0x0400000-0x04fffff ROM wr2_ic70.ic70 even bytes
+	    0x0600000-0x06fffff ROM wr2_ic70.ic70 odd bytes
+	*/
+
+	/* split ROM wr2_ic69.ic69 */
+	gaelco2_ROM16_split_gfx("gfx2", "gfx1", 0x0000000, 0x0400000, 0x0000000, 0x0200000);
+
+	/* split ROM wr2_ic70.ic70 */
+	gaelco2_ROM16_split_gfx("gfx2", "gfx1", 0x0400000, 0x0200000, 0x0400000, 0x0600000);
 }
 
 
@@ -204,7 +226,7 @@ WRITE16_MEMBER(gaelco2_state::alighunt_coin_w)
 ***************************************************************************/
 
 
-DRIVER_INIT_MEMBER(bang_state,bang)
+void bang_state::init_bang()
 {
 	m_clr_gun_int = 0;
 }

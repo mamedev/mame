@@ -27,8 +27,8 @@ public:
 		m_bankrom_base(*this, "bankrom_base")
 	{ }
 
-	DECLARE_DRIVER_INIT(offtwall);
-	DECLARE_DRIVER_INIT(offtwalc);
+	void init_offtwall();
+	void init_offtwalc();
 
 	void offtwall(machine_config &config);
 

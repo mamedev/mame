@@ -114,7 +114,6 @@
 #include "includes/tsispch.h"
 
 #include "cpu/i86/i86.h"
-#include "cpu/upd7725/upd7725.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -184,44 +183,38 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 *****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(true);
+	uint8_t temp = m_dsp->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(true);
+	return m_dsp->snesdsp_read(true);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
 #endif
-	upd7725->snesdsp_write(true, data);
+	m_dsp->snesdsp_write(true, data);
 }
 
 READ16_MEMBER( tsispch_state::dsp_status_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(false);
+	uint8_t temp = m_dsp->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(false);
+	return m_dsp->snesdsp_read(false);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_status_w )
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
-	upd7725->snesdsp_write(false, data);
+	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
@@ -245,7 +238,7 @@ void tsispch_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
-DRIVER_INIT_MEMBER(tsispch_state,prose2k)
+void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
@@ -266,28 +259,27 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
 	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
-	uint8_t byte1t;
-	uint16_t byte23t;
-		for (int i = 0; i < 0x600; i+= 3)
+	for (int i = 0; i < 0x600; i+= 3)
+	{
+		uint8_t byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
+		uint16_t byte23t;
+		// here's where things get disgusting: if the first byte was an OP or RT, do the following:
+		if ((byte1t&0x80) == 0x00) // op or rt instruction
 		{
-			byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
-			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
-			if ((byte1t&0x80) == 0x00) // op or rt instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
-			}
-			else if ((byte1t&0xC0) == 0x80) // jp instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
-			}
-			else // ld instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
-			}
-
-			*dspprg = byte1t<<24 | byte23t<<8;
-			dspprg++;
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 		}
+		else if ((byte1t&0xC0) == 0x80) // jp instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+		}
+		else // ld instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+		}
+
+		*dspprg = byte1t<<24 | byte23t<<8;
+		dspprg++;
+	}
 	m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
 }
 
@@ -318,10 +310,10 @@ void tsispch_state::i8086_mem(address_map &map)
 	map(0x03000, 0x03000).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x03002, 0x03002).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
-	map(0x03400, 0x03400).mirror(0x341FE).r(this, FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
-	map(0x03401, 0x03401).mirror(0x341FE).w(this, FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
-	map(0x03600, 0x03601).mirror(0x341FC).rw(this, FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
-	map(0x03602, 0x03603).mirror(0x341FC).rw(this, FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
+	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
+	map(0x03600, 0x03601).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03603).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
 	map(0xc0000, 0xfffff).rom(); // verified
 }
 
@@ -379,19 +371,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
-	MCFG_CPU_PROGRAM_MAP(i8086_mem)
-	MCFG_CPU_IO_MAP(i8086_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(i8086_mem)
+	MCFG_DEVICE_IO_MAP(i8086_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
 	/* TODO: hook up p0, p1, int */
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
-	MCFG_NECDSP_OUT_P0_CB(WRITELINE(tsispch_state, dsp_to_8086_p0_w))
-	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	MCFG_NECDSP_OUT_P0_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p0_w))
+	MCFG_NECDSP_OUT_P1_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
@@ -400,15 +392,15 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
 	// (todo: proper hookup, currently using hack w/i8251_receive_character())
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tsispch_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tsispch_state, i8251_txrdy_int))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(tsispch_state, i8251_txempty_int))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_rxrdy_int))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txrdy_int))
+	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("i8251a_u15", i8251_device, receive_character))
@@ -546,6 +538,6 @@ ROM_START( prose2ko )
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT     COMPANY                                FULLNAME                  FLAGS
-COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                                FULLNAME                  FLAGS
+COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

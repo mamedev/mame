@@ -2,6 +2,7 @@
 // copyright-holders:Zsolt Vasvari
 
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 
 class funkybee_state : public driver_device

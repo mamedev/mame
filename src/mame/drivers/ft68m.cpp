@@ -59,7 +59,7 @@ void ft68m_state::mem_map(address_map &map)
 	map(0x800000, 0x800003).mirror(0x1ffffc).rw("stc", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0xa00000, 0xbfffff).ram(); //Page Map
 	map(0xc00000, 0xdfffff).ram(); //Segment Map
-	map(0xe00000, 0xffffff).r(this, FUNC(ft68m_state::switches_r)); //Context Register
+	map(0xe00000, 0xffffff).r(FUNC(ft68m_state::switches_r)); //Context Register
 }
 
 
@@ -84,31 +84,31 @@ void ft68m_state::machine_reset()
 MACHINE_CONFIG_START(ft68m_state::ft68m)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(19'660'800) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(19'660'800) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 0)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_DEVICE_ADD("stc", AM9513A, XTAL(19'660'800) / 8)
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", upd7201_new_device, txca_w))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", upd7201_new_device, txcb_w))
+	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("mpsc", upd7201_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mpsc", upd7201_new_device, txca_w))
+	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("mpsc", upd7201_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mpsc", upd7201_new_device, txcb_w))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxa_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxb_w))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -131,5 +131,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS        INIT  COMPANY               FULLNAME  FLAGS
-COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  ft68m_state, 0,    "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY               FULLNAME  FLAGS
+COMP( 198?, ft68m, 0,      0,      ft68m,   ft68m,  ft68m_state, empty_init, "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

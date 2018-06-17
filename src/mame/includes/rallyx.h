@@ -3,6 +3,7 @@
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 struct jungler_star
 {
@@ -60,8 +61,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_on_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE_LINE_MEMBER(led_0_w);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);

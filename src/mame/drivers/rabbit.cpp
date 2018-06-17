@@ -83,6 +83,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -124,7 +125,7 @@ public:
 	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-	DECLARE_DRIVER_INIT(rabbit);
+	void init_rabbit();
 
 	void rabbit(machine_config &config);
 
@@ -720,8 +721,8 @@ void rabbit_state::rabbit_map(address_map &map)
 	map(0x000010, 0x000013).nopw(); // bug in code / emulation?
 	map(0x000024, 0x000027).nopw(); // bug in code / emulation?
 	map(0x00719c, 0x00719f).nopw(); // bug in code / emulation?
-	map(0x200000, 0x200003).portr("INPUTS").w(this, FUNC(rabbit_state::eeprom_write));
-	map(0x400010, 0x400013).r(this, FUNC(rabbit_state::randomrabbits)); // gfx chip status?
+	map(0x200000, 0x200003).portr("INPUTS").w(FUNC(rabbit_state::eeprom_write));
+	map(0x400010, 0x400013).r(FUNC(rabbit_state::randomrabbits)); // gfx chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
 	map(0x400010, 0x400013).writeonly().share("viewregs0");
 	map(0x400100, 0x400117).writeonly().share("tilemap_regs.0"); // tilemap regs1
@@ -729,10 +730,10 @@ void rabbit_state::rabbit_map(address_map &map)
 	map(0x400140, 0x400157).writeonly().share("tilemap_regs.2"); // tilemap regs3
 	map(0x400160, 0x400177).writeonly().share("tilemap_regs.3"); // tilemap regs4
 	map(0x400200, 0x40021b).writeonly().share("spriteregs"); // sprregs?
-	map(0x400300, 0x400303).w(this, FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
+	map(0x400300, 0x400303).w(FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
 	map(0x400400, 0x400413).writeonly().share("viewregs6"); // some global controls? (brightness etc.?)
 	map(0x400500, 0x400503).writeonly().share("viewregs7");
-	map(0x400700, 0x40070f).w(this, FUNC(rabbit_state::blitter_w)).share("blitterregs");
+	map(0x400700, 0x40070f).w(FUNC(rabbit_state::blitter_w)).share("blitterregs");
 	map(0x400800, 0x40080f).writeonly().share("viewregs9"); // never changes?
 	map(0x400900, 0x4009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
@@ -740,10 +741,10 @@ void rabbit_state::rabbit_map(address_map &map)
 
 	map(0x440000, 0x47ffff).bankr("bank1"); // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
-	map(0x480000, 0x483fff).rw(this, FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
-	map(0x484000, 0x487fff).rw(this, FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
-	map(0x488000, 0x48bfff).rw(this, FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
-	map(0x48c000, 0x48ffff).rw(this, FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
+	map(0x480000, 0x483fff).rw(FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
+	map(0x484000, 0x487fff).rw(FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
+	map(0x488000, 0x48bfff).rw(FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
+	map(0x48c000, 0x48ffff).rw(FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
 	map(0x494000, 0x497fff).ram().share("spriteram"); // sprites?
 	map(0x4a0000, 0x4affff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xff0000, 0xffffff).ram();
@@ -873,7 +874,7 @@ static const gfx_layout _16x16x8_layout =
 
 
 
-static GFXDECODE_START( rabbit )
+static GFXDECODE_START( gfx_rabbit )
 	/* this seems to be sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_8x8x4_layout,   0x0, 0x1000  )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_16x16x4_layout, 0x0, 0x1000  )
@@ -901,13 +902,13 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 }
 
 MACHINE_CONFIG_START(rabbit_state::rabbit)
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(rabbit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(24'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rabbit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -923,7 +924,8 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_PALETTE_FORMAT(XGRB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
@@ -934,7 +936,7 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(rabbit_state,rabbit)
+void rabbit_state::init_rabbit()
 {
 	m_banking = 1;
 	m_vblirqlevel = 6;
@@ -1026,5 +1028,5 @@ ROM_START( rabbitjt )
 	ROM_LOAD( "rabbit.nv", 0x0000, 0x0080, CRC(73d471ed) SHA1(45e045f5ea9036342b88013e021d402741d98537) )
 ROM_END
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // This is the Asian version sold in Korea but the devs forgot to update the disclaimer. It has English text.
-GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Japan, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japanese text.
+GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // This is the Asian version sold in Korea but the devs forgot to update the disclaimer. It has English text.
+GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japanese text.

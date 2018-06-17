@@ -14,13 +14,14 @@
 #include "machine/upd4992.h"
 #include "sound/okim9810.h"
 #include "sound/x1_010.h"
+#include "emupal.h"
 #include "screen.h"
 
 class seta2_state : public driver_device
 {
 public:
-	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	seta2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_sub(*this,"sub"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -38,37 +39,9 @@ public:
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
 		m_vregs(*this, "vregs", 0),
-		m_funcube_outputs(*this, "funcube_outputs"),
-		m_funcube_leds(*this, "funcube_leds")
+		m_leds(*this, "led%u", 0U),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_sub;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	optional_device<tmp68301_device> m_tmp68301;
-	optional_device<okim9810_device> m_oki;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<intelfsh16_device> m_flash;
-	optional_device<upd4992_device> m_rtc;
-	optional_device<ticket_dispenser_device> m_dispenser;
-
-	optional_shared_ptr<uint16_t> m_nvram;
-	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_tileram;
-	optional_shared_ptr<uint16_t> m_vregs;
-	optional_shared_ptr<uint16_t> m_funcube_outputs;
-	optional_shared_ptr<uint16_t> m_funcube_leds;
-
-	int m_xoffset;
-	int m_yoffset;
-	int m_keyboard_row;
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
-
-	uint64_t m_funcube_coin_start_cycles;
-	uint8_t m_funcube_hopper_motor;
 
 	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
 	DECLARE_READ16_MEMBER(spriteram16_word_r);
@@ -99,24 +72,7 @@ public:
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
-	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
-	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
-	DECLARE_READ32_MEMBER(funcube_debug_r);
-	DECLARE_READ16_MEMBER(funcube_coins_r);
-	DECLARE_WRITE16_MEMBER(funcube_leds_w);
-	DECLARE_READ16_MEMBER(funcube_outputs_r);
-	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
-	DECLARE_READ16_MEMBER(funcube_battery_r);
 
-	DECLARE_DRIVER_INIT(funcube3);
-	DECLARE_DRIVER_INIT(funcube);
-	DECLARE_DRIVER_INIT(funcube2);
-
-	DECLARE_MACHINE_START(mj4simai);
-	DECLARE_MACHINE_START(funcube);
-	DECLARE_MACHINE_RESET(funcube);
-
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
@@ -127,16 +83,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(seta2_interrupt);
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
-	void funcube_debug_outputs();
 	void seta2(machine_config &config);
-	void funcube(machine_config &config);
-	void funcube3(machine_config &config);
-	void funcube2(machine_config &config);
 	void grdians(machine_config &config);
 	void myangel(machine_config &config);
-	void mj4simai(machine_config &config);
 	void penbros(machine_config &config);
 	void pzlbowl(machine_config &config);
 	void myangel2(machine_config &config);
@@ -147,11 +97,6 @@ public:
 	void samshoot(machine_config &config);
 	void namcostr(machine_config &config);
 	void ablastb_map(address_map &map);
-	void funcube2_map(address_map &map);
-	void funcube2_sub_io(address_map &map);
-	void funcube_map(address_map &map);
-	void funcube_sub_io(address_map &map);
-	void funcube_sub_map(address_map &map);
 	void grdians_map(address_map &map);
 	void gundamex_map(address_map &map);
 	void mj4simai_map(address_map &map);
@@ -164,6 +109,96 @@ public:
 	void reelquak_map(address_map &map);
 	void samshoot_map(address_map &map);
 	void telpacfl_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); m_lamps.resolve(); }
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_sub;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	optional_device<tmp68301_device> m_tmp68301;
+	optional_device<okim9810_device> m_oki;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<intelfsh16_device> m_flash;
+	optional_device<upd4992_device> m_rtc;
+	optional_device<ticket_dispenser_device> m_dispenser;
+
+	optional_shared_ptr<uint16_t> m_nvram;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_tileram;
+	optional_shared_ptr<uint16_t> m_vregs;
+	output_finder<7> m_leds;
+	output_finder<11> m_lamps;
+
+	int m_xoffset;
+	int m_yoffset;
+	int m_keyboard_row;
+	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
+
+};
+
+
+class mj4simai_state : public seta2_state
+{
+public:
+	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag)
+		: seta2_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_start() override;
+};
+
+
+class funcube_state : public seta2_state
+{
+public:
+	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
+		: seta2_state(mconfig, type, tag)
+		, m_funcube_outputs(*this, "funcube_outputs")
+		, m_funcube_leds(*this, "funcube_leds")
+	{ }
+
+	void funcube(machine_config &config);
+	void funcube3(machine_config &config);
+	void funcube2(machine_config &config);
+
+	void init_funcube3();
+	void init_funcube();
+	void init_funcube2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
+	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
+	DECLARE_READ32_MEMBER(funcube_debug_r);
+	DECLARE_READ16_MEMBER(funcube_coins_r);
+	DECLARE_WRITE16_MEMBER(funcube_leds_w);
+	DECLARE_READ16_MEMBER(funcube_outputs_r);
+	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
+	DECLARE_READ16_MEMBER(funcube_battery_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
+
+	void funcube2_map(address_map &map);
+	void funcube2_sub_io(address_map &map);
+	void funcube_map(address_map &map);
+	void funcube_sub_io(address_map &map);
+	void funcube_sub_map(address_map &map);
+
+	void funcube_debug_outputs();
+
+	required_shared_ptr<uint16_t> m_funcube_outputs;
+	required_shared_ptr<uint16_t> m_funcube_leds;
+	uint64_t m_funcube_coin_start_cycles;
+	uint8_t m_funcube_hopper_motor;
 };
 
 

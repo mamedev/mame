@@ -40,6 +40,7 @@ ToDo:
 #include "machine/i8255.h"
 #include "sound/msm5205.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -89,9 +90,9 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_DRIVER_INIT(game0);
-	DECLARE_DRIVER_INIT(game1);
-	DECLARE_DRIVER_INIT(game2);
+	void init_game0();
+	void init_game1();
+	void init_game2();
 	DECLARE_PALETTE_INIT(spinb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jolypark(machine_config &config);
@@ -149,9 +150,9 @@ void spinb_state::spinb_map(address_map &map)
 	map(0x6400, 0x6403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6c20, 0x6c3f).mirror(0x1300).w(this, FUNC(spinb_state::sndcmd_w));
-	map(0x6c40, 0x6c45).mirror(0x1300).w(this, FUNC(spinb_state::lamp1_w));
-	map(0x6c60, 0x6c60).mirror(0x1300).w(this, FUNC(spinb_state::disp_w));
+	map(0x6c20, 0x6c3f).mirror(0x1300).w(FUNC(spinb_state::sndcmd_w));
+	map(0x6c40, 0x6c45).mirror(0x1300).w(FUNC(spinb_state::lamp1_w));
+	map(0x6c60, 0x6c60).mirror(0x1300).w(FUNC(spinb_state::disp_w));
 	map(0x6ce0, 0x6ce0).nopw();
 }
 
@@ -163,9 +164,9 @@ void spinb_state::vrnwrld_map(address_map &map)
 	map(0xc400, 0xc403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc800, 0xc803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xcc00, 0xcc03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xcc20, 0xcc3f).mirror(0x1300).w(this, FUNC(spinb_state::sndcmd_w));
-	map(0xcc40, 0xcc45).mirror(0x1300).w(this, FUNC(spinb_state::lamp1_w));
-	map(0xcc60, 0xcc60).mirror(0x1300).w(this, FUNC(spinb_state::disp_w));
+	map(0xcc20, 0xcc3f).mirror(0x1300).w(FUNC(spinb_state::sndcmd_w));
+	map(0xcc40, 0xcc45).mirror(0x1300).w(FUNC(spinb_state::lamp1_w));
+	map(0xcc60, 0xcc60).mirror(0x1300).w(FUNC(spinb_state::disp_w));
 	map(0xcce0, 0xcce0).nopw();
 }
 
@@ -174,8 +175,8 @@ void spinb_state::spinb_audio_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram(); // 6164
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppia", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(spinb_state::sndbank_a_w));
-	map(0x8000, 0x8000).r(this, FUNC(spinb_state::sndcmd_r));
+	map(0x6000, 0x6000).w(FUNC(spinb_state::sndbank_a_w));
+	map(0x8000, 0x8000).r(FUNC(spinb_state::sndcmd_r));
 }
 
 void spinb_state::spinb_music_map(address_map &map)
@@ -183,9 +184,9 @@ void spinb_state::spinb_music_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram(); // 6164
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppim", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(spinb_state::sndbank_m_w));
-	map(0x8000, 0x8000).r(this, FUNC(spinb_state::sndcmd_r));
-	map(0xA000, 0xA000).w(this, FUNC(spinb_state::volume_w));
+	map(0x6000, 0x6000).w(FUNC(spinb_state::sndbank_m_w));
+	map(0x8000, 0x8000).r(FUNC(spinb_state::sndcmd_r));
+	map(0xA000, 0xA000).w(FUNC(spinb_state::volume_w));
 }
 
 void spinb_state::dmd_mem(address_map &map)
@@ -195,8 +196,8 @@ void spinb_state::dmd_mem(address_map &map)
 
 void spinb_state::dmd_io(address_map &map)
 {
-	map(0x0000, 0x1fff).w(this, FUNC(spinb_state::dmdram_w));
-	map(0x0000, 0xffff).r(this, FUNC(spinb_state::dmdram_r));
+	map(0x0000, 0x1fff).w(FUNC(spinb_state::dmdram_w));
+	map(0x0000, 0xffff).r(FUNC(spinb_state::dmdram_r));
 }
 
 static INPUT_PORTS_START( spinb )
@@ -453,17 +454,17 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 void spinb_state::update_sound_a()
 {
 	if (m_sndbank_a != 0xff)
-		m_ic14a->ba_w(m_p_audio[m_sound_addr_a]);
+		m_ic14a->write_ba(m_p_audio[m_sound_addr_a]);
 	else
-		m_ic14a->ba_w(0);
+		m_ic14a->write_ba(0);
 }
 
 void spinb_state::update_sound_m()
 {
 	if (m_sndbank_m != 0xff)
-		m_ic14m->ba_w(m_p_music[m_sound_addr_m]);
+		m_ic14m->write_ba(m_p_music[m_sound_addr_m]);
 	else
-		m_ic14m->ba_w(0);
+		m_ic14m->write_ba(0);
 }
 
 WRITE_LINE_MEMBER( spinb_state::ic5a_w )
@@ -548,14 +549,14 @@ void spinb_state::machine_start()
 	save_item(NAME(m_dmdram)); // make it visible in the debugger
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game0 )
+void spinb_state::init_game0()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game1 )
+void spinb_state::init_game1()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
@@ -563,7 +564,7 @@ DRIVER_INIT_MEMBER( spinb_state, game1 )
 	m_game = 1;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game2 )
+void spinb_state::init_game2()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
@@ -636,19 +637,19 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 MACHINE_CONFIG_START(spinb_state::spinb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(spinb_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spinb_state, irq0_line_hold, 160) // NE556 adjustable (if faster, then jolypark has a stack problem)
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(spinb_audio_map)
-	MCFG_CPU_ADD("musiccpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(spinb_music_map)
-	MCFG_CPU_ADD("dmdcpu",I8031, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(dmd_mem)
-	MCFG_CPU_IO_MAP(dmd_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(spinb_state, p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(spinb_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(spinb_state, p3_w))
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(spinb_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spinb_state, irq0_line_hold, 160) // NE556 adjustable (if faster, then jolypark has a stack problem)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(spinb_audio_map)
+	MCFG_DEVICE_ADD("musiccpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(spinb_music_map)
+	MCFG_DEVICE_ADD("dmdcpu",I8031, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dmd_mem)
+	MCFG_DEVICE_IO_MAP(dmd_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, spinb_state, p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, spinb_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, spinb_state, p3_w))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -665,83 +666,83 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("msmavol")
-	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
+	SPEAKER(config, "msmavol").front_center();
+	MCFG_DEVICE_ADD("msm_a", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
-	MCFG_SPEAKER_STANDARD_MONO("msmmvol")
-	MCFG_SOUND_ADD("msm_m", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5m", ttl7474_device, clock_w))
+	SPEAKER(config, "msmmvol").front_center();
+	MCFG_DEVICE_ADD("msm_m", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("ic5m", ttl7474_device, clock_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(spinb_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(spinb_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(spinb_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spinb_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(spinb_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(spinb_state, ppi60c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi60a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi60a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi60b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi60b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, sw_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi60c_w))
 
 	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(spinb_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(spinb_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(spinb_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(spinb_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(spinb_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spinb_state, ppi64c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi64a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi64a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi64b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi64b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppi64c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi64c_w))
 
 	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(spinb_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(spinb_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(spinb_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(spinb_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(spinb_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(spinb_state, ppi68c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi68a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi68a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi68b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi68b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppi68c_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi68c_w))
 
 	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(spinb_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(spinb_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(spinb_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(spinb_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(spinb_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(spinb_state, ppi6cc_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi6ca_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi6ca_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi6cb_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi6cb_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppi6cc_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi6cc_w))
 
 	MCFG_DEVICE_ADD("ppia", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(spinb_state, ppia_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spinb_state, ppia_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(spinb_state, ppia_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spinb_state, ppia_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppia_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppia_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppia_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppia_c_w))
 
 	MCFG_DEVICE_ADD("ppim", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(spinb_state, ppim_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spinb_state, ppim_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(spinb_state, ppim_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spinb_state, ppim_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppim_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppim_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppim_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppim_c_w))
 
 	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5a_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5a_w))
 
 	MCFG_DEVICE_ADD("ic14a", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(DEVWRITE8("msm_a", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm_a", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5m_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5m_w))
 
 	MCFG_DEVICE_ADD("ic14m", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spinb_state::jolypark)
 	spinb(config);
-	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL(640'000))
-	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
+	MCFG_DEVICE_REPLACE("msm_a", MSM6585, XTAL(640'000))
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
-	MCFG_SOUND_REPLACE("msm_m", MSM6585, XTAL(640'000))
-	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5m", ttl7474_device, clock_w))
+	MCFG_DEVICE_REPLACE("msm_m", MSM6585, XTAL(640'000))
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("ic5m", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 MACHINE_CONFIG_END
@@ -749,8 +750,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(spinb_state::vrnwrld)
 	jolypark(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vrnwrld_map)
 MACHINE_CONFIG_END
 
 
@@ -884,8 +885,8 @@ ROM_START(vrnwrld)
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, game0,  ROT0,  "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, game1,  ROT0,  "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, game2,  ROT0,  "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

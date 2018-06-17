@@ -15,6 +15,7 @@
 #include "machine/ram.h"
 #include "sound/discrete.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define M6502_TAG       "m6502"
@@ -106,7 +107,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
-	DECLARE_DRIVER_INIT(c1p);
+	void init_c1p();
 	void c1p(machine_config &config);
 	void c1p_mem(address_map &map);
 };

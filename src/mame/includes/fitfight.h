@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emupal.h"
+
 class fitfight_state : public driver_device
 {
 public:
@@ -55,10 +57,10 @@ public:
 	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);
 
 	DECLARE_READ16_MEMBER( hotmindff_unk_r );
-	DECLARE_DRIVER_INIT(hotmindff);
-	DECLARE_DRIVER_INIT(fitfight);
-	DECLARE_DRIVER_INIT(histryma);
-	DECLARE_DRIVER_INIT(bbprot);
+	void init_hotmindff();
+	void init_fitfight();
+	void init_histryma();
+	void init_bbprot();
 	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);

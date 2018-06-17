@@ -14,6 +14,7 @@
 #include "cpu/mips/r3000.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -93,11 +94,11 @@ void turrett_state::cpu_map(address_map &map)
 	map(0x02000050, 0x02000053).ram();
 	map(0x02000060, 0x02000063).ram();
 	map(0x02000070, 0x02000073).ram(); // TODO: What are these?
-	map(0x04000000, 0x0400000f).w(this, FUNC(turrett_state::dma_w));
-	map(0x04000100, 0x04000103).rw(this, FUNC(turrett_state::int_r), FUNC(turrett_state::int_w));
+	map(0x04000000, 0x0400000f).w(FUNC(turrett_state::dma_w));
+	map(0x04000100, 0x04000103).rw(FUNC(turrett_state::int_r), FUNC(turrett_state::int_w));
 	map(0x04000200, 0x040003ff).rw("ttsound", FUNC(turrett_device::read), FUNC(turrett_device::write));
-	map(0x08000000, 0x0800000f).rw(this, FUNC(turrett_state::video_r), FUNC(turrett_state::video_w));
-	map(0x08000200, 0x080003ff).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+	map(0x08000000, 0x0800000f).rw(FUNC(turrett_state::video_r), FUNC(turrett_state::video_w));
+	map(0x08000200, 0x080003ff).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0);
 }
 
@@ -341,9 +342,10 @@ public:
 
 DEFINE_DEVICE_TYPE(TURRETT_HARDDISK, turrett_hdd, "turrett_hdd", "Turret Tower HDD")
 
-SLOT_INTERFACE_START(turrett_devices)
-	SLOT_INTERFACE("hdd", TURRETT_HARDDISK)
-SLOT_INTERFACE_END
+void turrett_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", TURRETT_HARDDISK);
+}
 
 /*************************************
  *
@@ -354,13 +356,13 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(turrett_state::turrett)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", R3041, R3041_CLOCK)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_R3000_BRCOND2_INPUT(READLINE(turrett_state, sbrc2_r))
-	MCFG_R3000_BRCOND3_INPUT(READLINE(turrett_state, sbrc3_r))
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
-	MCFG_CPU_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
+	MCFG_R3000_BRCOND2_INPUT(READLINE(*this, turrett_state, sbrc2_r))
+	MCFG_R3000_BRCOND3_INPUT(READLINE(*this, turrett_state, sbrc3_r))
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
 
 	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", nullptr, true)
 
@@ -375,7 +377,8 @@ MACHINE_CONFIG_START(turrett_state::turrett)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
 	MCFG_DEVICE_ADDRESS_MAP(0, turrett_sound_map)
@@ -414,4 +417,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2001, turrett, 0, turrett, turrett, turrett_state, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )
+GAME( 2001, turrett, 0, turrett, turrett, turrett_state, empty_init, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )

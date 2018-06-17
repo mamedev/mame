@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/ram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -91,9 +92,9 @@ uint32_t vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt320_state::vt320)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(vt320_mem)
-	MCFG_CPU_IO_MAP(vt320_io)
+	MCFG_DEVICE_ADD("maincpu", I8051, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vt320_mem)
+	MCFG_DEVICE_IO_MAP(vt320_io)
 
 
 	/* video hardware */
@@ -119,22 +120,22 @@ ROM_START( vt320 )
 	//DOL: http://web.archive.org/web/20060905115711/http://cmcnabb.cc.vt.edu/dec94mds/vt320dol.txt
 	ROM_SYSTEM_BIOS( 0, "vt320v11", "VT320 V1.1" )
 	// 23-054E7 below can also appear (same contents?) as 23-048E7 which is a mask rom
-	ROMX_LOAD( "23-054e7.e9", 0x0000, 0x10000, CRC(be98f9a4) SHA1(b8044d42ffaadb734fbd047fbca9c8aadeb0bf6c), ROM_BIOS(1) ) // EPROM
+	ROMX_LOAD( "23-054e7.e9", 0x0000, 0x10000, CRC(be98f9a4) SHA1(b8044d42ffaadb734fbd047fbca9c8aadeb0bf6c), ROM_BIOS(0) ) // EPROM
 	ROM_SYSTEM_BIOS( 1, "vt320", "VT320 V1.2" )
-	ROMX_LOAD( "23-104e7.e9", 0x0000, 0x10000, CRC(5f419b5a) SHA1(dbc429b32d6baefd8a56862717d6e7fea1fb0c1c), ROM_BIOS(2) )
+	ROMX_LOAD( "23-104e7.e9", 0x0000, 0x10000, CRC(5f419b5a) SHA1(dbc429b32d6baefd8a56862717d6e7fea1fb0c1c), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( vt330 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt330" )
 	ROM_SYSTEM_BIOS( 0, "vt330", "VT330" )
-	ROMX_LOAD( "23-236e6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(1) ) // 27256 EPROM
+	ROMX_LOAD( "23-236e6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(0) ) // 27256 EPROM
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                          FULLNAME   FLAGS */
-COMP( 1987, vt320,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
-COMP( 1987, vt330,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
-//COMP( 1989?, vt340,  0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
-//COMP( 1990?, vt340p, 0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )
+/*    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                          FULLNAME   FLAGS */
+COMP( 1987,  vt320,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
+COMP( 1987,  vt330,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
+//COMP( 1989?, vt340,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
+//COMP( 1990?, vt340p, 0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )

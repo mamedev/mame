@@ -110,7 +110,7 @@ void mikie_state::mikie_map(address_map &map)
 	map(0x0000, 0x00ff).ram();
 	map(0x2000, 0x2007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x2100, 0x2100).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2200, 0x2200).w(this, FUNC(mikie_state::mikie_palettebank_w));
+	map(0x2200, 0x2200).w(FUNC(mikie_state::mikie_palettebank_w));
 	map(0x2300, 0x2300).nopw();    // ???
 	map(0x2400, 0x2400).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x2401, 0x2401).portr("P1");
@@ -120,8 +120,8 @@ void mikie_state::mikie_map(address_map &map)
 	map(0x2501, 0x2501).portr("DSW2");
 	map(0x2800, 0x288f).ram().share("spriteram");
 	map(0x2890, 0x37ff).ram();
-	map(0x3800, 0x3bff).ram().w(this, FUNC(mikie_state::mikie_colorram_w)).share("colorram");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(mikie_state::mikie_videoram_w)).share("videoram");
+	map(0x3800, 0x3bff).ram().w(FUNC(mikie_state::mikie_colorram_w)).share("colorram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(mikie_state::mikie_videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).rom(); // Machine checks for extra rom
 	map(0x6000, 0xffff).rom();
 }
@@ -132,10 +132,10 @@ void mikie_state::sound_map(address_map &map)
 	map(0x4000, 0x43ff).ram();
 	map(0x8000, 0x8000).nopw();    // sound command latch
 	map(0x8001, 0x8001).nopw();    // ???
-	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::write)); // trigger read of latch
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::command_w)); // trigger read of latch
 	map(0x8003, 0x8003).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::write)); // trigger read of latch
-	map(0x8005, 0x8005).r(this, FUNC(mikie_state::mikie_sh_timer_r));
+	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::command_w)); // trigger read of latch
+	map(0x8005, 0x8005).r(FUNC(mikie_state::mikie_sh_timer_r));
 	map(0x8079, 0x8079).nopw();    // ???
 	map(0xa003, 0xa003).nopw();    // ???
 }
@@ -228,7 +228,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 64 bytes */
 };
 
-static GFXDECODE_START( mikie )
+static GFXDECODE_START( gfx_mikie )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0001, spritelayout, 16*8*16, 16*8 )
@@ -261,19 +261,19 @@ WRITE_LINE_MEMBER(mikie_state::vblank_irq)
 MACHINE_CONFIG_START(mikie_state::mikie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
-	MCFG_CPU_PROGRAM_MAP(mikie_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
+	MCFG_DEVICE_PROGRAM_MAP(mikie_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 6I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mikie_state, coin_counter_1_w)) // COIN1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mikie_state, coin_counter_2_w)) // COIN2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mikie_state, sh_irqtrigger_w)) // SOUNDON
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_1_w)) // COIN1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_2_w)) // COIN2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mikie_state, sh_irqtrigger_w)) // SOUNDON
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // END (not used?)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mikie_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mikie_state, irq_mask_w)) // INT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mikie_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mikie_state, irq_mask_w)) // INT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -285,22 +285,22 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mikie_state, screen_update_mikie)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mikie_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mikie_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikie)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(mikie_state, mikie)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL/8)
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, CLK)
+	MCFG_DEVICE_ADD("sn2", SN76489A, CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -394,6 +394,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )

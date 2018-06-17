@@ -13,6 +13,7 @@
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
+#include "emupal.h"
 
 #define MAX_SAMPLES 0x2f        /* max samples */
 
@@ -182,7 +183,7 @@ public:
 	DECLARE_WRITE8_MEMBER(csport_w);
 
 	DECLARE_MACHINE_RESET(kageki);
-	DECLARE_DRIVER_INIT(kageki);
+	void init_kageki();
 
 	SAMPLES_START_CB_MEMBER(init_samples);
 

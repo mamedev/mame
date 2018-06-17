@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class lkage_state : public driver_device
 {
@@ -60,8 +61,8 @@ public:
 	DECLARE_READ8_MEMBER(fake_status_r);
 
 	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
-	DECLARE_DRIVER_INIT(bygone);
-	DECLARE_DRIVER_INIT(lkage);
+	void init_bygone();
+	void init_lkage();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

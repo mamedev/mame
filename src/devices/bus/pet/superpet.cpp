@@ -62,7 +62,7 @@ const tiny_rom_entry *superpet_device::device_rom_region() const
 
 void superpet_device::superpet_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(superpet_device::read), FUNC(superpet_device::write));
+	map(0x0000, 0xffff).rw(FUNC(superpet_device::read), FUNC(superpet_device::write));
 }
 
 
@@ -71,21 +71,21 @@ void superpet_device::superpet_mem(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(superpet_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL(16'000'000)/16)
-	MCFG_CPU_PROGRAM_MAP(superpet_mem)
+	MCFG_DEVICE_ADD(M6809_TAG, M6809, XTAL(16'000'000)/16)
+	MCFG_DEVICE_PROGRAM_MAP(superpet_mem)
 
 	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL(16'000'000)/16)
 
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(superpet_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, superpet_device, acia_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 

@@ -85,7 +85,7 @@ void funybubl_state::funybubl_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank2"); // banked port 1?
-	map(0xc400, 0xcfff).ram().w(this, FUNC(funybubl_state::funybubl_paldatawrite)).share("paletteram"); // palette
+	map(0xc400, 0xcfff).ram().w(FUNC(funybubl_state::funybubl_paldatawrite)).share("paletteram"); // palette
 	map(0xd000, 0xdfff).bankrw("bank1"); // banked port 0?
 	map(0xe000, 0xffff).ram();
 }
@@ -93,10 +93,10 @@ void funybubl_state::funybubl_map(address_map &map)
 void funybubl_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(this, FUNC(funybubl_state::funybubl_vidram_bank_w));    // vidram bank
-	map(0x01, 0x01).portr("P1").w(this, FUNC(funybubl_state::funybubl_cpurombank_w));     // rom bank?
+	map(0x00, 0x00).portr("SYSTEM").w(FUNC(funybubl_state::funybubl_vidram_bank_w));    // vidram bank
+	map(0x01, 0x01).portr("P1").w(FUNC(funybubl_state::funybubl_cpurombank_w));     // rom bank?
 	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW").w(this, FUNC(funybubl_state::funybubl_soundcommand_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(funybubl_state::funybubl_soundcommand_w));
 	map(0x06, 0x06).nopr();     /* Nothing is done with the data read */
 	map(0x06, 0x06).nopw();        /* Written directly after IO port 0 */
 	map(0x07, 0x07).nopw();        /* Reset something on startup - Sound CPU ?? */
@@ -108,7 +108,7 @@ void funybubl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(funybubl_state::funybubl_oki_bank_sw));
+	map(0x9000, 0x9000).w(FUNC(funybubl_state::funybubl_oki_bank_sw));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -198,7 +198,7 @@ static const gfx_layout tiles16x16x8_2_layout =
 };
 
 
-static GFXDECODE_START( funybubl )
+static GFXDECODE_START( gfx_funybubl )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_1_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x8_2_layout, 0, 16 )
 GFXDECODE_END
@@ -222,13 +222,13 @@ void funybubl_state::machine_start()
 MACHINE_CONFIG_START(funybubl_state::funybubl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(funybubl_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(funybubl_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
@@ -241,16 +241,16 @@ MACHINE_CONFIG_START(funybubl_state::funybubl)
 	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update_funybubl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funybubl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funybubl)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -317,5 +317,5 @@ ROM_START( funybublc )
 ROM_END
 
 
-GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, 0, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, empty_init, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, empty_init, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )

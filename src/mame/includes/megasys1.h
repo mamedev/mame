@@ -12,6 +12,7 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -127,31 +128,31 @@ public:
 	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
 	DECLARE_WRITE16_MEMBER(ram_w);
 
-	DECLARE_DRIVER_INIT(64street);
-	DECLARE_DRIVER_INIT(chimerab);
-	DECLARE_DRIVER_INIT(peekaboo);
-	DECLARE_DRIVER_INIT(soldam);
-	DECLARE_DRIVER_INIT(astyanax);
-	DECLARE_DRIVER_INIT(stdragon);
-	DECLARE_DRIVER_INIT(hayaosi1);
-	DECLARE_DRIVER_INIT(soldamj);
-	DECLARE_DRIVER_INIT(phantasm);
-	DECLARE_DRIVER_INIT(jitsupro);
-	DECLARE_DRIVER_INIT(iganinju);
-	DECLARE_DRIVER_INIT(cybattlr);
-	DECLARE_DRIVER_INIT(rodlandj);
-	DECLARE_DRIVER_INIT(rittam);
-	DECLARE_DRIVER_INIT(rodlandjb);
-	DECLARE_DRIVER_INIT(avspirit);
-	DECLARE_DRIVER_INIT(monkelf);
-	DECLARE_DRIVER_INIT(edf);
-	DECLARE_DRIVER_INIT(edfp);
-	DECLARE_DRIVER_INIT(bigstrik);
-	DECLARE_DRIVER_INIT(rodland);
-	DECLARE_DRIVER_INIT(edfbl);
-	DECLARE_DRIVER_INIT(stdragona);
-	DECLARE_DRIVER_INIT(stdragonb);
-	DECLARE_DRIVER_INIT(systemz);
+	void init_64street();
+	void init_chimerab();
+	void init_peekaboo();
+	void init_soldam();
+	void init_astyanax();
+	void init_stdragon();
+	void init_hayaosi1();
+	void init_soldamj();
+	void init_phantasm();
+	void init_jitsupro();
+	void init_iganinju();
+	void init_cybattlr();
+	void init_rodlandj();
+	void init_rittam();
+	void init_rodlandjb();
+	void init_avspirit();
+	void init_monkelf();
+	void init_edf();
+	void init_edfp();
+	void init_bigstrik();
+	void init_rodland();
+	void init_edfbl();
+	void init_stdragona();
+	void init_stdragonb();
+	void init_systemz();
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
 	DECLARE_PALETTE_INIT(megasys1);

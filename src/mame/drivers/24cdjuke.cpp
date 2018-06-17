@@ -130,7 +130,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 void midcoin24cdjuke_state::midcoin24cdjuke_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x7800, 0x780f).w(this, FUNC(midcoin24cdjuke_state::digit_w));
+	map(0x7800, 0x780f).w(FUNC(midcoin24cdjuke_state::digit_w));
 	map(0x8000, 0xffff).ram();
 }
 
@@ -141,7 +141,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke_io(address_map &map)
 	map(0x04, 0x07).rw("ic11", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0c, 0x0c).nopw();
-	map(0x10, 0x1f).r(this, FUNC(midcoin24cdjuke_state::unknown_r));
+	map(0x10, 0x1f).r(FUNC(midcoin24cdjuke_state::unknown_r));
 }
 
 static INPUT_PORTS_START( midcoin24cdjuke )
@@ -283,10 +283,10 @@ void midcoin24cdjuke_state::machine_reset()
 
 MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(midcoin24cdjuke_map)
-	MCFG_CPU_IO_MAP(midcoin24cdjuke_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
+	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(midcoin24cdjuke_map)
+	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
 
 	MCFG_DEFAULT_LAYOUT(layout_24cdjuke)
 
@@ -297,8 +297,8 @@ MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 
 	MCFG_DEVICE_ADD("ic25", I8255A, 0)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("PB"))
-	MCFG_I8255_IN_PORTC_CB(READ8(midcoin24cdjuke_state, kb_row_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(midcoin24cdjuke_state, kb_col_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, midcoin24cdjuke_state, kb_row_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, midcoin24cdjuke_state, kb_col_w))
 
 	MCFG_DEVICE_ADD("ic31", I8255A, 0)
 	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
@@ -321,4 +321,4 @@ ROM_START( 24cdjuke )
 ROM_END
 
 
-GAME( 1988, 24cdjuke,  0,    midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state,  0, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text
+GAME( 1988, 24cdjuke, 0, midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state, empty_init, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text

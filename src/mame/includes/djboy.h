@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8
 
@@ -44,7 +45,7 @@ public:
 
 	/* ROM banking */
 	uint8_t       m_bankxor;
-	
+
 	required_memory_bank m_masterbank;
 	required_memory_bank m_slavebank;
 	required_memory_bank m_soundbank;
@@ -95,8 +96,8 @@ public:
 	DECLARE_WRITE8_MEMBER(djboy_scrolly_w);
 	DECLARE_WRITE8_MEMBER(djboy_videoram_w);
 	DECLARE_WRITE8_MEMBER(djboy_paletteram_w);
-	DECLARE_DRIVER_INIT(djboy);
-	DECLARE_DRIVER_INIT(djboyj);
+	void init_djboy();
+	void init_djboyj();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

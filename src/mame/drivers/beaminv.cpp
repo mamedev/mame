@@ -247,8 +247,8 @@ void beaminv_state::main_map(address_map &map)
 	map(0x1800, 0x1fff).ram();
 	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
 	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
-	map(0x3400, 0x3400).mirror(0x03ff).r(this, FUNC(beaminv_state::controller_r));
-	map(0x3800, 0x3800).mirror(0x03ff).r(this, FUNC(beaminv_state::v128_r));
+	map(0x3400, 0x3400).mirror(0x03ff).r(FUNC(beaminv_state::controller_r));
+	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(beaminv_state::v128_r));
 	map(0x4000, 0x5fff).ram().share("videoram");
 }
 
@@ -263,7 +263,7 @@ void beaminv_state::main_map(address_map &map)
 void beaminv_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(beaminv_state::controller_select_w)); /* to be confirmed */
+	map(0x00, 0x00).w(FUNC(beaminv_state::controller_select_w)); /* to be confirmed */
 }
 
 
@@ -343,9 +343,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(beaminv_state::beaminv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 
 	/* video hardware */
@@ -394,5 +394,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  beaminv_state, 0, ROT270, "Teknon Kogyo",      "Beam Invader",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
-GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, beaminv_state, 0, ROT270, "Pacom Corporation", "Pacom Invader", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  beaminv_state, empty_init, ROT270, "Teknon Kogyo",      "Beam Invader",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation", "Pacom Invader", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )

@@ -62,6 +62,7 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -287,16 +288,16 @@ void supdrapo_state::sdpoker_mem(address_map &map)
 	map(0x6800, 0x6bff).ram().share("videoram");
 	map(0x6c00, 0x6fff).ram().share("char_bank");
 	map(0x7000, 0x7bff).ram(); //$7600 seems watchdog
-	map(0x7c00, 0x7c00).w(this, FUNC(supdrapo_state::debug7c00_w));
-	map(0x8000, 0x8000).portr("IN4").w(this, FUNC(supdrapo_state::wdog8000_w));
+	map(0x7c00, 0x7c00).w(FUNC(supdrapo_state::debug7c00_w));
+	map(0x8000, 0x8000).portr("IN4").w(FUNC(supdrapo_state::wdog8000_w));
 	map(0x8001, 0x8001).portr("IN0");
-	map(0x8002, 0x8002).portr("IN1").w(this, FUNC(supdrapo_state::payout_w));
-	map(0x8003, 0x8003).portr("IN2").w(this, FUNC(supdrapo_state::coinin_w));
-	map(0x8004, 0x8004).portr("IN3").w(this, FUNC(supdrapo_state::debug8004_w));
+	map(0x8002, 0x8002).portr("IN1").w(FUNC(supdrapo_state::payout_w));
+	map(0x8003, 0x8003).portr("IN2").w(FUNC(supdrapo_state::coinin_w));
+	map(0x8004, 0x8004).portr("IN3").w(FUNC(supdrapo_state::debug8004_w));
 	map(0x8005, 0x8005).portr("SW1");
 	map(0x8006, 0x8006).portr("SW2");
 	map(0x9000, 0x90ff).ram().share("nvram");
-	map(0x9400, 0x9400).r(this, FUNC(supdrapo_state::rng_r));
+	map(0x9400, 0x9400).r(FUNC(supdrapo_state::rng_r));
 	map(0x9800, 0x9801).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
@@ -428,7 +429,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( supdrapo )
+static GFXDECODE_START( gfx_supdrapo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
@@ -454,9 +455,9 @@ WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
 
 MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
-	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(sdpoker_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -471,15 +472,15 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supdrapo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supdrapo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(supdrapo_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(supdrapo_state, ay8910_outputb_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -613,7 +614,7 @@ ROM_END
                            Games Drivers
 **********************************************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  ROT    COMPANY                                           FULLNAME                      FLAGS
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT    COMPANY                                           FULLNAME                      FLAGS
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, supdrapo_state, empty_init, ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, supdrapo_state, empty_init, ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, supdrapo_state, empty_init, ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )

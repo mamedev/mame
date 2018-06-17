@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
+		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -71,9 +71,9 @@ void surpratk_state::surpratk_map(address_map &map)
 	map(0x5f90, 0x5f90).portr("DSW2");
 	map(0x5fa0, 0x5faf).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
 	map(0x5fb0, 0x5fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(surpratk_state::surpratk_5fc0_w));
+	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::surpratk_5fc0_w));
 	map(0x5fd0, 0x5fd1).w("ymsnd", FUNC(ym2151_device::write));
-	map(0x5fc4, 0x5fc4).w(this, FUNC(surpratk_state::surpratk_videobank_w));
+	map(0x5fc4, 0x5fc4).w(FUNC(surpratk_state::surpratk_videobank_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
@@ -164,17 +164,17 @@ void surpratk_state::machine_reset()
 
 WRITE8_MEMBER( surpratk_state::banking_callback )
 {
-//  logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+//  logerror("%s: setlines %02x\n", machine().describe_context(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
 MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	MCFG_CPU_PROGRAM_MAP(surpratk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(surpratk_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	MCFG_DEVICE_PROGRAM_MAP(surpratk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
@@ -210,9 +210,10 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -273,6 +274,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, suratk,  0,      surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (World ver. K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, suratka, suratk, surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (Asia ver. L)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, suratkj, suratk, surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (Japan ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, suratk,  0,      surpratk, surpratk, surpratk_state, empty_init, ROT0, "Konami", "Surprise Attack (World ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, suratka, suratk, surpratk, surpratk, surpratk_state, empty_init, ROT0, "Konami", "Surprise Attack (Asia ver. L)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, suratkj, suratk, surpratk, surpratk, surpratk_state, empty_init, ROT0, "Konami", "Surprise Attack (Japan ver. M)", MACHINE_SUPPORTS_SAVE )

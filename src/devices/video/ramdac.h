@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -20,7 +21,7 @@
 #define MCFG_RAMDAC_ADD(_tag, _map, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, RAMDAC, 0) \
 	MCFG_DEVICE_ADDRESS_MAP(0, _map) \
-	downcast<ramdac_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<ramdac_device &>(*device).set_palette_tag(_palette_tag);
 
 #define MCFG_RAMDAC_COLOR_BASE(_color_base) \
 	downcast<ramdac_device &>(*device).set_color_base(_color_base);

@@ -27,6 +27,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/psi_kbd/psi_kbd.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -41,29 +42,29 @@ class kdt6_state : public driver_device
 {
 public:
 	kdt6_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_cpu(*this, "maincpu"),
-	m_dma(*this, "dma"),
-	m_sio(*this, "sio"),
-	m_crtc(*this, "crtc"),
-	m_page_r(*this, "page%x_r", 0), m_page_w(*this, "page%x_w", 0),
-	m_boot(*this, "boot"),
-	m_palette(*this, "palette"),
-	m_gfx(*this, "gfx"),
-	m_rtc(*this, "rtc"),
-	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_beeper(*this, "beeper"),
-	m_beep_timer(*this, "beep_timer"),
-	m_centronics(*this, "centronics"),
-	m_dip_s2(*this, "S2"),
-	m_keyboard(*this, "kbd"),
-	m_rs232b(*this, "rs232b"),
-	m_sasi_dma(false),
-	m_dma_map(0),
-	m_status0(0), m_status1(0), m_status2(0),
-	m_video_address(0)
+		driver_device(mconfig, type, tag),
+		m_cpu(*this, "maincpu"),
+		m_dma(*this, "dma"),
+		m_sio(*this, "sio"),
+		m_crtc(*this, "crtc"),
+		m_page_r(*this, "page%x_r", 0), m_page_w(*this, "page%x_w", 0),
+		m_boot(*this, "boot"),
+		m_palette(*this, "palette"),
+		m_gfx(*this, "gfx"),
+		m_rtc(*this, "rtc"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_beeper(*this, "beeper"),
+		m_beep_timer(*this, "beep_timer"),
+		m_centronics(*this, "centronics"),
+		m_dip_s2(*this, "S2"),
+		m_keyboard(*this, "kbd"),
+		m_rs232b(*this, "rs232b"),
+		m_sasi_dma(false),
+		m_dma_map(0),
+		m_status0(0), m_status1(0), m_status2(0),
+		m_video_address(0)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
@@ -173,7 +174,7 @@ void kdt6_state::psi98_mem(address_map &map)
 void kdt6_state::psi98_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x04, 0x07).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
@@ -182,27 +183,27 @@ void kdt6_state::psi98_io(address_map &map)
 	map(0x15, 0x15).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x18, 0x18).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x19, 0x19).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1c, 0x1c).w(this, FUNC(kdt6_state::status0_w));
+	map(0x1c, 0x1c).w(FUNC(kdt6_state::status0_w));
 	map(0x1d, 0x1d).r(m_keyboard, FUNC(psi_keyboard_bus_device::key_data_r));
 	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
-	map(0x1f, 0x1f).w(this, FUNC(kdt6_state::fdc_tc_w));
-	map(0x20, 0x2f).rw(this, FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
-	map(0x30, 0x30).rw(this, FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
-	map(0x31, 0x31).w(this, FUNC(kdt6_state::video_data_inc_w));
-	map(0x36, 0x36).w(this, FUNC(kdt6_state::video_data_dec_w));
-	map(0x37, 0x37).w(this, FUNC(kdt6_state::video_data_inc_w));
-	map(0x38, 0x38).w(this, FUNC(kdt6_state::status1_w));
-	map(0x39, 0x39).r(this, FUNC(kdt6_state::status1_r));
-	map(0x3a, 0x3a).w(this, FUNC(kdt6_state::status2_w));
-	map(0x3b, 0x3b).rw(this, FUNC(kdt6_state::sasi_ctrl_r), FUNC(kdt6_state::sasi_ctrl_w));
-	map(0x3c, 0x3c).w(this, FUNC(kdt6_state::dma_map_w));
+	map(0x1f, 0x1f).w(FUNC(kdt6_state::fdc_tc_w));
+	map(0x20, 0x2f).rw(FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
+	map(0x30, 0x30).rw(FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
+	map(0x31, 0x31).w(FUNC(kdt6_state::video_data_inc_w));
+	map(0x36, 0x36).w(FUNC(kdt6_state::video_data_dec_w));
+	map(0x37, 0x37).w(FUNC(kdt6_state::video_data_inc_w));
+	map(0x38, 0x38).w(FUNC(kdt6_state::status1_w));
+	map(0x39, 0x39).r(FUNC(kdt6_state::status1_r));
+	map(0x3a, 0x3a).w(FUNC(kdt6_state::status2_w));
+	map(0x3b, 0x3b).rw(FUNC(kdt6_state::sasi_ctrl_r), FUNC(kdt6_state::sasi_ctrl_w));
+	map(0x3c, 0x3c).w(FUNC(kdt6_state::dma_map_w));
 #if 0
-	AM_RANGE(0x3d, 0x3d) WATCHDOG
-	AM_RANGE(0x3e, 0x3e) WATCHDOG TRIGGER
-	AM_RANGE(0x3f, 0x3f) SASI DATA
+	map(0x3d, 0x3d) WATCHDOG
+	map(0x3e, 0x3e) WATCHDOG TRIGGER
+	map(0x3f, 0x3f) SASI DATA
 #endif
-	map(0x40, 0x40).w(this, FUNC(kdt6_state::video_address_latch_high_w));
-	map(0x41, 0x41).w(this, FUNC(kdt6_state::video_address_latch_low_w));
+	map(0x40, 0x40).w(FUNC(kdt6_state::video_address_latch_high_w));
+	map(0x41, 0x41).w(FUNC(kdt6_state::video_address_latch_low_w));
 }
 
 
@@ -222,9 +223,10 @@ INPUT_PORTS_END
 //  FLOPPY
 //**************************************************************************
 
-static SLOT_INTERFACE_START( kdt6_floppies )
-	SLOT_INTERFACE("fd55f", TEAC_FD_55F)
-SLOT_INTERFACE_END
+static void kdt6_floppies(device_slot_interface &device)
+{
+	device.option_add("fd55f", TEAC_FD_55F);
+}
 
 WRITE8_MEMBER( kdt6_state::fdc_tc_w )
 {
@@ -614,9 +616,9 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 
 MACHINE_CONFIG_START(kdt6_state::psi98)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(psi98_mem)
-	MCFG_CPU_IO_MAP(psi98_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(psi98_mem)
+	MCFG_DEVICE_IO_MAP(psi98_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	// video hardware
@@ -631,74 +633,74 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(kdt6_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc2", z80ctc_device, trg2))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc2", z80ctc_device, trg2))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1000) // frequency unknown
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(kdt6_state, busreq_w))
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, kdt6_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(kdt6_state, memory_r))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(kdt6_state, memory_w))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(kdt6_state, io_r))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(kdt6_state, io_w))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, kdt6_state, memory_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, kdt6_state, memory_w))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, kdt6_state, io_r))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, kdt6_state, io_w))
 
 	// jumper J3 allows selection of 16MHz / 8 instead
 	MCFG_CLOCK_ADD("uart_clk", XTAL(9'830'400) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc1", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
 
 	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc2", z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(16'000'000) / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(kdt6_state, siob_tx_w))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(*this, kdt6_state, siob_tx_w))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))  MCFG_DEVCB_XOR(1)
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcda_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("sio", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))  MCFG_DEVCB_XOR(1)
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(kdt6_state, rs232b_rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, syncb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))  MCFG_DEVCB_XOR(1)
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, kdt6_state, rs232b_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("sio", z80sio_device, syncb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))  MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kdt6_state, pio_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kdt6_state, pio_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa2_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("pio", z80pio_device, pa3_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("pio", z80pio_device, pa4_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa5_w))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("pio", z80pio_device, pa2_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("pio", z80pio_device, pa3_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("pio", z80pio_device, pa4_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("pio", z80pio_device, pa5_w))
 
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -706,16 +708,16 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_UPD1990A_ADD("rtc", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg0))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kdt6_state, fdc_drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc1", z80ctc_device, trg0))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, kdt6_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
 
 	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
-	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(kdt6_state, keyboard_rx_w))
-	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg1))
+	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(*this, kdt6_state, keyboard_rx_w))
+	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(WRITELINE("ctc2", z80ctc_device, trg1))
 
 	// 6 ECB slots
 MACHINE_CONFIG_END
@@ -749,5 +751,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
-COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1984, psi98, 0,      0,      psi98,   psi98, kdt6_state, empty_init, "Kontron", "PSI98",  0 )

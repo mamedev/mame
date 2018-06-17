@@ -6,6 +6,7 @@
 #include "machine/upd4701.h"
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 
 
 class taitol_state : public driver_device
@@ -205,7 +206,7 @@ public:
 
 	DECLARE_READ8_MEMBER(extport_select_and_ym2203_r);
 
-	DECLARE_DRIVER_INIT(plottinga);
+	void init_plottinga();
 
 	DECLARE_MACHINE_RESET(plotting);
 	DECLARE_MACHINE_RESET(puzznic);

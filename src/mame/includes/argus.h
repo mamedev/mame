@@ -3,28 +3,29 @@
 
 #include "machine/timer.h"
 #include "video/jalblend.h"
+#include "emupal.h"
 #include "screen.h"
 
 class argus_state : public driver_device
 {
 public:
 	argus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_blend(*this, "blend"),
-		m_bg0_scrollx(*this, "bg0_scrollx"),
-		m_bg0_scrolly(*this, "bg0_scrolly"),
-		m_bg1_scrollx(*this, "bg1_scrollx"),
-		m_bg1_scrolly(*this, "bg1_scrolly"),
-		m_paletteram(*this, "paletteram"),
-		m_txram(*this, "txram"),
-		m_bg1ram(*this, "bg1ram"),
-		m_spriteram(*this, "spriteram"),
-		m_butasan_bg1ram(*this, "butasan_bg1ram")  { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_blend(*this, "blend")
+		, m_bg_scrollx(*this, "bg%u_scrollx", 0U)
+		, m_bg_scrolly(*this, "bg%u_scrolly", 0U)
+		, m_paletteram(*this, "paletteram")
+		, m_txram(*this, "txram")
+		, m_bg1ram(*this, "bg1ram")
+		, m_spriteram(*this, "spriteram")
+		, m_butasan_bg1ram(*this, "butasan_bg1ram")
+		, m_vrom(*this, "vrom%u", 1U)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -33,15 +34,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<jaleco_blend_device> m_blend;
 
-	optional_shared_ptr<uint8_t> m_bg0_scrollx;
-	optional_shared_ptr<uint8_t> m_bg0_scrolly;
-	required_shared_ptr<uint8_t> m_bg1_scrollx;
-	required_shared_ptr<uint8_t> m_bg1_scrolly;
+	optional_shared_ptr_array<uint8_t, 2> m_bg_scrollx;
+	optional_shared_ptr_array<uint8_t, 2> m_bg_scrolly;
 	required_shared_ptr<uint8_t> m_paletteram;
 	optional_shared_ptr<uint8_t> m_txram;
 	optional_shared_ptr<uint8_t> m_bg1ram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_butasan_bg1ram;
+	optional_region_ptr_array<uint8_t, 2> m_vrom;
 
 	// common
 	uint8_t m_bg_status;
@@ -70,8 +70,7 @@ public:
 	int m_mosaic;
 
 	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg0_tilemap;
-	tilemap_t *m_bg1_tilemap;
+	tilemap_t *m_bg_tilemap[2];
 
 	// common
 	DECLARE_WRITE8_MEMBER(bankselect_w);

@@ -116,6 +116,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -164,7 +165,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_shared_w);
 	DECLARE_READ16_MEMBER(mcu_r);
 
-	DECLARE_DRIVER_INIT(ddealer);
+	void init_ddealer();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -489,10 +490,10 @@ void ddealer_state::ddealer(address_map &map)
 	map(0x092000, 0x092fff).ram().share("left_fg_vrabot");
 	map(0x093000, 0x093fff).ram().share("right_fg_vrabot");
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
-	map(0x098000, 0x098001).w(this, FUNC(ddealer_state::flipscreen_w));
-	map(0x09c000, 0x09cfff).ram().w(this, FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
+	map(0x098000, 0x098001).w(FUNC(ddealer_state::flipscreen_w));
+	map(0x09c000, 0x09cfff).ram().w(FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
 	map(0x0f0000, 0x0fdfff).ram().share("work_ram");
-	map(0x0fe000, 0x0fefff).ram().w(this, FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
+	map(0x0fe000, 0x0fefff).ram().w(FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
 	map(0x0ff000, 0x0fffff).ram();
 }
 
@@ -595,7 +596,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( ddealer )
+static GFXDECODE_START( gfx_ddealer )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
@@ -621,15 +622,15 @@ INTERRUPT_GEN_MEMBER(ddealer_state::interrupt)
 
 MACHINE_CONFIG_START(ddealer_state::ddealer)
 
-	MCFG_CPU_ADD("maincpu" , M68000, XTAL(16'000'000)/2) /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(ddealer)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddealer_state,  interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess, controls music tempo, 112 is way too fast
+	MCFG_DEVICE_ADD("maincpu" , M68000, XTAL(16'000'000)/2) /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ddealer)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ddealer_state,  interrupt)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess, controls music tempo, 112 is way too fast
 
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddealer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -644,8 +645,8 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, mcu_sim, attotime::from_hz(10000))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -672,7 +673,7 @@ READ16_MEMBER(ddealer_state::mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(ddealer_state,ddealer)
+void ddealer_state::init_ddealer()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::mcu_r), this));
 }
@@ -696,4 +697,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, ddealer, 0, ddealer, ddealer, ddealer_state, init_ddealer, ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

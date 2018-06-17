@@ -4,6 +4,8 @@
 #include "machine/tmp68301.h"
 #include "screen.h"
 #include "audio/nichisnd.h"
+#include "machine/nb1413m3.h"
+#include "emupal.h"
 
 #define VRAM_MAX    3
 
@@ -82,7 +84,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 
-	DECLARE_DRIVER_INIT(niyanpai);
+	void init_niyanpai();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
 

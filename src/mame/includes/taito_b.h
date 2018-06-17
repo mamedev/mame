@@ -4,32 +4,19 @@
 #include "machine/taitoio.h"
 #include "video/hd63484.h"
 #include "video/tc0180vcu.h"
+#include "emupal.h"
 #include "screen.h"
 
 class taitob_state : public driver_device
 {
 public:
-	enum
-	{
-		RSAGA2_INTERRUPT2,
-		CRIMEC_INTERRUPT3,
-		HITICE_INTERRUPT6,
-		RAMBO3_INTERRUPT1,
-		PBOBBLE_INTERRUPT5,
-		VIOFIGHT_INTERRUPT1,
-		MASTERW_INTERRUPT4,
-		SILENTD_INTERRUPT4,
-		SELFEENA_INTERRUPT4,
-		SBM_INTERRUPT5,
-		REALPUNC_INTERRUPT3
-	};
-
 	taitob_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_pixelram(*this, "pixelram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ym(*this, "ymsnd"),
 		m_hd63484(*this, "hd63484"),
 		m_tc0180vcu(*this, "tc0180vcu"),
 		m_tc0640fio(*this, "tc0640fio"),
@@ -64,7 +51,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
-	DECLARE_DRIVER_INIT(taito_b);
+	void init_taito_b();
 	DECLARE_VIDEO_START(taitob_color_order0);
 	DECLARE_VIDEO_START(taitob_color_order1);
 	DECLARE_VIDEO_START(taitob_color_order2);
@@ -75,17 +62,6 @@ public:
 	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitob);
-	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
-	INTERRUPT_GEN_MEMBER(crimec_interrupt);
-	INTERRUPT_GEN_MEMBER(hitice_interrupt);
-	INTERRUPT_GEN_MEMBER(rambo3_interrupt);
-	INTERRUPT_GEN_MEMBER(pbobble_interrupt);
-	INTERRUPT_GEN_MEMBER(viofight_interrupt);
-	INTERRUPT_GEN_MEMBER(masterw_interrupt);
-	INTERRUPT_GEN_MEMBER(silentd_interrupt);
-	INTERRUPT_GEN_MEMBER(selfeena_interrupt);
-	INTERRUPT_GEN_MEMBER(sbm_interrupt);
-	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
 
 	void spacedx(machine_config &config);
 	void rambo3(machine_config &config);
@@ -128,7 +104,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void tc0180vcu_memrw(address_map &map, u32 addr);
 
@@ -157,7 +132,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_ym;
+	required_device<device_t> m_ym;
 	optional_device<hd63484_device> m_hd63484;
 	required_device<tc0180vcu_device> m_tc0180vcu;
 	optional_device<tc0640fio_device> m_tc0640fio;

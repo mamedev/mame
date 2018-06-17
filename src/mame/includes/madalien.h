@@ -7,9 +7,12 @@
     Original driver by Norbert Kehrer (February 2004)
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_MADALIEN_H
+#define MAME_INCLUDES_MADALIEN_H
 
 #include "machine/gen_latch.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 
 #define MADALIEN_MAIN_CLOCK     XTAL(10'595'000)
@@ -91,8 +94,10 @@ public:
 
 /*----------- defined in audio/madalien.c -----------*/
 
-DISCRETE_SOUND_EXTERN( madalien );
+DISCRETE_SOUND_EXTERN( madalien_discrete );
 
 /* Discrete Sound Input Nodes */
 #define MADALIEN_8910_PORTA         NODE_01
 #define MADALIEN_8910_PORTB         NODE_02
+
+#endif // MAME_INCLUDES_MADALIEN_H

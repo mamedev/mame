@@ -37,6 +37,7 @@
 #include "machine/nvram.h"
 #include "machine/pc_lpt.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -315,11 +316,11 @@ void tv990_state::tv990_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x060000, 0x06ffff).ram().share("vram"); // character/attribute RAM
 	map(0x080000, 0x087fff).ram().share("fontram"); // font RAM
-	map(0x090000, 0x0900ff).rw(this, FUNC(tv990_state::tvi1111_r), FUNC(tv990_state::tvi1111_w));
+	map(0x090000, 0x0900ff).rw(FUNC(tv990_state::tvi1111_r), FUNC(tv990_state::tvi1111_w));
 	map(0x0a0000, 0x0a000f).rw(m_uart0, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
 	map(0x0a0010, 0x0a001f).rw(UART1_TAG, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
 	map(0x0a0028, 0x0a002d).rw(LPT_TAG, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
-	map(0x0b0000, 0x0b0003).rw(this, FUNC(tv990_state::kbdc_r), FUNC(tv990_state::kbdc_w)).umask16(0x00ff);
+	map(0x0b0000, 0x0b0003).rw(FUNC(tv990_state::kbdc_r), FUNC(tv990_state::kbdc_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c7fff).ram().share("nvram");// work RAM
 }
 
@@ -372,9 +373,9 @@ void tv990_state::device_post_load()
 
 MACHINE_CONFIG_START(tv990_state::tv990)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
-	MCFG_CPU_PROGRAM_MAP(tv990_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
+	MCFG_DEVICE_PROGRAM_MAP(tv990_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
@@ -384,29 +385,29 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL(3'686'400) )
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(tv990_state, uart0_irq))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart0_irq))
 
 	MCFG_DEVICE_ADD( UART1_TAG, NS16450, XTAL(3'686'400) )
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(tv990_state, uart1_irq))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart1_irq))
 
 	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(tv990_state, lpt_irq))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, tv990_state, lpt_irq))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UART0_TAG, ns16450_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART0_TAG, ns16450_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART0_TAG, ns16450_device, cts_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(UART0_TAG, ns16450_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(UART0_TAG, ns16450_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UART0_TAG, ns16450_device, cts_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, cts_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(UART1_TAG, ns16450_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(UART1_TAG, ns16450_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UART1_TAG, ns16450_device, cts_w))
 
 	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
@@ -414,8 +415,8 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 1000); //whats the freq?
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beep", BEEP, 1000); //whats the freq?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -433,5 +434,5 @@ ROM_START( tv995 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
-COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
+COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )

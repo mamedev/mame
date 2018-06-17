@@ -180,14 +180,14 @@ void dribling_state::dribling_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).rom();
-	map(0xc000, 0xdfff).ram().w(this, FUNC(dribling_state::dribling_colorram_w)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(FUNC(dribling_state::dribling_colorram_w)).share("colorram");
 }
 
 
 void dribling_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
+	map(0x00, 0xff).rw(FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
 }
 
 
@@ -271,21 +271,21 @@ void dribling_state::machine_reset()
 MACHINE_CONFIG_START(dribling_state::dribling)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(dribling_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dribling_state,  dribling_irq_gen)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(dribling_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dribling_state,  dribling_irq_gen)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(dribling_state, dsr_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(dribling_state, input_mux0_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dribling_state, misc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, dribling_state, dsr_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, dribling_state, input_mux0_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dribling_state, misc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dribling_state, sound_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(dribling_state, pb_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dribling_state, sound_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dribling_state, pb_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dribling_state, shr_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dribling_state, shr_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -375,6 +375,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, 0, ROT0, "Model Racing",                   "Dribbling",                   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingbr, dribling, dribling, dribling, dribling_state, 0, ROT0, "bootleg (Videomac)",             "Dribbling (bootleg, Brazil)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                   "Dribbling",                   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingbr, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",             "Dribbling (bootleg, Brazil)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -6,9 +6,11 @@
 
 ***************************************************************************/
 
-#include "includes/nb1414m4.h"
+#include "machine/nb1412m2.h"
+#include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class galivan_state : public driver_device
 {
@@ -53,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
-	DECLARE_DRIVER_INIT(youmab);
+	void init_youmab();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
@@ -82,4 +84,19 @@ public:
 	void ninjemak_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+};
+
+class dangarj_state : public galivan_state
+{
+public:
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag),
+		m_prot(*this, "prot_chip")
+		{}
+	void dangarj(machine_config &config);
+
+private:
+	required_device<nb1412m2_device> m_prot;
+
+	void dangarj_io_map(address_map &map);
 };

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "s3c24xx.h"
+#include "emupal.h"
 
 
 /*******************************************************************************
@@ -21,10 +22,10 @@
 #define S3C2400_TAG "s3c2400"
 
 #define MCFG_S3C2400_PALETTE(palette_tag) \
-	downcast<s3c2400_device &>(*device).set_palette_tag(("^" palette_tag));
+	downcast<s3c2400_device &>(*device).set_palette_tag(palette_tag);
 
 #define MCFG_S3C2400_SCREEN(screen_tag) \
-	downcast<s3c2400_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<s3c2400_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_S3C2400_CORE_PIN_R_CB(cb) \
 	devcb = &downcast<s3c2400_device &>(*device).set_core_pin_r_callback(DEVCB_##cb);

@@ -210,6 +210,7 @@
 //#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -232,7 +233,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
 	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
-	DECLARE_DRIVER_INIT(mpu12wbk);
+	void init_mpu12wbk();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mpu12wbk);
@@ -316,8 +317,8 @@ void mpu12wbk_state::mpu12wbk_map(address_map &map)
 	map(0x1400, 0x1400).w("crtc", FUNC(mc6845_device::address_w));                      // OK
 	map(0x1401, 0x1401).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));     // OK
 	map(0x1e00, 0x1e01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // hmmmmm....
-	map(0x2000, 0x23ff).ram().w(this, FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");             // FIXME
-	map(0x2400, 0x27ff).ram().w(this, FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");             // FIXME
+	map(0x2000, 0x23ff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");             // FIXME
+	map(0x2400, 0x27ff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");             // FIXME
 	map(0x2800, 0x3fff).ram();                                                             // RAM (from 2000-3fff)
 	map(0x6000, 0x6000).portr("SW1");    // dummy, placeholder
 	map(0x6001, 0x6001).portr("SW2");    // dummy, placeholder
@@ -478,7 +479,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( mpu12wbk )
+static GFXDECODE_START( gfx_mpu12wbk )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -489,8 +490,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mpu12wbk_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mpu12wbk_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -503,7 +504,7 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mpu12wbk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mpu12wbk)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
 
@@ -513,9 +514,9 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END
@@ -553,7 +554,7 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
+void mpu12wbk_state::init_mpu12wbk()
 {
 	// just in case...
 }
@@ -563,5 +564,5 @@ DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY             FULLNAME                          FLAGS
-GAME( 1997, fruitstb, 0,      mpu12wbk, mpu12wbk, mpu12wbk_state, mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY             FULLNAME                          FLAGS
+GAME( 1997, fruitstb, 0,      mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

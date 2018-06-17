@@ -142,14 +142,14 @@ void photon_state::pk8000_io(address_map &map)
 	map.unmap_value_high();
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x84, 0x87).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x88, 0x88).rw(this, FUNC(photon_state::video_color_r), FUNC(photon_state::video_color_w));
+	map(0x88, 0x88).rw(FUNC(photon_state::video_color_r), FUNC(photon_state::video_color_w));
 	map(0x8c, 0x8c).portr("JOY1");
 	map(0x8d, 0x8d).portr("JOY2");
-	map(0x90, 0x90).rw(this, FUNC(photon_state::text_start_r), FUNC(photon_state::text_start_w));
-	map(0x91, 0x91).rw(this, FUNC(photon_state::chargen_start_r), FUNC(photon_state::chargen_start_w));
-	map(0x92, 0x92).rw(this, FUNC(photon_state::video_start_r), FUNC(photon_state::video_start_w));
-	map(0x93, 0x93).rw(this, FUNC(photon_state::color_start_r), FUNC(photon_state::color_start_w));
-	map(0xa0, 0xbf).rw(this, FUNC(photon_state::color_r), FUNC(photon_state::color_w));
+	map(0x90, 0x90).rw(FUNC(photon_state::text_start_r), FUNC(photon_state::text_start_w));
+	map(0x91, 0x91).rw(FUNC(photon_state::chargen_start_r), FUNC(photon_state::chargen_start_w));
+	map(0x92, 0x92).rw(FUNC(photon_state::video_start_r), FUNC(photon_state::video_start_w));
+	map(0x93, 0x93).rw(FUNC(photon_state::color_start_r), FUNC(photon_state::color_start_w));
+	map(0xa0, 0xbf).rw(FUNC(photon_state::color_r), FUNC(photon_state::color_w));
 }
 
 static INPUT_PORTS_START( photon )
@@ -203,11 +203,11 @@ uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 MACHINE_CONFIG_START(photon_state::photon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 1780000)
-	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
-	MCFG_CPU_IO_MAP(pk8000_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", photon_state, interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(photon_state, irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I8080, 1780000)
+	MCFG_DEVICE_PROGRAM_MAP(pk8000_mem)
+	MCFG_DEVICE_IO_MAP(pk8000_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", photon_state, interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(photon_state, irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -222,18 +222,18 @@ MACHINE_CONFIG_START(photon_state::photon)
 	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(photon_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(photon_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(photon_state, _80_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, photon_state, _80_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, photon_state, _80_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, photon_state, _80_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state, _84_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8000_base_state, _84_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_base_state, _84_porta_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -276,6 +276,6 @@ ROM_START( phklad )
 	ROM_LOAD( "klad.bin", 0x10000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
 ROM_END
 
-GAME( 19??,  phtetris, 0,      photon, photon, photon_state, 0, ROT0, "<unknown>", "Tetris (Photon System)",           0 )
-GAME( 1989?, phpython,  0,     photon, photon, photon_state, 0, ROT0, "<unknown>", "Python (Photon System)",           0 )
-GAME( 19??,  phklad,   0,      photon, photon, photon_state, 0, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )
+GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           0 )
+GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           0 )
+GAME( 19??,  phklad,   0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )

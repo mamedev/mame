@@ -15,6 +15,7 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -324,12 +325,12 @@ void fk1_state::fk1_io(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x23).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).rw(this, FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
+	map(0x30, 0x30).rw(FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
 	map(0x40, 0x40).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).rw(this, FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
+	map(0x50, 0x50).rw(FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
 	map(0x60, 0x63).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x70, 0x70).rw(this, FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
+	map(0x70, 0x70).rw(FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
 }
 
 /* Input ports */
@@ -412,10 +413,10 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 MACHINE_CONFIG_START(fk1_state::fk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fk1_mem)
-	MCFG_CPU_IO_MAP(fk1_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fk1_mem)
+	MCFG_DEVICE_IO_MAP(fk1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -430,33 +431,33 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(fk1_state, fk1_pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out0))
 	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(fk1_state, fk1_pit_out1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out1))
 	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(fk1_state, fk1_pit_out2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out2))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(fk1_state, fk1_ppi_1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_1_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fk1_state, fk1_ppi_1_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_1_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_1_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_1_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_1_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_1_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_1_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_1_c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_2_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_2_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_2_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_2_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_2_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_2_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_2_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_2_c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(fk1_state, fk1_ppi_3_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_3_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_3_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fk1_state, fk1_ppi_3_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_3_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_3_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_3_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_3_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_3_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_3_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_3_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_3_c_w))
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -473,12 +474,12 @@ MACHINE_CONFIG_END
 ROM_START( fk1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
-	ROMX_LOAD( "fk1.u65",      0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
+	ROMX_LOAD( "fk1.u65",      0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
-	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2))
+	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE      INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1989, fk1,    0,      0,       fk1,       fk1,   fk1_state, 0,    "Statni statek Klicany", "FK-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                  FULLNAME  FLAGS
+COMP( 1989, fk1,  0,      0,      fk1,     fk1,   fk1_state, empty_init, "Statni statek Klicany", "FK-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -51,7 +51,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(gen32);
+	void init_gen32();
 	void alm32(machine_config &config);
 	void van32(machine_config &config);
 	void van16(machine_config &config);
@@ -176,7 +176,7 @@ void berlinp_state::berlinp_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x800000, 0x800000).r(this, FUNC(berlinp_state::berlinp_input_r));
+	map(0x800000, 0x800000).r(FUNC(berlinp_state::berlinp_input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
@@ -242,7 +242,7 @@ static INPUT_PORTS_START( berlinp )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(mmodular_state, gen32)
+void mmodular_state::init_gen32()
 {
 	// patch LCD delay loop
 	uint8_t *rom = memregion("maincpu")->base();
@@ -251,9 +251,9 @@ DRIVER_INIT_MEMBER(mmodular_state, gen32)
 }
 
 MACHINE_CONFIG_START(mmodular_state::alm16)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(alm16_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alm16_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
@@ -263,15 +263,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmodular_state::van16)
 	alm16(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(van16_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(van16_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mmodular_state::alm32)
-	MCFG_CPU_ADD("maincpu", M68020, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(alm32_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alm32_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -283,15 +283,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmodular_state::van32)
 	alm32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(van32_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(van32_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mmodular_state::gen32)
-	MCFG_CPU_ADD("maincpu", M68030, XTAL(33'333'000))
-	MCFG_CPU_PROGRAM_MAP(gen32_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(33'333'000))
+	MCFG_DEVICE_PROGRAM_MAP(gen32_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -302,9 +302,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(berlinp_state::berlinp)
-	MCFG_CPU_ADD("maincpu", M68020, XTAL(24'576'000))
-	MCFG_CPU_PROGRAM_MAP(berlinp_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(24'576'000))
+	MCFG_DEVICE_PROGRAM_MAP(berlinp_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -339,9 +339,9 @@ ROM_END
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v41", "V4.1" )
-	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(1))
+	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v40", "V4.0" )
-	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(2))
+	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(1))
 ROM_END
 
 ROM_START( van16 )
@@ -391,19 +391,19 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS                   INIT   COMPANY             FULLNAME                                FLAGS */
-CONS( 1988, alm16,    0,           0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm32,    0,           0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,   alm16,       0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32,   alm32,       0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,   alm16,       0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32,   alm32,       0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,    alm16,       0,      van16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van32,    alm32,       0,      van32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, gen32,    0,           0,      gen32,     gen32,    mmodular_state,     gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond020,  alm32,       0,      van32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond030,  gen32,       0,      gen32,     gen32,    mmodular_state,     gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY             FULLNAME                                FLAGS */
+CONS( 1988, alm16,   0,       0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm32,   0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   alm16,   0,      van16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, gen32,   0,       0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond020, alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond030, gen32,   0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
 // not modular boards
-CONS( 1994, berlinp,  0,           0,      berlinp,   berlinp,  berlinp_state,      0,     "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, bpl32,    berlinp,     0,      berlinp,   berlinp,  berlinp_state,      0,     "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

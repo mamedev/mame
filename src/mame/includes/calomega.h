@@ -2,6 +2,7 @@
 // copyright-holders:Roberto Fresca
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "emupal.h"
 
 class calomega_state : public driver_device
 {
@@ -21,9 +22,9 @@ public:
 		m_in0_2(*this, "IN0-2"),
 		m_in0_3(*this, "IN0-3"),
 		m_frq(*this, "FRQ"),
-		m_sw2(*this, "SW2")
-	{
-	}
+		m_sw2(*this, "SW2"),
+		m_lamps(*this, "lamp%u", 1U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(calomega_videoram_w);
 	DECLARE_WRITE8_MEMBER(calomega_colorram_w);
@@ -46,10 +47,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
-	DECLARE_DRIVER_INIT(sys903);
-	DECLARE_DRIVER_INIT(comg080);
-	DECLARE_DRIVER_INIT(s903mod);
-	DECLARE_DRIVER_INIT(sys905);
+	void init_sys903();
+	void init_comg080();
+	void init_s903mod();
+	void init_sys905();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(calomega);
@@ -63,6 +64,7 @@ public:
 	void sys905_map(address_map &map);
 	void sys906_map(address_map &map);
 protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 private:
@@ -82,6 +84,7 @@ private:
 	optional_ioport m_in0_3;
 	optional_ioport m_frq;
 	optional_ioport m_sw2;
+	output_finder<9> m_lamps;
 
 	uint8_t m_tx_line;
 	int m_s903_mux_data;

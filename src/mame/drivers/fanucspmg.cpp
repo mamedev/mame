@@ -631,7 +631,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
 
-	DECLARE_DRIVER_INIT(fanucspmg);
+	void init_fanucspmg();
 
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
@@ -650,7 +650,7 @@ private:
 	uint8_t m_dma_page;
 };
 
-DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
+void fanucspmg_state::init_fanucspmg()
 {
 	memset(m_vram, 0, sizeof(m_vram));
 
@@ -735,12 +735,12 @@ void fanucspmg_state::maincpu_mem(address_map &map)
 	map(0xf001c, 0xf001c).rw(m_usart3, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf001e, 0xf001e).rw(m_usart3, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0xf0042, 0xf0043).r(this, FUNC(fanucspmg_state::magic_r));
-	map(0xf0046, 0xf0046).w(this, FUNC(fanucspmg_state::dma_page_w));
+	map(0xf0042, 0xf0043).r(FUNC(fanucspmg_state::magic_r));
+	map(0xf0046, 0xf0046).w(FUNC(fanucspmg_state::dma_page_w));
 	map(0xf0048, 0xf004f).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xf2000, 0xf2003).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 
-	map(0xf8000, 0xf9fff).rw(this, FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
+	map(0xf8000, 0xf9fff).rw(FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
 	map(0xfc000, 0xfffff).rom().region(MAINCPU_TAG, 0);
 }
 
@@ -823,18 +823,18 @@ void fanucspmg_state::subcpu_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region(SUBCPU_TAG, 0);
 
-	map(0x4000, 0x45ff).rw(this, FUNC(fanucspmg_state::vram1_r), FUNC(fanucspmg_state::vram1_w));
-	map(0x4800, 0x4dff).rw(this, FUNC(fanucspmg_state::vram2_r), FUNC(fanucspmg_state::vram2_w));
+	map(0x4000, 0x45ff).rw(FUNC(fanucspmg_state::vram1_r), FUNC(fanucspmg_state::vram1_w));
+	map(0x4800, 0x4dff).rw(FUNC(fanucspmg_state::vram2_r), FUNC(fanucspmg_state::vram2_w));
 
 	map(0x5000, 0x5000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x5001, 0x5001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x5008, 0x5008).w(this, FUNC(fanucspmg_state::keyboard_row_w));
-	map(0x5009, 0x5009).r(this, FUNC(fanucspmg_state::keyboard_r));
+	map(0x5008, 0x5008).w(FUNC(fanucspmg_state::keyboard_row_w));
+	map(0x5009, 0x5009).r(FUNC(fanucspmg_state::keyboard_r));
 	map(0x500a, 0x500b).nopw();    // keyboard rows 2 and 3 control what's written here.  dip switches?
-	map(0x500c, 0x500c).w(this, FUNC(fanucspmg_state::vbl_ctrl_w));
-	map(0x500d, 0x500d).w(this, FUNC(fanucspmg_state::vram_bank_w));
-	map(0x500e, 0x500e).r(this, FUNC(fanucspmg_state::vblank_ack_r));
-	map(0x5018, 0x5018).w(this, FUNC(fanucspmg_state::video_ctrl_w));
+	map(0x500c, 0x500c).w(FUNC(fanucspmg_state::vbl_ctrl_w));
+	map(0x500d, 0x500d).w(FUNC(fanucspmg_state::vram_bank_w));
+	map(0x500e, 0x500e).r(FUNC(fanucspmg_state::vblank_ack_r));
+	map(0x5018, 0x5018).w(FUNC(fanucspmg_state::video_ctrl_w));
 
 	map(0xe000, 0xffff).ram().share(SHARED_TAG); // shared RAM
 }
@@ -955,9 +955,10 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 	}
 }
 
-static SLOT_INTERFACE_START( fanuc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void fanuc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
@@ -965,12 +966,12 @@ FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
-	MCFG_CPU_IO_MAP(maincpu_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
-	MCFG_I8086_ESC_OPCODE_HANDLER(DEVWRITE32("i8087", i8087_device, insn_w))
-	MCFG_I8086_ESC_DATA_HANDLER(DEVWRITE32("i8087", i8087_device, addr_w))
+	MCFG_DEVICE_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
+	MCFG_DEVICE_IO_MAP(maincpu_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
 
 	MCFG_DEVICE_ADD("i8087", I8087, XTAL(15'000'000)/3)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
@@ -978,8 +979,8 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
 	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
 
-	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
-	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
+	MCFG_DEVICE_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
 
 	MCFG_DEVICE_ADD(USART0_TAG, I8251, 0)
 	MCFG_DEVICE_ADD(USART1_TAG, I8251, 0)
@@ -996,25 +997,25 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
 
 	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL(15'000'000) / 5)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(fanucspmg_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(fanucspmg_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(fanucspmg_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(fanucspmg_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, fanucspmg_state, hrq_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, fanucspmg_state, tc_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, fanucspmg_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fanucspmg_state, memory_write_byte))
+	MCFG_I8257_IN_IOR_0_CB(READ8(*this, fanucspmg_state, fdcdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, fanucspmg_state, fdcdma_w))
 
 	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(fanucspmg_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, fanucspmg_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(PIC0_TAG, pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(DMAC_TAG, i8257_device, dreq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(PIC0_TAG, pic8259_device, ir3_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(DMAC_TAG, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 
@@ -1026,7 +1027,7 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
@@ -1037,7 +1038,7 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row_mono)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -1066,6 +1067,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
-COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT            COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, init_fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, init_fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

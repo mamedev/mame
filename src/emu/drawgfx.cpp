@@ -2112,6 +2112,3 @@ void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bi
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
-
-GFXDECODE_START( empty )
-GFXDECODE_END

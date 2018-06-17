@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_6502, bbc_tube_6502_device, "bbc_tube_6502", "Acorn 
 
 void bbc_tube_6502_device::tube_6502_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_6502_device::read), FUNC(bbc_tube_6502_device::write));
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_6502_device::read), FUNC(bbc_tube_6502_device::write));
 }
 
 //-------------------------------------------------
@@ -44,8 +44,8 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_6502_device::device_add_mconfig)
-	MCFG_CPU_ADD("m6502", M65C02, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(tube_6502_mem)
+	MCFG_DEVICE_ADD("m6502", M65C02, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(tube_6502_mem)
 
 	MCFG_TUBE_ADD("ula")
 	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("m6502", M65C02_NMI_LINE))

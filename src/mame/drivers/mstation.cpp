@@ -33,6 +33,7 @@
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -261,9 +262,9 @@ void mstation_state::mstation_banked_map(address_map &map)
 	map(0x0000000, 0x00fffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x0400000, 0x041ffff).mirror(0x03e0000).ram().share("nvram");
 	map(0x0c00000, 0x0c7ffff).mirror(0x0380000).rw("flash1", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
-	map(0x0800000, 0x0803fff).mirror(0x03fc000).rw(this, FUNC(mstation_state::lcd_left_r), FUNC(mstation_state::lcd_left_w));
-	map(0x1000000, 0x1003fff).mirror(0x03fc000).rw(this, FUNC(mstation_state::lcd_right_r), FUNC(mstation_state::lcd_right_w));
-	map(0x1400000, 0x1403fff).mirror(0x03fc000).rw(this, FUNC(mstation_state::modem_r), FUNC(mstation_state::modem_w));
+	map(0x0800000, 0x0803fff).mirror(0x03fc000).rw(FUNC(mstation_state::lcd_left_r), FUNC(mstation_state::lcd_left_w));
+	map(0x1000000, 0x1003fff).mirror(0x03fc000).rw(FUNC(mstation_state::lcd_right_r), FUNC(mstation_state::lcd_right_w));
+	map(0x1400000, 0x1403fff).mirror(0x03fc000).rw(FUNC(mstation_state::modem_r), FUNC(mstation_state::modem_w));
 }
 
 void mstation_state::mstation_mem(address_map &map)
@@ -277,12 +278,12 @@ void mstation_state::mstation_mem(address_map &map)
 void mstation_state::mstation_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).rw(this, FUNC(mstation_state::kb_r), FUNC(mstation_state::kb_w));
-	map(0x02, 0x02).w(this, FUNC(mstation_state::port2_w));
-	map(0x03, 0x03).rw(this, FUNC(mstation_state::irq_r), FUNC(mstation_state::irq_w));
-	map(0x05, 0x06).rw(this, FUNC(mstation_state::bank1_r), FUNC(mstation_state::bank1_w));
-	map(0x07, 0x08).rw(this, FUNC(mstation_state::bank2_r), FUNC(mstation_state::bank2_w));
-	map(0x09, 0x09).r(this, FUNC(mstation_state::battery_status_r));
+	map(0x01, 0x01).rw(FUNC(mstation_state::kb_r), FUNC(mstation_state::kb_w));
+	map(0x02, 0x02).w(FUNC(mstation_state::port2_w));
+	map(0x03, 0x03).rw(FUNC(mstation_state::irq_r), FUNC(mstation_state::irq_w));
+	map(0x05, 0x06).rw(FUNC(mstation_state::bank1_r), FUNC(mstation_state::bank1_w));
+	map(0x07, 0x08).rw(FUNC(mstation_state::bank2_r), FUNC(mstation_state::bank2_w));
+	map(0x09, 0x09).r(FUNC(mstation_state::battery_status_r));
 	map(0x10, 0x1f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 	//AM_RANGE( 0x2c, 0x2c ) printer
 }
@@ -445,9 +446,9 @@ PALETTE_INIT_MEMBER(mstation_state, mstation)
 
 MACHINE_CONFIG_START(mstation_state::mstation)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
-	MCFG_CPU_PROGRAM_MAP(mstation_mem)
-	MCFG_CPU_IO_MAP(mstation_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mstation_mem)
+	MCFG_DEVICE_IO_MAP(mstation_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -472,7 +473,7 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(mstation_state, rtc_irq))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
@@ -495,12 +496,12 @@ MACHINE_CONFIG_END
 ROM_START( mstation )
 	ROM_REGION( 0x100000, "flash0", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v303a", "v3.03a" )
-	ROMX_LOAD( "ms303a.bin", 0x000000, 0x100000, CRC(7a5cf752) SHA1(15629ccaecd8094dd883987bed94c16eee6de7c2), ROM_BIOS(1))
+	ROMX_LOAD("ms303a.bin", 0x000000, 0x100000, CRC(7a5cf752) SHA1(15629ccaecd8094dd883987bed94c16eee6de7c2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v253", "v2.53" )
-	ROMX_LOAD( "ms253.bin",  0x000000, 0x0fc000, BAD_DUMP CRC(a27e7f8b) SHA1(ae5a0aa0f1e23f3b183c5c0bcf4d4c1ae54b1798), ROM_BIOS(2))
+	ROMX_LOAD("ms253.bin",  0x000000, 0x0fc000, BAD_DUMP CRC(a27e7f8b) SHA1(ae5a0aa0f1e23f3b183c5c0bcf4d4c1ae54b1798), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, 0,    "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, empty_init, "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

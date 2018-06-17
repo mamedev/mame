@@ -32,17 +32,19 @@ DEFINE_DEVICE_TYPE(E0C6S46, e0c6s46_device, "e0c6s46", "Seiko Epson E0C6S46")
 
 
 // internal memory maps
-ADDRESS_MAP_START(e0c6s46_device::e0c6s46_program)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-ADDRESS_MAP_END
+void e0c6s46_device::e0c6s46_program(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+}
 
 
-ADDRESS_MAP_START(e0c6s46_device::e0c6s46_data)
-	AM_RANGE(0x0000, 0x027f) AM_RAM
-	AM_RANGE(0x0e00, 0x0e4f) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x0e80, 0x0ecf) AM_RAM AM_SHARE("vram2")
-	AM_RANGE(0x0f00, 0x0f7f) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void e0c6s46_device::e0c6s46_data(address_map &map)
+{
+	map(0x0000, 0x027f).ram();
+	map(0x0e00, 0x0e4f).ram().share("vram1");
+	map(0x0e80, 0x0ecf).ram().share("vram2");
+	map(0x0f00, 0x0f7f).rw(FUNC(e0c6s46_device::io_r), FUNC(e0c6s46_device::io_w));
+}
 
 
 // device definitions

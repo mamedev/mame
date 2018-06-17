@@ -11,6 +11,7 @@
 
 #include "video/crt.h"
 #include "cpu/pdp1/tx0.h"
+#include "emupal.h"
 
 enum state_t
 {
@@ -156,7 +157,7 @@ public:
 	bitmap_ind16 m_typewriter_bitmap;
 	int m_pos;
 	int m_case_shift;
-	DECLARE_DRIVER_INIT(tx0);
+	void init_tx0();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -30,6 +30,7 @@ Other outs:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -101,7 +102,7 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 void headonb_state::headonb_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().mirror(0x4000);
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(headonb_state::video_ram_w)).share("video_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(headonb_state::video_ram_w)).share("video_ram");
 	map(0xff00, 0xffff).ram();
 }
 
@@ -158,17 +159,17 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( headonb )
+static GFXDECODE_START( gfx_headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(headonb_state::headonb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(headonb_map)
-	MCFG_CPU_IO_MAP(headonb_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(headonb_map)
+	MCFG_DEVICE_IO_MAP(headonb_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -179,7 +180,7 @@ MACHINE_CONFIG_START(headonb_state::headonb)
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_headonb)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -210,4 +211,4 @@ ROM_START( headonb )
 ROM_END
 
 
-GAME( 1979, headonb, headon, headonb, headonb, headonb_state, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonb, headon, headonb, headonb, headonb_state, empty_init, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

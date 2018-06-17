@@ -9,6 +9,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class deniam_state : public driver_device
 {
@@ -60,8 +61,8 @@ public:
 	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
 	DECLARE_WRITE8_MEMBER(deniam16b_oki_rom_bank_w);
 	DECLARE_WRITE16_MEMBER(deniam16c_oki_rom_bank_w);
-	DECLARE_DRIVER_INIT(karianx);
-	DECLARE_DRIVER_INIT(logicpro);
+	void init_karianx();
+	void init_logicpro();
 	TILEMAP_MAPPER_MEMBER(scan_pages);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

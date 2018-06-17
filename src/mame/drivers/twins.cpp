@@ -65,6 +65,7 @@ this requires the -joystick_contradictory switch on the commandline.
 #include "sound/ay8910.h"
 #include "machine/i2cmem.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -284,16 +285,16 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 
 void twins_state::twins_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
+	map(0x00000, 0xfffff).rw(FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
 }
 
 void twins_state::twins_io(address_map &map)
 {
 	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x0004, 0x0005).rw(this, FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
-	map(0x0006, 0x0007).w(this, FUNC(twins_state::twins_pal_w)).share("paletteram");
-	map(0x000e, 0x000f).w(this, FUNC(twins_state::porte_paloff0_w));
+	map(0x0004, 0x0005).rw(FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0006, 0x0007).w(FUNC(twins_state::twins_pal_w)).share("paletteram");
+	map(0x000e, 0x000f).w(FUNC(twins_state::porte_paloff0_w));
 }
 
 void twins_state::video_start()
@@ -391,9 +392,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(twins_map)
-	MCFG_CPU_IO_MAP(twins_io)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(twins_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -407,9 +408,9 @@ MACHINE_CONFIG_START(twins_state::twins)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -426,7 +427,7 @@ void twins_state::twinsa_io(address_map &map)
 	map(0x0004, 0x0004).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x0008, 0x0008).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x0010, 0x0010).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x0018, 0x0019).r(this, FUNC(twins_state::twins_port4_r)).w(this, FUNC(twins_state::twins_port4_w));
+	map(0x0018, 0x0019).r(FUNC(twins_state::twins_port4_r)).w(FUNC(twins_state::twins_port4_w));
 }
 
 
@@ -438,9 +439,9 @@ void twins_state::ramdac_map(address_map &map)
 
 MACHINE_CONFIG_START(twins_state::twinsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(twins_map)
-	MCFG_CPU_IO_MAP(twinsa_io)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(twinsa_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -456,9 +457,9 @@ MACHINE_CONFIG_START(twins_state::twinsa)
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -547,14 +548,14 @@ void twins_state::spider_io(address_map &map)
 {
 	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x0004, 0x0005).rw(this, FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
-	map(0x0008, 0x0009).w(this, FUNC(twins_state::spider_pal_w)).share("paletteram");
-	map(0x0010, 0x0011).w(this, FUNC(twins_state::spider_paloff0_w));
+	map(0x0004, 0x0005).rw(FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0008, 0x0009).w(FUNC(twins_state::spider_pal_w)).share("paletteram");
+	map(0x0010, 0x0011).w(FUNC(twins_state::spider_paloff0_w));
 
-	map(0x0018, 0x0019).r(this, FUNC(twins_state::spider_port_18_r));
-	map(0x001a, 0x001b).w(this, FUNC(twins_state::spider_port_1a_w));
-	map(0x001c, 0x001d).w(this, FUNC(twins_state::spider_port_1c_w));
-	map(0x001e, 0x001f).r(this, FUNC(twins_state::spider_port_1e_r));
+	map(0x0018, 0x0019).r(FUNC(twins_state::spider_port_18_r));
+	map(0x001a, 0x001b).w(FUNC(twins_state::spider_port_1a_w));
+	map(0x001c, 0x001d).w(FUNC(twins_state::spider_port_1c_w));
+	map(0x001e, 0x001f).r(FUNC(twins_state::spider_port_1e_r));
 
 
 }
@@ -565,9 +566,9 @@ void twins_state::spider_io(address_map &map)
 
 MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(twins_map)
-	MCFG_CPU_IO_MAP(spider_io)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(spider_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -581,9 +582,9 @@ MACHINE_CONFIG_START(twins_state::spider)
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 
@@ -627,7 +628,7 @@ ROM_START( spider )
 	ROM_LOAD16_BYTE( "21.bin", 0x000000, 0x080000, CRC(ff224206) SHA1(d8d45850983542e811facc917d016841fc56a97f) )
 ROM_END
 
-GAME( 1994, twins,  0,     twins,  twins, twins_state, 0, ROT0, "Electronic Devices", "Twins (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twinsa, twins, twinsa, twins, twins_state, 0, ROT0, "Electronic Devices", "Twins (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twins,  0,     twins,  twins, twins_state, empty_init, ROT0, "Electronic Devices", "Twins (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twinsa, twins, twinsa, twins, twins_state, empty_init, ROT0, "Electronic Devices", "Twins (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, spider, 0,     spider, twins, twins_state, 0, ROT0, "Buena Vision",       "Spider",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spider, 0,     spider, twins, twins_state, empty_init, ROT0, "Buena Vision",       "Spider",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class goindol_state : public driver_device
 {
 public:
@@ -46,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
 	DECLARE_WRITE8_MEMBER(goindol_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(goindol_bg_videoram_w);
-	DECLARE_DRIVER_INIT(goindol);
+	void init_goindol();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;

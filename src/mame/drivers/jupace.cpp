@@ -56,6 +56,7 @@ Ports:
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -75,26 +76,26 @@ class ace_state : public driver_device
 {
 public:
 	ace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ppi(*this, I8255_TAG),
-			m_z80pio(*this, Z80PIO_TAG),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_ram(*this, RAM_TAG),
-			m_sp0256(*this, SP0256AL2_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_char_ram(*this, "char_ram"),
-			m_a8(*this, "A8"),
-			m_a9(*this, "A9"),
-			m_a10(*this, "A10"),
-			m_a11(*this, "A11"),
-			m_a12(*this, "A12"),
-			m_a13(*this, "A13"),
-			m_a14(*this, "A14"),
-			m_a15(*this, "A15"),
-			m_joy(*this, "JOY")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_ppi(*this, I8255_TAG)
+		, m_z80pio(*this, Z80PIO_TAG)
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_sp0256(*this, SP0256AL2_TAG)
+		, m_video_ram(*this, "video_ram")
+		, m_char_ram(*this, "char_ram")
+		, m_a8(*this, "A8")
+		, m_a9(*this, "A9")
+		, m_a10(*this, "A10")
+		, m_a11(*this, "A11")
+		, m_a12(*this, "A12")
+		, m_a13(*this, "A13")
+		, m_a14(*this, "A14")
+		, m_a15(*this, "A15")
+		, m_joy(*this, "JOY")
 	{ }
 
 	virtual void machine_start() override;
@@ -429,16 +430,16 @@ void ace_state::ace_mem(address_map &map)
 
 void ace_state::ace_io(address_map &map)
 {
-	map(0x00, 0x00).mirror(0x00fe).select(0xff00).rw(this, FUNC(ace_state::io_r), FUNC(ace_state::io_w));
+	map(0x00, 0x00).mirror(0x00fe).select(0xff00).rw(FUNC(ace_state::io_r), FUNC(ace_state::io_w));
 	map(0x01, 0x01).mirror(0xff00).portr("JOY");
-	map(0x41, 0x41).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pa_r), FUNC(ace_state::ppi_pa_w));
-	map(0x43, 0x43).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pb_r), FUNC(ace_state::ppi_pb_w));
-	map(0x45, 0x45).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pc_r), FUNC(ace_state::ppi_pc_w));
-	map(0x47, 0x47).mirror(0xff80).rw(this, FUNC(ace_state::ppi_control_r), FUNC(ace_state::ppi_control_w));
-	map(0x81, 0x81).mirror(0xff38).rw(this, FUNC(ace_state::pio_ad_r), FUNC(ace_state::pio_ad_w));
-	map(0x83, 0x83).mirror(0xff38).rw(this, FUNC(ace_state::pio_bd_r), FUNC(ace_state::pio_bd_w));
-	map(0x85, 0x85).mirror(0xff38).rw(this, FUNC(ace_state::pio_ac_r), FUNC(ace_state::pio_ac_w));
-	map(0x87, 0x87).mirror(0xff38).rw(this, FUNC(ace_state::pio_bc_r), FUNC(ace_state::pio_bc_w));
+	map(0x41, 0x41).mirror(0xff80).rw(FUNC(ace_state::ppi_pa_r), FUNC(ace_state::ppi_pa_w));
+	map(0x43, 0x43).mirror(0xff80).rw(FUNC(ace_state::ppi_pb_r), FUNC(ace_state::ppi_pb_w));
+	map(0x45, 0x45).mirror(0xff80).rw(FUNC(ace_state::ppi_pc_r), FUNC(ace_state::ppi_pc_w));
+	map(0x47, 0x47).mirror(0xff80).rw(FUNC(ace_state::ppi_control_r), FUNC(ace_state::ppi_control_w));
+	map(0x81, 0x81).mirror(0xff38).rw(FUNC(ace_state::pio_ad_r), FUNC(ace_state::pio_ad_w));
+	map(0x83, 0x83).mirror(0xff38).rw(FUNC(ace_state::pio_bd_r), FUNC(ace_state::pio_bd_w));
+	map(0x85, 0x85).mirror(0xff38).rw(FUNC(ace_state::pio_ac_r), FUNC(ace_state::pio_ac_w));
+	map(0x87, 0x87).mirror(0xff38).rw(FUNC(ace_state::pio_bc_r), FUNC(ace_state::pio_bc_w));
 	map(0xfd, 0xfd).mirror(0xff00).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0xff, 0xff).mirror(0xff00).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 }
@@ -555,7 +556,7 @@ static const gfx_layout ace_charlayout =
 //  GFXDECODE( ace )
 //-------------------------------------------------
 
-static GFXDECODE_START( ace )
+static GFXDECODE_START( gfx_ace )
 	GFXDECODE_ENTRY( Z80_TAG, 0xfc00, ace_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -753,9 +754,9 @@ void ace_state::machine_start()
 
 MACHINE_CONFIG_START(ace_state::ace)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ace_mem)
-	MCFG_CPU_IO_MAP(ace_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ace_mem)
+	MCFG_DEVICE_IO_MAP(ace_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video hardware
@@ -769,19 +770,17 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
+	MCFG_DEVICE_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -793,16 +792,16 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8(ace_state, sby_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ace_state, ald_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ace_state, sby_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ace_state, ald_w))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(6'500'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(ace_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(ace_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ace_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// internal ram
@@ -841,5 +840,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT  STATE      INIT  COMPANY           FULLNAME       FLAGS
-COMP( 1981, jupace,  0,        0,      ace,       ace,   ace_state, 0,    "Jupiter Cantab", "Jupiter Ace", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME       FLAGS
+COMP( 1981, jupace, 0,      0,      ace,     ace,   ace_state, empty_init, "Jupiter Cantab", "Jupiter Ace", 0 )

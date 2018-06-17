@@ -59,8 +59,8 @@ void evmbug_state::io_map(address_map &map)
 	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
-	map(0x0000, 0x0003).r(this, FUNC(evmbug_state::rs232_r));
-	map(0x0000, 0x001f).w(this, FUNC(evmbug_state::rs232_w));
+	map(0x0000, 0x0003).r(FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(FUNC(evmbug_state::rs232_w));
 }
 
 /* Input ports */
@@ -133,5 +133,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY                FULLNAME    FLAGS
-COMP( 19??, evmbug, 0,      0,       evmbug,    evmbug, evmbug_state,  0,    "Texas Instruments",   "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY              FULLNAME    FLAGS
+COMP( 19??, evmbug, 0,      0,      evmbug,  evmbug, evmbug_state, empty_init, "Texas Instruments", "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

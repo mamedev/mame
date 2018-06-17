@@ -14,6 +14,7 @@
 #include "video/decospr.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
+#include "emupal.h"
 
 class rohga_state : public driver_device
 {
@@ -52,11 +53,11 @@ public:
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(wizdfire);
-	DECLARE_DRIVER_INIT(nitrobal);
-	DECLARE_DRIVER_INIT(schmeisr);
-	DECLARE_DRIVER_INIT(hangzo);
-	DECLARE_DRIVER_INIT(rohga);
+	void init_wizdfire();
+	void init_nitrobal();
+	void init_schmeisr();
+	void init_hangzo();
+	void init_rohga();
 	DECLARE_VIDEO_START(wizdfire);
 	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

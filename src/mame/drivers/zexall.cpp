@@ -139,9 +139,9 @@ WRITE8_MEMBER( zexall_state::output_data_w )
 void zexall_state::z80_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("main_ram");
-	map(0xfffd, 0xfffd).rw(this, FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
-	map(0xfffe, 0xfffe).rw(this, FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
-	map(0xffff, 0xffff).rw(this, FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
+	map(0xfffd, 0xfffd).rw(FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
+	map(0xfffe, 0xfffe).rw(FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
+	map(0xffff, 0xffff).rw(FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
 }
 
 
@@ -159,8 +159,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -182,5 +182,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT   STATE         INIT    COMPANY                         FULLNAME                            FLAGS
-COMP( 2009, zexall,  0,      0,      zexall,   zexall, zexall_state, 0,      "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME                            FLAGS
+COMP( 2009, zexall, 0,      0,      zexall,  zexall, zexall_state, empty_init, "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )

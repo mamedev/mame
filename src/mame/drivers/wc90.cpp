@@ -79,11 +79,11 @@ void wc90_state::wc90_map_1(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();     /* Main RAM */
-	map(0xa000, 0xafff).ram().w(this, FUNC(wc90_state::fgvideoram_w)).share("fgvideoram"); /* fg video ram */
+	map(0xa000, 0xafff).ram().w(FUNC(wc90_state::fgvideoram_w)).share("fgvideoram"); /* fg video ram */
 	map(0xb000, 0xbfff).ram();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(wc90_state::bgvideoram_w)).share("bgvideoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(wc90_state::bgvideoram_w)).share("bgvideoram");
 	map(0xd000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram().w(this, FUNC(wc90_state::txvideoram_w)).share("txvideoram"); /* tx video ram */
+	map(0xe000, 0xefff).ram().w(FUNC(wc90_state::txvideoram_w)).share("txvideoram"); /* tx video ram */
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("share1");
 	map(0xfc00, 0xfc00).portr("P1");
@@ -105,7 +105,7 @@ void wc90_state::wc90_map_1(address_map &map)
 	map(0xfc47, 0xfc47).writeonly().share("scroll2xhi");
 	map(0xfcc0, 0xfcc0).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfcd0, 0xfcd0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfce0, 0xfce0).w(this, FUNC(wc90_state::bankswitch_w));
+	map(0xfce0, 0xfce0).w(FUNC(wc90_state::bankswitch_w));
 }
 
 void wc90_state::wc90_map_2(address_map &map)
@@ -117,7 +117,7 @@ void wc90_state::wc90_map_2(address_map &map)
 	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf7ff).bankr("subbank");
 	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(this, FUNC(wc90_state::bankswitch1_w));
+	map(0xfc00, 0xfc00).w(FUNC(wc90_state::bankswitch1_w));
 	map(0xfc01, 0xfc01).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -331,7 +331,7 @@ static const gfx_layout spritelayout8 =
 };
 
 
-static GFXDECODE_START( wc90 )
+static GFXDECODE_START( gfx_wc90 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       1*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       2*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,       3*16*16, 16*16 )
@@ -349,16 +349,16 @@ void wc90_state::machine_start()
 MACHINE_CONFIG_START(wc90_state::wc90)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wc90_map_1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wc90_map_2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -380,12 +380,12 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -568,9 +568,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, empty_init, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

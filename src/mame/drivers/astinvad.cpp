@@ -22,6 +22,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -79,8 +80,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
-	DECLARE_DRIVER_INIT(kamikaze);
-	DECLARE_DRIVER_INIT(spcking2);
+	void init_kamikaze();
+	void init_spcking2();
 	DECLARE_MACHINE_START(kamikaze);
 	DECLARE_MACHINE_RESET(kamikaze);
 	DECLARE_MACHINE_START(spaceint);
@@ -488,14 +489,14 @@ void astinvad_state::spaceint_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x5fff).ram().w(this, FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram().w(FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
 }
 
 
 void astinvad_state::kamikaze_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
+	map(0x00, 0xff).rw(FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
 }
 
 
@@ -504,9 +505,9 @@ void astinvad_state::spaceint_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).w(this, FUNC(astinvad_state::spaceint_sound1_w));
-	map(0x03, 0x03).w(this, FUNC(astinvad_state::color_latch_w));
-	map(0x04, 0x04).w(this, FUNC(astinvad_state::spaceint_sound2_w));
+	map(0x02, 0x02).w(FUNC(astinvad_state::spaceint_sound1_w));
+	map(0x03, 0x03).w(FUNC(astinvad_state::color_latch_w));
+	map(0x04, 0x04).w(FUNC(astinvad_state::spaceint_sound2_w));
 }
 
 
@@ -666,9 +667,9 @@ static const char *const astinvad_sample_names[] =
 MACHINE_CONFIG_START(astinvad_state::kamikaze)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kamikaze_map)
-	MCFG_CPU_IO_MAP(kamikaze_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kamikaze_map)
+	MCFG_DEVICE_IO_MAP(kamikaze_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
@@ -679,8 +680,8 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(astinvad_state, kamikaze_sound1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(astinvad_state, kamikaze_sound2_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, kamikaze_sound1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, kamikaze_sound2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -690,9 +691,9 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(astinvad_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -704,9 +705,9 @@ MACHINE_CONFIG_START(astinvad_state::spcking2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(astinvad_state, spcking2_sound1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(astinvad_state, spcking2_sound2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(astinvad_state, spcking2_sound3_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, spcking2_sound1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, spcking2_sound2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, astinvad_state, spcking2_sound3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -718,10 +719,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(astinvad_state::spaceint)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
-	MCFG_CPU_PROGRAM_MAP(spaceint_map)
-	MCFG_CPU_IO_MAP(spaceint_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
+	MCFG_DEVICE_PROGRAM_MAP(spaceint_map)
+	MCFG_DEVICE_IO_MAP(spaceint_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, spaceint)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, spaceint)
@@ -738,9 +739,9 @@ MACHINE_CONFIG_START(astinvad_state::spaceint)
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(astinvad_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -838,14 +839,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::init_kamikaze()
 {
 	/* the flip screen logic adds 32 to the Y after flipping */
 	m_flip_yoffs = 32;
 }
 
 
-DRIVER_INIT_MEMBER(astinvad_state,spcking2)
+void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
@@ -859,9 +860,9 @@ DRIVER_INIT_MEMBER(astinvad_state,spcking2)
  *
  *************************************/
 
-GAME( 1980,  kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980?, kosmokil, kamikaze, kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979,  spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  spaceint, 0,        spaceint, spaceint,  astinvad_state, 0,        ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  spaceintj,spaceint, spaceint, spaceintj, astinvad_state, 0,        ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  astinvad_state, init_kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  astinvad_state, init_kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  astinvad_state, init_kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
+GAME( 1979,  spcking2,  0,        spcking2, spcking2,  astinvad_state, init_spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceint,  0,        spaceint, spaceint,  astinvad_state, empty_init,    ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceintj, spaceint, spaceint, spaceintj, astinvad_state, empty_init,    ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

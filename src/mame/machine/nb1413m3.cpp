@@ -13,7 +13,7 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 
 #include "cpu/z80/z80.h"
 
@@ -24,8 +24,9 @@ Memo:
 
 DEFINE_DEVICE_TYPE(NB1413M3, nb1413m3_device, "nb1413m3", "NB1413 Mahjong Custom")
 
-nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NB1413M3, tag, owner, clock),
+nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NB1413M3, tag, owner, clock),
+	m_maincpu(*this, "^maincpu"),
 	m_sndromrgntag("voice"),
 	m_sndrombank1(0),
 	m_sndrombank2(0),
@@ -41,7 +42,8 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 	m_gfxradr_l(0),
 	m_gfxradr_h(0),
 	m_gfxrombank(0),
-	m_outcoin_enable(0)
+	m_outcoin_enable(0),
+	m_led(*this, "led0")
 {
 }
 
@@ -52,6 +54,7 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 
 void nb1413m3_device::device_start()
 {
+	m_led.resolve();
 	m_timer_cb = timer_alloc(TIMER_CB);
 	m_timer_cb->adjust(attotime::zero);
 
@@ -124,7 +127,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 	{
 		if (m_nmi_enable)
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_nmi_count++;
 		}
 
@@ -598,7 +601,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 			break;
 	}
 
-	machine().output().set_led_value(2, m_outcoin_flag);      // out coin
+	m_led = m_outcoin_flag;      // out coin
 }
 
 WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
@@ -606,11 +609,11 @@ WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
 	if (data & 0x08)
 	{
 		popmessage(" ** VCR CONTROL ** ");
-		machine().output().set_led_value(2, 1);
+		m_led = 1;
 	}
 	else
 	{
-		machine().output().set_led_value(2, 0);
+		m_led = 0;
 	}
 }
 

@@ -212,31 +212,31 @@ void fgoal_state::cpu_map(address_map &map)
 
 	map(0x0000, 0x00ef).ram();
 
-	map(0x00f0, 0x00f0).r(this, FUNC(fgoal_state::row_r));
-	map(0x00f1, 0x00f1).r(this, FUNC(fgoal_state::analog_r));
+	map(0x00f0, 0x00f0).r(FUNC(fgoal_state::row_r));
+	map(0x00f1, 0x00f1).r(FUNC(fgoal_state::analog_r));
 	map(0x00f2, 0x00f2).portr("IN0");
 	map(0x00f3, 0x00f3).portr("IN1");
-	map(0x00f4, 0x00f4).r(this, FUNC(fgoal_state::address_hi_r));
-	map(0x00f5, 0x00f5).r(this, FUNC(fgoal_state::address_lo_r));
-	map(0x00f6, 0x00f6).r(this, FUNC(fgoal_state::shifter_r));
-	map(0x00f7, 0x00f7).r(this, FUNC(fgoal_state::shifter_reverse_r));
-	map(0x00f8, 0x00fb).r(this, FUNC(fgoal_state::nmi_reset_r));
-	map(0x00fc, 0x00ff).r(this, FUNC(fgoal_state::irq_reset_r));
+	map(0x00f4, 0x00f4).r(FUNC(fgoal_state::address_hi_r));
+	map(0x00f5, 0x00f5).r(FUNC(fgoal_state::address_lo_r));
+	map(0x00f6, 0x00f6).r(FUNC(fgoal_state::shifter_r));
+	map(0x00f7, 0x00f7).r(FUNC(fgoal_state::shifter_reverse_r));
+	map(0x00f8, 0x00fb).r(FUNC(fgoal_state::nmi_reset_r));
+	map(0x00fc, 0x00ff).r(FUNC(fgoal_state::irq_reset_r));
 
-	map(0x00f0, 0x00f0).w(this, FUNC(fgoal_state::row_w));
-	map(0x00f1, 0x00f1).w(this, FUNC(fgoal_state::col_w));
-	map(0x00f2, 0x00f2).w(this, FUNC(fgoal_state::row_w));
-	map(0x00f3, 0x00f3).w(this, FUNC(fgoal_state::col_w));
+	map(0x00f0, 0x00f0).w(FUNC(fgoal_state::row_w));
+	map(0x00f1, 0x00f1).w(FUNC(fgoal_state::col_w));
+	map(0x00f2, 0x00f2).w(FUNC(fgoal_state::row_w));
+	map(0x00f3, 0x00f3).w(FUNC(fgoal_state::col_w));
 	map(0x00f4, 0x00f7).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x00f8, 0x00fb).w(this, FUNC(fgoal_state::sound1_w));
-	map(0x00fc, 0x00ff).w(this, FUNC(fgoal_state::sound2_w));
+	map(0x00f8, 0x00fb).w(FUNC(fgoal_state::sound1_w));
+	map(0x00fc, 0x00ff).w(FUNC(fgoal_state::sound2_w));
 
 	map(0x0100, 0x03ff).ram();
 	map(0x4000, 0x7fff).ram().share("video_ram");
 
-	map(0x8000, 0x8000).w(this, FUNC(fgoal_state::ypos_w));
-	map(0x8001, 0x8001).w(this, FUNC(fgoal_state::xpos_w));
-	map(0x8002, 0x8002).w(this, FUNC(fgoal_state::color_w));
+	map(0x8000, 0x8000).w(FUNC(fgoal_state::ypos_w));
+	map(0x8001, 0x8001).w(FUNC(fgoal_state::xpos_w));
+	map(0x8002, 0x8002).w(FUNC(fgoal_state::color_w));
 
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xffff).rom();
@@ -332,7 +332,7 @@ static const gfx_layout gfxlayout =
 };
 
 
-static GFXDECODE_START( fgoal )
+static GFXDECODE_START( gfx_fgoal )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x00, 8 ) /* foreground */
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x80, 1 ) /* background */
 GFXDECODE_END
@@ -368,8 +368,8 @@ void fgoal_state::machine_reset()
 MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* add shifter */
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(fgoal_state::fgoal)
 	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fgoal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fgoal)
 	MCFG_PALETTE_ADD("palette", 128 + 16 + 1)
 	MCFG_PALETTE_INIT_OWNER(fgoal_state, fgoal)
 
@@ -438,5 +438,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, empty_init, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, fgoal_state, empty_init, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

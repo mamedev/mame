@@ -13,16 +13,6 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VRC6_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, VRC6, _clock)
-
-#define MCFG_VRC6_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, VRC6, _clock)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -55,6 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type VRC6;
+DECLARE_DEVICE_TYPE(VRC6, vrc6snd_device)
 
 #endif // MAME_SOUND_VRC6_H

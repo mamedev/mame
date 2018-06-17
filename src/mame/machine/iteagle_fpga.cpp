@@ -17,23 +17,27 @@
 
 DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle FPGA")
 
-ADDRESS_MAP_START(iteagle_fpga_device::fpga_map)
-	AM_RANGE(0x000, 0x01f) AM_READWRITE(fpga_r, fpga_w)
-ADDRESS_MAP_END
+void iteagle_fpga_device::fpga_map(address_map &map)
+{
+	map(0x000, 0x01f).rw(FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
+}
 
-ADDRESS_MAP_START(iteagle_fpga_device::rtc_map)
-	AM_RANGE(0x000, 0x7ff) AM_READWRITE(rtc_r, rtc_w)
-ADDRESS_MAP_END
+void iteagle_fpga_device::rtc_map(address_map &map)
+{
+	map(0x000, 0x7ff).rw(FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
+}
 
-ADDRESS_MAP_START(iteagle_fpga_device::ram_map)
-	AM_RANGE(0x00000, 0x3f) AM_READWRITE(e1_nvram_r, e1_nvram_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(e1_ram_r, e1_ram_w)
-ADDRESS_MAP_END
+void iteagle_fpga_device::ram_map(address_map &map)
+{
+	map(0x00000, 0x3f).rw(FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
+	map(0x10000, 0x1ffff).rw(FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
+}
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock),
-		m_rtc(*this, "eagle2_rtc"), m_e1_nvram(*this, "eagle1_bram"), m_scc1(*this, AM85C30_TAG), m_version(0), m_seq_init(0)
+	: pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock)
+	, m_rtc(*this, "eagle2_rtc"), m_e1_nvram(*this, "eagle1_bram"), m_scc1(*this, AM85C30_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_cpu(*this, finder_base::DUMMY_TAG), m_version(0), m_seq_init(0)
 {
+	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
 
 MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
@@ -42,26 +46,25 @@ MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
-	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL(7'372'800).value(), XTAL(7'372'800).value(), 0, XTAL(7'372'800).value(), 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD(AM85C30_TAG, SCC85C30, 7.3728_MHz_XTAL)
+	MCFG_Z80SCC_OFFSETS((7.3728_MHz_XTAL).value(), 0, (7.3728_MHz_XTAL).value(), 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, iteagle_fpga_device, serial_interrupt))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(COM2_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(COM1_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(COM1_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
+	MCFG_DEVICE_ADD(COM1_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD(COM2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
+	MCFG_DEVICE_ADD(COM2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
 MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()
 {
-	m_screen = downcast<screen_device *>(machine().device("screen"));
-
 	// RTC M48T02
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
 
@@ -101,7 +104,6 @@ void iteagle_fpga_device::device_start()
 void iteagle_fpga_device::device_reset()
 {
 	remap_cb();
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	memset(m_fpga_regs, 0, sizeof(m_fpga_regs));
 	m_seq = m_seq_init;
 	m_seq_rem1 = 0;
@@ -468,7 +470,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 //*************************************
 //*  AM85c30 serial controller
 //*************************************
-void iteagle_am85c30::reset(void)
+void iteagle_am85c30::reset()
 {
 	memset(m_rr_regs, 0, 0x10 * 2);
 	memset(m_wr_regs, 0, 0x10 * 2);
@@ -643,18 +645,21 @@ WRITE32_MEMBER( iteagle_fpga_device::e1_ram_w )
 
 DEFINE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device, "iteagle_eeprom", "ITEagle EEPROM AT93C46")
 
-ADDRESS_MAP_START(iteagle_eeprom_device::eeprom_map)
-	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
-ADDRESS_MAP_END
+void iteagle_eeprom_device::eeprom_map(address_map &map)
+{
+	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
+}
 
 MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock),
-		m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
+	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
+	, m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
 {
+	set_ids(0x80861229, 0x02, 0x020000, 0x00);
+
 	// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
 	// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
 	// 0x5 = Serial Num + top byte of 0x4
@@ -767,14 +772,16 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITEagle Peripheral Controller")
 
-ADDRESS_MAP_START(iteagle_periph_device::ctrl_map)
-	AM_RANGE(0x000, 0x0cf) AM_READWRITE(ctrl_r, ctrl_w)
-ADDRESS_MAP_END
+void iteagle_periph_device::ctrl_map(address_map &map)
+{
+	map(0x000, 0x0cf).rw(FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
+}
 
 iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_PERIPH, tag, owner, clock),
-	m_rtc(*this, "eagle1_rtc")
+	: pci_device(mconfig, ITEAGLE_PERIPH, tag, owner, clock)
+	, m_rtc(*this, "eagle1_rtc")
 {
+	set_ids(0x1080c693, 0x00, 0x060100, 0x00);
 }
 
 void iteagle_periph_device::device_start()

@@ -60,18 +60,19 @@
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
 */
 
-ADDRESS_MAP_START(naomi_board::submap)
-	AM_RANGE(0x00, 0xff) AM_READ(default_r)
+void naomi_board::submap(address_map &map)
+{
+	map(0x00, 0xff).r(FUNC(naomi_board::default_r));
 
-	AM_RANGE(0x00, 0x01) AM_WRITE(rom_offseth_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rom_offsetl_w)
-	AM_RANGE(0x04, 0x05) AM_READWRITE(rom_data_r, rom_data_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(dma_offseth_w)
-	AM_RANGE(0x08, 0x09) AM_WRITE(dma_offsetl_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(dma_count_w)
-	AM_RANGE(0x3c, 0x3d) AM_WRITE(boardid_w)
-	AM_RANGE(0x3e, 0x3f) AM_READ(boardid_r)
-ADDRESS_MAP_END
+	map(0x00, 0x01).w(FUNC(naomi_board::rom_offseth_w));
+	map(0x02, 0x03).w(FUNC(naomi_board::rom_offsetl_w));
+	map(0x04, 0x05).rw(FUNC(naomi_board::rom_data_r), FUNC(naomi_board::rom_data_w));
+	map(0x06, 0x07).w(FUNC(naomi_board::dma_offseth_w));
+	map(0x08, 0x09).w(FUNC(naomi_board::dma_offsetl_w));
+	map(0x0a, 0x0b).w(FUNC(naomi_board::dma_count_w));
+	map(0x3c, 0x3d).w(FUNC(naomi_board::boardid_w));
+	map(0x3e, 0x3f).r(FUNC(naomi_board::boardid_r));
+}
 
 naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_g1_device(mconfig, type, tag, owner, clock)

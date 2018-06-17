@@ -27,7 +27,7 @@ public:
 		m_extra(*this, "extra")
 	{ }
 
-	DECLARE_DRIVER_INIT(thunderj);
+	void init_thunderj();
 	void thunderj(machine_config &config);
 
 protected:

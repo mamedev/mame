@@ -8,6 +8,7 @@
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sprint8_state : public driver_device
@@ -81,6 +82,6 @@ private:
 };
 
 /*----------- defined in audio/sprint8.c -----------*/
-DISCRETE_SOUND_EXTERN( sprint8 );
+DISCRETE_SOUND_EXTERN( sprint8_discrete );
 
 #endif // MAME_INCLUDES_SPRINT8_H

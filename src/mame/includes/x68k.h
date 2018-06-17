@@ -24,6 +24,7 @@
 #include "sound/ym2151.h"
 #include "bus/x68k/x68kexp.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define MC68901_TAG     "mc68901"
@@ -265,9 +266,9 @@ public:
 	int m_sprite_shift;
 	int m_oddscanline;
 	bool m_is_32bit;
-	DECLARE_DRIVER_INIT(x68kxvi);
-	DECLARE_DRIVER_INIT(x68030);
-	DECLARE_DRIVER_INIT(x68000);
+	void init_x68kxvi();
+	void init_x68030();
+	void init_x68000();
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);

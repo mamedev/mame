@@ -22,6 +22,7 @@
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,8 +39,8 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(hvysmsh);
-	DECLARE_DRIVER_INIT(wcvol95);
+	void init_hvysmsh();
+	void init_wcvol95();
 
 	void hvysmsh(machine_config &config);
 	void wcvol95(machine_config &config);
@@ -136,19 +137,19 @@ void deco156_state::hvysmsh_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 	map(0x120000, 0x120003).portr("INPUTS");
 	map(0x120000, 0x120003).nopw(); // Volume control in low byte
-	map(0x120004, 0x120007).w(this, FUNC(deco156_state::hvysmsh_eeprom_w));
+	map(0x120004, 0x120007).w(FUNC(deco156_state::hvysmsh_eeprom_w));
 	map(0x120008, 0x12000b).nopw(); // IRQ ack?
-	map(0x12000c, 0x12000f).w(this, FUNC(deco156_state::hvysmsh_oki_0_bank_w));
+	map(0x12000c, 0x12000f).w(FUNC(deco156_state::hvysmsh_oki_0_bank_w));
 	map(0x140000, 0x140000).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x160000, 0x160000).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x180000, 0x18001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
 	map(0x190000, 0x191fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
 	map(0x194000, 0x195fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1a0000, 0x1a0fff).rw(this, FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
-	map(0x1a4000, 0x1a4fff).rw(this, FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
+	map(0x1a0000, 0x1a0fff).rw(FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
+	map(0x1a4000, 0x1a4fff).rw(FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
 	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x1d0010, 0x1d002f).nopr(); // Check for DMA complete?
-	map(0x1e0000, 0x1e1fff).rw(this, FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
+	map(0x1e0000, 0x1e1fff).rw(FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
 }
 
 void deco156_state::wcvol95_map(address_map &map)
@@ -157,12 +158,12 @@ void deco156_state::wcvol95_map(address_map &map)
 	map(0x100000, 0x10001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
 	map(0x110000, 0x111fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
 	map(0x114000, 0x115fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x120000, 0x120fff).rw(this, FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
-	map(0x124000, 0x124fff).rw(this, FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
+	map(0x120000, 0x120fff).rw(FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
+	map(0x124000, 0x124fff).rw(FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
 	map(0x130000, 0x137fff).ram();
 	map(0x140000, 0x140003).portr("INPUTS");
 	map(0x150000, 0x150003).portw("EEPROMOUT");
-	map(0x160000, 0x161fff).rw(this, FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
+	map(0x160000, 0x161fff).rw(FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
 	map(0x170000, 0x170003).noprw(); // Irq ack?
 	map(0x180000, 0x180fff).readonly().w(m_palette, FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x1a0000, 0x1a0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
@@ -295,7 +296,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( hvysmsh )
+static GFXDECODE_START( gfx_hvysmsh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites 16x16 */
@@ -330,11 +331,11 @@ DECOSPR_PRIORITY_CB_MEMBER(deco156_state::pri_callback)
 MACHINE_CONFIG_START(deco156_state::hvysmsh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
-	MCFG_CPU_PROGRAM_MAP(hvysmsh_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
+	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -343,7 +344,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -369,13 +370,14 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28000000/28, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28000000/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 28000000/14, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 28000000/14, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -383,11 +385,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(deco156_state::wcvol95)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
-	MCFG_CPU_PROGRAM_MAP(wcvol95_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
+	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -396,7 +398,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -422,9 +424,10 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 28000000 / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -672,14 +675,14 @@ void deco156_state::descramble_sound( const char *tag )
 	memcpy(rom,&buf1[0],length);
 }
 
-DRIVER_INIT_MEMBER(deco156_state,hvysmsh)
+void deco156_state::init_hvysmsh()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
 	descramble_sound("oki2");
 }
 
-DRIVER_INIT_MEMBER(deco156_state,wcvol95)
+void deco156_state::init_wcvol95()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
@@ -689,8 +692,8 @@ DRIVER_INIT_MEMBER(deco156_state,wcvol95)
 
 /**********************************************************************************/
 
-GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )

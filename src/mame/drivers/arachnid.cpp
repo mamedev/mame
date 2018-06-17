@@ -127,8 +127,8 @@ void arachnid_state::arachnid_map(address_map &map)
 	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_write));
-	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_write));
+	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_w));
+	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_w));
 	map(0x8000, 0xffff).rom().region(M6809_TAG, 0);
 }
 
@@ -422,25 +422,25 @@ void arachnid_state::machine_start()
 
 MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(arachnid_map)
+	MCFG_DEVICE_ADD(M6809_TAG, M6809, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA6821_U4_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(arachnid_state, pia_u4_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(arachnid_state, pia_u4_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(arachnid_state, pia_u4_pca_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(arachnid_state, pia_u4_pcb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(arachnid_state, pia_u4_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(arachnid_state, pia_u4_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(arachnid_state, pia_u4_pca_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u4_pcb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, arachnid_state, pia_u4_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, arachnid_state, pia_u4_pb_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, arachnid_state, pia_u4_pca_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, arachnid_state, pia_u4_pcb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, arachnid_state, pia_u4_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, arachnid_state, pia_u4_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, arachnid_state, pia_u4_pca_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u4_pcb_w))
 
 	MCFG_DEVICE_ADD(PIA6821_U17_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(arachnid_state, pia_u17_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(arachnid_state, pia_u17_pca_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(arachnid_state, pia_u17_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u17_pcb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, arachnid_state, pia_u17_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, arachnid_state, pia_u17_pca_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, arachnid_state, pia_u17_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u17_pcb_w))
 
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL(10'738'635) / 2 )
@@ -450,13 +450,13 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(arachnid_state, ptm_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -472,5 +472,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT     MACHINE   INPUT     STATE              INIT         COMPANY             FULLNAME */
-GAME( 1990, arac6000,   0,         arachnid, arachnid, arachnid_state,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME */
+GAME( 1990, arac6000, 0,      arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

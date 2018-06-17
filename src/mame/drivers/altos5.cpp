@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -38,7 +38,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_DRIVER_INIT(altos5);
+	void init_altos5();
 	void altos5(machine_config &config);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altos5);
@@ -102,12 +102,12 @@ void altos5_state::mem_map(address_map &map)
 void altos5_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x04, 0x07).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0x08, 0x0b).rw(m_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x14, 0x17).w(this, FUNC(altos5_state::port14_w));
+	map(0x14, 0x17).w(FUNC(altos5_state::port14_w));
 	map(0x1c, 0x1f).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	//AM_RANGE(0x20, 0x23) // Hard drive
 	map(0x2c, 0x2f).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
@@ -357,9 +357,10 @@ QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 }
 
 
-static SLOT_INTERFACE_START( altos5_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void altos5_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 {
@@ -367,7 +368,7 @@ WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 	m_pio0->port_a_write(data);
 }
 
-DRIVER_INIT_MEMBER( altos5_state, altos5 )
+void altos5_state::init_altos5()
 {
 	m_p_prom =  memregion("proms")->base();
 
@@ -409,67 +410,67 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 
 MACHINE_CONFIG_START(altos5_state::altos5)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(8'000'000) / 4) // 2MHz
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc" ,z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc" ,z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc" ,z80ctc_device, trg2))
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 8_MHz_XTAL / 4) // 2MHz
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc" ,z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc" ,z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc" ,z80ctc_device, trg2))
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(8'000'000) / 2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(altos5_state, busreq_w))
+	MCFG_DEVICE_ADD("dma", Z80DMA, 8_MHz_XTAL / 2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, altos5_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// BAO, not used
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(altos5_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(altos5_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(altos5_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(altos5_state, io_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, altos5_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, altos5_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, altos5_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, altos5_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_ADD("pio0", Z80PIO, 8_MHz_XTAL / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(altos5_state, port08_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(altos5_state, port08_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(altos5_state, port09_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(altos5_state, port09_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, altos5_state, port08_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, altos5_state, port08_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, altos5_state, port09_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, altos5_state, port09_w))
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, 8_MHz_XTAL / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_ADD("dart", Z80DART, 8_MHz_XTAL / 2)
 	// Channel A - console #3
 	// Channel B - printer
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_ADD("sio", Z80SIO, 8_MHz_XTAL / 2)
 	// Channel A - console #2
 	// WRDY connects to (altos5_state, fdc_intrq_w)
 	// Channel B - console #1
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 8_MHz_XTAL / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))    // SIO Ch B
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart", z80dart_device, txca_w))       // Z80DART Ch A, SIO Ch A
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart" ,z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio" ,z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio" ,z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))       // Z80DART Ch B
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))    // SIO Ch B
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart", z80dart_device, txca_w))       // Z80DART Ch A, SIO Ch A
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart" ,z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio" ,z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio" ,z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))       // Z80DART Ch B
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(altos5_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, altos5_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -491,5 +492,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS         INIT    COMPANY  FULLNAME      FLAGS */
-COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state, altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME      FLAGS */
+COMP( 1982, altos5, 0,      0,      altos5,  altos5, altos5_state, init_altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )

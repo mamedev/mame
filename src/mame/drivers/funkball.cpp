@@ -341,10 +341,10 @@ void funkball_state::funkball_map(address_map &map)
 	map(0x000f4000, 0x000f7fff).bankr("bios_bank2");
 	map(0x000f8000, 0x000fbfff).bankr("bios_bank3");
 	map(0x000fc000, 0x000fffff).bankr("bios_bank4");
-	map(0x000e0000, 0x000fffff).w(this, FUNC(funkball_state::bios_ram_w));
+	map(0x000e0000, 0x000fffff).w(FUNC(funkball_state::bios_ram_w));
 	map(0x00100000, 0x07ffffff).ram();
 //  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
-	map(0x40008000, 0x400080ff).rw(this, FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
+	map(0x40008000, 0x400080ff).rw(FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
 	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
 	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
@@ -361,19 +361,19 @@ void funkball_state::flashbank_map(address_map &map)
 void funkball_state::funkball_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0022, 0x0023).rw(this, FUNC(funkball_state::io20_r), FUNC(funkball_state::io20_w));
+	map(0x0022, 0x0023).rw(FUNC(funkball_state::io20_r), FUNC(funkball_state::io20_w));
 	map(0x00e8, 0x00ef).noprw();
 
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
-	map(0x03f8, 0x03ff).rw(this, FUNC(funkball_state::serial_r), FUNC(funkball_state::serial_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
+	map(0x03f8, 0x03ff).rw(FUNC(funkball_state::serial_r), FUNC(funkball_state::serial_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-	map(0x0360, 0x0363).w(this, FUNC(funkball_state::flash_w));
+	map(0x0360, 0x0363).w(FUNC(funkball_state::flash_w));
 
 //  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-	map(0x0360, 0x036f).r(this, FUNC(funkball_state::in_r)); // inputs
+	map(0x0360, 0x036f).r(FUNC(funkball_state::in_r)); // inputs
 }
 
 static INPUT_PORTS_START( funkball )
@@ -770,10 +770,10 @@ void funkball_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(funkball_state::funkball)
-	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
-	MCFG_CPU_PROGRAM_MAP(funkball_map)
-	MCFG_CPU_IO_MAP(funkball_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
+	MCFG_DEVICE_PROGRAM_MAP(funkball_map)
+	MCFG_DEVICE_IO_MAP(funkball_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -782,7 +782,7 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
@@ -827,4 +827,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, funkball_state, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class gsword_state_base : public driver_device
 {
@@ -89,8 +90,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 
-	DECLARE_DRIVER_INIT(gsword);
-	DECLARE_DRIVER_INIT(gsword2);
+	void init_gsword();
+	void init_gsword2();
 
 	DECLARE_PALETTE_INIT(gsword);
 

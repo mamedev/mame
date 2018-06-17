@@ -358,11 +358,11 @@ void t5182_device::t5182_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw(":ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x10, 0x10).w(this, FUNC(t5182_device::sharedram_semaphore_snd_acquire_w));
-	map(0x11, 0x11).w(this, FUNC(t5182_device::sharedram_semaphore_snd_release_w));
-	map(0x12, 0x12).w(this, FUNC(t5182_device::ym2151_irq_ack_w));
-	map(0x13, 0x13).w(this, FUNC(t5182_device::cpu_irq_ack_w));
-	map(0x20, 0x20).r(this, FUNC(t5182_device::sharedram_semaphore_main_r));
+	map(0x10, 0x10).w(FUNC(t5182_device::sharedram_semaphore_snd_acquire_w));
+	map(0x11, 0x11).w(FUNC(t5182_device::sharedram_semaphore_snd_release_w));
+	map(0x12, 0x12).w(FUNC(t5182_device::ym2151_irq_ack_w));
+	map(0x13, 0x13).w(FUNC(t5182_device::cpu_irq_ack_w));
+	map(0x20, 0x20).r(FUNC(t5182_device::sharedram_semaphore_main_r));
 	map(0x30, 0x30).portr("T5182_COIN");
 }
 
@@ -372,8 +372,8 @@ void t5182_device::t5182_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(t5182_device::device_add_mconfig)
-	MCFG_CPU_ADD("t5182_z80", Z80, T5182_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(t5182_map)
-	MCFG_CPU_IO_MAP(t5182_io)
+	MCFG_DEVICE_ADD("t5182_z80", Z80, T5182_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(t5182_map)
+	MCFG_DEVICE_IO_MAP(t5182_io)
 
 MACHINE_CONFIG_END

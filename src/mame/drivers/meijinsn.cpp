@@ -67,6 +67,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -192,13 +193,13 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 void meijinsn_state::meijinsn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080e00, 0x080fff).r(this, FUNC(meijinsn_state::alpha_mcu_r)).nopw();
+	map(0x080e00, 0x080fff).r(FUNC(meijinsn_state::alpha_mcu_r)).nopw();
 	map(0x100000, 0x107fff).ram().share("videoram");
 	map(0x180000, 0x180dff).ram();
 	map(0x180e00, 0x180fff).ram().share("shared_ram");
 	map(0x181000, 0x181fff).ram();
 	map(0x1c0000, 0x1c0001).portr("P2");
-	map(0x1a0000, 0x1a0001).portr("P1").w(this, FUNC(meijinsn_state::sound_w));
+	map(0x1a0000, 0x1a0001).portr("P1").w(FUNC(meijinsn_state::sound_w));
 }
 
 void meijinsn_state::meijinsn_sound_map(address_map &map)
@@ -361,14 +362,14 @@ void meijinsn_state::machine_reset()
 MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
-	MCFG_CPU_PROGRAM_MAP(meijinsn_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 9000000 )
+	MCFG_DEVICE_PROGRAM_MAP(meijinsn_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meijinsn_state, meijinsn_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(meijinsn_sound_map)
-	MCFG_CPU_IO_MAP(meijinsn_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(meijinsn_state, irq0_line_hold,  160*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(meijinsn_sound_map)
+	MCFG_DEVICE_IO_MAP(meijinsn_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(meijinsn_state, irq0_line_hold,  160*60)
 
 
 	/* video hardware */
@@ -384,12 +385,12 @@ MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 	MCFG_PALETTE_INIT_OWNER(meijinsn_state, meijinsn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 MACHINE_CONFIG_END
@@ -422,4 +423,4 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )

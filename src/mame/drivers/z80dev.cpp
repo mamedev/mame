@@ -84,9 +84,9 @@ void z80dev_state::io_map(address_map &map)
 	map(0x21, 0x21).portr("LINE1");
 	map(0x22, 0x22).portr("LINE2");
 	map(0x23, 0x23).portr("LINE3");
-	map(0x20, 0x25).w(this, FUNC(z80dev_state::display_w));
+	map(0x20, 0x25).w(FUNC(z80dev_state::display_w));
 
-	map(0x13, 0x13).r(this, FUNC(z80dev_state::test_r));
+	map(0x13, 0x13).r(FUNC(z80dev_state::test_r));
 }
 
 /* Input ports */
@@ -126,9 +126,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(z80dev_state::z80dev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_z80dev)
@@ -142,5 +142,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY      FULLNAME         FLAGS */
-COMP( 198?, z80dev, 0,      0,       z80dev,    z80dev, z80dev_state,  0,    "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME         FLAGS */
+COMP( 198?, z80dev, 0,      0,      z80dev,  z80dev, z80dev_state, empty_init, "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)

@@ -23,6 +23,7 @@ Other:  BMC B816140 (CPLD)
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -385,11 +386,11 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	map(0x280000, 0x287fff).ram().w(this, FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
-	map(0x288000, 0x28ffff).ram().w(this, FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
 	map(0x290000, 0x297fff).ram();
 
-	map(0x2a0000, 0x2dffff).ram().w(this, FUNC(bmcpokr_state::pixram_w)).share("pixram");
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
 
 	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
 	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
@@ -398,27 +399,27 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 
 	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	map(0x330000, 0x330001).rw(this, FUNC(bmcpokr_state::prot_r), FUNC(bmcpokr_state::prot_w));
+	map(0x330000, 0x330001).rw(FUNC(bmcpokr_state::prot_r), FUNC(bmcpokr_state::prot_w));
 
 	map(0x340000, 0x340001).ram(); // 340001.b, rw
 	map(0x340002, 0x340003).ram(); // 340003.b, w(9d)
-	map(0x340006, 0x340007).w(this, FUNC(bmcpokr_state::irq_ack_w));
-	map(0x340008, 0x340009).w(this, FUNC(bmcpokr_state::irq_enable_w));
+	map(0x340006, 0x340007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x340008, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x34000e, 0x34000f).ram().share("priority");    // 34000f.b, w (priority?)
-	map(0x340016, 0x340017).w(this, FUNC(bmcpokr_state::pixpal_w));
+	map(0x340016, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
 	map(0x340018, 0x340019).ram(); // 340019.b, w
-	map(0x34001a, 0x34001b).r(this, FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x34001a, 0x34001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x34001c, 0x34001d).ram(); // 34001d.b, w(0)
 
 	map(0x350001, 0x350001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x350003, 0x350003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x350005, 0x350005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x360000, 0x360001).r(this, FUNC(bmcpokr_state::dsw_r));
+	map(0x360000, 0x360001).r(FUNC(bmcpokr_state::dsw_r));
 
 	map(0x370000, 0x370001).portr("INPUTS");
 
-	map(0x380000, 0x380001).w(this, FUNC(bmcpokr_state::mux_w));
+	map(0x380000, 0x380001).w(FUNC(bmcpokr_state::mux_w));
 
 	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x398001, 0x398001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -458,11 +459,11 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	map(0x280000, 0x287fff).ram().w(this, FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
-	map(0x288000, 0x28ffff).ram().w(this, FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
 	map(0x290000, 0x297fff).ram();
 
-	map(0x2a0000, 0x2dffff).ram().w(this, FUNC(bmcpokr_state::pixram_w)).share("pixram");
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
 
 	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
 	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
@@ -471,11 +472,11 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 
 	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	map(0x388000, 0x388001).w(this, FUNC(bmcpokr_state::mux_w));
+	map(0x388000, 0x388001).w(FUNC(bmcpokr_state::mux_w));
 
-	map(0x390000, 0x390001).r(this, FUNC(bmcpokr_state::mjmaglmp_dsw_r));
+	map(0x390000, 0x390001).r(FUNC(bmcpokr_state::mjmaglmp_dsw_r));
 
-	map(0x398000, 0x398001).r(this, FUNC(bmcpokr_state::mjmaglmp_key_r));
+	map(0x398000, 0x398001).r(FUNC(bmcpokr_state::mjmaglmp_key_r));
 
 	map(0x3c8800, 0x3c8803).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x3c9001, 0x3c9001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -486,12 +487,12 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 
 	map(0x3ca000, 0x3ca001).ram(); // 3ca001.b, rw
 	map(0x3ca002, 0x3ca003).ram(); // 3ca003.b, w(9d)
-	map(0x3ca006, 0x3ca007).w(this, FUNC(bmcpokr_state::irq_ack_w));
-	map(0x3ca008, 0x3ca009).w(this, FUNC(bmcpokr_state::irq_enable_w));
+	map(0x3ca006, 0x3ca007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x3ca008, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x3ca00e, 0x3ca00f).ram().share("priority");    // 3ca00f.b, w (priority?)
-	map(0x3ca016, 0x3ca017).w(this, FUNC(bmcpokr_state::pixpal_w));
+	map(0x3ca016, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
 	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
-	map(0x3ca01a, 0x3ca01b).r(this, FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x3ca01a, 0x3ca01b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
 }
 
@@ -781,7 +782,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( bmcpokr )
+static GFXDECODE_START( gfx_bmcpokr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -809,8 +810,8 @@ void bmcpokr_state::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
-	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
+	MCFG_DEVICE_PROGRAM_MAP(bmcpokr_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -824,27 +825,28 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmcpokr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)    // hopper stuck low if too slow
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000) / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bmcpokr_state::mjmaglmp)
 	bmcpokr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjmaglmp_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -959,5 +961,5 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
-GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, 0, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, 0, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )

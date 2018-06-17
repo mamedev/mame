@@ -144,13 +144,13 @@ void wc90b_state::wc90b_map1(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram(); /* Main RAM */
-	map(0xa000, 0xafff).ram().w(this, FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
+	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(this, FUNC(wc90b_state::bankswitch_w));
-	map(0xfd00, 0xfd00).w(this, FUNC(wc90b_state::sound_command_w));
+	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch_w));
+	map(0xfd00, 0xfd00).w(FUNC(wc90b_state::sound_command_w));
 	map(0xfd04, 0xfd04).writeonly().share("scroll1y");
 	map(0xfd06, 0xfd06).writeonly().share("scroll1x");
 	map(0xfd08, 0xfd08).writeonly().share("scroll2y");
@@ -160,7 +160,7 @@ void wc90b_state::wc90b_map1(address_map &map)
 	map(0xfd02, 0xfd02).portr("P2");
 	map(0xfd06, 0xfd06).portr("DSW1");
 	map(0xfd08, 0xfd08).portr("DSW2");
-	map(0xfd0c, 0xfd0c).r(this, FUNC(wc90b_state::master_irq_ack_r));
+	map(0xfd0c, 0xfd0c).r(FUNC(wc90b_state::master_irq_ack_r));
 }
 
 void wc90b_state::wc90b_map2(address_map &map)
@@ -173,16 +173,16 @@ void wc90b_state::wc90b_map2(address_map &map)
 	map(0xe800, 0xefff).rom();
 	map(0xf000, 0xf7ff).bankr("subbank");
 	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(this, FUNC(wc90b_state::bankswitch1_w));
-	map(0xfd0c, 0xfd0c).w(this, FUNC(wc90b_state::slave_irq_ack_w));
+	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch1_w));
+	map(0xfd0c, 0xfd0c).w(FUNC(wc90b_state::slave_irq_ack_w));
 }
 
 void wc90b_state::sound_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("audiobank");
-	map(0xe000, 0xe000).w(this, FUNC(wc90b_state::adpcm_control_w));
-	map(0xe400, 0xe400).w(this, FUNC(wc90b_state::adpcm_data_w));
+	map(0xe000, 0xe000).w(FUNC(wc90b_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(wc90b_state::adpcm_data_w));
 	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf000, 0xf7ff).ram();
@@ -307,7 +307,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( wc90b )
+static GFXDECODE_START( gfx_wc90b )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x02000, tilelayout,       0x200, 0x10 )
@@ -335,11 +335,11 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
-		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
+		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
 }
 
 void wc90b_state::machine_start()
@@ -356,16 +356,16 @@ void wc90b_state::machine_start()
 MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wc90b_map1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wc90b_map1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wc90b_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("sub", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wc90b_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
@@ -377,24 +377,24 @@ MACHINE_CONFIG_START(wc90b_state::wc90b)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90b)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd1", YM2203, YM2203_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd1", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ymsnd2", YM2203, YM2203_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd2", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, MSM5205_CLOCK)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wc90b_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -537,6 +537,6 @@ ROM_START( twcup90ba )
 ROM_END
 
 
-GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

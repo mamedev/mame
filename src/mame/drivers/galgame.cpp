@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -49,7 +50,7 @@ public:
 	DECLARE_READ16_MEMBER(y_r);
 	DECLARE_WRITE16_MEMBER(y_w);
 	DECLARE_WRITE16_MEMBER(clk_w);
-	DECLARE_DRIVER_INIT(galaxygame);
+	void init_galaxygame();
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
@@ -289,12 +290,12 @@ WRITE16_MEMBER(galaxygame_state::clk_w)
 void galaxygame_state::galaxygame_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0xfec0, 0xfecf).rw(this, FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
-	map(0xff52, 0xff53).rw(this, FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
+	map(0xfec0, 0xfecf).rw(FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
+	map(0xff52, 0xff53).rw(FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
 	map(0xff54, 0xff55).portr("COINAC"); // 177524 COINAC
-	map(0xff5a, 0xff5b).rw(this, FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
+	map(0xff5a, 0xff5b).rw(FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
 	map(0xff5c, 0xff5d).portr("SR");     // 177534 SR
-	map(0xff66, 0xff67).w(this, FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
+	map(0xff66, 0xff67).w(FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
 }
 
 
@@ -323,11 +324,11 @@ void galaxygame_state::machine_reset()
 
 MACHINE_CONFIG_START(galaxygame_state::galaxygame)
 
-	MCFG_CPU_ADD("maincpu", T11, 3000000 )
-	MCFG_CPU_PROGRAM_MAP(galaxygame_map)
+	MCFG_DEVICE_ADD("maincpu", T11, 3000000 )
+	MCFG_DEVICE_PROGRAM_MAP(galaxygame_map)
 	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_CPU_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -357,15 +358,13 @@ ROM_END
 
 static uint8_t read_uint16(uint16_t *pval, int pos, const uint8_t* line, int linelen)
 {
-	int i;
-
 	*pval = 0;
-	if ( linelen < (pos + 6) )
+	if (linelen < (pos + 6))
 	{
 		return 0;
 	}
 
-	for ( i = 0; i < 6; i++ )
+	for (int i = 0; i < 6; i++)
 	{
 		*pval <<= 3;
 		*pval |= line[pos + i] - 0x30;
@@ -375,15 +374,13 @@ static uint8_t read_uint16(uint16_t *pval, int pos, const uint8_t* line, int lin
 
 static uint8_t read_uint8(uint8_t *pval, int pos, const uint8_t* line, int linelen)
 {
-	int i;
-
 	*pval = 0;
-	if ( linelen < (pos + 3) )
+	if (linelen < (pos + 3))
 	{
 		return 0;
 	}
 
-	for ( i = 0; i < 3; i++ )
+	for (int i = 0; i < 3; i++)
 	{
 		*pval <<= 3;
 		*pval |= line[pos + i] - 0x30;
@@ -391,49 +388,49 @@ static uint8_t read_uint8(uint8_t *pval, int pos, const uint8_t* line, int linel
 	return 1;
 }
 
-DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
+void galaxygame_state::init_galaxygame()
 {
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	uint8_t *code = memregion("code")->base();
 
-	int filepos = 0, linepos, linelen;
-	uint8_t line[256];
-	uint16_t address;
-	uint16_t val;
-	uint8_t val8;
+	int filepos = 0;
 
 	//load lst file
-	while( code[filepos] != 0 )
+	while (code[filepos] != 0)
 	{
-		linepos = 0;
-		while( code[filepos] != 0x0d )
+		uint8_t line[256];
+		int linepos = 0;
+		while (code[filepos] != 0x0d)
 		{
 			line[linepos++] = code[filepos++];
 		}
 		line[linepos] = 0;
 		filepos += 2;
-		linelen = linepos;
+		int linelen = linepos;
 
-		if ( linelen == 0 )
+		if (linelen == 0)
 		{
 			continue;
 		}
-		if ( ( line[8] != ' ' ) && read_uint16(&address, 7, line, linelen ) )
+
+		uint16_t address;
+		if ((line[8] != ' ') && read_uint16(&address, 7, line, linelen))
 		{
-			if ( (linelen >= 15+6) && (line[15] != ' ') )
+			if ((linelen >= 15+6) && (line[15] != ' '))
 			{
+				uint16_t val;
 				read_uint16(&val, 15, line, linelen);
 				main.write_word(address, val, 0xffff);
 				address += 2;
 
-				if ( (linelen >= 22+6) && (line[22] != ' ') )
+				if ((linelen >= 22+6) && (line[22] != ' '))
 				{
 					read_uint16(&val, 22, line, linelen);
 					main.write_word(address, val, 0xffff);
 					address += 2;
 				}
 
-				if ( (linelen >= 29+6) && (line[29] != ' ') )
+				if ((linelen >= 29+6) && (line[29] != ' '))
 				{
 					read_uint16(&val, 29, line, linelen);
 					main.write_word(address, val, 0xffff);
@@ -443,8 +440,9 @@ DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 			}
 			else
 			{
-				if ( (linelen >= 18+3) && (line[18] != ' ') )
+				if ((linelen >= 18+3) && (line[18] != ' '))
 				{
+					uint8_t val8;
 					read_uint8(&val8, 18, line, linelen);
 					main.write_byte(address, val8);
 					address += 1;
@@ -462,4 +460,4 @@ DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 	main.write_word(8, 000500 - 10);
 }
 
-GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )
+GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, init_galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )

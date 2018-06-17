@@ -451,8 +451,8 @@ void dec0_state::dec0_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
-	map(0x30c000, 0x30c00b).r(this, FUNC(dec0_state::dec0_controls_r));
-	map(0x30c010, 0x30c01f).w(this, FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
+	map(0x30c000, 0x30c00b).r(FUNC(dec0_state::dec0_controls_r));
+	map(0x30c010, 0x30c01f).w(FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
 	map(0x30c012, 0x30c013).nopr(); // clr.w for sprite DMA
 	map(0x30c018, 0x30c019).nopr(); // clr.w for irq ack
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -476,7 +476,7 @@ void dec0_state::hippodrm_sub_map(address_map &map)
 	map(0x1a0000, 0x1a0007).w(m_tilegen3, FUNC(deco_bac06_device::pf_control0_8bit_packed_w));
 	map(0x1a0010, 0x1a001f).w(m_tilegen3, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
 	map(0x1a1000, 0x1a17ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x1d0000, 0x1d00ff).rw(this, FUNC(dec0_state::hippodrm_prot_r), FUNC(dec0_state::hippodrm_prot_w));
+	map(0x1d0000, 0x1d00ff).rw(FUNC(dec0_state::hippodrm_prot_r), FUNC(dec0_state::hippodrm_prot_w));
 	map(0x1f0000, 0x1f1fff).bankrw("bank8"); /* Main ram */
 	map(0x1ff400, 0x1ff403).w(m_subcpu, FUNC(h6280_device::irq_status_w));
 	map(0x1ff402, 0x1ff403).portr("VBLANK");
@@ -573,8 +573,8 @@ READ16_MEMBER(dec0_state::slyspy_state_r)
 
 void dec0_state::slyspy_protection_map(address_map &map)
 {
-	map(0x04000, 0x04001).mirror(0x30000).r(this, FUNC(dec0_state::slyspy_state_r)).nopw();
-	map(0x0a000, 0x0a001).mirror(0x30000).w(this, FUNC(dec0_state::slyspy_state_w));
+	map(0x04000, 0x04001).mirror(0x30000).r(FUNC(dec0_state::slyspy_state_r)).nopw();
+	map(0x0a000, 0x0a001).mirror(0x30000).w(FUNC(dec0_state::slyspy_state_w));
 	// Default state (called by Traps 1, 3, 4, 7, C)
 	map(0x00000, 0x00007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_0_w));
 	map(0x00010, 0x00017).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_1_w));
@@ -616,9 +616,9 @@ void dec0_state::slyspy_map(address_map &map)
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x314002, 0x314003).w(this, FUNC(dec0_state::dec0_priority_w));
-	map(0x314008, 0x31400f).r(this, FUNC(dec0_state::slyspy_controls_r));
-	map(0x31c000, 0x31c00f).r(this, FUNC(dec0_state::slyspy_protection_r)).nopw();
+	map(0x314002, 0x314003).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x314008, 0x31400f).r(FUNC(dec0_state::slyspy_controls_r));
+	map(0x31c000, 0x31c00f).r(FUNC(dec0_state::slyspy_protection_r)).nopw();
 }
 
 
@@ -628,8 +628,8 @@ void dec0_state::midres_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("ram");
 	map(0x120000, 0x1207ff).ram().share("spriteram");
 	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x160000, 0x160001).w(this, FUNC(dec0_state::dec0_priority_w));
-	map(0x180000, 0x18000f).r(this, FUNC(dec0_state::midres_controls_r));
+	map(0x160000, 0x160001).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x180000, 0x18000f).r(FUNC(dec0_state::midres_controls_r));
 	map(0x180008, 0x18000f).nopw(); /* ?? watchdog ?? */
 	map(0x1a0001, 0x1a0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
@@ -656,10 +656,10 @@ void dec0_state::midres_map(address_map &map)
 void dec0_state::midresb_map(address_map &map)
 {
 	midres_map(map);
-	map(0x160010, 0x160011).w(this, FUNC(dec0_state::dec0_priority_w));
-	map(0x180000, 0x18000f).r(this, FUNC(dec0_state::dec0_controls_r));
+	map(0x160010, 0x160011).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x180000, 0x18000f).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x180012, 0x180013).noprw();
-	map(0x180014, 0x180015).w(this, FUNC(dec0_state::midres_sound_w));
+	map(0x180014, 0x180015).w(FUNC(dec0_state::midres_sound_w));
 	map(0x180018, 0x180019).noprw();
 	map(0x1a0000, 0x1a0001).portr("AN0");
 	map(0x1a0008, 0x1a0009).portr("AN1");
@@ -710,8 +710,8 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
 
 void dec0_state::slyspy_sound_protection_map(address_map &map)
 {
-	map(0x020000, 0x020001).mirror(0x180000).r(this, FUNC(dec0_state::slyspy_sound_state_r)); /* Protection counter */
-	map(0x050000, 0x050001).mirror(0x180000).r(this, FUNC(dec0_state::slyspy_sound_state_reset_r));
+	map(0x020000, 0x020001).mirror(0x180000).r(FUNC(dec0_state::slyspy_sound_state_r)); /* Protection counter */
+	map(0x050000, 0x050001).mirror(0x180000).r(FUNC(dec0_state::slyspy_sound_state_reset_r));
 	// state 0
 	map(0x010000, 0x010001).w("ym2", FUNC(ym3812_device::write));
 	map(0x030000, 0x030001).w("ym1", FUNC(ym2203_device::write));
@@ -801,14 +801,14 @@ void dec0_automat_state::automat_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
-	map(0x30c000, 0x30c00b).r(this, FUNC(dec0_automat_state::dec0_controls_r));
-	map(0x30c000, 0x30c01f).w(this, FUNC(dec0_automat_state::automat_control_w));            /* Priority, sound, etc. */
-	map(0x310000, 0x3107ff).rw(this, FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
+	map(0x30c000, 0x30c00b).r(FUNC(dec0_automat_state::dec0_controls_r));
+	map(0x30c000, 0x30c01f).w(FUNC(dec0_automat_state::automat_control_w));            /* Priority, sound, etc. */
+	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
 	map(0x314000, 0x3147ff).ram();
 
 	// video regs are moved to here..
-	map(0x400000, 0x400007).w(this, FUNC(dec0_automat_state::automat_scroll_w));
-	map(0x400008, 0x400009).w(this, FUNC(dec0_automat_state::dec0_priority_w));
+	map(0x400000, 0x400007).w(FUNC(dec0_automat_state::automat_scroll_w));
+	map(0x400008, 0x400009).w(FUNC(dec0_automat_state::dec0_priority_w));
 
 	map(0x500000, 0x500001).nopw(); // ???
 
@@ -831,7 +831,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 //  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
 //  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
 
-	map(0x314008, 0x31400f).r(this, FUNC(dec0_automat_state::slyspy_controls_r));
+	map(0x314008, 0x31400f).r(FUNC(dec0_automat_state::slyspy_controls_r));
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0x300000, 0x300007).ram();
@@ -840,7 +840,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 	map(0x300c00, 0x300fff).ram();
 	map(0x301000, 0x3017ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x301800, 0x307fff).ram().share("ram"); /* Sly spy main ram */
-	map(0x310000, 0x3107ff).rw(this, FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
+	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
 	map(0xb08000, 0xb08fff).ram().share("spriteram"); /* Sprites */
 }
 
@@ -854,7 +854,7 @@ void dec0_automat_state::automat_s_map(address_map &map)
 	map(0xd000, 0xd001).rw("2203b", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).w(m_adpcm_select2, FUNC(ls157_device::ba_w));
-	map(0xe800, 0xe800).w(this, FUNC(dec0_automat_state::sound_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
 	map(0xf000, 0xf000).w(m_adpcm_select1, FUNC(ls157_device::ba_w));
 }
 
@@ -867,7 +867,7 @@ void dec0_automat_state::secretab_s_map(address_map &map)
 	map(0xd000, 0xd001).rw("ym3812", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).w(m_adpcm_select2, FUNC(ls157_device::ba_w));
-	map(0xe800, 0xe800).w(this, FUNC(dec0_automat_state::sound_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
 	map(0xf000, 0xf000).w(m_adpcm_select1, FUNC(ls157_device::ba_w));
 }
 
@@ -1564,14 +1564,14 @@ static const gfx_layout automat_tilelayout2 =
 };
 
 
-static GFXDECODE_START( dec0 )
+static GFXDECODE_START( gfx_dec0 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 768, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 256, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( midres )
+static GFXDECODE_START( gfx_midres )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 256, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 768, 16 )   /* Tiles 16x16 */
@@ -1582,14 +1582,14 @@ GFXDECODE_END
 
 
 
-static GFXDECODE_START( automat )
+static GFXDECODE_START( gfx_automat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout3, 512, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, automat_tilelayout2, 768, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, automat_spritelayout, 256, 16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( secretab )
+static GFXDECODE_START( gfx_secretab )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout2,     0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, automat_tilelayout2,     0x300, 0x10 )
@@ -1618,7 +1618,7 @@ MACHINE_CONFIG_START(dec0_state::dec0_base)
 	//MCFG_SCREEN_UPDATE_DRIVER differs per game
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dec0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dec0)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
@@ -1643,12 +1643,12 @@ MACHINE_CONFIG_START(dec0_state::dec0)
 	dec0_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert) /* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(dec0_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert) /* VBL */
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
@@ -1657,19 +1657,19 @@ MACHINE_CONFIG_START(dec0_state::dec0)
 	MCFG_PALETTE_FORMAT(XBGR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(12'000'000) / 4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 2 / 10, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 2 / 10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1686,19 +1686,19 @@ MACHINE_CONFIG_START(dec0_state::dec1)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1734,12 +1734,12 @@ WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
 MACHINE_CONFIG_START(dec0_automat_state::automat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(automat_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(automat_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)// ?
-	MCFG_CPU_PROGRAM_MAP(automat_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)// ?
+	MCFG_DEVICE_PROGRAM_MAP(automat_s_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
@@ -1768,39 +1768,39 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", automat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_automat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("2203a", YM2203, 1250000)
+	MCFG_DEVICE_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("2203b", YM2203, 1250000)
+	MCFG_DEVICE_ADD("2203b", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm1_vclk_cb))
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec0_automat_state, msm1_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm2_vclk_cb))
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec0_automat_state, msm2_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1809,12 +1809,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_automat_state::secretab)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MCFG_CPU_PROGRAM_MAP(secretab_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(secretab_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)// ?
-	MCFG_CPU_PROGRAM_MAP(secretab_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)// ?
+	MCFG_DEVICE_PROGRAM_MAP(secretab_s_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
@@ -1843,36 +1843,36 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", secretab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_secretab)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("2203a", YM2203, 1250000)
+	MCFG_DEVICE_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym3812", YM3812, 2500000)
+	MCFG_DEVICE_ADD("ym3812", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm1_vclk_cb))
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec0_automat_state, msm1_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm2_vclk_cb))
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec0_automat_state, msm2_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1881,12 +1881,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::hbarrel)
 	dec0(config);
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec0_state, dec0_mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec0_state, dec0_mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec0_state, dec0_mcu_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec0_state, dec0_mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(dec0_state, dec0_mcu_port3_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec0_state, dec0_mcu_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1896,12 +1896,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::baddudes)
 	dec0(config);
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec0_state, dec0_mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec0_state, dec0_mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec0_state, dec0_mcu_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec0_state, dec0_mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(dec0_state, dec0_mcu_port3_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec0_state, dec0_mcu_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1927,8 +1927,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::robocop)
 	dec0(config);
 
-	MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
-	MCFG_CPU_PROGRAM_MAP(robocop_sub_map)
+	MCFG_DEVICE_ADD("sub", H6280, XTAL(21'477'272) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(robocop_sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))  /* Interleave between HuC6280 & 68000 */
 
@@ -1948,8 +1948,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::hippodrm)
 	dec0(config);
 
-	MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
-	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
+	MCFG_DEVICE_ADD("sub", H6280, XTAL(21'477'272) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(hippodrm_sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
 
@@ -1961,8 +1961,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::ffantasybl)
 	dec0(config);
 
-//  MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
-//  MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
+//  MCFG_DEVICE_ADD("sub", H6280, XTAL(21'477'272) / 16)
+//  MCFG_DEVICE_PROGRAM_MAP(hippodrm_sub_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
 
@@ -1984,13 +1984,13 @@ MACHINE_CONFIG_START(dec0_state::slyspy)
 	dec1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MCFG_CPU_PROGRAM_MAP(slyspy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(slyspy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
 
 	// TODO: both games doesn't like /3 here, MT #06740
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(12'000'000)/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
-	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(12'000'000)/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
+	MCFG_DEVICE_PROGRAM_MAP(slyspy_s_map)
 
 	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(slyspy_protection_map)
@@ -2018,31 +2018,31 @@ MACHINE_CONFIG_START(dec0_state::midres)
 	dec1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MCFG_CPU_PROGRAM_MAP(midres_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(midres_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(midres_s_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(24'000'000)/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(midres_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_midres)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_midres)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec0_state::midresb)
 	midres(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(midresb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(midresb_map)
 
-	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000 )
-	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+	MCFG_DEVICE_REPLACE("audiocpu", M6502, 1500000 )
+	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
-	MCFG_CPU_ADD("mcu", M68705R3, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("mcu", M68705R3, XTAL(3'579'545))
 
-	MCFG_SOUND_MODIFY("ym2")
+	MCFG_DEVICE_MODIFY("ym2")
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -3726,7 +3726,7 @@ ROM_START( bouldashj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(dec0_state,midresb)
+void dec0_state::init_midresb()
 {
 //  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
 //  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
@@ -3747,7 +3747,7 @@ READ16_MEMBER(dec0_state::ffantasybl_242024_r)
 	return 0xffff;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
+void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 
@@ -3757,46 +3757,46 @@ DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
 
 /******************************************************************************/
 
-//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE/DEVICE,   INIT, MONITOR,COMPANY,                 FULLNAME,            FLAGS
-GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state,  hbarrel, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state,  hbarrel, ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, birdtry,    0,        birdtry,  birdtry,  dec0_state,  birdtry, ROT270, "Data East Corporation", "Birdie Try (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection controls game related data, impossible to emulate without a working PCB
-GAME( 1988, robocop,    0,        robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopw,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopj,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopu,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopu0,  robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hippodrm,   0,        hippodrm, hippodrm, dec0_state, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasy,   hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasyj,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", MACHINE_SUPPORTS_SAVE ) // presumably rev 1
-GAME( 1989, ffantasyb,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision ?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, secretag,   0,        slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East Corporation", "Secret Agent (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, secretagj,  secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East Corporation", "Secret Agent (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, slyspy,     secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, slyspy3,    secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, slyspy2,    secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midres,     0,        midres,   midres,   dec0_state,        0, ROT0,   "Data East Corporation", "Midnight Resistance (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midresu,    midres,   midres,   midresu,  dec0_state,        0, ROT0,   "Data East USA",         "Midnight Resistance (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midresj,    midres,   midres,   midresu,  dec0_state,        0, ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bouldash,   0,        slyspy,   bouldash, dec0_state,   slyspy, ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state,   slyspy, ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,       PARENT,   MACHINE,    INPUT,      STATE/DEVICE,   INIT,        MONITOR,COMPANY,                 FULLNAME,            FLAGS
+GAME( 1987, hbarrel,    0,        hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hbarrelw,   hbarrel,  hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state, init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state, init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state, init_birdtry,    ROT270, "Data East Corporation", "Birdie Try (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection controls game related data, impossible to emulate without a working PCB
+GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   dec0_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasya,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", MACHINE_SUPPORTS_SAVE ) // presumably rev 1
+GAME( 1989, ffantasyb,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, secretag,   0,        slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East Corporation", "Secret Agent (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, secretagj,  secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East Corporation", "Secret Agent (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy,     secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy3,    secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy2,    secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midres,     0,        midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresu,    midres,   midres,     midresu,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Midnight Resistance (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresj,    midres,   midres,     midresu,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bouldash,   0,        slyspy,     bouldash,   dec0_state, init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bouldashj,  bouldash, slyspy,     bouldash,   dec0_state, init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, robocop,    ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, init_robocop,    ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
-GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl, ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
-GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
+GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, init_ffantasybl, ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
+GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,  robocop,  dec0_automat_state,  robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   secretag, secretab, slyspy,   dec0_automat_state,        0, ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, automat,    robocop,  automat,    robocop,    dec0_automat_state, init_robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   secretag, secretab,   slyspy,     dec0_automat_state, empty_init,   ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

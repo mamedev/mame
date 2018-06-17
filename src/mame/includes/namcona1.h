@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "machine/msm6242.h"
 #include "sound/c140.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -63,14 +64,14 @@ public:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
-	DECLARE_DRIVER_INIT(bkrtmaq);
-	DECLARE_DRIVER_INIT(fa);
-	DECLARE_DRIVER_INIT(cgangpzl);
-	DECLARE_DRIVER_INIT(tinklpit);
-	DECLARE_DRIVER_INIT(swcourt);
-	DECLARE_DRIVER_INIT(exvania);
-	DECLARE_DRIVER_INIT(emeraldj);
-	DECLARE_DRIVER_INIT(swcourtb);
+	void init_bkrtmaq();
+	void init_fa();
+	void init_cgangpzl();
+	void init_tinklpit();
+	void init_swcourt();
+	void init_exvania();
+	void init_emeraldj();
+	void init_swcourtb();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -171,10 +172,10 @@ public:
 		: namcona1_state(mconfig, type, tag)
 	{}
 
-	DECLARE_DRIVER_INIT(knckhead);
-	DECLARE_DRIVER_INIT(emeralda);
-	DECLARE_DRIVER_INIT(numanath);
-	DECLARE_DRIVER_INIT(quiztou);
+	void init_knckhead();
+	void init_emeralda();
+	void init_numanath();
+	void init_quiztou();
 
 	void namcona2(machine_config &config);
 };
@@ -194,7 +195,7 @@ public:
 	DECLARE_READ8_MEMBER(printer_r);
 	DECLARE_WRITE8_MEMBER(printer_w);
 
-	DECLARE_DRIVER_INIT(xday2);
+	void init_xday2();
 	void xday2(machine_config &config);
 	void xday2_main_map(address_map &map);
 };

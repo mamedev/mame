@@ -108,15 +108,15 @@ void suprslam_state::suprslam_map(address_map &map)
 	map(0xfb0000, 0xfb1fff).ram().share("spriteram");
 	map(0xfc0000, 0xfcffff).ram().share("sp_videoram");
 	map(0xfd0000, 0xfdffff).ram();
-	map(0xfe0000, 0xfe0fff).ram().w(this, FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
-	map(0xff0000, 0xff1fff).ram().w(this, FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
+	map(0xfe0000, 0xfe0fff).ram().w(FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
+	map(0xff0000, 0xff1fff).ram().w(FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
 	map(0xff2000, 0xff203f).ram().share("screen_vregs");
 	map(0xff3000, 0xff3001).nopw(); // sprite buffer trigger?
 	map(0xff8000, 0xff8fff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0xff9001, 0xff9001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xffa000, 0xffafff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffd000, 0xffd01f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xffe000, 0xffe001).w(this, FUNC(suprslam_state::suprslam_bank_w));
+	map(0xffe000, 0xffe001).w(FUNC(suprslam_state::suprslam_bank_w));
 	map(0xfff000, 0xfff01f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 }
 
@@ -130,7 +130,7 @@ void suprslam_state::sound_map(address_map &map)
 void suprslam_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(suprslam_state::suprslam_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(suprslam_state::suprslam_sh_bankswitch_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -244,7 +244,7 @@ static const gfx_layout suprslam_16x16x4_layout =
 	16*64
 };
 
-static GFXDECODE_START( suprslam )
+static GFXDECODE_START( gfx_suprslam )
 	GFXDECODE_ENTRY( "gfx1", 0, suprslam_8x8x4_layout,   0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, suprslam_16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
@@ -270,13 +270,13 @@ void suprslam_state::machine_reset()
 
 MACHINE_CONFIG_START(suprslam_state::suprslam)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(suprslam_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprslam_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(suprslam_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprslam_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	MCFG_DEVICE_ADD("io", VS9209, 0)
 	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
@@ -284,9 +284,9 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
 	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_OUT_PORTG_CB(WRITE8(suprslam_state, spr_ctrl_w))
+	MCFG_VS9209_OUT_PORTG_CB(WRITE8(*this, suprslam_state, spr_ctrl_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprslam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprslam)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -309,13 +309,14 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(-45, -21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -356,4 +357,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, empty_init, ROT0, "Banpresto / Toei Animation / Video System Co.", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Video System credited in ending screen

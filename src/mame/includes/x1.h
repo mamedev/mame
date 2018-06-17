@@ -14,7 +14,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
@@ -31,6 +31,7 @@
 
 #include "formats/x1_tap.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -67,6 +68,8 @@ public:
 		m_palette(*this, "palette"),
 		m_dma(*this, "dma"),
 		m_iobank(*this, "iobank"),
+		m_ym(*this, "ym"),
+		m_sound_sw(*this, "SOUND_SW"),
 		m_tvram(*this, "tvram"),
 		m_avram(*this, "avram"),
 		m_kvram(*this, "kvram"),
@@ -131,7 +134,7 @@ public:
 	DECLARE_WRITE8_MEMBER(x1_porta_w);
 	DECLARE_WRITE8_MEMBER(x1_portb_w);
 	DECLARE_WRITE8_MEMBER(x1_portc_w);
-	DECLARE_DRIVER_INIT(x1_kanji);
+	void init_x1_kanji();
 	DECLARE_MACHINE_START(x1);
 	DECLARE_MACHINE_RESET(x1);
 	DECLARE_VIDEO_START(x1);
@@ -221,6 +224,8 @@ protected:
 	uint16_t jis_convert(int kanji_addr);
 
 	required_device<address_map_bank_device> m_iobank;
+	optional_device<ym2151_device> m_ym; // turbo-only
+	optional_ioport m_sound_sw; // turbo-only
 	required_shared_ptr<uint8_t> m_tvram;   /**< Pointer for Text Video RAM */
 	required_shared_ptr<uint8_t> m_avram;   /**< Pointer for Attribute Video RAM */
 	optional_shared_ptr<uint8_t> m_kvram;   /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */

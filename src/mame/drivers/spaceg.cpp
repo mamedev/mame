@@ -167,6 +167,7 @@ Notes:
 #include "includes/mw8080bw.h"
 
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -430,8 +431,8 @@ void spaceg_state::spaceg_map(address_map &map)
 	map(0x3000, 0x3fff).rom();
 	map(0x7000, 0x77ff).ram();
 
-	map(0xa000, 0xbfff).ram().r(this, FUNC(spaceg_state::colorram_r)).share("colorram");
-	map(0xc000, 0xdfff).ram().w(this, FUNC(spaceg_state::zvideoram_w)).share("videoram");
+	map(0xa000, 0xbfff).ram().r(FUNC(spaceg_state::colorram_r)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(FUNC(spaceg_state::zvideoram_w)).share("videoram");
 
 	map(0x9400, 0x9400).writeonly().share("io9400"); /* gfx ctrl */
 	map(0x9401, 0x9401).writeonly().share("io9401"); /* gfx ctrl */
@@ -442,9 +443,9 @@ void spaceg_state::spaceg_map(address_map &map)
 	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
 	*/
 	map(0x9402, 0x9402).nopw();
-	map(0x9405, 0x9405).w(this, FUNC(spaceg_state::sound1_w));
-	map(0x9406, 0x9406).w(this, FUNC(spaceg_state::sound2_w));
-	map(0x9407, 0x9407).w(this, FUNC(spaceg_state::sound3_w));
+	map(0x9405, 0x9405).w(FUNC(spaceg_state::sound1_w));
+	map(0x9406, 0x9406).w(FUNC(spaceg_state::sound2_w));
+	map(0x9407, 0x9407).w(FUNC(spaceg_state::sound3_w));
 
 	map(0x9800, 0x9800).portr("9800");
 	map(0x9801, 0x9801).portr("9801");
@@ -509,8 +510,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(spaceg_state::spaceg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(spaceg_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spaceg_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -526,10 +527,10 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// HACK: SN76477 parameters copied from space invaders
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -546,7 +547,7 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	// HACK: samples copied from space invaders
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(invaders_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -586,4 +587,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, empty_init, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

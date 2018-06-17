@@ -278,8 +278,8 @@ void slapfght_state::perfrman_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8fff).ram().share("share1");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9fff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0x9000, 0x97ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9fff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa7ff).ram().share("spriteram");
 }
 
@@ -289,14 +289,14 @@ void slapfght_state::tigerh_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_lo_w));
-	map(0xe801, 0xe801).w(this, FUNC(slapfght_state::scrollx_hi_w));
-	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+	map(0xe800, 0xe800).w(FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe801, 0xe801).w(FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(FUNC(slapfght_state::scrolly_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
 }
 
 void slapfght_state::tigerh_map_mcu(address_map &map)
@@ -308,7 +308,7 @@ void slapfght_state::tigerh_map_mcu(address_map &map)
 void slapfght_state::tigerhb1_map(address_map &map)
 {
 	tigerh_map(map);
-	map(0xe803, 0xe803).rw(this, FUNC(slapfght_state::tigerhb1_prot_r), FUNC(slapfght_state::tigerhb1_prot_w));
+	map(0xe803, 0xe803).rw(FUNC(slapfght_state::tigerhb1_prot_r), FUNC(slapfght_state::tigerhb1_prot_w));
 }
 
 void slapfght_state::tigerhb2_map(address_map &map)
@@ -324,14 +324,14 @@ void slapfght_state::slapfigh_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_lo_w));
-	map(0xe801, 0xe801).w(this, FUNC(slapfght_state::scrollx_hi_w));
-	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+	map(0xe800, 0xe800).w(FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe801, 0xe801).w(FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(FUNC(slapfght_state::scrolly_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
 }
 
 void slapfght_state::slapfigh_map_mcu(address_map &map)
@@ -349,7 +349,7 @@ void slapfght_state::slapfighb1_map(address_map &map)
 void slapfght_state::getstar_map(address_map &map)
 {
 	slapfigh_map(map);
-	map(0xe803, 0xe803).rw(this, FUNC(slapfght_state::getstar_mcusim_r), FUNC(slapfght_state::getstar_mcusim_w));
+	map(0xe803, 0xe803).rw(FUNC(slapfght_state::getstar_mcusim_r), FUNC(slapfght_state::getstar_mcusim_w));
 }
 
 void slapfght_state::slapfighb2_map(address_map &map)
@@ -358,15 +358,15 @@ void slapfght_state::slapfighb2_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_hi_w));
-	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
-	map(0xe803, 0xe803).w(this, FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe800, 0xe800).w(FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(FUNC(slapfght_state::scrolly_w));
+	map(0xe803, 0xe803).w(FUNC(slapfght_state::scrollx_lo_w));
 	map(0xec00, 0xefff).rom(); // it reads a copy of the logo from here!
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
 }
 
 
@@ -402,28 +402,28 @@ READ8_MEMBER(slapfght_state::vblank_r)
 void slapfght_state::io_map_nomcu(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::vblank_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::vblank_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
 void slapfght_state::io_map_mcu(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::tigerh_mcu_status_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::tigerh_mcu_status_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
 void slapfght_state::getstarb1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::getstarb1_prot_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::getstarb1_prot_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
 void slapfght_state::getstarb2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::getstar_mcusim_status_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::getstar_mcusim_status_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
@@ -438,7 +438,7 @@ void slapfght_state::getstarb2_io_map(address_map &map)
 INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 {
 	if (m_sound_nmi_enabled)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
@@ -456,7 +456,7 @@ void slapfght_state::perfrman_sound_map(address_map &map)
 	map(0xa090, 0xa090).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa091, 0xa091).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa092, 0xa092).w("ay2", FUNC(ay8910_device::data_w));
-	map(0xa0e0, 0xa0e0).select(0x0010).w(this, FUNC(slapfght_state::sound_nmi_enable_w));
+	map(0xa0e0, 0xa0e0).select(0x0010).w(FUNC(slapfght_state::sound_nmi_enable_w));
 }
 
 void slapfght_state::tigerh_sound_map(address_map &map)
@@ -468,7 +468,7 @@ void slapfght_state::tigerh_sound_map(address_map &map)
 	map(0xa090, 0xa090).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa091, 0xa091).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa092, 0xa092).w("ay2", FUNC(ay8910_device::data_w));
-	map(0xa0e0, 0xa0e0).select(0x0010).w(this, FUNC(slapfght_state::sound_nmi_enable_w));
+	map(0xa0e0, 0xa0e0).select(0x0010).w(FUNC(slapfght_state::sound_nmi_enable_w));
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xffff).ram();
 }
@@ -778,12 +778,12 @@ void slapfght_state::init_banks()
 	membank("bank1")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
+void slapfght_state::init_slapfigh()
 {
 	init_banks();
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
+void slapfght_state::init_getstarb1()
 {
 	m_getstar_id = GETSTARB1;
 	init_banks();
@@ -796,7 +796,7 @@ DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
 	ROM[0x6d56] = 0xc3; // jp instead of jp z
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,getstarb2)
+void slapfght_state::init_getstarb2()
 {
 	m_getstar_id = GETSTARB2;
 	init_banks();
@@ -870,12 +870,12 @@ static const gfx_layout perfrman_spritelayout =
 };
 
 
-static GFXDECODE_START( perfrman )
+static GFXDECODE_START( gfx_perfrman )
 	GFXDECODE_ENTRY( "gfx1", 0, perfrman_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, perfrman_spritelayout, 128, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( slapfght )
+static GFXDECODE_START( gfx_slapfght )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0,  16 )
@@ -892,24 +892,24 @@ GFXDECODE_END
 MACHINE_CONFIG_START(slapfght_state::perfrman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
-	MCFG_CPU_PROGRAM_MAP(perfrman_map)
-	MCFG_CPU_IO_MAP(io_map_nomcu)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
+	MCFG_DEVICE_PROGRAM_MAP(perfrman_map)
+	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(slapfght_state, palette_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, slapfght_state, palette_bank_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
-	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
+	MCFG_DEVICE_PROGRAM_MAP(perfrman_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -917,23 +917,23 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_perfrman)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(16'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(16'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -943,25 +943,25 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(slapfght_state::tigerh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
-	MCFG_CPU_PROGRAM_MAP(tigerh_map_mcu)
-	MCFG_CPU_IO_MAP(io_map_mcu)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
+	MCFG_DEVICE_PROGRAM_MAP(tigerh_map_mcu)
+	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
+	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL(36'000'000)/12) // 3MHz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -969,23 +969,23 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -995,9 +995,9 @@ MACHINE_CONFIG_START(slapfght_state::tigerhb1)
 	tigerh(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tigerhb1_map)
-	MCFG_CPU_IO_MAP(io_map_nomcu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tigerhb1_map)
+	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
@@ -1006,35 +1006,35 @@ MACHINE_CONFIG_START(slapfght_state::tigerhb2)
 	tigerhb1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tigerhb2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tigerhb2_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(slapfght_state::slapfigh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
-	MCFG_CPU_PROGRAM_MAP(slapfigh_map_mcu)
-	MCFG_CPU_IO_MAP(io_map_mcu)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
+	MCFG_DEVICE_PROGRAM_MAP(slapfigh_map_mcu)
+	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
+	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(36'000'000)/12) // 3MHz
-	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(slapfght_state, scroll_from_mcu_w))
+	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(*this, slapfght_state, scroll_from_mcu_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1042,23 +1042,23 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1068,9 +1068,9 @@ MACHINE_CONFIG_START(slapfght_state::slapfighb1)
 	slapfigh(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(slapfighb1_map)
-	MCFG_CPU_IO_MAP(io_map_nomcu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(slapfighb1_map)
+	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
@@ -1079,25 +1079,25 @@ MACHINE_CONFIG_START(slapfght_state::slapfighb2)
 	slapfighb1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(slapfighb2_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::getstarb1)
 	slapfighb1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(getstarb1_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(getstarb1_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::getstarb2)
 	slapfighb1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(getstar_map)
-	MCFG_CPU_IO_MAP(getstarb2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(getstar_map)
+	MCFG_DEVICE_IO_MAP(getstarb2_io_map)
 MACHINE_CONFIG_END
 
 
@@ -1991,23 +1991,23 @@ ROM_END
 
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT      INIT                       MONITOR, COMPANY, FULLNAME, FLAGS ) */
-GAME( 1985, perfrman,   0,        perfrman,   perfrman,  slapfght_state, 0,         ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  slapfght_state, 0,         ROT270, "Toaplan / Data East USA", "Performan (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, perfrman,   0,        perfrman,   perfrman,  slapfght_state, empty_init,     ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  slapfght_state, empty_init,     ROT270, "Toaplan / Data East USA", "Performan (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, 0,         ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, 0,         ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, 0,         ROT270, "bootleg", "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, 0,         ROT270, "bootleg", "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, 0,         ROT270, "bootleg", "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg", "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg", "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg", "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (A76 set, GX-006-A PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // England?
-GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (A76 set, GX-006-A PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, init_slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, init_slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // England?
+GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, init_slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, grdian,     0,        slapfigh,   getstar,   slapfght_state, slapfigh,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, getstarj,   grdian,   slapfigh,   getstarj,  slapfght_state, slapfigh,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grdian,     0,        slapfigh,   getstar,   slapfght_state, init_slapfigh,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, getstarj,   grdian,   slapfigh,   getstarj,  slapfght_state, init_slapfigh,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, init_getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, init_getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", MACHINE_SUPPORTS_SAVE )

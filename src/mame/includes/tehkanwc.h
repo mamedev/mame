@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class tehkanwc_state : public driver_device
 {
@@ -82,7 +83,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_DRIVER_INIT(teedoff);
+	void init_teedoff();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

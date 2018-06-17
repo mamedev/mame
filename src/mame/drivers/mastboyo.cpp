@@ -11,6 +11,7 @@ this is Gaelco's first game, although there should be a 1986 release too, likely
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/nvram.h"
@@ -107,9 +108,9 @@ void mastboyo_state::mastboyo_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x5000, 0x53ff).ram().w(this, FUNC(mastboyo_state::fgram_w)).share("fgram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(mastboyo_state::fgram2_w)).share("fgram2");
-	map(0x6000, 0x6000).w(this, FUNC(mastboyo_state::rombank_w));
+	map(0x5000, 0x53ff).ram().w(FUNC(mastboyo_state::fgram_w)).share("fgram");
+	map(0x5400, 0x57ff).ram().w(FUNC(mastboyo_state::fgram2_w)).share("fgram2");
+	map(0x6000, 0x6000).w(FUNC(mastboyo_state::rombank_w));
 //  map(0x7000, 0x7000).portr("UNK"); // possible watchdog? or IRQ ack?
 	map(0x8000, 0xffff).bankr("bank1");
 }
@@ -160,7 +161,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( mastboyo )
+static GFXDECODE_START( gfx_mastboyo )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -186,10 +187,10 @@ PALETTE_INIT_MEMBER(mastboyo_state, mastboyo)
 MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20_MHz_XTAL/6)
-	MCFG_CPU_PROGRAM_MAP(mastboyo_map)
-	MCFG_CPU_IO_MAP(mastboyo_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f) // not sure, INT0 pin was measured at 256.244Hz
+	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL/6)
+	MCFG_DEVICE_PROGRAM_MAP(mastboyo_map)
+	MCFG_DEVICE_IO_MAP(mastboyo_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f) // not sure, INT0 pin was measured at 256.244Hz
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -202,15 +203,15 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 20_MHz_XTAL/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 20_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0")) // DSW
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1")) // player inputs
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -239,4 +240,4 @@ ROM_START( mastboyo )
 	ROM_LOAD( "masterboy-1987-82s129-l-ic40.bin", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
 
-GAME( 1987, mastboyo,  0,    mastboyo, mastboyo,  mastboyo_state, 0, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyo, 0, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )

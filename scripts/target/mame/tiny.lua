@@ -68,8 +68,11 @@ MACHINES["Z80PIO"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["GEN_LATCH"] = true
+MACHINES["INPUT_MERGER"] = true
+MACHINES["OUTPUT_LATCH"] = true
 MACHINES["TICKET"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["Z80DAISY"] = true
 
 
 --------------------------------------------------

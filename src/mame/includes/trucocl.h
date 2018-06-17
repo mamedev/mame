@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+
 #include "sound/dac.h"
+#include "emupal.h"
 
 class trucocl_state : public driver_device
 {
@@ -31,7 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
 	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
 	DECLARE_WRITE8_MEMBER(audio_dac_w);
-	DECLARE_DRIVER_INIT(trucocl);
+	void init_trucocl();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(trucocl);
@@ -43,6 +45,8 @@ public:
 
 	void trucocl(machine_config &config);
 	void main_map(address_map &map);
+	void main_io(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_reset() override;
 };

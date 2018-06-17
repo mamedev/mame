@@ -19,6 +19,7 @@ There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -57,9 +58,9 @@ void jonos_state::jonos_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("roms", 0);
 	map(0x1800, 0x27ff).ram().share("videoram");
-	map(0x3000, 0x3001).w(this, FUNC(jonos_state::cursor_w)); // unknown device
+	map(0x3000, 0x3001).w(FUNC(jonos_state::cursor_w)); // unknown device
 	map(0x4000, 0x4001); // unknown device
-	map(0x5000, 0x5003).r(this, FUNC(jonos_state::keyboard_r)); // unknown device
+	map(0x5000, 0x5003).r(FUNC(jonos_state::keyboard_r)); // unknown device
 	map(0x6000, 0x6001); // unknown device
 }
 
@@ -167,15 +168,15 @@ static const gfx_layout jonos_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( jonos )
+static GFXDECODE_START( gfx_jonos )
 	GFXDECODE_ENTRY( "chargen", 0x0000, jonos_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(jonos_state::jonos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(jonos_mem)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(jonos_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -186,7 +187,7 @@ MACHINE_CONFIG_START(jonos_state::jonos)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 287)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jonos)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jonos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -208,5 +209,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT     COMPANY  FULLNAME  FLAGS
-COMP( 198?, jonos,  0,      0,       jonos,   jonos, jonos_state, 0,       "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR   NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, jonos, 0,      0,      jonos,   jonos, jonos_state, empty_init, "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

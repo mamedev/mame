@@ -162,14 +162,14 @@ void ampex_state::mem_map(address_map &map)
 	map(0x0000, 0x2fff).rom().region("roms", 0);
 	map(0x4000, 0x43ff).ram(); // main RAM
 	map(0x4400, 0x57ff).ram(); // expansion RAM
-	map(0x5840, 0x5840).rw(this, FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
-	map(0x5841, 0x5841).rw(this, FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
-	map(0x5842, 0x5842).r(this, FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
-	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(this, FUNC(ampex_state::write_5843));
-	map(0x5846, 0x5846).r(this, FUNC(ampex_state::read_5846));
-	map(0x5847, 0x5847).r(this, FUNC(ampex_state::read_5847));
+	map(0x5840, 0x5840).rw(FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
+	map(0x5841, 0x5841).rw(FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
+	map(0x5842, 0x5842).r(FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
+	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(FUNC(ampex_state::write_5843));
+	map(0x5846, 0x5846).r(FUNC(ampex_state::read_5846));
+	map(0x5847, 0x5847).r(FUNC(ampex_state::read_5847));
 	map(0x5c00, 0x5c0f).rw("vtac", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
-	map(0x8000, 0x97ff).rw(this, FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
+	map(0x8000, 0x97ff).rw(FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
 	map(0xc000, 0xcfff).ram(); // video RAM
 }
 
@@ -187,8 +187,8 @@ void ampex_state::machine_start()
 	m_uart->write_swe(0);
 
 	// Are rates hardwired to DIP switches? They don't seem to be software-controlled...
-	m_dbrg->str_w(0xe);
-	m_dbrg->stt_w(0xe);
+	m_dbrg->write_str(0xe);
+	m_dbrg->write_stt(0xe);
 
 	// Make up some settings for the UART (probably also actually controlled by DIP switches)
 	m_uart->write_nb1(1);
@@ -206,8 +206,8 @@ void ampex_state::machine_start()
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000) / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250)
@@ -215,17 +215,17 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 
 	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2 / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(ampex_state, vsyn_w))
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(ampex_state, so_w))
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, ampex_state, so_w))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ampex_state, dav_w))
 	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay31015_device, write_rcp))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart", ay31015_device, write_tcp))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay31015_device, write_rcp))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("uart", ay31015_device, write_tcp))
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )
@@ -245,4 +245,4 @@ ROM_START( dialog80 )
 	ROM_LOAD( "417129-010.u87",  0x0100, 0x0100, NO_DUMP )
 ROM_END
 
-COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, 0, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )
+COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )

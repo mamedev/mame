@@ -153,8 +153,8 @@ WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 	{
 		if (LOG_CPUIMASK)
 		{
-			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device().safe_pc( ), m_cpu_imask[0]);
+			logerror("%s BeBox CPU #0 imask=0x%08x\n",
+				machine().describe_context(), m_cpu_imask[0]);
 		}
 		bebox_update_interrupts();
 	}
@@ -170,8 +170,8 @@ WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
 	{
 		if (LOG_CPUIMASK)
 		{
-			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device() .safe_pc( ), m_cpu_imask[1]);
+			logerror("%s BeBox CPU #1 imask=0x%08x\n",
+				machine().describe_context(), m_cpu_imask[1]);
 		}
 		bebox_update_interrupts();
 	}
@@ -598,17 +598,17 @@ WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
  *
  *************************************/
 
-READ8_MEMBER(bebox_state::bebox_flash_r )
+READ8_MEMBER(bebox_state::bebox_flash_r)
 {
 	offset = (offset & ~7) | (7 - (offset & 7));
-	return m_flash->read(offset);
+	return m_flash->read(space, offset);
 }
 
 
-WRITE8_MEMBER(bebox_state::bebox_flash_w )
+WRITE8_MEMBER(bebox_state::bebox_flash_w)
 {
 	offset = (offset & ~7) | (7 - (offset & 7));
-	m_flash->write(offset, data);
+	m_flash->write(space, offset, data);
 }
 
 /*************************************
@@ -778,7 +778,7 @@ void bebox_state::machine_start()
 {
 }
 
-DRIVER_INIT_MEMBER(bebox_state,bebox)
+void bebox_state::init_bebox()
 {
 	address_space &space_0 = m_ppc1->space(AS_PROGRAM);
 	address_space &space_1 = m_ppc2->space(AS_PROGRAM);

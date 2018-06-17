@@ -2,6 +2,7 @@
 // copyright-holders:Ernesto Corvi, Phil Stroffolino, Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class shootout_state : public driver_device
 {
@@ -42,7 +43,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	DECLARE_DRIVER_INIT(shootout);
+	void init_shootout();
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;

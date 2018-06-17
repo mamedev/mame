@@ -215,14 +215,15 @@ List of default vregs (title screen):
 // device type definition
 DEFINE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device, "seibu_crtc", "Seibu CRT Controller")
 
-ADDRESS_MAP_START(seibu_crtc_device::seibu_crtc_vregs)
-	AM_RANGE(0x0000, 0x004f) AM_RAM // debug
-	AM_RANGE(0x0014, 0x0015) AM_WRITE(decrypt_key_w)
-	AM_RANGE(0x001a, 0x001b) AM_READWRITE(reg_1a_r, reg_1a_w)
-	AM_RANGE(0x001c, 0x001d) AM_WRITE(layer_en_w)
-	AM_RANGE(0x0020, 0x002b) AM_WRITE(layer_scroll_w)
-	AM_RANGE(0x002c, 0x003b) AM_WRITE(layer_scroll_base_w)
-ADDRESS_MAP_END
+void seibu_crtc_device::seibu_crtc_vregs(address_map &map)
+{
+	map(0x0000, 0x004f).ram(); // debug
+	map(0x0014, 0x0015).w(FUNC(seibu_crtc_device::decrypt_key_w));
+	map(0x001a, 0x001b).rw(FUNC(seibu_crtc_device::reg_1a_r), FUNC(seibu_crtc_device::reg_1a_w));
+	map(0x001c, 0x001d).w(FUNC(seibu_crtc_device::layer_en_w));
+	map(0x0020, 0x002b).w(FUNC(seibu_crtc_device::layer_scroll_w));
+	map(0x002c, 0x003b).w(FUNC(seibu_crtc_device::layer_scroll_base_w));
+}
 
 WRITE16_MEMBER(seibu_crtc_device::decrypt_key_w)
 {

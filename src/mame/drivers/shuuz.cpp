@@ -116,8 +116,8 @@ void shuuz_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x101000, 0x101fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x102000, 0x102001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x103000, 0x103003).r(this, FUNC(shuuz_state::leta_r));
-	map(0x105000, 0x105001).rw(this, FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
+	map(0x103000, 0x103003).r(FUNC(shuuz_state::leta_r));
+	map(0x105000, 0x105001).rw(FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
 	map(0x105002, 0x105003).portr("BUTTONS");
 	map(0x106001, 0x106001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x107000, 0x107007).noprw();
@@ -219,7 +219,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( shuuz )
+static GFXDECODE_START( gfx_shuuz )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -235,8 +235,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(shuuz_state::shuuz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -244,11 +244,11 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(shuuz_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, shuuz_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_MOB(shuuz_state::s_mob_config, "gfxdecode")
 
@@ -261,9 +261,9 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -350,5 +350,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )

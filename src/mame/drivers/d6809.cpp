@@ -129,7 +129,7 @@ void d6809_state::mem_map(address_map &map)
 	// 00-FF is for various devices.
 	map(0x0000, 0x0003).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0004, 0x0007).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x00ff, 0x00ff).rw(this, FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
+	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
 	map(0x1000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }
@@ -152,8 +152,8 @@ void d6809_state::machine_reset()
 
 MACHINE_CONFIG_START(d6809_state::d6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(14'745'600) / 8) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(14'745'600) / 8) // MC68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
 	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
@@ -171,5 +171,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME         FLAGS
-COMP( 1983, d6809,  0,      0,       d6809,   d6809, d6809_state, 0,    "Dunfield", "6809 Portable", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME         FLAGS
+COMP( 1983, d6809, 0,      0,      d6809,   d6809, d6809_state, empty_init, "Dunfield", "6809 Portable", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -14,6 +14,9 @@ Chips: P8251, D8253C, MK3880N-4 (Z80). 3x 6-sw dips. Unmarked crystal.
 
 A blue jumper marked 4M and 2M (between U11 and U12) selects the CPU clock.
 
+The RS232 port uses a 26-pin header (J1) rather than the conventional DB25
+connector. The second 26-pin header (J2) is for the parallel port.
+
 Feature list from QT ad:
 - 1K RAM (which can be located at any 1K boundary) plus one each
   Parallel and Serial I/O ports on board
@@ -46,37 +49,42 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pit(*this, "pit")
 		, m_usart(*this, "usart")
+		, m_rs232(*this, "rs232")
 		, m_dsw(*this, "DSW%u", 1)
 		, m_jumpers(*this, "JUMPERS")
 		, m_cpu_speed(*this, "SPEED")
 		, m_eprom(*this, "maincpu")
 		, m_p_ram(*this, "ram")
+		, m_rts(true)
 	{ }
 
 	void qtsbc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 private:
-	DECLARE_READ8_MEMBER(memory_read);
-	DECLARE_WRITE8_MEMBER(memory_write);
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(memory_r);
+	DECLARE_WRITE8_MEMBER(memory_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_loopback_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8251_device> m_usart;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<3> m_dsw;
 	required_ioport m_jumpers;
 	required_ioport m_cpu_speed;
 	required_region_ptr<u8> m_eprom;
 	required_shared_ptr<u8> m_p_ram;
 	bool m_power_on;
+	bool m_rts;
 };
 
 
-READ8_MEMBER(qtsbc_state::memory_read)
+READ8_MEMBER(qtsbc_state::memory_r)
 {
 	ioport_value jumpers = m_jumpers->read();
 	ioport_value dsw3 = m_dsw[2]->read();
@@ -107,7 +115,7 @@ READ8_MEMBER(qtsbc_state::memory_read)
 	}
 }
 
-WRITE8_MEMBER(qtsbc_state::memory_write)
+WRITE8_MEMBER(qtsbc_state::memory_w)
 {
 #ifdef NOT_IMPLEMENTED_CURRENTLY
 	if ((offset & 0xfc00) >> 10 == m_dsw[1]->read())
@@ -123,7 +131,7 @@ WRITE8_MEMBER(qtsbc_state::memory_write)
 	}
 }
 
-READ8_MEMBER(qtsbc_state::io_read)
+READ8_MEMBER(qtsbc_state::io_r)
 {
 	if ((offset & 0xf8) >> 3 == (m_dsw[0]->read() & 0x1f))
 	{
@@ -164,7 +172,7 @@ READ8_MEMBER(qtsbc_state::io_read)
 	}
 }
 
-WRITE8_MEMBER(qtsbc_state::io_write)
+WRITE8_MEMBER(qtsbc_state::io_w)
 {
 	if ((offset & 0x00f8) >> 3 == (m_dsw[0]->read() & 0x1f))
 	{
@@ -200,16 +208,28 @@ WRITE8_MEMBER(qtsbc_state::io_write)
 	}
 }
 
-ADDRESS_MAP_START(qtsbc_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(memory_read, memory_write)
-ADDRESS_MAP_END
+WRITE_LINE_MEMBER(qtsbc_state::rts_loopback_w)
+{
+	// Filtered through this routine to avoid infinite loops
+	if (state != bool(m_rts))
+	{
+		m_rts = state;
+		m_rs232->write_rts(m_rts);
+	}
+}
 
-ADDRESS_MAP_START(qtsbc_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
-ADDRESS_MAP_END
+void qtsbc_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().share("ram");
+	map(0x0000, 0xffff).rw(FUNC(qtsbc_state::memory_r), FUNC(qtsbc_state::memory_w));
+}
+
+void qtsbc_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(qtsbc_state::io_r), FUNC(qtsbc_state::io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( qtsbc )
@@ -438,9 +458,10 @@ INPUT_PORTS_END
 
 void qtsbc_state::machine_start()
 {
-	subdevice<i8251_device>("usart")->write_cts(0);
+	m_usart->write_cts(0);
 
 	save_item(NAME(m_power_on));
+	save_item(NAME(m_rts));
 }
 
 void qtsbc_state::machine_reset()
@@ -460,28 +481,27 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL) // Mostek MK3880
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL) // Mostek MK3880
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0) // U9
 	MCFG_PIT8253_CLK0(4_MHz_XTAL / 2) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("usart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("usart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(4_MHz_XTAL / 2)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit", pit8253_device, write_clk2))
 
 	MCFG_DEVICE_ADD("usart", I8251, 0) // U8
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, qtsbc_state, rts_loopback_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -492,5 +512,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME       FLAGS
-COMP( 19??, qtsbc,  0,      0,      qtsbc,   qtsbc, qtsbc_state, 0,    "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                     FULLNAME     FLAGS
+COMP( 19??, qtsbc, 0,      0,      qtsbc,   qtsbc, qtsbc_state, empty_init, "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

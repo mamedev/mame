@@ -23,14 +23,16 @@ DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "Sharp SM590") // 512x8 ROM, 32
 //DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "Sharp SM595") // 768x8 ROM, 32x4 RAM
 
 // internal memory maps
-ADDRESS_MAP_START(sm590_device::program_1x128x4)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void sm590_device::program_1x128x4(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(sm590_device::data_16x2x4)
-	AM_RANGE(0x00, 0x0f) AM_RAM
-	AM_RANGE(0x10, 0x1f) AM_RAM
-ADDRESS_MAP_END
+void sm590_device::data_16x2x4(address_map &map)
+{
+	map(0x00, 0x0f).ram();
+	map(0x10, 0x1f).ram();
+}
 
 // device definitions
 sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

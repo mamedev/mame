@@ -89,7 +89,7 @@ void pc1401_state::pc1401_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x3800, 0x47ff).ram();
-	map(0x6000, 0x67ff).rw(this, FUNC(pc1401_state::pc1401_lcd_read), FUNC(pc1401_state::pc1401_lcd_write)).mirror(0x1000);
+	map(0x6000, 0x67ff).rw(FUNC(pc1401_state::pc1401_lcd_read), FUNC(pc1401_state::pc1401_lcd_write)).mirror(0x1000);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -97,7 +97,7 @@ void pc1401_state::pc1402_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x47ff).ram();
-	map(0x6000, 0x67ff).rw(this, FUNC(pc1401_state::pc1401_lcd_read), FUNC(pc1401_state::pc1401_lcd_write)).mirror(0x1000);
+	map(0x6000, 0x67ff).rw(FUNC(pc1401_state::pc1401_lcd_read), FUNC(pc1401_state::pc1401_lcd_write)).mirror(0x1000);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -106,7 +106,7 @@ void pc1251_state::pc1250_mem(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram(); // 2KB RAM
-	map(0xf800, 0xf8ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+	map(0xf800, 0xf8ff).rw(FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
 }
 
 void pc1251_state::pc1251_mem(address_map &map)
@@ -114,7 +114,7 @@ void pc1251_state::pc1251_mem(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x7fff).rom();
 	map(0xb800, 0xc7ff).ram(); // 4KB RAM
-	map(0xf800, 0xf8ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+	map(0xf800, 0xf8ff).rw(FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
 }
 
 void pc1251_state::pc1255_mem(address_map &map)
@@ -122,14 +122,14 @@ void pc1251_state::pc1255_mem(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x7fff).rom();
 	map(0xa000, 0xc7ff).ram(); // 10KB RAM
-	map(0xf800, 0xf8ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+	map(0xf800, 0xf8ff).rw(FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
 }
 
 void pc1251_state::pc1260_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x20ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
-	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
+	map(0x2000, 0x20ff).rw(FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+	//map( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 	map(0x5800, 0x67ff).ram(); // 4KB RAM
 	map(0x8000, 0xffff).rom();
 }
@@ -137,8 +137,8 @@ void pc1251_state::pc1260_mem(address_map &map)
 void pc1251_state::pc1261_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x20ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
-	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
+	map(0x2000, 0x20ff).rw(FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+	//map( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 	map(0x4000, 0x67ff).ram(); // 10KB RAM
 	map(0x8000, 0xffff).rom();
 }
@@ -147,15 +147,15 @@ void pc1251_state::pc1261_mem(address_map &map)
 void pc1350_state::pc1350_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x7000, 0x7eff).rw(this, FUNC(pc1350_state::pc1350_lcd_read), FUNC(pc1350_state::pc1350_lcd_write));
+	map(0x7000, 0x7eff).rw(FUNC(pc1350_state::pc1350_lcd_read), FUNC(pc1350_state::pc1350_lcd_write));
 	map(0x8000, 0xffff).rom();
 }
 
 void pc1403_state::pc1403_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x3000, 0x30bf).rw(this, FUNC(pc1403_state::pc1403_lcd_read), FUNC(pc1403_state::pc1403_lcd_write));
-	map(0x3800, 0x3fff).rw(this, FUNC(pc1403_state::pc1403_asic_read), FUNC(pc1403_state::pc1403_asic_write));
+	map(0x3000, 0x30bf).rw(FUNC(pc1403_state::pc1403_lcd_read), FUNC(pc1403_state::pc1403_lcd_write));
+	map(0x3800, 0x3fff).rw(FUNC(pc1403_state::pc1403_asic_read), FUNC(pc1403_state::pc1403_asic_write));
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0xe000, 0xffff).ram();
 }
@@ -163,26 +163,28 @@ void pc1403_state::pc1403_mem(address_map &map)
 void pc1403_state::pc1403h_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x3000, 0x30bf).rw(this, FUNC(pc1403_state::pc1403_lcd_read), FUNC(pc1403_state::pc1403_lcd_write));
-	map(0x3800, 0x3fff).rw(this, FUNC(pc1403_state::pc1403_asic_read), FUNC(pc1403_state::pc1403_asic_write));
+	map(0x3000, 0x30bf).rw(FUNC(pc1403_state::pc1403_lcd_read), FUNC(pc1403_state::pc1403_lcd_write));
+	map(0x3800, 0x3fff).rw(FUNC(pc1403_state::pc1403_asic_read), FUNC(pc1403_state::pc1403_asic_write));
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).ram();
 }
 
 
 #if 0
-ADDRESS_MAP_START(pc1403_state::pc1421_readmem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3800, 0x47ff) AM_RAM
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pc1403_state::pc1421_readmem(address_map &map)
+{
+	map( 0x0000, 0x1fff).rom();
+	map( 0x3800, 0x47ff).ram();
+	map( 0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(pc1403_state::pc1421_writemem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x37ff) AM_RAM
-	AM_RANGE( 0x3800, 0x47ff) AM_RAM
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pc1403_state::pc1421_writemem(address_map &map)
+{
+	map( 0x0000, 0x1fff).rom();
+	map( 0x2000, 0x37ff).ram();
+	map( 0x3800, 0x47ff).ram();
+	map( 0x8000, 0xffff).rom();
+}
 #endif
 
 
@@ -714,11 +716,11 @@ static const gfx_layout pc1251_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( pc1401 )
+static GFXDECODE_START( gfx_pc1401 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1401_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( pc1251 )
+static GFXDECODE_START( gfx_pc1251 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -743,7 +745,7 @@ MACHINE_CONFIG_START(pocketc_state::pocketc)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc1401 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc1401)
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(6)
 	MCFG_PALETTE_INIT_OWNER( pocketc_state, pocketc )
@@ -751,16 +753,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1401_state::pc1401)
 	pocketc(config);
-	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
-	MCFG_SC61860_READ_RESET_HANDLER(READLINE(pc1401_state,pc1401_reset))
-	MCFG_SC61860_READ_BRK_HANDLER(READLINE(pc1401_state,pc1401_brk))
+	MCFG_DEVICE_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pc1401_mem)
+	MCFG_SC61860_READ_RESET_HANDLER(READLINE(*this, pc1401_state,pc1401_reset))
+	MCFG_SC61860_READ_BRK_HANDLER(READLINE(*this, pc1401_state,pc1401_brk))
 	MCFG_SC61860_READ_X_HANDLER(NOOP)
-	MCFG_SC61860_READ_A_HANDLER(READ8(pc1401_state,pc1401_ina))
-	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(pc1401_state,pc1401_outa))
-	MCFG_SC61860_READ_B_HANDLER(READ8(pc1401_state,pc1401_inb))
-	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(pc1401_state,pc1401_outb))
-	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1401_state,pc1401_outc))
+	MCFG_SC61860_READ_A_HANDLER(READ8(*this, pc1401_state,pc1401_ina))
+	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(*this, pc1401_state,pc1401_outa))
+	MCFG_SC61860_READ_B_HANDLER(READ8(*this, pc1401_state,pc1401_inb))
+	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(*this, pc1401_state,pc1401_outb))
+	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(*this, pc1401_state,pc1401_outc))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc1401_state, screen_update_pc1401)
@@ -768,69 +770,69 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1401_state::pc1402)
 	pc1401(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( pc1402_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( pc1402_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1250)
 	pocketc(config);
-	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP( pc1250_mem)
+	MCFG_DEVICE_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_DEVICE_PROGRAM_MAP( pc1250_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NOOP)
-	MCFG_SC61860_READ_BRK_HANDLER(READLINE(pc1251_state,pc1251_brk))
+	MCFG_SC61860_READ_BRK_HANDLER(READLINE(*this, pc1251_state,pc1251_brk))
 	MCFG_SC61860_READ_X_HANDLER(NOOP)
-	MCFG_SC61860_READ_A_HANDLER(READ8(pc1251_state,pc1251_ina))
-	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(pc1251_state,pc1251_outa))
-	MCFG_SC61860_READ_B_HANDLER(READ8(pc1251_state,pc1251_inb))
-	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(pc1251_state,pc1251_outb))
-	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1251_state,pc1251_outc))
+	MCFG_SC61860_READ_A_HANDLER(READ8(*this, pc1251_state,pc1251_ina))
+	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(*this, pc1251_state,pc1251_outa))
+	MCFG_SC61860_READ_B_HANDLER(READ8(*this, pc1251_state,pc1251_inb))
+	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(*this, pc1251_state,pc1251_outb))
+	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(*this, pc1251_state,pc1251_outc))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(608, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pc1251_state, screen_update_pc1251)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc1251 )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc1251)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1251)
 	pc1250(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( pc1251_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( pc1251_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1255)
 	pc1250(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( pc1255_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( pc1255_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1260)
 	pc1250(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( pc1260_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( pc1260_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(pc1251_state, pc1260 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1261)
 	pc1260(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( pc1261_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( pc1261_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1350_state::pc1350)
 	pocketc(config);
-	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP( pc1350_mem)
+	MCFG_DEVICE_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_DEVICE_PROGRAM_MAP( pc1350_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NOOP)
-	MCFG_SC61860_READ_BRK_HANDLER(READLINE(pc1350_state,pc1350_brk))
+	MCFG_SC61860_READ_BRK_HANDLER(READLINE(*this, pc1350_state,pc1350_brk))
 	MCFG_SC61860_READ_X_HANDLER(NOOP)
-	MCFG_SC61860_READ_A_HANDLER(READ8(pc1350_state,pc1350_ina))
-	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(pc1350_state,pc1350_outa))
-	MCFG_SC61860_READ_B_HANDLER(READ8(pc1350_state,pc1350_inb))
-	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(pc1350_state,pc1350_outb))
-	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1350_state,pc1350_outc))
+	MCFG_SC61860_READ_A_HANDLER(READ8(*this, pc1350_state,pc1350_ina))
+	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(*this, pc1350_state,pc1350_outa))
+	MCFG_SC61860_READ_B_HANDLER(READ8(*this, pc1350_state,pc1350_inb))
+	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(*this, pc1350_state,pc1350_outb))
+	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(*this, pc1350_state,pc1350_outc))
 
 	/*
 	   aim: show sharp with keyboard
@@ -850,16 +852,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1403_state::pc1403)
 	pocketc(config);
-	MCFG_CPU_ADD( "maincpu", SC61860, 256000 )
-	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
+	MCFG_DEVICE_ADD( "maincpu", SC61860, 256000 )
+	MCFG_DEVICE_PROGRAM_MAP( pc1403_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NOOP)
-	MCFG_SC61860_READ_BRK_HANDLER(READLINE(pc1403_state,pc1403_brk))
+	MCFG_SC61860_READ_BRK_HANDLER(READLINE(*this, pc1403_state,pc1403_brk))
 	MCFG_SC61860_READ_X_HANDLER(NOOP)
-	MCFG_SC61860_READ_A_HANDLER(READ8(pc1403_state,pc1403_ina))
-	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(pc1403_state,pc1403_outa))
+	MCFG_SC61860_READ_A_HANDLER(READ8(*this, pc1403_state,pc1403_ina))
+	MCFG_SC61860_WRITE_A_HANDLER(WRITE8(*this, pc1403_state,pc1403_outa))
 	MCFG_SC61860_READ_B_HANDLER(NOOP)
 	MCFG_SC61860_WRITE_B_HANDLER(NOOP)
-	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1403_state,pc1403_outc))
+	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(*this, pc1403_state,pc1403_outc))
 
 	/*
 	   aim: show sharp with keyboard
@@ -876,8 +878,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1403_state::pc1403h)
 	pc1403(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( pc1403h_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( pc1403h_mem)
 MACHINE_CONFIG_END
 
 
@@ -984,25 +986,25 @@ ROM_END
    pc1600
 */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   STATE          INIT    COMPANY  FULLNAME                     FLAGS
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME                     FLAGS
 // cpu sc61860
-COMP( 1982, pc1245,   0,      0,      pc1250,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1245",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
-COMP( 1982, pc1250,   0,      0,      pc1250,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1250",      MACHINE_NO_SOUND)
-COMP( 1982, pc1251,   pc1250, 0,      pc1251,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1251",      MACHINE_NO_SOUND)
-COMP( 1982, pc1255,   pc1250, 0,      pc1255,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1255",      MACHINE_NO_SOUND)
-COMP( 1983, trs80pc3, pc1250, 0,      pc1251,  pc1251, pc1251_state,  pc1251, "Tandy Radio Shack", "TRS-80 Pocket Computer PC-3", MACHINE_NO_SOUND)
+COMP( 1982, pc1245,   0,      0,      pc1250,  pc1251, pc1251_state, init_pc1251, "Sharp", "Pocket Computer 1245",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
+COMP( 1982, pc1250,   0,      0,      pc1250,  pc1251, pc1251_state, init_pc1251, "Sharp", "Pocket Computer 1250",      MACHINE_NO_SOUND)
+COMP( 1982, pc1251,   pc1250, 0,      pc1251,  pc1251, pc1251_state, init_pc1251, "Sharp", "Pocket Computer 1251",      MACHINE_NO_SOUND)
+COMP( 1982, pc1255,   pc1250, 0,      pc1255,  pc1251, pc1251_state, init_pc1251, "Sharp", "Pocket Computer 1255",      MACHINE_NO_SOUND)
+COMP( 1983, trs80pc3, pc1250, 0,      pc1251,  pc1251, pc1251_state, init_pc1251, "Tandy Radio Shack", "TRS-80 Pocket Computer PC-3", MACHINE_NO_SOUND)
 
-COMP( 1982, pc1260,   0,      0,      pc1260,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1260",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
-COMP( 1982, pc1261,   pc1260, 0,      pc1261,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1261/1262", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
+COMP( 1982, pc1260,   0,      0,      pc1260,  pc1251, pc1251_state, init_pc1251, "Sharp", "Pocket Computer 1260",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
+COMP( 1982, pc1261,   pc1260, 0,      pc1261,  pc1251, pc1251_state, init_pc1251, "Sharp", "Pocket Computer 1261/1262", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
 
 // pc1261/pc1262
-COMP( 1984, pc1350,   0,      0,      pc1350,  pc1350, pc1350_state,  0,      "Sharp", "Pocket Computer 1350",      MACHINE_NO_SOUND )
-COMP( 198?, pc1450,   0,      0,      pc1350,  pc1350, pc1350_state,  0,      "Sharp", "Pocket Computer 1450",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, pc1350,   0,      0,      pc1350,  pc1350, pc1350_state, empty_init,  "Sharp", "Pocket Computer 1350",      MACHINE_NO_SOUND )
+COMP( 198?, pc1450,   0,      0,      pc1350,  pc1350, pc1350_state, empty_init,  "Sharp", "Pocket Computer 1450",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-COMP( 1983, pc1401,   0,      0,      pc1401,  pc1401, pc1401_state,  pc1401, "Sharp", "Pocket Computer 1401",      MACHINE_NO_SOUND)
-COMP( 1984, pc1402,   pc1401, 0,      pc1402,  pc1401, pc1401_state,  pc1401, "Sharp", "Pocket Computer 1402",      MACHINE_NO_SOUND)
-COMP( 198?, pc1360,   pc1401, 0,      pc1401,  pc1401, pc1401_state,  pc1401, "Sharp", "Pocket Computer 1360",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, pc1401,   0,      0,      pc1401,  pc1401, pc1401_state, init_pc1401, "Sharp", "Pocket Computer 1401",      MACHINE_NO_SOUND)
+COMP( 1984, pc1402,   pc1401, 0,      pc1402,  pc1401, pc1401_state, init_pc1401, "Sharp", "Pocket Computer 1402",      MACHINE_NO_SOUND)
+COMP( 198?, pc1360,   pc1401, 0,      pc1401,  pc1401, pc1401_state, init_pc1401, "Sharp", "Pocket Computer 1360",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // 72kb rom, 32kb ram, cpu? pc1360
-COMP( 1986, pc1403,   0,      0,      pc1403,  pc1403, pc1403_state,  pc1403, "Sharp", "Pocket Computer 1403",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
-COMP( 198?, pc1403h,  pc1403, 0,      pc1403h, pc1403, pc1403_state,  pc1403, "Sharp", "Pocket Computer 1403H",     MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
+COMP( 1986, pc1403,   0,      0,      pc1403,  pc1403, pc1403_state, init_pc1403, "Sharp", "Pocket Computer 1403",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
+COMP( 198?, pc1403h,  pc1403, 0,      pc1403h, pc1403, pc1403_state, init_pc1403, "Sharp", "Pocket Computer 1403H",     MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)

@@ -296,23 +296,23 @@ void mystwarr_state::mystwarr_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // main program
 	map(0x200000, 0x20ffff).ram().share("gx_workram");
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x480000, 0x4800ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x482000, 0x48200f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x482010, 0x48201f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
 	map(0x484000, 0x484007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
 	map(0x48a000, 0x48a01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48c000, 0x48c03f).w(m_k056832, FUNC(k056832_device::word_w));
-	map(0x490000, 0x490001).w(this, FUNC(mystwarr_state::mweeprom_w));
+	map(0x490000, 0x490001).w(FUNC(mystwarr_state::mweeprom_w));
 	map(0x492000, 0x492001).noprw();    // watchdog
 	map(0x494000, 0x494001).portr("P1_P2");
 	map(0x494002, 0x494003).portr("P3_P4");
 	map(0x496000, 0x496001).portr("IN0");
-	map(0x496002, 0x496003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x496002, 0x496003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x498000, 0x49801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x49a000, 0x49a001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x49a000, 0x49a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x49c000, 0x49c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x49e000, 0x49e007).w(this, FUNC(mystwarr_state::irq_ack_w));    // VSCCS (custom)
+	map(0x49e000, 0x49e007).w(FUNC(mystwarr_state::irq_ack_w));    // VSCCS (custom)
 	map(0x600000, 0x601fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x602000, 0x603fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
 	map(0x680000, 0x683fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
@@ -334,16 +334,16 @@ void mystwarr_state::metamrph_map(address_map &map)
 	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x264000, 0x264001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x264000, 0x264001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x268000, 0x26801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x274000, 0x274001).portr("P1_P3");
 	map(0x274002, 0x274003).portr("P2_P4");
 	map(0x278000, 0x278001).portr("IN0");
-	map(0x278002, 0x278003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr(); // watchdog lives here
-	map(0x27c000, 0x27c001).w(this, FUNC(mystwarr_state::mmeeprom_w));
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
 	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
@@ -365,18 +365,18 @@ void mystwarr_state::viostorm_map(address_map &map)
 	map(0x250000, 0x25000f).ram();     // K053250 reg
 	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
-	map(0x25c000, 0x25c03f).rw(this, FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x25c000, 0x25c03f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
 	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x264000, 0x264001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x264000, 0x264001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x268000, 0x26801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x274000, 0x274001).portr("P1_P3");
 	map(0x274002, 0x274003).portr("P2_P4");
 	map(0x278000, 0x278001).portr("IN0");
-	map(0x278002, 0x278003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr();     // watchdog lives here
-	map(0x27c000, 0x27c001).w(this, FUNC(mystwarr_state::mmeeprom_w));
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
 	map(0x304000, 0x3041ff).ram();
@@ -458,18 +458,18 @@ void mystwarr_state::martchmp_map(address_map &map)
 	map(0x404000, 0x404007).w(m_k055673, FUNC(k055673_device::k053246_word_w));                // OBJSET1
 	map(0x40a000, 0x40a01f).w(m_k054338, FUNC(k054338_device::word_w));                // CLTC
 	map(0x40c000, 0x40c03f).w(m_k056832, FUNC(k056832_device::word_w));                // VACSET
-	map(0x40e000, 0x40e03f).w(this, FUNC(mystwarr_state::K053990_martchmp_word_w));      // protection
-	map(0x410000, 0x410001).w(this, FUNC(mystwarr_state::mceeprom_w));
-	map(0x412000, 0x412001).rw(this, FUNC(mystwarr_state::mccontrol_r), FUNC(mystwarr_state::mccontrol_w));
+	map(0x40e000, 0x40e03f).w(FUNC(mystwarr_state::K053990_martchmp_word_w));      // protection
+	map(0x410000, 0x410001).w(FUNC(mystwarr_state::mceeprom_w));
+	map(0x412000, 0x412001).rw(FUNC(mystwarr_state::mccontrol_r), FUNC(mystwarr_state::mccontrol_w));
 	map(0x414000, 0x414001).portr("P1_P2");
 	map(0x414002, 0x414003).portr("P3_P4");
 	map(0x416000, 0x416001).portr("IN0");
-	map(0x416002, 0x416003).r(this, FUNC(mystwarr_state::eeprom_r));                  // eeprom read
+	map(0x416002, 0x416003).r(FUNC(mystwarr_state::eeprom_r));                  // eeprom read
 	map(0x418000, 0x41801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x41a000, 0x41a001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x41a000, 0x41a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x41c000, 0x41c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);              // CCU
 	map(0x41e000, 0x41e007).w(m_k056832, FUNC(k056832_device::b_word_w));              // VSCCS
-	map(0x480000, 0x483fff).rw(this, FUNC(mystwarr_state::k053247_martchmp_word_r), FUNC(mystwarr_state::k053247_martchmp_word_w)).share("spriteram");    // sprite RAM
+	map(0x480000, 0x483fff).rw(FUNC(mystwarr_state::k053247_martchmp_word_r), FUNC(mystwarr_state::k053247_martchmp_word_w)).share("spriteram");    // sprite RAM
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                     // palette RAM
 	map(0x680000, 0x681fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM
 	map(0x682000, 0x683fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
@@ -480,7 +480,7 @@ void mystwarr_state::martchmp_map(address_map &map)
 void mystwarr_state::dadandrn_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                         // main program and data ROM
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x410000, 0x411fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM
 	map(0x412000, 0x413fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
 	map(0x420000, 0x421fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -492,21 +492,21 @@ void mystwarr_state::dadandrn_map(address_map &map)
 	map(0x470000, 0x470fff).ram().share("k053936_0_li16");
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));        // VACSET
 	map(0x482000, 0x482007).w(m_k056832, FUNC(k056832_device::b_word_w));  // VSCCS
-	map(0x484000, 0x484003).w(this, FUNC(mystwarr_state::ddd_053936_clip_w));
+	map(0x484000, 0x484003).w(FUNC(mystwarr_state::ddd_053936_clip_w));
 	map(0x486000, 0x48601f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
 	map(0x488000, 0x4880ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x48a000, 0x48a01f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x48c000, 0x48c01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48e000, 0x48e001).portr("IN0_P1"); // bit 3 (0x8) is test switch
-	map(0x48e020, 0x48e021).r(this, FUNC(mystwarr_state::dddeeprom_r));
+	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
-	map(0x680000, 0x68003f).rw(this, FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
-	map(0x6a0000, 0x6a0001).w(this, FUNC(mystwarr_state::mmeeprom_w));
-	map(0x6c0000, 0x6c0001).w(this, FUNC(mystwarr_state::ddd_053936_enable_w));
-	map(0x6e0000, 0x6e0001).w(this, FUNC(mystwarr_state::sound_irq_w));
-	map(0x800000, 0x87ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_0_r));    // 256k tilemap readback
-	map(0xa00000, 0xa7ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_1_r)); // 128k tilemap readback
-	map(0xc00000, 0xdfffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_2_r));    // tile character readback
+	map(0x680000, 0x68003f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
+	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
+	map(0x800000, 0x87ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_0_r));    // 256k tilemap readback
+	map(0xa00000, 0xa7ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_1_r)); // 128k tilemap readback
+	map(0xc00000, 0xdfffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_2_r));    // tile character readback
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
@@ -517,7 +517,7 @@ void mystwarr_state::dadandrn_map(address_map &map)
 void mystwarr_state::gaiapols_map(address_map &map)
 {
 	map(0x000000, 0x2fffff).rom();                             // main program
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x410000, 0x411fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));     // tilemap RAM
 	map(0x412000, 0x413fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));     // tilemap RAM mirror read / write (essential)
 	map(0x420000, 0x421fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -529,21 +529,21 @@ void mystwarr_state::gaiapols_map(address_map &map)
 	map(0x470000, 0x470fff).ram().share("k053936_0_li16");
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));            // VACSET
 	map(0x482000, 0x482007).w(m_k056832, FUNC(k056832_device::b_word_w));          // VSCCS
-	map(0x484000, 0x484003).w(this, FUNC(mystwarr_state::ddd_053936_clip_w));
+	map(0x484000, 0x484003).w(FUNC(mystwarr_state::ddd_053936_clip_w));
 	map(0x486000, 0x48601f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
 	map(0x488000, 0x4880ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x48a000, 0x48a01f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x48c000, 0x48c01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48e000, 0x48e001).portr("IN0_P1");             // bit 3 (0x8) is test switch
-	map(0x48e020, 0x48e021).r(this, FUNC(mystwarr_state::dddeeprom_r));
+	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
 	map(0x660000, 0x6600ff).rw("k054000", FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
-	map(0x6a0000, 0x6a0001).w(this, FUNC(mystwarr_state::mmeeprom_w));
-	map(0x6c0000, 0x6c0001).w(this, FUNC(mystwarr_state::ddd_053936_enable_w));
-	map(0x6e0000, 0x6e0001).w(this, FUNC(mystwarr_state::sound_irq_w));
-	map(0x800000, 0x87ffff).r(this, FUNC(mystwarr_state::gai_053936_tilerom_0_r));    // 256k tilemap readback
-	map(0xa00000, 0xa7ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_1_r));    // 128k tilemap readback
-	map(0xc00000, 0xdfffff).r(this, FUNC(mystwarr_state::gai_053936_tilerom_2_r));    // tile character readback
+	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
+	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
+	map(0x800000, 0x87ffff).r(FUNC(mystwarr_state::gai_053936_tilerom_0_r));    // 256k tilemap readback
+	map(0xa00000, 0xa7ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_1_r));    // 128k tilemap readback
+	map(0xc00000, 0xdfffff).r(FUNC(mystwarr_state::gai_053936_tilerom_2_r));    // tile character readback
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
@@ -577,7 +577,7 @@ void mystwarr_state::mystwarr_sound_map(address_map &map)
 	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(mystwarr_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(mystwarr_state::sound_ctrl_w));
 	map(0xfff0, 0xfff3).nopw();    // unknown write
 }
 
@@ -593,7 +593,7 @@ void mystwarr_state::martchmp_sound_map(address_map &map)
 	map(0xe400, 0xe62f).noprw();
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(mystwarr_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(mystwarr_state::sound_ctrl_w));
 	map(0xfff0, 0xfff3).nopw();    // unknown write
 }
 
@@ -851,11 +851,11 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
-static GFXDECODE_START( gaiapols )
+static GFXDECODE_START( gfx_gaiapols )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_4bpp, 0x0000, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( dadandrn )
+static GFXDECODE_START( gfx_dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
@@ -943,16 +943,16 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz (confirmed) */
-	MCFG_CPU_PROGRAM_MAP(mystwarr_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz (confirmed) */
+	MCFG_DEVICE_PROGRAM_MAP(mystwarr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mystwarr_state, mystwarr_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(mystwarr_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(mystwarr_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
 	MCFG_K053252_OFFSETS(24, 16)
@@ -977,7 +977,7 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
@@ -987,20 +987,20 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
 	MCFG_K054338_ALPHAINV(1)
-	MCFG_K054338_MIXER("k055555")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, mystwarr_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(mystwarr_state, k054539_nmi_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, mystwarr_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 
@@ -1019,8 +1019,8 @@ MACHINE_CONFIG_START(mystwarr_state::viostorm)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(viostorm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(viostorm_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
@@ -1048,8 +1048,8 @@ MACHINE_CONFIG_START(mystwarr_state::metamrph)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(metamrph_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(metamrph_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
@@ -1082,15 +1082,15 @@ MACHINE_CONFIG_START(mystwarr_state::dadandrn)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dadandrn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dadandrn_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24, 16+1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dadandrn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dadandrn)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
@@ -1116,9 +1116,9 @@ MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gaiapols_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gaiapols_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
 	MCFG_DEVICE_MODIFY("k053252")
@@ -1126,7 +1126,7 @@ MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 
 	MCFG_K054000_ADD("k054000")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiapols)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiapols)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
@@ -1153,13 +1153,13 @@ MACHINE_CONFIG_START(mystwarr_state::martchmp)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(martchmp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(martchmp_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(martchmp_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(martchmp_sound_map)
 
 	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
 	MCFG_K053252_OFFSETS(32, 24-1)
@@ -1189,7 +1189,7 @@ MACHINE_CONFIG_START(mystwarr_state::martchmp)
 	MCFG_DEVICE_REMOVE("k054539_2")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(mystwarr_state, k054539_nmi_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, mystwarr_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2288,36 +2288,36 @@ ROM_START( dadandrn )
 ROM_END
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     STATE
-GAME( 1993, mystwarr,   0,        mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarru,  mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarrj,  mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarraa, mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarr,   0,        mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarru,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarrj,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarraa, mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mmaulers,   0,        dadandrn, dadandrn, mystwarr_state, 0, ROT0,  "Konami", "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dadandrn,   mmaulers, dadandrn, dadandrn, mystwarr_state, 0, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mmaulers,   0,        dadandrn, dadandrn, mystwarr_state, empty_init, ROT0,  "Konami", "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dadandrn,   mmaulers, dadandrn, dadandrn, mystwarr_state, empty_init, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, viostorm,   0,        viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormeb, viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormu,  viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormub, viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormj,  viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostorma,  viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormab, viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorm,   0,        viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormeb, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormu,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormub, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormj,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorma,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormab, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, metamrph,   0,        metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphe,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphu,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphj,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrpha,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrph,   0,        metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphe,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphu,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphj,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrpha,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mtlchamp,   0,        martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchamp1,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver UAE)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu1, mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver UAD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampj,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampa,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp,   0,        martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp1,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver UAE)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu1, mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver UAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampj,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampa,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, gaiapols,   0,        gaiapols, dadandrn, mystwarr_state, 0, ROT90, "Konami", "Gaiapolis (ver EAF)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsu,  gaiapols, gaiapols, dadandrn, mystwarr_state, 0, ROT90, "Konami", "Gaiapolis (ver UAF)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsj,  gaiapols, gaiapols, dadandrn, mystwarr_state, 0, ROT90, "Konami", "Gaiapolis (ver JAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapols,   0,        gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver EAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsu,  gaiapols, gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver UAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsj,  gaiapols, gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver JAF)", MACHINE_IMPERFECT_GRAPHICS )

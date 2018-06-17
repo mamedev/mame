@@ -30,19 +30,20 @@ FLOPPY_FORMATS_MEMBER( bbc_cv1797_device::floppy_formats )
 	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END0
 
-static SLOT_INTERFACE_START( bbc_floppies_525 )
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
-	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void bbc_floppies_525(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd",   FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd",   FLOPPY_525_DD);
+	device.option_add("525qd",   FLOPPY_525_QD);
+}
 
 ROM_START( cv1797 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
 	ROM_DEFAULT_BIOS("lvldos")
 	ROM_SYSTEM_BIOS(0, "lvldos", "LVL Dos 0.91")
-	ROMX_LOAD("lvldos91.rom", 0x0000, 0x2000, CRC(69d7653a) SHA1(9cd39d011290b97d5ba05b6c745689a8553be5fc), ROM_BIOS(1))
+	ROMX_LOAD("lvldos91.rom", 0x0000, 0x2000, CRC(69d7653a) SHA1(9cd39d011290b97d5ba05b6c745689a8553be5fc), ROM_BIOS(0))
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
@@ -52,10 +53,10 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_cv1797_device::device_add_mconfig)
-	MCFG_FD1797_ADD("fd1797", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cv1797_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cv1797_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_cv1797_device, motor_w))
+	MCFG_DEVICE_ADD("fd1797", FD1797, 8_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_cv1797_device, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", bbc_floppies_525, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", bbc_floppies_525, "525qd", floppy_formats)

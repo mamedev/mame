@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tecmosys_state : public driver_device
@@ -86,9 +87,9 @@ public:
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
-	DECLARE_DRIVER_INIT(tkdensha);
-	DECLARE_DRIVER_INIT(deroon);
-	DECLARE_DRIVER_INIT(tkdensho);
+	void init_tkdensha();
+	void init_deroon();
+	void init_tkdensho();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100, bbc_tube_zep100_device, "bbc_tube_zep100", "
 
 void bbc_tube_zep100_device::tube_zep100_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_zep100_device::mem_r), FUNC(bbc_tube_zep100_device::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_zep100_device::mem_r), FUNC(bbc_tube_zep100_device::mem_w));
 }
 
 //-------------------------------------------------
@@ -37,7 +37,7 @@ void bbc_tube_zep100_device::tube_zep100_mem(address_map &map)
 void bbc_tube_zep100_device::tube_zep100_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).mirror(0xff00).rw(this, FUNC(bbc_tube_zep100_device::io_r), FUNC(bbc_tube_zep100_device::io_w));
+	map(0x00, 0x07).mirror(0xff00).rw(FUNC(bbc_tube_zep100_device::io_r), FUNC(bbc_tube_zep100_device::io_w));
 }
 
 //-------------------------------------------------
@@ -48,9 +48,9 @@ ROM_START( tube_zep100 )
 	ROM_REGION(0x2000, "rom", 0)
 	ROM_DEFAULT_BIOS("cccp102")
 	ROM_SYSTEM_BIOS(0, "cccp102", "CCCP 1.02")
-	ROMX_LOAD("cccp102.rom", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d), ROM_BIOS(1))
+	ROMX_LOAD("cccp102.rom", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "cccp094", "CCCP 0.94")
-	ROMX_LOAD("cccp094.rom", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61), ROM_BIOS(2))
+	ROMX_LOAD("cccp094.rom", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61), ROM_BIOS(1))
 ROM_END
 
 //-------------------------------------------------
@@ -58,20 +58,20 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_zep100_device::device_add_mconfig)
-	MCFG_CPU_ADD("z80", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(tube_zep100_mem)
-	MCFG_CPU_IO_MAP(tube_zep100_io)
+	MCFG_DEVICE_ADD("z80", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(tube_zep100_mem)
+	MCFG_DEVICE_IO_MAP(tube_zep100_io)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 2)
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_tube_zep100_device, via_pb_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("ppi", i8255_device, pc2_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("ppi", i8255_device, pc6_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bbc_tube_zep100_device, via_pb_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE("ppi", i8255_device, pc2_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE("ppi", i8255_device, pc6_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("via", via6522_device, write_pa))
-	MCFG_I8255_IN_PORTB_CB(READ8(bbc_tube_zep100_device, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(bbc_tube_zep100_device, ppi_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("via", via6522_device, write_pa))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, bbc_tube_zep100_device, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bbc_tube_zep100_device, ppi_pc_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

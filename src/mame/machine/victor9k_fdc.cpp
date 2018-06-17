@@ -144,10 +144,11 @@ void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)
 	m_via4->write_cb1(1);
 }
 
-static SLOT_INTERFACE_START( victor9k_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD ) // Tandon TM100-3 with custom electronics
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Tandon TM100-4 with custom electronics
-SLOT_INTERFACE_END
+static void victor9k_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
+	device.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
+}
 
 FLOPPY_FORMATS_MEMBER( victor_9000_fdc_device::floppy_formats )
 	FLOPPY_VICTOR_9000_FORMAT
@@ -159,36 +160,36 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(victor_9000_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(30'000'000)/6)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_fdc_device, floppy_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_fdc_device, floppy_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(victor_9000_fdc_device, floppy_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(victor_9000_fdc_device, floppy_p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(victor_9000_fdc_device, tach0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(victor_9000_fdc_device, tach1_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(victor_9000_fdc_device, da_w))
+	MCFG_DEVICE_ADD(I8048_TAG, I8048, XTAL(30'000'000)/6)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, victor_9000_fdc_device, floppy_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, victor_9000_fdc_device, floppy_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, victor_9000_fdc_device, floppy_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, victor_9000_fdc_device, floppy_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, victor_9000_fdc_device, tach0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, victor_9000_fdc_device, tach1_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, victor_9000_fdc_device, da_w))
 
 	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL(30'000'000)/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_device, via4_pa_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_device, via4_pa_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8(victor_9000_fdc_device, via4_pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_device, via4_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor_9000_fdc_device, wrsync_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_device, via4_irq_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, victor_9000_fdc_device, via4_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, victor_9000_fdc_device, via4_pa_w))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, victor_9000_fdc_device, via4_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, victor_9000_fdc_device, via4_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, victor_9000_fdc_device, wrsync_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, victor_9000_fdc_device, via4_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL(30'000'000)/30)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_device, via5_irq_w))
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_device, via5_pa_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_device, via5_pb_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, victor_9000_fdc_device, via5_irq_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, victor_9000_fdc_device, via5_pa_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, victor_9000_fdc_device, via5_pb_w))
 
 	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL(30'000'000)/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_device, via6_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(victor_9000_fdc_device, via6_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_device, via6_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_device, via6_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor_9000_fdc_device, drw_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(victor_9000_fdc_device, erase_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_device, via6_irq_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, victor_9000_fdc_device, via6_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, victor_9000_fdc_device, via6_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, victor_9000_fdc_device, via6_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, victor_9000_fdc_device, via6_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, victor_9000_fdc_device, drw_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, victor_9000_fdc_device, erase_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, victor_9000_fdc_device, via6_irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", victor_9000_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", victor_9000_fdc_device::floppy_formats)
@@ -215,6 +216,7 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 	m_floppy0(*this, I8048_TAG":0"),
 	m_floppy1(*this, I8048_TAG":1"),
 	m_gcr_rom(*this, "gcr"),
+	m_leds(*this, "led%u", 0U),
 	m_da(0),
 	m_da0(0),
 	m_da1(0),
@@ -259,6 +261,8 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 
 void victor_9000_fdc_device::device_start()
 {
+	m_leds.resolve();
+
 	// resolve callbacks
 	m_irq_cb.resolve_safe();
 	m_syn_cb.resolve_safe();
@@ -891,10 +895,10 @@ WRITE8_MEMBER( victor_9000_fdc_device::via6_pa_w )
 	*/
 
 	// LED, drive A
-	machine().output().set_led_value(LED_A, BIT(data, 0));
+	m_leds[LED_A] = BIT(data, 0);
 
 	// LED, drive B
-	machine().output().set_led_value(LED_B, BIT(data, 2));
+	m_leds[LED_B] = BIT(data, 2);
 
 	bool sync = false;
 

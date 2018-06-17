@@ -2,6 +2,7 @@
 // copyright-holders:Phil Stroffolino
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tsamurai_state : public driver_device
 {
@@ -64,12 +65,12 @@ public:
 	DECLARE_VIDEO_START(m660);
 	DECLARE_VIDEO_START(tsamurai);
 	DECLARE_VIDEO_START(vsgongf);
-	DECLARE_DRIVER_INIT(the26thz);
+	void init_the26thz();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 
 	void tsamurai(machine_config &config);

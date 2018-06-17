@@ -90,17 +90,17 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 
 void electron_state::electron_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(electron_state::electron_mem_r), FUNC(electron_state::electron_mem_w));          /* 32KB of RAM */
-	map(0x8000, 0xbfff).rw(this, FUNC(electron_state::electron_paged_r), FUNC(electron_state::electron_paged_w));      /* Banked ROM pages */
-	map(0xc000, 0xffff).rw(this, FUNC(electron_state::electron_mos_r), FUNC(electron_state::electron_mos_w));          /* OS ROM */
-	map(0xfc00, 0xfcff).rw(this, FUNC(electron_state::electron_fred_r), FUNC(electron_state::electron_fred_w));        /* FRED */
-	map(0xfd00, 0xfdff).rw(this, FUNC(electron_state::electron_jim_r), FUNC(electron_state::electron_jim_w));          /* JIM */
-	map(0xfe00, 0xfeff).rw(this, FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
+	map(0x0000, 0x7fff).rw(FUNC(electron_state::electron_mem_r), FUNC(electron_state::electron_mem_w));          /* 32KB of RAM */
+	map(0x8000, 0xbfff).rw(FUNC(electron_state::electron_paged_r), FUNC(electron_state::electron_paged_w));      /* Banked ROM pages */
+	map(0xc000, 0xffff).rw(FUNC(electron_state::electron_mos_r), FUNC(electron_state::electron_mos_w));          /* OS ROM */
+	map(0xfc00, 0xfcff).rw(FUNC(electron_state::electron_fred_r), FUNC(electron_state::electron_fred_w));        /* FRED */
+	map(0xfd00, 0xfdff).rw(FUNC(electron_state::electron_jim_r), FUNC(electron_state::electron_jim_w));          /* JIM */
+	map(0xfe00, 0xfeff).rw(FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
 }
 
 void electron_state::electron64_opcodes(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(electron_state::electron64_fetch_r));
+	map(0x0000, 0xffff).r(FUNC(electron_state::electron64_fetch_r));
 }
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
@@ -213,11 +213,12 @@ static INPUT_PORTS_START( electron64 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(electron_state::electron)
-	MCFG_CPU_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
-	MCFG_CPU_PROGRAM_MAP( electron_mem )
+	MCFG_DEVICE_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
+	MCFG_DEVICE_PROGRAM_MAP( electron_mem )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
+	//MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 264, 264 + 640, 312, 31, 31 + 256)
 	MCFG_SCREEN_UPDATE_DRIVER(electron_state, screen_update_electron)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
@@ -225,8 +226,8 @@ MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 300 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -267,9 +268,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(electron_state::electron64)
 	electron(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(electron_mem)
-	MCFG_CPU_OPCODES_MAP(electron64_opcodes)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(electron_mem)
+	MCFG_DEVICE_OPCODES_MAP(electron64_opcodes)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -294,7 +295,7 @@ ROM_END
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT  COMPANY                             FULLNAME                                 FLAGS */
-COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, 0,    "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
-COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, 0,    "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                             FULLNAME                                 FLAGS */
+COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, empty_init, "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
+COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, empty_init, "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

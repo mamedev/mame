@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 
 class airbustr_state : public driver_device
@@ -39,7 +40,7 @@ public:
 	required_shared_ptr<uint8_t> m_devram;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
-	
+
 	required_memory_bank m_masterbank;
 	required_memory_bank m_slavebank;
 	required_memory_bank m_audiobank;
@@ -71,7 +72,7 @@ public:
 	template<int Layer> DECLARE_WRITE8_MEMBER(videoram_w);
 	template<int Layer> DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(scrollregs_w);
-	DECLARE_DRIVER_INIT(airbustr);
+	void init_airbustr();
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

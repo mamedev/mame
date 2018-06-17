@@ -504,11 +504,9 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 			device_t *mapdevice = entry->m_submap_device;
 			if (!mapdevice)
 			{
-				std::string tag = owner.subtag(entry->m_read.m_tag);
-				mapdevice = machine.device(tag.c_str());
-				if (mapdevice == nullptr) {
-					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, m_device->basetag());
-				}
+				mapdevice = owner.subdevice(entry->m_read.m_tag);
+				if (mapdevice == nullptr)
+					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", owner.subtag(entry->m_read.m_tag).c_str(), m_spacenum, m_device->basetag());
 			}
 
 			// Grab the submap
@@ -677,6 +675,12 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			osd_printf_error("In %s memory range %x-%x, start address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
 		if (entry.m_addrend & ~globalmask)
 			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
+		if (entry.m_addrmask & ~globalmask)
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, mask is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrmask & globalmask);
+		if ((entry.m_addrmirror & ~globalmask) && (entry.m_addrmirror | globalmask) != 0xffffffff >> (32 - spaceconfig.m_addr_width))
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, mirror is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrmirror & globalmask);
+		if (entry.m_addrselect & ~globalmask)
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, select is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrselect & globalmask);
 
 		// look for misaligned entries
 		if (entry.m_read.m_type != AMH_NONE)
@@ -770,8 +774,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 				case 64: devtag = entry.m_rproto64.device_name(); break;
 			}
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_read.m_bits, entry.m_mask, entry.m_read.m_name);
 #endif
@@ -788,8 +791,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 				case 64: devtag = entry.m_wproto64.device_name(); break;
 			}
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_mask, entry.m_write.m_name);
 #endif
@@ -799,8 +801,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			// extract the device tag from the proto-delegate
 			const char *devtag = entry.m_soproto.device_name();
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry references nonexistent device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+				osd_printf_error("%s space memory map entry references nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
 		}
 
 		// make sure ports exist

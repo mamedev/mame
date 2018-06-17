@@ -215,17 +215,17 @@ void amico2k_state::machine_start()
 
 MACHINE_CONFIG_START(amico2k_state::amico2k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1MHz */
-	MCFG_CPU_PROGRAM_MAP(amico2k_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) /* 1MHz */
+	MCFG_DEVICE_PROGRAM_MAP(amico2k_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_amico2k )
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amico2k_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amico2k_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amico2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(amico2k_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amico2k_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amico2k_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amico2k_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amico2k_state, ppi_pb_w))
 MACHINE_CONFIG_END
 
 
@@ -244,5 +244,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    STATE          INIT   COMPANY     FULLNAME      FLAGS
-COMP( 1978, amico2k,  0,      0,      amico2k, amico2k, amico2k_state, 0,     "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1978, amico2k, 0,      0,      amico2k, amico2k, amico2k_state, empty_init, "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)

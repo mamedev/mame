@@ -9,6 +9,7 @@
 #include "machine/k054321.h"
 #include "video/k053936.h"
 #include "cpu/dsp56k/dsp56k.h"
+#include "emupal.h"
 
 
 static const uint16_t dsp56k_bank00_size = 0x1000;
@@ -96,7 +97,7 @@ public:
 	DECLARE_WRITE32_MEMBER(polygonet_ttl_ram_w);
 	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
 	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
-	DECLARE_DRIVER_INIT(polygonet);
+	void init_polygonet();
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(plygonet_scan);

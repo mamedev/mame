@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 class ohmygod_state : public driver_device
 {
 public:
@@ -22,8 +24,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(ohmygod);
-	DECLARE_DRIVER_INIT(naname);
+	void init_ohmygod();
+	void init_naname();
 	void ohmygod(machine_config &config);
 
 protected:

@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail, David Graves
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
+#include "emupal.h"
 
 struct gb_tempsprite
 {
@@ -52,8 +53,8 @@ public:
 	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
 	DECLARE_READ32_MEMBER(main_cycle_r);
 	DECLARE_WRITE8_MEMBER(coin_word_w);
-	DECLARE_DRIVER_INIT(gunbustrj);
-	DECLARE_DRIVER_INIT(gunbustr);
+	void init_gunbustrj();
+	void init_gunbustr();
 	virtual void video_start() override;
 	uint32_t screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);

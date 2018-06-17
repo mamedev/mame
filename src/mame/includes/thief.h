@@ -2,6 +2,7 @@
 // copyright-holders:Victor Trucco, Mike Balfour, Phil Stroffolino
 #include "sound/samples.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 
 struct coprocessor_t {
 	std::unique_ptr<uint8_t[]> context_ram;
@@ -40,7 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(thief_coprocessor_r);
 	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
 	DECLARE_WRITE8_MEMBER(tape_control_w);
-	DECLARE_DRIVER_INIT(thief);
+	void init_thief();
 	virtual void video_start() override;
 	uint32_t screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(slam_w);

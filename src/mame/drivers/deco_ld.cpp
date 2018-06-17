@@ -114,6 +114,7 @@ Sound processor - 6502
 #include "machine/ldp1000.h"
 #include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -276,10 +277,10 @@ void deco_ld_state::rblaster_map(address_map &map)
 	map(0x1001, 0x1001).portr("DSW1");
 	map(0x1002, 0x1002).portr("DSW2");
 	map(0x1003, 0x1003).portr("IN1");
-	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(this, FUNC(deco_ld_state::decold_sound_cmd_w));
-	map(0x1005, 0x1005).r(this, FUNC(deco_ld_state::sound_status_r));
+	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
+	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
 	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	map(0x1006, 0x1006).r(this, FUNC(deco_ld_state::acia_status_hack_r));
+	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x27ff).ram();
@@ -303,7 +304,7 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
-	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -451,7 +452,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( rblaster )
+static GFXDECODE_START( gfx_rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
@@ -463,13 +464,13 @@ void deco_ld_state::machine_start()
 MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(rblaster_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M6502,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(rblaster_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",M6502,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
+	MCFG_DEVICE_ADD("audiocpu",M6502,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(rblaster_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -480,30 +481,31 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rblaster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("laserdisc", sony_ldp1000_device, write))
-	//MCFG_ACIA6850_RXD_HANDLER(DEVREADLINE("laserdisc", sony_ldp1000_device, read))
+	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("laserdisc", sony_ldp1000_device, write))
+	//MCFG_ACIA6850_RXD_HANDLER(READLINE("laserdisc", sony_ldp1000_device, read))
 
 	/* sound hardware */
 	/* TODO: mixing */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -663,9 +665,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1,   begas, rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa,   cobra, rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

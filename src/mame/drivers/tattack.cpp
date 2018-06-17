@@ -50,6 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -72,7 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_WRITE8_MEMBER(brick_dma_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_DRIVER_INIT(tattack);
+	void init_tattack();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(tattack);
 
@@ -272,11 +273,11 @@ void tattack_state::tattack_map(address_map &map)
 	map(0x6000, 0x6000).portr("DSW2");
 	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
 	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
-	map(0xc000, 0xc000).portr("INPUTS").w(this, FUNC(tattack_state::sound_w)); // sound
-	map(0xc001, 0xc001).w(this, FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
-	map(0xc005, 0xc005).w(this, FUNC(tattack_state::paddle_w));
-	map(0xc006, 0xc007).w(this, FUNC(tattack_state::ball_w));
+	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
+	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
 	map(0xe000, 0xe3ff).ram().share("ram");
 }
 
@@ -367,7 +368,7 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( tattack )
+static GFXDECODE_START( gfx_tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
@@ -403,9 +404,9 @@ static const char *const tattack_sample_names[] =
 MACHINE_CONFIG_START(tattack_state::tattack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(tattack_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(tattack_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -416,19 +417,19 @@ MACHINE_CONFIG_START(tattack_state::tattack)
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tattack)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(tattack_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	/* Discrete ???? */
-//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+//  MCFG_DEVICE_ADD("discrete", DISCRETE)
 //  MCFG_DISCRETE_INTF(tattack)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -447,7 +448,7 @@ ROM_START( tattack )
 	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
 ROM_END
 
-DRIVER_INIT_MEMBER(tattack_state,tattack)
+void tattack_state::init_tattack()
 {
 //  uint8_t *rom = memregion("maincpu")->base();
 
@@ -484,5 +485,5 @@ DRIVER_INIT_MEMBER(tattack_state,tattack)
 
 }
 
-GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 // there is another undumped version with katakana Shonan logo and black background

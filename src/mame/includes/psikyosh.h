@@ -3,6 +3,7 @@
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh/sh2.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -65,9 +66,9 @@ public:
 	DECLARE_READ32_MEMBER(mjgtaste_input_r);
 	DECLARE_WRITE32_MEMBER(psh_eeprom_w);
 	DECLARE_READ32_MEMBER(psh_eeprom_r);
-	DECLARE_DRIVER_INIT(ps3);
-	DECLARE_DRIVER_INIT(ps5);
-	DECLARE_DRIVER_INIT(mjgtaste);
+	void init_ps3();
+	void init_ps5();
+	void init_mjgtaste();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

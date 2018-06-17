@@ -11,6 +11,7 @@
 
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 
 class ac1_state : public driver_device
 {
@@ -24,7 +25,7 @@ public:
 		, m_io_line(*this, "LINE.%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(ac1);
+	void init_ac1();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

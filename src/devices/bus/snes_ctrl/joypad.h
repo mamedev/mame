@@ -48,6 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type SNES_JOYPAD;
+DECLARE_DEVICE_TYPE(SNES_JOYPAD, snes_joypad_device)
 
 #endif // MAME_BUS_SNES_CTRL_JOYPAD_H

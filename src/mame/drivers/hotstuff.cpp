@@ -6,6 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -100,8 +101,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(hotstuff_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(hotstuff_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -132,4 +133,4 @@ ROM_START( hotstuff )
 	ROM_LOAD16_WORD_SWAP( "hot stuff symbol u8,68000.bin", 0x00000, 0x80000, CRC(f154a157) SHA1(92ae0fb977e2dcc0377487d768f95c6e447e990b) )
 ROM_END
 
-GAME( ????, hotstuff,    0,        hotstuff,    hotstuff, hotstuff_state,    0, ROT0,  "Olympic Video Gaming", "Olympic Hot Stuff (TAS 5 Reel System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( ????, hotstuff, 0, hotstuff, hotstuff, hotstuff_state, empty_init, ROT0, "Olympic Video Gaming", "Olympic Hot Stuff (TAS 5 Reel System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

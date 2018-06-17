@@ -16,6 +16,7 @@
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -120,15 +121,15 @@ static const gfx_layout m79152pc_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( m79152pc )
+static GFXDECODE_START( gfx_m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -138,31 +139,31 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update_m79152pc)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m79152pc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, rxca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", z80sio_device, rxca_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	//MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	//MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	//MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	//MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	//MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	//MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", z80sio_device, ctsa_w))
-	//MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", z80sio_device, rxb_w))
-	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", z80sio_device, ctsa_w))
+	//MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	//MCFG_RS232_RXD_HANDLER(WRITELINE("uart", z80sio_device, rxb_w))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE("uart", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -177,5 +178,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME         FLAGS
-COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, m79152pc_state, 0,    "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME         FLAGS
+COMP( ????, m79152pc, 0,      0,      m79152pc, m79152pc, m79152pc_state, empty_init, "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

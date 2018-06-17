@@ -8,6 +8,7 @@
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
+#include "emupal.h"
 #include "screen.h"
 
 enum
@@ -282,14 +283,14 @@ public:
 	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
 	DECLARE_READ8_MEMBER(hng64_comm_mmu_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
-	DECLARE_DRIVER_INIT(hng64_race);
-	DECLARE_DRIVER_INIT(fatfurwa);
-	DECLARE_DRIVER_INIT(buriki);
-	DECLARE_DRIVER_INIT(hng64);
-	DECLARE_DRIVER_INIT(hng64_shoot);
-	DECLARE_DRIVER_INIT(ss64);
-	DECLARE_DRIVER_INIT(hng64_fght);
-	DECLARE_DRIVER_INIT(hng64_reorder_gfx);
+	void init_hng64_race();
+	void init_fatfurwa();
+	void init_buriki();
+	void init_hng64();
+	void init_hng64_shoot();
+	void init_ss64();
+	void init_hng64_fght();
+	void init_hng64_reorder_gfx();
 
 	void set_irq(uint32_t irq_vector);
 	uint32_t m_irq_pending;

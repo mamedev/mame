@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 #include "sound/sn76477.h"
+#include "emupal.h"
 
 class route16_state : public driver_device
 {
@@ -30,7 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
 	DECLARE_MACHINE_START(speakres);
 	DECLARE_MACHINE_START(ttmahjng);
-	DECLARE_DRIVER_INIT(route16);
+	void init_route16();
 
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

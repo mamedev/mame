@@ -68,7 +68,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
+	MCFG_DEVICE_ADD("maincpu", SH4LE, 200000000) // SH7750
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(0)
 	MCFG_SH4_MD2(1)
@@ -79,8 +79,8 @@ MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(200000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
 MACHINE_CONFIG_END
@@ -99,5 +99,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY      FULLNAME  FLAGS
-COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, 0,    "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME  FLAGS
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )

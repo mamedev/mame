@@ -23,6 +23,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,7 +41,7 @@ public:
 
 	DECLARE_READ8_MEMBER(jackpool_io_r);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
-	DECLARE_DRIVER_INIT(jackpool);
+	void init_jackpool();
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
@@ -147,7 +148,7 @@ void jackpool_state::jackpool_mem(address_map &map)
 	map(0x348000, 0x34ffff).ram(); //<- vram banks 2 & 3?
 
 	map(0x360000, 0x3603ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x38002f).r(this, FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
+	map(0x380000, 0x38002f).r(FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
 	map(0x380030, 0x38003f).w("latch1", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x380040, 0x38004f).w("latch2", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x380050, 0x38005f).w("latch3", FUNC(ls259_device::write_d0)).umask16(0x00ff);
@@ -214,7 +215,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jackpool )
+static GFXDECODE_START( gfx_jackpool )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 0x20  ) /* sprites */
 GFXDECODE_END
 
@@ -227,11 +228,11 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 
 
 MACHINE_CONFIG_START(jackpool_state::jackpool)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
-	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackpool)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -255,23 +256,23 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // Coin counter
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // Ticket motor
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // Hopper motor
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(jackpool_state, map_vreg_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jackpool_state, map_vreg_w))
 
 	MCFG_DEVICE_ADD("latch3", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -291,7 +292,7 @@ ROM_START( jackpool )
 	ROM_LOAD( "jpc7", 0xc0000, 0x40000,  CRC(b1d40623) SHA1(fb76ae6b53474bd4bee19dbce9537da0f2b63ff4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(jackpool_state,jackpool)
+void jackpool_state::init_jackpool()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -299,4 +300,4 @@ DRIVER_INIT_MEMBER(jackpool_state,jackpool)
 	rom[0x9040/2] = 0x6602;
 }
 
-GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )
+GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, init_jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )

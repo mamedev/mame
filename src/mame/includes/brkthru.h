@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class brkthru_state : public driver_device
 {
@@ -48,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
 	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(brkthru);
+	void init_brkthru();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p50a_w);
 	DECLARE_WRITE8_MEMBER(p50b_w);
 	DECLARE_WRITE8_MEMBER(p51a_w);
-	DECLARE_DRIVER_INIT(micropin);
+	void init_micropin();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void pentacup2(machine_config &config);
 	void micropin(machine_config &config);
@@ -82,16 +82,16 @@ void micropin_state::micropin_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x01ff).ram().share("nvram"); // 4x 6561 RAM
-	map(0x4000, 0x4005).w(this, FUNC(micropin_state::sw_w));
+	map(0x4000, 0x4005).w(FUNC(micropin_state::sw_w));
 	map(0x4000, 0x4000).portr("X1");
 	map(0x4001, 0x4001).portr("X2");
 	map(0x4002, 0x4002).portr("X3");
 	map(0x4003, 0x4003).portr("X4");
 	map(0x4004, 0x4004).portr("X5");
 	map(0x5000, 0x5003).rw("pia50", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x5100, 0x5103).rw(this, FUNC(micropin_state::pia51_r), FUNC(micropin_state::pia51_w));
-	map(0x5200, 0x5200).w(this, FUNC(micropin_state::sol_w));
-	map(0x5202, 0x5202).w(this, FUNC(micropin_state::lamp_w));
+	map(0x5100, 0x5103).rw(FUNC(micropin_state::pia51_r), FUNC(micropin_state::pia51_w));
+	map(0x5200, 0x5200).w(FUNC(micropin_state::sol_w));
+	map(0x5202, 0x5202).w(FUNC(micropin_state::lamp_w));
 	map(0x5203, 0x5203).nopw();
 	map(0x6400, 0x7fff).rom().region("v1cpu", 0);
 }
@@ -105,8 +105,8 @@ void micropin_state::pentacup2_map(address_map &map)
 void micropin_state::pentacup2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0e).w(this, FUNC(micropin_state::sw_w));
-	map(0x0f, 0x0f).w(this, FUNC(micropin_state::lamp_w));
+	map(0x00, 0x0e).w(FUNC(micropin_state::sw_w));
+	map(0x0f, 0x0f).w(FUNC(micropin_state::lamp_w));
 	map(0x00, 0x00).portr("X0");
 	map(0x01, 0x01).portr("X1");
 	map(0x02, 0x02).portr("X2");
@@ -291,15 +291,15 @@ void micropin_state::machine_reset()
 		m_led_time[i] = 5;
 }
 
-DRIVER_INIT_MEMBER( micropin_state, micropin )
+void micropin_state::init_micropin()
 {
 }
 
 MACHINE_CONFIG_START(micropin_state::micropin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(micropin_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
+	MCFG_DEVICE_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(micropin_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -308,36 +308,36 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 387)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia50", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(micropin_state, p50a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(micropin_state, p50a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(micropin_state, p50b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(micropin_state, p50b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(micropin_state, p50ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(micropin_state, p50cb2_w))
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, micropin_state, p50a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, micropin_state, p50a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, micropin_state, p50b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, micropin_state, p50b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, micropin_state, p50ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, micropin_state, p50cb2_w))
 
 	MCFG_DEVICE_ADD("pia51", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(micropin_state, p51a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(micropin_state, p51a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(micropin_state, p51b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(micropin_state, p51b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(micropin_state, p51ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(micropin_state, p51cb2_w))
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, micropin_state, p51a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, micropin_state, p51a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, micropin_state, p51b_r))
+	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, micropin_state, p51b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, micropin_state, p51ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, micropin_state, p51cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micropin_state::pentacup2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v2cpu", I8085A, 2000000)
-	MCFG_CPU_PROGRAM_MAP(pentacup2_map)
-	MCFG_CPU_IO_MAP(pentacup2_io)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
+	MCFG_DEVICE_ADD("v2cpu", I8085A, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(pentacup2_map)
+	MCFG_DEVICE_IO_MAP(pentacup2_io)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -369,5 +369,5 @@ ROM_START(pentacup2)
 ROM_END
 
 
-GAME(1978,  pentacup,  0,         micropin,   micropin, micropin_state,  micropin,  ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state,  micropin,  ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  pentacup,  0,         micropin,   micropin, micropin_state, init_micropin, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state, init_micropin, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)

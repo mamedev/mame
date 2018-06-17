@@ -19,6 +19,7 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -236,15 +237,15 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rgum )
+static GFXDECODE_START( gfx_rgum )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(rgum_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -265,12 +266,12 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rgum)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rgum)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -297,4 +298,4 @@ ROM_START( rgum )
 ROM_END
 
 
-GAME( 199?, rgum, 0, rgum, rgum, rgum_state, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

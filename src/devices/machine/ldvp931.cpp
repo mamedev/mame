@@ -55,10 +55,10 @@ DEFINE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device, "22vp931", "Philli
 
 void phillips_22vp931_device::vp931_portmap(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_keypad_r), FUNC(phillips_22vp931_device::i8049_output0_w));
-	map(0x10, 0x10).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_unknown_r), FUNC(phillips_22vp931_device::i8049_output1_w));
-	map(0x20, 0x20).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_datic_r), FUNC(phillips_22vp931_device::i8049_lcd_w));
-	map(0x30, 0x30).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_from_controller_r), FUNC(phillips_22vp931_device::i8049_to_controller_w));
+	map(0x00, 0x00).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_keypad_r), FUNC(phillips_22vp931_device::i8049_output0_w));
+	map(0x10, 0x10).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_unknown_r), FUNC(phillips_22vp931_device::i8049_output1_w));
+	map(0x20, 0x20).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_datic_r), FUNC(phillips_22vp931_device::i8049_lcd_w));
+	map(0x30, 0x30).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_from_controller_r), FUNC(phillips_22vp931_device::i8049_to_controller_w));
 }
 
 
@@ -287,14 +287,14 @@ const tiny_rom_entry *phillips_22vp931_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(phillips_22vp931_device::device_add_mconfig)
-	MCFG_CPU_ADD("vp931", I8049, XTAL(11'000'000))
-	MCFG_CPU_IO_MAP(vp931_portmap)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(phillips_22vp931_device, i8049_port1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(phillips_22vp931_device, i8049_port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(phillips_22vp931_device, i8049_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(phillips_22vp931_device, i8049_port2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(phillips_22vp931_device, i8049_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(phillips_22vp931_device, i8049_t1_r))
+	MCFG_DEVICE_ADD("vp931", I8049, XTAL(11'000'000))
+	MCFG_DEVICE_IO_MAP(vp931_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, phillips_22vp931_device, i8049_port1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, phillips_22vp931_device, i8049_port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, phillips_22vp931_device, i8049_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, phillips_22vp931_device, i8049_port2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, phillips_22vp931_device, i8049_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, phillips_22vp931_device, i8049_t1_r))
 MACHINE_CONFIG_END
 
 

@@ -3,6 +3,7 @@
 #include "audio/taito_en.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
@@ -262,44 +263,44 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
-	DECLARE_DRIVER_INIT(commandw);
-	DECLARE_DRIVER_INIT(pbobble2);
-	DECLARE_DRIVER_INIT(puchicar);
-	DECLARE_DRIVER_INIT(intcup94);
-	DECLARE_DRIVER_INIT(landmakr);
-	DECLARE_DRIVER_INIT(twinqix);
-	DECLARE_DRIVER_INIT(elvactr);
-	DECLARE_DRIVER_INIT(arabianm);
-	DECLARE_DRIVER_INIT(bubsympb);
-	DECLARE_DRIVER_INIT(ktiger2);
-	DECLARE_DRIVER_INIT(lightbr);
-	DECLARE_DRIVER_INIT(gekirido);
-	DECLARE_DRIVER_INIT(arkretrn);
-	DECLARE_DRIVER_INIT(kirameki);
-	DECLARE_DRIVER_INIT(qtheater);
-	DECLARE_DRIVER_INIT(popnpop);
-	DECLARE_DRIVER_INIT(spcinvdj);
-	DECLARE_DRIVER_INIT(pbobbl2p);
-	DECLARE_DRIVER_INIT(landmkrp);
-	DECLARE_DRIVER_INIT(bubblem);
-	DECLARE_DRIVER_INIT(ridingf);
-	DECLARE_DRIVER_INIT(gseeker);
-	DECLARE_DRIVER_INIT(bubsymph);
-	DECLARE_DRIVER_INIT(hthero95);
-	DECLARE_DRIVER_INIT(gunlock);
-	DECLARE_DRIVER_INIT(pbobble4);
-	DECLARE_DRIVER_INIT(dariusg);
-	DECLARE_DRIVER_INIT(recalh);
-	DECLARE_DRIVER_INIT(kaiserkn);
-	DECLARE_DRIVER_INIT(spcinv95);
-	DECLARE_DRIVER_INIT(trstaroj);
-	DECLARE_DRIVER_INIT(ringrage);
-	DECLARE_DRIVER_INIT(cupfinal);
-	DECLARE_DRIVER_INIT(quizhuhu);
-	DECLARE_DRIVER_INIT(pbobble3);
-	DECLARE_DRIVER_INIT(cleopatr);
-	DECLARE_DRIVER_INIT(scfinals);
-	DECLARE_DRIVER_INIT(pbobbl2x);
+	void init_commandw();
+	void init_pbobble2();
+	void init_puchicar();
+	void init_intcup94();
+	void init_landmakr();
+	void init_twinqix();
+	void init_elvactr();
+	void init_arabianm();
+	void init_bubsympb();
+	void init_ktiger2();
+	void init_lightbr();
+	void init_gekirido();
+	void init_arkretrn();
+	void init_kirameki();
+	void init_qtheater();
+	void init_popnpop();
+	void init_spcinvdj();
+	void init_pbobbl2p();
+	void init_landmkrp();
+	void init_bubblem();
+	void init_ridingf();
+	void init_gseeker();
+	void init_bubsymph();
+	void init_hthero95();
+	void init_gunlock();
+	void init_pbobble4();
+	void init_dariusg();
+	void init_recalh();
+	void init_kaiserkn();
+	void init_spcinv95();
+	void init_trstaroj();
+	void init_ringrage();
+	void init_cupfinal();
+	void init_quizhuhu();
+	void init_pbobble3();
+	void init_cleopatr();
+	void init_scfinals();
+	void init_pbobbl2x();
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info3);
@@ -310,9 +311,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info8);
 	TILE_GET_INFO_MEMBER(get_tile_info_vram);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
-	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(f3);
-	DECLARE_VIDEO_START(f3);
 	uint32_t screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_f3);
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);
@@ -327,6 +325,10 @@ public:
 	void bubsympb_map(address_map &map);
 	void f3_map(address_map &map);
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load(void) override;
 

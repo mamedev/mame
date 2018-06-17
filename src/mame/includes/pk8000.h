@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+
+#include "emupal.h"
+
 class pk8000_base_state : public driver_device
 {
 public:

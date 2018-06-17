@@ -63,6 +63,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -123,10 +124,10 @@ void quakeat_state::machine_start()
 
 MACHINE_CONFIG_START(quakeat_state::quake)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
-	MCFG_CPU_PROGRAM_MAP(quake_map)
-	MCFG_CPU_IO_MAP(quake_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
+	MCFG_DEVICE_PROGRAM_MAP(quake_map)
+	MCFG_DEVICE_IO_MAP(quake_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -153,4 +154,4 @@ ROM_START(quake)
 ROM_END
 
 
-GAME( 1998, quake,  0,   quake, quake, quakeat_state, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+GAME( 1998, quake,  0,   quake, quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )

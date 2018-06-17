@@ -23,6 +23,7 @@
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -145,14 +146,12 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
 
 uint8_t dfruit_state::ram_bank_r(uint16_t offset, uint8_t bank_num)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	return vdp_space.read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
+	return m_vdp->space().read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
 }
 
 void dfruit_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+	m_vdp->space().write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
 }
 
 READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }
@@ -167,20 +166,20 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(dfruit_state::dfruit_rom_r));
+	map(0x6000, 0x7fff).r(FUNC(dfruit_state::dfruit_rom_r));
 
 	map(0x8000, 0x9fff).ram();
 
-	map(0xc000, 0xcfff).rw(this, FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
-	map(0xd000, 0xdfff).rw(this, FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
-	map(0xe000, 0xefff).rw(this, FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
-	map(0xf000, 0xfdff).rw(this, FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
+	map(0xc000, 0xcfff).rw(FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
+	map(0xd000, 0xdfff).rw(FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
+	map(0xe000, 0xefff).rw(FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
+	map(0xf000, 0xfdff).rw(FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
 
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(this, FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
-	map(0xff03, 0xff03).rw(this, FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
-	map(0xff04, 0xff07).rw(this, FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
-	map(0xff08, 0xff08).rw(this, FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
+	map(0xff00, 0xff02).rw(FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
+	map(0xff03, 0xff03).rw(FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
+	map(0xff08, 0xff08).rw(FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
 }
 
 
@@ -342,7 +341,7 @@ static const gfx_layout char_layout =
 };
 #endif
 
-static GFXDECODE_START( dfruit )
+static GFXDECODE_START( gfx_dfruit )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
 	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
@@ -373,8 +372,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
-	MCFG_CPU_PROGRAM_MAP(dfruit_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
+	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
@@ -387,10 +386,10 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dfruit_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfruit )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
@@ -402,8 +401,8 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -423,4 +422,4 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 1993, dfruit,  0,   dfruit, dfruit, dfruit_state,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dfruit, 0, dfruit, dfruit, dfruit_state, empty_init, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )

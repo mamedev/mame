@@ -296,7 +296,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 	if (m_sound_accessed)
 	{
-		m_sound->write(space, 0, data);
+		m_sound->write(data);
 	}
 }
 
@@ -481,14 +481,14 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
 	// video hardware
 	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(snug_enhanced_video_device, video_interrupt_in))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, snug_enhanced_video_device, video_interrupt_in))
 	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	SPEAKER(config, "sound_out").front_center();
+	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(snug_enhanced_video_device, ready_line) )
+	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, snug_enhanced_video_device, ready_line) )
 
 	// Mouse connected to the color bus of the v9938
 	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )

@@ -43,6 +43,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -218,13 +219,13 @@ void _3x3puzzle_state::_3x3puzzle_map(address_map &map)
 	map(0x202000, 0x202fff).ram().share("videoram3");
 	map(0x280000, 0x280001).portr("VBLANK");
 	map(0x300000, 0x3005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x400001).w(this, FUNC(_3x3puzzle_state::tilemap1_scrollx_w));
-	map(0x480000, 0x480001).w(this, FUNC(_3x3puzzle_state::tilemap1_scrolly_w));
+	map(0x400000, 0x400001).w(FUNC(_3x3puzzle_state::tilemap1_scrollx_w));
+	map(0x480000, 0x480001).w(FUNC(_3x3puzzle_state::tilemap1_scrolly_w));
 	map(0x500000, 0x500001).portr("P1");
 	map(0x580000, 0x580001).portr("SYS");
 	map(0x600000, 0x600001).portr("DSW01");
 	map(0x700001, 0x700001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x800000, 0x800001).w(this, FUNC(_3x3puzzle_state::gfx_ctrl_w));
+	map(0x800000, 0x800001).w(FUNC(_3x3puzzle_state::gfx_ctrl_w));
 	map(0x880000, 0x880001).nopr(); // read, but no tested afterwards
 }
 
@@ -366,7 +367,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( _3x3puzzle )
+static GFXDECODE_START( gfx_3x3puzzle )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout,     0, 3 )
@@ -388,9 +389,9 @@ void _3x3puzzle_state::machine_reset()
 MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(_3x3puzzle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(_3x3puzzle_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -400,14 +401,14 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", _3x3puzzle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_3x3puzzle)
 
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -506,6 +507,6 @@ ROM_END
 
 
 
-GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    _3x3puzzle_state, 0,       ROT0, "Promat",              "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3x3puzzl,  0,        _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl, _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 199?, casanova,  0,        _3x3puzzle, casanova,   _3x3puzzle_state, empty_init, ROT0, "Promat",         "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

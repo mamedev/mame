@@ -244,7 +244,7 @@ uint8_t xtom3d_state::piix4_config_r(int function, int reg)
 
 void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -355,13 +355,13 @@ void xtom3d_state::xtom3d_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(this, FUNC(xtom3d_state::isa_ram1_w));
-	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(this, FUNC(xtom3d_state::isa_ram2_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(this, FUNC(xtom3d_state::bios_ext1_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(this, FUNC(xtom3d_state::bios_ext2_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(this, FUNC(xtom3d_state::bios_ext3_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(this, FUNC(xtom3d_state::bios_ext4_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(xtom3d_state::bios_ram_w));
+	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(FUNC(xtom3d_state::isa_ram1_w));
+	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(FUNC(xtom3d_state::isa_ram2_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(FUNC(xtom3d_state::bios_ext1_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(FUNC(xtom3d_state::bios_ext2_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(FUNC(xtom3d_state::bios_ext3_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(FUNC(xtom3d_state::bios_ext4_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(xtom3d_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -405,10 +405,10 @@ void xtom3d_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(xtom3d_state::xtom3d)
-	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
-	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
-	MCFG_CPU_IO_MAP(xtom3d_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
+	MCFG_DEVICE_PROGRAM_MAP(xtom3d_map)
+	MCFG_DEVICE_IO_MAP(xtom3d_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 
 	pcat_common(config);
@@ -441,4 +441,4 @@ ROM_START( xtom3d )
 ROM_END
 
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, 0, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)

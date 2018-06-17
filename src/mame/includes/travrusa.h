@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Lee Taylor
 // thanks-to:John Clegg,Tomasz Slanina
+
+#include "emupal.h"
+
 class travrusa_state : public driver_device
 {
 public:
@@ -24,9 +27,9 @@ public:
 	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_high_w);
 	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
 	DECLARE_READ8_MEMBER(shtridrb_port11_r);
-	DECLARE_DRIVER_INIT(shtridra);
-	DECLARE_DRIVER_INIT(motorace);
-	DECLARE_DRIVER_INIT(shtridrb);
+	void init_shtridra();
+	void init_motorace();
+	void init_shtridrb();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

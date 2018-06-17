@@ -86,6 +86,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -336,21 +337,21 @@ void prestige_state::prestige_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x05).rw(this, FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x04, 0x05).rw(FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 void prestige_state::glcolor_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 /* Input ports */
@@ -740,10 +741,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 
 MACHINE_CONFIG_START(prestige_state::prestige_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
-	MCFG_CPU_PROGRAM_MAP(prestige_mem)
-	MCFG_CPU_IO_MAP(prestige_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
+	MCFG_DEVICE_PROGRAM_MAP(prestige_mem)
+	MCFG_DEVICE_IO_MAP(prestige_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_hz(200))
 
@@ -772,8 +773,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glcolor)
 	prestige_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(glcolor_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(glcolor_io)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -791,8 +792,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glmcolor)
 	glcolor(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(prestige_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(prestige_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::snotec)
@@ -940,34 +941,34 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY   FULLNAME                                FLAGS
-COMP( 1994, glcolor,  0,       0,      glcolor,    glcolor,  prestige_state, 0,    "VTech",  "Genius Leader Color (Germany)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, glscolor, glcolor, 0,      glcolor,    glcolor,  prestige_state, 0,    "VTech",  "Genius Leader Super Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, snotec,   0,       0,      snotec,     glcolor,  prestige_state, 0,    "Bandai", "Super Note Club (Japan)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1996, snotecex, 0,       0,      snotec,     glcolor,  prestige_state, 0,    "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1996, glmcolor, 0,       0,      glmcolor,   glmcolor, prestige_state, 0,    "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, gl6000sl, 0,       0,      gl6000sl,   prestige, prestige_state, 0,    "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, snotecu,  0,       0,      snotec,     glcolor,  prestige_state, 0,    "Bandai", "Super Note Club \xce\xbc (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, gl7007sl, 0,       0,      gl7007sl,   prestige, prestige_state, 0,    "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, prestige, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, gwnf,     0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                                FLAGS
+COMP( 1994, glcolor,  0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Color (Germany)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, glscolor, glcolor, 0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Super Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, snotec,   0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club (Japan)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club \xce\xbc (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // these systems need to be moved into a separate driver
-COMP( 1996, gj4000,   0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior 4000 (Germany)",         MACHINE_IS_SKELETON )
-COMP( 1996, gkidabc,  0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius KID ABC Fan (Germany)",         MACHINE_IS_SKELETON )
-COMP( 1993, gjmovie,  0,       0,      gjmovie,    prestige, prestige_state, 0,    "VTech",  "Genius Junior Movie (Germany)",        MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar,  0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior Redstar(Germany)",       MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar2, gjrstar, 0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior Redstar 2 (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1998, gjrstar3, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior Redstar 3 (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1998, gj5000,   0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior 5000 (Germany)",         MACHINE_IS_SKELETON )
-COMP( 2012, cars2lap, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "CARS 2 Laptop (Germany)",              MACHINE_IS_SKELETON )
+COMP( 1996, gj4000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 4000 (Germany)",         MACHINE_IS_SKELETON )
+COMP( 1996, gkidabc,  0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius KID ABC Fan (Germany)",         MACHINE_IS_SKELETON )
+COMP( 1993, gjmovie,  0,       0,      gjmovie,  prestige, prestige_state, empty_init, "VTech",  "Genius Junior Movie (Germany)",        MACHINE_IS_SKELETON )
+COMP( 1996, gjrstar,  0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar(Germany)",       MACHINE_IS_SKELETON )
+COMP( 1996, gjrstar2, gjrstar, 0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 2 (Germany)",    MACHINE_IS_SKELETON )
+COMP( 1998, gjrstar3, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)",    MACHINE_IS_SKELETON )
+COMP( 1998, gj5000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",         MACHINE_IS_SKELETON )
+COMP( 2012, cars2lap, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "CARS 2 Laptop (Germany)",              MACHINE_IS_SKELETON )
 
 
 // gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
 // http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
-COMP( 1999, gl6600cx, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Leader 6600CX (Germany)",       MACHINE_IS_SKELETON )
+COMP( 1999, gl6600cx, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6600CX (Germany)",       MACHINE_IS_SKELETON )
 
 // TODO: move into a separate driver
 // Prin-C use a Fujitsu MB90611A MCU (F2MC-16L)
-COMP( ????, princ,    0,       0,      princ,      prestige, prestige_state, 0,    "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )
+COMP( ????, princ,    0,       0,      princ,    prestige, prestige_state, empty_init, "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )

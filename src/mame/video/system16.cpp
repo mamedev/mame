@@ -157,69 +157,69 @@ void segas1x_bootleg_state::update_page(  )
 	int all_dirty = 0;
 	int i, offset;
 
-	if (m_old_tile_bank1 != m_tile_bank1)
+	if (m_old_tile_bank[1] != m_tile_bank[1])
 	{
 		all_dirty = 1;
-		m_old_tile_bank1 = m_tile_bank1;
+		m_old_tile_bank[1] = m_tile_bank[1];
 	}
 
-	if (m_old_tile_bank0 != m_tile_bank0)
+	if (m_old_tile_bank[0] != m_tile_bank[0])
 	{
 		all_dirty = 1;
-		m_old_tile_bank0 = m_tile_bank0;
+		m_old_tile_bank[0] = m_tile_bank[0];
 		m_text_layer->mark_all_dirty();
 	}
 
 	if (all_dirty)
 	{
-		m_background->mark_all_dirty();
-		m_foreground->mark_all_dirty();
+		m_background[0]->mark_all_dirty();
+		m_foreground[0]->mark_all_dirty();
 
 		if (m_system18)
 		{
-			m_background2->mark_all_dirty();
-			m_foreground2->mark_all_dirty();
+			m_background[1]->mark_all_dirty();
+			m_foreground[1]->mark_all_dirty();
 		}
 	}
 	else {
 		for (i = 0; i < 4; i++)
 		{
 			int page0 = 64 * 32 * i;
-			if (m_old_bg_page[i] != m_bg_page[i])
+			if (m_old_bg_page[0][i] != m_bg_page[0][i])
 			{
-				m_old_bg_page[i] = m_bg_page[i];
+				m_old_bg_page[0][i] = m_bg_page[0][i];
 				for (offset = page0; offset < page0 + 64 * 32; offset++)
 				{
-					m_background->mark_tile_dirty(offset);
+					m_background[0]->mark_tile_dirty(offset);
 				}
 			}
 
-			if (m_old_fg_page[i] != m_fg_page[i])
+			if (m_old_fg_page[0][i] != m_fg_page[0][i])
 			{
-				m_old_fg_page[i] = m_fg_page[i];
+				m_old_fg_page[0][i] = m_fg_page[0][i];
 				for (offset = page0; offset < page0 + 64 * 32; offset++)
 				{
-					m_foreground->mark_tile_dirty(offset);
+					m_foreground[0]->mark_tile_dirty(offset);
 				}
 			}
 
 			if (m_system18)
 			{
-				if (m_old_bg2_page[i] != m_bg2_page[i])
+				if (m_old_bg_page[1][i] != m_bg_page[1][i])
 				{
-					m_old_bg2_page[i] = m_bg2_page[i];
+					m_old_bg_page[1][i] = m_bg_page[1][i];
 					for (offset = page0; offset < page0 + 64 * 32; offset++)
 					{
-						m_background2->mark_tile_dirty(offset);
+						m_background[1]->mark_tile_dirty(offset);
 					}
 				}
 
-				if (m_old_fg2_page[i] != m_fg2_page[i])
+				if (m_old_fg_page[1][i] != m_fg_page[1][i])
 				{
-					m_old_fg2_page[i] = m_fg2_page[i];
+					m_old_fg_page[1][i] = m_fg_page[1][i];
 					for (offset = page0; offset < page0 + 64 * 32; offset++)
 					{
-						m_foreground2->mark_tile_dirty(offset);
+						m_foreground[1]->mark_tile_dirty(offset);
 					}
 				}
 			}
@@ -229,9 +229,9 @@ void segas1x_bootleg_state::update_page(  )
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 {
-	const uint16_t *source = 64 * 32 * m_bg_page[tile_index / (64 * 32)] + m_tileram;
-	int data = source[tile_index%(64*32)];
-	int tile_number = (data & 0xfff) + 0x1000 * ((data & m_tilebank_switch) ? m_tile_bank1 : m_tile_bank0);
+	const uint16_t *source = (m_bg_page[0][tile_index >> 11] << 11) + m_tileram;
+	int data = source[tile_index & 0x7ff];
+	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
 	SET_TILE_INFO_MEMBER(0,
 			tile_number,
@@ -241,9 +241,9 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 {
-	const uint16_t *source = 64 * 32 * m_fg_page[tile_index / (64 * 32)] + m_tileram;
-	int data = source[tile_index % (64 * 32)];
-	int tile_number = (data & 0xfff) + 0x1000 * ((data & m_tilebank_switch) ? m_tile_bank1 : m_tile_bank0);
+	const uint16_t *source = (m_fg_page[0][tile_index >> 11] << 11) + m_tileram;
+	int data = source[tile_index & 0x7ff];
+	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
 	SET_TILE_INFO_MEMBER(0,
 			tile_number,
@@ -253,9 +253,9 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 {
-	const uint16_t *source = 64 * 32 * m_bg2_page[tile_index / (64 * 32)] + m_tileram;
-	int data = source[tile_index % (64 * 32)];
-	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? m_tile_bank1 : m_tile_bank0);
+	const uint16_t *source = (m_bg_page[1][tile_index >> 11] << 11) + m_tileram;
+	int data = source[tile_index & 0x7ff];
+	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
 	SET_TILE_INFO_MEMBER(0,
 			tile_number,
@@ -265,9 +265,9 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 {
-	const uint16_t *source = 64 * 32 * m_fg2_page[tile_index / (64 * 32)] + m_tileram;
-	int data = source[tile_index % (64 * 32)];
-	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? m_tile_bank1 : m_tile_bank0);
+	const uint16_t *source = (m_fg_page[1][tile_index >> 11] << 11) + m_tileram;
+	int data = source[tile_index & 0x7ff];
+	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
 	SET_TILE_INFO_MEMBER(0,
 			tile_number,
@@ -283,30 +283,30 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_tileram_w)
 
 	if (oldword != m_tileram[offset])
 	{
-		int page = offset / (64 * 32);
-		offset = offset % (64 * 32);
+		int page = offset >> 11;
+		offset = offset & 0x7ff;
 
-		if (m_bg_page[0] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 0);
-		if (m_bg_page[1] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 1);
-		if (m_bg_page[2] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 2);
-		if (m_bg_page[3] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 3);
+		if (m_bg_page[0][0] == page) m_background[0]->mark_tile_dirty(offset);
+		if (m_bg_page[0][1] == page) m_background[0]->mark_tile_dirty(offset | (1 << 11));
+		if (m_bg_page[0][2] == page) m_background[0]->mark_tile_dirty(offset | (2 << 11));
+		if (m_bg_page[0][3] == page) m_background[0]->mark_tile_dirty(offset | (3 << 11));
 
-		if (m_fg_page[0] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 0);
-		if (m_fg_page[1] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 1);
-		if (m_fg_page[2] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 2);
-		if (m_fg_page[3] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 3);
+		if (m_fg_page[0][0] == page) m_foreground[0]->mark_tile_dirty(offset);
+		if (m_fg_page[0][1] == page) m_foreground[0]->mark_tile_dirty(offset | (1 << 11));
+		if (m_fg_page[0][2] == page) m_foreground[0]->mark_tile_dirty(offset | (2 << 11));
+		if (m_fg_page[0][3] == page) m_foreground[0]->mark_tile_dirty(offset | (3 << 11));
 
 		if (m_system18)
 		{
-			if (m_bg2_page[0] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 0);
-			if (m_bg2_page[1] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 1);
-			if (m_bg2_page[2] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 2);
-			if (m_bg2_page[3] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 3);
+			if (m_bg_page[1][0] == page) m_background[1]->mark_tile_dirty(offset);
+			if (m_bg_page[1][1] == page) m_background[1]->mark_tile_dirty(offset | (1 << 11));
+			if (m_bg_page[1][2] == page) m_background[1]->mark_tile_dirty(offset | (2 << 11));
+			if (m_bg_page[1][3] == page) m_background[1]->mark_tile_dirty(offset | (3 << 11));
 
-			if (m_fg2_page[0] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 0);
-			if (m_fg2_page[1] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 1);
-			if (m_fg2_page[2] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 2);
-			if (m_fg2_page[3] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 3);
+			if (m_fg_page[1][0] == page) m_foreground[1]->mark_tile_dirty(offset);
+			if (m_fg_page[1][1] == page) m_foreground[1]->mark_tile_dirty(offset | (1 << 11));
+			if (m_fg_page[1][2] == page) m_foreground[1]->mark_tile_dirty(offset | (2 << 11));
+			if (m_fg_page[1][3] == page) m_foreground[1]->mark_tile_dirty(offset | (3 << 11));
 		}
 	}
 }
@@ -322,14 +322,14 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 	if (!m_shinobl_kludge)
 	{
 		SET_TILE_INFO_MEMBER(0,
-				(tile_number & 0x1ff) + m_tile_bank0 * 0x1000,
+				(tile_number & 0x1ff) | (m_tile_bank[0] << 12),
 				(tile_number >> 9) % 8,
 				0);
 	}
 	else
 	{
 		SET_TILE_INFO_MEMBER(0,
-				(tile_number & 0xff)  + m_tile_bank0 * 0x1000,
+				(tile_number & 0xff) | (m_tile_bank[0] << 12),
 				(tile_number >> 8) % 8,
 				0);
 	}
@@ -365,17 +365,17 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 			);
 
 	if (!m_bg1_trans)
-		m_background = &machine().tilemap().create(
+		m_background[0] = &machine().tilemap().create(
 				*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 				8,8,
 				64*2,32*2 );
 	else
-		m_background = &machine().tilemap().create(
+		m_background[0] = &machine().tilemap().create(
 				*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 				8,8,
 				64*2,32*2 );
 
-	m_foreground = &machine().tilemap().create(
+	m_foreground[0] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 			8,8,
 			64*2,32*2 );
@@ -385,12 +385,12 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 			8,8,
 			40,28 );
 
-	if (m_bg1_trans) m_background->set_transparent_pen(0);
-	m_foreground->set_transparent_pen(0);
+	if (m_bg1_trans) m_background[0]->set_transparent_pen(0);
+	m_foreground[0]->set_transparent_pen(0);
 	m_text_layer->set_transparent_pen(0);
 
-	m_tile_bank0 = 0;
-	m_tile_bank1 = 1;
+	m_tile_bank[0] = 0;
+	m_tile_bank[1] = 1;
 
 	m_fg_scrollx = 0;
 	m_fg_scrolly = 0;
@@ -421,28 +421,28 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 
 	m_bg1_trans = 1;
 
-	m_background2 = &machine().tilemap().create(
+	m_background[1] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 			8,8,
 			64*2,32*2 );
 
-	m_foreground2 = &machine().tilemap().create(
+	m_foreground[1] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 			8,8,
 			64*2,32*2 );
 
-	m_foreground2->set_transparent_pen(0);
+	m_foreground[1]->set_transparent_pen(0);
 
 	if (m_splittab_fg_x)
 	{
-		m_foreground ->set_scroll_rows(64);
-		m_foreground2 ->set_scroll_rows(64);
+		m_foreground[0] ->set_scroll_rows(64);
+		m_foreground[1] ->set_scroll_rows(64);
 	}
 
 	if (m_splittab_bg_x)
 	{
-		m_background ->set_scroll_rows(64);
-		m_background2 ->set_scroll_rows(64);
+		m_background[0] ->set_scroll_rows(64);
+		m_background[1] ->set_scroll_rows(64);
 	}
 
 	m_textlayer_lo_min = 0;
@@ -762,20 +762,20 @@ uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bi
 
 	screen.priority().fill(0, cliprect);
 
-	m_background->set_scrollx(0, -320 - m_bg_scrollx);
-	m_background->set_scrolly(0, -256 + m_bg_scrolly + m_back_yscroll);
-	m_foreground->set_scrollx(0, -320 - m_fg_scrollx);
-	m_foreground->set_scrolly(0, -256 + m_fg_scrolly + m_fore_yscroll);
+	m_background[0]->set_scrollx(0, -320 - m_bg_scrollx);
+	m_background[0]->set_scrolly(0, -256 + m_bg_scrolly + m_back_yscroll);
+	m_foreground[0]->set_scrollx(0, -320 - m_fg_scrollx);
+	m_foreground[0]->set_scrolly(0, -256 + m_fg_scrolly + m_fore_yscroll);
 
 	m_text_layer->set_scrollx(0, 0);
 	m_text_layer->set_scrolly(0, 0 + m_text_yscroll);
 
 	/* Background */
-	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
+	m_background[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
 
 	/* Foreground */
-	m_foreground->draw(screen, bitmap, cliprect, 0, 0x03);
-	m_foreground->draw(screen, bitmap, cliprect, 1, 0x07);
+	m_foreground[0]->draw(screen, bitmap, cliprect, 0, 0x03);
+	m_foreground[0]->draw(screen, bitmap, cliprect, 1, 0x07);
 
 
 	/* Text Layer */
@@ -842,14 +842,14 @@ uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen,
 
 	bitmap.fill(0, cliprect);
 
-	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);   //??
-	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);   //??
-	m_background->draw(screen, bitmap, cliprect, 1, 0x1);
-	m_background->draw(screen, bitmap, cliprect, 2, 0x3);
+	m_background[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_background[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);   //??
+	m_background[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);   //??
+	m_background[0]->draw(screen, bitmap, cliprect, 1, 0x1);
+	m_background[0]->draw(screen, bitmap, cliprect, 2, 0x3);
 
-	m_foreground->draw(screen, bitmap, cliprect, 0, 0x3);
-	m_foreground->draw(screen, bitmap, cliprect, 1, 0x7);
+	m_foreground[0]->draw(screen, bitmap, cliprect, 0, 0x3);
+	m_foreground[0]->draw(screen, bitmap, cliprect, 1, 0x7);
 
 	m_text_layer->draw(screen, bitmap, cliprect, 1, 0x7);
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 0xf);

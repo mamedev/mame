@@ -85,7 +85,7 @@ void crimfght_state::crimfght_map(address_map &map)
 {
 	map(0x0000, 0x03ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
 	map(0x0400, 0x1fff).ram();
-	map(0x2000, 0x5fff).rw(this, FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   /* video RAM + sprite RAM */
+	map(0x2000, 0x5fff).rw(FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   /* video RAM + sprite RAM */
 	map(0x3f80, 0x3f80).portr("SYSTEM");
 	map(0x3f81, 0x3f81).portr("P1");
 	map(0x3f82, 0x3f82).portr("P2");
@@ -94,8 +94,8 @@ void crimfght_state::crimfght_map(address_map &map)
 	map(0x3f85, 0x3f85).portr("P3");
 	map(0x3f86, 0x3f86).portr("P4");
 	map(0x3f87, 0x3f87).portr("DSW1");
-	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(crimfght_state::crimfght_coin_w)); // 051550
-	map(0x3f8c, 0x3f8c).mirror(0x03).w(this, FUNC(crimfght_state::sound_w));
+	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(crimfght_state::crimfght_coin_w)); // 051550
+	map(0x3f8c, 0x3f8c).mirror(0x03).w(FUNC(crimfght_state::sound_w));
 	map(0x6000, 0x7fff).bankr("rombank");                        /* banked ROM */
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
 }
@@ -303,13 +303,13 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)       /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(crimfght_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(crimfght_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)       /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(crimfght_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, crimfght_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(crimfght_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
@@ -343,17 +343,18 @@ MACHINE_CONFIG_START(crimfght_state::crimfght)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state, ym2151_ct_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, crimfght_state, ym2151_ct_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(crimfght_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, crimfght_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
@@ -438,6 +439,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, crimfght,  0,        crimfght, crimfght,  crimfght_state, 0, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, crimfght_state, 0, ROT0, "Konami", "Crime Fighters (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfght,  crimfght_state, 0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfght,  0,        crimfght, crimfght,  crimfght_state, empty_init, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, crimfght_state, empty_init, ROT0, "Konami", "Crime Fighters (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfght,  crimfght_state, empty_init, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )

@@ -17,17 +17,17 @@
 
     banking:
     - 0x1c = 0
-    AM_RANGE(0x0000,0x1fff) ROM
-    AM_RANGE(0x2000,0xdfff) NOP
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0x1fff).rom()
+    map(0x2000,0xdfff).noprw()
+    map(0xe000,0xffff).ram()
     - 0x1c = 1 0x20 = 1
-    AM_RANGE(0x0000,0x7fff) RAM (0x18 selects bank)
-    AM_RANGE(0x8000,0x87ff) CMOS
-    AM_RANGE(0x8800,0xdfff) NOP or previous bank?
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0x7fff).ram() (0x18 selects bank)
+    map(0x8000,0x87ff) CMOS
+    map(0x8800,0xdfff).noprw() or previous bank?
+    map(0xe000,0xffff).ram()
     - 0x1c = 1 0x20 = 0
-    AM_RANGE(0x0000,0xdfff) RAM (0x18 selects bank)
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0xdfff).ram() (0x18 selects bank)
+    map(0xe000,0xffff).ram()
 ****************************************************************************/
 
 
@@ -45,6 +45,7 @@
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -73,10 +74,12 @@ public:
 		m_dma_1(*this, "8237dma_1"),
 		m_dma_2(*this, "8237dma_2"),
 		m_fdc(*this, "upd765"),
+		m_floppy(*this, "upd765:%u", 0U),
 		m_hgdc(*this, "upd7220"),
 		m_rtc(*this, "rtc"),
 		m_kbd(*this, "kbd"),
 		m_vram_bank(0),
+		m_char_rom(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
@@ -84,22 +87,9 @@ public:
 	{
 	}
 
-	required_device<pit8253_device> m_pit_1;
-	required_device<pit8253_device> m_pit_2;
-	required_device<pic8259_device> m_pic_m;
-	required_device<pic8259_device> m_pic_s;
-	required_device<upd7201_device> m_scc;
-	required_device<i8255_device> m_ppi;
-	required_device<am9517a_device> m_dma_1;
-	required_device<am9517a_device> m_dma_2;
-	required_device<upd765a_device> m_fdc;
-	required_device<upd7220_device> m_hgdc;
-	required_device<mc146818_device> m_rtc;
-	required_device<rs232_port_device> m_kbd;
-	uint8_t m_vram_bank;
-	//required_shared_ptr<uint8_t> m_video_ram;
-	std::unique_ptr<uint16_t[]> m_video_ram;
+	void qx10(machine_config &config);
 
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
@@ -134,12 +124,43 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(qx10);
 
-	uint8_t *m_char_rom;
+	DECLARE_PALETTE_INIT(qx10);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+
+	void qx10_io(address_map &map);
+	void qx10_mem(address_map &map);
+	void upd7220_map(address_map &map);
+
+	required_device<pit8253_device> m_pit_1;
+	required_device<pit8253_device> m_pit_2;
+	required_device<pic8259_device> m_pic_m;
+	required_device<pic8259_device> m_pic_s;
+	required_device<upd7201_device> m_scc;
+	required_device<i8255_device> m_ppi;
+	required_device<am9517a_device> m_dma_1;
+	required_device<am9517a_device> m_dma_2;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<upd7220_device> m_hgdc;
+	required_device<mc146818_device> m_rtc;
+	required_device<rs232_port_device> m_kbd;
+	uint8_t m_vram_bank;
+	//required_shared_ptr<uint8_t> m_video_ram;
+	std::unique_ptr<uint16_t[]> m_video_ram;
+	required_region_ptr<uint8_t> m_char_rom;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 
 	/* FDD */
 	int     m_fdcint;
 	int     m_fdcmotor;
-	int     m_fdcready;
+	//int     m_fdcready;
 
 	/* memory */
 	int     m_membank;
@@ -148,23 +169,6 @@ public:
 	uint8_t   m_cmosram[0x800];
 
 	uint8_t m_color_mode;
-
-	struct{
-		uint8_t rx;
-	}m_rs232c;
-
-	DECLARE_PALETTE_INIT(qx10);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<ram_device> m_ram;
-	required_device<palette_device> m_palette;
-	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
-	void qx10(machine_config &config);
-	void qx10_io(address_map &map);
-	void qx10_mem(address_map &map);
-	void upd7220_map(address_map &map);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
@@ -199,24 +203,17 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int x;
-	int xi,yi;
-	int tile;
-	int attr;
-	uint8_t color;
-	uint8_t tile_data;
-	uint8_t pen;
 
-	for( x = 0; x < pitch; x++ )
+	for (int x = 0; x < pitch; x++)
 	{
-		tile = m_video_ram[((addr+x)*2) >> 1] & 0xff;
-		attr = m_video_ram[((addr+x)*2) >> 1] >> 8;
+		int tile = m_video_ram[((addr+x)*2) >> 1] & 0xff;
+		int attr = m_video_ram[((addr+x)*2) >> 1] >> 8;
 
-		color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
+		uint8_t color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
-		for( yi = 0; yi < lr; yi++)
+		for (int yi = 0; yi < lr; yi++)
 		{
-			tile_data = (m_char_rom[tile*16+yi]);
+			uint8_t tile_data = (m_char_rom[tile*16+yi]);
 
 			if(attr & 8)
 				tile_data^=0xff;
@@ -227,16 +224,15 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 			if(attr & 0x80 && m_screen->frame_number() & 0x10) //TODO: check for blinking interval
 				tile_data=0;
 
-			for( xi = 0; xi < 8; xi++)
+			for (int xi = 0; xi < 8; xi++)
 			{
-				int res_x,res_y;
-
-				res_x = x * 8 + xi;
-				res_y = y + yi;
+				int res_x = x * 8 + xi;
+				int res_y = y + yi;
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
+				uint8_t pen;
 				if(yi >= 16)
 					pen = 0;
 				else
@@ -381,9 +377,10 @@ QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
     FDD
 */
 
-static SLOT_INTERFACE_START( qx10_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void qx10_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 {
@@ -398,7 +395,7 @@ WRITE8_MEMBER( qx10_state::fdd_motor_w )
 {
 	m_fdcmotor = 1;
 
-	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(false);
+	m_floppy[0]->get_device()->mon_w(false);
 	// motor off controlled by clock
 }
 
@@ -406,8 +403,8 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 {
 	floppy_image_device *floppy1,*floppy2;
 
-	floppy1 = machine().device<floppy_connector>("upd765:0")->get_device();
-	floppy2 = machine().device<floppy_connector>("upd765:1")->get_device();
+	floppy1 = m_floppy[0]->get_device();
+	floppy2 = m_floppy[1]->get_device();
 
 	return m_fdcint |
 			/*m_fdcmotor*/ 0 << 1 |
@@ -560,20 +557,20 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x0c, 0x0d).rw(m_pic_s, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x10, 0x13).rw(m_scc, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x14, 0x17).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x18, 0x1b).portr("DSW").w(this, FUNC(qx10_state::qx10_18_w));
-	map(0x1c, 0x1f).w(this, FUNC(qx10_state::prom_sel_w));
-	map(0x20, 0x23).w(this, FUNC(qx10_state::cmos_sel_w));
+	map(0x18, 0x1b).portr("DSW").w(FUNC(qx10_state::qx10_18_w));
+	map(0x1c, 0x1f).w(FUNC(qx10_state::prom_sel_w));
+	map(0x20, 0x23).w(FUNC(qx10_state::cmos_sel_w));
 	map(0x2c, 0x2c).portr("CONFIG");
-	map(0x2d, 0x2d).rw(this, FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
-	map(0x30, 0x33).rw(this, FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
+	map(0x2d, 0x2d).rw(FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
+	map(0x30, 0x33).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-//  AM_RANGE(0x3a, 0x3a) GDC zoom
-//  AM_RANGE(0x3b, 0x3b) GDC light pen req
-	map(0x3c, 0x3d).rw(this, FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
+//  map(0x3a, 0x3a) GDC zoom
+//  map(0x3b, 0x3b) GDC light pen req
+	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-//  AM_RANGE(0xfc, 0xfd) Multi-Font comms
+//  map(0xfc, 0xfd) Multi-Font comms
 }
 
 /* Input ports */
@@ -676,7 +673,7 @@ static const gfx_layout qx10_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( qx10 )
+static GFXDECODE_START( gfx_qx10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 1 )
 GFXDECODE_END
 
@@ -684,9 +681,6 @@ void qx10_state::video_start()
 {
 	// allocate memory
 	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
-
-	// find memory regions
-	m_char_rom = memregion("chargen")->base();
 }
 
 PALETTE_INIT_MEMBER(qx10_state, qx10)
@@ -718,19 +712,20 @@ WRITE16_MEMBER( qx10_state::vram_w )
 
 void qx10_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(this, FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
+	map(0x00000, 0x3ffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
 }
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("qx10", QX10_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(qx10_state::qx10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
-	MCFG_CPU_PROGRAM_MAP(qx10_mem)
-	MCFG_CPU_IO_MAP(qx10_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",Z80, MAIN_CLK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(qx10_mem)
+	MCFG_DEVICE_IO_MAP(qx10_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -739,7 +734,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_SCREEN_UPDATE_DRIVER(qx10_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qx10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_qx10)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(qx10_state, qx10)
 
@@ -768,39 +763,39 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_DEVICE_ADD("pit8253_2", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLK / 8)
 	MCFG_PIT8253_CLK1(MAIN_CLK / 8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(qx10_state, keyboard_clk))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, qx10_state, keyboard_clk))
 	MCFG_PIT8253_CLK2(MAIN_CLK / 8)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("upd7201", z80dart_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(qx10_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, qx10_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("upd7201", UPD7201, MAIN_CLK/4) // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("kbd", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("kbd", rs232_port_device, write_txd))
 	// Channel B: RS232
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(qx10_state, keyboard_irq))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, qx10_state, keyboard_irq))
 
 	MCFG_DEVICE_ADD("8237dma_1", AM9517A, MAIN_CLK/4)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(qx10_state, dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(qx10_state, tc_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(qx10_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(qx10_state, memory_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8(qx10_state, fdc_dma_r))
-	MCFG_I8237_IN_IOR_1_CB(READ8(qx10_state, gdc_dack_r))
-	//MCFG_I8237_IN_IOR_2_CB(DEVREAD8("upd7220", upd7220_device, dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(qx10_state, fdc_dma_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(qx10_state, gdc_dack_w))
-	//MCFG_I8237_OUT_IOW_2_CB(DEVWRITE8("upd7220", upd7220_device, dack_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, qx10_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, qx10_state, tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, qx10_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, qx10_state, memory_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(*this, qx10_state, fdc_dma_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, qx10_state, gdc_dack_r))
+	//MCFG_I8237_IN_IOR_2_CB(READ8("upd7220", upd7220_device, dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, qx10_state, fdc_dma_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, qx10_state, gdc_dack_w))
+	//MCFG_I8237_OUT_IOW_2_CB(WRITE8("upd7220", upd7220_device, dack_w))
 	MCFG_DEVICE_ADD("8237dma_2", AM9517A, MAIN_CLK/4)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
@@ -811,19 +806,20 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
+
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(qx10_state, qx10_upd765_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("8237dma_1", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, qx10_state, qx10_upd765_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("8237dma_1", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd7201", upd7201_device, rxb_w))
 
-	MCFG_RS232_PORT_ADD("kbd", keyboard, "qx10")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "qx10")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd7201", z80dart_device, rxa_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -840,9 +836,9 @@ MACHINE_CONFIG_END
 ROM_START( qx10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v006", "v0.06")
-	ROMX_LOAD( "ipl006.bin", 0x0000, 0x0800, CRC(3155056a) SHA1(67cc0ae5055d472aa42eb40cddff6da69ffc6553), ROM_BIOS(1))
+	ROMX_LOAD( "ipl006.bin", 0x0000, 0x0800, CRC(3155056a) SHA1(67cc0ae5055d472aa42eb40cddff6da69ffc6553), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v003", "v0.03")
-	ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(2))
+	ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(1))
 
 	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
 	/* The first part of this rom looks like code for an embedded controller?
@@ -857,5 +853,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,      0,      qx10,    qx10,  qx10_state,  0,       "Epson",  "QX-10",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1983, qx10, 0,      0,      qx10,    qx10,  qx10_state, empty_init, "Epson", "QX-10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

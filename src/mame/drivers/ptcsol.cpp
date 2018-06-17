@@ -121,6 +121,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -177,7 +178,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	void kbd_put(u8 data);
-	DECLARE_DRIVER_INIT(sol20);
+	void init_sol20();
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -438,22 +439,22 @@ void sol20_state::sol20_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).rw(this, FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
-	map(0xf9, 0xf9).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0xfa, 0xfa).rw(this, FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
-	map(0xfb, 0xfb).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0xfc, 0xfc).r(this, FUNC(sol20_state::sol20_fc_r));
-	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
-	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
+	map(0xf8, 0xf8).rw(FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
+	map(0xf9, 0xf9).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfa, 0xfa).rw(FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
+	map(0xfb, 0xfb).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfc, 0xfc).r(FUNC(sol20_state::sol20_fc_r));
+	map(0xfd, 0xfd).rw(FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
+	map(0xfe, 0xfe).w(FUNC(sol20_state::sol20_fe_w));
 	map(0xff, 0xff).portr("S2");
-/*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
-    AM_RANGE(0xf9, 0xf9) serial data in, out
-    AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
-    AM_RANGE(0xfb, 0xfb) tape
-    AM_RANGE(0xfc, 0xfc) keyboard data in
-    AM_RANGE(0xfd, 0xfd) parallel data in, out
-    AM_RANGE(0xfe, 0xfe) scroll register
-    AM_RANGE(0xff, 0xff) sense switches */
+/*  map(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
+    map(0xf9, 0xf9) serial data in, out
+    map(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
+    map(0xfb, 0xfb) tape
+    map(0xfc, 0xfc) keyboard data in
+    map(0xfd, 0xfd) parallel data in, out
+    map(0xfe, 0xfe) scroll register
+    map(0xff, 0xff) sense switches */
 }
 
 /* Input ports */
@@ -607,7 +608,7 @@ void sol20_state::machine_reset()
 	m_rs232->write_rts(1);
 }
 
-DRIVER_INIT_MEMBER(sol20_state,sol20)
+void sol20_state::init_sol20()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
@@ -699,7 +700,7 @@ static const gfx_layout sol20_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( sol20 )
+static GFXDECODE_START( gfx_sol20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -714,10 +715,10 @@ void sol20_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(sol20_state::sol20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
-	MCFG_CPU_PROGRAM_MAP(sol20_mem)
-	MCFG_CPU_IO_MAP(sol20_io)
-	MCFG_I8085A_INTE(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
+	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
+	MCFG_DEVICE_IO_MAP(sol20_io)
+	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -728,17 +729,14 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sol20)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sol20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) // music board
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
-	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass2 speaker
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 2.00); // music board
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette")
@@ -752,15 +750,15 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_CASSETTE_INTERFACE("sol20_cass")
 
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // TMS6011NC
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_TX_CLOCK(4800.0)
 	MCFG_AY51013_RX_CLOCK(4800.0)
 	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_DEVICE_ADD("uart_s", AY51013, 0) // TMS6011NC
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_TX_CLOCK(4800.0)
 	MCFG_AY51013_RX_CLOCK(4800.0)
 	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
@@ -775,18 +773,18 @@ MACHINE_CONFIG_END
 ROM_START( sol20 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "solos", "SOLOS")
-	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )    // from solace emu
+	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(0) )    // from solace emu
 	ROM_SYSTEM_BIOS(1, "dpmon", "DPMON")
-	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(2) )
+	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "consol", "CONSOL")
-	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(3) )
+	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "solos2", "Solos Patched")
-	ROMX_LOAD( "solos2.bin", 0xc000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(4) ) // from Nama
+	ROMX_LOAD( "solos2.bin", 0xc000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(3) ) // from Nama
 	ROM_SYSTEM_BIOS(4, "bootload", "BOOTLOAD")
-	ROMX_LOAD( "bootload.bin", 0xc000, 0x0800, BAD_DUMP CRC(4261ac71) SHA1(4752408ac85d88857e8e9171c7f42bd623c9271e), ROM_BIOS(5) ) // from Nama
+	ROMX_LOAD( "bootload.bin", 0xc000, 0x0800, BAD_DUMP CRC(4261ac71) SHA1(4752408ac85d88857e8e9171c7f42bd623c9271e), ROM_BIOS(4) ) // from Nama
 //        This one doesn't work
 	ROM_SYSTEM_BIOS(5, "cuter", "CUTER")
-	ROMX_LOAD( "cuter.bin", 0xc000, 0x0800, BAD_DUMP CRC(39cca901) SHA1(33725d6da63e295552ee13f0a735d33aee8f0d17), ROM_BIOS(6) ) // from Nama
+	ROMX_LOAD( "cuter.bin", 0xc000, 0x0800, BAD_DUMP CRC(39cca901) SHA1(33725d6da63e295552ee13f0a735d33aee8f0d17), ROM_BIOS(5) ) // from Nama
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
@@ -794,5 +792,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY                             FULLNAME  FLAGS
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20_state, sol20, "Processor Technology Corporation", "SOL-20", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME  FLAGS
+COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "SOL-20", 0 )

@@ -5,11 +5,8 @@
 
 #pragma once
 
+#include "diserial.h"
 
-
-#define MCFG_SUNKBD_PORT_ADD(tag, slot_intf, def_slot) \
-	MCFG_DEVICE_ADD(tag, SUNKBD_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false)
 
 #define MCFG_SUNKBD_RXD_HANDLER(cb) \
 	devcb = &downcast<sun_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
@@ -23,7 +20,16 @@ class sun_keyboard_port_device : public device_t, public device_slot_interface
 	friend class device_sun_keyboard_port_interface;
 
 public:
-	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: sun_keyboard_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sun_keyboard_port_device();
 
 	// static configuration helpers
@@ -76,6 +82,6 @@ protected:
 DECLARE_DEVICE_TYPE(SUNKBD_PORT, sun_keyboard_port_device)
 
 
-SLOT_INTERFACE_EXTERN( default_sun_keyboard_devices );
+void default_sun_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_DEVICES_SUNKBD_SUNKBD_H

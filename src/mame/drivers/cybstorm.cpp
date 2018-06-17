@@ -87,10 +87,10 @@ void cybstorm_state::main_map(address_map &map)
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f0000, 0x3fffff).m(m_vadbank, FUNC(address_map_bank_device::amap16));
 	map(0x9f0000, 0x9f0003).portr("9F0000");
-	map(0x9f0010, 0x9f0013).r(this, FUNC(cybstorm_state::special_port1_r));
+	map(0x9f0010, 0x9f0013).r(FUNC(cybstorm_state::special_port1_r));
 	map(0x9f0031, 0x9f0031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0x9f0041, 0x9f0041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0x9f0050, 0x9f0053).w(this, FUNC(cybstorm_state::latch_w));
+	map(0x9f0050, 0x9f0053).w(FUNC(cybstorm_state::latch_w));
 	map(0xfb0000, 0xfb0003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0xfc0000, 0xfc0003).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xfd0000, 0xfd0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
@@ -207,7 +207,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( cybstorm )
+static GFXDECODE_START( gfx_cybstorm )
 	GFXDECODE_ENTRY( "gfx2", 0, pflayout,     0, 16 )       /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, molayout,  4096, 64 )       /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout, 16384, 64 )       /* characters 8x8 */
@@ -224,8 +224,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cybstorm_state::round2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x90000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cybstorm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybstorm)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -264,7 +264,8 @@ MACHINE_CONFIG_START(cybstorm_state::cybstorm)
 	round2(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("9F0010", 22)
@@ -345,9 +346,8 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
+void cybstorm_state::init_cybstorm()
 {
-
 }
 
 
@@ -358,4 +358,4 @@ DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
  *
  *************************************/
 
-GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, init_cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )

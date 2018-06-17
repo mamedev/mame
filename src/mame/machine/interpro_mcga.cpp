@@ -21,29 +21,31 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-ADDRESS_MAP_START(interpro_mcga_device::map)
-	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE16(control_r, control_w, 0xffff)
-	AM_RANGE(0x10, 0x13) AM_READWRITE16(error_r, error_w, 0xffff)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE8(frcrd_r, frcrd_w, 0xff)
-	AM_RANGE(0x20, 0x23) AM_READWRITE8(cbsub_r, cbsub_w, 0xff)
-	AM_RANGE(0x28, 0x2b) AM_READWRITE16(reg28_r, reg28_w, 0xffff)
-	AM_RANGE(0x30, 0x33) AM_READWRITE16(reg30_r, reg30_w, 0xffff)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE16(memsize_r, memsize_w, 0xffff)
-ADDRESS_MAP_END
+void interpro_mcga_device::map(address_map &map)
+{
+	map(0x00, 0x01).rw(FUNC(interpro_mcga_device::reg00_r), FUNC(interpro_mcga_device::reg00_w));
+	map(0x08, 0x09).rw(FUNC(interpro_mcga_device::control_r), FUNC(interpro_mcga_device::control_w));
+	map(0x10, 0x11).rw(FUNC(interpro_mcga_device::error_r), FUNC(interpro_mcga_device::error_w));
+	map(0x18, 0x18).rw(FUNC(interpro_mcga_device::frcrd_r), FUNC(interpro_mcga_device::frcrd_w));
+	map(0x20, 0x20).rw(FUNC(interpro_mcga_device::cbsub_r), FUNC(interpro_mcga_device::cbsub_w));
+	map(0x28, 0x29).rw(FUNC(interpro_mcga_device::reg28_r), FUNC(interpro_mcga_device::reg28_w));
+	map(0x30, 0x31).rw(FUNC(interpro_mcga_device::reg30_r), FUNC(interpro_mcga_device::reg30_w));
+	map(0x38, 0x39).rw(FUNC(interpro_mcga_device::memsize_r), FUNC(interpro_mcga_device::memsize_w));
+}
 
-ADDRESS_MAP_START(interpro_fmcc_device::map)
-	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE16(control_r, control_w, 0xffff)
-	AM_RANGE(0x10, 0x13) AM_READWRITE16(error_r, error_w, 0xffff)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE8(frcrd_r, frcrd_w, 0xff)
-	AM_RANGE(0x20, 0x23) AM_READWRITE8(cbsub_r, cbsub_w, 0xff)
-	AM_RANGE(0x28, 0x2b) AM_READWRITE16(reg28_r, reg28_w, 0xffff)
-	AM_RANGE(0x30, 0x33) AM_READWRITE16(reg30_r, reg30_w, 0xffff)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE16(memsize_r, memsize_w, 0xffff)
-	AM_RANGE(0x40, 0x43) AM_NOP // unknown
-	AM_RANGE(0x48, 0x4b) AM_READWRITE16(error_control_r, error_control_w, 0xffff)
-ADDRESS_MAP_END
+void interpro_fmcc_device::map(address_map &map)
+{
+	map(0x00, 0x01).rw(FUNC(interpro_fmcc_device::reg00_r), FUNC(interpro_fmcc_device::reg00_w));
+	map(0x08, 0x09).rw(FUNC(interpro_fmcc_device::control_r), FUNC(interpro_fmcc_device::control_w));
+	map(0x10, 0x11).rw(FUNC(interpro_fmcc_device::error_r), FUNC(interpro_fmcc_device::error_w));
+	map(0x18, 0x18).rw(FUNC(interpro_fmcc_device::frcrd_r), FUNC(interpro_fmcc_device::frcrd_w));
+	map(0x20, 0x20).rw(FUNC(interpro_fmcc_device::cbsub_r), FUNC(interpro_fmcc_device::cbsub_w));
+	map(0x28, 0x29).rw(FUNC(interpro_fmcc_device::reg28_r), FUNC(interpro_fmcc_device::reg28_w));
+	map(0x30, 0x31).rw(FUNC(interpro_fmcc_device::reg30_r), FUNC(interpro_fmcc_device::reg30_w));
+	map(0x38, 0x39).rw(FUNC(interpro_fmcc_device::memsize_r), FUNC(interpro_fmcc_device::memsize_w));
+	map(0x40, 0x43).noprw(); // unknown
+	map(0x48, 0x49).rw(FUNC(interpro_fmcc_device::error_control_r), FUNC(interpro_fmcc_device::error_control_w));
+}
 
 DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "Memory Controller Gate Array")
 DEFINE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device, "fmcc", "Fast Memory Control Chip")

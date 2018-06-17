@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -21,8 +22,8 @@
 class atarifb_state : public driver_device
 {
 public:
-	atarifb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	atarifb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_alphap1_videoram(*this, "p1_videoram"),
 		m_alphap2_videoram(*this, "p2_videoram"),
 		m_field_videoram(*this, "field_videoram"),
@@ -32,7 +33,47 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 0U)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
+	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
+	DECLARE_WRITE8_MEMBER(abaseb_out1_w);
+	DECLARE_WRITE8_MEMBER(soccer_out1_w);
+	DECLARE_WRITE8_MEMBER(atarifb_out2_w);
+	DECLARE_WRITE8_MEMBER(soccer_out2_w);
+	DECLARE_WRITE8_MEMBER(atarifb_out3_w);
+	DECLARE_READ8_MEMBER(atarifb_in0_r);
+	DECLARE_READ8_MEMBER(atarifb_in2_r);
+	DECLARE_READ8_MEMBER(atarifb4_in0_r);
+	DECLARE_READ8_MEMBER(atarifb4_in2_r);
+	DECLARE_WRITE8_MEMBER(atarifb_alpha1_videoram_w);
+	DECLARE_WRITE8_MEMBER(atarifb_alpha2_videoram_w);
+	DECLARE_WRITE8_MEMBER(atarifb_field_videoram_w);
+	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
+	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
+	TILE_GET_INFO_MEMBER(field_get_tile_info);
+	DECLARE_PALETTE_INIT(atarifb);
+	uint32_t screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void get_tile_info_common( tile_data &tileinfo, tilemap_memory_index tile_index, uint8_t *alpha_videoram );
+	void draw_playfield_and_alpha( bitmap_ind16 &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, int is_soccer );
+	void atarifb4(machine_config &config);
+	void atarifb(machine_config &config);
+	void soccer(machine_config &config);
+	void abaseb(machine_config &config);
+	void abaseb_map(address_map &map);
+	void atarifb4_map(address_map &map);
+	void atarifb_map(address_map &map);
+	void soccer_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	/* video-related */
 	required_shared_ptr<uint8_t> m_alphap1_videoram;
@@ -70,44 +111,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
-	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
-	DECLARE_WRITE8_MEMBER(abaseb_out1_w);
-	DECLARE_WRITE8_MEMBER(soccer_out1_w);
-	DECLARE_WRITE8_MEMBER(atarifb_out2_w);
-	DECLARE_WRITE8_MEMBER(soccer_out2_w);
-	DECLARE_WRITE8_MEMBER(atarifb_out3_w);
-	DECLARE_READ8_MEMBER(atarifb_in0_r);
-	DECLARE_READ8_MEMBER(atarifb_in2_r);
-	DECLARE_READ8_MEMBER(atarifb4_in0_r);
-	DECLARE_READ8_MEMBER(atarifb4_in2_r);
-	DECLARE_WRITE8_MEMBER(atarifb_alpha1_videoram_w);
-	DECLARE_WRITE8_MEMBER(atarifb_alpha2_videoram_w);
-	DECLARE_WRITE8_MEMBER(atarifb_field_videoram_w);
-	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
-	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
-	TILE_GET_INFO_MEMBER(field_get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(atarifb);
-	uint32_t screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void get_tile_info_common( tile_data &tileinfo, tilemap_memory_index tile_index, uint8_t *alpha_videoram );
-	void draw_playfield_and_alpha( bitmap_ind16 &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, int is_soccer );
-	void atarifb4(machine_config &config);
-	void atarifb(machine_config &config);
-	void soccer(machine_config &config);
-	void abaseb(machine_config &config);
-	void abaseb_map(address_map &map);
-	void atarifb4_map(address_map &map);
-	void atarifb_map(address_map &map);
-	void soccer_map(address_map &map);
+	output_finder<2> m_leds;
 };
 
 /*----------- defined in audio/atarifb.c -----------*/
-DISCRETE_SOUND_EXTERN( atarifb );
-DISCRETE_SOUND_EXTERN( abaseb );
+DISCRETE_SOUND_EXTERN( atarifb_discrete );
+DISCRETE_SOUND_EXTERN( abaseb_discrete );

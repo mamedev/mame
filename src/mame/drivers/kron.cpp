@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/pckeybrd.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VERBOSE 2
@@ -200,14 +201,14 @@ void kron180_state::kron180_mem(address_map &map)
 void kron180_state::kron180_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x000f).w(this, FUNC(kron180_state::sn74259_w));
-	map(0x0010, 0x001f).rw(this, FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
-	map(0x0020, 0x002f).w(this, FUNC(kron180_state::wkb_w));
-	map(0x0030, 0x003f).r(this, FUNC(kron180_state::sn74299_r));
-	map(0x0040, 0x004f).w(this, FUNC(kron180_state::sn74299_w));
-	map(0x0050, 0x005f).w(this, FUNC(kron180_state::txen_w));
-	map(0x0060, 0x006f).w(this, FUNC(kron180_state::kbd_reset_w));
-	map(0x0070, 0x007f).w(this, FUNC(kron180_state::dreq_w));
+	map(0x0000, 0x000f).w(FUNC(kron180_state::sn74259_w));
+	map(0x0010, 0x001f).rw(FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
+	map(0x0020, 0x002f).w(FUNC(kron180_state::wkb_w));
+	map(0x0030, 0x003f).r(FUNC(kron180_state::sn74299_r));
+	map(0x0040, 0x004f).w(FUNC(kron180_state::sn74299_w));
+	map(0x0050, 0x005f).w(FUNC(kron180_state::txen_w));
+	map(0x0060, 0x006f).w(FUNC(kron180_state::kbd_reset_w));
+	map(0x0070, 0x007f).w(FUNC(kron180_state::dreq_w));
 }
 
 /* Input ports */
@@ -298,9 +299,9 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
  */
 MACHINE_CONFIG_START(kron180_state::kron180)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", Z180, XTAL(12'288'000))
-	MCFG_CPU_PROGRAM_MAP (kron180_mem)
-	MCFG_CPU_IO_MAP(kron180_iomap)
+	MCFG_DEVICE_ADD ("maincpu", Z180, XTAL(12'288'000))
+	MCFG_DEVICE_PROGRAM_MAP (kron180_mem)
+	MCFG_DEVICE_IO_MAP(kron180_iomap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -314,7 +315,7 @@ MACHINE_CONFIG_START(kron180_state::kron180)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard TODO: fix it, doesn't work yet */
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(kron180_state, keyb_interrupt))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, kron180_state, keyb_interrupt))
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -327,5 +328,5 @@ ROM_START (kron180)
 ROM_END
 
 /* Driver */
-//     YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS         INIT  COMPANY        FULLNAME      FLAGS
-COMP ( 1995, kron180,      0,      0,       kron180,        kron180, kron180_state, 0,    "Kron Ltd",    "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS
+COMP ( 1995, kron180, 0,      0,      kron180, kron180, kron180_state, empty_init, "Kron Ltd", "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

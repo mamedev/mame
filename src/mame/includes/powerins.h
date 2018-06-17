@@ -1,21 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "machine/nmk112.h"
+#include "emupal.h"
 #include "screen.h"
 
 class powerins_state : public driver_device
 {
 public:
-	powerins_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	powerins_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_vctrl_0(*this, "vctrl_0"),
-		m_vram_0(*this, "vram_0"),
-		m_vram_1(*this, "vram_1"),
-		m_spriteram(*this, "spriteram") { }
+		m_vram(*this, "vram_%u", 0U),
+		m_spriteram(*this, "spriteram"),
+		m_okibank(*this, "okibank") { }
 
 
 	required_device<cpu_device> m_maincpu;
@@ -24,19 +25,20 @@ public:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint16_t> m_vctrl_0;
-	required_shared_ptr<uint16_t> m_vram_0;
-	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1;
+	optional_memory_bank m_okibank;
+
+	std::unique_ptr<uint16_t[]> m_spritebuffer[2];
+
+	tilemap_t *m_tilemap[2];
 	int m_tile_bank;
 
 	DECLARE_WRITE8_MEMBER(powerinsa_okibank_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(powerinsb_fake_ym2203_r);
 
 	DECLARE_MACHINE_START(powerinsa);
@@ -44,6 +46,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset_0);
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	virtual void video_start() override;
 

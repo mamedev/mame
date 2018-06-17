@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
-	DECLARE_DRIVER_INIT(megaphx);
+	void init_megaphx();
 
 	void megaphx(machine_config &config);
 	void megaphx_68k_map(address_map &map);
@@ -374,37 +374,37 @@ WRITE_LINE_MEMBER( megaphx_state::dsw_w )
 }
 
 MACHINE_CONFIG_START(megaphx_state::megaphx)
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(megaphx_68k_map)
 
-	MCFG_CPU_ADD("pic", PIC16C54, 6_MHz_XTAL) // correct?
-	MCFG_PIC16C5x_READ_A_CB(READ8(megaphx_state, pic_porta_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(megaphx_state, pic_porta_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(megaphx_state, pic_portb_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(megaphx_state, pic_portb_w))
+	MCFG_DEVICE_ADD("pic", PIC16C54, 6_MHz_XTAL) // correct?
+	MCFG_PIC16C5x_READ_A_CB(READ8(*this, megaphx_state, pic_porta_r))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, megaphx_state, pic_porta_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, megaphx_state, pic_portb_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, megaphx_state, pic_portb_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_TTL166_ADD("ttl166_1")
+	MCFG_DEVICE_ADD("ttl166_1", TTL166)
 	MCFG_TTL166_DATA_CB(IOPORT("DSW1"))
-	MCFG_TTL166_QH_CB(DEVWRITELINE("ttl166_2", ttl166_device, serial_w))
+	MCFG_TTL166_QH_CB(WRITELINE("ttl166_2", ttl166_device, serial_w))
 
-	MCFG_TTL166_ADD("ttl166_2")
+	MCFG_DEVICE_ADD("ttl166_2", TTL166)
 	MCFG_TTL166_DATA_CB(IOPORT("DSW2"))
-	MCFG_TTL166_QH_CB(WRITELINE(megaphx_state, dsw_w))
+	MCFG_TTL166_QH_CB(WRITELINE(*this, megaphx_state, dsw_w))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(megaphx_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(megaphx_state, ppi_portc_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, megaphx_state, ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, megaphx_state, ppi_portc_w))
 
 	MCFG_INDER_VIDEO_ADD("inder_vid")
 
 	MCFG_INDER_AUDIO_ADD("inder_sb")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(megaphx_state, megaphx)
+void megaphx_state::init_megaphx()
 {
 	uint16_t *src = (uint16_t*)memregion( "boot" )->base();
 	// copy vector table? - it must be writable because the game write the irq vector..
@@ -468,5 +468,5 @@ ROM_START( hamboy )
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
 ROM_END
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  megaphx, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, init_megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  init_megaphx, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

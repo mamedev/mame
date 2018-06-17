@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class seicross_state : public driver_device
 {
@@ -55,7 +56,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(seicross);
-	DECLARE_DRIVER_INIT(friskytb);
+	void init_friskytb();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -445,6 +445,7 @@
 #include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -504,8 +505,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void bank_c000_map(address_map &map);
 	void mastboy_io_map(address_map &map);
 	void mastboy_map(address_map &map);
@@ -595,12 +595,12 @@ WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
-	m_msm->data_w(m_m5205_next);
+	m_msm->write_data(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
 	if(!m_m5205_part)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -612,12 +612,10 @@ WRITE_LINE_MEMBER(mastboy_state::irq0_ack_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
+WRITE_LINE_MEMBER(mastboy_state::vblank_irq)
 {
-	if (m_outlatch->q0_r() == 1)
-	{
-		device.execute().set_input_line(0, ASSERT_LINE);
-	}
+	if (state && m_outlatch->q0_r() == 1)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /* Memory Maps */
@@ -640,20 +638,21 @@ void mastboy_state::mastboy_map(address_map &map)
 	map(0xff810, 0xff817).portr("DSW1");
 	map(0xff818, 0xff81f).portr("DSW2");
 
-	map(0xff820, 0xff827).w(this, FUNC(mastboy_state::bank_w));
+	map(0xff820, 0xff827).w(FUNC(mastboy_state::bank_w));
 	map(0xff828, 0xff829).w("saa", FUNC(saa1099_device::write));
-	map(0xff830, 0xff830).w(this, FUNC(mastboy_state::msm5205_data_w));
+	map(0xff830, 0xff830).w(FUNC(mastboy_state::msm5205_data_w));
 	map(0xff838, 0xff83f).w(m_outlatch, FUNC(ls259_device::write_d0));
 
 	map(0xffc00, 0xfffff).ram(); // Internal RAM
 }
 
 // TODO : banked map is mirrored?
-ADDRESS_MAP_START(mastboy_state::bank_c000_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x1e0000) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
-	AM_RANGE(0x010000, 0x01ffff) AM_MIRROR(0x1e0000) AM_ROM AM_REGION("vrom", 0)
-	AM_RANGE(0x200000, 0x3fffff) AM_ROM AM_REGION("bankedrom", 0)
-ADDRESS_MAP_END
+void mastboy_state::bank_c000_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
+	map(0x010000, 0x01ffff).mirror(0x1e0000).rom().region("vrom", 0);
+	map(0x200000, 0x3fffff).rom().region("bankedrom", 0);
+}
 
 /* Ports */
 
@@ -670,8 +669,8 @@ READ8_MEMBER(mastboy_state::nmi_read)
 
 void mastboy_state::mastboy_io_map(address_map &map)
 {
-	map(0x38, 0x38).r(this, FUNC(mastboy_state::port_38_read));
-	map(0x39, 0x39).r(this, FUNC(mastboy_state::nmi_read));
+	map(0x38, 0x38).r(FUNC(mastboy_state::port_38_read));
+	map(0x39, 0x39).r(FUNC(mastboy_state::nmi_read));
 }
 
 /* Input Ports */
@@ -784,7 +783,7 @@ static const gfx_layout tiles8x8_layout_2 =
 };
 
 
-static GFXDECODE_START( mastboy )
+static GFXDECODE_START( gfx_mastboy )
 	GFXDECODE_RAM(   "vram", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "vrom", 0, tiles8x8_layout_2, 0, 16 )
 GFXDECODE_END
@@ -810,19 +809,18 @@ void mastboy_state::machine_reset()
 
 
 MACHINE_CONFIG_START(mastboy_state::mastboy)
-	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
-	MCFG_CPU_PROGRAM_MAP(mastboy_map)
-	MCFG_CPU_IO_MAP(mastboy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
+	MCFG_DEVICE_PROGRAM_MAP(mastboy_map)
+	MCFG_DEVICE_IO_MAP(mastboy_io_map)
 
 	MCFG_EEPROM_2816_ADD("earom")
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC17
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mastboy_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, s2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, s1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mastboy_state, irq0_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, s2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, s1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
 
 	MCFG_DEVICE_ADD("bank_c000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_c000_map)
@@ -839,17 +837,18 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mastboy_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mastboy_state, adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -999,8 +998,8 @@ ROM_START( mastboyia )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboya, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboy,   0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboya,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A, hack?)", MACHINE_SUPPORTS_SAVE )
 // are the Italian sets legitimate, or also hacked, the startup display is incorrect displaying 'MARK' instead of 'PLAYMARK' Maybe the internal ROM should differ instead?
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyi,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

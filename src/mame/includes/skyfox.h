@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class skyfox_state : public driver_device
@@ -37,7 +38,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(skyfox);
+	void init_skyfox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(skyfox);

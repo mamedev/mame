@@ -80,7 +80,7 @@ function cheatfind.startplugin()
 			elseif data.shift < 0 then
 				local s = -data.shift
 				local read = (s == 1) and space.read_u16 or (s == 2) and space.read_u32 or (s == 3) and space.read_u64 or space.read_u8
-				local pack = (s == 1) and "<H" or (s == 2) and "<L" or (s == 3) and "<J" or "B"
+				local pack = (s == 1) and "<I2" or (s == 2) and "<I4" or (s == 3) and "<I8" or "B"
 				for i = start, start + (size >> s) do
 					if j < 65536 then
 						temp[j] = string.pack(pack, read(space, i))
@@ -254,7 +254,7 @@ function cheatfind.startplugin()
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
-	local formtable = { "B", "b", "<H", ">H", "<h", ">h", "<L", ">L", "<l", ">l", "<J", ">J", "<j", ">j" }
+	local formtable = { "I1", "i1", "<I2", ">I2", "<i2", ">i2", "<I4", ">I4", "<i4", ">i4", "<I8", ">I8", "<i8", ">i8" }
 	local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
 			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64" }
 	local width = 1
@@ -674,12 +674,12 @@ function cheatfind.startplugin()
 					end
 					return mpairs_it, list, 0
 				end
-				local bitwidth = formtable[width]:sub(2, 2):lower()
-				if bitwidth == "h" then
+				local bitwidth = formtable[width]:sub(3, 3):lower()
+				if bitwidth == "2" then
 					bitwidth = " %04x"
-				elseif bitwidth == "l" then
+				elseif bitwidth == "4" then
 					bitwidth = " %08x"
-				elseif bitwidth == "j" then
+				elseif bitwidth == "8" then
 					bitwidth = " %016x"
 				else
 					bitwidth = " %02x"
@@ -688,18 +688,18 @@ function cheatfind.startplugin()
 				local function match_exec(match)
 					local dev = devtable[devcur]
 					local cheat = { desc = string.format(_("Test cheat at addr %08X"), match.addr), script = {} }
-					local wid = formtable[width]:sub(2, 2):lower()
+					local wid = formtable[width]:sub(3, 3):lower()
 					local widchar
 					local form
-					if wid == "h" then
+					if wid == "2" then
 						wid = "u16"
 						form = "%08x %04x"
 						widchar = "w"
-					elseif wid == "l" then
+					elseif wid == "4" then
 						wid = "u32"
 						form = "%08x %08x"
 						widchart = "d"
-					elseif wid == "j" then
+					elseif wid == "8" then
 						wid = "u64"
 						form = "%08x %016x"
 						widchar = "q"
@@ -730,9 +730,13 @@ function cheatfind.startplugin()
 						menu_type = 1
 						local setname = emu.romname()
 						if emu.softname() ~= "" then
-							for name, image in pairs(manager:machine().images) do
-								if image:exists() and image:software_list_name() ~= "" then
-									setname = image:software_list_name() .. "/" .. emu.softname()
+							if emu.softname():find(":") then
+								filename = emu.softname():gsub(":", "/")
+							else
+								for name, image in pairs(manager:machine().images) do
+									if image:exists() and image:software_list_name() ~= "" then
+										setname = image:software_list_name() .. "/" .. emu.softname()
+									end
 								end
 							end
 						end

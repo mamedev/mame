@@ -12,6 +12,7 @@
 
 #include "audio/cheekyms.h"
 #include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cheekyms_state : public driver_device

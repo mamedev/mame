@@ -346,42 +346,43 @@ void pc8401a_state::pc8401a_io(address_map &map)
 	map.global_mask(0xff);
 }
 
-ADDRESS_MAP_START(pc8401a_state::pc8500_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("Y.0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("Y.1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("Y.2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("Y.3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("Y.4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("Y.5")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("Y.6")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("Y.7")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("Y.8")
-	AM_RANGE(0x09, 0x09) AM_READ_PORT("Y.9")
-	AM_RANGE(0x10, 0x10) AM_WRITE(rtc_cmd_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(mmr_r, mmr_w)
+void pc8401a_state::pc8500_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("Y.0");
+	map(0x01, 0x01).portr("Y.1");
+	map(0x02, 0x02).portr("Y.2");
+	map(0x03, 0x03).portr("Y.3");
+	map(0x04, 0x04).portr("Y.4");
+	map(0x05, 0x05).portr("Y.5");
+	map(0x06, 0x06).portr("Y.6");
+	map(0x07, 0x07).portr("Y.7");
+	map(0x08, 0x08).portr("Y.8");
+	map(0x09, 0x09).portr("Y.9");
+	map(0x10, 0x10).w(FUNC(pc8401a_state::rtc_cmd_w));
+	map(0x20, 0x20).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x30).rw(FUNC(pc8401a_state::mmr_r), FUNC(pc8401a_state::mmr_w));
 //  AM_RANGE(0x31, 0x31)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(rtc_r, rtc_ctrl_w)
+	map(0x40, 0x40).rw(FUNC(pc8401a_state::rtc_r), FUNC(pc8401a_state::rtc_ctrl_w));
 //  AM_RANGE(0x41, 0x41)
 //  AM_RANGE(0x50, 0x51)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SED1330_TAG, sed1330_device, status_r, data_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SED1330_TAG, sed1330_device, data_r, command_w)
-	AM_RANGE(0x70, 0x70) AM_READWRITE(port70_r, port70_w)
-	AM_RANGE(0x71, 0x71) AM_READWRITE(port71_r, port71_w)
+	map(0x60, 0x60).rw(m_lcdc, FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
+	map(0x61, 0x61).rw(m_lcdc, FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));
+	map(0x70, 0x70).rw(FUNC(pc8401a_state::port70_r), FUNC(pc8401a_state::port70_w));
+	map(0x71, 0x71).rw(FUNC(pc8401a_state::port71_r), FUNC(pc8401a_state::port71_w));
 //  AM_RANGE(0x80, 0x80) modem status, set to 0xff to boot
 //  AM_RANGE(0x8b, 0x8b)
 //  AM_RANGE(0x90, 0x93)
 //  AM_RANGE(0xa0, 0xa1)
-	AM_RANGE(0x98, 0x98) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0xb0, 0xb3) AM_WRITE(io_rom_addr_w)
-	AM_RANGE(0xb3, 0xb3) AM_READ(io_rom_data_r)
+	map(0x98, 0x98).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x99, 0x99).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xb0, 0xb3).w(FUNC(pc8401a_state::io_rom_addr_w));
+	map(0xb3, 0xb3).r(FUNC(pc8401a_state::io_rom_data_r));
 //  AM_RANGE(0xc8, 0xc8)
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-ADDRESS_MAP_END
+	map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input Ports */
 
@@ -572,9 +573,9 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
-	MCFG_CPU_IO_MAP(pc8401a_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
+	MCFG_DEVICE_PROGRAM_MAP(pc8401a_mem)
+	MCFG_DEVICE_IO_MAP(pc8401a_io)
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
@@ -583,17 +584,17 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(pc8401a_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc8401a_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
 	pc8401a_video(config);
@@ -614,9 +615,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
-	MCFG_CPU_IO_MAP(pc8500_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
+	MCFG_DEVICE_PROGRAM_MAP(pc8401a_mem)
+	MCFG_DEVICE_IO_MAP(pc8500_io)
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
@@ -625,17 +626,17 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(pc8401a_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc8401a_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
 	pc8500_video(config);
@@ -674,7 +675,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
-COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401BD", MACHINE_NOT_WORKING)
-COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, pc8500_state,  0,      "NEC",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME */
+COMP( 1984, pc8401a,  0,       0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1984, pc8401bd, pc8401a, 0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401BD", MACHINE_NOT_WORKING)
+COMP( 1985, pc8500,   0,       0,      pc8500,  pc8401a, pc8500_state,  empty_init, "NEC",   "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

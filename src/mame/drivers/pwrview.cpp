@@ -21,13 +21,13 @@ class pwrview_state : public driver_device
 {
 public:
 	pwrview_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pit(*this, "pit"),
-	m_bios(*this, "bios"),
-	m_ram(*this, "ram"),
-	m_biosbank(*this, "bios_bank"),
-	m_vram(64*1024)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pit(*this, "pit"),
+		m_bios(*this, "bios"),
+		m_ram(*this, "ram"),
+		m_biosbank(*this, "bios_bank"),
+		m_vram(64*1024)
 	{ }
 
 	DECLARE_READ16_MEMBER(bank0_r);
@@ -340,72 +340,73 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 void pwrview_state::bios_bank(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("bios", 0);
-	map(0x00000, 0x07fff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x00000, 0x07fff).w(FUNC(pwrview_state::nmimem_w));
 
-	map(0x08000, 0x0ffff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x08000, 0x0ffff).w(FUNC(pwrview_state::nmimem_w));
 	map(0x0be00, 0x0be7f).bankrw("vram1");
-	map(0x0befe, 0x0beff).rw(this, FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
+	map(0x0befe, 0x0beff).rw(FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
 	map(0x0bf00, 0x0bf7f).bankrw("vram2");
-	map(0x0bffe, 0x0bfff).rw(this, FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
+	map(0x0bffe, 0x0bfff).rw(FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
 	map(0x0c000, 0x0ffff).rom().region("bios", 0x4000);
 
 	map(0x10000, 0x17fff).ram();
 
-	map(0x18000, 0x1ffff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x18000, 0x1ffff).w(FUNC(pwrview_state::nmimem_w));
 
 	map(0x1be00, 0x1be7f).bankrw("vram1");
-	map(0x1befe, 0x1beff).rw(this, FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
+	map(0x1befe, 0x1beff).rw(FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
 	map(0x1bf00, 0x1bf7f).bankrw("vram2");
-	map(0x1bffe, 0x1bfff).rw(this, FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
+	map(0x1bffe, 0x1bfff).rw(FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
 	map(0x1c000, 0x1ffff).rom().region("bios", 0x4000);
 }
 
 void pwrview_state::pwrview_map(address_map &map)
 {
 	map(0x00000, 0xf7fff).ram().share("ram");
-	map(0x00000, 0x003ff).rw(this, FUNC(pwrview_state::bank0_r), FUNC(pwrview_state::bank0_w));
+	map(0x00000, 0x003ff).rw(FUNC(pwrview_state::bank0_r), FUNC(pwrview_state::bank0_w));
 	map(0xf8000, 0xfffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
 }
 
 void pwrview_state::pwrview_fetch_map(address_map &map)
 {
 	map(0x00000, 0xf7fff).ram().share("ram");
-	map(0x00000, 0x003ff).r(this, FUNC(pwrview_state::bank0_r));
-	map(0xf8000, 0xfffff).r(this, FUNC(pwrview_state::fbios_r));
+	map(0x00000, 0x003ff).r(FUNC(pwrview_state::bank0_r));
+	map(0xf8000, 0xfffff).r(FUNC(pwrview_state::fbios_r));
 }
 
 void pwrview_state::pwrview_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(pwrview_state::nmiio_r), FUNC(pwrview_state::nmiio_w));
-	map(0xc001, 0xc001).rw(this, FUNC(pwrview_state::unk1_r), FUNC(pwrview_state::unk1_w));
-	map(0xc002, 0xc005).rw(this, FUNC(pwrview_state::led_r), FUNC(pwrview_state::led_w)).umask16(0xff00);
-	map(0xc007, 0xc007).r(this, FUNC(pwrview_state::rotary_r));
-	map(0xc009, 0xc009).rw(this, FUNC(pwrview_state::unk2_r), FUNC(pwrview_state::unk2_w));
-	map(0xc00b, 0xc00b).r(this, FUNC(pwrview_state::err_r));
+	map(0x0000, 0xffff).rw(FUNC(pwrview_state::nmiio_r), FUNC(pwrview_state::nmiio_w));
+	map(0xc001, 0xc001).rw(FUNC(pwrview_state::unk1_r), FUNC(pwrview_state::unk1_w));
+	map(0xc002, 0xc005).rw(FUNC(pwrview_state::led_r), FUNC(pwrview_state::led_w)).umask16(0xff00);
+	map(0xc007, 0xc007).r(FUNC(pwrview_state::rotary_r));
+	map(0xc009, 0xc009).rw(FUNC(pwrview_state::unk2_r), FUNC(pwrview_state::unk2_w));
+	map(0xc00b, 0xc00b).r(FUNC(pwrview_state::err_r));
 	map(0xc00c, 0xc00d).ram();
-	map(0xc080, 0xc080).rw(this, FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
+	map(0xc080, 0xc080).rw(FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
 	map(0xc088, 0xc088).w("crtc", FUNC(hd6845_device::address_w));
 	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xc280, 0xc287).rw(this, FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
+	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
 	map(0xc2c0, 0xc2c0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc2c2, 0xc2c2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
-	map(0xc2e6, 0xc2e6).r(this, FUNC(pwrview_state::pitclock_r));
+	map(0xc2e6, 0xc2e6).r(FUNC(pwrview_state::pitclock_r));
 }
 
-static SLOT_INTERFACE_START(pwrview_floppies)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void pwrview_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(pwrview_state::pwrview)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(pwrview_map)
-	MCFG_CPU_OPCODES_MAP(pwrview_fetch_map)
-	MCFG_CPU_IO_MAP(pwrview_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pwrview_map)
+	MCFG_DEVICE_OPCODES_MAP(pwrview_fetch_map)
+	MCFG_DEVICE_IO_MAP(pwrview_io)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
@@ -418,8 +419,8 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("fdc", true, true) // Rockwell R7675P
-	//MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
-	//MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
+	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
@@ -442,8 +443,8 @@ MACHINE_CONFIG_END
 ROM_START(pwrview)
 	ROM_REGION(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "bios", "bios")
-	ROMX_LOAD("215856-003.bin", 0x0000, 0x4000, CRC(1fa2cd11) SHA1(b4755c7d5200a423a750ecf71c0aed33e364138b), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("215856-003.bin", 0x0000, 0x4000, CRC(1fa2cd11) SHA1(b4755c7d5200a423a750ecf71c0aed33e364138b), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
-COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, 0, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)
+COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, empty_init, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)

@@ -5,6 +5,7 @@
 #include "machine/mb3773.h"
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class aquarium_state : public driver_device
@@ -56,7 +57,7 @@ public:
 	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
-	DECLARE_DRIVER_INIT(aquarium);
+	void init_aquarium();
 	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_bak_tile_info);

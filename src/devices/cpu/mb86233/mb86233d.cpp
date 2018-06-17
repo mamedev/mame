@@ -77,11 +77,11 @@
     Top 3 bits = instruction group, except when it isn't.
 
 
-	Conditions are 5 bits, but only a subset is known, see condition()
+    Conditions are 5 bits, but only a subset is known, see condition()
 
-	Alu can theorically be on C or D registers, but since C doesn't
-	exist, we don't know how C access is encoded.  The operation
-	itself is 5-bits for the "full" alu range.
+    Alu can theorically be on C or D registers, but since C doesn't
+    exist, we don't know how C access is encoded.  The operation
+    itself is 5-bits for the "full" alu range.
 
  */
 

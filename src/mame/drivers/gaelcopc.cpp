@@ -26,6 +26,7 @@ motherboard bioses.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -71,8 +72,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
-	MCFG_CPU_PROGRAM_MAP(gaelcopc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
+	MCFG_DEVICE_PROGRAM_MAP(gaelcopc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -133,8 +134,8 @@ ROM_START(tuningrc)
 ROM_END
 
 
-GAME( 2003, tokyocop,  0,         gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_IS_SKELETON )
-GAME( 2003, tokyocopk, tokyocop,  gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Tokyo Cop (US, kit version)",         MACHINE_IS_SKELETON )
-GAME( 2003, tokyocopi, tokyocop,  gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)",                   MACHINE_IS_SKELETON )
-GAME( 2004, rriders,   0,         gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
-GAME( 2005, tuningrc,  0,         gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race",     MACHINE_IS_SKELETON )
+GAME( 2003, tokyocop,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopk, tokyocop, gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, kit version)",         MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopi, tokyocop, gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (Italy)",                   MACHINE_IS_SKELETON )
+GAME( 2004, rriders,   0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
+GAME( 2005, tuningrc,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Gaelco Championship Tuning Race",     MACHINE_IS_SKELETON )

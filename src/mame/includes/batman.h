@@ -13,6 +13,7 @@
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "video/atarivad.h"
+#include "emupal.h"
 #include "screen.h"
 
 class batman_state : public driver_device
@@ -26,7 +27,7 @@ public:
 		m_vad(*this, "vad")
 	{ }
 
-	DECLARE_DRIVER_INIT(batman);
+	void init_batman();
 	void batman(machine_config &config);
 
 protected:

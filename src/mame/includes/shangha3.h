@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 class shangha3_state : public driver_device
@@ -55,8 +56,8 @@ public:
 	// blocken specific
 	DECLARE_WRITE16_MEMBER(blocken_coinctrl_w);
 
-	DECLARE_DRIVER_INIT(shangha3);
-	DECLARE_DRIVER_INIT(heberpop);
+	void init_shangha3();
+	void init_heberpop();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

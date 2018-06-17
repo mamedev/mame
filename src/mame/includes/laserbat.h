@@ -16,6 +16,7 @@
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -60,11 +61,19 @@ public:
 	{
 	}
 
+	void init_laserbat();
+
+	void laserbat_base(machine_config &config);
+	void laserbat_io_map(address_map &map);
+	void laserbat_map(address_map &map);
+
+protected:
+	enum { TIMER_SCANLINE };
+
 	// control ports
 	DECLARE_WRITE8_MEMBER(ct_io_w);
 	DECLARE_READ8_MEMBER(rrowx_r);
 
-	DECLARE_DRIVER_INIT(laserbat);
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
 
 	// video memory and control ports
@@ -83,12 +92,6 @@ public:
 	// running the video
 	virtual void video_start() override;
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void laserbat_base(machine_config &config);
-	void laserbat_io_map(address_map &map);
-	void laserbat_map(address_map &map);
-protected:
-	enum { TIMER_SCANLINE };
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -115,16 +118,16 @@ protected:
 	// stuff for rendering video
 	emu_timer       *m_scanline_timer;
 	bitmap_ind16    m_bitmap;
-	uint8_t const     *m_gfx1;
-	uint8_t const     *m_gfx2;
+	uint8_t const   *m_gfx1;
+	uint8_t const   *m_gfx2;
 
 	// control lines
 	unsigned        m_input_mux;
 	bool            m_mpx_p_1_2;
 
 	// RAM used by TTL video hardware, writable by CPU
-	uint8_t           m_bg_ram[0x400];    // background tilemap
-	uint8_t           m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
+	uint8_t         m_bg_ram[0x400];    // background tilemap
+	uint8_t         m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
 	bool            m_mpx_bkeff;        // select between writing background and effects memory
 
 	// signals affecting the TTL-generated 32x32 sprite
@@ -162,17 +165,18 @@ public:
 	{
 	}
 
+	void laserbat(machine_config &config);
+
+protected:
+
+	// initialisation/startup
+	virtual void machine_start() override;
+
 	// video initialisation
 	DECLARE_PALETTE_INIT(laserbat);
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
-
-	void laserbat(machine_config &config);
-protected:
-
-	// initialisation/startup
-	virtual void machine_start() override;
 
 	// sound board devices
 	required_device<sn76477_device> m_csg;
@@ -193,6 +197,10 @@ public:
 	{
 	}
 
+	void catnmous(machine_config &config);
+
+protected:
+
 	// video initialisation
 	DECLARE_PALETTE_INIT(catnmous);
 
@@ -200,7 +208,5 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
-	void catnmous(machine_config &config);
-protected:
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };

@@ -5,6 +5,10 @@
     Atari System 1 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATARISY1_H
+#define MAME_INCLUDES_ATARISY1_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/adc0808.h"
@@ -19,20 +23,21 @@ class atarisy1_state : public atarigen_state
 {
 public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundcomm(*this, "soundcomm"),
-			m_bankselect(*this, "bankselect"),
-			m_mob(*this, "mob"),
-			m_adc(*this, "adc"),
-			m_ajsint(*this, "ajsint"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_yscroll_reset_timer(*this, "yreset_timer"),
-			m_scanline_timer(*this, "scan_timer"),
-			m_int3off_timer(*this, "int3off_timer"),
-			m_tms(*this, "tms"),
-			m_outlatch(*this, "outlatch") { }
+		: atarigen_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundcomm(*this, "soundcomm")
+		, m_bankselect(*this, "bankselect")
+		, m_mob(*this, "mob")
+		, m_adc(*this, "adc")
+		, m_ajsint(*this, "ajsint")
+		, m_playfield_tilemap(*this, "playfield")
+		, m_alpha_tilemap(*this, "alpha")
+		, m_yscroll_reset_timer(*this, "yreset_timer")
+		, m_scanline_timer(*this, "scan_timer")
+		, m_int3off_timer(*this, "int3off_timer")
+		, m_tms(*this, "tms")
+		, m_outlatch(*this, "outlatch")
+	{ }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
@@ -76,19 +81,17 @@ public:
 	DECLARE_WRITE8_MEMBER(adc_w);
 	DECLARE_READ16_MEMBER(trakball_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE8_MEMBER(via_pa_w);
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);
 	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_DRIVER_INIT(roadblst);
-	DECLARE_DRIVER_INIT(peterpak);
-	DECLARE_DRIVER_INIT(marble);
-	DECLARE_DRIVER_INIT(roadrunn);
-	DECLARE_DRIVER_INIT(indytemp);
+	void init_roadblst();
+	void init_peterpak();
+	void init_marble();
+	void init_roadrunn();
+	void init_indytemp();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarisy1);
@@ -120,3 +123,5 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ATARISY1_H

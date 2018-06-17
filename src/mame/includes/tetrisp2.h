@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tetrisp2_state : public driver_device
 {
@@ -31,57 +32,10 @@ public:
 		m_palette(*this, "palette"),
 		m_sub_palette(*this, "sub_palette"),
 		m_paletteram(*this, "paletteram"),
-		m_sub_paletteram(*this, "sub_paletteram")
+		m_sub_paletteram(*this, "sub_paletteram"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
-
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_spriteram2;
-
-	uint16_t m_systemregs[0x10];
-	required_shared_ptr<uint16_t> m_vram_fg;
-	required_shared_ptr<uint16_t> m_vram_bg;
-	required_shared_ptr<uint16_t> m_vram_rot;
-	required_shared_ptr<uint16_t> m_nvram;
-	required_shared_ptr<uint16_t> m_scroll_fg;
-	required_shared_ptr<uint16_t> m_scroll_bg;
-	required_shared_ptr<uint16_t> m_rotregs;
-	std::unique_ptr<uint8_t[]> m_priority;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_priority;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_rot;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_fg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_bg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_scroll_fg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_scroll_bg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_rotregs;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device<gfxdecode_device> m_sub_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_device<palette_device> m_sub_palette;
-	required_shared_ptr<uint16_t> m_paletteram;
-	optional_shared_ptr<uint16_t> m_sub_paletteram;
-
-	uint16_t m_rocknms_sub_systemregs[0x10];
-	uint16_t m_rockn_protectdata;
-	uint16_t m_rockn_adpcmbank;
-	uint16_t m_rockn_soundvolume;
-	emu_timer *m_rockn_timer_l4;
-	emu_timer *m_rockn_timer_sub_l4;
-	emu_timer *m_rockn_timer_l1;
-	emu_timer *m_rockn_timer_sub_l1;
-	int m_bank_lo;
-	int m_bank_hi;
-	uint16_t m_rocknms_main2sub;
-	uint16_t m_rocknms_sub2main;
-	int m_flipscreen_old;
-	tilemap_t *m_tilemap_bg;
-	tilemap_t *m_tilemap_fg;
-	tilemap_t *m_tilemap_rot;
-	tilemap_t *m_tilemap_sub_bg;
-	tilemap_t *m_tilemap_sub_fg;
-	tilemap_t *m_tilemap_sub_rot;
 	DECLARE_WRITE16_MEMBER(rockn_systemregs_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_systemregs_w);
 	DECLARE_READ16_MEMBER(rockn_adpcmbank_r);
@@ -113,11 +67,11 @@ public:
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_rot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
-	DECLARE_DRIVER_INIT(rockn2);
-	DECLARE_DRIVER_INIT(rockn1);
-	DECLARE_DRIVER_INIT(rockn);
-	DECLARE_DRIVER_INIT(rockn3);
-	DECLARE_DRIVER_INIT(rocknms);
+	void init_rockn2();
+	void init_rockn1();
+	void init_rockn();
+	void init_rockn3();
+	void init_rocknms();
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rot);
@@ -149,6 +103,59 @@ public:
 	void rocknms_main_map(address_map &map);
 	void rocknms_sub_map(address_map &map);
 	void tetrisp2_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_spriteram2;
+
+	uint16_t m_systemregs[0x10];
+	required_shared_ptr<uint16_t> m_vram_fg;
+	required_shared_ptr<uint16_t> m_vram_bg;
+	required_shared_ptr<uint16_t> m_vram_rot;
+	required_shared_ptr<uint16_t> m_nvram;
+	required_shared_ptr<uint16_t> m_scroll_fg;
+	required_shared_ptr<uint16_t> m_scroll_bg;
+	required_shared_ptr<uint16_t> m_rotregs;
+	std::unique_ptr<uint8_t[]> m_priority;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_priority;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_rot;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_fg;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_bg;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_scroll_fg;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_scroll_bg;
+	optional_shared_ptr<uint16_t> m_rocknms_sub_rotregs;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_sub_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_sub_palette;
+	required_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint16_t> m_sub_paletteram;
+	output_finder<45> m_leds;
+
+	uint16_t m_rocknms_sub_systemregs[0x10];
+	uint16_t m_rockn_protectdata;
+	uint16_t m_rockn_adpcmbank;
+	uint16_t m_rockn_soundvolume;
+	emu_timer *m_rockn_timer_l4;
+	emu_timer *m_rockn_timer_sub_l4;
+	emu_timer *m_rockn_timer_l1;
+	emu_timer *m_rockn_timer_sub_l1;
+	int m_bank_lo;
+	int m_bank_hi;
+	uint16_t m_rocknms_main2sub;
+	uint16_t m_rocknms_sub2main;
+	int m_flipscreen_old;
+	tilemap_t *m_tilemap_bg;
+	tilemap_t *m_tilemap_fg;
+	tilemap_t *m_tilemap_rot;
+	tilemap_t *m_tilemap_sub_bg;
+	tilemap_t *m_tilemap_sub_fg;
+	tilemap_t *m_tilemap_sub_rot;
 };
 
 class stepstag_state : public tetrisp2_state
@@ -184,7 +191,7 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_step_leds_w);
 	DECLARE_WRITE16_MEMBER(stepstag_button_leds_w);
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
-	DECLARE_DRIVER_INIT(stepstag);
+	void init_stepstag();
 	DECLARE_VIDEO_START(stepstag);
 	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

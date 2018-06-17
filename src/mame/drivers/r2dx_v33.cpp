@@ -110,9 +110,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
-	DECLARE_DRIVER_INIT(rdx_v33);
-	DECLARE_DRIVER_INIT(nzerotea);
-	DECLARE_DRIVER_INIT(zerotm2k);
+	void init_rdx_v33();
+	void init_nzerotea();
+	void init_zerotm2k();
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
@@ -373,7 +373,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	{
 		uint16_t palval = space.read_word(src);
 		src += 2;
-		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+		m_palette->write16(space, i, palval, 0xffff);
 	}
 }
 
@@ -387,50 +387,50 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); // vectors copied here
 
-	map(0x00400, 0x00401).w(this, FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
-	map(0x00402, 0x00403).w(this, FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
+	map(0x00400, 0x00401).w(FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
+	map(0x00402, 0x00403).w(FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
 
 
-	map(0x00404, 0x00405).w(this, FUNC(r2dx_v33_state::r2dx_rom_bank_w));
-	map(0x00406, 0x00407).w(this, FUNC(r2dx_v33_state::tile_bank_w));
+	map(0x00404, 0x00405).w(FUNC(r2dx_v33_state::r2dx_rom_bank_w));
+	map(0x00406, 0x00407).w(FUNC(r2dx_v33_state::tile_bank_w));
 
-	map(0x00420, 0x00421).w(this, FUNC(r2dx_v33_state::r2dx_dx_w));
-	map(0x00422, 0x00423).w(this, FUNC(r2dx_v33_state::r2dx_dy_w));
-	map(0x00424, 0x00425).w(this, FUNC(r2dx_v33_state::r2dx_sdistl_w));
-	map(0x00426, 0x00427).w(this, FUNC(r2dx_v33_state::r2dx_sdisth_w));
-	map(0x00428, 0x00429).w(this, FUNC(r2dx_v33_state::r2dx_angle_w));
+	map(0x00420, 0x00421).w(FUNC(r2dx_v33_state::r2dx_dx_w));
+	map(0x00422, 0x00423).w(FUNC(r2dx_v33_state::r2dx_dy_w));
+	map(0x00424, 0x00425).w(FUNC(r2dx_v33_state::r2dx_sdistl_w));
+	map(0x00426, 0x00427).w(FUNC(r2dx_v33_state::r2dx_sdisth_w));
+	map(0x00428, 0x00429).w(FUNC(r2dx_v33_state::r2dx_angle_w));
 
-	map(0x00430, 0x00431).r(this, FUNC(r2dx_v33_state::r2dx_angle_r));
-	map(0x00432, 0x00433).r(this, FUNC(r2dx_v33_state::r2dx_dist_r));
-	map(0x00434, 0x00435).r(this, FUNC(r2dx_v33_state::r2dx_sin_r));
-	map(0x00436, 0x00437).r(this, FUNC(r2dx_v33_state::r2dx_cos_r));
+	map(0x00430, 0x00431).r(FUNC(r2dx_v33_state::r2dx_angle_r));
+	map(0x00432, 0x00433).r(FUNC(r2dx_v33_state::r2dx_dist_r));
+	map(0x00434, 0x00435).r(FUNC(r2dx_v33_state::r2dx_sin_r));
+	map(0x00436, 0x00437).r(FUNC(r2dx_v33_state::r2dx_cos_r));
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
 	map(0x0068e, 0x0068f).nopw(); // sprite buffering
-	map(0x006b0, 0x006b1).w(this, FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
-	map(0x006b2, 0x006b3).w(this, FUNC(r2dx_v33_state::mcu_prog_w2));
+	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
+	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	map(0x006bc, 0x006bd).w(this, FUNC(r2dx_v33_state::mcu_prog_offs_w));
+	map(0x006bc, 0x006bd).w(FUNC(r2dx_v33_state::mcu_prog_offs_w));
 //  AM_RANGE(0x006be, 0x006bf) AM_WRITENOP
 
 	// sprite protection not 100% verified as the same
-	map(0x006c0, 0x006c1).rw(this, FUNC(r2dx_v33_state::sprite_prot_off_r), FUNC(r2dx_v33_state::sprite_prot_off_w));
-	map(0x006c2, 0x006c3).rw(this, FUNC(r2dx_v33_state::sprite_prot_src_seg_r), FUNC(r2dx_v33_state::sprite_prot_src_seg_w));
-	map(0x006c6, 0x006c7).w(this, FUNC(r2dx_v33_state::sprite_prot_dst1_w));
+	map(0x006c0, 0x006c1).rw(FUNC(r2dx_v33_state::sprite_prot_off_r), FUNC(r2dx_v33_state::sprite_prot_off_w));
+	map(0x006c2, 0x006c3).rw(FUNC(r2dx_v33_state::sprite_prot_src_seg_r), FUNC(r2dx_v33_state::sprite_prot_src_seg_w));
+	map(0x006c6, 0x006c7).w(FUNC(r2dx_v33_state::sprite_prot_dst1_w));
 
-	map(0x006d8, 0x006d9).w(this, FUNC(r2dx_v33_state::sprite_prot_x_w));
-	map(0x006da, 0x006db).w(this, FUNC(r2dx_v33_state::sprite_prot_y_w));
-	map(0x006dc, 0x006dd).rw(this, FUNC(r2dx_v33_state::sprite_prot_maxx_r), FUNC(r2dx_v33_state::sprite_prot_maxx_w));
-	map(0x006de, 0x006df).w(this, FUNC(r2dx_v33_state::sprite_prot_src_w));
+	map(0x006d8, 0x006d9).w(FUNC(r2dx_v33_state::sprite_prot_x_w));
+	map(0x006da, 0x006db).w(FUNC(r2dx_v33_state::sprite_prot_y_w));
+	map(0x006dc, 0x006dd).rw(FUNC(r2dx_v33_state::sprite_prot_maxx_r), FUNC(r2dx_v33_state::sprite_prot_maxx_w));
+	map(0x006de, 0x006df).w(FUNC(r2dx_v33_state::sprite_prot_src_w));
 
 
-	map(0x00700, 0x00701).w(this, FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
-	map(0x00740, 0x00741).r(this, FUNC(r2dx_v33_state::r2dx_debug_r));
+	map(0x00700, 0x00701).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
+	map(0x00740, 0x00741).r(FUNC(r2dx_v33_state::r2dx_debug_r));
 	map(0x00744, 0x00745).portr("INPUT");
 	map(0x0074c, 0x0074d).portr("SYSTEM");
-	map(0x00762, 0x00763).r(this, FUNC(r2dx_v33_state::sprite_prot_dst1_r));
+	map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::sprite_prot_dst1_r));
 
 	map(0x00780, 0x00780).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // single OKI chip on this version
 
@@ -456,38 +456,38 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); //stack area
 
-	map(0x00400, 0x00401).w(this, FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
-	map(0x00402, 0x00403).w(this, FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
+	map(0x00400, 0x00401).w(FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
+	map(0x00402, 0x00403).w(FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
 	// 0x404 is bank on r2dx, this doesn't need it
 	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
 	map(0x00406, 0x00407).noprw(); // always 6022, supposed to be the tile bank but ignores the actual value???
 
-	map(0x00420, 0x00421).w(this, FUNC(r2dx_v33_state::r2dx_dx_w));
-	map(0x00422, 0x00423).w(this, FUNC(r2dx_v33_state::r2dx_dy_w));
-	map(0x00424, 0x00425).w(this, FUNC(r2dx_v33_state::r2dx_sdistl_w));
-	map(0x00426, 0x00427).w(this, FUNC(r2dx_v33_state::r2dx_sdisth_w));
-	map(0x00428, 0x00429).w(this, FUNC(r2dx_v33_state::r2dx_angle_w));
+	map(0x00420, 0x00421).w(FUNC(r2dx_v33_state::r2dx_dx_w));
+	map(0x00422, 0x00423).w(FUNC(r2dx_v33_state::r2dx_dy_w));
+	map(0x00424, 0x00425).w(FUNC(r2dx_v33_state::r2dx_sdistl_w));
+	map(0x00426, 0x00427).w(FUNC(r2dx_v33_state::r2dx_sdisth_w));
+	map(0x00428, 0x00429).w(FUNC(r2dx_v33_state::r2dx_angle_w));
 
-	map(0x00430, 0x00431).r(this, FUNC(r2dx_v33_state::r2dx_angle_r));
-	map(0x00432, 0x00433).r(this, FUNC(r2dx_v33_state::r2dx_dist_r));
-	map(0x00434, 0x00435).r(this, FUNC(r2dx_v33_state::r2dx_sin_r));
-	map(0x00436, 0x00437).r(this, FUNC(r2dx_v33_state::r2dx_cos_r));
+	map(0x00430, 0x00431).r(FUNC(r2dx_v33_state::r2dx_angle_r));
+	map(0x00432, 0x00433).r(FUNC(r2dx_v33_state::r2dx_dist_r));
+	map(0x00434, 0x00435).r(FUNC(r2dx_v33_state::r2dx_sin_r));
+	map(0x00436, 0x00437).r(FUNC(r2dx_v33_state::r2dx_cos_r));
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf)rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x0068e, 0x0068f).nopw(); // sprite buffering
-	map(0x006b0, 0x006b1).w(this, FUNC(r2dx_v33_state::mcu_prog_w));
-	map(0x006b2, 0x006b3).w(this, FUNC(r2dx_v33_state::mcu_prog_w2));
+	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w));
+	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  map(0x006b4, 0x006b5).nopw();
 //  map(0x006b6, 0x006b7).nopw();
-	map(0x006bc, 0x006bd).w(this, FUNC(r2dx_v33_state::mcu_prog_offs_w));
-//  map(0x006d8, 0x006d9).w(this, FUNC(r2dx_v33_state::bbbbll_w)); // scroll?
-//  map(0x006dc, 0x006dd).r(this, FUNC(r2dx_v33_state::nzerotea_unknown_r));
-//  map(0x006de, 0x006df).w(this, FUNC(r2dx_v33_state::mcu_unkaa_w)); // mcu command related?
-//  map(0x00700, 0x00701).w(this, FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
+	map(0x006bc, 0x006bd).w(FUNC(r2dx_v33_state::mcu_prog_offs_w));
+//  map(0x006d8, 0x006d9).w(FUNC(r2dx_v33_state::bbbbll_w)); // scroll?
+//  map(0x006dc, 0x006dd).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
+//  map(0x006de, 0x006df).w(FUNC(r2dx_v33_state::mcu_unkaa_w)); // mcu command related?
+//  map(0x00700, 0x00701).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
 
-//  map(0x00762, 0x00763).r(this, FUNC(r2dx_v33_state::nzerotea_unknown_r));
+//  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
 	map(0x00780, 0x0079f).lrw8("seibu_sound_rw",
 							   [this](address_space &space, offs_t offset, u8 mem_mask) {
@@ -502,10 +502,10 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 
 	map(0x0c000, 0x0c7ff).ram().share("sprites");
 	map(0x0c800, 0x0cfff).ram();
-	map(0x0d000, 0x0d7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_background_w)).share("back_data");
-	map(0x0d800, 0x0dfff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_foreground_w)).share("fore_data");
-	map(0x0e000, 0x0e7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_midground_w)).share("mid_data");
-	map(0x0e800, 0x0f7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_text_w)).share("text_data");
+	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_foreground_w)).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_midground_w)).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); //.w(FUNC(r2dx_v33_state::raiden2_text_w)).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 	map(0x10000, 0x1efff).ram();
 	map(0x1f000, 0x1ffff).ram(); //.w("palette", FUNC(palette_device::write)).share("palette");
@@ -536,7 +536,7 @@ void r2dx_v33_state::zerotm2k_map(address_map &map)
 	map(0x00740, 0x00741).portr("P3_P4");
 	map(0x00744, 0x00745).portr("INPUT");
 	map(0x0074c, 0x0074d).portr("SYSTEM");
-	map(0x00748, 0x00749).w(this, FUNC(r2dx_v33_state::zerotm2k_eeprom_w));
+	map(0x00748, 0x00749).w(FUNC(r2dx_v33_state::zerotm2k_eeprom_w));
 }
 
 
@@ -585,7 +585,7 @@ static const gfx_layout rdx_v33_spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( rdx_v33 )
+static GFXDECODE_START( gfx_rdx_v33 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 4096 )
@@ -787,13 +787,13 @@ void r2dx_v33_state::r2dx_oki_map(address_map &map)
 MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
-	MCFG_CPU_PROGRAM_MAP(rdx_v33_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	MCFG_DEVICE_ADD("maincpu", V33, 32000000/2 ) // ?
+	MCFG_DEVICE_PROGRAM_MAP(rdx_v33_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -803,20 +803,20 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363)/28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, r2dx_oki_map)
 MACHINE_CONFIG_END
@@ -824,14 +824,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33,XTAL(32'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(nzerotea_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	MCFG_DEVICE_ADD("maincpu", V33,XTAL(32'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(nzerotea_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -841,42 +841,42 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
 	nzerotea(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zerotm2k_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zerotm2k_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
+void r2dx_v33_state::init_rdx_v33()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -900,7 +900,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
+void r2dx_v33_state::init_nzerotea()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -909,7 +909,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	zeroteam_decrypt_sprites(machine());
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
+void r2dx_v33_state::init_zerotm2k()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -919,11 +919,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 
 	// BG tile rom has 2 lines swapped
 	uint8_t *src = memregion("gfx2")->base()+0x100000;
-	int len = 0x080000;
+	const int len = 0x080000;
 
 	std::vector<uint8_t> buffer(len);
-	int i;
-	for (i = 0; i < len; i ++)
+	for (int i = 0; i < len; i ++)
 		buffer[i] = src[bitswap<32>(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
 	memcpy(src, &buffer[0], len);
 }
@@ -1144,17 +1143,17 @@ ROM_END
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
 // is there a switching method? for now I've split it into 2 sets with different EEPROM, the game checks that on startup and runs different code depending on what it finds
-GAME( 1996, r2dx_v33,    0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", MACHINE_SUPPORTS_SAVE)
-GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", MACHINE_SUPPORTS_SAVE)
+GAME( 1996, r2dx_v33,    0,        rdx_v33,  rdx_v33,  r2dx_v33_state, init_rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", MACHINE_SUPPORTS_SAVE)
+GAME( 1996, r2dx_v33_r2, r2dx_v33, rdx_v33,  rdx_v33,  r2dx_v33_state, init_rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", MACHINE_SUPPORTS_SAVE)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, DSW for settings
-GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu",                                     "New Zero Team (V33 SYSTEM TYPE_B hardware)", MACHINE_SUPPORTS_SAVE)
-GAME( 1997, nzeroteama,zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu (Haoyunlai Trading Company license)", "New Zero Team (V33 SYSTEM TYPE_B hardware, China?)", MACHINE_SUPPORTS_SAVE) // license text translated from title screen
+GAME( 1997, nzeroteam,   zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu",                                     "New Zero Team (V33 SYSTEM TYPE_B hardware)", MACHINE_SUPPORTS_SAVE)
+GAME( 1997, nzeroteama,  zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu (Haoyunlai Trading Company license)", "New Zero Team (V33 SYSTEM TYPE_B hardware, China?)", MACHINE_SUPPORTS_SAVE) // license text translated from title screen
 
 // 'V33 SYSTEM TYPE_C' - uses V33 CPU, basically the same board as TYPE_C VER2
 // there is a version of New Zero Team on "V33 SYSTEM TYPE_C" board with EEPROM rather than dipswitches like Zero Team 2000
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
-GAME( 2000, zerotm2k,  zeroteam,  zerotm2k, zerotm2k, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)
+GAME( 2000, zerotm2k,    zeroteam, zerotm2k, zerotm2k, r2dx_v33_state, init_zerotm2k,  ROT0,  "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)
 
 // there is also a 'Raiden 2 2000' on unknown hardware.

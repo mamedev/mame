@@ -52,7 +52,7 @@ WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space,offset,data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -75,7 +75,7 @@ void galspnbl_state::main_map(address_map &map)
 	map(0xa01000, 0xa017ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa01800, 0xa027ff).nopw();    /* more palette ? */
 	map(0xa80000, 0xa80001).portr("IN0");
-	map(0xa80010, 0xa80011).portr("IN1").w(this, FUNC(galspnbl_state::soundcommand_w));
+	map(0xa80010, 0xa80011).portr("IN1").w(FUNC(galspnbl_state::soundcommand_w));
 	map(0xa80020, 0xa80021).portr("SYSTEM").nopw();     /* w - could be watchdog, but causes resets when picture is shown */
 	map(0xa80030, 0xa80031).portr("DSW1").nopw();       /* w - irq ack? */
 	map(0xa80040, 0xa80041).portr("DSW2");
@@ -204,7 +204,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( galspnbl )
+static GFXDECODE_START( gfx_galspnbl )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   512, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
@@ -217,12 +217,12 @@ void galspnbl_state::machine_start()
 MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 								/* NMI is caused by the main CPU */
 
 
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galspnbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galspnbl)
 
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)
@@ -248,15 +248,15 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_TECMO_SPRITE_BOOTLEG(1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -321,5 +321,5 @@ ROM_START( hotpinbl )
 ROM_END
 
 
-GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, 0, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, 0, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, empty_init, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, empty_init, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )

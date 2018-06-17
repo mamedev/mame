@@ -41,11 +41,11 @@ void coco3_state::coco3_mem(address_map &map)
 	map(0xC000, 0xDFFF).bankr("rbank6").bankw("wbank6");
 	map(0xE000, 0xFDFF).bankr("rbank7").bankw("wbank7");
 	map(0xFE00, 0xFEFF).bankr("rbank8").bankw("wbank8");
-	map(0xFF00, 0xFF1F).rw(this, FUNC(coco3_state::ff00_read), FUNC(coco3_state::ff00_write));
-	map(0xFF20, 0xFF3F).rw(this, FUNC(coco3_state::ff20_read), FUNC(coco3_state::ff20_write));
-	map(0xFF40, 0xFF5F).rw(this, FUNC(coco3_state::ff40_read), FUNC(coco3_state::ff40_write));
-	map(0xFF60, 0xFF8F).rw(this, FUNC(coco3_state::ff60_read), FUNC(coco3_state::ff60_write));
-	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::read), FUNC(gime_device::write));
+	map(0xFF00, 0xFF1F).rw(FUNC(coco3_state::ff00_read), FUNC(coco3_state::ff00_write));
+	map(0xFF20, 0xFF3F).rw(FUNC(coco3_state::ff20_read), FUNC(coco3_state::ff20_write));
+	map(0xFF40, 0xFF5F).rw(FUNC(coco3_state::ff40_read), FUNC(coco3_state::ff40_write));
+	map(0xFF60, 0xFF8F).rw(FUNC(coco3_state::ff60_read), FUNC(coco3_state::ff60_write));
+	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::bus_r), FUNC(gime_device::bus_w));
 
 	// While Tepolt and other sources say that the interrupt vectors are mapped to
 	// the same memory accessed at $BFFx, William Astle offered evidence that this
@@ -247,28 +247,28 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_DEVICE_CLOCK(XTAL(28'636'363) / 32)
 
 	// basic machine hardware
-	MCFG_CPU_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(coco3_mem)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
+	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia0_irq_b))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia0_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia0_irq_b))
 
 	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(coco_state, pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(coco_state, pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, coco_state, pia1_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, coco_state, pia1_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia1_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
 	// Becker Port device
 	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
@@ -277,12 +277,12 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "printer")
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(PIA1_TAG, pia6821_device, ca1_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("printer", printer)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "printer")
+	MCFG_RS232_DCD_HANDLER(WRITELINE(PIA1_TAG, pia6821_device, ca1_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
 
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "fdcv11")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 
@@ -292,15 +292,12 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	// video hardware
 	MCFG_DEFAULT_LAYOUT(layout_coco3)
 
-	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363))
-	MCFG_GIME_MAINCPU(MAINCPU_TAG)
-	MCFG_GIME_RAM(RAM_TAG)
-	MCFG_GIME_EXT(CARTRIDGE_TAG)
-	MCFG_GIME_HSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, ca1_w))
-	MCFG_GIME_FSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, cb1_w))
-	MCFG_GIME_IRQ_CALLBACK(WRITELINE(coco3_state, gime_irq_w))
-	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(coco3_state, gime_firq_w))
-	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
+	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
+	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
+	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
+	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
+	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_firq_w))
+	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(*this, coco_state, floating_bus_r))
 
 	// composite monitor
 	MCFG_SCREEN_ADD(COMPOSITE_SCREEN_TAG, RASTER)
@@ -343,27 +340,27 @@ MACHINE_CONFIG_START(coco3_state::coco3p)
 	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
-	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000))
-	MCFG_GIME_MAINCPU(MAINCPU_TAG)
-	MCFG_GIME_RAM(RAM_TAG)
-	MCFG_GIME_EXT(CARTRIDGE_TAG)
-	MCFG_GIME_HSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, ca1_w))
-	MCFG_GIME_FSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, cb1_w))
-	MCFG_GIME_IRQ_CALLBACK(WRITELINE(coco3_state, gime_irq_w))
-	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(coco3_state, gime_firq_w))
-	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
+	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
+	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
+	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
+	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
+	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_firq_w))
+	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(*this, coco_state, floating_bus_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco3_state::coco3h)
 	coco3(config);
-	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(coco3_mem)
+	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco3_state::coco3dw1)
 	coco3(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cc3hdb1")
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
+	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -387,7 +384,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
-COMP(  19??,    coco3dw1,   coco,   0,      coco3dw1,  coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
+COMP( 1986, coco3,    coco, 0, coco3,    coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
+COMP( 1986, coco3p,   coco, 0, coco3p,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
+COMP( 19??, coco3h,   coco, 0, coco3h,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
+COMP( 19??, coco3dw1, coco, 0, coco3dw1, coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )

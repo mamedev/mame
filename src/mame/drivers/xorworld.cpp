@@ -69,10 +69,10 @@ void xorworld_state::xorworld_map(address_map &map)
 	map(0x600000, 0x600001).portr("DSW");
 	map(0x800000, 0x800003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00000, 0xa0000f).w("mainlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xffc000, 0xffc7ff).ram().w(this, FUNC(xorworld_state::videoram_w)).share("videoram");
+	map(0xffc000, 0xffc7ff).ram().w(FUNC(xorworld_state::videoram_w)).share("videoram");
 	map(0xffc800, 0xffc87f).ram().share("spriteram");
-	map(0xffc880, 0xffc881).w(this, FUNC(xorworld_state::irq2_ack_w)).nopr();
-	map(0xffc882, 0xffc883).w(this, FUNC(xorworld_state::irq6_ack_w)).nopr();
+	map(0xffc880, 0xffc881).w(FUNC(xorworld_state::irq2_ack_w)).nopr();
+	map(0xffc882, 0xffc883).w(FUNC(xorworld_state::irq6_ack_w)).nopr();
 	map(0xffc884, 0xffffff).ram();
 }
 
@@ -146,7 +146,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( xorworld )
+static GFXDECODE_START( gfx_xorworld )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spritelayout, 0, 64 )
 GFXDECODE_END
@@ -154,22 +154,22 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(xorworld_state::xorworld)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   // 10 MHz
-	MCFG_CPU_PROGRAM_MAP(xorworld_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
-	//MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   // 10 MHz
+	MCFG_DEVICE_PROGRAM_MAP(xorworld_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
 	// Simple fix - but this sounds good!! -Valley Bell
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq2_line_assert) // irq 4 or 6
-	MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq6_line_assert, 3*60) //timed irq, unknown timing
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xorworld_state, irq2_line_assert) // irq 4 or 6
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(xorworld_state, irq6_line_assert, 3*60) //timed irq, unknown timing
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) // CS (active low)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) // SK (active high)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) // EEPROM data (DIN)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) // CS (active low)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) // SK (active high)
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) // EEPROM data (DIN)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -180,13 +180,13 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xorworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xorworld)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(xorworld_state, xorworld)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 8000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -210,7 +210,7 @@ ROM_END
 
 #define PATCH(data) *rom = data; rom++
 
-DRIVER_INIT_MEMBER(xorworld_state,xorworld)
+void xorworld_state::init_xorworld()
 {
 	/*  patch some strange protection (without this, strange characters appear
 	    after level 5 and some pieces don't rotate properly some times) */
@@ -230,4 +230,4 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 }
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )

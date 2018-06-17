@@ -75,8 +75,8 @@ Notes:
 
 WRITE8_MEMBER( ob68k1a_state::com8116_w )
 {
-	m_dbrg->stt_w(data & 0x0f);
-	m_dbrg->str_w(data >> 4);
+	m_dbrg->write_stt(data & 0x0f);
+	m_dbrg->write_str(data >> 4);
 }
 
 
@@ -123,11 +123,11 @@ void ob68k1a_state::ob68k1a_mem(address_map &map)
 	map(0x000000, 0x01ffff).ram();
 	map(0xfe0000, 0xfeffff).rom().region(MC68000L10_TAG, 0);
 	map(0xffff00, 0xffff03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-	map(0xffff10, 0xffff10).w(this, FUNC(ob68k1a_state::com8116_w));
+	map(0xffff10, 0xffff10).w(FUNC(ob68k1a_state::com8116_w));
 	map(0xffff20, 0xffff23).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
-	map(0xffff40, 0xffff47).rw(this, FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
+	map(0xffff40, 0xffff47).rw(FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
 	map(0xffff60, 0xffff6f).rw(MC6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 }
 
@@ -171,8 +171,8 @@ void ob68k1a_state::machine_start()
 void ob68k1a_state::machine_reset()
 {
 	// initialize COM8116
-	m_dbrg->stt_w(0x0e);
-	m_dbrg->str_w(0x0e);
+	m_dbrg->write_stt(0x0e);
+	m_dbrg->write_str(0x0e);
 
 	// set reset vector
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
@@ -195,8 +195,8 @@ void ob68k1a_state::machine_reset()
 
 MACHINE_CONFIG_START(ob68k1a_state::ob68k1a)
 	// basic machine hardware
-	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
+	MCFG_DEVICE_ADD(MC68000L10_TAG, M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ob68k1a_mem)
 
 	// devices
 	MCFG_DEVICE_ADD(MC6821_0_TAG, PIA6821, 0)
@@ -205,28 +205,28 @@ MACHINE_CONFIG_START(ob68k1a_state::ob68k1a)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MC6850_0_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MC6850_0_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MC6850_0_TAG, acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE(MC6850_0_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(MC6850_0_TAG, acia6850_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxc))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -266,5 +266,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, ob68k1a_state, 0,    "Omnibyte", "OB68K1A",   MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME   FLAGS
+COMP( 1982, ob68k1a, 0,      0,      ob68k1a, ob68k1a, ob68k1a_state, empty_init, "Omnibyte", "OB68K1A", MACHINE_NO_SOUND_HW )

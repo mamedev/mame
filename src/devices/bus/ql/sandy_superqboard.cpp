@@ -39,11 +39,11 @@ ROM_START( sandy_superqboard )
 	ROM_REGION( 0x8000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v118y")
 	ROM_SYSTEM_BIOS( 0, "v118y", "v1.18" )
-	ROMX_LOAD( "sandy_disk_controller_v1.18y_1984.ic2", 0x0000, 0x8000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd), ROM_BIOS(1) )
+	ROMX_LOAD( "sandy_disk_controller_v1.18y_1984.ic2", 0x0000, 0x8000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v119", "v1.19N" )
-	ROMX_LOAD( "sandysuperqboard_119n.ic2", 0x0000, 0x8000, CRC(5df04059) SHA1(51403f82a2eed3ef689e880936d1613e2b29c218), ROM_BIOS(2) )
+	ROMX_LOAD( "sandysuperqboard_119n.ic2", 0x0000, 0x8000, CRC(5df04059) SHA1(51403f82a2eed3ef689e880936d1613e2b29c218), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v121n", "v1.21N" )
-	ROMX_LOAD( "sandy_disk_controller_v1.21n_1984_tk2.ic2", 0x0000, 0x8000, CRC(6a7a6a12) SHA1(a3a233e4f6c8450055fa537601a2a2eef143edca), ROM_BIOS(3) )
+	ROMX_LOAD( "sandy_disk_controller_v1.21n_1984_tk2.ic2", 0x0000, 0x8000, CRC(6a7a6a12) SHA1(a3a233e4f6c8450055fa537601a2a2eef143edca), ROM_BIOS(2) )
 
 	ROM_REGION( 0x100, "plds", 0 )
 	ROM_LOAD( "gal16v8.ic5", 0x000, 0x100, NO_DUMP )
@@ -64,10 +64,11 @@ const tiny_rom_entry *sandy_superqboard_device::device_rom_region() const
 //  SLOT_INTERFACE( sandy_superqboard_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( sandy_superqboard_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void sandy_superqboard_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 
 //-------------------------------------------------
@@ -107,8 +108,8 @@ MACHINE_CONFIG_START(sandy_superqboard_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", sandy_superqboard_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, nullptr, sandy_superqboard_device::floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_superqboard_device, busy_w))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sandy_superqboard_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD(TTL74273_TAG, CENTRONICS_TAG)
 MACHINE_CONFIG_END
 

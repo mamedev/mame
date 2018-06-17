@@ -74,7 +74,7 @@ WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_rombank1->set_entry(0);
 		logerror("DMD2: Reset\n");
 	}
@@ -121,18 +121,18 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 void decodmd_type2_device::decodmd2_map(address_map &map)
 {
 	map(0x0000, 0x2fff).bankrw("dmdram");
-	map(0x3000, 0x3000).rw(this, FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
-	map(0x3001, 0x3001).w(this, FUNC(decodmd_type2_device::crtc_register_w));
-	map(0x3002, 0x3002).w(this, FUNC(decodmd_type2_device::bank_w));
-	map(0x3003, 0x3003).r(this, FUNC(decodmd_type2_device::latch_r));
-	map(0x4000, 0x7fff).bankr("dmdbank1").w(this, FUNC(decodmd_type2_device::status_w));
+	map(0x3000, 0x3000).rw(FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
+	map(0x3001, 0x3001).w(FUNC(decodmd_type2_device::crtc_register_w));
+	map(0x3002, 0x3002).w(FUNC(decodmd_type2_device::bank_w));
+	map(0x3003, 0x3003).r(FUNC(decodmd_type2_device::latch_r));
+	map(0x4000, 0x7fff).bankr("dmdbank1").w(FUNC(decodmd_type2_device::status_w));
 	map(0x8000, 0xffff).bankr("dmdbank2"); // last 32k of ROM
 }
 
 MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(decodmd2_map)
+	MCFG_DEVICE_ADD("dmdcpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(decodmd2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

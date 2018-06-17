@@ -15,15 +15,17 @@ FLOPPY_FORMATS_MEMBER( microdisc_device::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( microdisc_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void microdisc_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
-ADDRESS_MAP_START(microdisc_device::map)
-	AM_RANGE(0x310, 0x313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x314, 0x314) AM_READWRITE(port_314_r, port_314_w)
-	AM_RANGE(0x318, 0x318) AM_READ(port_318_r)
-ADDRESS_MAP_END
+void microdisc_device::map(address_map &map)
+{
+	map(0x310, 0x313).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x314, 0x314).rw(FUNC(microdisc_device::port_314_r), FUNC(microdisc_device::port_314_w));
+	map(0x318, 0x318).r(FUNC(microdisc_device::port_318_r));
+}
 
 microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	oricext_device(mconfig, MICRODISC, tag, owner, clock),
@@ -67,10 +69,10 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(microdisc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(microdisc_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(microdisc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(microdisc_device, fdc_hld_w))
+	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, microdisc_device, fdc_hld_w))
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)

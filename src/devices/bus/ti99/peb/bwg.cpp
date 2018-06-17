@@ -682,11 +682,12 @@ FLOPPY_FORMATS_MEMBER(snug_bwg_device::floppy_formats)
 	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bwg_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )        // 40 tracks
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )        // 80 tracks
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
-SLOT_INTERFACE_END
+static void bwg_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);  // 40 tracks
+	device.option_add("525qd", FLOPPY_525_QD);  // 80 tracks
+	device.option_add("35dd", FLOPPY_35_DD);    // 80 tracks
+}
 
 ROM_START( bwg_fdc )
 	ROM_REGION(0x8000, TI99_DSRROM, 0)
@@ -694,9 +695,9 @@ ROM_START( bwg_fdc )
 ROM_END
 
 MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
-	MCFG_WD1773_ADD(FDC_TAG, XTAL(8'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
+	MCFG_DEVICE_ADD(FDC_TAG, WD1773, 8_MHz_XTAL)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, snug_bwg_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, snug_bwg_device, fdc_drq_w))
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour

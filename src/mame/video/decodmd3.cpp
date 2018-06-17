@@ -42,7 +42,7 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		logerror("DMD3: Reset\n");
 	}
 	m_ctrl = data;
@@ -126,15 +126,15 @@ void decodmd_type3_device::decodmd3_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).bankr("dmdrom");
 	map(0x00800000, 0x0080ffff).bankrw("dmdram");
-	map(0x00c00010, 0x00c00011).rw(this, FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
-	map(0x00c00012, 0x00c00013).w(this, FUNC(decodmd_type3_device::crtc_register_w));
-	map(0x00c00020, 0x00c00021).rw(this, FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
+	map(0x00c00010, 0x00c00011).rw(FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
+	map(0x00c00012, 0x00c00013).w(FUNC(decodmd_type3_device::crtc_register_w));
+	map(0x00c00020, 0x00c00021).rw(FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
 }
 
 MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
+	MCFG_DEVICE_ADD("dmdcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

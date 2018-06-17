@@ -24,11 +24,11 @@ void dsbz80_device::dsbz80_map(address_map &map)
 void dsbz80_device::dsbz80io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xe0, 0xe0).w(this, FUNC(dsbz80_device::mpeg_trigger_w));
-	map(0xe2, 0xe4).rw(this, FUNC(dsbz80_device::mpeg_pos_r), FUNC(dsbz80_device::mpeg_start_w));
-	map(0xe5, 0xe7).w(this, FUNC(dsbz80_device::mpeg_end_w));
-	map(0xe8, 0xe8).w(this, FUNC(dsbz80_device::mpeg_volume_w));
-	map(0xe9, 0xe9).w(this, FUNC(dsbz80_device::mpeg_stereo_w));
+	map(0xe0, 0xe0).w(FUNC(dsbz80_device::mpeg_trigger_w));
+	map(0xe2, 0xe4).rw(FUNC(dsbz80_device::mpeg_pos_r), FUNC(dsbz80_device::mpeg_start_w));
+	map(0xe5, 0xe7).w(FUNC(dsbz80_device::mpeg_end_w));
+	map(0xe8, 0xe8).w(FUNC(dsbz80_device::mpeg_volume_w));
+	map(0xe9, 0xe9).w(FUNC(dsbz80_device::mpeg_stereo_w));
 	map(0xf0, 0xf0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf1, 0xf1).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }
@@ -46,17 +46,17 @@ DEFINE_DEVICE_TYPE(DSBZ80, dsbz80_device, "dsbz80_device", "Sega Z80-based Digit
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(dsbz80_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)     /* unknown clock, but probably pretty slow considering the z80 does like nothing */
-	MCFG_CPU_PROGRAM_MAP(dsbz80_map)
-	MCFG_CPU_IO_MAP(dsbz80io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)     /* unknown clock, but probably pretty slow considering the z80 does like nothing */
+	MCFG_DEVICE_PROGRAM_MAP(dsbz80_map)
+	MCFG_DEVICE_IO_MAP(dsbz80io_map)
 
 	MCFG_DEVICE_ADD("uart", I8251, 4000000)
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_I8251_TXD_HANDLER(WRITELINE(dsbz80_device, output_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, dsbz80_device, output_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 //**************************************************************************

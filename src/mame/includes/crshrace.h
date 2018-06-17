@@ -6,6 +6,7 @@
 #include "video/bufsprite.h"
 #include "video/vsystem_spr.h"
 #include "video/k053936.h"
+#include "emupal.h"
 
 class crshrace_state : public driver_device
 {
@@ -55,8 +56,8 @@ public:
 	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
 	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
 	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
-	DECLARE_DRIVER_INIT(crshrace2);
-	DECLARE_DRIVER_INIT(crshrace);
+	void init_crshrace2();
+	void init_crshrace();
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void machine_start() override;

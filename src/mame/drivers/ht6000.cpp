@@ -73,18 +73,18 @@ void ht6000_state::maincpu_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xcfff).w(this, FUNC(ht6000_state::music_w)); // UPD935G
-	map(0xd000, 0xd0ff).w(this, FUNC(ht6000_state::pg1_w)); // MSM6294-07
-	map(0xd100, 0xd1ff).w(this, FUNC(ht6000_state::pg2_w)); // MSM6294-08
-	map(0xd200, 0xd2ff).w(this, FUNC(ht6000_state::pg3_w)); // MSM6294-09
-	map(0xd300, 0xd3ff).w(this, FUNC(ht6000_state::led_w));
-	map(0xd400, 0xd4ff).w(this, FUNC(ht6000_state::led_addr_w));
-	map(0xd500, 0xd5ff).w(this, FUNC(ht6000_state::led_data_w));
-	map(0xd600, 0xd6ff).r(this, FUNC(ht6000_state::switches_r));
-	map(0xd700, 0xd7ff).r(this, FUNC(ht6000_state::keys_r));
-	map(0xd800, 0xd8ff).w(this, FUNC(ht6000_state::ram_card_l_w));
-	map(0xd900, 0xd9ff).w(this, FUNC(ht6000_state::ram_card_h_w));
-	map(0xe000, 0xefff).r(this, FUNC(ht6000_state::rom2_r));
+	map(0xc000, 0xcfff).w(FUNC(ht6000_state::music_w)); // UPD935G
+	map(0xd000, 0xd0ff).w(FUNC(ht6000_state::pg1_w)); // MSM6294-07
+	map(0xd100, 0xd1ff).w(FUNC(ht6000_state::pg2_w)); // MSM6294-08
+	map(0xd200, 0xd2ff).w(FUNC(ht6000_state::pg3_w)); // MSM6294-09
+	map(0xd300, 0xd3ff).w(FUNC(ht6000_state::led_w));
+	map(0xd400, 0xd4ff).w(FUNC(ht6000_state::led_addr_w));
+	map(0xd500, 0xd5ff).w(FUNC(ht6000_state::led_data_w));
+	map(0xd600, 0xd6ff).r(FUNC(ht6000_state::switches_r));
+	map(0xd700, 0xd7ff).r(FUNC(ht6000_state::keys_r));
+	map(0xd800, 0xd8ff).w(FUNC(ht6000_state::ram_card_l_w));
+	map(0xd900, 0xd9ff).w(FUNC(ht6000_state::ram_card_h_w));
+	map(0xe000, 0xefff).r(FUNC(ht6000_state::rom2_r));
 }
 
 
@@ -314,11 +314,11 @@ void ht6000_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START( ht6000_state::ht6000 )
-	MCFG_CPU_ADD("maincpu", UPD7810, 12_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(ht6000_state, port_a_w))
+	MCFG_DEVICE_ADD("maincpu", UPD7810, 12_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, ht6000_state, port_a_w))
 
-	MCFG_CPU_ADD("keycpu", I8049, 10_MHz_XTAL)
+	MCFG_DEVICE_ADD("keycpu", I8049, 10_MHz_XTAL)
 MACHINE_CONFIG_END
 
 
@@ -342,5 +342,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY  FULLNAME   FLAGS
-CONS( 1987, ht6000, 0,      0,       ht6000,  ht6000, ht6000_state, 0,    "Casio", "HT-6000", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+CONS( 1987, ht6000, 0,      0,      ht6000,  ht6000, ht6000_state, empty_init, "Casio", "HT-6000", MACHINE_IS_SKELETON )

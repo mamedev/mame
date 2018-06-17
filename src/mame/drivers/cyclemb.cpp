@@ -77,6 +77,7 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -131,8 +132,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
-	DECLARE_DRIVER_INIT(skydest);
-	DECLARE_DRIVER_INIT(cyclemb);
+	void init_skydest();
+	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cyclemb);
@@ -587,21 +588,21 @@ void cyclemb_state::cyclemb_map(address_map &map)
 void cyclemb_state::cyclemb_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc09e, 0xc09f).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
-	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
 void cyclemb_state::skydest_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc080, 0xc081).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
-	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
@@ -641,7 +642,7 @@ void cyclemb_state::cyclemb_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x40, 0x41).rw(this, FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
+	map(0x40, 0x41).rw(FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
 }
 
 
@@ -958,7 +959,7 @@ static const gfx_layout spritelayout_32x32 =
 	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
-static GFXDECODE_START( cyclemb )
+static GFXDECODE_START( gfx_cyclemb )
 	GFXDECODE_ENTRY( "tilemap_data", 0, charlayout,     0, 0x40 )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_16x16,    0x00, 0x40 )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
@@ -966,15 +967,15 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/3) // Z8400BPS
-	MCFG_CPU_PROGRAM_MAP(cyclemb_map)
-	MCFG_CPU_IO_MAP(cyclemb_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclemb_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000)/3) // Z8400BPS
+	MCFG_DEVICE_PROGRAM_MAP(cyclemb_map)
+	MCFG_DEVICE_IO_MAP(cyclemb_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclemb_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(cyclemb_sound_map)
-	MCFG_CPU_IO_MAP(cyclemb_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cyclemb_state,  irq0_line_hold, 60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(cyclemb_sound_map)
+	MCFG_DEVICE_IO_MAP(cyclemb_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cyclemb_state,  irq0_line_hold, 60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -985,27 +986,27 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclemb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclemb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(18'000'000)/12)
-//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(cyclemb_state, ym_irq))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(18'000'000)/12)
+//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, cyclemb_state, ym_irq))
 //  MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cyclemb_state::skydest)
 	cyclemb(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(skydest_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(skydest_io)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -1091,7 +1092,7 @@ ROM_START( skydest )
 	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) ) // on daughterboard, _not_ a color prom
 ROM_END
 
-DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
+void cyclemb_state::init_cyclemb()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 
@@ -1107,7 +1108,7 @@ DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 	rom[0xa38] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(cyclemb_state,skydest)
+void cyclemb_state::init_skydest()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 
@@ -1123,5 +1124,5 @@ DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 	rom[0xa38] = 0x00;
 }
 
-GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest,  0,   skydest,  skydest, cyclemb_state,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cyclemb, 0, cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest, 0, skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

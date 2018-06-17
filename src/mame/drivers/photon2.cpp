@@ -25,6 +25,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,11 +270,11 @@ void photon2_state::spectrum_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x1f, 0x1f).portr("JOY");
-	map(0x5b, 0x5b).portr("COIN").w(this, FUNC(photon2_state::misc_w));
-	map(0x7a, 0x7a).w(this, FUNC(photon2_state::membank_w));
+	map(0x5b, 0x5b).portr("COIN").w(FUNC(photon2_state::misc_w));
+	map(0x7a, 0x7a).w(FUNC(photon2_state::membank_w));
 	map(0x7b, 0x7b).nopw(); // unknown write
-	map(0x7e, 0x7e).w(this, FUNC(photon2_state::membank_w));
-	map(0xfe, 0xfe).rw(this, FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
+	map(0x7e, 0x7e).w(FUNC(photon2_state::membank_w));
+	map(0xfe, 0xfe).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
 }
 
 /*************************************
@@ -339,7 +340,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
 	{
 		if ( m_nmi_enable )
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }
@@ -354,9 +355,9 @@ void photon2_state::machine_start()
 
 MACHINE_CONFIG_START(photon2_state::photon2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
-	MCFG_CPU_IO_MAP(spectrum_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
 
 
@@ -367,15 +368,15 @@ MACHINE_CONFIG_START(photon2_state::photon2)
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(photon2_state, screen_vblank_spectrum))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, photon2_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(photon2_state, photon2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
@@ -414,6 +415,6 @@ ROM_START( brod )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
 
-GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
-GAME( 19??,  black, 0,      photon2, black,   photon2_state, 0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black,   photon2_state, 0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software
+GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, empty_init, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
+GAME( 19??,  black, 0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
+GAME( 19??,  brod,  0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software

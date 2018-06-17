@@ -5,10 +5,11 @@
 #include "mcd.h"
 #include "coreutil.h"
 
-ADDRESS_MAP_START(mcd_isa_device::map)
-	AM_RANGE(0x0, 0x1) AM_READWRITE8(data_r, cmd_w, 0x00ff)
-	AM_RANGE(0x0, 0x1) AM_READWRITE8(flag_r, reset_w, 0xff00)
-ADDRESS_MAP_END
+void mcd_isa_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(mcd_isa_device::data_r), FUNC(mcd_isa_device::cmd_w));
+	map(0x1, 0x1).rw(FUNC(mcd_isa_device::flag_r), FUNC(mcd_isa_device::reset_w));
+}
 
 static INPUT_PORTS_START( ide )
 INPUT_PORTS_END

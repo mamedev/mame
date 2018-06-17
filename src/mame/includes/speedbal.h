@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Joseba Epalza
+
+#include "emupal.h"
+
 class speedbal_state : public driver_device
 {
 public:
@@ -28,8 +31,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_DRIVER_INIT(speedbal);
-	DECLARE_DRIVER_INIT(musicbal);
+	void init_speedbal();
+	void init_musicbal();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

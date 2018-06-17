@@ -34,6 +34,7 @@
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -695,7 +696,7 @@ WRITE32_MEMBER(tmmjprd_state::brt_2_w)
 void tmmjprd_state::tmmjprd_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200010, 0x200013).r(this, FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
+	map(0x200010, 0x200013).r(FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
 	/* check these are used .. */
 //  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("viewregs0")
 	map(0x200100, 0x200117).writeonly().share("tilemap_regs.0"); // tilemap regs1
@@ -704,8 +705,8 @@ void tmmjprd_state::tmmjprd_map(address_map &map)
 	map(0x200160, 0x200177).writeonly().share("tilemap_regs.3"); // tilemap regs4
 	map(0x200200, 0x20021b).writeonly().share("spriteregs"); // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
-	map(0x20040c, 0x20040f).w(this, FUNC(tmmjprd_state::brt_1_w));
-	map(0x200410, 0x200413).w(this, FUNC(tmmjprd_state::brt_2_w));
+	map(0x20040c, 0x20040f).w(FUNC(tmmjprd_state::brt_1_w));
+	map(0x200410, 0x200413).w(FUNC(tmmjprd_state::brt_2_w));
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
 //  AM_RANGE(0x200700, 0x20070f) AM_WRITE(blitter_w) AM_SHARE("blitterregs")
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
@@ -713,15 +714,15 @@ void tmmjprd_state::tmmjprd_map(address_map &map)
 	/* hmm */
 //  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("viewregs10")
 	/* tilemaps */
-	map(0x280000, 0x283fff).rw(this, FUNC(tmmjprd_state::tilemap0_r), FUNC(tmmjprd_state::tilemap0_w));
-	map(0x284000, 0x287fff).rw(this, FUNC(tmmjprd_state::tilemap1_r), FUNC(tmmjprd_state::tilemap1_w));
-	map(0x288000, 0x28bfff).rw(this, FUNC(tmmjprd_state::tilemap2_r), FUNC(tmmjprd_state::tilemap2_w));
-	map(0x28c000, 0x28ffff).rw(this, FUNC(tmmjprd_state::tilemap3_r), FUNC(tmmjprd_state::tilemap3_w));
+	map(0x280000, 0x283fff).rw(FUNC(tmmjprd_state::tilemap0_r), FUNC(tmmjprd_state::tilemap0_w));
+	map(0x284000, 0x287fff).rw(FUNC(tmmjprd_state::tilemap1_r), FUNC(tmmjprd_state::tilemap1_w));
+	map(0x288000, 0x28bfff).rw(FUNC(tmmjprd_state::tilemap2_r), FUNC(tmmjprd_state::tilemap2_w));
+	map(0x28c000, 0x28ffff).rw(FUNC(tmmjprd_state::tilemap3_r), FUNC(tmmjprd_state::tilemap3_w));
 	/* ?? is palette ram shared with sprites in this case or just a different map */
 	map(0x290000, 0x29bfff).ram().share("spriteram");
 	map(0x29c000, 0x29ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	map(0x400000, 0x400003).r(this, FUNC(tmmjprd_state::mux_r)).w(this, FUNC(tmmjprd_state::eeprom_write));
+	map(0x400000, 0x400003).r(FUNC(tmmjprd_state::mux_r)).w(FUNC(tmmjprd_state::eeprom_write));
 	map(0xf00000, 0xffffff).ram();
 }
 
@@ -747,7 +748,7 @@ static const gfx_layout sprite_16x16x8_layout =
 
 
 // gfx decoding is ugly.. 16*16 tiles can start at varying different offsets..
-static GFXDECODE_START( tmmjprd )
+static GFXDECODE_START( gfx_tmmjprd )
 	/* this seems to be sprites */
 //  GFXDECODE_ENTRY( "gfx1", 0, sprite_8x8x4_layout,   0x0, 0x1000  )
 //  GFXDECODE_ENTRY( "gfx1", 0, sprite_16x16x4_layout, 0x0, 0x1000  )
@@ -769,14 +770,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 }
 
 MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
-	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
+	MCFG_DEVICE_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmmjprd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmmjprd)
 
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -810,7 +810,8 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
@@ -892,5 +893,5 @@ ROM_START( tmpdoki )
 ROM_END
 
 
-GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?
+GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?

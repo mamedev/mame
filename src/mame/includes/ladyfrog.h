@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "emupal.h"
 
 class ladyfrog_state : public driver_device
 {

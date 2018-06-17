@@ -17,6 +17,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -95,7 +96,7 @@ void buster_state::mainmap(address_map &map)
 	map(0x7c8a, 0x7c8a).portr("IN5");
 	map(0x7c8c, 0x7c8c).portr("IN6");
 	map(0x7c8e, 0x7c8e).portr("IN7");
-	map(0x7cb0, 0x7cb7).w(this, FUNC(buster_state::coin_output_w));
+	map(0x7cb0, 0x7cb7).w(FUNC(buster_state::coin_output_w));
 	map(0x8800, 0x8fff).ram().share("wram"); // ???
 	map(0xa000, 0xa0ff).ram(); // nvram?
 }
@@ -315,16 +316,16 @@ static const gfx_layout tiles8x8_layout =
 	8*4
 };
 
-static GFXDECODE_START( buster )
+static GFXDECODE_START( gfx_buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(buster_state::buster)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(mainmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mainmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -339,13 +340,13 @@ MACHINE_CONFIG_START(buster_state::buster)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000/2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -364,4 +365,4 @@ ROM_START( buster )
 ROM_END
 
 
-GAME( 1982, buster,  0,    buster, buster, buster_state,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1982, buster, 0, buster, buster, buster_state, empty_init, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -448,6 +448,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -500,7 +501,7 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	DECLARE_DRIVER_INIT(fclown);
+	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -763,12 +764,12 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(_5clown_state::fclown_videoram_w)).share("videoram");   /* Init'ed at $2042 */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(_5clown_state::fclown_colorram_w)).share("colorram");   /* Init'ed at $2054 */
+	map(0x1000, 0x13ff).ram().w(FUNC(_5clown_state::fclown_videoram_w)).share("videoram");   /* Init'ed at $2042 */
+	map(0x1800, 0x1bff).ram().w(FUNC(_5clown_state::fclown_colorram_w)).share("colorram");   /* Init'ed at $2054 */
 	map(0x2000, 0x7fff).rom();                 /* ROM space */
 
-	map(0xc048, 0xc048).w(this, FUNC(_5clown_state::cpu_c048_w));
-	map(0xd800, 0xd800).w(this, FUNC(_5clown_state::cpu_d800_w));
+	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
+	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
 	map(0xc400, 0xc400).portr("SW1");    /* DIP Switches bank */
 	map(0xcc00, 0xcc00).portr("SW2");    /* DIP Switches bank */
@@ -835,11 +836,11 @@ void _5clown_state::fclown_map(address_map &map)
 void _5clown_state::fcaudio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(this, FUNC(_5clown_state::snd_800_w));
-	map(0x0a02, 0x0a02).w(this, FUNC(_5clown_state::snd_a02_w));
+	map(0x0800, 0x0800).w(FUNC(_5clown_state::snd_800_w));
+	map(0x0a02, 0x0a02).w(FUNC(_5clown_state::snd_a02_w));
 	map(0x0c04, 0x0c04).w("oki6295", FUNC(okim6295_device::write));
 	map(0x0c06, 0x0c06).r("oki6295", FUNC(okim6295_device::read));
-	map(0x0e06, 0x0e06).r(this, FUNC(_5clown_state::snd_e06_r));
+	map(0x0e06, 0x0e06).r(FUNC(_5clown_state::snd_e06_r));
 	map(0xe000, 0xffff).rom();                 /* ROM space */
 }
 
@@ -1010,7 +1011,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( fclown )
+static GFXDECODE_START( gfx_fclown )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -1022,24 +1023,24 @@ GFXDECODE_END
 MACHINE_CONFIG_START(_5clown_state::fclown)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
-	MCFG_CPU_PROGRAM_MAP(fclown_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
+	MCFG_DEVICE_PROGRAM_MAP(fclown_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
-	MCFG_CPU_PROGRAM_MAP(fcaudio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
+	MCFG_DEVICE_PROGRAM_MAP(fcaudio_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(_5clown_state, mux_port_r))
-	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, counters_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, _5clown_state, mux_port_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia0_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, counters_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
-	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(_5clown_state, trigsnd_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, mux_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia1_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, _5clown_state, trigsnd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1050,7 +1051,7 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fclown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fclown)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
 
@@ -1060,12 +1061,12 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
+	MCFG_DEVICE_ADD("oki6295", OKIM6295, MASTER_CLOCK/12, okim6295_device::PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
 MACHINE_CONFIG_END
@@ -1173,45 +1174,40 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(_5clown_state,fclown)
+void _5clown_state::init_fclown()
 {
 	/* Decrypting main program */
-
-	int x;
 	uint8_t *src = memregion( "maincpu" )->base();
 
-	for (x = 0x0000; x < 0x10000; x++)
+	for (int x = 0x0000; x < 0x10000; x++)
 	{
 		src[x] = src[x] ^ 0x20;     /* Decrypting byte */
 	}
 
 
 	/* Decrypting GFX by segments */
-
 	uint8_t *gfx1_src = memregion( "gfx1" )->base();
 	uint8_t *gfx2_src = memregion( "gfx2" )->base();
 
-	for (x = 0x2000; x < 0x3000; x++)
+	for (int x = 0x2000; x < 0x3000; x++)
 	{
 		gfx1_src[x] = gfx1_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 7000-7fff */
 	}
 
-	for (x = 0x0000; x < 0x1000; x++)
+	for (int x = 0x0000; x < 0x1000; x++)
 	{
 		gfx2_src[x] = gfx2_src[x] ^ 0x3f;   /* Decrypting bulk GFX segment 6000-6fff */
 	}
 
-	for (x = 0x2000; x < 0x3000; x++)
+	for (int x = 0x2000; x < 0x3000; x++)
 	{
 		gfx2_src[x] = gfx2_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 4000-4fff */
 	}
 
 
 	/* Decrypting sound samples */
-
 	uint8_t *samples_src = memregion( "oki6295" )->base();
-
-	for (x = 0x0000; x < 0x10000; x++)
+	for (int x = 0x0000; x < 0x10000; x++)
 	{
 		if (samples_src[x] & 0x02)                      /* If bit 1 is active... */
 		{
@@ -1230,7 +1226,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE INPUT   STATE          INIT    ROT   COMPANY  FULLNAME                       FLAGS...
-GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE INPUT   CLASS          INIT         ROT   COMPANY  FULLNAME                       FLAGS...
+GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

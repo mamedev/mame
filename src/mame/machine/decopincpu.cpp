@@ -25,7 +25,7 @@ void decocpu_type1_device::decocpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(decocpu_type1_device::solenoid2_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type1_device::solenoid2_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -38,7 +38,7 @@ void decocpu_type2_device::decocpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(decocpu_type2_device::solenoid2_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type2_device::solenoid2_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -87,7 +87,7 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )
@@ -201,48 +201,48 @@ WRITE8_MEMBER( decocpu_type1_device::solenoid2_w )
 
 MACHINE_CONFIG_START(decocpu_type1_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(decocpu1_map)
+	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(decocpu1_map)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0) // 5F - PIA at 0x2100
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, solenoid1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(decocpu_type1_device, pia21_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, decocpu_type1_device, solenoid1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, decocpu_type1_device, pia21_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0) // 11D - PIA at 0x2400
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, lamp1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, decocpu_type1_device, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, decocpu_type1_device, lamp1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0) // 11B - PIA at 0x2800
-	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, display_strobe_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_strobe_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, decocpu_type1_device, display_strobe_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, decocpu_type1_device, display_strobe_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, decocpu_type1_device, display_out1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia2c", PIA6821, 0) // 9B - PIA at 0x2c00
-	MCFG_PIA_READPB_HANDLER(READ8(decocpu_type1_device, display_in3_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out3_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, decocpu_type1_device, display_in3_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, decocpu_type1_device, display_out2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, decocpu_type1_device, display_out3_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0) // 8H - PIA at 0x3000
-	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, switch_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, decocpu_type1_device, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, decocpu_type1_device, switch_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia34", PIA6821, 0) // 7B - PIA at 0x3400
-	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, dmdstatus_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out4_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, sound_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, decocpu_type1_device, dmdstatus_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, decocpu_type1_device, display_out4_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, decocpu_type1_device, sound_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
@@ -308,8 +308,8 @@ MACHINE_CONFIG_START(decocpu_type2_device::device_add_mconfig)
 	decocpu_type1_device::device_add_mconfig(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(decocpu2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(decocpu2_map)
 MACHINE_CONFIG_END
 
 void decocpu_type2_device::device_start()

@@ -49,6 +49,8 @@ private:
 	required_memory_region m_ram;
 	required_memory_region m_rom;
 
+	output_finder<2> m_digits;
+
 	uint8_t   m_portc;
 };
 

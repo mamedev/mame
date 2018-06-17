@@ -116,29 +116,30 @@ DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control U
 //AM_RANGE(0x0010, 0x0013) DMA enable
 //AM_RANGE(0x0014, 0x0017) DMA start factor
 
-ADDRESS_MAP_START(sega_scu_device::regs_map)
-	AM_RANGE(0x0000, 0x0017) AM_READWRITE(dma_lv0_r,dma_lv0_w)
-	AM_RANGE(0x0020, 0x0037) AM_READWRITE(dma_lv1_r,dma_lv1_w)
-	AM_RANGE(0x0040, 0x0057) AM_READWRITE(dma_lv2_r,dma_lv2_w)
+void sega_scu_device::regs_map(address_map &map)
+{
+	map(0x0000, 0x0017).rw(FUNC(sega_scu_device::dma_lv0_r), FUNC(sega_scu_device::dma_lv0_w));
+	map(0x0020, 0x0037).rw(FUNC(sega_scu_device::dma_lv1_r), FUNC(sega_scu_device::dma_lv1_w));
+	map(0x0040, 0x0057).rw(FUNC(sega_scu_device::dma_lv2_r), FUNC(sega_scu_device::dma_lv2_w));
 	// Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-	AM_RANGE(0x005c, 0x005f) AM_READ(dma_status_r)
+	map(0x005c, 0x005f).r(FUNC(sega_scu_device::dma_status_r));
 //  AM_RANGE(0x0060, 0x0063) AM_WRITE(dma_force_stop_w)
-	AM_RANGE(0x007c, 0x007f) AM_READ(dma_status_r)
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("scudsp",scudsp_cpu_device, program_control_r,program_control_w)
-	AM_RANGE(0x0084, 0x0087) AM_DEVWRITE("scudsp", scudsp_cpu_device, program_w)
-	AM_RANGE(0x0088, 0x008b) AM_DEVWRITE("scudsp", scudsp_cpu_device, ram_address_control_w)
-	AM_RANGE(0x008c, 0x008f) AM_DEVREADWRITE("scudsp", scudsp_cpu_device, ram_address_r, ram_address_w)
-	AM_RANGE(0x0090, 0x0093) AM_WRITE(t0_compare_w)
-	AM_RANGE(0x0094, 0x0097) AM_WRITE(t1_setdata_w)
-	AM_RANGE(0x0098, 0x009b) AM_WRITE16(t1_mode_w,0x0000ffff)
-	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE(irq_mask_r,irq_mask_w)
-	AM_RANGE(0x00a4, 0x00a7) AM_READWRITE(irq_status_r,irq_status_w)
+	map(0x007c, 0x007f).r(FUNC(sega_scu_device::dma_status_r));
+	map(0x0080, 0x0083).rw("scudsp", FUNC(scudsp_cpu_device::program_control_r), FUNC(scudsp_cpu_device::program_control_w));
+	map(0x0084, 0x0087).w("scudsp", FUNC(scudsp_cpu_device::program_w));
+	map(0x0088, 0x008b).w("scudsp", FUNC(scudsp_cpu_device::ram_address_control_w));
+	map(0x008c, 0x008f).rw("scudsp", FUNC(scudsp_cpu_device::ram_address_r), FUNC(scudsp_cpu_device::ram_address_w));
+	map(0x0090, 0x0093).w(FUNC(sega_scu_device::t0_compare_w));
+	map(0x0094, 0x0097).w(FUNC(sega_scu_device::t1_setdata_w));
+	map(0x009a, 0x009b).w(FUNC(sega_scu_device::t1_mode_w));
+	map(0x00a0, 0x00a3).rw(FUNC(sega_scu_device::irq_mask_r), FUNC(sega_scu_device::irq_mask_w));
+	map(0x00a4, 0x00a7).rw(FUNC(sega_scu_device::irq_status_r), FUNC(sega_scu_device::irq_status_w));
 //  AM_RANGE(0x00a8, 0x00ab) AM_WRITE(abus_irqack_w)
 //  AM_RANGE(0x00b0, 0x00b7) AM_READWRITE(abus_set_r,abus_set_w)
 //  AM_RANGE(0x00b8, 0x00bb) AM_READWRITE(abus_refresh_r,abus_refresh_w)
 //  AM_RANGE(0x00c4, 0x00c7) AM_READWRITE(sdram_r,sdram_w)
-	AM_RANGE(0x00c8, 0x00cb) AM_READ(version_r) // returns 4 for stock Saturn
-ADDRESS_MAP_END
+	map(0x00c8, 0x00cb).r(FUNC(sega_scu_device::version_r));
+}
 
 //-------------------------------------------------
 //  sega_scu_device - constructor
@@ -177,10 +178,10 @@ WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
 }
 
 MACHINE_CONFIG_START(sega_scu_device::device_add_mconfig)
-	MCFG_CPU_ADD("scudsp", SCUDSP, XTAL(57'272'727)/4) // 14 MHz
-	MCFG_SCUDSP_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
-	MCFG_SCUDSP_IN_DMA_CB(READ16(sega_scu_device, scudsp_dma_r))
-	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(sega_scu_device, scudsp_dma_w))
+	MCFG_DEVICE_ADD("scudsp", SCUDSP, XTAL(57'272'727)/4) // 14 MHz
+	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
+	MCFG_SCUDSP_IN_DMA_CB(READ16(*this, sega_scu_device, scudsp_dma_r))
+	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(*this, sega_scu_device, scudsp_dma_w))
 MACHINE_CONFIG_END
 
 

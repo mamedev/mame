@@ -110,9 +110,10 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 
 }
 
-ADDRESS_MAP_START(m68340_cpu_device::m68340_internal_map)
-	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
-ADDRESS_MAP_END
+void m68340_cpu_device::m68340_internal_map(address_map &map)
+{
+	map(0x0003ff00, 0x0003ff03).rw(FUNC(m68340_cpu_device::m68340_internal_base_r), FUNC(m68340_cpu_device::m68340_internal_base_w));
+}
 
 
 //-------------------------------------------------
@@ -120,7 +121,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 MACHINE_CONFIG_START(m68340_cpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
-	MCFG_MC68340SER_IRQ_CALLBACK(DEVWRITELINE("serial", mc68340_serial_module_device, irq_w))
+	MCFG_MC68340SER_IRQ_CALLBACK(WRITELINE("serial", mc68340_serial_module_device, irq_w))
 	MCFG_DEVICE_ADD("timer1", MC68340_TIMER_MODULE, 0)
 	MCFG_DEVICE_ADD("timer2", MC68340_TIMER_MODULE, 0)
 MACHINE_CONFIG_END

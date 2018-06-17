@@ -59,9 +59,9 @@ void tr175_state::mem_map(address_map &map)
 	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
 	map(0xffe800, 0xffe805).unmaprw(); //AM_DEVREADWRITE8("pai", um82c11_device, read, write, 0xff00)
-	map(0xffec01, 0xffec01).w(this, FUNC(tr175_state::ffec01_w));
-	map(0xfff000, 0xfff000).w(this, FUNC(tr175_state::fff000_w));
-	map(0xfff400, 0xfff400).r(this, FUNC(tr175_state::fff400_r));
+	map(0xffec01, 0xffec01).w(FUNC(tr175_state::ffec01_w));
+	map(0xfff000, 0xfff000).w(FUNC(tr175_state::fff000_w));
+	map(0xfff400, 0xfff400).r(FUNC(tr175_state::fff400_r));
 	map(0xfffc01, 0xfffc01).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0xfffc03, 0xfffc03).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0xfffc05, 0xfffc05).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -85,8 +85,8 @@ static INPUT_PORTS_START( tr175 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tr175_state::tr175)
-	MCFG_CPU_ADD("maincpu", M68000, 12'000'000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000), 900, 0, 720, 449, 0, 416) // guess
@@ -123,4 +123,4 @@ ROM_START( tr175 )
 	ROM_LOAD16_BYTE( "v6.05.u45", 0x00000, 0x10000, CRC(e220befe) SHA1(8402280577e6de4b85843222bbd6b06a3f625b3b) )
 ROM_END
 
-COMP( 1982, tr175, 0, 0, tr175, tr175, tr175_state, 0, "Relisys", "TR-175 II", MACHINE_IS_SKELETON )
+COMP( 1982, tr175, 0, 0, tr175, tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_IS_SKELETON )

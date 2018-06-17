@@ -42,13 +42,15 @@
 DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "Fujitsu MB86235 \"TGPx4\"")
 
 
-ADDRESS_MAP_START(mb86235_device::internal_abus)
-	AM_RANGE(0x000000, 0x0003ff) AM_RAM
-ADDRESS_MAP_END
+void mb86235_device::internal_abus(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+}
 
-ADDRESS_MAP_START(mb86235_device::internal_bbus)
-	AM_RANGE(0x000000, 0x0003ff) AM_RAM
-ADDRESS_MAP_END
+void mb86235_device::internal_bbus(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+}
 
 
 
@@ -66,7 +68,7 @@ void mb86235_device::execute_run()
 		curpc = check_previous_op_stall() ? m_core->cur_fifo_state.pc : m_core->pc;
 
 		debugger_instruction_hook(curpc);
-		opcode = m_direct->read_qword(curpc);
+		opcode = m_pcache->read_qword(curpc);
 
 		m_core->ppc = curpc;
 
@@ -90,7 +92,7 @@ void mb86235_device::execute_run()
 void mb86235_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_pcache = m_program->cache<3, -3, ENDIANNESS_LITTLE>();
 	m_dataa = &space(AS_DATA);
 	m_datab = &space(AS_IO);
 
@@ -269,6 +271,10 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
+{
+}
+
+mb86235_device::~mb86235_device()
 {
 }
 

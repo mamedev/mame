@@ -82,6 +82,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
 #include "video/kaneko_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -278,7 +279,7 @@ WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 void sandscrp_state::sandscrp(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
-	map(0x100000, 0x100001).w(this, FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
+	map(0x100000, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
 
 	map(0x700000, 0x70ffff).ram();     // RAM
 	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
@@ -286,15 +287,15 @@ void sandscrp_state::sandscrp(address_map &map)
 	map(0x400000, 0x403fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
 	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
 	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xa00000, 0xa00001).w(this, FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
+	map(0xa00000, 0xa00001).w(FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
 	map(0xb00000, 0xb00001).portr("P1");
 	map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("UNK");
 	map(0xec0000, 0xec0001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x800000, 0x800001).r(this, FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
-	map(0xe00001, 0xe00001).rw(this, FUNC(sandscrp_state::soundlatch_r<1>), FUNC(sandscrp_state::soundlatch_w<0>));   // From/To Sound CPU
-	map(0xe40000, 0xe40001).rw(this, FUNC(sandscrp_state::latchstatus_word_r), FUNC(sandscrp_state::latchstatus_word_w)); //
+	map(0x800000, 0x800001).r(FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
+	map(0xe00001, 0xe00001).rw(FUNC(sandscrp_state::soundlatch_r<1>), FUNC(sandscrp_state::soundlatch_w<0>));   // From/To Sound CPU
+	map(0xe40000, 0xe40001).rw(FUNC(sandscrp_state::latchstatus_word_r), FUNC(sandscrp_state::latchstatus_word_w)); //
 }
 
 
@@ -324,12 +325,12 @@ void sandscrp_state::sandscrp_soundmem(address_map &map)
 void sandscrp_state::sandscrp_soundport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sandscrp_state::bankswitch_w));    // ROM Bank
+	map(0x00, 0x00).w(FUNC(sandscrp_state::bankswitch_w));    // ROM Bank
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));        // PORTA/B read
 	map(0x04, 0x04).w("oki", FUNC(okim6295_device::write));     // OKIM6295
-	map(0x06, 0x06).w(this, FUNC(sandscrp_state::soundlatch_w<1>));    //
-	map(0x07, 0x07).r(this, FUNC(sandscrp_state::soundlatch_r<0>));     //
-	map(0x08, 0x08).r(this, FUNC(sandscrp_state::latchstatus_r));    //
+	map(0x06, 0x06).w(FUNC(sandscrp_state::soundlatch_w<1>));    //
+	map(0x07, 0x07).r(FUNC(sandscrp_state::soundlatch_r<0>));     //
+	map(0x08, 0x08).r(FUNC(sandscrp_state::latchstatus_r));    //
 }
 
 
@@ -452,7 +453,7 @@ static const gfx_layout layout_16x16x4 =
 };
 
 
-static GFXDECODE_START( sandscrp )
+static GFXDECODE_START( gfx_sandscrp )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0x000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4_2, 0x400, 0x40 ) // [1] Layers
 GFXDECODE_END
@@ -467,13 +468,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
-	MCFG_CPU_PROGRAM_MAP(sandscrp)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
+	MCFG_DEVICE_PROGRAM_MAP(sandscrp)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
-	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)
-	MCFG_CPU_IO_MAP(sandscrp_soundport)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
+	MCFG_DEVICE_PROGRAM_MAP(sandscrp_soundmem)
+	MCFG_DEVICE_IO_MAP(sandscrp_soundport)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -485,10 +486,10 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sandscrp_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sandscrp_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -504,18 +505,18 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* YM3014B + YM2203C */
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
@@ -569,7 +570,7 @@ ROM_START( sandscrpa ) /* Z03VA-003 PCB, earlier program version */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
-
+//快打獅子皇帝/Kuài dǎ shīzi huángdì
 ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) ) /* Chinese title screen */
@@ -590,6 +591,6 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 ROM_END
 
 
-GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, empty_init, ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, empty_init, ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, empty_init, ROT90, "Face",   "Kuai Da Shizi Huangdi (China?, Revised Hardware)", MACHINE_SUPPORTS_SAVE )

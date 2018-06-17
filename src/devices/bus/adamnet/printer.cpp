@@ -64,10 +64,10 @@ void adam_printer_device::adam_prn_mem(address_map &map)
 
 void adam_printer_device::adam_prn_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(adam_printer_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_printer_device::p2_r), FUNC(adam_printer_device::p2_w));
-	map(M6801_PORT3, M6801_PORT3).r(this, FUNC(adam_printer_device::p3_r));
-	map(M6801_PORT4, M6801_PORT4).rw(this, FUNC(adam_printer_device::p4_r), FUNC(adam_printer_device::p4_w));
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_printer_device::p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_printer_device::p2_r), FUNC(adam_printer_device::p2_w));
+	map(M6801_PORT3, M6801_PORT3).r(FUNC(adam_printer_device::p3_r));
+	map(M6801_PORT4, M6801_PORT4).rw(FUNC(adam_printer_device::p4_r), FUNC(adam_printer_device::p4_w));
 }
 
 
@@ -76,9 +76,9 @@ void adam_printer_device::adam_prn_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_printer_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(adam_prn_mem)
-	MCFG_CPU_IO_MAP(adam_prn_io)
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(adam_prn_mem)
+	MCFG_DEVICE_IO_MAP(adam_prn_io)
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
 

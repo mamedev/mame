@@ -14,6 +14,7 @@
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define CONTRAST (ioport("DSW0")->read() & 0x07)
 
@@ -37,7 +38,7 @@ public:
 	uint8_t m_outb;
 	int m_power;
 	uint8_t m_reg[0x100];
-	DECLARE_DRIVER_INIT(pc1401);
+	void init_pc1401();
 	uint32_t screen_update_pc1401(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ_LINE_MEMBER(pc1401_reset);
 	DECLARE_READ_LINE_MEMBER(pc1401_brk);

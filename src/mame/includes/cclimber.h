@@ -3,6 +3,8 @@
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/segacrpt_device.h"
+#include "emupal.h"
 
 class cclimber_state : public driver_device
 {
@@ -24,7 +26,8 @@ public:
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -73,15 +76,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(cclimber);
-	DECLARE_DRIVER_INIT(yamato);
-	DECLARE_DRIVER_INIT(ckongb);
-	DECLARE_DRIVER_INIT(toprollr);
-	DECLARE_DRIVER_INIT(cclimberj);
-	DECLARE_DRIVER_INIT(cannonb2);
-	DECLARE_DRIVER_INIT(cannonb);
-	DECLARE_DRIVER_INIT(dking);
-	DECLARE_DRIVER_INIT(rpatrol);
+	void init_cclimber();
+	void init_yamato();
+	void init_ckongb();
+	void init_toprollr();
+	void init_cclimberj();
+	void init_cannonb2();
+	void init_cannonb();
+	void init_dking();
+	void init_rpatrol();
 	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
 	DECLARE_VIDEO_START(swimmer);

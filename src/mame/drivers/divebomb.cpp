@@ -106,7 +106,7 @@ To verify against original HW:
 void divebomb_state::divebomb_fgcpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(divebomb_state::fgram_w)).share("fgram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(divebomb_state::fgram_w)).share("fgram");
 	map(0xe000, 0xffff).ram();
 }
 
@@ -114,12 +114,12 @@ void divebomb_state::divebomb_fgcpu_map(address_map &map)
 void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::write));
-	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::write));
-	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::write));
-	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::write));
-	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::write));
-	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::write));
+	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::command_w));
+	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::command_w));
 	map(0x10, 0x10).r(m_roz2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2roz", FUNC(generic_latch_8_device::write));
 	map(0x20, 0x20).r(m_spr2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2spr", FUNC(generic_latch_8_device::write));
 	map(0x30, 0x30).portr("IN0");
@@ -130,7 +130,7 @@ void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 	map(0x34, 0x34).portr("DSW3");
 	map(0x35, 0x35).portr("DSW4");
 	map(0x36, 0x36).portr("SYSTEM");
-	map(0x37, 0x37).r(this, FUNC(divebomb_state::fgcpu_comm_flags_r));
+	map(0x37, 0x37).r(FUNC(divebomb_state::fgcpu_comm_flags_r));
 }
 
 
@@ -165,7 +165,7 @@ void divebomb_state::divebomb_spritecpu_map(address_map &map)
 void divebomb_state::divebomb_spritecpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(divebomb_state::spritecpu_port00_w));
+	map(0x00, 0x00).w(FUNC(divebomb_state::spritecpu_port00_w));
 	map(0x80, 0x80).r("fg2spr", FUNC(generic_latch_8_device::read)).w(m_spr2fg_latch, FUNC(generic_latch_8_device::write));
 }
 
@@ -210,15 +210,15 @@ void divebomb_state::divebomb_rozcpu_map(address_map &map)
 void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(divebomb_state::rozcpu_bank_w));
-	map(0x10, 0x10).w(this, FUNC(divebomb_state::rozcpu_wrap_enable_w<1>));
-	map(0x12, 0x12).w(this, FUNC(divebomb_state::rozcpu_enable_w<0>));
-	map(0x13, 0x13).w(this, FUNC(divebomb_state::rozcpu_enable_w<1>));
-	map(0x14, 0x14).w(this, FUNC(divebomb_state::rozcpu_wrap_enable_w<0>));
+	map(0x00, 0x00).w(FUNC(divebomb_state::rozcpu_bank_w));
+	map(0x10, 0x10).w(FUNC(divebomb_state::rozcpu_wrap_enable_w<1>));
+	map(0x12, 0x12).w(FUNC(divebomb_state::rozcpu_enable_w<0>));
+	map(0x13, 0x13).w(FUNC(divebomb_state::rozcpu_enable_w<1>));
+	map(0x14, 0x14).w(FUNC(divebomb_state::rozcpu_wrap_enable_w<0>));
 	map(0x20, 0x2f).w(m_k051316[0], FUNC(k051316_device::ctrl_w));
 	map(0x30, 0x3f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));
 	map(0x40, 0x40).r("fg2roz", FUNC(generic_latch_8_device::read)).w(m_roz2fg_latch, FUNC(generic_latch_8_device::write));
-	map(0x50, 0x50).w(this, FUNC(divebomb_state::rozcpu_pal_w));
+	map(0x50, 0x50).w(FUNC(divebomb_state::rozcpu_pal_w));
 }
 
 
@@ -373,7 +373,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( divebomb )
+static GFXDECODE_START( gfx_divebomb )
 	GFXDECODE_ENTRY( "fgrom", 0, tiles8x8_layout, 0x400+0x400, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16_layout, 0x400+0x400+0x400, 16 )
 GFXDECODE_END
@@ -388,20 +388,17 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(divebomb_state::divebomb)
 
-	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
-	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)
-	MCFG_CPU_IO_MAP(divebomb_fgcpu_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("fgcpu", Z80,XTAL1/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(divebomb_fgcpu_map)
+	MCFG_DEVICE_IO_MAP(divebomb_fgcpu_iomap)
 
-	MCFG_CPU_ADD("spritecpu", Z80,XTAL1/4) // ?
-	MCFG_CPU_PROGRAM_MAP(divebomb_spritecpu_map)
-	MCFG_CPU_IO_MAP(divebomb_spritecpu_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("spritecpu", Z80,XTAL1/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(divebomb_spritecpu_map)
+	MCFG_DEVICE_IO_MAP(divebomb_spritecpu_iomap)
 
-	MCFG_CPU_ADD("rozcpu", Z80,XTAL1/4) // ?
-	MCFG_CPU_PROGRAM_MAP(divebomb_rozcpu_map)
-	MCFG_CPU_IO_MAP(divebomb_rozcpu_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("rozcpu", Z80,XTAL1/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(divebomb_rozcpu_map)
+	MCFG_DEVICE_IO_MAP(divebomb_rozcpu_iomap)
 
 	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
 
@@ -415,10 +412,10 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("rozcpu", INPUT_LINE_IRQ0))
 
 	MCFG_GENERIC_LATCH_8_ADD("spr2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD("roz2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -447,27 +444,30 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1-32)
 	MCFG_SCREEN_UPDATE_DRIVER(divebomb_state, screen_update_divebomb)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("fgcpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("spritecpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("rozcpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", divebomb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_divebomb)
 	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)
 
 	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
-	MCFG_SOUND_ADD("sn0", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn0", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn1", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn2", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn3", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn3", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn4", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn4", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn5", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn5", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -578,4 +578,4 @@ MACHINE_RESET_MEMBER(divebomb_state, divebomb)
  *************************************/
 
 // According to a flyer, the world release was to be called 'Gaia'. The Gaia title graphics are present in the ROMs.
-GAME( 1989, divebomb, 0, divebomb, divebomb, divebomb_state, 0, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, divebomb, 0, divebomb, divebomb, divebomb_state, empty_init, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

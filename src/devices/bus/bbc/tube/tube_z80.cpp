@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80
 
 void bbc_tube_z80_device::tube_z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
 }
 
 //-------------------------------------------------
@@ -36,7 +36,7 @@ void bbc_tube_z80_device::tube_z80_mem(address_map &map)
 
 void bbc_tube_z80_device::tube_z80_fetch(address_map &map)
 {
-	map(0x000, 0xffff).r(this, FUNC(bbc_tube_z80_device::opcode_r));
+	map(0x000, 0xffff).r(FUNC(bbc_tube_z80_device::opcode_r));
 }
 
 //-------------------------------------------------
@@ -62,15 +62,15 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_z80_device::device_add_mconfig)
-	MCFG_CPU_ADD("z80", Z80, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(tube_z80_mem)
-	MCFG_CPU_OPCODES_MAP(tube_z80_fetch)
-	MCFG_CPU_IO_MAP(tube_z80_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
+	MCFG_DEVICE_ADD("z80", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tube_z80_mem)
+	MCFG_DEVICE_OPCODES_MAP(tube_z80_fetch)
+	MCFG_DEVICE_IO_MAP(tube_z80_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
 
 	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_HIRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
-	MCFG_TUBE_PNMI_HANDLER(WRITELINE(bbc_tube_z80_device, nmi_w))
+	MCFG_TUBE_HIRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	MCFG_TUBE_PNMI_HANDLER(WRITELINE(*this, bbc_tube_z80_device, nmi_w))
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* internal ram */

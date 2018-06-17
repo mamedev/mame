@@ -89,11 +89,6 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 #include "emu.h"
 #include "includes/policetr.h"
 
-#include "cpu/mips/r3000.h"
-#include "machine/eepromser.h"
-#include "sound/bsmt2000.h"
-#include "speaker.h"
-
 
 /* constants */
 #define MASTER_CLOCK    48000000
@@ -156,8 +151,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (m_control_data & 0x80000000))
 	{
-		bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
-		bsmt->reset();
+		m_bsmt->reset();
 	}
 
 	/* log any unknown bits */
@@ -176,7 +170,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
 {
 	if (m_control_data & 0x80000000)
-		machine().device<bsmt2000_device>("bsmt")->write_data(data);
+		m_bsmt->write_data(data);
 	else
 		COMBINE_DATA(&m_bsmt_data_offset);
 }
@@ -184,20 +178,20 @@ WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
 
 WRITE32_MEMBER(policetr_state::policetr_bsmt2000_data_w)
 {
-	machine().device<bsmt2000_device>("bsmt")->write_reg(data);
+	m_bsmt->write_reg(data);
 	COMBINE_DATA(&m_bsmt_data_bank);
 }
 
 
 CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
 {
-	return machine().device<bsmt2000_device>("bsmt")->read_status();
+	return m_bsmt->read_status();
 }
 
 
 READ32_MEMBER(policetr_state::bsmt2000_data_r)
 {
-	return memregion("bsmt")->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
+	return m_bsmt_region->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
 }
 
 
@@ -243,16 +237,16 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 void policetr_state::policetr_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().share("rambase");
-	map(0x00200000, 0x0020000f).w(this, FUNC(policetr_state::policetr_video_w));
-	map(0x00400000, 0x00400003).r(this, FUNC(policetr_state::policetr_video_r));
+	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
+	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::policetr_video_w));
+	map(0x00400000, 0x00400003).r(FUNC(policetr_state::policetr_video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
-	map(0x00600000, 0x00600003).r(this, FUNC(policetr_state::bsmt2000_data_r));
-	map(0x00700000, 0x00700003).w(this, FUNC(policetr_state::policetr_bsmt2000_reg_w));
-	map(0x00800000, 0x00800003).w(this, FUNC(policetr_state::policetr_bsmt2000_data_w));
-	map(0x00900000, 0x00900003).w(this, FUNC(policetr_state::policetr_palette_offset_w));
-	map(0x00920000, 0x00920003).w(this, FUNC(policetr_state::policetr_palette_data_w));
-	map(0x00a00000, 0x00a00003).w(this, FUNC(policetr_state::control_w));
+	map(0x00600000, 0x00600003).r(FUNC(policetr_state::bsmt2000_data_r));
+	map(0x00700000, 0x00700003).w(FUNC(policetr_state::policetr_bsmt2000_reg_w));
+	map(0x00800000, 0x00800003).w(FUNC(policetr_state::policetr_bsmt2000_data_w));
+	map(0x00900000, 0x00900003).w(FUNC(policetr_state::policetr_palette_offset_w));
+	map(0x00920000, 0x00920003).w(FUNC(policetr_state::policetr_palette_data_w));
+	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
 	map(0x00a40000, 0x00a40003).portr("DSW");
@@ -263,16 +257,16 @@ void policetr_state::policetr_map(address_map &map)
 
 void policetr_state::sshooter_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().share("rambase");
-	map(0x00200000, 0x00200003).w(this, FUNC(policetr_state::policetr_bsmt2000_data_w));
-	map(0x00300000, 0x00300003).w(this, FUNC(policetr_state::policetr_palette_offset_w));
-	map(0x00320000, 0x00320003).w(this, FUNC(policetr_state::policetr_palette_data_w));
-	map(0x00400000, 0x00400003).r(this, FUNC(policetr_state::policetr_video_r));
+	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
+	map(0x00200000, 0x00200003).w(FUNC(policetr_state::policetr_bsmt2000_data_w));
+	map(0x00300000, 0x00300003).w(FUNC(policetr_state::policetr_palette_offset_w));
+	map(0x00320000, 0x00320003).w(FUNC(policetr_state::policetr_palette_data_w));
+	map(0x00400000, 0x00400003).r(FUNC(policetr_state::policetr_video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
-	map(0x00600000, 0x00600003).r(this, FUNC(policetr_state::bsmt2000_data_r));
-	map(0x00700000, 0x00700003).w(this, FUNC(policetr_state::policetr_bsmt2000_reg_w));
-	map(0x00800000, 0x0080000f).w(this, FUNC(policetr_state::policetr_video_w));
-	map(0x00a00000, 0x00a00003).w(this, FUNC(policetr_state::control_w));
+	map(0x00600000, 0x00600003).r(FUNC(policetr_state::bsmt2000_data_r));
+	map(0x00700000, 0x00700003).w(FUNC(policetr_state::policetr_bsmt2000_reg_w));
+	map(0x00800000, 0x0080000f).w(FUNC(policetr_state::policetr_video_w));
+	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
 	map(0x00a40000, 0x00a40003).portr("DSW");
@@ -315,7 +309,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )       /* Not actually a dipswitch */
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state,bsmt_status_r, nullptr)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -402,40 +396,37 @@ void policetr_state::machine_start()
 MACHINE_CONFIG_START(policetr_state::policetr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(policetr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
+	device = &R3041(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_endianness(ENDIANNESS_BIG);
+	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::policetr_map);
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", policetr_state, irq4_gen);
 
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 262)  /* needs to be verified */
-	MCFG_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(policetr_state, screen_update_policetr)
-	MCFG_SCREEN_PALETTE("palette")
+	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(400, 262);  /* needs to be verified */
+	m_screen->set_visarea(0, 393, 0, 239);
+	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_UPDATE_DRIVER(policetr_state, screen_update_policetr);
 
-	MCFG_PALETTE_ADD("palette", 256)
-
+	PALETTE(config, m_palette, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
 
-	MCFG_BSMT2000_ADD("bsmt", MASTER_CLOCK/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	BSMT2000(config, m_bsmt, MASTER_CLOCK/2);
+	m_bsmt->add_route(0, *m_lspeaker, 1.0);
+	m_bsmt->add_route(1, *m_rspeaker, 1.0);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(policetr_state::sshooter)
 	policetr(config);
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sshooter_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::sshooter_map);
 MACHINE_CONFIG_END
 
 
@@ -685,14 +676,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(policetr_state,policetr)
+void policetr_state::init_policetr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028ac;
 	m_speedup_data = m_rambase + 0xfc8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,plctr13b)
+void policetr_state::init_plctr13b()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028bc;
@@ -700,14 +691,14 @@ DRIVER_INIT_MEMBER(policetr_state,plctr13b)
 }
 
 
-DRIVER_INIT_MEMBER(policetr_state,sshooter)
+void policetr_state::init_sshooter()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc03470;
 	m_speedup_data = m_rambase + 0x18fd8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,sshoot12)
+void policetr_state::init_sshoot12()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc033e0;
@@ -722,14 +713,14 @@ DRIVER_INIT_MEMBER(policetr_state,sshoot12)
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

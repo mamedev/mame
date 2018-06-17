@@ -408,56 +408,56 @@ DEFINE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device, "ibm5160_mb", "IBM 51
 MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12.0) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12.0) /* dram refresh */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out1_changed))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, ibm5160_mb_device, pc_pit8253_out1_changed))
 	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12.0) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ibm5160_mb_device, pc_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL(14'318'181)/3.0 )
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(ibm5160_mb_device, pc_dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(ibm5160_mb_device, pc_dma8237_out_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(ibm5160_mb_device, pc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(ibm5160_mb_device, pc_dma_write_byte))
-	MCFG_I8237_IN_IOR_1_CB(READ8(ibm5160_mb_device, pc_dma8237_1_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(ibm5160_mb_device, pc_dma8237_2_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(ibm5160_mb_device, pc_dma8237_3_dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(ibm5160_mb_device, pc_dma8237_0_dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(ibm5160_mb_device, pc_dma8237_1_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(ibm5160_mb_device, pc_dma8237_2_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ibm5160_mb_device, pc_dma8237_3_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(ibm5160_mb_device, pc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(ibm5160_mb_device, pc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(ibm5160_mb_device, pc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ibm5160_mb_device, pc_dack3_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, ibm5160_mb_device, pc_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, ibm5160_mb_device, pc_dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, ibm5160_mb_device, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, ibm5160_mb_device, pc_dma_write_byte))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, ibm5160_mb_device, pc_dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(*this, ibm5160_mb_device, pc_dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(*this, ibm5160_mb_device, pc_dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, ibm5160_mb_device, pc_dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, ibm5160_mb_device, pc_dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, ibm5160_mb_device, pc_dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, ibm5160_mb_device, pc_dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, ibm5160_mb_device, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, ibm5160_mb_device, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, ibm5160_mb_device, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, ibm5160_mb_device, pc_dack3_w))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(ibm5160_mb_device, pic_int_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, ibm5160_mb_device, pic_int_w))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ibm5160_mb_device, pc_ppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ibm5160_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(ibm5160_mb_device, pc_ppi_portc_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ibm5160_mb_device, pc_ppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm5160_mb_device, pc_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm5160_mb_device, pc_ppi_portc_r))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237", am9517a_device, dreq3_w))
 
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ibm5160_mb_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(ibm5160_mb_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ibm5160_mb_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, ibm5160_mb_device, keyboard_data_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -528,14 +528,15 @@ ibm5160_mb_device::ibm5160_mb_device(
 {
 }
 
-ADDRESS_MAP_START(ibm5160_mb_device::map)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_WRITE(pc_page_w)
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
-ADDRESS_MAP_END
+void ibm5160_mb_device::map(address_map &map)
+{
+	map(0x0000, 0x000f).rw("dma8237", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0080, 0x008f).w(FUNC(ibm5160_mb_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(FUNC(ibm5160_mb_device::nmi_enable_w));
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -594,11 +595,11 @@ MACHINE_CONFIG_START(ibm5150_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ibm5150_mb_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ibm5150_mb_device, keyboard_clock_w))
 
 	MCFG_DEVICE_MODIFY("ppi8255")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ibm5150_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(ibm5150_mb_device, pc_ppi_portc_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm5150_mb_device, pc_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm5150_mb_device, pc_ppi_portc_r))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
@@ -772,11 +773,11 @@ MACHINE_CONFIG_START(ec1841_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("ppi8255")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ec1841_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(ec1841_mb_device, pc_ppi_portc_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ec1841_mb_device, pc_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ec1841_mb_device, pc_ppi_portc_r))
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ec1841_mb_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ec1841_mb_device, keyboard_clock_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ec1841_mb )
@@ -910,12 +911,13 @@ ioport_constructor pc_noppi_mb_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc_noppi_mb );
 }
 
-ADDRESS_MAP_START(pc_noppi_mb_device::map)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_WRITE(pc_page_w)
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
-ADDRESS_MAP_END
+void pc_noppi_mb_device::map(address_map &map)
+{
+	map(0x0000, 0x000f).rw("dma8237", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0080, 0x008f).w(FUNC(pc_noppi_mb_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(FUNC(pc_noppi_mb_device::nmi_enable_w));
+}
 
 DEFINE_DEVICE_TYPE(PCNOPPI_MOTHERBOARD, pc_noppi_mb_device, "pcnoppi_mb", "PCNOPPI_MOTHERBOARD")

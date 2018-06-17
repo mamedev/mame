@@ -165,12 +165,12 @@ void dgn_beta_state::dgnbeta_map(address_map &map)
 	map(0xfc80, 0xfc80).w(m_mc6845, FUNC(mc6845_device::address_w));
 	map(0xfc81, 0xfc81).rw(m_mc6845, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xfc82, 0xfC9F).noprw();
-	map(0xFCA0, 0xFCA3).nopr().w(this, FUNC(dgn_beta_state::dgnbeta_colour_ram_w));         /* 4x4bit colour ram for graphics modes */
+	map(0xFCA0, 0xFCA3).nopr().w(FUNC(dgn_beta_state::dgnbeta_colour_ram_w));         /* 4x4bit colour ram for graphics modes */
 	map(0xFCC0, 0xFCC3).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfcC4, 0xfcdf).noprw();
-	map(0xfce0, 0xfce3).rw(this, FUNC(dgn_beta_state::dgnbeta_wd2797_r), FUNC(dgn_beta_state::dgnbeta_wd2797_w));  /* Onboard disk interface */
+	map(0xfce0, 0xfce3).rw(FUNC(dgn_beta_state::dgnbeta_wd2797_r), FUNC(dgn_beta_state::dgnbeta_wd2797_w));  /* Onboard disk interface */
 	map(0xfce4, 0xfdff).noprw();
-	map(0xFE00, 0xFE0F).rw(this, FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
+	map(0xFE00, 0xFE0F).rw(FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
 	map(0xfe10, 0xfEff).noprw();
 	map(0xFF00, 0xFFFF).bankrw("bank17");
 
@@ -305,7 +305,7 @@ static const gfx_layout dgnbeta_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dgnbeta )
+static GFXDECODE_START( gfx_dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -314,19 +314,20 @@ FLOPPY_FORMATS_MEMBER(dgn_beta_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( dgnbeta_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void dgnbeta_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dgnbeta_map)
+	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
 
 	/* both cpus in the beta share the same address/data buses */
-	MCFG_CPU_ADD(DMACPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
+	MCFG_DEVICE_ADD(DMACPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dgnbeta_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -337,43 +338,43 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dgnbeta)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dgnbeta)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	MCFG_DEVICE_ADD(PIA_0_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state, d_pia0_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state, d_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state, d_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state, d_pia0_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(dgn_beta_state, d_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia0_irq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia0_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia0_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_irq_b))
 
 	/* PIA 1 at $FC24-$FC27 I63 */
 	MCFG_DEVICE_ADD(PIA_1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state, d_pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state, d_pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state, d_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state, d_pia1_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia1_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia1_irq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia1_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia1_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia1_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia1_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia1_irq_b))
 
 	/* PIA 2 at FCC0-FCC3 I28 */
 	/* This seems to control the RAM paging system, and have the DRQ */
 	/* from the WD2797 */
 	MCFG_DEVICE_ADD(PIA_2_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state, d_pia2_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state, d_pia2_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state, d_pia2_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state, d_pia2_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia2_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia2_irq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia2_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia2_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia2_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia2_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_b))
 
-	MCFG_WD2797_ADD(FDC_TAG, XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_drq_w))
+	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 1_MHz_XTAL)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -384,11 +385,11 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(12'288'000) / 16)    //XTAL is guessed
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", 12.288_MHz_XTAL / 16)    //XTAL is guessed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(dgn_beta_state, dgnbeta_vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, dgn_beta_state, dgnbeta_vsync_changed))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -407,17 +408,17 @@ MACHINE_CONFIG_END
 ROM_START(dgnbeta)
 	ROM_REGION(0x4000,MAINCPU_TAG,0)
 	ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon Beta OS-9 Boot ROM (15.6.84)" )
-	ROMX_LOAD("beta_bt.rom"     ,0x0000 ,0x4000 ,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(1))
+	ROMX_LOAD("beta_bt.rom"     ,0x0000 ,0x4000 ,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "testrom", "Dragon Beta Test ROM (1984?)" )
-	ROMX_LOAD("beta_tst.rom"    ,0x2000 ,0x2000 ,CRC(01d79d00) SHA1(343e08cf7656b5e8970514868df37ea0af1e2362), ROM_BIOS(2))
+	ROMX_LOAD("beta_tst.rom"    ,0x2000 ,0x2000 ,CRC(01d79d00) SHA1(343e08cf7656b5e8970514868df37ea0af1e2362), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "cfiles", "cfiles rom" )
-	ROMX_LOAD("beta_cfi.rom"    ,0x2000 ,0x2000 ,CRC(d312e4c0) SHA1(5c00daac488eaf8d36d66de6ec6c746ab7b78ecf), ROM_BIOS(3))
+	ROMX_LOAD("beta_cfi.rom"    ,0x2000 ,0x2000 ,CRC(d312e4c0) SHA1(5c00daac488eaf8d36d66de6ec6c746ab7b78ecf), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "dfiles", "dfiles rom" )
-	ROMX_LOAD("beta_dfi.rom"    ,0x2000 ,0x2000 ,CRC(c4ad7f64) SHA1(50aa92a1c383321485d5a1aa41dfe4f90b3beaed), ROM_BIOS(4))
+	ROMX_LOAD("beta_dfi.rom"    ,0x2000 ,0x2000 ,CRC(c4ad7f64) SHA1(50aa92a1c383321485d5a1aa41dfe4f90b3beaed), ROM_BIOS(3))
 
 	ROM_REGION (0x2000, "gfx1", 0)
 	ROM_LOAD("betachar.rom" ,0x0000 ,0x2000 ,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS           INIT    COMPANY             FULLNAME                  FLAGS
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, dgn_beta_state, 0,      "Dragon Data Ltd",  "Dragon 128 (Beta)",      MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY            FULLNAME             FLAGS
+COMP( 1984, dgnbeta, 0,      0,      dgnbeta, dgnbeta, dgn_beta_state, empty_init, "Dragon Data Ltd", "Dragon 128 (Beta)", MACHINE_NO_SOUND )

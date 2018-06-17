@@ -62,15 +62,15 @@ void mbc55x_state::mbc55x_mem(address_map &map)
 void mbc55x_state::mbc55x_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0003).rw(this, FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
-	map(0x0008, 0x000F).rw(this, FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
-	map(0x0010, 0x0010).rw(this, FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
-	map(0x0018, 0x001F).rw(this, FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
-	map(0x0020, 0x0027).rw(this, FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
-	map(0x0028, 0x002B).rw(this, FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
+	map(0x0000, 0x0003).rw(FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
+	map(0x0008, 0x000F).rw(FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
+	map(0x0010, 0x0010).rw(FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
+	map(0x0018, 0x001F).rw(FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
+	map(0x0020, 0x0027).rw(FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
+	map(0x0028, 0x002B).rw(FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
 	map(0x0030, 0x0031).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0032, 0x0033).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0038, 0x003B).rw(this, FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
+	map(0x0038, 0x003B).rw(FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
 }
 
 static INPUT_PORTS_START( mbc55x )
@@ -233,25 +233,26 @@ FLOPPY_FORMATS_END
 // MBC-555-2 : 2 x 5.25" disk-drive (360 KB)
 // MBC-555-3 : 2 x 5.25" disk-drive (720 KB)
 
-static SLOT_INTERFACE_START( mbc55x_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void mbc55x_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_525_SSDD);
+	device.option_add("dd", FLOPPY_525_DD);
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, I8088, 3600000)
-	MCFG_CPU_PROGRAM_MAP(mbc55x_mem)
-	MCFG_CPU_IO_MAP(mbc55x_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC8259_TAG, pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, I8088, 3600000)
+	MCFG_DEVICE_PROGRAM_MAP(mbc55x_mem)
+	MCFG_DEVICE_IO_MAP(mbc55x_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(PIC8259_TAG, pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),896,0,300,262,0,200)
+	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL, 896, 0, 300, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DEVICE(VID_MC6845_NAME, mc6845_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mbc55x_state, screen_vblank_mbc55x))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mbc55x_state, screen_vblank_mbc55x))
 
 	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
 	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
@@ -263,42 +264,41 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K,576K,640K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,MONO_TAG, 0.75)
+	SPEAKER(config, MONO_TAG).front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	/* Devices */
 	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(PIC8259_TAG, pic8259_device, ir3_w))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir3_w))
 
 	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIT_C0_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(PIC8259_TAG, pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(PIT_C1_CLOCK)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(PIC8259_TAG, pic8259_device, ir1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir1_w))
 	MCFG_PIT8253_CLK2(PIT_C2_CLOCK)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mbc55x_state, pit8253_t2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mbc55x_state, pit8253_t2))
 
 	MCFG_DEVICE_ADD(PIC8259_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(PPI8255_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mbc55x_state, mbc55x_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc55x_state, mbc55x_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mbc55x_state, mbc55x_ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mbc55x_state, mbc55x_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mbc55x_state, mbc55x_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mbc55x_state, mbc55x_ppi_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc55x_state, mbc55x_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portc_w))
 
-	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, XTAL(14'318'181)/8)
+	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc55x_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbc55x_state, vid_hsync_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(mbc55x_state, vid_vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbc55x_state, vid_hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_FD1793_ADD(FDC_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(FDC_TAG, FD1793, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
@@ -314,9 +314,9 @@ ROM_START( mbc55x )
 	ROM_REGION( 0x4000, MAINCPU_TAG, 0 )
 
 	ROM_SYSTEM_BIOS(0, "v120", "mbc55x BIOS v1.20 (1983)")
-	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(1)  )
+	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(0)  )
 ROM_END
 
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME    FLAGS
-COMP( 1983, mbc55x,     0,      0,      mbc55x,  mbc55x, mbc55x_state, 0,    "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 /*MACHINE_NO_SOUND*/)

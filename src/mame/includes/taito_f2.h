@@ -16,6 +16,7 @@
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 
 class taitof2_state : public driver_device
@@ -140,10 +141,10 @@ public:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
-	DECLARE_DRIVER_INIT(driveout);
-	DECLARE_DRIVER_INIT(cameltry);
-	DECLARE_DRIVER_INIT(mjnquest);
-	DECLARE_DRIVER_INIT(finalb);
+	void init_driveout();
+	void init_cameltry();
+	void init_mjnquest();
+	void init_finalb();
 	DECLARE_MACHINE_START(f2);
 	DECLARE_VIDEO_START(taitof2_default);
 	DECLARE_MACHINE_START(common);

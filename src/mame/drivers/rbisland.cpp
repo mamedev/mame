@@ -353,7 +353,7 @@ void rbisland_state::rbisland_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x201000, 0x203fff).ram();             /* r/w in initial checks */
 	map(0x390000, 0x390003).portr("DSWA");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::rbisland_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(rbisland_state::rbisland_spritectrl_w));
 	map(0x3b0000, 0x3b0003).portr("DSWB");
 	map(0x3c0000, 0x3c0003).nopw();        /* written very often, watchdog? */
 	map(0x3e0000, 0x3e0001).nopr();
@@ -380,9 +380,9 @@ void rbisland_state::jumping_map(address_map &map)
 	map(0x400002, 0x400003).portr("DSWB");
 	map(0x401000, 0x401001).portr("401001");
 	map(0x401002, 0x401003).portr("401003");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::jumping_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(rbisland_state::jumping_spritectrl_w));
 	map(0x3c0000, 0x3c0001).nopw();        /* watchdog? */
-	map(0x400006, 0x400007).w(this, FUNC(rbisland_state::jumping_sound_w));
+	map(0x400006, 0x400007).w(FUNC(rbisland_state::jumping_sound_w));
 	map(0x420000, 0x420001).nopr();         /* read, but result not used */
 	map(0x430000, 0x430003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0x440000, 0x4407ff).ram().share("spriteram");
@@ -429,7 +429,7 @@ void rbisland_state::jumping_sound_map(address_map &map)
 	map(0x8000, 0x8fff).ram();
 	map(0xb000, 0xb001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb400, 0xb401).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xb800, 0xb800).r(this, FUNC(rbisland_state::jumping_latch_r));
+	map(0xb800, 0xb800).r(FUNC(rbisland_state::jumping_latch_r));
 	map(0xbc00, 0xbc00).nopw();    /* looks like a bankswitch, but sound works with or without it */
 	map(0xc000, 0xffff).rom();
 }
@@ -591,7 +591,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( rbisland )
+static GFXDECODE_START( gfx_rbisland )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0, 0x80 )  /* OBJ 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,   0, 0x80 )  /* SCR 8x8 */
 GFXDECODE_END
@@ -619,7 +619,7 @@ static const gfx_layout jumping_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( jumping )
+static GFXDECODE_START( gfx_jumping )
 	GFXDECODE_ENTRY( "gfx2", 0, jumping_spritelayout, 0, 0x80 ) /* OBJ 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, jumping_tilelayout,   0, 0x80 ) /* SCR 8x8 */
 GFXDECODE_END
@@ -656,19 +656,19 @@ WRITE8_MEMBER(rbisland_state::counters_w)
 MACHINE_CONFIG_START(rbisland_state::rbisland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rbisland_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rbisland_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rbisland_sound_map)
 
 	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC next to C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, counters_w))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(*this, rbisland_state, counters_w))
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
 
@@ -683,7 +683,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbisland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbisland)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -696,11 +696,11 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rbisland_state,bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rbisland_state,bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -714,12 +714,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rbisland_state::jumping)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(jumping_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(jumping_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
 
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jumping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jumping)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -745,21 +745,21 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
 MACHINE_CONFIG_START(rbisland_state::jumpingi)
 	jumping(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(jumping_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -987,25 +987,25 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(rbisland_state,rbisland)
+void rbisland_state::init_rbisland()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,jumping)
+void rbisland_state::init_jumping()
 {
 	m_jumping_latch = 0;
 	save_item(NAME(m_jumping_latch));
 }
 
 
-GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, init_rbisland, ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, init_rbisland, ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, init_jumping,  ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, init_jumping,  ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, init_jumping,  ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, rbislande, 0,         rbisland, rbisland, rbisland_state, rbisland, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, 0,        rbisland, rbisland, rbisland_state, init_rbisland, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
 

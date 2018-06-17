@@ -38,6 +38,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -90,8 +91,8 @@ void st17xx_state::machine_start()
 
 MACHINE_CONFIG_START(st17xx_state::st17xx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 50000000) /* speed unknown */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) /* speed unknown */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -177,14 +178,14 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     CLASS          INIT  COMPANY      FULLNAME                       FLAGS
-CONS( 200?, st1700h,    0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1700 (headphone version)", MACHINE_IS_SKELETON )
-CONS( 200?, st1701,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1701",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1702,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1702",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1703,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1703",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1704,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1704",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1705,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1705",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1706,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1706",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1707,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1707",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1708,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1708",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1714,     0,          0,      st17xx,     st17xx,   st17xx_state,  0,    "Saturn",    "ST-1714",                     MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY   FULLNAME                       FLAGS
+CONS( 200?, st1700h, 0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1700 (headphone version)", MACHINE_IS_SKELETON )
+CONS( 200?, st1701,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1701",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1702,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1702",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1703,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1703",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1704,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1704",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1705,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1705",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1706,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1706",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1707,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1707",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1708,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1708",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1714,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1714",                     MACHINE_IS_SKELETON )

@@ -581,10 +581,10 @@ void myb3k_state::myb3k_io(address_map &map)
 	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	// Discrete latches
-	map(0x04, 0x04).r(this, FUNC(myb3k_state::myb3k_kbd_r));
-	map(0x04, 0x04).w(this, FUNC(myb3k_state::myb3k_video_mode_w)); // b0=40CH, b1=80CH, b2=16 raster
-	map(0x05, 0x05).r(this, FUNC(myb3k_state::myb3k_io_status_r)); // printer connector bits: b3=fault b2=paper out b1 or b0=busy
-	map(0x05, 0x05).w(this, FUNC(myb3k_state::dma_segment_w)); // b0-b3=addr, b6=A b7=B
+	map(0x04, 0x04).r(FUNC(myb3k_state::myb3k_kbd_r));
+	map(0x04, 0x04).w(FUNC(myb3k_state::myb3k_video_mode_w)); // b0=40CH, b1=80CH, b2=16 raster
+	map(0x05, 0x05).r(FUNC(myb3k_state::myb3k_io_status_r)); // printer connector bits: b3=fault b2=paper out b1 or b0=busy
+	map(0x05, 0x05).w(FUNC(myb3k_state::dma_segment_w)); // b0-b3=addr, b6=A b7=B
 	map(0x06, 0x06).portr("DSW2");
 
 	// 8-9 8259A interrupt controller
@@ -923,18 +923,19 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_select_w){
 		LOGCENT("%s %d - not used by machine\n", FUNCNAME, state);
 }
 
-static SLOT_INTERFACE_START(stepone_isa_cards)
-	SLOT_INTERFACE("myb3k_com", ISA8_MYB3K_COM)
-	SLOT_INTERFACE("myb3k_fdc4710", ISA8_MYB3K_FDC4710)
-	SLOT_INTERFACE("myb3k_fdc4711", ISA8_MYB3K_FDC4711)
-SLOT_INTERFACE_END
+static void stepone_isa_cards(device_slot_interface &device)
+{
+	device.option_add("myb3k_com", ISA8_MYB3K_COM);
+	device.option_add("myb3k_fdc4710", ISA8_MYB3K_FDC4710);
+	device.option_add("myb3k_fdc4711", ISA8_MYB3K_FDC4711);
+}
 
 MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181) / 3) /* 14.3182 main crystal divided by three through a 8284A */
-	MCFG_CPU_PROGRAM_MAP(myb3k_map)
-	MCFG_CPU_IO_MAP(myb3k_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181) / 3) /* 14.3182 main crystal divided by three through a 8284A */
+	MCFG_DEVICE_PROGRAM_MAP(myb3k_map)
+	MCFG_DEVICE_IO_MAP(myb3k_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
 	/* RAM options */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -943,41 +944,41 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* Interrupt controller */
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(myb3k_state, pic_int_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, myb3k_state, pic_int_w))
 
 	/* Parallel port */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(READ8(myb3k_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(myb3k_state, ppi_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, myb3k_state, ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, myb3k_state, ppi_portc_w))
 
 	/* DMA controller */
 	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'318'181) / 6)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(myb3k_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(myb3k_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(myb3k_state, dma_memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(myb3k_state, dma_memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(myb3k_state, io_dack0_r))
-	MCFG_I8257_IN_IOR_1_CB(READ8(myb3k_state, io_dack1_r))
-	MCFG_I8257_IN_IOR_2_CB(READ8(myb3k_state, io_dack2_r))
-	MCFG_I8257_IN_IOR_3_CB(READ8(myb3k_state, io_dack3_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(myb3k_state, io_dack0_w))
-	MCFG_I8257_OUT_IOW_1_CB(WRITE8(myb3k_state, io_dack1_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(myb3k_state, io_dack2_w))
-	MCFG_I8257_OUT_IOW_3_CB(WRITE8(myb3k_state, io_dack3_w))
-	MCFG_I8257_OUT_DACK_0_CB(WRITELINE(myb3k_state, dack0_w))
-	MCFG_I8257_OUT_DACK_1_CB(WRITELINE(myb3k_state, dack1_w))
-	MCFG_I8257_OUT_DACK_2_CB(WRITELINE(myb3k_state, dack2_w))
-	MCFG_I8257_OUT_DACK_3_CB(WRITELINE(myb3k_state, dack3_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, myb3k_state, hrq_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, myb3k_state, tc_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, myb3k_state, dma_memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, myb3k_state, dma_memory_write_byte))
+	MCFG_I8257_IN_IOR_0_CB(READ8(*this, myb3k_state, io_dack0_r))
+	MCFG_I8257_IN_IOR_1_CB(READ8(*this, myb3k_state, io_dack1_r))
+	MCFG_I8257_IN_IOR_2_CB(READ8(*this, myb3k_state, io_dack2_r))
+	MCFG_I8257_IN_IOR_3_CB(READ8(*this, myb3k_state, io_dack3_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, myb3k_state, io_dack0_w))
+	MCFG_I8257_OUT_IOW_1_CB(WRITE8(*this, myb3k_state, io_dack1_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, myb3k_state, io_dack2_w))
+	MCFG_I8257_OUT_IOW_3_CB(WRITE8(*this, myb3k_state, io_dack3_w))
+	MCFG_I8257_OUT_DACK_0_CB(WRITELINE(*this, myb3k_state, dack0_w))
+	MCFG_I8257_OUT_DACK_1_CB(WRITELINE(*this, myb3k_state, dack1_w))
+	MCFG_I8257_OUT_DACK_2_CB(WRITELINE(*this, myb3k_state, dack2_w))
+	MCFG_I8257_OUT_DACK_3_CB(WRITELINE(*this, myb3k_state, dack3_w))
 
 	/* Timer */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0) /* TIMINT straight into IRQ0 */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0) /* speaker if port c bit 5 is low */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(myb3k_state, pit_out1_changed))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, myb3k_state, pit_out1_changed))
 	//  MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
-	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
+	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, myb3k_state, pit_out2_changed))
 
 	/* Video controller */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
@@ -987,32 +988,32 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* ISA8+ Expansion bus */
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(myb3k_state, isa_irq5_w)) // Jumper J4 selectable
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(myb3k_state, isa_irq7_w)) // Jumper J5 selectable
-	//MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma", i8257_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma", i8257_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma", i8257_device, dreq3_w))
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", stepone_isa_cards, "myb3k_fdc4711", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", stepone_isa_cards, "myb3k_com", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", stepone_isa_cards, nullptr, false)
+	MCFG_ISA8_CPU("maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, myb3k_state, isa_irq5_w)) // Jumper J4 selectable
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(*this, myb3k_state, isa_irq7_w)) // Jumper J5 selectable
+	//MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma", i8257_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma", i8257_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma", i8257_device, dreq3_w))
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_fdc4711", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_com", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
 
 	/* Centronics */
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (myb3k_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (myb3k_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (myb3k_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (myb3k_state, centronics_select_w))
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, myb3k_state, centronics_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, myb3k_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, myb3k_state, centronics_perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (*this, myb3k_state, centronics_select_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Keyboard */
@@ -1062,7 +1063,7 @@ ROM_START( stepone )
 	ROM_LOAD( "steponebios-v2.07.bin", 0xe000, 0x2000, CRC(322c1618) SHA1(a7a3cc2af7cc9556007d98014714ba656f6e79d1))
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
-COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", 0)
-COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      0)
-COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     0)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME        FLAGS
+COMP( 1982, myb3k,   0,      0,      myb3k,   myb3k, myb3k_state, empty_init, "Matsushita", "MyBrain 3000", 0)
+COMP( 1982, jb3000,  myb3k,  0,      jb3000,  myb3k, myb3k_state, empty_init, "Panasonic",  "JB-3000",      0)
+COMP( 1984, stepone, myb3k,  0,      stepone, myb3k, myb3k_state, empty_init, "Ericsson",   "Step/One",     0)

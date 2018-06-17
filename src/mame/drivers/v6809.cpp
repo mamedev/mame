@@ -59,6 +59,7 @@ ToDo:
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -117,9 +118,9 @@ void v6809_state::v6809_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).ram();
-	map(0xf000, 0xf000).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(v6809_state::v6809_address_w));
-	map(0xf001, 0xf001).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(v6809_state::v6809_register_w));
-	map(0xf200, 0xf200).mirror(0xff).w(this, FUNC(v6809_state::videoram_w));
+	map(0xf000, 0xf000).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(v6809_state::v6809_address_w));
+	map(0xf001, 0xf001).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(v6809_state::v6809_register_w));
+	map(0xf200, 0xf200).mirror(0xff).w(FUNC(v6809_state::videoram_w));
 	map(0xf500, 0xf501).mirror(0x36).rw("acia0", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // modem
 	map(0xf508, 0xf509).mirror(0x36).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // printer
 	map(0xf600, 0xf603).mirror(0x3c).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
@@ -157,7 +158,7 @@ static const gfx_layout v6809_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( v6809 )
+static GFXDECODE_START( gfx_v6809 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -270,17 +271,18 @@ WRITE_LINE_MEMBER( v6809_state::speaker_w )
 //      m_speaker->level_w(data);
 }
 
-static SLOT_INTERFACE_START( v6809_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void v6809_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 // *** Machine ****
 
 MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(16'000'000) / 4) // divided by 4 again internally
-	MCFG_CPU_PROGRAM_MAP(v6809_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 16_MHz_XTAL / 4) // divided by 4 again internally
+	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */
@@ -291,15 +293,15 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(16'000'000) / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
@@ -311,8 +313,8 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(v6809_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(v6809_state, pa_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, v6809_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, v6809_state, pa_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -321,10 +323,10 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_O1_CB(WRITELINE(v6809_state, speaker_w))
-	MCFG_PTM6840_O2_CB(WRITELINE(v6809_state, speaker_en_w))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
+	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
@@ -332,17 +334,17 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
 // this is all guess
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_MB8876_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", MB8876, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
@@ -362,5 +364,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT   COMPANY     FULLNAME      FLAGS
-COMP( 1982, v6809,  0,      0,       v6809,     v6809, v6809_state,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1982, v6809, 0,      0,      v6809,   v6809, v6809_state, empty_init, "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )

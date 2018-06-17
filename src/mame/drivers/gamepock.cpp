@@ -8,6 +8,7 @@
 #include "bus/generic/carts.h"
 #include "cpu/upd7810/upd7810.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -43,13 +44,13 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(gamepock_state::gamepock)
-	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL(6'000'000))    /* uPD78C06AG */
-	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gamepock_state, port_a_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(gamepock_state, port_b_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gamepock_state, port_b_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(gamepock_state, port_c_r))
-	MCFG_UPD7810_TO(WRITELINE(gamepock_state,gamepock_to_w))
+	MCFG_DEVICE_ADD("maincpu", UPD78C06, XTAL(6'000'000))    /* uPD78C06AG */
+	MCFG_DEVICE_PROGRAM_MAP( gamepock_mem)
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, gamepock_state, port_a_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, gamepock_state, port_b_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, gamepock_state, port_b_w))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, gamepock_state, port_c_r))
+	MCFG_UPD7810_TO(WRITELINE(*this, gamepock_state,gamepock_to_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -63,8 +64,8 @@ MACHINE_CONFIG_START(gamepock_state::gamepock)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
@@ -81,4 +82,4 @@ ROM_START( gamepock )
 ROM_END
 
 
-CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, 0, "Epoch", "Game Pocket Computer", 0 )
+CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, empty_init, "Epoch", "Game Pocket Computer", 0 )

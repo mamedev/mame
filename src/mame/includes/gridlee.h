@@ -14,6 +14,7 @@
 
 #include "sound/samples.h"
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -47,8 +48,6 @@ protected:
 	DECLARE_READ8_MEMBER(analog_port_r);
 	DECLARE_READ8_MEMBER(random_num_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led_0_w);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
 	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
@@ -115,7 +114,7 @@ private:
 
 	/* sound streaming variables */
 	sound_stream *m_stream;
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	double m_freq_to_step;
 	uint8_t m_sound_data[24];
 };

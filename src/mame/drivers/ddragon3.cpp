@@ -294,17 +294,17 @@ void ddragon3_state::ddragon3_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x000004, 0x000007).nopw();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
-	map(0x0c0000, 0x0c000f).w(this, FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x0c0000, 0x0c000f).w(FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x100001).portr("P1_P2");
 	map(0x100002, 0x100003).portr("SYSTEM");
 	map(0x100004, 0x100005).portr("DSW");
 	map(0x100006, 0x100007).portr("P3");
-	map(0x100000, 0x100001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x100000, 0x100001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x100003, 0x100003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100004, 0x100005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x100006, 0x100007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x100004, 0x100005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x100006, 0x100007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140000, 0x1405ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
 	map(0x180000, 0x180fff).ram().share("spriteram");
 	map(0x1c0000, 0x1c3fff).ram(); /* work RAM */
@@ -313,15 +313,15 @@ void ddragon3_state::ddragon3_map(address_map &map)
 void ddragon3_state::dd3b_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
 	map(0x081000, 0x081fff).ram().share("spriteram");
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
-	map(0x0c0000, 0x0c000f).w(this, FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x0c0000, 0x0c000f).w(FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x140000, 0x140001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x140000, 0x140001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x140003, 0x140003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140004, 0x140005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x140006, 0x140007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x140004, 0x140005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x140006, 0x140007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -333,16 +333,16 @@ void ddragon3_state::dd3b_map(address_map &map)
 void ddragon3_state::ctribe_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
 	map(0x081000, 0x081fff).ram().share("spriteram");
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
 	map(0x082800, 0x082fff).ram();
-	map(0x0c0000, 0x0c000f).rw(this, FUNC(ddragon3_state::ddragon3_scroll_r), FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x0c0000, 0x0c000f).rw(FUNC(ddragon3_state::ddragon3_scroll_r), FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x140000, 0x140001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x140000, 0x140001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x140003, 0x140003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140004, 0x140005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x140006, 0x140007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x140004, 0x140005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x140006, 0x140007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -354,20 +354,20 @@ void ddragon3_state::ctribe_map(address_map &map)
 void wwfwfest_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x0c0000, 0x0c1fff).ram().w(this, FUNC(wwfwfest_state::wwfwfest_fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram - 4 bytes per tile */
+	map(0x0c0000, 0x0c1fff).ram().w(FUNC(wwfwfest_state::wwfwfest_fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram - 4 bytes per tile */
 	map(0x0c2000, 0x0c3fff).ram().share("spriteram");                       /* SPR Ram */
-	map(0x080000, 0x080fff).ram().w(this, FUNC(wwfwfest_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* BG0 Ram - 4 bytes per tile */
-	map(0x082000, 0x082fff).ram().w(this, FUNC(wwfwfest_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* BG1 Ram - 2 bytes per tile */
-	map(0x100000, 0x100007).rw(this, FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
-	map(0x10000a, 0x10000b).w(this, FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
-	map(0x140000, 0x140003).w(this, FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
-	map(0x14000c, 0x14000d).w(this, FUNC(wwfwfest_state::wwfwfest_soundwrite));
-	map(0x140011, 0x140011).w(this, FUNC(wwfwfest_state::wwfwfest_priority_w));
+	map(0x080000, 0x080fff).ram().w(FUNC(wwfwfest_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* BG0 Ram - 4 bytes per tile */
+	map(0x082000, 0x082fff).ram().w(FUNC(wwfwfest_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* BG1 Ram - 2 bytes per tile */
+	map(0x100000, 0x100007).rw(FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
+	map(0x10000a, 0x10000b).w(FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
+	map(0x140000, 0x140003).w(FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
+	map(0x14000c, 0x14000d).w(FUNC(wwfwfest_state::wwfwfest_soundwrite));
+	map(0x140011, 0x140011).w(FUNC(wwfwfest_state::wwfwfest_priority_w));
 	map(0x140020, 0x140021).portr("P1");
 	map(0x140022, 0x140023).portr("P2");
 	map(0x140024, 0x140025).portr("P3");
 	map(0x140026, 0x140027).portr("P4");
-	map(0x180000, 0x18ffff).rw(this, FUNC(wwfwfest_state::wwfwfest_paletteram_r), FUNC(wwfwfest_state::wwfwfest_paletteram_w)).share("palette");
+	map(0x180000, 0x18ffff).rw(FUNC(wwfwfest_state::wwfwfest_paletteram_r), FUNC(wwfwfest_state::wwfwfest_paletteram_w)).share("palette");
 	map(0x1c0000, 0x1c3fff).ram(); /* Work Ram */
 }
 
@@ -379,7 +379,7 @@ void ddragon3_state::sound_map(address_map &map)
 	map(0xc800, 0xc801).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd800, 0xd800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).w(this, FUNC(ddragon3_state::oki_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(ddragon3_state::oki_bankswitch_w));
 }
 
 
@@ -753,13 +753,13 @@ static const gfx_layout wwf_sprite_layout = {
  *
  *************************************/
 
-static GFXDECODE_START( ddragon3 )
+static GFXDECODE_START( gfx_ddragon3 )
 	GFXDECODE_ENTRY( "gfx1", 0, wwf_tile_layout,   512, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, wwf_tile_layout,   256, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwf_sprite_layout,  0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wwfwfest )
+static GFXDECODE_START( gfx_wwfwfest )
 	GFXDECODE_ENTRY( "gfx3", 0, wwf_tile_layout,     0x0c00, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, wwf_tile_layout,     0x1000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwf_sprite_layout,   0x0400, 16 )
@@ -823,38 +823,39 @@ void ddragon3_state::machine_reset()
 MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(ddragon3_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(ddragon3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon3)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_CONFIG_END
@@ -862,8 +863,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddragon3_state::ddragon3b)
 	ddragon3(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dd3b_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dd3b_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
@@ -872,11 +873,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddragon3_state::ctribe)
 	ddragon3(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ctribe_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ctribe_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(ctribe_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(ctribe_sound_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -885,12 +886,12 @@ MACHINE_CONFIG_START(ddragon3_state::ctribe)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ctribe)
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
 
-	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_DEVICE_MODIFY("ym2151")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.20)
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
@@ -900,38 +901,38 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL / 2)  /* 24 crystal, 12 rated chip */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)  /* 24 crystal, 12 rated chip */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfwfest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wwfwfest)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -1480,20 +1481,20 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, 0, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (US)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,   ctribe,   ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (US set 1?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeo,   ctribe,   ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (US, older)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, 0, ROT0, "bootleg",       "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, 0, ROT0, "bootleg",       "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe1,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US set 1?)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeo,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, older)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, wwfwfest,  0,        wwfwfest,  wwfwfest,  wwfwfest_state, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
-GAME( 1991, wwfwfestu, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestj, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestk, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfest,  0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
+GAME( 1991, wwfwfestu, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestj, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestk, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )

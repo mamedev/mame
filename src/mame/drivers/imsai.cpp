@@ -64,15 +64,15 @@ void imsai_state::imsai_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x02, 0x02).r(this, FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x03, 0x03).r(this, FUNC(imsai_state::status_r));
+	map(0x02, 0x02).r(FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x03, 0x03).r(FUNC(imsai_state::status_r));
 	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x12, 0x12).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x13, 0x13).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x14, 0x14).r(this, FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x15, 0x15).r(this, FUNC(imsai_state::status_r));
-	map(0xf3, 0xf3).w(this, FUNC(imsai_state::control_w));
+	map(0x14, 0x14).r(FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x15, 0x15).r(FUNC(imsai_state::status_r));
+	map(0xf3, 0xf3).w(FUNC(imsai_state::control_w));
 }
 
 /* Input ports */
@@ -107,9 +107,9 @@ void imsai_state::machine_reset()
 
 MACHINE_CONFIG_START(imsai_state::imsai)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(imsai_mem)
-	MCFG_CPU_IO_MAP(imsai_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(imsai_mem)
+	MCFG_DEVICE_IO_MAP(imsai_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -120,8 +120,8 @@ MACHINE_CONFIG_START(imsai_state::imsai)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(6'000'000) / 3) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(XTAL(6'000'000) / 3) /* Timer 1: user */
 	MCFG_PIT8253_CLK2(XTAL(6'000'000) / 3) /* Timer 2: user */
 MACHINE_CONFIG_END
@@ -140,5 +140,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1978, imsai,   0,      0,       imsai,     imsai, imsai_state, 0,    "Imsai", "MPU-B",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1978, imsai, 0,      0,      imsai,   imsai, imsai_state, empty_init, "Imsai", "MPU-B",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

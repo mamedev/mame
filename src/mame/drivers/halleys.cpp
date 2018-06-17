@@ -169,6 +169,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -270,9 +271,9 @@ public:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	DECLARE_DRIVER_INIT(halley87);
-	DECLARE_DRIVER_INIT(benberob);
-	DECLARE_DRIVER_INIT(halleys);
+	void init_halley87();
+	void init_benberob();
+	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
@@ -392,7 +393,7 @@ void halleys_state::blit(int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%s:[%04x]", machine.describe_context(), offset);
+	logerror("%s:[%04x]", machine().describe_context(), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n");
 }
@@ -1538,7 +1539,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 56*3:
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
@@ -1564,7 +1565,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
 			break;
 
 		case 56*3:
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 		case 56*2:
@@ -1601,7 +1602,7 @@ WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
 	m_soundlatch->write(space,offset,data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -1635,29 +1636,29 @@ READ8_MEMBER(halleys_state::io_mirror_r)
 
 void halleys_state::halleys_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(this, FUNC(halleys_state::blitter_r), FUNC(halleys_state::blitter_w)).share("blitter_ram");
-	map(0x1f00, 0x1fff).w(this, FUNC(halleys_state::bgtile_w));     // background tiles?(Ben Bero Beh only)
+	map(0x0000, 0x0fff).rw(FUNC(halleys_state::blitter_r), FUNC(halleys_state::blitter_w)).share("blitter_ram");
+	map(0x1f00, 0x1fff).w(FUNC(halleys_state::bgtile_w));     // background tiles?(Ben Bero Beh only)
 	map(0x1000, 0xefff).rom();
 	map(0xf000, 0xfeff).ram();                 // work ram
 
 	map(0xff00, 0xffbf).ram().share("io_ram");  // I/O write fall-through
 
-	map(0xff66, 0xff66).r(this, FUNC(halleys_state::collision_id_r)); // HACK: collision detection bypass(Halley's Comet only)
-	map(0xff71, 0xff71).r(this, FUNC(halleys_state::blitter_status_r));
-	map(0xff80, 0xff83).r(this, FUNC(halleys_state::io_mirror_r));
-	map(0xff8a, 0xff8a).w(this, FUNC(halleys_state::soundcommand_w));
+	map(0xff66, 0xff66).r(FUNC(halleys_state::collision_id_r)); // HACK: collision detection bypass(Halley's Comet only)
+	map(0xff71, 0xff71).r(FUNC(halleys_state::blitter_status_r));
+	map(0xff80, 0xff83).r(FUNC(halleys_state::io_mirror_r));
+	map(0xff8a, 0xff8a).w(FUNC(halleys_state::soundcommand_w));
 	map(0xff90, 0xff90).portr("IN0");    // coin/start
 	map(0xff91, 0xff91).portr("IN1");    // player 1
 	map(0xff92, 0xff92).portr("IN2");    // player 2
 	map(0xff93, 0xff93).portr("IN3");    // unused?
-	map(0xff94, 0xff94).r(this, FUNC(halleys_state::coin_lockout_r));
+	map(0xff94, 0xff94).r(FUNC(halleys_state::coin_lockout_r));
 	map(0xff95, 0xff95).portr("DSW1");   // dipswitch 4
 	map(0xff96, 0xff96).portr("DSW2");   // dipswitch 3
 	map(0xff97, 0xff97).portr("DSW3");   // dipswitch 2
-	map(0xff9c, 0xff9c).w(this, FUNC(halleys_state::firq_ack_w));
+	map(0xff9c, 0xff9c).w(FUNC(halleys_state::firq_ack_w));
 
-	map(0xffc0, 0xffdf).rw(this, FUNC(halleys_state::paletteram_r), FUNC(halleys_state::paletteram_w));
-	map(0xffe0, 0xffff).r(this, FUNC(halleys_state::vector_r));
+	map(0xffc0, 0xffdf).rw(FUNC(halleys_state::paletteram_r), FUNC(halleys_state::paletteram_w));
+	map(0xffe0, 0xffff).r(FUNC(halleys_state::vector_r));
 }
 
 
@@ -1928,13 +1929,13 @@ void halleys_state::machine_reset()
 
 
 MACHINE_CONFIG_START(halleys_state::halleys)
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(19'968'000)/12) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(halleys_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(19'968'000)/12) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(6'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(halleys_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(6'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(halleys_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
 
 	// video hardware
@@ -1951,29 +1952,29 @@ MACHINE_CONFIG_START(halleys_state::halleys)
 	MCFG_PALETTE_INIT_OWNER(halleys_state, halleys)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(halleys_state, sndnmi_msk_w)) // port Bwrite
+	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, halleys_state, sndnmi_msk_w)) // port Bwrite
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(halleys_state::benberob)
 	halleys(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(halleys_state, benberob_scanline)
 
@@ -2202,7 +2203,7 @@ void halleys_state::init_common()
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,benberob)
+void halleys_state::init_benberob()
 {
 	m_game_id = GAME_BENBEROB;
 
@@ -2212,7 +2213,7 @@ DRIVER_INIT_MEMBER(halleys_state,benberob)
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,halleys)
+void halleys_state::init_halleys()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb114;
@@ -2220,7 +2221,7 @@ DRIVER_INIT_MEMBER(halleys_state,halleys)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(halleys_state,halley87)
+void halleys_state::init_halley87()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb10d;
@@ -2232,8 +2233,8 @@ DRIVER_INIT_MEMBER(halleys_state,halley87)
 //**************************************************************************
 // Game Definitions
 
-GAME( 1984, benberob, 0,       benberob, benberob, halleys_state, benberob,  ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleys,  0,       halleys,  halleys,  halleys_state, halleys,   ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleysc, halleys, halleys,  halleys,  halleys_state, halleys,   ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Newer)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleycj, halleys, halleys,  halleys,  halleys_state, halleys,   ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halley87, halleys, halleys,  halleys,  halleys_state, halley87,  ROT90, "Taito Corporation",                           "Halley's Comet '87",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1984, benberob, 0,       benberob, benberob, halleys_state, init_benberob, ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleys,  0,       halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleysc, halleys, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Newer)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleycj, halleys, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halley87, halleys, halleys,  halleys,  halleys_state, init_halley87, ROT90, "Taito Corporation",                           "Halley's Comet '87",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

@@ -222,12 +222,12 @@ uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &b
 
 void pmd85_state::pmd85_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
+	map(0x00, 0xff).rw(FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
 }
 
 void pmd85_state::mato_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
+	map(0x00, 0xff).rw(FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
 }
 
 /* memory w/r functions */
@@ -582,9 +582,9 @@ static const struct CassetteOptions pmd85_cassette_options =
 /* machine definition */
 MACHINE_CONFIG_START(pmd85_state::pmd85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
-	MCFG_CPU_IO_MAP(pmd85_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(pmd85_mem)
+	MCFG_DEVICE_IO_MAP(pmd85_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
@@ -625,9 +625,8 @@ MACHINE_CONFIG_START(pmd85_state::pmd85)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
@@ -641,7 +640,7 @@ MACHINE_CONFIG_START(pmd85_state::pmd85)
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(pmd85_state, write_cas_tx))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, pmd85_state, write_cas_tx))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -652,93 +651,93 @@ MACHINE_CONFIG_START(pmd85_state::pmd851)
 	pmd85(config);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_2_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_2_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_2_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_2_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_2_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_2_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_2_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_3_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_3_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_3_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_3_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_3_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_3_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_3_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_3_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_3_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_3_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_3_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_3_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::pmd852a)
 	pmd851(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pmd852a_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pmd852a_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::pmd853)
 	pmd851(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pmd853_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pmd853_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::alfa)
 	pmd85(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alfa_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alfa_mem)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_2_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_2_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_2_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_2_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_2_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_2_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_2_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::mato)
 	pmd85(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mato_mem)
-	MCFG_CPU_IO_MAP(mato_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mato_mem)
+	MCFG_DEVICE_IO_MAP(mato_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, mato_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, mato_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, mato_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, mato_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, mato_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, mato_ppi_0_portc_w))
 
 	/* no uart */
 	MCFG_DEVICE_REMOVE("uart")
@@ -746,8 +745,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::c2717)
 	pmd851(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(c2717_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(c2717_mem)
 MACHINE_CONFIG_END
 
 
@@ -795,19 +794,19 @@ ROM_END
 ROM_START(mato)
 	ROM_REGION(0x14000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "default", "BASIC")
-	ROMX_LOAD("mato.bin",  0x10000, 0x4000, CRC(574110a6) SHA1(4ff2cd4b07a1a700c55f92e5b381c04f758fb461), ROM_BIOS(1))
+	ROMX_LOAD("mato.bin",  0x10000, 0x4000, CRC(574110a6) SHA1(4ff2cd4b07a1a700c55f92e5b381c04f758fb461), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ru", "Russian")
-	ROMX_LOAD("mato-ru.rom",  0x10000, 0x4000, CRC(44b68be4) SHA1(0d9ea9a9380e2af011a2f0b64c534dd0eb0a1fac), ROM_BIOS(2))
+	ROMX_LOAD("mato-ru.rom",  0x10000, 0x4000, CRC(44b68be4) SHA1(0d9ea9a9380e2af011a2f0b64c534dd0eb0a1fac), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "lan", "BASIC LAN")
-	ROMX_LOAD("mato-lan.rom",  0x10000, 0x4000, CRC(422cddde) SHA1(2a3dacf8e3e7637109c9d267f589a00881e9a5f4), ROM_BIOS(3))
+	ROMX_LOAD("mato-lan.rom",  0x10000, 0x4000, CRC(422cddde) SHA1(2a3dacf8e3e7637109c9d267f589a00881e9a5f4), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "games", "Games v1")
-	ROMX_LOAD("matoh.bin", 0x10000, 0x4000, CRC(ca25880d) SHA1(38ce0b6a26d48a09fdf96863c3eaf3705aca2590), ROM_BIOS(4))
+	ROMX_LOAD("matoh.bin", 0x10000, 0x4000, CRC(ca25880d) SHA1(38ce0b6a26d48a09fdf96863c3eaf3705aca2590), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "gamesen", "Games v2 EN")
-	ROMX_LOAD("matogmen.rom", 0x10000, 0x4000, CRC(47e039c8) SHA1(6cc73a6b58921b33691d2751dee28428456eb222), ROM_BIOS(5))
+	ROMX_LOAD("matogmen.rom", 0x10000, 0x4000, CRC(47e039c8) SHA1(6cc73a6b58921b33691d2751dee28428456eb222), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "gamessk", "Games v2 SK")
-	ROMX_LOAD("matogmsk.rom", 0x10000, 0x4000, CRC(d0c9b1e7) SHA1(9e7289d971a957bf161c317e5fa76db3289ee23c), ROM_BIOS(6))
+	ROMX_LOAD("matogmsk.rom", 0x10000, 0x4000, CRC(d0c9b1e7) SHA1(9e7289d971a957bf161c317e5fa76db3289ee23c), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "games3", "Games v3")
-	ROMX_LOAD("matogm3.rom", 0x10000, 0x4000, CRC(9352f2c1) SHA1(b3e45c56d2800c69a0bb02febda6fa715f1afbc3), ROM_BIOS(7))
+	ROMX_LOAD("matogm3.rom", 0x10000, 0x4000, CRC(9352f2c1) SHA1(b3e45c56d2800c69a0bb02febda6fa715f1afbc3), ROM_BIOS(6))
 ROM_END
 
 ROM_START(c2717)
@@ -821,13 +820,13 @@ ROM_START(c2717pmd)
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  STATE        INIT      COMPANY             FULLNAME                     FLAGS
-COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.1",                  0 )
-COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.2",                  0 )
-COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2A",                 0 )
-COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2B",                 0 )
-COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla",            "PMD-85.3",                  0 )
-COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa,  pmd85_state, alfa,     "Didaktik Skalica", "Didaktik Alfa",             0 )
-COMP( 1985, mato,    pmd851, 0,     mato,    mato,  pmd85_state, mato,     "Statny",           "Mato",                      0 )
-COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717",               0 )
-COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT          COMPANY             FULLNAME                     FLAGS
+COMP( 1985, pmd851,   0,      0,      pmd851,  pmd85, pmd85_state, init_pmd851,  "Tesla",            "PMD-85.1",                  0 )
+COMP( 1985, pmd852,   pmd851, 0,      pmd851,  pmd85, pmd85_state, init_pmd851,  "Tesla",            "PMD-85.2",                  0 )
+COMP( 1985, pmd852a,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2A",                 0 )
+COMP( 1985, pmd852b,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2B",                 0 )
+COMP( 1988, pmd853,   pmd851, 0,      pmd853,  pmd85, pmd85_state, init_pmd853,  "Tesla",            "PMD-85.3",                  0 )
+COMP( 1986, alfa,     pmd851, 0,      alfa,    alfa,  pmd85_state, init_alfa,    "Didaktik Skalica", "Didaktik Alfa",             0 )
+COMP( 1985, mato,     pmd851, 0,      mato,    mato,  pmd85_state, init_mato,    "Statny",           "Mato",                      0 )
+COMP( 1989, c2717,    pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717",               0 )
+COMP( 1989, c2717pmd, pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING )

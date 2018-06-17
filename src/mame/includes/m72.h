@@ -9,6 +9,7 @@
 #include "sound/dac.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define M81_B_B_JUMPER_J3_S \
@@ -167,15 +168,15 @@ public:
 	DECLARE_VIDEO_START(poundfor);
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
-	DECLARE_DRIVER_INIT(dkgenm72);
-	DECLARE_DRIVER_INIT(bchopper);
-	DECLARE_DRIVER_INIT(gallop);
-	DECLARE_DRIVER_INIT(m72_8751);
-	DECLARE_DRIVER_INIT(dbreedm72);
-	DECLARE_DRIVER_INIT(airduelm72);
-	DECLARE_DRIVER_INIT(nspirit);
-	DECLARE_DRIVER_INIT(loht);
-	DECLARE_DRIVER_INIT(imgfight);
+	void init_dkgenm72();
+	void init_bchopper();
+	void init_gallop();
+	void init_m72_8751();
+	void init_dbreedm72();
+	void init_airduelm72();
+	void init_nspirit();
+	void init_loht();
+	void init_imgfight();
 
 	INTERRUPT_GEN_MEMBER(mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);

@@ -16,6 +16,7 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 class k8915_state : public driver_device
@@ -29,7 +30,7 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(k8915_a8_w);
-	DECLARE_DRIVER_INIT(k8915);
+	void init_k8915();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void k8915(machine_config &config);
@@ -66,7 +67,7 @@ void k8915_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x50, 0x53).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x58, 0x5b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xa8, 0xa8).w(this, FUNC(k8915_state::k8915_a8_w));
+	map(0xa8, 0xa8).w(FUNC(k8915_state::k8915_a8_w));
 }
 
 /* Input ports */
@@ -78,7 +79,7 @@ void k8915_state::machine_reset()
 	membank("boot")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER(k8915_state,k8915)
+void k8915_state::init_k8915()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -133,9 +134,9 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 MACHINE_CONFIG_START(k8915_state::k8915)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'915'200) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'915'200) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -149,20 +150,20 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 2)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'915'200) / 2)
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'915'200) / 2)
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 
@@ -178,5 +179,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY     FULLNAME  FLAGS
-COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, init_k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

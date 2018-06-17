@@ -25,6 +25,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -455,16 +456,16 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 
 void tk2000_state::apple2_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
-	map(0xc000, 0xc07f).rw(this, FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
+	map(0x0000, 0xbfff).rw(FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
+	map(0xc000, 0xc07f).rw(FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
+	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void tk2000_state::inhbank_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom().region("maincpu", 0x100);
-	map(0x4000, 0x7eff).rw(this, FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
+	map(0x4000, 0x7eff).rw(FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
 }
 
 /***************************************************************************
@@ -574,8 +575,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2_map)
+	MCFG_DEVICE_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tk2000_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -593,8 +594,8 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 	MCFG_PALETTE_INIT_OWNER(tk2000_state, tk2000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
@@ -621,5 +622,5 @@ ROM_START(tk2000)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE INIT      INIT  COMPANY            FULLNAME */
-COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  tk2000_state,   0,    "Microdigital",    "TK2000", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
+COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000", MACHINE_NOT_WORKING )

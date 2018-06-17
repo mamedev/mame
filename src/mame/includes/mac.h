@@ -27,6 +27,7 @@
 #include "sound/awacs.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAC_SCREEN_NAME "screen"
@@ -476,33 +477,33 @@ private:
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
-	DECLARE_DRIVER_INIT(maclc2);
-	DECLARE_DRIVER_INIT(maciifdhd);
-	DECLARE_DRIVER_INIT(macse30);
-	DECLARE_DRIVER_INIT(macprtb);
-	DECLARE_DRIVER_INIT(maciivx);
-	DECLARE_DRIVER_INIT(macpd210);
-	DECLARE_DRIVER_INIT(macii);
-	DECLARE_DRIVER_INIT(macclassic);
-	DECLARE_DRIVER_INIT(macquadra700);
-	DECLARE_DRIVER_INIT(macclassic2);
-	DECLARE_DRIVER_INIT(maciifx);
-	DECLARE_DRIVER_INIT(maclc);
-	DECLARE_DRIVER_INIT(macpb160);
-	DECLARE_DRIVER_INIT(macse);
-	DECLARE_DRIVER_INIT(macpb140);
-	DECLARE_DRIVER_INIT(macpm6100);
-	DECLARE_DRIVER_INIT(maclc520);
-	DECLARE_DRIVER_INIT(maciici);
-	DECLARE_DRIVER_INIT(maciix);
-	DECLARE_DRIVER_INIT(maclrcclassic);
-	DECLARE_DRIVER_INIT(maciisi);
-	DECLARE_DRIVER_INIT(maciicx);
-	DECLARE_DRIVER_INIT(maclc3);
-	DECLARE_DRIVER_INIT(maclc3plus);
-	DECLARE_DRIVER_INIT(macpm7100);
-	DECLARE_DRIVER_INIT(macpm8100);
-	DECLARE_DRIVER_INIT(macpb100);
+	void init_maclc2();
+	void init_maciifdhd();
+	void init_macse30();
+	void init_macprtb();
+	void init_maciivx();
+	void init_macpd210();
+	void init_macii();
+	void init_macclassic();
+	void init_macquadra700();
+	void init_macclassic2();
+	void init_maciifx();
+	void init_maclc();
+	void init_macpb160();
+	void init_macse();
+	void init_macpb140();
+	void init_macpm6100();
+	void init_maclc520();
+	void init_maciici();
+	void init_maciix();
+	void init_maclrcclassic();
+	void init_maciisi();
+	void init_maciicx();
+	void init_maclc3();
+	void init_maclc3plus();
+	void init_macpm7100();
+	void init_macpm8100();
+	void init_macpb100();
 	DECLARE_VIDEO_START(mac);
 	DECLARE_PALETTE_INIT(mac);
 	DECLARE_VIDEO_START(macprtb);
@@ -526,7 +527,7 @@ public:
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mac_rbv_vbl);
+	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
 	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);

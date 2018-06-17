@@ -18,6 +18,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 /* SM8521 register addresses */
 enum
@@ -239,7 +240,7 @@ public:
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
-	DECLARE_DRIVER_INIT(gamecom);
+	void init_gamecom();
 	DECLARE_PALETTE_INIT(gamecom);
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);

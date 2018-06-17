@@ -41,6 +41,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -158,7 +159,7 @@ protected:
 DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
 
 MACHINE_CONFIG_START(galgames_bios_cart_device::device_add_mconfig)
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
 MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
@@ -184,11 +185,11 @@ protected:
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
 
 MACHINE_CONFIG_START(galgames_starpak2_cart_device::device_add_mconfig)
-	MCFG_CPU_ADD("pic", PIC16C56, XTAL(4'000'000))  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
-	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
+	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
+	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
 MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
@@ -215,12 +216,12 @@ protected:
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
 
 MACHINE_CONFIG_START(galgames_starpak3_cart_device::device_add_mconfig)
-	MCFG_CPU_ADD("pic", PIC16C56, XTAL(4'000'000))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(galgames_cart_device, int_pic_bank_w))
-	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
+	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, galgames_cart_device, int_pic_bank_w))
+	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
 MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
@@ -559,12 +560,13 @@ WRITE_LINE_MEMBER(galgames_cart_device::eeprom_cs_write)
 
 // SLOT implementation
 
-ADDRESS_MAP_START(galgames_slot_device::slot_map)
-	AM_RANGE( 0x000000, 0x1fffff ) AM_READ(rom0_r)
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(rom0_or_ram_r, ram_w) AM_SHARE("ram")
-	AM_RANGE( 0x200000, 0x3fffff ) AM_READ(rom_r)
-	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(rom_or_ram_r, ram_w)
-ADDRESS_MAP_END
+void galgames_slot_device::slot_map(address_map &map)
+{
+	map( 0x000000, 0x1fffff ).r(FUNC(galgames_slot_device::rom0_r));
+	map( 0x000000, 0x03ffff ).rw(FUNC(galgames_slot_device::rom0_or_ram_r), FUNC(galgames_slot_device::ram_w)).share("ram");
+	map( 0x200000, 0x3fffff ).r(FUNC(galgames_slot_device::rom_r));
+	map( 0x200000, 0x23ffff ).rw(FUNC(galgames_slot_device::rom_or_ram_r), FUNC(galgames_slot_device::ram_w));
+}
 
 galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GALGAMES_SLOT, tag, owner, clock),
@@ -868,16 +870,16 @@ void galgames_state::galgames_map(address_map &map)
 	map(0x400014, 0x400015).w(m_blitter, FUNC(cesblit_device::color_w));
 	map(0x400020, 0x400021).r(m_blitter, FUNC(cesblit_device::status_r));
 
-	map(0x600000, 0x600001).r(this, FUNC(galgames_state::fpga_status_r));
-	map(0x700000, 0x700001).r(this, FUNC(galgames_state::fpga_status_r)).nopw();
+	map(0x600000, 0x600001).r(FUNC(galgames_state::fpga_status_r));
+	map(0x700000, 0x700001).r(FUNC(galgames_state::fpga_status_r)).nopw();
 	map(0x800020, 0x80003f).noprw();   // ?
 	map(0x900000, 0x900001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(galgames_state::galgames_okiram_r), FUNC(galgames_state::galgames_okiram_w)); // (only low bytes tested) 4x N341024SJ-15
+	map(0xb00000, 0xb7ffff).rw(FUNC(galgames_state::galgames_okiram_r), FUNC(galgames_state::galgames_okiram_w)); // (only low bytes tested) 4x N341024SJ-15
 
-	map(0xc00000, 0xc00001).w(this, FUNC(galgames_state::galgames_palette_offset_w));
-	map(0xc00002, 0xc00003).w(this, FUNC(galgames_state::galgames_palette_data_w));
+	map(0xc00000, 0xc00001).w(FUNC(galgames_state::galgames_palette_offset_w));
+	map(0xc00002, 0xc00003).w(FUNC(galgames_state::galgames_palette_data_w));
 
 	map(0xd00000, 0xd00001).portr("TRACKBALL_1_X");
 	map(0xd00000, 0xd00001).nopw();  // bit 0: FPGA programming serial in (lsb first)
@@ -886,7 +888,7 @@ void galgames_state::galgames_map(address_map &map)
 	map(0xd00006, 0xd00007).portr("TRACKBALL_2_Y");
 	map(0xd00008, 0xd00009).portr("P1");
 	map(0xd0000a, 0xd0000b).portr("P2");
-	map(0xd0000c, 0xd0000d).portr("SYSTEM").w(this, FUNC(galgames_state::outputs_w));
+	map(0xd0000c, 0xd0000d).portr("SYSTEM").w(FUNC(galgames_state::outputs_w));
 
 	map(0xd0000e, 0xd0000f).nopr();
 	map(0xd0000f, 0xd0000f).w(m_slot, FUNC(galgames_slot_device::cart_sel_w));
@@ -977,8 +979,8 @@ int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 }
 
 MACHINE_CONFIG_START(galgames_state::galgames_base)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(galgames_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -997,14 +999,14 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(24'000'000))
 	MCFG_CESBLIT_MAP(blitter_map)
 	MCFG_CESBLIT_COMPUTE_ADDR(galgames_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(galgames_state, blitter_irq_callback))
+	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, galgames_state, blitter_irq_callback))
 
 	MCFG_PALETTE_ADD("palette", 0x1000) // only 0x100 used
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000) / 16, PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1080,7 +1082,7 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 ***************************************************************************/
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 #define GALGAMES_BIOS_ROMS \
 	ROM_SYSTEM_BIOS( 0, "1.90",   "v1.90 12/01/98" ) \
@@ -1225,7 +1227,7 @@ ROM_START( galgame4 )
 ROM_END
 
 
-GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
-GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
-GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
+GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
+GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )

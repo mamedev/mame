@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -133,10 +134,10 @@ void d9final_state::d9final_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xc800, 0xcbff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xcc00, 0xcfff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(d9final_state::sc0_lovram)).share("lo_vram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(d9final_state::sc0_hivram)).share("hi_vram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(d9final_state::sc0_cram)).share("cram");
-	map(0xf000, 0xf007).r(this, FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
+	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
@@ -150,7 +151,7 @@ void d9final_state::d9final_io(address_map &map)
 	map(0x40, 0x41).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x60, 0x60).portr("DSWD");
 	map(0x80, 0x80).portr("IN0");
-	map(0xa0, 0xa0).portr("IN1").w(this, FUNC(d9final_state::bank_w));
+	map(0xa0, 0xa0).portr("IN1").w(FUNC(d9final_state::bank_w));
 	map(0xe0, 0xe0).portr("IN2");
 }
 
@@ -288,7 +289,7 @@ static const gfx_layout tiles16x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( d9final )
+static GFXDECODE_START( gfx_d9final )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x8_layout, 0, 16*4 )
 GFXDECODE_END
 
@@ -300,10 +301,10 @@ void d9final_state::machine_start()
 
 MACHINE_CONFIG_START(d9final_state::d9final)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(d9final_map)
-	MCFG_CPU_IO_MAP(d9final_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(d9final_map)
+	MCFG_DEVICE_IO_MAP(d9final_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // Sharp LH5116D-10 + battery
 
@@ -316,13 +317,13 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", d9final)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	//MCFG_DEVICE_ADD("essnd", ES8712, 24000000/3) // clock unknown
@@ -346,4 +347,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, d9final_state, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, d9final, 0, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

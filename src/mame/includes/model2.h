@@ -1,21 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
-#include "video/poly.h"
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
-#include "machine/eepromser.h"
-#include "machine/i8251.h"
 #include "cpu/i960/i960.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/bankdev.h"
-#include "machine/gen_fifo.h"
-#include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
+#include "machine/bankdev.h"
+#include "machine/eepromser.h"
+#include "machine/gen_fifo.h"
+#include "machine/i8251.h"
 #include "machine/m2comm.h"
 #include "machine/timer.h"
+#include "sound/scsp.h"
+#include "video/segaic24.h"
+#include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 class model2_renderer;
@@ -43,19 +45,16 @@ public:
 		m_copro_fifo_out(*this, "copro_fifo_out"),
 		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom"),
+		m_tiles(*this, "tile"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
+		m_timers(*this, "timer%u", 0U),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_copro_data(*this, "copro_data"),
-		m_in(*this, "IN%u", 0),
-		m_dsw(*this, "DSW"),
-		m_steer(*this, "STEER"),
-		m_accel(*this, "ACCEL"),
-		m_brake(*this, "BRAKE"),
+		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 	{ }
 
@@ -70,7 +69,6 @@ public:
 
 	/* Public for access by the ioports */
 	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
@@ -79,14 +77,14 @@ public:
 
 
 	/* Public for access by GAME() */
-	DECLARE_DRIVER_INIT(overrev);
-	DECLARE_DRIVER_INIT(pltkids);
-	DECLARE_DRIVER_INIT(rchase2);
-	DECLARE_DRIVER_INIT(manxttdx);
-	DECLARE_DRIVER_INIT(doa);
-	DECLARE_DRIVER_INIT(zerogun);
-	DECLARE_DRIVER_INIT(sgt24h);
-	DECLARE_DRIVER_INIT(srallyc);
+	void init_overrev();
+	void init_pltkids();
+	void init_rchase2();
+	void init_manxttdx();
+	void init_doa();
+	void init_zerogun();
+	void init_sgt24h();
+	void init_srallyc();
 
 protected:
 	required_shared_ptr<uint32_t> m_workram;
@@ -104,29 +102,24 @@ protected:
 	required_device<generic_fifo_u32_device> m_copro_fifo_in;
 	required_device<generic_fifo_u32_device> m_copro_fifo_out;
 	optional_device<cpu_device> m_drivecpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<segas24_tile_device> m_tiles;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;
+	required_device_array<timer_device, 4> m_timers;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 	optional_memory_region m_copro_data;
 
-	optional_ioport_array<5> m_in;
-	required_ioport m_dsw;
-	optional_ioport m_steer;
-	optional_ioport m_accel;
-	optional_ioport m_brake;
+	required_ioport m_in0;
 	optional_ioport m_gears;
-	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
 
 	uint32_t m_timervals[4];
 	uint32_t m_timerorig[4];
 	int m_timerrun[4];
-	timer_device *m_timers[4];
 	int m_ctrlmode;
-	int m_analog_channel;
 	uint16_t m_cmd_data;
 	uint8_t m_driveio_comm_data;
 	int m_iop_write_num;
@@ -160,22 +153,24 @@ protected:
 	DECLARE_WRITE32_MEMBER(geo_w);
 
 	// Everything else
-	DECLARE_READ8_MEMBER(model2_crx_in_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(colorxlat_r);
 	DECLARE_WRITE16_MEMBER(colorxlat_w);
-	DECLARE_WRITE32_MEMBER(ctrl0_w);
-	DECLARE_WRITE32_MEMBER(analog_2b_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ32_MEMBER(fifo_control_2a_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
-	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
-	DECLARE_WRITE32_MEMBER(srallyc_devices_w);
-	DECLARE_READ8_MEMBER(hotd_lightgun_r);
-	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
+	DECLARE_READ8_MEMBER(rchase2_drive_board_r);
+	DECLARE_WRITE8_MEMBER(rchase2_drive_board_w);
+	DECLARE_WRITE8_MEMBER(drive_board_w);
+	DECLARE_READ8_MEMBER(lightgun_data_r);
+	DECLARE_READ8_MEMBER(lightgun_mux_r);
+	DECLARE_WRITE8_MEMBER(lightgun_mux_w);
+	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
 	DECLARE_READ32_MEMBER(irq_request_r);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	DECLARE_READ32_MEMBER(irq_enable_r);
@@ -213,8 +208,6 @@ protected:
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
-	DECLARE_READ8_MEMBER(virtuacop_lightgun_r);
-	DECLARE_READ8_MEMBER(virtuacop_lightgun_offscreen_r);
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
@@ -246,12 +239,6 @@ protected:
 	uint32_t m_intena;
 	uint32_t m_coproctl;
 	uint32_t m_coprocnt;
-
-	int m_port_1c00004;
-	int m_port_1c00006;
-	int m_port_1c00010;
-	int m_port_1c00012;
-	int m_port_1c00014;
 
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
@@ -328,7 +315,6 @@ public:
 	{}
 
 	DECLARE_MACHINE_START(model2_tgp);
-	DECLARE_MACHINE_START(srallyc);
 
 protected:
 	required_device<mb86234_device> m_copro_tgp;
@@ -394,13 +380,16 @@ public:
 
 	DECLARE_MACHINE_RESET(model2o);
 
-	void daytona(machine_config &config);
 	void model2o(machine_config &config);
+	void daytona(machine_config &config);
+	void desert(machine_config &config);
+	void vcop(machine_config &config);
 
 protected:
-	DECLARE_READ32_MEMBER(daytona_unk_r);
-	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
+	DECLARE_WRITE8_MEMBER(daytona_output_w);
+	DECLARE_WRITE8_MEMBER(desert_output_w);
+	DECLARE_WRITE8_MEMBER(vcop_output_w);
 
 	void model2o_mem(address_map &map);
 };
@@ -468,6 +457,9 @@ public:
 	void model2a_0229(machine_config &config);
 	void model2a_5881(machine_config &config);
 	void srallyc(machine_config &config);
+	void vcop2(machine_config &config);
+	void skytargt(machine_config &config);
+	void zeroguna(machine_config &config);
 
 protected:
 	void model2a_crx_mem(address_map &map);
@@ -490,13 +482,15 @@ public:
 
 	DECLARE_MACHINE_RESET(model2b);
 	DECLARE_MACHINE_START(model2b);
-	DECLARE_MACHINE_START(srallyc);
 
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
 	void rchase2(machine_config &config);
+	void gunblade(machine_config &config);
+	void dynabb(machine_config &config);
+	void zerogun(machine_config &config);
 
 protected:
 	required_device<adsp21062_device> m_copro_adsp;
@@ -537,12 +531,17 @@ public:
 
 	DECLARE_MACHINE_RESET(model2c);
 	DECLARE_MACHINE_START(model2c);
-	DECLARE_MACHINE_START(srallyc);
 
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
-	void overrev2c(machine_config &config);
+	void skisuprg(machine_config &config);
 	void stcc(machine_config &config);
+	void waverunr(machine_config &config);
+	void bel(machine_config &config);
+	void hotd(machine_config &config);
+	void overrev2c(machine_config &config);
+	void segawski(machine_config &config);
+	void topskatr(machine_config &config);
 
 protected:
 	required_device<mb86235_device> m_copro_tgpx4;

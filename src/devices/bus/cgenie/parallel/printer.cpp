@@ -28,11 +28,11 @@ DEFINE_DEVICE_TYPE(CGENIE_PRINTER, cgenie_printer_device, "cgenie_printer", "Pri
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cgenie_printer_device::device_add_mconfig)
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(cgenie_printer_device, busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(cgenie_printer_device, perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(cgenie_printer_device, select_w))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(cgenie_printer_device, fault_w))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, cgenie_printer_device, busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, cgenie_printer_device, perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, cgenie_printer_device, select_w))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, cgenie_printer_device, fault_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")
 MACHINE_CONFIG_END
 

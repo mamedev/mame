@@ -103,7 +103,7 @@ static const gfx_layout apple2gs_dbltext_layout =
 	8*8         /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2gs )
+static GFXDECODE_START( gfx_apple2gs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -188,7 +188,7 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 void apple2gs_state::vectors_map(address_map &map)
 {
-	map(0x00, 0x1f).r(this, FUNC(apple2gs_state::apple2gs_read_vector));
+	map(0x00, 0x1f).r(FUNC(apple2gs_state::apple2gs_read_vector));
 }
 
 // ADB microcontroller emulation
@@ -286,47 +286,48 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
 	apple2_update_memory();
 }
 
-static SLOT_INTERFACE_START(apple2_cards)
-	SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
-	SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
-	SLOT_INTERFACE("phasor", A2BUS_PHASOR)  /* Applied Engineering Phasor */
-	SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
-	SLOT_INTERFACE("cffa202", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	SLOT_INTERFACE("memexp", A2BUS_MEMEXP)  /* Apple II Memory Expansion Card */
-	SLOT_INTERFACE("ramfactor", A2BUS_RAMFACTOR)    /* Applied Engineering RamFactor */
-	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus */
-	SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
-	SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
-	SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
-	SLOT_INTERFACE("echoii", A2BUS_ECHOII)    /* Street Electronics Echo II */
-	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
-	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
-	SLOT_INTERFACE("vulcan", A2BUS_VULCAN)  /* AE Vulcan IDE card */
-	SLOT_INTERFACE("vulcangold", A2BUS_VULCANGOLD)  /* AE Vulcan Gold IDE card */
-	SLOT_INTERFACE("zipdrive", A2BUS_ZIPDRIVE)  /* ZIP Technologies IDE card */
-	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
-//  SLOT_INTERFACE("mdturbo", A2BUS_UDRIVE_TURBO)  /* ///SHH Systeme MicroDrive Turbo IDE card */
+static void apple2_cards(device_slot_interface &device)
+{
+	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
+	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
+	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
+	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
+	device.option_add("cffa202", A2BUS_CFFA2_6502);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
+	device.option_add("memexp", A2BUS_MEMEXP);  /* Apple II Memory Expansion Card */
+	device.option_add("ramfactor", A2BUS_RAMFACTOR);    /* Applied Engineering RamFactor */
+	device.option_add("thclock", A2BUS_THUNDERCLOCK);    /* ThunderWare ThunderClock Plus */
+	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
+	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
+	device.option_add("alfam2", A2BUS_ALFAM2);    /* ALF Apple Music II */
+	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
+	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
+	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
+	device.option_add("vulcan", A2BUS_VULCAN);  /* AE Vulcan IDE card */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD);  /* AE Vulcan Gold IDE card */
+	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
+	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
+//  device.option_add("mdturbo", A2BUS_UDRIVE_TURBO);  /* ///SHH Systeme MicroDrive Turbo IDE card */
 
-//    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
-	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
-	SLOT_INTERFACE("hsscsi", A2BUS_HSSCSI)  /* Apple II High-Speed SCSI Card */
-SLOT_INTERFACE_END
+//    device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
+	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
+	device.option_add("hsscsi", A2BUS_HSSCSI);  /* Apple II High-Speed SCSI Card */
+}
 
 MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
-	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
+	MCFG_DEVICE_ADD("maincpu", G65816, APPLE2GS_14M/5)
+	MCFG_DEVICE_PROGRAM_MAP(apple2gs_map)
 	MCFG_DEVICE_ADDRESS_MAP(g65816_device::AS_VECTORS, vectors_map)
 	#if RUN_ADB_MICRO
-	MCFG_CPU_ADD(ADBMICRO_TAG, M50741, XTAL(3'579'545))
-	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p0_in))
-	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p0_out))
-	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p1_in))
-	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p1_out))
-	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p2_in))
-	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p2_out))
-	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p3_in))
-	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p3_out))
+	MCFG_DEVICE_ADD(ADBMICRO_TAG, M50741, XTAL(3'579'545))
+	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
+	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p0_out))
+	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p1_in))
+	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p1_out))
+	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p2_in))
+	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p2_out))
+	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p3_in))
+	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p3_out))
 	#endif
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2gs_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -339,7 +340,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple2gs )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )
@@ -357,54 +358,55 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(apple2_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(apple2_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2_state, ay3600_iie_data_ready_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, apple2_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, apple2_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2_state, ay3600_iie_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("a2speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ES5503_ADD("es5503", APPLE2GS_7M)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(apple2gs_state, apple2gs_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(apple2gs_state, apple2gs_adc_read))
+	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, apple2gs_state, apple2gs_doc_irq))
+	MCFG_ES5503_ADC_FUNC(READ8(*this, apple2gs_state, apple2gs_adc_read))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2gs_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2gs_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2gs_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2gs_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2gs_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2gs_state, a2bus_inh_w))
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* SCC */
-	MCFG_SCC85C30_ADD(SCC_TAG, APPLE2GS_14M/2, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD(SCC_TAG, SCC85C30, APPLE2GS_14M/2)
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, z80scc_device, ctsb_w))
 
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)
@@ -426,15 +428,15 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gsr1)
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gsr1 )
 
 	#if RUN_ADB_MICRO
-	MCFG_CPU_REPLACE(ADBMICRO_TAG, M50740, XTAL(3'579'545))
-	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p0_in))
-	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p0_out))
-	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p1_in))
-	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p1_out))
-	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p2_in))
-	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p2_out))
-	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p3_in))
-	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p3_out))
+	MCFG_DEVICE_REPLACE(ADBMICRO_TAG, M50740, XTAL(3'579'545))
+	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
+	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p0_out))
+	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p1_in))
+	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p1_out))
+	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p2_in))
+	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p2_out))
+	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p3_in))
+	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p3_out))
 	#endif
 
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -586,10 +588,10 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
-/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME */
-COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY           FULLNAME */
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )

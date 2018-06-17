@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class mouser_state : public driver_device
 {
 public:
@@ -39,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_DRIVER_INIT(mouser);
+	void init_mouser();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(mouser);

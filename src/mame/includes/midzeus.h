@@ -9,6 +9,7 @@
 #define MIDZEUS_VIDEO_CLOCK     XTAL(66'666'700)
 
 #include "machine/timekpr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class midzeus_state : public driver_device
@@ -24,7 +25,9 @@ public:
 		m_m48t35(*this, "m48t35"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_digits(*this, "digit%u", 0U)
+		{ }
 
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
@@ -35,7 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-
+	output_finder<7> m_digits;
 	emu_timer *m_display_irq_off_timer;
 
 	DECLARE_WRITE32_MEMBER(cmos_w);
@@ -47,8 +50,6 @@ public:
 	DECLARE_WRITE32_MEMBER(disk_asic_w);
 	DECLARE_READ32_MEMBER(disk_asic_jr_r);
 	DECLARE_WRITE32_MEMBER(disk_asic_jr_w);
-	DECLARE_READ32_MEMBER(crusnexo_leds_r);
-	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
 	DECLARE_READ32_MEMBER(firewire_r);
 	DECLARE_WRITE32_MEMBER(firewire_w);
 	DECLARE_READ32_MEMBER(tms32031_control_r);
@@ -64,10 +65,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
 	DECLARE_READ32_MEMBER(grid_keypad_r);
 	DECLARE_READ32_MEMBER(trackball_r);
-	DECLARE_DRIVER_INIT(invasn);
-	DECLARE_DRIVER_INIT(mk4);
-	DECLARE_DRIVER_INIT(thegrid);
-	DECLARE_DRIVER_INIT(crusnexo);
+	void init_invasn();
+	void init_mk4();
 	DECLARE_MACHINE_START(midzeus);
 	DECLARE_MACHINE_RESET(midzeus);
 	DECLARE_VIDEO_START(midzeus);

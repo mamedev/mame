@@ -95,9 +95,9 @@ void zms8085_state::mem_map(address_map &map)
 
 void zms8085_state::io_map(address_map &map)
 {
-	map(0x61, 0x61).r(this, FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x61, 0x61).r(FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
 	map(0x62, 0x62).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x63, 0x63).r(this, FUNC(zms8085_state::uart_status_r));
+	map(0x63, 0x63).r(FUNC(zms8085_state::uart_status_r));
 	map(0x68, 0x68).nopw();
 }
 
@@ -119,9 +119,9 @@ void zms8085_state::machine_start()
 }
 
 MACHINE_CONFIG_START(zms8085_state::zephyr)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(15'582'000) / 2) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(15'582'000) / 2) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'582'000), 980, 0, 800, 265, 0, 250)
@@ -130,12 +130,12 @@ MACHINE_CONFIG_START(zms8085_state::zephyr)
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // SMC COM2017
 	MCFG_AY51013_TX_CLOCK(153600) // should actually be configurable somehow
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_WRITE_DAV_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_AY51013_AUTO_RDAV(true)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
@@ -150,13 +150,13 @@ ROM_START( zephyr )
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("test") // for now
 	ROM_SYSTEM_BIOS(0, "main", "Main program" )
-	ROMX_LOAD( "23-067-03b.bin",  0x0000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb), ROM_BIOS(1) )
-	ROMX_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061), ROM_BIOS(1) )
+	ROMX_LOAD( "23-067-03b.bin",  0x0000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb), ROM_BIOS(0) )
+	ROMX_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "test", "Test program" )
-	ROMX_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025), ROM_BIOS(2) )
+	ROMX_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025), ROM_BIOS(1) )
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )
 ROM_END
 
-COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, 0, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )
+COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )

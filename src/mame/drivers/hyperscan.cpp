@@ -589,7 +589,7 @@ void hyperscan_state::spg290_mem(address_map &map)
 {
 	map.global_mask(0x1fffffff);
 	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
-	map(0x08000000, 0x09ffffff).rw(this, FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
+	map(0x08000000, 0x09ffffff).rw(FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
 	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
 	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
 	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);
@@ -621,8 +621,8 @@ void hyperscan_state::machine_reset()
 
 MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
-	MCFG_CPU_PROGRAM_MAP(spg290_mem)
+	MCFG_DEVICE_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
+	MCFG_DEVICE_PROGRAM_MAP(spg290_mem)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
 
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperscan_state, spg290_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperscan_state, spg290_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -649,5 +649,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      STATE            INIT  COMPANY   FULLNAME     FLAGS
-COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, 0,    "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
+COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

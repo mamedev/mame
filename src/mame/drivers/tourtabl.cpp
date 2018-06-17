@@ -23,12 +23,14 @@ class tourtabl_state : public driver_device
 public:
 	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void tourtabl(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
@@ -36,6 +38,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_leds;
 };
 
 
@@ -44,10 +47,10 @@ private:
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 {
-	output().set_led_value(0, data & 0x40); /* start 1 */
-	output().set_led_value(1, data & 0x20); /* start 2 */
-	output().set_led_value(2, data & 0x10); /* start 4 */
-	output().set_led_value(3, data & 0x80); /* select game */
+	m_leds[0] = BIT(data, 6); /* start 1 */
+	m_leds[1] = BIT(data, 5); /* start 2 */
+	m_leds[2] = BIT(data, 4); /* start 4 */
+	m_leds[3] = BIT(data, 7); /* select game */
 
 	machine().bookkeeping().coin_lockout_global_w(!(data & 0x80));
 }
@@ -155,25 +158,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("riot1", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT0_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT0_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("watchdog", watchdog_timer_device, reset_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
 
 	MCFG_DEVICE_ADD("riot2", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT1_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT1_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, tourtabl_led_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, tourtabl_state, tourtabl_led_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tourtabl_state, tourtabl_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tourtabl_state, tourtabl_get_databus_contents))
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
@@ -181,7 +184,7 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -210,5 +213,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )

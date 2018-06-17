@@ -124,6 +124,7 @@ Dip locations verified for:
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -198,8 +199,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_DRIVER_INIT(wilytowr);
-	DECLARE_DRIVER_INIT(fghtbskt);
+	void init_wilytowr();
+	void init_fghtbskt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_MACHINE_START(m63);
@@ -479,14 +480,14 @@ void m63_state::m63_map(address_map &map)
 	map(0xe000, 0xe1ff).ram();
 	map(0xe200, 0xe2ff).ram().share("spriteram");
 	map(0xe300, 0xe3ff).ram().share("scrollram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
-	map(0xe800, 0xebff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
-	map(0xec00, 0xefff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xe800, 0xebff).ram().w(FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xec00, 0xefff).ram().w(FUNC(m63_state::m63_colorram_w)).share("colorram");
 	map(0xf000, 0xf007).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xf800, 0xf800).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf801, 0xf801).portr("P2").nopw(); /* continues game when in stop mode (cleared by NMI handler) */
 	map(0xf802, 0xf802).portr("DSW1");
-	map(0xf803, 0xf803).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf803, 0xf803).w(FUNC(m63_state::snd_irq_w));
 	map(0xf806, 0xf806).portr("DSW2");
 }
 
@@ -498,18 +499,18 @@ void m63_state::fghtbskt_map(address_map &map)
 	map(0xd000, 0xd1ff).ram();
 	map(0xd200, 0xd2ff).ram().share("spriteram");
 	map(0xd300, 0xd3ff).ram().share("scrollram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
-	map(0xf000, 0xf000).r(this, FUNC(m63_state::snd_status_r));
+	map(0xd400, 0xd7ff).ram().w(FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xd800, 0xdbff).ram().w(FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xf000, 0xf000).r(FUNC(m63_state::snd_status_r));
 	map(0xf001, 0xf001).portr("P1");
 	map(0xf002, 0xf002).portr("P2");
 	map(0xf003, 0xf003).portr("DSW");
-	map(0xf000, 0xf000).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf000, 0xf000).w(FUNC(m63_state::snd_irq_w));
 	map(0xf001, 0xf001).nopw();
 	map(0xf002, 0xf002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf800, 0xf807).w("outlatch", FUNC(ls259_device::write_d0));
-	map(0xf807, 0xf807).w(this, FUNC(m63_state::fghtbskt_samples_w)); // FIXME
+	map(0xf807, 0xf807).w(FUNC(m63_state::fghtbskt_samples_w)); // FIXME
 }
 
 void m63_state::i8039_map(address_map &map)
@@ -520,7 +521,7 @@ void m63_state::i8039_map(address_map &map)
 
 void m63_state::i8039_port_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
+	map(0x00, 0xff).rw(FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
 }
 
 
@@ -692,13 +693,13 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( m63 )
+static GFXDECODE_START( gfx_m63 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   256, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( fghtbskt )
+static GFXDECODE_START( gfx_fghtbskt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 32 )
@@ -749,30 +750,30 @@ MACHINE_RESET_MEMBER(m63_state,m63)
 INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(m63_state::m63)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(m63_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(m63_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // probably chip at E7 obscured by pulldown resistor
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(m63_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m63_state, m63_flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(m63_state, pal_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(m63_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m63_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, m63_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, m63_state, m63_flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, m63_state, pal_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, m63_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, m63_state, coin2_w))
 
-	MCFG_CPU_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
-	MCFG_CPU_PROGRAM_MAP(i8039_map)
-	MCFG_CPU_IO_MAP(i8039_port_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(m63_state, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(m63_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(m63_state, irq_r))
-	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
+	MCFG_DEVICE_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
+	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
+	MCFG_DEVICE_IO_MAP(i8039_port_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, m63_state, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, m63_state, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, m63_state, irq_r))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
@@ -786,46 +787,46 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m63)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m63)
 	MCFG_PALETTE_ADD("palette", 256+4)
 
 	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono") /* ????? */
+	SPEAKER(config, "mono").front_center(); /* ????? */
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* ????? */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* ????? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m63_state::atomboy)
 	m63(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(fghtbskt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fghtbskt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(m63_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m63_state, fghtbskt_flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m63_state, fghtbskt_samples_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, m63_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, m63_state, fghtbskt_flipscreen_w))
+	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, m63_state, fghtbskt_samples_w))
 
-	MCFG_CPU_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
-	MCFG_CPU_PROGRAM_MAP(i8039_map)
-	MCFG_CPU_IO_MAP(i8039_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
+	MCFG_DEVICE_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
+	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
+	MCFG_DEVICE_IO_MAP(i8039_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
@@ -839,19 +840,19 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghtbskt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghtbskt)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(m63_state, fghtbskt_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1031,17 +1032,17 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb_b.11e",     0x0200, 0x0100, CRC(fca5bf0e) SHA1(5846f43aa2906cac58e300fdab197b99f896e3ef) )
 ROM_END
 
-DRIVER_INIT_MEMBER(m63_state,wilytowr)
+void m63_state::init_wilytowr()
 {
 	m_sy_offset = 238;
 }
 
-DRIVER_INIT_MEMBER(m63_state,fghtbskt)
+void m63_state::init_fghtbskt()
 {
 	m_sy_offset = 240;
 }
 
-GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, wilytowr, ROT180, "Irem",                    "Wily Tower", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, m63_state, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, atomboya, wilytowr, atomboy,  wilytowr, m63_state, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, m63_state, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, init_wilytowr, ROT180, "Irem",                    "Wily Tower", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, m63_state, init_wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, atomboya, wilytowr, atomboy,  wilytowr, m63_state, init_wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, m63_state, init_fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", MACHINE_SUPPORTS_SAVE )

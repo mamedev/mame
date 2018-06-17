@@ -375,25 +375,24 @@ void mekd2_state::machine_start()
 
 MACHINE_CONFIG_START(mekd2_state::mekd2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
-	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(mekd2_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_mekd2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(mekd2_state, mekd2_key_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(mekd2_state, mekd2_key40_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mekd2_state, mekd2_segment_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mekd2_state, mekd2_digit_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(mekd2_state, mekd2_nmi_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, mekd2_state, mekd2_key_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, mekd2_state, mekd2_key40_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mekd2_state, mekd2_segment_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mekd2_state, mekd2_digit_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mekd2_state, mekd2_nmi_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
@@ -402,13 +401,13 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(mekd2_state, cass_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, mekd2_state, cass_w))
 
 	MCFG_DEVICE_ADD("acia_tx_clock", CLOCK, XTAL_MEKD2 / 256) // 4800Hz
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
 
 	MCFG_DEVICE_ADD("acia_rx_clock", CLOCK, 300) // toggled by cassette circuit
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))
@@ -433,5 +432,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY     FULLNAME      FLAGS
-COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, 0,    "Motorola", "MEK6800D2" , 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, empty_init, "Motorola", "MEK6800D2" , 0 )

@@ -68,7 +68,7 @@ void tv955_state::mem_map(address_map &map)
 {
 	// verified from maintenance manual (131968-00-C)
 	map(0x0000, 0x07ff).mirror(0x0800).ram().share("nvram");
-	map(0x1100, 0x1100).mirror(0x00ff).w(this, FUNC(tv955_state::control_latch_w));
+	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(tv955_state::control_latch_w));
 	map(0x1200, 0x1203).mirror(0x00fc).rw("keybuart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x1400, 0x1403).mirror(0x00fc).rw("printuart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x1800, 0x1803).mirror(0x00fc).rw("hostuart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
@@ -83,13 +83,13 @@ static INPUT_PORTS_START( tv955 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tv955_state::tv955)
-	MCFG_CPU_ADD("maincpu", M65C02, 19.3396_MHz_XTAL / 9)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 19.3396_MHz_XTAL / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", m6502_device::IRQ_LINE))
 
-	MCFG_CPU_ADD("keyboard", I8049, 5.7143_MHz_XTAL)
+	MCFG_DEVICE_ADD("keyboard", I8049, 5.7143_MHz_XTAL)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + 3.2V battery
 
@@ -108,15 +108,15 @@ MACHINE_CONFIG_START(tv955_state::tv955)
 
 	MCFG_DEVICE_ADD("hostuart", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("printuart", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("keybuart", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
@@ -143,4 +143,4 @@ ROM_START( tv955 )
 	ROM_LOAD( "8049.kbd",            0x0000, 0x0800, CRC(bc86e349) SHA1(0b62003ab7931822f1bcac8370517c685849f62c) )
 ROM_END
 
-COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, 0, "TeleVideo Systems", "TeleVideo 955", MACHINE_IS_SKELETON )
+COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, empty_init, "TeleVideo Systems", "TeleVideo 955", MACHINE_IS_SKELETON )

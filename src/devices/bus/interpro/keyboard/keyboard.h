@@ -56,16 +56,10 @@ protected:
 	device_interpro_keyboard_port_interface(machine_config const &mconfig, device_t &device);
 
 	interpro_keyboard_port_device *m_port;
-
-	static constexpr int START_BIT_COUNT = 1;
-	static constexpr int DATA_BIT_COUNT = 8;
-	static constexpr device_serial_interface::parity_t PARITY = device_serial_interface::PARITY_EVEN;
-	static constexpr device_serial_interface::stop_bits_t STOP_BITS = device_serial_interface::STOP_BITS_1;
-	static constexpr int BAUD = 1'200;
 };
 
 DECLARE_DEVICE_TYPE(INTERPRO_KEYBOARD_PORT, interpro_keyboard_port_device)
 
-SLOT_INTERFACE_EXTERN(interpro_keyboard_devices);
+void interpro_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_INTERPRO_KEYBOARD_KEYBOARD_H

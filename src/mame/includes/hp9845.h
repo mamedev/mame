@@ -12,6 +12,7 @@
 #include "machine/hp_taco.h"
 #include "sound/beep.h"
 #include "bus/hp9845_io/hp9845_io.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

@@ -54,7 +54,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/k7659kb.h"
 #include "machine/z80ctc.h"
@@ -62,6 +62,7 @@
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -249,15 +250,15 @@ static const gfx_layout pcm_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pcm )
+static GFXDECODE_START( gfx_pcm )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pcm_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pcm_state::pcm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'000'000) /4)
-	MCFG_CPU_PROGRAM_MAP(pcm_mem)
-	MCFG_CPU_IO_MAP(pcm_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'000'000) /4)
+	MCFG_DEVICE_PROGRAM_MAP(pcm_mem)
+	MCFG_DEVICE_IO_MAP(pcm_io)
 	MCFG_Z80_DAISY_CHAIN(pcm_daisy_chain)
 
 	/* video hardware */
@@ -269,15 +270,13 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MCFG_K7659_KEYBOARD_ADD()
@@ -288,9 +287,9 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 
 	MCFG_DEVICE_ADD("pio_s", Z80PIO, XTAL(10'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
-	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pcm_state, pcm_85_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, pcm_state, pcm_85_w))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(10'000'000) /4)
 
@@ -299,30 +298,30 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 
 	MCFG_DEVICE_ADD("ctc_s", Z80CTC, XTAL(10'000'000) /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(pcm_state, pcm_82_w))  // speaker
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, pcm_state, pcm_82_w))  // speaker
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pcm )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v202", "Version 2.02" )
-	ROMX_LOAD( "bios_v202.d14", 0x0000, 0x0800, CRC(27c24892) SHA1(a97bf9ef075de91330dc0c7cfd3bb6c7a88bb585), ROM_BIOS(1))
-	ROMX_LOAD( "bios_v202.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(1))
-	ROMX_LOAD( "bios_v202.d16", 0x1000, 0x0800, CRC(abe12001) SHA1(d8f0db6b141736d7715d588384fa49ab386bcc55), ROM_BIOS(1))
-	ROMX_LOAD( "bios_v202.d17", 0x1800, 0x0800, CRC(2d48d1cc) SHA1(36a825140124dbe10d267fdf28b3eacec6f6d556), ROM_BIOS(1))
+	ROMX_LOAD( "bios_v202.d14", 0x0000, 0x0800, CRC(27c24892) SHA1(a97bf9ef075de91330dc0c7cfd3bb6c7a88bb585), ROM_BIOS(0))
+	ROMX_LOAD( "bios_v202.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(0))
+	ROMX_LOAD( "bios_v202.d16", 0x1000, 0x0800, CRC(abe12001) SHA1(d8f0db6b141736d7715d588384fa49ab386bcc55), ROM_BIOS(0))
+	ROMX_LOAD( "bios_v202.d17", 0x1800, 0x0800, CRC(2d48d1cc) SHA1(36a825140124dbe10d267fdf28b3eacec6f6d556), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v210", "Version 2.10" )
-	ROMX_LOAD( "bios_v210.d14", 0x0000, 0x0800, CRC(45923112) SHA1(dde922533ebd0f6ac06d25b9786830ee3c7178b9), ROM_BIOS(2))
-	ROMX_LOAD( "bios_v210.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(2))
-	ROMX_LOAD( "bios_v210.d16", 0x1000, 0x0800, CRC(ee9ed77b) SHA1(12ea18e3e280f2a0657ff11c7bcdd658d325235c), ROM_BIOS(2))
-	ROMX_LOAD( "bios_v210.d17", 0x1800, 0x0800, CRC(2d48d1cc) SHA1(36a825140124dbe10d267fdf28b3eacec6f6d556), ROM_BIOS(2))
+	ROMX_LOAD( "bios_v210.d14", 0x0000, 0x0800, CRC(45923112) SHA1(dde922533ebd0f6ac06d25b9786830ee3c7178b9), ROM_BIOS(1))
+	ROMX_LOAD( "bios_v210.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(1))
+	ROMX_LOAD( "bios_v210.d16", 0x1000, 0x0800, CRC(ee9ed77b) SHA1(12ea18e3e280f2a0657ff11c7bcdd658d325235c), ROM_BIOS(1))
+	ROMX_LOAD( "bios_v210.d17", 0x1800, 0x0800, CRC(2d48d1cc) SHA1(36a825140124dbe10d267fdf28b3eacec6f6d556), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v330", "Version 3.30" )
-	ROMX_LOAD( "bios_v330.d14", 0x0000, 0x0800, CRC(9bbfee10) SHA1(895002f2f4c711278f1e2d0e2a987e2d31472e4f), ROM_BIOS(3))
-	ROMX_LOAD( "bios_v330.d15", 0x0800, 0x0800, CRC(4f8d5b40) SHA1(440b0be4cf45a5d450f9eb7684ceb809450585dc), ROM_BIOS(3))
-	ROMX_LOAD( "bios_v330.d16", 0x1000, 0x0800, CRC(93fd0d91) SHA1(c8f1bbb63eca3c93560622581ecbb588716aeb91), ROM_BIOS(3))
-	ROMX_LOAD( "bios_v330.d17", 0x1800, 0x0800, CRC(d8c7ce33) SHA1(9030d9a73ef1c12a31ac2cb9a593fb2a5097f24d), ROM_BIOS(3))
+	ROMX_LOAD( "bios_v330.d14", 0x0000, 0x0800, CRC(9bbfee10) SHA1(895002f2f4c711278f1e2d0e2a987e2d31472e4f), ROM_BIOS(2))
+	ROMX_LOAD( "bios_v330.d15", 0x0800, 0x0800, CRC(4f8d5b40) SHA1(440b0be4cf45a5d450f9eb7684ceb809450585dc), ROM_BIOS(2))
+	ROMX_LOAD( "bios_v330.d16", 0x1000, 0x0800, CRC(93fd0d91) SHA1(c8f1bbb63eca3c93560622581ecbb588716aeb91), ROM_BIOS(2))
+	ROMX_LOAD( "bios_v330.d17", 0x1800, 0x0800, CRC(d8c7ce33) SHA1(9030d9a73ef1c12a31ac2cb9a593fb2a5097f24d), ROM_BIOS(2))
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "charrom.d113", 0x0000, 0x0800, CRC(5684b3c3) SHA1(418054aa70a0fd120611e32059eb2051d3b82b5a))
@@ -330,5 +329,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY           FULLNAME  FLAGS */
-COMP( 1988, pcm,    0,      0,       pcm,       pcm,   pcm_state,  0,    "Mugler/Mathes",  "PC/M",   0)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
+COMP( 1988, pcm,  0,      0,      pcm,     pcm,   pcm_state, empty_init, "Mugler/Mathes", "PC/M",   0)

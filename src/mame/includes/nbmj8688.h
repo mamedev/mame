@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 #include "video/hd61830.h"
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
+#include "emupal.h"
 
 class nbmj8688_state : public driver_device
 {
@@ -68,11 +69,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
-	DECLARE_DRIVER_INIT(kyuhito);
-	DECLARE_DRIVER_INIT(idhimitu);
-	DECLARE_DRIVER_INIT(kaguya2);
-	DECLARE_DRIVER_INIT(mjcamera);
-	DECLARE_DRIVER_INIT(kanatuen);
+	void init_kyuhito();
+	void init_idhimitu();
+	void init_kaguya2();
+	void init_mjcamera();
+	void init_kanatuen();
 	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
 	DECLARE_PALETTE_INIT(mbmj8688_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);

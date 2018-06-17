@@ -31,7 +31,6 @@ Known to exist but not dumped:
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
-#include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
 #include "crusnusa.lh"
@@ -69,9 +68,6 @@ void midvunit_state::machine_reset()
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
-
-	m_timer[0] = machine().device<timer_device>("timer0");
-	m_timer[1] = machine().device<timer_device>("timer1");
 }
 
 
@@ -83,10 +79,7 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
 
-	m_timer[0] = machine().device<timer_device>("timer0");
-	m_timer[1] = machine().device<timer_device>("timer1");
-
-	machine().device("ata")->reset();
+	m_ata->reset();
 }
 
 
@@ -595,30 +588,30 @@ void midvunit_state::midvunit_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("ram_base");
 	map(0x400000, 0x41ffff).ram();
-	map(0x600000, 0x600000).w(this, FUNC(midvunit_state::midvunit_dma_queue_w));
-	map(0x808000, 0x80807f).rw(this, FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
+	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
+	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
 	map(0x809800, 0x809fff).ram();
-	map(0x900000, 0x97ffff).rw(this, FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
-	map(0x980000, 0x980000).r(this, FUNC(midvunit_state::midvunit_dma_queue_entries_r));
-	map(0x980020, 0x980020).r(this, FUNC(midvunit_state::midvunit_scanline_r));
-	map(0x980020, 0x98002b).w(this, FUNC(midvunit_state::midvunit_video_control_w));
-	map(0x980040, 0x980040).rw(this, FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
+	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
+	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
+	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
+	map(0x980020, 0x98002b).w(FUNC(midvunit_state::midvunit_video_control_w));
+	map(0x980040, 0x980040).rw(FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
 	map(0x980080, 0x980080).noprw();
-	map(0x980082, 0x980083).r(this, FUNC(midvunit_state::midvunit_dma_trigger_r));
+	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x990000).nopr(); // link PAL (low 4 bits must == 4)
 	map(0x991030, 0x991030).portr("991030");
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
-	map(0x991060, 0x991060).r(this, FUNC(midvunit_state::port0_r));
+	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
 	map(0x992000, 0x992000).portr("992000");
-	map(0x993000, 0x993000).rw(this, FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
-	map(0x994000, 0x994000).w(this, FUNC(midvunit_state::midvunit_control_w));
-	map(0x995000, 0x995000).rw(this, FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
-	map(0x995020, 0x995020).w(this, FUNC(midvunit_state::midvunit_cmos_protect_w));
+	map(0x993000, 0x993000).rw(FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
+	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
+	map(0x995000, 0x995000).rw(FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
+	map(0x995020, 0x995020).w(FUNC(midvunit_state::midvunit_cmos_protect_w));
 	map(0x997000, 0x997000).noprw(); // communications
-	map(0x9a0000, 0x9a0000).w(this, FUNC(midvunit_state::midvunit_sound_w));
-	map(0x9c0000, 0x9c1fff).rw(this, FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
-	map(0x9e0000, 0x9e7fff).ram().w(this, FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
-	map(0xa00000, 0xbfffff).rw(this, FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
+	map(0x9a0000, 0x9a0000).w(FUNC(midvunit_state::midvunit_sound_w));
+	map(0x9c0000, 0x9c1fff).rw(FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
+	map(0x9e0000, 0x9e7fff).ram().w(FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
+	map(0xa00000, 0xbfffff).rw(FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
 	map(0xc00000, 0xffffff).rom().region("user1", 0);
 }
 
@@ -627,23 +620,23 @@ void midvunit_state::midvplus_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("ram_base");
 	map(0x400000, 0x41ffff).ram().share("fastram_base");
-	map(0x600000, 0x600000).w(this, FUNC(midvunit_state::midvunit_dma_queue_w));
-	map(0x808000, 0x80807f).rw(this, FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
+	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
+	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
 	map(0x809800, 0x809fff).ram();
-	map(0x900000, 0x97ffff).rw(this, FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
-	map(0x980000, 0x980000).r(this, FUNC(midvunit_state::midvunit_dma_queue_entries_r));
-	map(0x980020, 0x980020).r(this, FUNC(midvunit_state::midvunit_scanline_r));
-	map(0x980020, 0x98002b).w(this, FUNC(midvunit_state::midvunit_video_control_w));
-	map(0x980040, 0x980040).rw(this, FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
+	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
+	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
+	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
+	map(0x980020, 0x98002b).w(FUNC(midvunit_state::midvunit_video_control_w));
+	map(0x980040, 0x980040).rw(FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
 	map(0x980080, 0x980080).noprw();
-	map(0x980082, 0x980083).r(this, FUNC(midvunit_state::midvunit_dma_trigger_r));
+	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x99000f).rw(m_midway_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x994000, 0x994000).w(this, FUNC(midvunit_state::midvunit_control_w));
-	map(0x995020, 0x995020).w(this, FUNC(midvunit_state::midvunit_cmos_protect_w));
-	map(0x9a0000, 0x9a0007).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask32(0x0000ffff);
-	map(0x9c0000, 0x9c7fff).ram().w(this, FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
-	map(0x9d0000, 0x9d000f).rw(this, FUNC(midvunit_state::midvplus_misc_r), FUNC(midvunit_state::midvplus_misc_w)).share("midvplus_misc");
-	map(0xa00000, 0xbfffff).rw(this, FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
+	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
+	map(0x995020, 0x995020).w(FUNC(midvunit_state::midvunit_cmos_protect_w));
+	map(0x9a0000, 0x9a0007).rw("ata", FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask32(0x0000ffff);
+	map(0x9c0000, 0x9c7fff).ram().w(FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
+	map(0x9d0000, 0x9d000f).rw(FUNC(midvunit_state::midvplus_misc_r), FUNC(midvunit_state::midvplus_misc_w)).share("midvplus_misc");
+	map(0xa00000, 0xbfffff).rw(FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
 	map(0xc00000, 0xcfffff).ram();
 }
 
@@ -1073,8 +1066,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(midvunit_map)
+	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1126,9 +1119,9 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	midvcommon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(midvplus_map)
-	MCFG_TMS3203X_XF1_CB(WRITE8(midvunit_state, midvplus_xf1_w))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
+	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")
@@ -1817,9 +1810,9 @@ void midvunit_state::init_crusnusa_common(offs_t speedup)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
 	m_generic_speedup = m_ram_base + speedup;
 }
-DRIVER_INIT_MEMBER(midvunit_state,crusnusa)  { init_crusnusa_common(0xc93e); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnu40)  { init_crusnusa_common(0xc957); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnu21)  { init_crusnusa_common(0xc051); }
+void midvunit_state::init_crusnusa()  { init_crusnusa_common(0xc93e); }
+void midvunit_state::init_crusnu40()  { init_crusnusa_common(0xc957); }
+void midvunit_state::init_crusnu21()  { init_crusnusa_common(0xc051); }
 
 
 void midvunit_state::init_crusnwld_common(offs_t speedup)
@@ -1843,13 +1836,13 @@ void midvunit_state::init_crusnwld_common(offs_t speedup)
 		m_generic_speedup = m_ram_base + speedup;
 	}
 }
-DRIVER_INIT_MEMBER(midvunit_state,crusnwld)  { init_crusnwld_common(0xd4c0); }
+void midvunit_state::init_crusnwld()  { init_crusnwld_common(0xd4c0); }
 #if 0
-DRIVER_INIT_MEMBER(midvunit_state,crusnw20)  { init_crusnwld_common(0xd49c); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw13)  { init_crusnwld_common(0); }
+void midvunit_state::init_crusnw20()  { init_crusnwld_common(0xd49c); }
+void midvunit_state::init_crusnw13()  { init_crusnwld_common(0); }
 #endif
 
-DRIVER_INIT_MEMBER(midvunit_state,offroadc)
+void midvunit_state::init_offroadc()
 {
 	m_adc_shift = 16;
 
@@ -1865,7 +1858,7 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 }
 
 
-DRIVER_INIT_MEMBER(midvunit_state,wargods)
+void midvunit_state::init_wargods()
 {
 	uint8_t default_nvram[256];
 
@@ -1878,7 +1871,7 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
 	default_nvram[0x12] = default_nvram[0x32] = 0xaf;
 	default_nvram[0x17] = default_nvram[0x37] = 0xd8;
 	default_nvram[0x18] = default_nvram[0x38] = 0xe7;
-	machine().device<midway_ioasic_device>("ioasic")->set_default_nvram(default_nvram);
+	m_midway_ioasic->set_default_nvram(default_nvram);
 
 	/* speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
@@ -1893,24 +1886,24 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
  *
  *************************************/
 
-GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, init_crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wargodsb,  wargods,  midvplus, wargodsa, midvunit_state, wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wargodsb,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", MACHINE_SUPPORTS_SAVE )

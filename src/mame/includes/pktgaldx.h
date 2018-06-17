@@ -9,6 +9,7 @@
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "machine/deco104.h"
+#include "emupal.h"
 
 class pktgaldx_state : public driver_device
 {
@@ -50,7 +51,7 @@ public:
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
 	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
-	DECLARE_DRIVER_INIT(pktgaldx);
+	void init_pktgaldx();
 	virtual void machine_start() override;
 	uint32_t screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

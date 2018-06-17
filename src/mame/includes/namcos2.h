@@ -14,6 +14,7 @@
 #include "video/c45.h"
 
 #include "cpu/m6502/m3745x.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* CPU reference numbers */
@@ -299,40 +300,40 @@ public:
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
-	DECLARE_DRIVER_INIT(cosmogng);
-	DECLARE_DRIVER_INIT(sgunner2);
-	DECLARE_DRIVER_INIT(kyukaidk);
-	DECLARE_DRIVER_INIT(bubbletr);
-	DECLARE_DRIVER_INIT(suzuk8h2);
-	DECLARE_DRIVER_INIT(burnforc);
-	DECLARE_DRIVER_INIT(gollygho);
-	DECLARE_DRIVER_INIT(rthun2j);
-	DECLARE_DRIVER_INIT(sws);
-	DECLARE_DRIVER_INIT(finehour);
-	DECLARE_DRIVER_INIT(finallap);
-	DECLARE_DRIVER_INIT(dirtfoxj);
-	DECLARE_DRIVER_INIT(marvlanj);
-	DECLARE_DRIVER_INIT(sws92);
-	DECLARE_DRIVER_INIT(dsaber);
-	DECLARE_DRIVER_INIT(assault);
-	DECLARE_DRIVER_INIT(mirninja);
-	DECLARE_DRIVER_INIT(finalap2);
-	DECLARE_DRIVER_INIT(valkyrie);
-	DECLARE_DRIVER_INIT(fourtrax);
-	DECLARE_DRIVER_INIT(finalap3);
-	DECLARE_DRIVER_INIT(luckywld);
-	DECLARE_DRIVER_INIT(assaultj);
-	DECLARE_DRIVER_INIT(dsaberj);
-	DECLARE_DRIVER_INIT(suzuka8h);
-	DECLARE_DRIVER_INIT(phelios);
-	DECLARE_DRIVER_INIT(sws93);
-	DECLARE_DRIVER_INIT(metlhawk);
-	DECLARE_DRIVER_INIT(sws92g);
-	DECLARE_DRIVER_INIT(assaultp_hack);
-	DECLARE_DRIVER_INIT(assaultp);
-	DECLARE_DRIVER_INIT(ordyne);
-	DECLARE_DRIVER_INIT(marvland);
-	DECLARE_DRIVER_INIT(rthun2);
+	void init_cosmogng();
+	void init_sgunner2();
+	void init_kyukaidk();
+	void init_bubbletr();
+	void init_suzuk8h2();
+	void init_burnforc();
+	void init_gollygho();
+	void init_rthun2j();
+	void init_sws();
+	void init_finehour();
+	void init_finallap();
+	void init_dirtfoxj();
+	void init_marvlanj();
+	void init_sws92();
+	void init_dsaber();
+	void init_assault();
+	void init_mirninja();
+	void init_finalap2();
+	void init_valkyrie();
+	void init_fourtrax();
+	void init_finalap3();
+	void init_luckywld();
+	void init_assaultj();
+	void init_dsaberj();
+	void init_suzuka8h();
+	void init_phelios();
+	void init_sws93();
+	void init_metlhawk();
+	void init_sws92g();
+	void init_assaultp_hack();
+	void init_assaultp();
+	void init_ordyne();
+	void init_marvland();
+	void init_rthun2();
 
 	virtual void video_start() override;
 	void video_start_finallap();

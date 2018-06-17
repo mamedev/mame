@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -236,17 +237,17 @@ CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 void pzletime_state::pzletime_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x700000, 0x700005).ram().w(this, FUNC(pzletime_state::video_regs_w)).share("video_regs");
+	map(0x700000, 0x700005).ram().w(FUNC(pzletime_state::video_regs_w)).share("video_regs");
 	map(0x800001, 0x800001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x900000, 0x9005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00007).ram().share("tilemap_regs");
 	map(0xb00000, 0xb3ffff).ram().share("bg_videoram");
-	map(0xc00000, 0xc00fff).ram().w(this, FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
-	map(0xc01000, 0xc01fff).ram().w(this, FUNC(pzletime_state::txt_videoram_w)).share("txt_videoram");
+	map(0xc00000, 0xc00fff).ram().w(FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(FUNC(pzletime_state::txt_videoram_w)).share("txt_videoram");
 	map(0xd00000, 0xd01fff).ram().share("spriteram");
-	map(0xe00000, 0xe00001).portr("INPUT").w(this, FUNC(pzletime_state::eeprom_w));
-	map(0xe00002, 0xe00003).portr("SYSTEM").w(this, FUNC(pzletime_state::ticket_w));
-	map(0xe00004, 0xe00005).w(this, FUNC(pzletime_state::oki_bank_w));
+	map(0xe00000, 0xe00001).portr("INPUT").w(FUNC(pzletime_state::eeprom_w));
+	map(0xe00002, 0xe00003).portr("SYSTEM").w(FUNC(pzletime_state::ticket_w));
+	map(0xe00004, 0xe00005).w(FUNC(pzletime_state::oki_bank_w));
 	map(0xf00000, 0xf0ffff).ram();
 }
 
@@ -304,7 +305,7 @@ static const gfx_layout layout16x16 =
 	32*32
 };
 
-static GFXDECODE_START( pzletime )
+static GFXDECODE_START( gfx_pzletime )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16, 0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
@@ -334,9 +335,9 @@ void pzletime_state::machine_reset()
 MACHINE_CONFIG_START(pzletime_state::pzletime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,10000000)
-	MCFG_CPU_PROGRAM_MAP(pzletime_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,10000000)
+	MCFG_DEVICE_PROGRAM_MAP(pzletime_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
 
 
 	/* video hardware */
@@ -348,17 +349,17 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pzletime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pzletime)
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 937500, PIN7_HIGH) //freq & pin7 taken from stlforce
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 937500, okim6295_device::PIN7_HIGH) //freq & pin7 taken from stlforce
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -405,4 +406,4 @@ ROM_START( pzletime )
 	ROM_LOAD( "pzletime.nv", 0x0000, 0x0080, CRC(e5ed3d40) SHA1(8c163a6e5839e5c82d52f046d3268202fdf9f4d1) )
 ROM_END
 
-GAME( 199?, pzletime, 0, pzletime,  pzletime, pzletime_state,  0, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, pzletime, 0, pzletime,  pzletime, pzletime_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )

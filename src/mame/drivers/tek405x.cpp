@@ -179,7 +179,7 @@ void tek4051_state::tek4051_mem(address_map &map)
 	map(0x8798, 0x879b).rw(MC6820_TAPE_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87a8, 0x87ab).rw(MC6820_KB_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87b0, 0x87b3).rw(m_gpib_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x87c0, 0x87c0).mirror(0x03).w(this, FUNC(tek4051_state::lbs_w));
+	map(0x87c0, 0x87c0).mirror(0x03).w(FUNC(tek4051_state::lbs_w));
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
 //  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
@@ -622,18 +622,18 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	*/
 
 	// lamps
-	output().set_led_value(1, !BIT(data, 5));
-	output().set_led_value(2, !BIT(data, 6));
-	output().set_led_value(3, !BIT(data, 7));
+	m_lamps[0] = BIT(~data, 5);
+	m_lamps[1] = BIT(~data, 6);
+	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
-	m_gpib->eoi_w(!BIT(data, 4));
+	m_gpib->host_eoi_w(!BIT(data, 4));
 
 	// speaker
 	m_speaker->level_w(!BIT(data, 7));
 
 	// remote enable
-	m_gpib->ren_w(!BIT(data, 7));
+	m_gpib->host_ren_w(!BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
@@ -741,7 +741,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 
 	if (m_talk)
 	{
-		m_gpib->dio_w(data);
+		m_gpib->write_dio(data);
 	}
 }
 
@@ -800,21 +800,21 @@ WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
 	*/
 
 	// end or identify
-	m_gpib->eoi_w(!BIT(data, 0));
+	m_gpib->host_eoi_w(!BIT(data, 0));
 
 	// interface clear
-	m_gpib->ifc_w(!BIT(data, 1));
+	m_gpib->host_ifc_w(!BIT(data, 1));
 
 	// attention
-	m_gpib->atn_w(BIT(data, 3));
+	m_gpib->host_atn_w(BIT(data, 3));
 
 	if (m_talk)
 	{
 		// not ready for data
-		m_gpib->nrfd_w(!BIT(data, 4));
+		m_gpib->host_nrfd_w(!BIT(data, 4));
 
 		// not data acknowledged
-		m_gpib->ndac_w(!BIT(data, 7));
+		m_gpib->host_ndac_w(!BIT(data, 7));
 	}
 }
 
@@ -824,9 +824,9 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 
 	if (!m_talk)
 	{
-		m_gpib->dio_w(0xff);
-		m_gpib->nrfd_w(1);
-		m_gpib->ndac_w(1);
+		m_gpib->write_dio(0xff);
+		m_gpib->host_nrfd_w(1);
+		m_gpib->host_ndac_w(1);
 	}
 }
 
@@ -958,6 +958,8 @@ WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 
 void tek4051_state::machine_start()
 {
+	m_lamps.resolve();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
@@ -1000,8 +1002,8 @@ void tek4052_state::machine_start()
 
 MACHINE_CONFIG_START(tek4051_state::tek4051)
 	// basic machine hardware
-	MCFG_CPU_ADD(MC6800_TAG, M6800, XTAL(12'500'000)/15)
-	MCFG_CPU_PROGRAM_MAP(tek4051_mem)
+	MCFG_DEVICE_ADD(MC6800_TAG, M6800, XTAL(12'500'000)/15)
+	MCFG_DEVICE_PROGRAM_MAP(tek4051_mem)
 
 	// video hardware
 	MCFG_VECTOR_ADD("vector")
@@ -1015,80 +1017,80 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL(12'500'000)/15/4))
 
 	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, x_pia_pa_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, x_pia_pa_r))
 	// CB1 viewcause
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, x_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, x_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(tek4051_state, adot_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(tek4051_state, bufclk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, x_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, x_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, x_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, x_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, adot_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, bufclk_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_Y_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, sa_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, sa_r))
 	// CA1 rdbyte
 	// CB1 mdata
 	// CB2 fmark
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, y_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, sb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(tek4051_state, sot_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, y_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, y_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, y_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, sb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, sot_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_KB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, kb_pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(tek4051_state, kb_pia_pb_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, kb_pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, kb_pia_pb_r))
 	// CA1 key
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, kb_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(tek4051_state, kb_halt_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, kb_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, kb_pia_irqb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, kb_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, kb_halt_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_TAPE_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, tape_pia_pa_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, tape_pia_pa_r))
 	// CA1 rmark
 	// CB1 lohole
 	// CA2 filfnd
 	// CB2 uphole
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, tape_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, tape_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, tape_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, tape_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_GPIB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(tek4051_state, gpib_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, gpib_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(tek4051_state, talk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, gpib_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, gpib_pia_irqb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, gpib_pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, dio_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, gpib_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, talk_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_COM_TAG, PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(tek4051_state, com_pia_pb_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, com_pia_pb_r))
 	//CA1 - SRX (RS-232 pin 12)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, com_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, com_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, com_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, com_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, com_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, com_pia_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(tek4051_state, acia_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, tek4051_state, acia_irq_w))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 38400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tek4051_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, tek4051_state, write_acia_clock))
 
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE(MC6820_GPIB_TAG, pia6821_device, ca1_w))
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
+	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, ca1_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1107,8 +1109,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tek4052_state::tek4052)
 	// basic machine hardware
-	MCFG_CPU_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
-	MCFG_CPU_PROGRAM_MAP(tek4052_mem)
+	MCFG_DEVICE_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
+	MCFG_DEVICE_PROGRAM_MAP(tek4052_mem)
 
 	// video hardware
 	MCFG_VECTOR_ADD("vector")
@@ -1122,8 +1124,8 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// internal ram
@@ -1251,7 +1253,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1975, tek4051,    0,       0,      tek4051,    tek4051, tek4051_state, 0,    "Tektronix", "Tektronix 4051",  MACHINE_NOT_WORKING )
-COMP( 1978, tek4052a,   tek4051, 0,      tek4052,    tek4051, tek4052_state, 0,    "Tektronix", "Tektronix 4052A", MACHINE_NOT_WORKING )
-//COMP( 1979, tek4054,  tek4051, 0,      tek4054,    tek4054, tek4052_state, 0,    "Tektronix", "Tektronix 4054",  MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1975, tek4051,   0,       0,      tek4051, tek4051, tek4051_state, empty_init, "Tektronix", "Tektronix 4051",  MACHINE_NOT_WORKING )
+COMP( 1978, tek4052a,  tek4051, 0,      tek4052, tek4051, tek4052_state, empty_init, "Tektronix", "Tektronix 4052A", MACHINE_NOT_WORKING )
+//COMP( 1979, tek4054,   tek4051, 0,      tek4054, tek4054, tek4052_state, empty_init, "Tektronix", "Tektronix 4054",  MACHINE_NOT_WORKING )

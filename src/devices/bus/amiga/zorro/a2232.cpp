@@ -33,109 +33,109 @@ DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
 void a2232_device::iocpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("shared");
-	map(0x4000, 0x47ff).rw(this, FUNC(a2232_device::acia_0_r), FUNC(a2232_device::acia_0_w));
-	map(0x4800, 0x4fff).rw(this, FUNC(a2232_device::acia_1_r), FUNC(a2232_device::acia_1_w));
-	map(0x5000, 0x57ff).rw(this, FUNC(a2232_device::acia_2_r), FUNC(a2232_device::acia_2_w));
-	map(0x5800, 0x5fff).rw(this, FUNC(a2232_device::acia_3_r), FUNC(a2232_device::acia_3_w));
-	map(0x6000, 0x67ff).rw(this, FUNC(a2232_device::acia_4_r), FUNC(a2232_device::acia_4_w));
-	map(0x6800, 0x6fff).rw(this, FUNC(a2232_device::acia_5_r), FUNC(a2232_device::acia_5_w));
-	map(0x7000, 0x73ff).w(this, FUNC(a2232_device::int2_w));
-	map(0x7400, 0x77ff).rw(this, FUNC(a2232_device::acia_6_r), FUNC(a2232_device::acia_6_w));
-	map(0x7800, 0x7fff).rw(this, FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
-	map(0x8000, 0x8000).w(this, FUNC(a2232_device::irq_ack8_w));
+	map(0x4000, 0x47ff).rw(FUNC(a2232_device::acia_0_r), FUNC(a2232_device::acia_0_w));
+	map(0x4800, 0x4fff).rw(FUNC(a2232_device::acia_1_r), FUNC(a2232_device::acia_1_w));
+	map(0x5000, 0x57ff).rw(FUNC(a2232_device::acia_2_r), FUNC(a2232_device::acia_2_w));
+	map(0x5800, 0x5fff).rw(FUNC(a2232_device::acia_3_r), FUNC(a2232_device::acia_3_w));
+	map(0x6000, 0x67ff).rw(FUNC(a2232_device::acia_4_r), FUNC(a2232_device::acia_4_w));
+	map(0x6800, 0x6fff).rw(FUNC(a2232_device::acia_5_r), FUNC(a2232_device::acia_5_w));
+	map(0x7000, 0x73ff).w(FUNC(a2232_device::int2_w));
+	map(0x7400, 0x77ff).rw(FUNC(a2232_device::acia_6_r), FUNC(a2232_device::acia_6_w));
+	map(0x7800, 0x7fff).rw(FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
+	map(0x8000, 0x8000).w(FUNC(a2232_device::irq_ack8_w));
 	map(0xc000, 0xffff).ram().share("shared");
 }
 
 MACHINE_CONFIG_START(a2232_device::device_add_mconfig)
 	// main cpu
-	MCFG_CPU_ADD("iocpu", M65CE02, XTAL(28'375'160) / 8) // should run at Amiga clock 7M / 2
-	MCFG_CPU_PROGRAM_MAP(iocpu_map)
+	MCFG_DEVICE_ADD("iocpu", M65CE02, XTAL(28'375'160) / 8) // should run at Amiga clock 7M / 2
+	MCFG_DEVICE_PROGRAM_MAP(iocpu_map)
 
 	// acia
 	MCFG_DEVICE_ADD("acia_0", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_0_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_0_irq_w))
 
 	MCFG_DEVICE_ADD("acia_1", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_1_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_2", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_1_irq_w))
 
 	MCFG_DEVICE_ADD("acia_2", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_3", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_2_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_3", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_2_irq_w))
 
 	MCFG_DEVICE_ADD("acia_3", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_4", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_3_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_4", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_3_irq_w))
 
 	MCFG_DEVICE_ADD("acia_4", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_5", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_4_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_5", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_4_irq_w))
 
 	MCFG_DEVICE_ADD("acia_5", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_6", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_5_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_6", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_5_irq_w))
 
 	MCFG_DEVICE_ADD("acia_6", MOS6551, XTAL(28'375'160) / 8)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232_7", rs232_port_device, write_txd))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2232_device, acia_6_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_7", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_6_irq_w))
 
 	// cia
 	MCFG_DEVICE_ADD("cia", MOS8520, XTAL(1'843'200))
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(a2232_device, cia_irq_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(a2232_device, cia_port_a_r))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(a2232_device, cia_port_b_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(a2232_device, cia_port_b_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, a2232_device, cia_irq_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, a2232_device, cia_port_a_r))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, a2232_device, cia_port_b_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, a2232_device, cia_port_b_w))
 
 	// rs232 ports
-	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(a2232_device, rs232_1_rxd_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_1_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_0", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_1_cts_w))
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, a2232_device, rs232_1_rxd_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_1_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_0", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_1_cts_w))
 
-	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia_1", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_2_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_1", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_2_cts_w))
+	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_1", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_2_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_1", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_2_cts_w))
 
-	MCFG_RS232_PORT_ADD("rs232_3", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia_2", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_3_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_2", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_3_cts_w))
+	MCFG_DEVICE_ADD("rs232_3", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_2", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_3_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_2", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_3_cts_w))
 
-	MCFG_RS232_PORT_ADD("rs232_4", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia_3", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_4_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_3", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_4_cts_w))
+	MCFG_DEVICE_ADD("rs232_4", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_3", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_4_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_3", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_4_cts_w))
 
-	MCFG_RS232_PORT_ADD("rs232_5", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia_4", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_5_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_4", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_5_cts_w))
+	MCFG_DEVICE_ADD("rs232_5", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_4", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_5_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_4", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_5_cts_w))
 
-	MCFG_RS232_PORT_ADD("rs232_6", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia_5", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_6_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_5", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_6_cts_w))
+	MCFG_DEVICE_ADD("rs232_6", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_5", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_6_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_5", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_6_cts_w))
 
-	MCFG_RS232_PORT_ADD("rs232_7", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia_6", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(a2232_device, rs232_7_dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia_6", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(a2232_device, rs232_7_cts_w))
+	MCFG_DEVICE_ADD("rs232_7", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_6", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_7_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_6", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_7_cts_w))
 MACHINE_CONFIG_END
 
 

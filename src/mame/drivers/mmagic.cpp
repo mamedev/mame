@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -123,16 +124,16 @@ void mmagic_state::mmagic_mem(address_map &map)
 	map(0x0000, 0x17ff).rom();
 	map(0x2000, 0x21ff).ram();
 	map(0x3000, 0x31ff).ram().share("vram");
-	map(0x8002, 0x8002).w(this, FUNC(mmagic_state::ball_x_w));
-	map(0x8003, 0x8003).w(this, FUNC(mmagic_state::ball_y_w));
-	map(0x8004, 0x8004).r(this, FUNC(mmagic_state::vblank_r));
+	map(0x8002, 0x8002).w(FUNC(mmagic_state::ball_x_w));
+	map(0x8003, 0x8003).w(FUNC(mmagic_state::ball_y_w));
+	map(0x8004, 0x8004).r(FUNC(mmagic_state::vblank_r));
 }
 
 void mmagic_state::mmagic_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).w(this, FUNC(mmagic_state::color_w));
-	map(0x81, 0x81).w(this, FUNC(mmagic_state::audio_w));
+	map(0x80, 0x80).w(FUNC(mmagic_state::color_w));
+	map(0x81, 0x81).w(FUNC(mmagic_state::audio_w));
 	map(0x85, 0x85).portr("paddle");
 	map(0x86, 0x86).portr("buttons");
 	map(0x87, 0x87).portr("dipswitch");
@@ -306,9 +307,9 @@ void mmagic_state::machine_start()
 
 MACHINE_CONFIG_START(mmagic_state::mmagic)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
-	MCFG_CPU_PROGRAM_MAP(mmagic_mem)
-	MCFG_CPU_IO_MAP(mmagic_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
+	MCFG_DEVICE_PROGRAM_MAP(mmagic_mem)
+	MCFG_DEVICE_IO_MAP(mmagic_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -318,8 +319,8 @@ MACHINE_CONFIG_START(mmagic_state::mmagic)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(mmagic_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -354,5 +355,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT  ROT     COMPANY     FULLNAME        FLAGS
-GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, 0,    ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT        ROT     COMPANY     FULLNAME        FLAGS
+GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, empty_init, ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

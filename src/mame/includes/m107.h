@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 struct pf_layer_info
@@ -68,9 +69,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 
-	DECLARE_DRIVER_INIT(firebarr);
-	DECLARE_DRIVER_INIT(dsoccr94);
-	DECLARE_DRIVER_INIT(wpksoc);
+	void init_firebarr();
+	void init_dsoccr94();
+	void init_wpksoc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

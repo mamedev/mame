@@ -178,8 +178,8 @@ void xerox820_state::xerox820_io(address_map &map)
 	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
 	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
-	map(0x10, 0x13).mirror(0xff00).rw(this, FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
-	map(0x14, 0x14).mirror(0x0003).select(0xff00).w(this, FUNC(xerox820_state::scroll_w));
+	map(0x10, 0x13).mirror(0xff00).rw(FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
+	map(0x14, 0x14).mirror(0x0003).select(0xff00).w(FUNC(xerox820_state::scroll_w));
 	map(0x18, 0x1b).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1c, 0x1f).mirror(0xff00).rw(m_kbpio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
@@ -194,11 +194,11 @@ void xerox820ii_state::xerox820ii_mem(address_map &map)
 void xerox820ii_state::xerox820ii_io(address_map &map)
 {
 	xerox820_io(map);
-	map(0x28, 0x29).mirror(0xff00).w(this, FUNC(xerox820ii_state::bell_w));
-	map(0x30, 0x31).mirror(0xff00).w(this, FUNC(xerox820ii_state::slden_w));
-	map(0x34, 0x35).mirror(0xff00).w(this, FUNC(xerox820ii_state::chrom_w));
-	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(xerox820ii_state::lowlite_w));
-	map(0x68, 0x69).mirror(0xff00).w(this, FUNC(xerox820ii_state::sync_w));
+	map(0x28, 0x29).mirror(0xff00).w(FUNC(xerox820ii_state::bell_w));
+	map(0x30, 0x31).mirror(0xff00).w(FUNC(xerox820ii_state::slden_w));
+	map(0x34, 0x35).mirror(0xff00).w(FUNC(xerox820ii_state::chrom_w));
+	map(0x36, 0x36).mirror(0xff00).w(FUNC(xerox820ii_state::lowlite_w));
+	map(0x68, 0x69).mirror(0xff00).w(FUNC(xerox820ii_state::sync_w));
 }
 
 void xerox820ii_state::xerox168_mem(address_map &map)
@@ -291,7 +291,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 		{
 			m_8n5 = _8n5;
 
-			m_fdc->set_unscaled_clock(m_8n5 ? XTAL(20'000'000)/10 : XTAL(20'000'000)/20);
+			m_fdc->set_unscaled_clock(m_8n5 ? 20_MHz_XTAL / 10 : 20_MHz_XTAL / 20);
 		}
 
 		m_400_460 = !floppy->twosid_r();
@@ -438,13 +438,14 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 
 /* WD1771 Interface */
 
-static SLOT_INTERFACE_START( xerox820_floppies )
-	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD_35T ) // Shugart SA-400, 35 trk drive
-	SLOT_INTERFACE( "sa400l", FLOPPY_525_SSSD ) // Shugart SA-400, 40 trk drive
-	SLOT_INTERFACE( "sa450", FLOPPY_525_DD ) // Shugart SA-450
-	SLOT_INTERFACE( "sa800", FLOPPY_8_SSDD ) // Shugart SA-800
-	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
-SLOT_INTERFACE_END
+static void xerox820_floppies(device_slot_interface &device)
+{
+	device.option_add("sa400", FLOPPY_525_SSSD_35T); // Shugart SA-400, 35 trk drive
+	device.option_add("sa400l", FLOPPY_525_SSSD); // Shugart SA-400, 40 trk drive
+	device.option_add("sa450", FLOPPY_525_DD); // Shugart SA-450
+	device.option_add("sa800", FLOPPY_8_SSDD); // Shugart SA-800
+	device.option_add("sa850", FLOPPY_8_DSDD); // Shugart SA-850
+}
 
 void xerox820_state::update_nmi()
 {
@@ -591,11 +592,11 @@ static const gfx_layout xerox820_gfxlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( xerox820 )
+static GFXDECODE_START( gfx_xerox820 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( xerox820ii )
+static GFXDECODE_START( gfx_xerox820ii )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, xerox820_gfxlayout, 0, 1 )
 GFXDECODE_END
@@ -604,62 +605,62 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(xerox820_state::xerox820)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(20'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(xerox820_mem)
-	MCFG_CPU_IO_MAP(xerox820_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 20_MHz_XTAL / 8)
+	MCFG_DEVICE_PROGRAM_MAP(xerox820_mem)
+	MCFG_DEVICE_IO_MAP(xerox820_io)
 	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(xerox820_state, kbpio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(xerox820_state, kbpio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(xerox820_state, kbpio_pb_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, xerox820_state, kbpio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, xerox820_state, kbpio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, xerox820_state, kbpio_pb_r))
 
-	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 20_MHz_XTAL / 8)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL(20'000'000)/8))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(20_MHz_XTAL / 8))
 
-	MCFG_FD1771_ADD(FD1771_TAG, XTAL(20'000'000)/20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
+	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 20_MHz_XTAL / 20)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(20'000'000)/8)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 20_MHz_XTAL / 8)
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(xerox820_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
-	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(DEVWRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
+	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -673,91 +674,91 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bigboard_state::bigboard)
 	xerox820(config);
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
-	MCFG_CPU_IO_MAP(xerox820ii_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(xerox820ii_mem)
+	MCFG_DEVICE_IO_MAP(xerox820ii_io)
 	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820ii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(xerox820_state, kbpio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(xerox820_state, kbpio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(xerox820_state, kbpio_pb_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, xerox820_state, kbpio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, xerox820_state, kbpio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, xerox820_state, kbpio_pb_r))
 
-	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80PIO_RD_TAG, Z80PIO, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80PIO_RD_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("sasi_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("sasi_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(xerox820ii_state, rdpio_pardy_w))
-	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("sasi_ctrl_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(xerox820ii_state, rdpio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8("sasi_data_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("sasi_data_out", output_latch_device, bus_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, xerox820ii_state, rdpio_pardy_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8("sasi_ctrl_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, xerox820ii_state, rdpio_pb_w))
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL(16'000'000)/4))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(16_MHz_XTAL / 4))
 
-	MCFG_FD1797_ADD(FD1797_TAG, XTAL(16'000'000)/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
+	MCFG_DEVICE_ADD(FD1797_TAG, FD1797, 16_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 16_MHz_XTAL / 4)
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(xerox820_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
-	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(DEVWRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
+	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
 
 	// SASI bus
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit1)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit2)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_IO_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_BSY_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_MSG_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit1)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_CD_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit2)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_REQ_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_IO_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4)) MCFG_DEVCB_XOR(1)
 
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SA1403D, SCSI_ID_0)
 
@@ -776,8 +777,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox168)
 	xerox820ii(config);
-	MCFG_CPU_ADD(I8086_TAG, I8086, 4770000)
-	MCFG_CPU_PROGRAM_MAP(xerox168_mem)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 4770000)
+	MCFG_DEVICE_PROGRAM_MAP(xerox168_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -787,8 +788,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820_state::mk83)
 	xerox820(config);
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(mk83_mem)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(mk83_mem)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -807,17 +808,17 @@ ROM_START( x820 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v20" )
 	ROM_SYSTEM_BIOS( 0, "v10", "Xerox Monitor v1.0" )
-	ROMX_LOAD( "x820v10.u64", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "x820v10.u63", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "x820v10.u64", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "x820v10.u63", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v20", "Xerox Monitor v2.0" )
-	ROMX_LOAD( "x820v20.u64", 0x0000, 0x0800, CRC(2fc227e2) SHA1(b4ea0ae23d281a687956e8a514cb364a1372678e), ROM_BIOS(2) )
-	ROMX_LOAD( "x820v20.u63", 0x0800, 0x0800, CRC(bc11f834) SHA1(4fd2b209a6e6ff9b0c41800eb5228c34a0d7f7ef), ROM_BIOS(2) )
+	ROMX_LOAD( "x820v20.u64", 0x0000, 0x0800, CRC(2fc227e2) SHA1(b4ea0ae23d281a687956e8a514cb364a1372678e), ROM_BIOS(1) )
+	ROMX_LOAD( "x820v20.u63", 0x0800, 0x0800, CRC(bc11f834) SHA1(4fd2b209a6e6ff9b0c41800eb5228c34a0d7f7ef), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "smart23", "MICROCode SmartROM v2.3" )
-	ROMX_LOAD( "mxkx25a.u64", 0x0000, 0x0800, CRC(7ec5f100) SHA1(5d0ff35a51aa18afc0d9c20ef99ff5d9d3f2075b), ROM_BIOS(3) )
-	ROMX_LOAD( "mxkx25b.u63", 0x0800, 0x0800, CRC(a7543798) SHA1(886e617e1003d13f86f33085cbd49391b77291a3), ROM_BIOS(3) )
+	ROMX_LOAD( "mxkx25a.u64", 0x0000, 0x0800, CRC(7ec5f100) SHA1(5d0ff35a51aa18afc0d9c20ef99ff5d9d3f2075b), ROM_BIOS(2) )
+	ROMX_LOAD( "mxkx25b.u63", 0x0800, 0x0800, CRC(a7543798) SHA1(886e617e1003d13f86f33085cbd49391b77291a3), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "plus2", "MICROCode Plus2 v0.2a" )
-	ROMX_LOAD( "p2x25a.u64",  0x0000, 0x0800, CRC(3ccd7a8f) SHA1(6e46c88f03fc7289595dd6bec95e23bb13969525), ROM_BIOS(4) )
-	ROMX_LOAD( "p2x25b.u63",  0x0800, 0x0800, CRC(1e580391) SHA1(e91f8ce82586df33c0d6d02eb005e8079f4de67d), ROM_BIOS(4) )
+	ROMX_LOAD( "p2x25a.u64",  0x0000, 0x0800, CRC(3ccd7a8f) SHA1(6e46c88f03fc7289595dd6bec95e23bb13969525), ROM_BIOS(3) )
+	ROMX_LOAD( "p2x25b.u63",  0x0800, 0x0800, CRC(1e580391) SHA1(e91f8ce82586df33c0d6d02eb005e8079f4de67d), ROM_BIOS(3) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "x820.u92", 0x0000, 0x0800, CRC(b823fa98) SHA1(ad0ea346aa257a53ad5701f4201896a2b3a0f928) )
@@ -827,32 +828,32 @@ ROM_START( x820ii )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v400", "Balcones Operating System v4.00" ) // Initial U.S. 3-ROM set: support for double density disks
-	ROMX_LOAD( "v400.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "v400.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "v400.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "v400.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "v400.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "v400.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v401", "Balcones Operating System v4.01" ) // Corrected overflow problem with large data files
-	ROMX_LOAD( "v401.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "v401.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "v401.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "v401.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "v401.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "v401.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v402", "Balcones Operating System v4.02" ) // Rank Xerox (European) boot ROM version of US 4.01
-	ROMX_LOAD( "v402.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(3) )
-	ROMX_LOAD( "v402.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(3) )
-	ROMX_LOAD( "v402.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v402.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "v402.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "v402.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "v403", "Balcones Operating System v4.03" ) // Incorporate programmable communications option and support for the low-profile keyboard (4-ROM set and type-ahead input buffer)
-	ROMX_LOAD( "v403.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(4) )
-	ROMX_LOAD( "v403.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(4) )
-	ROMX_LOAD( "v403.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(4) )
-	ROMX_LOAD( "v403.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(4) )
+	ROMX_LOAD( "v403.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "v404", "Balcones Operating System v4.04" ) // Changes sign-on message from Xerox 820-II to Xerox
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(5) )
-	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(5) )
-	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(5) )
-	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(5) ) // fitted for low-profile keyboard only
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(4) )
+	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(4) )
+	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(4) )
+	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(4) ) // fitted for low-profile keyboard only
 	ROM_SYSTEM_BIOS( 5, "v50", "Balcones Operating System v5.0" ) // Operating system modifications for DEM and new 5.25" disk controller (4 new boot ROMs)
-	ROMX_LOAD( "v50.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(6) )
-	ROMX_LOAD( "v50.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(6) )
-	ROMX_LOAD( "v50.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(6) )
-	ROMX_LOAD( "v50.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(6) ) // fitted for low-profile keyboard only
+	ROMX_LOAD( "v50.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "v50.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "v50.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "v50.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(5) ) // fitted for low-profile keyboard only
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
@@ -863,15 +864,15 @@ ROM_START( x168 )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" ) // Changes sign-on message from Xerox 820-II to Xerox
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(1) )
-	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(1) )
-	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(1) )
-	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(1) ) // fitted for low-profile keyboard only
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(0) )
+	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(0) )
+	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(0) )
+	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(0) ) // fitted for low-profile keyboard only
 	ROM_SYSTEM_BIOS( 1, "v50", "Balcones Operating System v5.0" ) // Operating system modifications for DEM and new 5.25" disk controller (4 new boot ROMs)
-	ROMX_LOAD( "v50.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "v50.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "v50.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "v50.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(2) ) // fitted for low-profile keyboard only
+	ROMX_LOAD( "v50.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "v50.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "v50.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "v50.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(1) ) // fitted for low-profile keyboard only
 
 	ROM_REGION( 0x1000, I8086_TAG, 0 )
 	ROM_LOAD( "8086.u33", 0x0000, 0x1000, CRC(ee49e3dc) SHA1(a5f20c74fc53f9d695d8894534ab69a39e2c38d8) )
@@ -891,10 +892,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     STATE             INIT  COMPANY                       FULLNAME        FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   0,    "Digital Research Computers", "Big Board",    0 )
-COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   0,    "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   0,    "Scomar",                     "MK-82",        0 )
-COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
-COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
-COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   0,    "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",    0 )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
+COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
+COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

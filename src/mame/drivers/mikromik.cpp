@@ -266,7 +266,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 
 void mm1_state::mm1_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mm1_state::read), FUNC(mm1_state::write));
+	map(0x0000, 0xffff).rw(FUNC(mm1_state::read), FUNC(mm1_state::write));
 }
 
 
@@ -407,9 +407,10 @@ FLOPPY_FORMATS_MEMBER( mm2_state::floppy_formats )
     FLOPPY_MM2_FORMAT
 FLOPPY_FORMATS_END
 */
-static SLOT_INTERFACE_START( mm1_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mm1_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 //**************************************************************************
@@ -458,60 +459,60 @@ void mm1_state::machine_reset()
 
 MACHINE_CONFIG_START(mm1_state::mm1)
 	// basic system hardware
-	MCFG_CPU_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mm1_map)
-	MCFG_I8085A_SID(READLINE(mm1_state, dsra_r))
-	MCFG_I8085A_SOD(DEVWRITELINE(KB_TAG, mm1_keyboard_device, bell_w))
+	MCFG_DEVICE_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mm1_map)
+	MCFG_I8085A_SID(READLINE(*this, mm1_state, dsra_r))
+	MCFG_I8085A_SOD(WRITELINE(KB_TAG, mm1_keyboard_device, bell_w))
 	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
 
 	// peripheral hardware
 	MCFG_DEVICE_ADD(I8212_TAG, I8212, 0)
 	MCFG_I8212_INT_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
-	MCFG_I8212_DI_CALLBACK(DEVREAD8(KB_TAG, mm1_keyboard_device, read))
+	MCFG_I8212_DI_CALLBACK(READ8(KB_TAG, mm1_keyboard_device, read))
 
 	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 6.144_MHz_XTAL/2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(mm1_state, dma_hrq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(mm1_state, dma_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(mm1_state, read))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(mm1_state, write))
-	MCFG_I8237_IN_IOR_2_CB(READ8(mm1_state, mpsc_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(DEVREAD8(UPD765_TAG, upd765_family_device, mdma_r))
-	MCFG_I8237_OUT_IOW_0_CB(DEVWRITE8(I8275_TAG, i8275_device, dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(mm1_state, mpsc_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8(UPD765_TAG, upd765_family_device, mdma_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(mm1_state, dack3_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, mm1_state, dma_hrq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, mm1_state, dma_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, mm1_state, read))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, mm1_state, write))
+	MCFG_I8237_IN_IOR_2_CB(READ8(*this, mm1_state, mpsc_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(UPD765_TAG, upd765_family_device, mdma_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(I8275_TAG, i8275_device, dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, mm1_state, mpsc_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(UPD765_TAG, upd765_family_device, mdma_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, mm1_state, dack3_w))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mm1_state, itxc_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mm1_state, itxc_w))
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mm1_state, irxc_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, mm1_state, irxc_w))
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mm1_state, auxc_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mm1_state, auxc_w))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, /* 16_MHz_XTAL/2/2 */ true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST55_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq3_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq3_w))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(UPD7201_TAG, UPD7201, 6.144_MHz_XTAL/2)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(mm1_state, drq2_w))
-	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(mm1_state, drq1_w))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(*this, mm1_state, drq2_w))
+	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(*this, mm1_state, drq1_w))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
 
 	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
-	MCFG_MM1_KEYBOARD_KBST_CALLBACK(DEVWRITELINE(I8212_TAG, i8212_device, stb_w))
+	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -579,6 +580,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,      0,      0,      mm1m6,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M6",      MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,      mm1m6,  0,      mm1m7,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M7",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME           FLAGS
+COMP( 1981, mm1m6, 0,      0,      mm1m6,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m7, mm1m6,  0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7", MACHINE_SUPPORTS_SAVE )

@@ -32,8 +32,9 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/3c505.h"
 
-
 #include "bus/rs232/rs232.h"
+
+#include "diserial.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -118,21 +119,21 @@ class apollo_ni;
 class apollo_state : public driver_device
 {
 public:
-	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag),
-			m_maincpu(*this, MAINCPU),
-			m_messram_ptr(*this, "messram"),
-			m_dma8237_1(*this, APOLLO_DMA1_TAG),
-			m_dma8237_2(*this, APOLLO_DMA2_TAG),
-			m_pic8259_master(*this, APOLLO_PIC1_TAG),
-			m_pic8259_slave(*this, APOLLO_PIC2_TAG),
-			m_ptm(*this, APOLLO_PTM_TAG),
-			m_sio(*this, APOLLO_SIO_TAG),
-			m_sio2(*this, APOLLO_SIO2_TAG),
-			m_rtc(*this, APOLLO_RTC_TAG),
-			m_node_id(*this, APOLLO_NI_TAG),
-			m_isa(*this, APOLLO_ISA_TAG)
-			{ }
+	apollo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MAINCPU),
+		m_messram_ptr(*this, "messram"),
+		m_dma8237_1(*this, APOLLO_DMA1_TAG),
+		m_dma8237_2(*this, APOLLO_DMA2_TAG),
+		m_pic8259_master(*this, APOLLO_PIC1_TAG),
+		m_pic8259_slave(*this, APOLLO_PIC2_TAG),
+		m_ptm(*this, APOLLO_PTM_TAG),
+		m_sio(*this, APOLLO_SIO_TAG),
+		m_sio2(*this, APOLLO_SIO2_TAG),
+		m_rtc(*this, APOLLO_RTC_TAG),
+		m_node_id(*this, APOLLO_NI_TAG),
+		m_isa(*this, APOLLO_ISA_TAG)
+	{ }
 
 	required_device<m68000_base_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_messram_ptr;
@@ -195,13 +196,13 @@ public:
 	DECLARE_READ8_MEMBER(dn5500_11500_r);
 	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
 	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
-	DECLARE_DRIVER_INIT(dsp3000);
-	DECLARE_DRIVER_INIT(dsp5500);
-	DECLARE_DRIVER_INIT(dn3500);
-	DECLARE_DRIVER_INIT(dn3000);
-	DECLARE_DRIVER_INIT(dsp3500);
-	DECLARE_DRIVER_INIT(dn5500);
-	DECLARE_DRIVER_INIT(apollo);
+	void init_dsp3000();
+	void init_dsp5500();
+	void init_dn3500();
+	void init_dn3000();
+	void init_dsp3500();
+	void init_dn5500();
+	void init_apollo();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

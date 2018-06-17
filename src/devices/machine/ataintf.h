@@ -55,7 +55,7 @@ DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 #define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
 	devcb = &downcast<abstract_ata_interface_device &>(*device).set_dasp_handler(DEVCB_##_devcb);
 
-SLOT_INTERFACE_EXTERN(ata_devices);
+void ata_devices(device_slot_interface &device);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -135,10 +135,10 @@ public:
 	void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, data, mem_mask); }
 	void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, data, mem_mask); }
 
-	DECLARE_READ16_MEMBER(read_cs0) { return read_cs0(offset, mem_mask); }
-	DECLARE_READ16_MEMBER(read_cs1) { return read_cs1(offset, mem_mask); }
-	DECLARE_WRITE16_MEMBER(write_cs0) { write_cs0(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(write_cs1) { write_cs1(offset, data, mem_mask); }
+	DECLARE_READ16_MEMBER(cs0_r) { return read_cs0(offset, mem_mask); }
+	DECLARE_READ16_MEMBER(cs1_r) { return read_cs1(offset, mem_mask); }
+	DECLARE_WRITE16_MEMBER(cs0_w) { write_cs0(offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER(cs1_w) { write_cs1(offset, data, mem_mask); }
 };
 
 DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)

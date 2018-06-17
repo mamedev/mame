@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+
 #include "machine/eepromser.h"
+#include "emupal.h"
 
 class xorworld_state : public driver_device
 {
@@ -30,7 +32,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(xorworld);
+	void init_xorworld();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(xorworld);
 

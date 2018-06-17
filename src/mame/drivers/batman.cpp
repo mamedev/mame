@@ -92,7 +92,7 @@ void batman_state::main_map(address_map &map)
 	map(0x260010, 0x260011).mirror(0x11ff8e).portr("260010");
 	map(0x260031, 0x260031).mirror(0x11ff8e).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0x260041, 0x260041).mirror(0x11ff8e).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0x260050, 0x260051).mirror(0x11ff8e).w(this, FUNC(batman_state::latch_w));
+	map(0x260050, 0x260051).mirror(0x11ff8e).w(FUNC(batman_state::latch_w));
 	map(0x260060, 0x260061).mirror(0x11ff8e).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x2a0000, 0x2a0001).mirror(0x11fffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x2e0000, 0x2e0fff).mirror(0x100000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -169,7 +169,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( batman )
+static GFXDECODE_START( gfx_batman )
 	GFXDECODE_ENTRY( "gfx3", 0, pfmolayout,  512, 32 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout,      0, 64 )      /* characters 8x8 */
@@ -186,8 +186,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(batman_state::batman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(batman_state::batman)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(batman_state::batman)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
@@ -292,4 +292,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, batman_state, 0, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, batman, 0, batman, batman, batman_state, empty_init, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )

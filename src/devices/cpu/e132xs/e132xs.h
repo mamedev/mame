@@ -114,6 +114,8 @@ class hyperstone_device : public cpu_device, public hyperstone_disassembler::con
 	friend class e132xs_frontend;
 
 public:
+	virtual ~hyperstone_device() override;
+
 	inline void ccfunc_unimplemented();
 	inline void ccfunc_print();
 	inline void ccfunc_total_cycles();
@@ -182,8 +184,6 @@ protected:
 		uint32_t  delay_pc;
 		uint32_t  delay_slot;
 		uint32_t  delay_slot_taken;
-
-		uint32_t  opcodexor;
 
 		int32_t   intblock;
 
@@ -303,7 +303,8 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_io;
 
 	uint16_t  m_op;           // opcode

@@ -108,15 +108,15 @@ void tv910_state::tv910_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x4000, 0x47ff).ram().share("vram"); // VRAM
-	map(0x8010, 0x801f).r(this, FUNC(tv910_state::charset_r));
+	map(0x8010, 0x801f).r(FUNC(tv910_state::charset_r));
 	map(0x8020, 0x8020).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8021, 0x8021).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
 	map(0x8030, 0x8033).rw(ACIA_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x8040, 0x804f).w(this, FUNC(tv910_state::vbl_ack_w));
-	map(0x8050, 0x805f).w(this, FUNC(tv910_state::nmi_ack_w));
-	map(0x8060, 0x806f).r(this, FUNC(tv910_state::kbd_ascii_r));
-	map(0x8070, 0x807f).r(this, FUNC(tv910_state::kbd_flags_r));
-	map(0x9000, 0x9000).w(this, FUNC(tv910_state::control_w));
+	map(0x8040, 0x804f).w(FUNC(tv910_state::vbl_ack_w));
+	map(0x8050, 0x805f).w(FUNC(tv910_state::nmi_ack_w));
+	map(0x8060, 0x806f).r(FUNC(tv910_state::kbd_ascii_r));
+	map(0x8070, 0x807f).r(FUNC(tv910_state::kbd_flags_r));
+	map(0x9000, 0x9000).w(FUNC(tv910_state::control_w));
 	map(0x9001, 0x9001).portr("DSW1");
 	map(0x9002, 0x9002).portr("DSW2");
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
@@ -509,8 +509,8 @@ MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 
 MACHINE_CONFIG_START(tv910_state::tv910)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(tv910_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(tv910_mem)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(tv910_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(tv910_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tv910_state, vbl_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv910_state, vbl_w))
 
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
 	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
@@ -536,24 +536,24 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(tv910_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(tv910_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(tv910_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(tv910_state, ay3600_ako_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, tv910_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, tv910_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, tv910_state, ay3600_data_ready_w))
+	MCFG_AY3600_AKO_CB(WRITELINE(*this, tv910_state, ay3600_ako_w))
 
 	MCFG_DEVICE_ADD(ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_cts))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -570,5 +570,5 @@ ROM_START( tv910 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY              FULLNAME               FLAGS
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo Systems", "TeleVideo Model 910", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME               FLAGS
+COMP( 1981, tv910, 0,      0,      tv910,   tv910, tv910_state, empty_init, "TeleVideo Systems", "TeleVideo Model 910", 0 )

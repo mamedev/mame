@@ -300,7 +300,9 @@ const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(BS_PAD),    "\010" },   // Backspace on the numeric keypad
 	{ UCHAR_MAMEKEY(TAB_PAD),   "\011" },   // Tab on the numeric keypad
 	{ UCHAR_MAMEKEY(00_PAD),    "00" },     // 00 on the numeric keypad
-	{ UCHAR_MAMEKEY(000_PAD),   "000" }     // 000 on the numeric keypad
+	{ UCHAR_MAMEKEY(000_PAD),   "000" },    // 000 on the numeric keypad
+	{ UCHAR_MAMEKEY(COMMA_PAD), "," },      // , on the numeric keypad
+	{ UCHAR_MAMEKEY(EQUALS_PAD), "=" }      // = on the numeric keypad
 };
 
 

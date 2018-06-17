@@ -32,9 +32,9 @@
 ***************************************************************************/
 
 #define MCFG_UPD4701_PORTX(_tag) \
-	downcast<upd4701_device &>(*device).set_portx_tag("^" _tag);
+	downcast<upd4701_device &>(*device).set_portx_tag(_tag);
 #define MCFG_UPD4701_PORTY(_tag) \
-	downcast<upd4701_device &>(*device).set_porty_tag("^" _tag);
+	downcast<upd4701_device &>(*device).set_porty_tag(_tag);
 #define MCFG_UPD4701_CF_CALLBACK(_devcb) \
 	devcb = downcast<upd4701_device &>(*device).set_cf_cb(DEVCB_##_devcb);
 #define MCFG_UPD4701_SF_CALLBACK(_devcb) \
@@ -59,12 +59,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ul_w);
 	DECLARE_WRITE_LINE_MEMBER(resetx_w);
 	DECLARE_WRITE_LINE_MEMBER(resety_w);
-	DECLARE_READ8_MEMBER(reset_x);
-	DECLARE_WRITE8_MEMBER(reset_x);
-	DECLARE_READ8_MEMBER(reset_y);
-	DECLARE_WRITE8_MEMBER(reset_y);
-	DECLARE_READ8_MEMBER(reset_xy);
-	DECLARE_WRITE8_MEMBER(reset_xy);
+	DECLARE_READ8_MEMBER(reset_x_r);
+	DECLARE_WRITE8_MEMBER(reset_x_w);
+	DECLARE_READ8_MEMBER(reset_y_r);
+	DECLARE_WRITE8_MEMBER(reset_y_w);
+	DECLARE_READ8_MEMBER(reset_xy_r);
+	DECLARE_WRITE8_MEMBER(reset_xy_w);
 
 	DECLARE_READ8_MEMBER(d_r);
 	DECLARE_READ8_MEMBER(read_x);

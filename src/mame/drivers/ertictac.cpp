@@ -37,7 +37,7 @@ public:
 		: archimedes_state(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER(ertictac_podule_r);
-	DECLARE_DRIVER_INIT(ertictac);
+	void init_ertictac();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
@@ -64,15 +64,15 @@ READ32_MEMBER(ertictac_state::ertictac_podule_r)
 
 void ertictac_state::ertictac_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).rw(this, FUNC(ertictac_state::archimedes_memc_logical_r), FUNC(ertictac_state::archimedes_memc_logical_w));
+	map(0x00000000, 0x01ffffff).rw(FUNC(ertictac_state::archimedes_memc_logical_r), FUNC(ertictac_state::archimedes_memc_logical_w));
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
-	map(0x03000000, 0x033fffff).rw(this, FUNC(ertictac_state::archimedes_ioc_r), FUNC(ertictac_state::archimedes_ioc_w));
-	map(0x03340000, 0x0334001f).r(this, FUNC(ertictac_state::ertictac_podule_r));
-	map(0x033c0000, 0x033c001f).r(this, FUNC(ertictac_state::ertictac_podule_r));
-	map(0x03400000, 0x035fffff).rw(this, FUNC(ertictac_state::archimedes_vidc_r), FUNC(ertictac_state::archimedes_vidc_w));
-	map(0x03600000, 0x037fffff).rw(this, FUNC(ertictac_state::archimedes_memc_r), FUNC(ertictac_state::archimedes_memc_w));
-	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(this, FUNC(ertictac_state::archimedes_memc_page_w));
+	map(0x03000000, 0x033fffff).rw(FUNC(ertictac_state::archimedes_ioc_r), FUNC(ertictac_state::archimedes_ioc_w));
+	map(0x03340000, 0x0334001f).r(FUNC(ertictac_state::ertictac_podule_r));
+	map(0x033c0000, 0x033c001f).r(FUNC(ertictac_state::ertictac_podule_r));
+	map(0x03400000, 0x035fffff).rw(FUNC(ertictac_state::archimedes_vidc_r), FUNC(ertictac_state::archimedes_vidc_w));
+	map(0x03600000, 0x037fffff).rw(FUNC(ertictac_state::archimedes_memc_r), FUNC(ertictac_state::archimedes_memc_w));
+	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(FUNC(ertictac_state::archimedes_memc_page_w));
 }
 
 static INPUT_PORTS_START( ertictac )
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(ertictac_state,ertictac)
+void ertictac_state::init_ertictac()
 {
 	archimedes_driver_init();
 }
@@ -222,9 +222,9 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 MACHINE_CONFIG_START(ertictac_state::ertictac)
 
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(24'000'000)/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
-	MCFG_CPU_PROGRAM_MAP(ertictac_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(24'000'000)/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	MCFG_DEVICE_PROGRAM_MAP(ertictac_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
@@ -237,24 +237,24 @@ MACHINE_CONFIG_START(ertictac_state::ertictac)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ertictac )
@@ -348,7 +348,7 @@ ROM_START( poizone )
 	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
-GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)
-GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)",  MACHINE_IMPERFECT_SOUND)
-GAME( 1991, poizone,          0, ertictac, poizone,  ertictac_state, ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)",  MACHINE_IMPERFECT_SOUND)
+GAME( 1991, poizone,          0, ertictac, poizone,  ertictac_state, init_ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)

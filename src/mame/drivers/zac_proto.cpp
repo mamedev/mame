@@ -60,10 +60,10 @@ void zac_proto_state::zac_proto_map(address_map &map)
 	map(0x0e05, 0x0e05).portr("PL5");
 	map(0x0e06, 0x0e06).portr("PL6");
 	map(0x0e07, 0x0e07).portr("PL7");
-	map(0x0e00, 0x0e01).w(this, FUNC(zac_proto_state::out0_w));
-	map(0x0e02, 0x0e06).w(this, FUNC(zac_proto_state::digit_w));
-	map(0x0e07, 0x0e08).w(this, FUNC(zac_proto_state::sound_w));
-	map(0x0e09, 0x0e16).w(this, FUNC(zac_proto_state::out1_w));
+	map(0x0e00, 0x0e01).w(FUNC(zac_proto_state::out0_w));
+	map(0x0e02, 0x0e06).w(FUNC(zac_proto_state::digit_w));
+	map(0x0e07, 0x0e08).w(FUNC(zac_proto_state::sound_w));
+	map(0x0e09, 0x0e16).w(FUNC(zac_proto_state::out1_w));
 	map(0x1400, 0x1bff).rom();
 }
 
@@ -241,8 +241,8 @@ void zac_proto_state::machine_reset()
 
 MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
-	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
+	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
+	MCFG_DEVICE_PROGRAM_MAP(zac_proto_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
@@ -285,6 +285,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

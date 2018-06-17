@@ -47,19 +47,19 @@ void wswan_state::wswan_mem(address_map &map)
 	map(0x00000, 0x03fff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles
 	map(0x04000, 0x0ffff).noprw();       // nothing
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
-	map(0xf0000, 0xfffff).r(this, FUNC(wswan_state::bios_r));
+	map(0xf0000, 0xfffff).r(FUNC(wswan_state::bios_r));
 }
 
 void wscolor_state::wscolor_mem(address_map &map)
 {
 	map(0x00000, 0x0ffff).rw("vdp", FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
-	map(0xf0000, 0xfffff).r(this, FUNC(wscolor_state::bios_r));
+	map(0xf0000, 0xfffff).r(FUNC(wscolor_state::bios_r));
 }
 
 void wswan_state::wswan_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(wswan_state::port_r), FUNC(wswan_state::port_w));   // I/O ports
+	map(0x00, 0xff).rw(FUNC(wswan_state::port_r), FUNC(wswan_state::port_w));   // I/O ports
 }
 
 static INPUT_PORTS_START( wswan )
@@ -81,7 +81,7 @@ static INPUT_PORTS_START( wswan )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y2 - Right") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static GFXDECODE_START( wswan )
+static GFXDECODE_START( gfx_wswan )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
@@ -105,19 +105,20 @@ PALETTE_INIT_MEMBER(wscolor_state, wscolor)
 	}
 }
 
-static SLOT_INTERFACE_START(wswan_cart)
-	SLOT_INTERFACE_INTERNAL("ws_rom",     WS_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ws_sram",    WS_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
-SLOT_INTERFACE_END
+static void wswan_cart(device_slot_interface &device)
+{
+	device.option_add_internal("ws_rom",     WS_ROM_STD);
+	device.option_add_internal("ws_sram",    WS_ROM_SRAM);
+	device.option_add_internal("ws_eeprom",  WS_ROM_EEPROM);
+}
 
 MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30MZ, XTAL(3'072'000))
-	MCFG_CPU_PROGRAM_MAP(wswan_mem)
-	MCFG_CPU_IO_MAP(wswan_io)
+	MCFG_DEVICE_ADD(m_maincpu, V30MZ, 3.072_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
+	MCFG_DEVICE_IO_MAP(wswan_io)
 
-	MCFG_DEVICE_ADD("vdp", WSWAN_VIDEO, 0)
+	MCFG_DEVICE_ADD(m_vdp, WSWAN_VIDEO, 0)
 	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
 	MCFG_WSWAN_VIDEO_IRQ_CB(wswan_state, set_irq_line)
 	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
@@ -128,7 +129,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", wswan_video_device, screen_update)
 //  MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(3'072'000),256,0,WSWAN_X_PIXELS,159,0,WSWAN_Y_PIXELS)
+	MCFG_SCREEN_RAW_PARAMS(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_wswan)
@@ -137,18 +138,19 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wswan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", WSWAN_SND, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartridge */
-	MCFG_WSWAN_CARTRIDGE_ADD("cartslot", wswan_cart, nullptr)
+	MCFG_DEVICE_ADD(m_cart, WS_CART_SLOT, 3.072_MHz_XTAL / 8, wswan_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")
@@ -160,8 +162,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wscolor_state::wscolor)
 	wswan(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
 
 	MCFG_DEVICE_MODIFY("vdp")
 	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)
@@ -193,6 +195,6 @@ ROM_START( wscolor )
 //  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE          INIT   COMPANY   FULLNAME
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state,   0,    "Bandai",  "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wscolor_state, 0,    "Bandai",  "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state,   empty_init, "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wscolor_state, empty_init, "Bandai", "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

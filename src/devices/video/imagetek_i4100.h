@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -19,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_I4100_GFXDECODE(gfxtag) \
-	downcast<imagetek_i4100_device &>(*device).set_gfxdecode_tag(("^" gfxtag));
+	downcast<imagetek_i4100_device &>(*device).set_gfxdecode_tag(gfxtag);
 
 #define MCFG_I4100_BLITTER_END_CALLBACK(_devcb) \
 	devcb = &downcast<imagetek_i4100_device &>(*device).set_blitter_irq_callback(DEVCB_##_devcb);

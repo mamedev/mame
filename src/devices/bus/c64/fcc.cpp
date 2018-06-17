@@ -66,7 +66,7 @@ const tiny_rom_entry *c64_final_chesscard_device::device_rom_region() const
 
 void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 {
-	map(0x0000, 0x1fff).mirror(0x6000).rw(this, FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w));
+	map(0x0000, 0x1fff).mirror(0x6000).rw(FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w));
 	map(0x8000, 0xffff).rom().region(G65SC02P4_TAG, 0);
 }
 
@@ -76,8 +76,8 @@ void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c64_final_chesscard_device::device_add_mconfig)
-	MCFG_CPU_ADD(G65SC02P4_TAG, M65SC02, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(c64_fcc_map)
+	MCFG_DEVICE_ADD(G65SC02P4_TAG, M65SC02, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(c64_fcc_map)
 MACHINE_CONFIG_END
 
 

@@ -65,6 +65,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -186,7 +187,7 @@ void dominob_state::memmap(address_map &map)
 
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0xd008, 0xd008).w(this, FUNC(dominob_state::dominob_d008_w));
+	map(0xd008, 0xd008).w(FUNC(dominob_state::dominob_d008_w));
 	map(0xd00c, 0xd00c).portr("IN0");
 	map(0xd010, 0xd010).portr("IN1").nopw();
 	map(0xd018, 0xd018).portr("IN2").nopw();
@@ -209,7 +210,7 @@ READ8_MEMBER(dominob_state::dominob_unk_port02_r)
 void dominob_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x02).r(this, FUNC(dominob_state::dominob_unk_port02_r));
+	map(0x02, 0x02).r(FUNC(dominob_state::dominob_unk_port02_r));
 }
 
 
@@ -288,7 +289,7 @@ static const gfx_layout bglayout =
 	16*32*2
 };
 
-static GFXDECODE_START( dominob )
+static GFXDECODE_START( gfx_dominob )
 	GFXDECODE_ENTRY("gfx1", 0, charlayout,   0, 0x20)
 	GFXDECODE_ENTRY("gfx2", 0, bglayout,     0x100, 0x10)
 GFXDECODE_END
@@ -297,10 +298,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dominob_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_IO_MAP(portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dominob_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -311,14 +312,14 @@ MACHINE_CONFIG_START(dominob_state::dominob)
 	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dominob)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dominob)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -366,5 +367,5 @@ ROM_START( dominobv2 )
 	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
 ROM_END
 
-GAME( 1996, dominob,  0,       dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dominobv2,dominob, dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominob,   0,       dominob,  dominob, dominob_state, empty_init, ROT0, "Wonwoo Systems", "Domino Block",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominobv2, dominob, dominob,  dominob, dominob_state, empty_init, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )

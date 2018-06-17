@@ -21,6 +21,7 @@ QTY     Type    position
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -136,7 +137,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( subhuntr )
+static GFXDECODE_START( gfx_subhuntr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -144,12 +145,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)
-	MCFG_CPU_PROGRAM_MAP(subhuntr_map)
-	MCFG_CPU_IO_MAP(subhuntr_io_map)
-	MCFG_CPU_DATA_MAP(subhuntr_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_ADD("maincpu", S2650, 14318180/4/2)
+	MCFG_DEVICE_PROGRAM_MAP(subhuntr_map)
+	MCFG_DEVICE_IO_MAP(subhuntr_io_map)
+	MCFG_DEVICE_DATA_MAP(subhuntr_data_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
 //  MCFG_DEVICE_ADD("s2636", S2636, 0)
 //  MCFG_S2636_WORKRAM_SIZE(0x100)
@@ -166,13 +167,13 @@ MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 	MCFG_SCREEN_UPDATE_DRIVER(subhuntr_state, screen_update_subhuntr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subhuntr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subhuntr)
 
 	MCFG_PALETTE_ADD("palette", 26)
 	MCFG_PALETTE_INIT_OWNER(subhuntr_state, subhuntr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
 MACHINE_CONFIG_END
@@ -192,4 +193,4 @@ ROM_START( subhuntr )
 	ROM_LOAD( "82s115.2b",   0x0000, 0x0200, CRC(6946c9de) SHA1(956b4bebe6960a73609deb75e1493c4127fd7f77) ) // ASCII, not much else
 ROM_END
 
-GAME(1979, subhuntr,  0,        subhuntr, subhuntr, subhuntr_state, 0, ROT0, "Model Racing", "Sub Hunter (Model Racing)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1979, subhuntr,  0,        subhuntr, subhuntr, subhuntr_state, empty_init, ROT0, "Model Racing", "Sub Hunter (Model Racing)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

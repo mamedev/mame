@@ -94,7 +94,7 @@ public:
 		m_adpcm(*this, "adpcm") { };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
-	DECLARE_DRIVER_INIT(chinagat);
+	void init_chinagat();
 	DECLARE_MACHINE_START(chinagat);
 	DECLARE_MACHINE_RESET(chinagat);
 	DECLARE_VIDEO_START(chinagat);
@@ -292,7 +292,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 
 		if (((m_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4))
 		{
-			m_adpcm->data_w(m_pcm_nibble);
+			m_adpcm->write_data(m_pcm_nibble);
 			logerror("Writing %02x to m5205\n", m_pcm_nibble);
 		}
 		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n", m_adpcm_addr, m_i8748_P1, data, m_i8748_P2, m_pcm_shift, m_pcm_nibble);
@@ -337,16 +337,16 @@ WRITE_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_w)
 void chinagat_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(chinagat_state::ddragon_fgvideoram_w)).share("fgvideoram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(chinagat_state::ddragon_bgvideoram_w)).share("bgvideoram");
+	map(0x2000, 0x27ff).ram().w(FUNC(chinagat_state::ddragon_fgvideoram_w)).share("fgvideoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(chinagat_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3000, 0x317f).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3400, 0x357f).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3800, 0x397f).bankw("bank3").share("spriteram");
-	map(0x3e00, 0x3e04).w(this, FUNC(chinagat_state::interrupt_w));
+	map(0x3e00, 0x3e04).w(FUNC(chinagat_state::interrupt_w));
 	map(0x3e06, 0x3e06).writeonly().share("scrolly_lo");
 	map(0x3e07, 0x3e07).writeonly().share("scrollx_lo");
-	map(0x3f00, 0x3f00).w(this, FUNC(chinagat_state::video_ctrl_w));
-	map(0x3f01, 0x3f01).w(this, FUNC(chinagat_state::bankswitch_w));
+	map(0x3f00, 0x3f00).w(FUNC(chinagat_state::video_ctrl_w));
+	map(0x3f01, 0x3f01).w(FUNC(chinagat_state::bankswitch_w));
 	map(0x3f00, 0x3f00).portr("SYSTEM");
 	map(0x3f01, 0x3f01).portr("DSW1");
 	map(0x3f02, 0x3f02).portr("DSW2");
@@ -359,8 +359,8 @@ void chinagat_state::main_map(address_map &map)
 void chinagat_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x2000).w(this, FUNC(chinagat_state::sub_bankswitch_w));
-	map(0x2800, 0x2800).w(this, FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
+	map(0x2000, 0x2000).w(FUNC(chinagat_state::sub_bankswitch_w));
+	map(0x2800, 0x2800).w(FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
 //  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
 //  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
 	map(0x4000, 0x7fff).bankr("bank4");
@@ -400,7 +400,7 @@ void chinagat_state::saiyugoub1_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x9800, 0x9800).w(this, FUNC(chinagat_state::saiyugoub1_mcu_command_w));
+	map(0x9800, 0x9800).w(FUNC(chinagat_state::saiyugoub1_mcu_command_w));
 	map(0xA000, 0xA000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -512,7 +512,7 @@ static const gfx_layout tilelayout =
 	64*8 /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( chinagat )
+static GFXDECODE_START( gfx_chinagat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,16 )    /*  8x8  chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128, 8 )    /* 16x16 sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 256, 8 )    /* 16x16 background tiles */
@@ -560,15 +560,15 @@ MACHINE_RESET_MEMBER(chinagat_state,chinagat)
 MACHINE_CONFIG_START(chinagat_state::chinagat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chinagat_state, chinagat_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
@@ -581,47 +581,47 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1065000, PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1065000, okim6295_device::PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chinagat_state, chinagat_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
-	MCFG_CPU_PROGRAM_MAP(saiyugoub1_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
+	MCFG_DEVICE_PROGRAM_MAP(saiyugoub1_sound_map)
 
-	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-	MCFG_CPU_PROGRAM_MAP(i8748_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(chinagat_state, saiyugoub1_mcu_command_r))
+	MCFG_DEVICE_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+	MCFG_DEVICE_PROGRAM_MAP(i8748_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, chinagat_state, saiyugoub1_mcu_command_r))
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(chinagat_state, saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(chinagat_state, saiyugoub1_m5205_irq_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(chinagat_state, saiyugoub1_adpcm_rom_addr_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(chinagat_state, saiyugoub1_adpcm_control_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, chinagat_state, saiyugoub1_m5205_irq_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, chinagat_state, saiyugoub1_adpcm_rom_addr_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, chinagat_state, saiyugoub1_adpcm_control_w))
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */
@@ -635,25 +635,25 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
+	MCFG_DEVICE_ADD("adpcm", MSM5205, 9263750 / 24)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -661,15 +661,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chinagat_state, chinagat_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
-	MCFG_CPU_PROGRAM_MAP(ym2203c_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
+	MCFG_DEVICE_PROGRAM_MAP(ym2203c_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
@@ -682,26 +682,26 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
+	MCFG_DEVICE_ADD("ym1", YM2203, 3579545)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3579545)
+	MCFG_DEVICE_ADD("ym2", YM2203, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -919,7 +919,7 @@ ROM_START( saiyugoub2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chinagat_state,chinagat)
+void chinagat_state::init_chinagat()
 {
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SUB = memregion("sub")->base();
@@ -932,8 +932,8 @@ DRIVER_INIT_MEMBER(chinagat_state,chinagat)
 }
 
 
-//  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT           MONITOR COMPANY    FULLNAME     FLAGS ) */
+GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, init_chinagat, ROT0,   "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, init_chinagat, ROT0,   "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, init_chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, init_chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )

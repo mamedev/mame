@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 #include "vbiparse.h"
 #include "avhuff.h"
@@ -64,12 +65,10 @@ enum laserdisc_field_code
 	downcast<laserdisc_device &>(*device).set_audio(_func);
 #define MCFG_LASERDISC_SCREEN(_tag) \
 	downcast<laserdisc_device &>(*device).set_screen(_tag);
-#define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
+	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, &_class::_method, #_class "::" #_method);
 #define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
+	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, _device, &_class::_method, #_class "::" #_method);
 #define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
 	downcast<laserdisc_device &>(*device).set_overlay_clip(_minx, _maxx, _miny, _maxy);
 #define MCFG_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
@@ -77,7 +76,7 @@ enum laserdisc_field_code
 #define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
 	downcast<laserdisc_device &>(*device).set_overlay_scale(_scalex, _scaley);
 #define MCFG_LASERDISC_OVERLAY_PALETTE(_palette_tag) \
-	downcast<laserdisc_device &>(*device).set_overlay_palette("^" _palette_tag);
+	downcast<laserdisc_device &>(*device).set_overlay_palette(_palette_tag);
 
 // use these to add laserdisc screens with proper video update parameters
 // TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
@@ -165,6 +164,27 @@ public:
 	// configuration helpers
 	void set_get_disc(get_disc_delegate &&callback) { m_getdisc_callback = std::move(callback); }
 	void set_audio(audio_delegate &&callback) { m_audio_callback = std::move(callback); }
+	template <class FunctionClass>
+	// FIXME: these should be aware of current device for resolving the tag
+	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	{
+		set_overlay(width, height, screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	{
+		set_overlay(width, height, screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_overlay(uint32_t width, uint32_t height, const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	{
+		set_overlay(width, height, screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_overlay(uint32_t width, uint32_t height, const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	{
+		set_overlay(width, height, screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
 	void set_overlay(uint32_t width, uint32_t height, screen_update_ind16_delegate &&update)
 	{
 		m_overwidth = width;

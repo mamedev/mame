@@ -4,6 +4,7 @@
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 #define HORZ_RES        32
 #define VERT_RES        24
@@ -68,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(medlanes_hardware_w);
 	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
 	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
-	DECLARE_DRIVER_INIT(lazercmd);
+	void init_lazercmd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(lazercmd);

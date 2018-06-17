@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -424,7 +425,7 @@ void fp200_state::fp200_map(address_map &map)
 
 void fp200_state::fp200_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+	map(0x00, 0xff).rw(FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
 }
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
@@ -547,7 +548,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( fp200 )
+static GFXDECODE_START( gfx_fp200 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -587,11 +588,11 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(fp200_map)
-	MCFG_CPU_IO_MAP(fp200_io)
-	MCFG_I8085A_SID(READLINE(fp200_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(fp200_state, sod_w))
+	MCFG_DEVICE_ADD("maincpu",I8085A,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(fp200_map)
+	MCFG_DEVICE_IO_MAP(fp200_io)
+	MCFG_I8085A_SID(READLINE(*this, fp200_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, fp200_state, sod_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -602,14 +603,14 @@ MACHINE_CONFIG_START(fp200_state::fp200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 8*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp200)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp200)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -630,4 +631,4 @@ ROM_START( fp200 )
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
 
-COMP( 1982, fp200,  0,   0,   fp200,  fp200, fp200_state,  0,  "Casio",      "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, fp200, 0, 0, fp200, fp200, fp200_state, empty_init, "Casio", "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

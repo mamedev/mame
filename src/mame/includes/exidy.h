@@ -8,6 +8,7 @@
 
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define EXIDY_MASTER_CLOCK              (XTAL(11'289'000))
@@ -84,16 +85,16 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
 
-	DECLARE_DRIVER_INIT(fax);
-	DECLARE_DRIVER_INIT(sidetrac);
-	DECLARE_DRIVER_INIT(pepper2);
-	DECLARE_DRIVER_INIT(targ);
-	DECLARE_DRIVER_INIT(rallys);
-	DECLARE_DRIVER_INIT(mtrap);
-	DECLARE_DRIVER_INIT(teetert);
-	DECLARE_DRIVER_INIT(venture);
-	DECLARE_DRIVER_INIT(spectar);
-	DECLARE_DRIVER_INIT(phantoma);
+	void init_fax();
+	void init_sidetrac();
+	void init_pepper2();
+	void init_targ();
+	void init_rallys();
+	void init_mtrap();
+	void init_teetert();
+	void init_venture();
+	void init_spectar();
+	void init_phantoma();
 
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(teetert);
@@ -128,9 +129,7 @@ public:
 
 	void base(machine_config &config);
 	void mtrap(machine_config &config);
-	void mtrap_cvsd_audio(machine_config &config);
 	void venture(machine_config &config);
-	void venture_audio(machine_config &config);
 	void fax(machine_config &config);
 	void teetert(machine_config &config);
 	void sidetrac(machine_config &config);
@@ -148,9 +147,6 @@ public:
 	void spectar_map(address_map &map);
 	void targ_map(address_map &map);
 	void venture_map(address_map &map);
-	void venture_audio_map(address_map &map);
-	void cvsd_iomap(address_map &map);
-	void cvsd_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

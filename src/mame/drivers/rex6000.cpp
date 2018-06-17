@@ -37,6 +37,7 @@
 #include "machine/timer.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -385,7 +386,7 @@ void oz750_state::oz750_banked_map(address_map &map)
 {
 	map(0x0000000, 0x01fffff).rw("flash0a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x0200000, 0x02fffff).mirror(0x100000).rw("flash1a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
-	map(0x0600000, 0x07fffff).rw(this, FUNC(oz750_state::lcd_io_r), FUNC(oz750_state::lcd_io_w));
+	map(0x0600000, 0x07fffff).rw(FUNC(oz750_state::lcd_io_r), FUNC(oz750_state::lcd_io_w));
 	map(0x0800000, 0x083ffff).mirror(0x1c0000).ram().share("nvram");
 	map(0x0a00000, 0x0a3ffff).mirror(0x1c0000).ram();
 }
@@ -404,27 +405,27 @@ void rex6000_state::rex6000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x01, 0x04).rw(this, FUNC(rex6000_state::bankswitch_r), FUNC(rex6000_state::bankswitch_w));
-	map(0x05, 0x07).rw(this, FUNC(rex6000_state::irq_r), FUNC(rex6000_state::irq_w));
+	map(0x01, 0x04).rw(FUNC(rex6000_state::bankswitch_r), FUNC(rex6000_state::bankswitch_w));
+	map(0x05, 0x07).rw(FUNC(rex6000_state::irq_r), FUNC(rex6000_state::irq_w));
 	map(0x10, 0x10).portr("INPUT");
-	map(0x15, 0x19).rw(this, FUNC(rex6000_state::beep_r), FUNC(rex6000_state::beep_w));
-	map(0x22, 0x23).rw(this, FUNC(rex6000_state::lcd_base_r), FUNC(rex6000_state::lcd_base_w));
+	map(0x15, 0x19).rw(FUNC(rex6000_state::beep_r), FUNC(rex6000_state::beep_w));
+	map(0x22, 0x23).rw(FUNC(rex6000_state::lcd_base_r), FUNC(rex6000_state::lcd_base_w));
 	map(0x30, 0x3f).rw(TC8521_TAG, FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 	map(0x40, 0x47).mirror(0x08).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x50, 0x51).rw(this, FUNC(rex6000_state::lcd_io_r), FUNC(rex6000_state::lcd_io_w));
-	map(0x60, 0x6f).rw(this, FUNC(rex6000_state::touchscreen_r), FUNC(rex6000_state::touchscreen_w));
+	map(0x50, 0x51).rw(FUNC(rex6000_state::lcd_io_r), FUNC(rex6000_state::lcd_io_w));
+	map(0x60, 0x6f).rw(FUNC(rex6000_state::touchscreen_r), FUNC(rex6000_state::touchscreen_w));
 }
 
 void oz750_state::oz750_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x01, 0x04).rw(this, FUNC(oz750_state::bankswitch_r), FUNC(oz750_state::bankswitch_w));
-	map(0x05, 0x08).rw(this, FUNC(oz750_state::irq_r), FUNC(oz750_state::irq_w));
-	map(0x10, 0x10).r(this, FUNC(oz750_state::kb_data_r));
-	map(0x11, 0x12).rw(this, FUNC(oz750_state::kb_status_r), FUNC(oz750_state::kb_mask_w));
-	map(0x15, 0x19).rw(this, FUNC(oz750_state::beep_r), FUNC(oz750_state::beep_w));
-	map(0x22, 0x23).rw(this, FUNC(oz750_state::lcd_base_r), FUNC(oz750_state::lcd_base_w));
+	map(0x01, 0x04).rw(FUNC(oz750_state::bankswitch_r), FUNC(oz750_state::bankswitch_w));
+	map(0x05, 0x08).rw(FUNC(oz750_state::irq_r), FUNC(oz750_state::irq_w));
+	map(0x10, 0x10).r(FUNC(oz750_state::kb_data_r));
+	map(0x11, 0x12).rw(FUNC(oz750_state::kb_status_r), FUNC(oz750_state::kb_mask_w));
+	map(0x15, 0x19).rw(FUNC(oz750_state::beep_r), FUNC(oz750_state::beep_w));
+	map(0x22, 0x23).rw(FUNC(oz750_state::lcd_base_r), FUNC(oz750_state::lcd_base_w));
 	map(0x30, 0x3f).rw(TC8521_TAG, FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 	map(0x40, 0x47).mirror(0x08).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 }
@@ -875,7 +876,7 @@ static const gfx_layout rex6000_graph_charlayout =
 	8*28            /* every char takes 28 bytes, first 2 bytes are used for the char size */
 };
 
-static GFXDECODE_START( rex6000 )
+static GFXDECODE_START( gfx_rex6000 )
 	GFXDECODE_ENTRY( "flash0a", 0x0f0000, rex6000_bold_charlayout,  0, 0 )  //normal
 	GFXDECODE_ENTRY( "flash0a", 0x0f2000, rex6000_bold_charlayout,  0, 0 )  //bold
 	GFXDECODE_ENTRY( "flash0a", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )  //tiny
@@ -885,9 +886,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
-	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
-	MCFG_CPU_IO_MAP(rex6000_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
+	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
+	MCFG_DEVICE_IO_MAP(rex6000_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
@@ -905,7 +906,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rex6000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rex6000)
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rex6000_banked_map)
@@ -920,23 +921,23 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(rex6000_state, serial_irq))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, rex6000_state, serial_irq))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
 	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
 
 	/*
 	Fujitsu 29DL16X have feature which is capability of reading data from one
@@ -955,33 +956,33 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(oz750_state::oz750)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
-	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
-	MCFG_CPU_IO_MAP(oz750_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
+	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
+	MCFG_DEVICE_IO_MAP(oz750_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(9'830'400) / 4 )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(rex6000_state, serial_irq))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, rex6000_state, serial_irq))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
-	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1012,7 +1013,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
 
 	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
 
 	MCFG_SHARP_LH28F016S_ADD("flash0a")
 	MCFG_SHARP_LH28F016S_ADD("flash1a")
@@ -1022,8 +1023,8 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
@@ -1066,7 +1067,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY             FULLNAME          FLAGS */
-COMP( 199?, oz750,    0,       0,   oz750,      oz750,   oz750_state,    0,    "Sharp",            "Wizard OZ-750",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, rex6000_state,  0,    "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, rex6000_state,  0,    "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME         FLAGS */
+COMP( 199?, oz750,   0,       0,      oz750,   oz750,   oz750_state,   empty_init, "Sharp",          "Wizard OZ-750", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, rex6000, 0,       0,      rex6000, rex6000, rex6000_state, empty_init, "Xircom / Intel", "REX 6000",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, ds2,     rex6000, 0,      rex6000, rex6000, rex6000_state, empty_init, "Citizen",        "DataSlim 2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

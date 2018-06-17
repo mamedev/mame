@@ -13,6 +13,7 @@
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define SKYDIVER_RANGE_DATA     NODE_01
@@ -108,6 +109,6 @@ private:
 };
 
 /*----------- defined in audio/skydiver.c -----------*/
-DISCRETE_SOUND_EXTERN( skydiver );
+DISCRETE_SOUND_EXTERN( skydiver_discrete );
 
 #endif // MAME_INCLUDES_SKYDIVER_H

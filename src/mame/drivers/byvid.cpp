@@ -165,22 +165,22 @@ void by133_state::main_map(address_map &map)
 
 void by133_state::video_map(address_map &map)
 { // U8 Vidiot
-	map(0x0000, 0x1fff).rw(this, FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
+	map(0x0000, 0x1fff).rw(FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U7 Vidiot
-	map(0x4000, 0x4000).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x4001, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x4000, 0x4000).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x4001, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
 	map(0x8000, 0xffff).rom();
 }
 
 void by133_state::granny_map(address_map &map)
 {
-	map(0x0000, 0x0001).rw(this, FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
-	map(0x0002, 0x0002).rw(m_crtc, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x0003, 0x0003).rw(m_crtc, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x0004, 0x0004).rw(m_crtc2, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x0005, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x0006, 0x0007).w(this, FUNC(by133_state::granny_crtc_w)); // can write to both at once
+	map(0x0000, 0x0001).rw(FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
+	map(0x0002, 0x0002).rw(m_crtc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x0003, 0x0003).rw(m_crtc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0004, 0x0004).rw(m_crtc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x0005, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0006, 0x0007).w(FUNC(by133_state::granny_crtc_w)); // can write to both at once
 	map(0x0008, 0x000b).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x27ff).ram();
 	map(0x2801, 0x2801).nopr(); // The '9' test reads this location constantly and throws away the result
@@ -194,27 +194,27 @@ void by133_state::sound_map(address_map &map)
 
 void by133_state::sound_portmap(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::write)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
+	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
 }
 
 
 INPUT_CHANGED_MEMBER( by133_state::video_test )
 {
 	if(newval)
-		m_videocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_videocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::sound_test )
 {
 	if(newval)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::activity_test )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::self_test )
@@ -545,13 +545,13 @@ WRITE8_MEMBER( by133_state::granny_crtc_w )
 {
 	if (offset)
 	{
-		m_crtc->register_write(space, 0, data);
-		m_crtc2->register_write(space, 0, data);
+		m_crtc->register_write(data);
+		m_crtc2->register_write(data);
 	}
 	else
 	{
-		m_crtc->vram_write(space, 0, data);
-		m_crtc2->vram_write(space, 0, data);
+		m_crtc->vram_write(data);
+		m_crtc2->vram_write(data);
 	}
 }
 
@@ -755,46 +755,46 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 
 MACHINE_CONFIG_START(by133_state::babypac)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545)/4) // no xtal, just 2 chips
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545)/4) // no xtal, just 2 chips
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("videocpu", MC6809, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(video_map)
+	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(video_map)
 
-	MCFG_CPU_ADD("audiocpu", M6803, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", M6803, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia_u7", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by133_state, u7_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by133_state, u7_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by133_state, u7_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, u7_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by133_state, u7_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u7_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by133_state, u7_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by133_state, u7_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, by133_state, u7_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by133_state, u7_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by133_state, u7_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by133_state, u7_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("videocpu", M6809_FIRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("videocpu", M6809_FIRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by133_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by133_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by133_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, u10_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by133_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u10_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by133_state, u10_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by133_state, u10_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, by133_state, u10_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by133_state, u10_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by133_state, u10_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by133_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac1", by133_state, u10_timer, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by133_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by133_state, u11_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by133_state, u11_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, u11_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by133_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u11_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by133_state, u11_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by133_state, u11_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, by133_state, u11_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by133_state, u11_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by133_state, u11_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by133_state, u11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
@@ -807,21 +807,21 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", ZN429E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // U32 (Vidiot) or U6 (Cheap Squeak)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", ZN429E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // U32 (Vidiot) or U6 (Cheap Squeak)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SPEAKER_STANDARD_MONO("beee")
-	MCFG_SOUND_ADD("beeper", BEEP, 600)
+	SPEAKER(config, "beee").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 600)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(by133_state::granny)
 	babypac(config);
 	MCFG_DEVICE_REMOVE("videocpu")
-	MCFG_CPU_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
-	MCFG_CPU_PROGRAM_MAP(granny_map)
+	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
+	MCFG_DEVICE_PROGRAM_MAP(granny_map)
 
 	MCFG_DEVICE_REMOVE("screen")
 
@@ -891,6 +891,6 @@ ROM_START(granny)
 ROM_END
 
 
-GAME( 1982, babypac,  0,        babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1982, babypac2, babypac,  babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1984, granny,   0,        granny,  granny,  by133_state,  0,  ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac,  0,       babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac2, babypac, babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

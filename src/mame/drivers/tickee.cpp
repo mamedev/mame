@@ -220,7 +220,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 {
 	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -245,7 +245,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 {
 	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -450,7 +450,7 @@ void tickee_state::tickee_map(address_map &map)
 	map(0x04200000, 0x0420001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200100, 0x0420011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0x04400040, 0x0440004f).portr("IN2");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
@@ -469,7 +469,7 @@ void tickee_state::ghoshunt_map(address_map &map)
 	map(0x04300000, 0x0430001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04300100, 0x0430011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04500000, 0x0450007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04500000, 0x0450007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
@@ -485,7 +485,7 @@ void tickee_state::mouseatk_map(address_map &map)
 	map(0x04200000, 0x0420000f).r("ym", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).w("ym", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0x04400040, 0x0440004f).portr("IN2"); // ?
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
@@ -497,14 +497,14 @@ void tickee_state::mouseatk_map(address_map &map)
 void tickee_state::rapidfir_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram().share("vram");
-	map(0x02000000, 0x027fffff).rw(this, FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
+	map(0x02000000, 0x027fffff).rw(FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
-	map(0xfc000000, 0xfc00000f).r(this, FUNC(tickee_state::rapidfir_gun1_r));
-	map(0xfc000100, 0xfc00010f).r(this, FUNC(tickee_state::rapidfir_gun2_r));
-	map(0xfc000400, 0xfc00040f).r(this, FUNC(tickee_state::ffff_r));
+	map(0xfc000000, 0xfc00000f).r(FUNC(tickee_state::rapidfir_gun1_r));
+	map(0xfc000100, 0xfc00010f).r(FUNC(tickee_state::rapidfir_gun2_r));
+	map(0xfc000400, 0xfc00040f).r(FUNC(tickee_state::ffff_r));
 	map(0xfc000500, 0xfc00050f).noprw();
-	map(0xfc000600, 0xfc00060f).w(this, FUNC(tickee_state::rapidfir_control_w));
-	map(0xfc000700, 0xfc00070f).w(this, FUNC(tickee_state::sound_bank_w));
+	map(0xfc000600, 0xfc00060f).w(FUNC(tickee_state::rapidfir_control_w));
+	map(0xfc000700, 0xfc00070f).w(FUNC(tickee_state::sound_bank_w));
 	map(0xfc000800, 0xfc00080f).portr("IN0");
 	map(0xfc000900, 0xfc00090f).portr("IN1");
 	map(0xfc000a00, 0xfc000a0f).portr("IN2");
@@ -514,7 +514,7 @@ void tickee_state::rapidfir_map(address_map &map)
 	map(0xfc100000, 0xfc1000ff).mirror(0x80000).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xfc200000, 0xfc207fff).ram().share("nvram");
 	map(0xfc300000, 0xfc30000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0xfc400010, 0xfc40001f).rw(this, FUNC(tickee_state::ff7f_r), FUNC(tickee_state::ff7f_w));
+	map(0xfc400010, 0xfc40001f).rw(FUNC(tickee_state::ff7f_r), FUNC(tickee_state::ff7f_w));
 	map(0xfe000000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -759,8 +759,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(tickee_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(tickee_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -782,14 +782,14 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2149, VIDEO_CLOCK/8)
+	MCFG_DEVICE_ADD("ym1", YM2149, VIDEO_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2149, VIDEO_CLOCK/8)
+	MCFG_DEVICE_ADD("ym2", YM2149, VIDEO_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -800,16 +800,16 @@ MACHINE_CONFIG_START(tickee_state::ghoshunt)
 	tickee(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ghoshunt_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ghoshunt_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(50'000'000))
-	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(50'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rapidfir_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -832,9 +832,9 @@ MACHINE_CONFIG_START(tickee_state::rapidfir)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -842,8 +842,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mouseatk_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -863,14 +863,14 @@ MACHINE_CONFIG_START(tickee_state::mouseatk)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym", YM2149, OKI_CLOCK)
+	MCFG_DEVICE_ADD("ym", YM2149, OKI_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1166,11 +1166,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_state, 0, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Island Design", "Tut's Tomb",                  0 )
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state, 0, ROT0, "ICE",           "Mouse Attack",                0 )
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
-GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_state, empty_init, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_state, empty_init, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_state, empty_init, ROT0, "Island Design", "Tut's Tomb",                  0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state, empty_init, ROT0, "ICE",           "Mouse Attack",                0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
+GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )

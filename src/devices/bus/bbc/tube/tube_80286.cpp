@@ -38,8 +38,8 @@ void bbc_tube_80286_device::tube_80286_mem(address_map &map)
 void bbc_tube_80286_device::tube_80286_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x50, 0x50).r(this, FUNC(bbc_tube_80286_device::disable_boot_rom));
-	map(0x60, 0x60).w(this, FUNC(bbc_tube_80286_device::irq_latch_w));
+	map(0x50, 0x50).r(FUNC(bbc_tube_80286_device::disable_boot_rom));
+	map(0x60, 0x60).w(FUNC(bbc_tube_80286_device::irq_latch_w));
 	map(0x80, 0x8f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask16(0x00ff);
 }
 
@@ -58,10 +58,10 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_80286_device::device_add_mconfig)
-	MCFG_CPU_ADD("i80286", I80286, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(tube_80286_mem)
-	MCFG_CPU_IO_MAP(tube_80286_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_80286_device, irq_callback)
+	MCFG_DEVICE_ADD("i80286", I80286, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tube_80286_mem)
+	MCFG_DEVICE_IO_MAP(tube_80286_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_80286_device, irq_callback)
 
 	MCFG_TUBE_ADD("ula")
 	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("i80286", INPUT_LINE_NMI))

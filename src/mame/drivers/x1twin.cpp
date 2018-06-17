@@ -42,9 +42,9 @@ public:
 };
 
 
-#define X1_MAIN_CLOCK XTAL(16'000'000)
-#define VDP_CLOCK  XTAL(42'954'545)
-#define MCU_CLOCK  XTAL(6'000'000)
+#define X1_MAIN_CLOCK 16_MHz_XTAL
+#define VDP_CLOCK  42.954545_MHz_XTAL
+#define MCU_CLOCK  6_MHz_XTAL
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -55,7 +55,7 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 void x1twin_state::x1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
 }
 
 void x1twin_state::x1_io(address_map &map)
@@ -65,20 +65,22 @@ void x1twin_state::x1_io(address_map &map)
 }
 
 #if 0
-ADDRESS_MAP_START(x1twin_state::pce_mem)
-	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_r, vdc_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
-ADDRESS_MAP_END
+void x1twin_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x09FFFF).rom();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
+	map(0x1FE000, 0x1FE3FF).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+	map(0x1FE400, 0x1FE7FF).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
+	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(FUNC(x1twin_state::h6280_timer_r), FUNC(x1twin_state::h6280_timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(x1twin_state::pce_joystick_r), FUNC(x1twin_state::pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw("maincpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(x1twin_state::pce_io)
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_r, vdc_w )
-ADDRESS_MAP_END
+void x1twin_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+}
 #endif
 
 /*************************************
@@ -390,7 +392,7 @@ static const gfx_layout x1_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( x1 )
+static GFXDECODE_START( gfx_x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
@@ -404,15 +406,16 @@ static const z80_daisy_config x1_daisy[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(x1_mem)
-	MCFG_CPU_IO_MAP(x1_io)
+	MCFG_DEVICE_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
+	MCFG_DEVICE_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
 
 	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
@@ -424,27 +427,27 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
 	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
-	MCFG_CPU_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
+	MCFG_DEVICE_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
+	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "pce_screen", 0, 1)
 	#endif
 
@@ -470,13 +473,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -488,24 +491,23 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SPEAKER_ADD("x1_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("x1_r",0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_r",0.2, 0.0, 1.0)
+	SPEAKER(config, "x1_l").front_left();
+	SPEAKER(config, "x1_r").front_right();
+	SPEAKER(config, "pce_l").front_left();
+	SPEAKER(config, "pce_r").front_right();
 
-//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "x1_l",  0.25)
 	MCFG_SOUND_ROUTE(0, "x1_r", 0.25)
 	MCFG_SOUND_ROUTE(1, "x1_l",  0.5)
 	MCFG_SOUND_ROUTE(2, "x1_r", 0.5)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_l", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_r", 0.10)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
@@ -515,7 +517,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 #if 0
-	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("pce_cpu")
 	MCFG_SOUND_ROUTE(0, "pce_l", 0.5)
 	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)
@@ -556,4 +558,4 @@ ROM_START( x1twin )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
-COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1twin_state, x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    MACHINE_NOT_WORKING )
+COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

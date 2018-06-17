@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class nbmj8991_state : public driver_device
@@ -61,10 +62,10 @@ public:
 	DECLARE_WRITE8_MEMBER(clut_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
-	DECLARE_DRIVER_INIT(galkaika);
-	DECLARE_DRIVER_INIT(tokimbsj);
-	DECLARE_DRIVER_INIT(tokyogal);
-	DECLARE_DRIVER_INIT(finalbny);
+	void init_galkaika();
+	void init_tokimbsj();
+	void init_tokyogal();
+	void init_finalbny();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

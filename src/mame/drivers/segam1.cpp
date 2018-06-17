@@ -41,6 +41,7 @@ uses s24 style tilemaps (ram based?)
 #include "machine/mb8421.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -194,7 +195,7 @@ void segam1_state::segam1_map(address_map &map)
 	map(0xb60000, 0xb60001).nopw();        /* Frame trigger position (XVOUT) */
 	map(0xb70000, 0xb70001).nopw();        /* Synchronization mode */
 	map(0xb80000, 0xbfffff).rw(m_tile, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
-	map(0xc00000, 0xc03fff).ram().w(this, FUNC(segam1_state::paletteram_w)).share("paletteram");
+	map(0xc00000, 0xc03fff).ram().w(FUNC(segam1_state::paletteram_w)).share("paletteram");
 	map(0xc04000, 0xc0401f).rw(m_mixer, FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
 	map(0xe00000, 0xe0001f).rw("io1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0xe40000, 0xe40001).portr("INX");
@@ -223,7 +224,7 @@ void segam1_state::segam1_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x80, 0x83).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xa0).w(this, FUNC(segam1_state::sound_a0_bank_w));
+	map(0xa0, 0xa0).w(FUNC(segam1_state::sound_a0_bank_w));
 	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read)).nopw();
 }
 
@@ -348,16 +349,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segam1_state::segam1)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(segam1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(segam1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segam1_sound_map)
-	MCFG_CPU_IO_MAP(segam1_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_sound_map)
+	MCFG_DEVICE_IO_MAP(segam1_sound_io_map)
 
-	MCFG_CPU_ADD("m1comm", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segam1_comms_map)
+	MCFG_DEVICE_ADD("m1comm", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_comms_map)
 
 	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("INA"))
@@ -375,9 +376,9 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
 
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-	MCFG_S24MIXER_DEVICE_ADD("mixer")
+	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -388,22 +389,22 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_PALETTE_ADD("palette", 8192*2)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
+	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segam1_state::unkm1)
 	segam1(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(unkm1_sound_map)
 
-	MCFG_CPU_MODIFY("m1comm")
+	MCFG_DEVICE_MODIFY("m1comm")
 	MCFG_DEVICE_DISABLE() // not dumped yet
 MACHINE_CONFIG_END
 
@@ -438,5 +439,5 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
-GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state,    0, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state, empty_init, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
+GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state, empty_init, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

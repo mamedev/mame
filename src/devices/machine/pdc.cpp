@@ -150,15 +150,15 @@ void pdc_device::pdc_mem(address_map &map)
 
 void pdc_device::pdc_io(address_map &map)
 {
-	map(0x00, 0x07).rw(this, FUNC(pdc_device::p0_7_r), FUNC(pdc_device::p0_7_w)).mirror(0xFF00);
-	map(0x21, 0x2F).rw(this, FUNC(pdc_device::fdd_68k_r), FUNC(pdc_device::fdd_68k_w)).mirror(0xFF00);
-	map(0x38, 0x38).r(this, FUNC(pdc_device::p38_r)).mirror(0xFF00); // Possibly UPD765 interrupt
-	map(0x39, 0x39).r(this, FUNC(pdc_device::p39_r)).mirror(0xFF00); // HDD related
+	map(0x00, 0x07).rw(FUNC(pdc_device::p0_7_r), FUNC(pdc_device::p0_7_w)).mirror(0xFF00);
+	map(0x21, 0x2F).rw(FUNC(pdc_device::fdd_68k_r), FUNC(pdc_device::fdd_68k_w)).mirror(0xFF00);
+	map(0x38, 0x38).r(FUNC(pdc_device::p38_r)).mirror(0xFF00); // Possibly UPD765 interrupt
+	map(0x39, 0x39).r(FUNC(pdc_device::p39_r)).mirror(0xFF00); // HDD related
 	map(0x3c, 0x3c).portr("SW2").mirror(0xFF00); /* FDC Dipswitch */
 	map(0x3d, 0x3d).portr("SW1").mirror(0xFF00); /* HDC Dipswitch */
 	map(0x40, 0x41).rw(HDC_TAG, FUNC(hdc9224_device::read), FUNC(hdc9224_device::write)).mirror(0xFF00);
 	map(0x42, 0x43).m(FDC_TAG, FUNC(upd765a_device::map)).mirror(0xFF00);
-	map(0x50, 0x5f).w(this, FUNC(pdc_device::p50_5f_w)).mirror(0xFF00);
+	map(0x50, 0x5f).w(FUNC(pdc_device::p50_5f_w)).mirror(0xFF00);
 	map(0x60, 0x6f).rw(FDCDMA_TAG, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xFF00);
 }
 
@@ -226,20 +226,22 @@ INPUT_PORTS_END
 //  SLOT_INTERFACE( pdc_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( pdc_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void pdc_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( pdc_harddisks )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( pdc_harddisks )
-	SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
-	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
-	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
-	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
-SLOT_INTERFACE_END
+static void pdc_harddisks(device_slot_interface &device)
+{
+	device.option_add("generic", MFMHD_GENERIC);    // Generic hard disk (self-adapting to image)
+	device.option_add("st213", MFMHD_ST213);        // Seagate ST-213 (10 MB)
+	device.option_add("st225", MFMHD_ST225);        // Seagate ST-225 (20 MB)
+	device.option_add("st251", MFMHD_ST251);        // Seagate ST-251 (40 MB)
+}
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
@@ -255,15 +257,15 @@ FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* CPU - Zilog Z0840006PSC */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(pdc_mem)
-	MCFG_CPU_IO_MAP(pdc_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pdc_mem)
+	MCFG_DEVICE_IO_MAP(pdc_io)
 	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	/* Floppy Disk Controller - uPD765a - NEC D765AC-2 */
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pdc_device, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) //MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pdc_device, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) //MCFG_DEVCB_INVERT
 
 	// Floppy disk drive
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
@@ -272,14 +274,14 @@ MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* Channel 0: uPD765a Floppy Disk Controller */
 	/* Channel 1: M68K main system memory */
 	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL(10'000'000) / 2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pdc_device, i8237_hreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(pdc_device, i8237_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, i8237_dma_mem_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(pdc_device, i8237_dma_mem_w))
-	MCFG_I8237_IN_IOR_0_CB(READ8(pdc_device, i8237_fdc_dma_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pdc_device, i8237_fdc_dma_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(pdc_device, m68k_dma_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(pdc_device, m68k_dma_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pdc_device, i8237_hreq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pdc_device, i8237_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, pdc_device, i8237_dma_mem_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, pdc_device, i8237_dma_mem_w))
+	MCFG_I8237_IN_IOR_0_CB(READ8(*this, pdc_device, i8237_fdc_dma_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, pdc_device, i8237_fdc_dma_w))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, pdc_device, m68k_dma_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, pdc_device, m68k_dma_w))
 
 	/* Hard Disk Controller - HDC9224 */
 	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)

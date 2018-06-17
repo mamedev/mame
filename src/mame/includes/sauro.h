@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/sp0256.h"
+#include "emupal.h"
 
 class sauro_state : public driver_device
 {
@@ -63,7 +64,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 
-	DECLARE_DRIVER_INIT(tecfri);
+	void init_tecfri();
 	DECLARE_VIDEO_START(trckydoc);
 	DECLARE_VIDEO_START(sauro);
 

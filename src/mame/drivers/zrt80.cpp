@@ -22,6 +22,7 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -118,11 +119,11 @@ void zrt80_state::io_map(address_map &map)
 	map(0x00, 0x07).rw(m_8250, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x10, 0x17).r(this, FUNC(zrt80_state::zrt80_10_r));
+	map(0x10, 0x17).r(FUNC(zrt80_state::zrt80_10_r));
 	map(0x18, 0x1F).portr("DIPSW2");
 	map(0x20, 0x27).portr("DIPSW3");
-	map(0x30, 0x37).w(this, FUNC(zrt80_state::zrt80_30_w));
-	map(0x38, 0x3F).w(this, FUNC(zrt80_state::zrt80_38_w));
+	map(0x30, 0x37).w(FUNC(zrt80_state::zrt80_30_w));
+	map(0x38, 0x3F).w(FUNC(zrt80_state::zrt80_38_w));
 }
 
 /* Input ports */
@@ -268,15 +269,15 @@ static const gfx_layout zrt80_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( zrt80 )
+static GFXDECODE_START( gfx_zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(zrt80_state::zrt80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -285,12 +286,12 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zrt80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zrt80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -317,5 +318,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY                       FULLNAME   FLAGS */
-COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, zrt80_state, 0,    "Digital Research Computers", "ZRT-80",  0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                       FULLNAME   FLAGS */
+COMP( 1982, zrt80, 0,      0,      zrt80,   zrt80, zrt80_state, empty_init, "Digital Research Computers", "ZRT-80",  0)

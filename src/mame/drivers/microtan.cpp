@@ -51,6 +51,7 @@
 /* Devices */
 #include "imagedev/cassette.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,7 +59,7 @@
 void microtan_state::microtan_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x03ff).ram().w(this, FUNC(microtan_state::microtan_videoram_w)).share("videoram");
+	map(0x0200, 0x03ff).ram().w(FUNC(microtan_state::microtan_videoram_w)).share("videoram");
 	map(0xbc00, 0xbc00).w("ay8910.1", FUNC(ay8910_device::address_w));
 	map(0xbc01, 0xbc01).rw("ay8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xbc02, 0xbc02).w("ay8910.2", FUNC(ay8910_device::address_w));
@@ -66,7 +67,7 @@ void microtan_state::microtan_map(address_map &map)
 	map(0xbfc0, 0xbfcf).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xbfd0, 0xbfd3).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xbfe0, 0xbfef).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xbff0, 0xbfff).rw(this, FUNC(microtan_state::microtan_bffx_r), FUNC(microtan_state::microtan_bffx_w));
+	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::microtan_bffx_r), FUNC(microtan_state::microtan_bffx_w));
 	map(0xc000, 0xe7ff).rom();
 	map(0xf000, 0xffff).rom();
 }
@@ -204,7 +205,7 @@ static const gfx_layout chunky_layout =
 	8 * 16      /* code takes 8 times 16 bits */
 };
 
-static GFXDECODE_START( microtan )
+static GFXDECODE_START( gfx_microtan )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, chunky_layout, 0, 1 )
 GFXDECODE_END
@@ -212,9 +213,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(6'000'000) / 8)  // 750 kHz
-	MCFG_CPU_PROGRAM_MAP(microtan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(6'000'000) / 8)  // 750 kHz
+	MCFG_DEVICE_PROGRAM_MAP(microtan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
 
 
 	/* video hardware - include overscan */
@@ -226,17 +227,16 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", microtan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("ay8910.1", AY8910, 1000000)
+	SPEAKER(config, "speaker").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("ay8910.1", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_ADD("ay8910.2", AY8910, 1000000)
+	MCFG_DEVICE_ADD("ay8910.2", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	/* snapshot/quickload */
@@ -252,19 +252,19 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(microtan_state, via_0_in_a))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_0_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(microtan_state, via_0_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(microtan_state, via_0_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(microtan_state, via_0_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, microtan_state, via_0_in_a))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_0_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_0_out_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_ca2))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_0_irq))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_1_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(microtan_state, via_1_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(microtan_state, via_1_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(microtan_state, via_1_irq))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_1_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_1_out_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_ca2))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_1_irq))
 MACHINE_CONFIG_END
 
 ROM_START( microtan )
@@ -285,5 +285,5 @@ ROM_START( microtan )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY      FULLNAME        FLAGS
-COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY      FULLNAME        FLAGS
+COMP( 1979, microtan, 0,      0,      microtan, microtan, microtan_state, init_microtan, "Tangerine", "Microtan 65" , 0 )

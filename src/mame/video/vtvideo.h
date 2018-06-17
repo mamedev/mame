@@ -14,6 +14,8 @@ DEC VT Terminal video emulation
 
 #pragma once
 
+#include "emupal.h"
+
 
 class vt100_video_device : public device_t,
 	public device_video_interface
@@ -112,7 +114,7 @@ DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 #define MCFG_VT_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_VT_CHARGEN(_tag) \
-	downcast<vt100_video_device &>(*device).set_chargen_tag("^" _tag);
+	downcast<vt100_video_device &>(*device).set_chargen_tag(_tag);
 
 #define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
 	devcb = &downcast<vt100_video_device &>(*device).set_ram_rd_callback(DEVCB_##_read);

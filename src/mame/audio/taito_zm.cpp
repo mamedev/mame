@@ -118,7 +118,7 @@ void taito_zoom_device::taitozoom_mn_map(address_map &map)
 	map(0x400000, 0x41ffff).ram();
 	map(0x800000, 0x8007ff).rw("zsg2", FUNC(zsg2_device::read), FUNC(zsg2_device::write));
 	map(0xc00000, 0xc00001).ram(); // TMS57002 comms
-	map(0xe00000, 0xe000ff).rw(this, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
+	map(0xe00000, 0xe000ff).rw(FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
 }
 
 
@@ -177,16 +177,16 @@ WRITE16_MEMBER(taito_zoom_device::reg_address_w)
 
 MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL(25'000'000)/2)
-	MCFG_MN10200_READ_PORT_CB(1, DEVREAD8(DEVICE_SELF, taito_zoom_device, tms_ctrl_r))
-	MCFG_MN10200_WRITE_PORT_CB(1, DEVWRITE8(DEVICE_SELF, taito_zoom_device, tms_ctrl_w))
-	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
+	MCFG_DEVICE_ADD("mn10200", MN1020012A, XTAL(25'000'000)/2)
+	MCFG_MN10200_READ_PORT_CB(1, READ8(DEVICE_SELF, taito_zoom_device, tms_ctrl_r))
+	MCFG_MN10200_WRITE_PORT_CB(1, WRITE8(DEVICE_SELF, taito_zoom_device, tms_ctrl_w))
+	MCFG_DEVICE_PROGRAM_MAP(taitozoom_mn_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_ZSG2_ADD("zsg2", XTAL(25'000'000))
 
 	// we assume the parent machine has created lspeaker/rspeaker
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^rspeaker", 1.0)
 MACHINE_CONFIG_END

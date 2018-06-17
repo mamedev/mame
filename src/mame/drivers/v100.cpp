@@ -85,27 +85,14 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	unsigned row0 = cliprect.top() / 10;
 	unsigned x0 = cliprect.left();
 	unsigned px0 = x0 % CHAR_WIDTH;
+	unsigned columns = screen.visible_area().width() / CHAR_WIDTH;
 
 	u16 start = 0;
 	unsigned y = 0;
 	for (unsigned row = 0; y <= cliprect.bottom(); row++)
 	{
 		start = m_videoram[start] | (m_videoram[(start + 1) & 0xfff] << 8);
-		u16 end = start + 0x50;
-		switch (start & 0xf000)
-		{
-		case 0x1000:
-			end = start + 0x29;
-			break;
-		case 0x3000:
-			end = start + 0x6e;
-			break;
-		case 0xc000:
-			end = start + 0x50;
-			break;
-		default:
-			break;
-		}
+		u16 end = start + ((start & 0x3000) != 0 ? (columns / 2) + 1 : columns);
 		start &= 0xfff;
 		end &= 0xfff;
 
@@ -170,8 +157,8 @@ void v100_state::machine_start()
 template<int N>
 WRITE8_MEMBER(v100_state::brg_w)
 {
-	m_brg[N]->str_w(data & 0x0f);
-	m_brg[N]->stt_w(data >> 4);
+	m_brg[N]->write_str(data & 0x0f);
+	m_brg[N]->write_stt(data >> 4);
 }
 
 READ8_MEMBER(v100_state::earom_r)
@@ -238,17 +225,17 @@ void v100_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).w(m_vtac, FUNC(crt5037_device::write));
-	map(0x10, 0x10).w(this, FUNC(v100_state::brg_w<0>));
+	map(0x10, 0x10).w(FUNC(v100_state::brg_w<0>));
 	map(0x12, 0x12).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x13, 0x13).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x14, 0x14).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x15, 0x15).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x16, 0x16).w(this, FUNC(v100_state::brg_w<1>));
-	map(0x20, 0x20).r(this, FUNC(v100_state::earom_r));
-	map(0x30, 0x30).w(this, FUNC(v100_state::port30_w));
-	map(0x40, 0x40).rw(this, FUNC(v100_state::keyboard_r), FUNC(v100_state::key_row_w));
-	map(0x48, 0x48).w(this, FUNC(v100_state::port48_w));
-	map(0x60, 0x60).w(this, FUNC(v100_state::picu_w));
+	map(0x16, 0x16).w(FUNC(v100_state::brg_w<1>));
+	map(0x20, 0x20).r(FUNC(v100_state::earom_r));
+	map(0x30, 0x30).w(FUNC(v100_state::port30_w));
+	map(0x40, 0x40).rw(FUNC(v100_state::keyboard_r), FUNC(v100_state::key_row_w));
+	map(0x48, 0x48).w(FUNC(v100_state::port48_w));
+	map(0x60, 0x60).w(FUNC(v100_state::picu_w));
 	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -367,22 +354,22 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(v100_state::v100)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(47'736'000) / 12) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(47'736'000) / 12) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
 
 	MCFG_DEVICE_ADD("usart1", I8251, XTAL(47'736'000) / 12) // divider not verified
 
 	MCFG_DEVICE_ADD("brg1", COM8116, 5068800) // TODO: clock and divisors for this customized variant
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("usart1", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("usart1", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("usart1", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("usart1", i8251_device, write_txc))
 
 	MCFG_DEVICE_ADD("usart2", I8251, XTAL(47'736'000) / 12)
 
 	MCFG_DEVICE_ADD("brg2", COM8116, 5068800)
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("usart2", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("usart2", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("usart2", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("usart2", i8251_device, write_txc))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
@@ -392,19 +379,19 @@ MACHINE_CONFIG_START(v100_state::v100)
 	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(47'736'000) / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS9927_HSYN_CALLBACK(WRITELINE(v100_state, picu_r_w<7>)) MCFG_DEVCB_INVERT
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(v100_state, picu_r_w<6>)) MCFG_DEVCB_INVERT
+	MCFG_TMS9927_HSYN_CALLBACK(WRITELINE(*this, v100_state, picu_r_w<7>)) MCFG_DEVCB_INVERT
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, v100_state, picu_r_w<6>)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("picu", I8214, XTAL(47'736'000) / 12)
 	MCFG_I8214_INT_CALLBACK(ASSERTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(v100_state, ppi_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITELINE("earom", er1400_device, c3_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("earom", er1400_device, c2_w)) MCFG_DEVCB_BIT(5) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("earom", er1400_device, c1_w)) MCFG_DEVCB_BIT(4) MCFG_DEVCB_INVERT
-	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("earom", er1400_device, data_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("earom", er1400_device, clock_w)) MCFG_DEVCB_BIT(0) MCFG_DEVCB_INVERT
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v100_state, ppi_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITELINE("earom", er1400_device, c3_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, c2_w)) MCFG_DEVCB_BIT(5) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, c1_w)) MCFG_DEVCB_BIT(4) MCFG_DEVCB_INVERT
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE("earom", er1400_device, data_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, clock_w)) MCFG_DEVCB_BIT(0) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("earom", ER1400, 0)
 MACHINE_CONFIG_END
@@ -428,4 +415,4 @@ ROM_START( v100 )
 	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
 ROM_END
 
-COMP( 1980, v100, 0, 0, v100, v100, v100_state, 0, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
+COMP( 1980, v100, 0, 0, v100, v100, v100_state, empty_init, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )

@@ -12,6 +12,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -40,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gmaster_portc_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portd_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portf_w);
-	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
+	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void gmaster(machine_config &config);
@@ -240,7 +241,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 void gmaster_state::gmaster_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).rw(this, FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
+	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
 }
 
@@ -332,18 +333,18 @@ void gmaster_state::machine_start()
 
 
 MACHINE_CONFIG_START(gmaster_state::gmaster)
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000)/2/*?*/)  // upd78c11 in the unit
-	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
+	MCFG_DEVICE_ADD("maincpu", UPD7810, XTAL(12'000'000)/2/*?*/)  // upd78c11 in the unit
+	MCFG_DEVICE_PROGRAM_MAP(gmaster_mem)
 	MCFG_UPD7810_PORTA_READ_CB(IOPORT("JOY"))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(gmaster_state, gmaster_portb_r))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(gmaster_state, gmaster_portc_r))
-	MCFG_UPD7810_PORTD_READ_CB(READ8(gmaster_state, gmaster_portd_r))
-	MCFG_UPD7810_PORTF_READ_CB(READ8(gmaster_state, gmaster_portf_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gmaster_state, gmaster_porta_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gmaster_state, gmaster_portb_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(gmaster_state, gmaster_portc_w))
-	MCFG_UPD7810_PORTD_WRITE_CB(WRITE8(gmaster_state, gmaster_portd_w))
-	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(gmaster_state, gmaster_portf_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, gmaster_state, gmaster_portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, gmaster_state, gmaster_portc_r))
+	MCFG_UPD7810_PORTD_READ_CB(READ8(*this, gmaster_state, gmaster_portd_r))
+	MCFG_UPD7810_PORTF_READ_CB(READ8(*this, gmaster_state, gmaster_portf_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portc_w))
+	MCFG_UPD7810_PORTD_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portd_w))
+	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portf_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -355,8 +356,8 @@ MACHINE_CONFIG_START(gmaster_state::gmaster)
 	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gmaster_cart")
@@ -372,5 +373,5 @@ ROM_START(gmaster)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
-CONS( 1990, gmaster,  0,      0,        gmaster,  gmaster, gmaster_state, gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME */
+CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, init_gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

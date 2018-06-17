@@ -33,6 +33,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/namco.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -364,9 +365,9 @@ void namcos16_state::namcos16_master_base_map(address_map &map)
 
 	// 0x6000 - 0x7fff i/o specific, guessing PAL controlled.
 
-	map(0x8000, 0x8fff).w(this, FUNC(namcos16_state::slave_halt_ctrl_w));
-	map(0x9000, 0x9fff).w(this, FUNC(namcos16_state::sound_halt_ctrl_w));
-	map(0xa000, 0xa001).w(this, FUNC(namcos16_state::pal_bank_w));
+	map(0x8000, 0x8fff).w(FUNC(namcos16_state::slave_halt_ctrl_w));
+	map(0x9000, 0x9fff).w(FUNC(namcos16_state::sound_halt_ctrl_w));
+	map(0xa000, 0xa001).w(FUNC(namcos16_state::pal_bank_w));
 	map(0x8000, 0xffff).rom().region("master_rom", 0);
 }
 
@@ -377,7 +378,7 @@ void namcos16_state::master_liblrabl_map(address_map &map)
 	map(0x6800, 0x680f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
 	map(0x6810, 0x681f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6820, 0x682f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
-	map(0x7000, 0x7fff).nopr().w(this, FUNC(namcos16_state::irq_ctrl_w));
+	map(0x7000, 0x7fff).nopr().w(FUNC(namcos16_state::irq_ctrl_w));
 }
 
 void namcos16_state::master_toypop_map(address_map &map)
@@ -387,17 +388,17 @@ void namcos16_state::master_toypop_map(address_map &map)
 	map(0x6010, 0x601f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6020, 0x602f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6800, 0x6bff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
-	map(0x7000, 0x7000).rw(this, FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
+	map(0x7000, 0x7000).rw(FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
 }
 
 void namcos16_state::slave_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("slave_rom", 0);
 	map(0x080000, 0x0bffff).ram();
-	map(0x100000, 0x100fff).rw(this, FUNC(namcos16_state::slave_shared_r), FUNC(namcos16_state::slave_shared_w)).umask16(0x00ff);
-	map(0x180000, 0x187fff).rw(this, FUNC(namcos16_state::bg_rmw_r), FUNC(namcos16_state::bg_rmw_w));
+	map(0x100000, 0x100fff).rw(FUNC(namcos16_state::slave_shared_r), FUNC(namcos16_state::slave_shared_w)).umask16(0x00ff);
+	map(0x180000, 0x187fff).rw(FUNC(namcos16_state::bg_rmw_r), FUNC(namcos16_state::bg_rmw_w));
 	map(0x190000, 0x1dffff).ram().share("bgvram");
-	map(0x300000, 0x3fffff).w(this, FUNC(namcos16_state::slave_irq_enable_w));
+	map(0x300000, 0x3fffff).w(FUNC(namcos16_state::slave_irq_enable_w));
 }
 
 void namcos16_state::sound_map(address_map &map)
@@ -624,7 +625,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( toypop )
+static GFXDECODE_START( gfx_toypop )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128*4,  64 )
 GFXDECODE_END
@@ -665,16 +666,16 @@ WRITE_LINE_MEMBER(namcos16_state::slave_vblank_irq)
 }
 
 MACHINE_CONFIG_START(namcos16_state::liblrabl)
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
 
 	MCFG_DEVICE_ADD("58xx", NAMCO_58XX, 0)
@@ -684,11 +685,11 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("56xx_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(namcos16_state, dipA_h))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(namcos16_state, dipB_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(namcos16_state, dipB_h))
-	MCFG_NAMCO56XX_IN_3_CB(READ8(namcos16_state, dipA_l))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(namcos16_state, flip))
+	MCFG_NAMCO56XX_IN_0_CB(READ8(*this, namcos16_state, dipA_h))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(*this, namcos16_state, dipB_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(*this, namcos16_state, dipB_h))
+	MCFG_NAMCO56XX_IN_3_CB(READ8(*this, namcos16_state, dipA_l))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, namcos16_state, flip))
 
 	MCFG_DEVICE_ADD("56xx_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
@@ -699,24 +700,24 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK,384,0,288,264,0,224) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_UPDATE_DRIVER(namcos16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos16_state, slave_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos16_state, slave_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toypop)
 	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(namcos16_state, toypop)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, 24000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 24000)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos16_state::toypop)
 	liblrabl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(master_toypop_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(master_toypop_map)
 MACHINE_CONFIG_END
 
 
@@ -778,5 +779,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, 0,   ROT0,   "Namco", "Toypop",        MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0, "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT0, "Namco", "Toypop",        MACHINE_NO_COCKTAIL )

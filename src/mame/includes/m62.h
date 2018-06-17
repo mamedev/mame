@@ -2,6 +2,7 @@
 // copyright-holders:smf, David Haywood
 
 #include "audio/irem.h"
+#include "emupal.h"
 
 class m62_state : public driver_device
 {
@@ -75,13 +76,13 @@ public:
 	DECLARE_WRITE8_MEMBER(spelunkr_palbank_w);
 	DECLARE_WRITE8_MEMBER(spelunk2_gfxport_w);
 	DECLARE_WRITE8_MEMBER(horizon_scrollram_w);
-	DECLARE_DRIVER_INIT(youjyudn);
-	DECLARE_DRIVER_INIT(spelunkr);
-	DECLARE_DRIVER_INIT(ldrun2);
-	DECLARE_DRIVER_INIT(ldrun4);
-	DECLARE_DRIVER_INIT(spelunk2);
-	DECLARE_DRIVER_INIT(kidniki);
-	DECLARE_DRIVER_INIT(battroad);
+	void init_youjyudn();
+	void init_spelunkr();
+	void init_ldrun2();
+	void init_ldrun4();
+	void init_spelunk2();
+	void init_kidniki();
+	void init_battroad();
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ldrun_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ldrun2_bg_tile_info);

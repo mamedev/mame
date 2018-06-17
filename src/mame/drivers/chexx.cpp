@@ -32,26 +32,16 @@ class chexx_state : public driver_device
 {
 public:
 	chexx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_via(*this, "via6522"),
-			m_digitalker(*this, "digitalker"),
-			m_aysnd(*this, "aysnd")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_via(*this, "via6522")
+		, m_digitalker(*this, "digitalker")
+		, m_aysnd(*this, "aysnd")
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{
 	}
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<via6522_device> m_via;
-	required_device<digitalker_device> m_digitalker;
-	optional_device<ay8910_device> m_aysnd; // only faceoffh
-
-	// vars
-	uint8_t  m_port_a, m_port_b;
-	uint8_t  m_bank;
-	uint32_t m_shift;
-	uint8_t  m_lamp;
-	uint8_t  m_ay_cmd, m_ay_data;
 
 	// callbacks
 	TIMER_DEVICE_CALLBACK_MEMBER(update);
@@ -73,16 +63,34 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
+	void faceoffh(machine_config &config);
+	void chexx83(machine_config &config);
+	void chexx83_map(address_map &map);
+	void faceoffh_map(address_map &map);
+
+private:
+	// vars
+	uint8_t  m_port_a, m_port_b;
+	uint8_t  m_bank;
+	uint32_t m_shift;
+	uint8_t  m_lamp;
+	uint8_t  m_ay_cmd, m_ay_data;
+
 	// digitalker
 	void digitalker_set_bank(uint8_t bank);
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void faceoffh(machine_config &config);
-	void chexx83(machine_config &config);
-	void chexx83_map(address_map &map);
-	void faceoffh_map(address_map &map);
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via;
+	required_device<digitalker_device> m_digitalker;
+	optional_device<ay8910_device> m_aysnd; // only faceoffh
+	output_finder<4> m_digits;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
 };
 
 
@@ -139,18 +147,17 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	m_shift = ((m_shift << 1) & 0xffffff) | state;
 
 	// 7segs (score)
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	constexpr uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 
-	output().set_digit_value(0, patterns[(m_shift >> (16+4)) & 0xf]);
-	output().set_digit_value(1, patterns[(m_shift >> (16+0)) & 0xf]);
-
-	output().set_digit_value(2, patterns[(m_shift >>  (8+4)) & 0xf]);
-	output().set_digit_value(3, patterns[(m_shift >>  (8+0)) & 0xf]);
+	m_digits[0] = patterns[(m_shift >> (16+4)) & 0xf];
+	m_digits[1] = patterns[(m_shift >> (16+0)) & 0xf];
+	m_digits[2] = patterns[(m_shift >>  (8+4)) & 0xf];
+	m_digits[3] = patterns[(m_shift >>  (8+0)) & 0xf];
 
 	// Leds (period being played)
-	output().set_led_value(0, BIT(m_shift,2));
-	output().set_led_value(1, BIT(m_shift,1));
-	output().set_led_value(2, BIT(m_shift,0));
+	m_leds[0] = BIT(m_shift,2);
+	m_leds[1] = BIT(m_shift,1);
+	m_leds[2] = BIT(m_shift,0);
 
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
@@ -178,7 +185,7 @@ void chexx_state::chexx83_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // 6810 - 128 x 8 static RAM
 	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
+	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -187,8 +194,8 @@ void chexx_state::chexx83_map(address_map &map)
 WRITE8_MEMBER(chexx_state::lamp_w)
 {
 	m_lamp = data;
-	output().set_lamp_value(0, BIT(m_lamp,0));
-	output().set_lamp_value(1, BIT(m_lamp,1));
+	m_lamps[0] = BIT(m_lamp,0);
+	m_lamps[1] = BIT(m_lamp,1);
 }
 
 WRITE8_MEMBER(chexx_state::ay_w)
@@ -216,9 +223,9 @@ void chexx_state::faceoffh_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // M58725P - 2KB
 	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
-	map(0xa000, 0xa001).w(this, FUNC(chexx_state::ay_w));
-	map(0xc000, 0xc000).w(this, FUNC(chexx_state::lamp_w));
+	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
+	map(0xa000, 0xa001).w(FUNC(chexx_state::ay_w));
+	map(0xc000, 0xc000).w(FUNC(chexx_state::lamp_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -258,6 +265,9 @@ INPUT_PORTS_END
 
 void chexx_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
+	m_lamps.resolve();
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)
@@ -322,39 +332,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 MACHINE_CONFIG_START(chexx_state::chexx83)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(chexx83_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(chexx83_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("update", chexx_state, update, attotime::from_hz(60))
 
 	// via
 	MCFG_DEVICE_ADD("via6522", VIA6522, MAIN_CLOCK/4)
 
-	MCFG_VIA6522_READPA_HANDLER(READ8(chexx_state, via_a_in))
-	MCFG_VIA6522_READPB_HANDLER(READ8(chexx_state, via_b_in))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, chexx_state, via_a_in))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, chexx_state, via_b_in))
 
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(chexx_state, via_a_out))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(chexx_state, via_b_out))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, chexx_state, via_a_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, chexx_state, via_b_out))
 
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(chexx_state, via_ca2_out))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(chexx_state, via_cb1_out))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(chexx_state, via_cb2_out))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(chexx_state, via_irq_out))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, chexx_state, via_ca2_out))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, chexx_state, via_cb1_out))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, chexx_state, via_cb2_out))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, chexx_state, via_irq_out))
 
 	// Layout
 	MCFG_DEFAULT_LAYOUT(layout_chexx)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DIGITALKER_ADD("digitalker", MAIN_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chexx_state::faceoffh)
 	chexx83(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(faceoffh_map)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -427,5 +437,5 @@ ROM_START( faceoffh )
 	ROM_FILL(         0xe000, 0x2000, 0xff ) // unpopulated
 ROM_END
 
-GAME( 1983, chexx83,  0,       chexx83,  chexx83, chexx_state, 0, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, chexx_state, 0, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, chexx83,  0,       chexx83,  chexx83, chexx_state, empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, chexx_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

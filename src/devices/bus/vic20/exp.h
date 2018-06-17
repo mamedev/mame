@@ -51,15 +51,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, VIC20_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 #define MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD(_tag) \
-	MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, 0, vic20_expansion_cards, nullptr) \
-	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w)) \
-	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w)) \
-	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
+	MCFG_DEVICE_ADD(_tag, VIC20_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), vic20_expansion_cards, nullptr) \
+	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w)) \
+	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w)) \
+	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
 
 
 #define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
@@ -87,6 +83,15 @@ class vic20_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	vic20_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+		: vic20_expansion_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
@@ -164,6 +169,6 @@ protected:
 DECLARE_DEVICE_TYPE(VIC20_EXPANSION_SLOT, vic20_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
+void vic20_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIC20_EXP_H

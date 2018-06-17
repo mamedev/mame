@@ -18,6 +18,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -50,7 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(pasopia);
+	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
 	void pasopia(machine_config &config);
@@ -143,7 +144,7 @@ void pasopia_state::pasopia_io(address_map &map)
 	map(0x28, 0x2b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x33).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 //  0x38 printer
-	map(0x3c, 0x3c).w(this, FUNC(pasopia_state::pasopia_ctrl_w));
+	map(0x3c, 0x3c).w(FUNC(pasopia_state::pasopia_ctrl_w));
 }
 
 /* Input ports */
@@ -254,7 +255,7 @@ static const gfx_layout p7_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( pasopia )
+static GFXDECODE_START( gfx_pasopia )
 	GFXDECODE_ENTRY( "chargen", 0x0000, p7_chars_8x8, 0, 4 )
 GFXDECODE_END
 
@@ -268,7 +269,7 @@ static const z80_daisy_config pasopia_daisy[] =
 
 
 
-DRIVER_INIT_MEMBER(pasopia_state,pasopia)
+void pasopia_state::init_pasopia()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
@@ -284,9 +285,9 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 
 MACHINE_CONFIG_START(pasopia_state::pasopia)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(pasopia_map)
-	MCFG_CPU_IO_MAP(pasopia_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(pasopia_map)
+	MCFG_DEVICE_IO_MAP(pasopia_io)
 	MCFG_Z80_DAISY_CHAIN(pasopia_daisy)
 
 	/* video hardware */
@@ -296,7 +297,7 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
@@ -306,28 +307,28 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_MC6845_UPDATE_ROW_CB(pasopia_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia_state, vram_addr_lo_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pasopia_state, vram_latch_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pasopia_state, vram_latch_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia_state, vram_addr_lo_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pasopia_state, vram_latch_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia_state, vram_latch_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia_state, screen_mode_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pasopia_state, portb_1_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pasopia_state, vram_addr_hi_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia_state, screen_mode_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia_state, portb_1_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia_state, vram_addr_hi_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(pasopia_state, rombank_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia_state, rombank_r))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("z80ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia_state, mux_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia_state, keyb_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, pasopia_state, mux_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pasopia_state, keyb_r))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -343,5 +344,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY      FULLNAME   FLAGS
-COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME   FLAGS
+COMP( 1986, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, init_pasopia, "Toshiba", "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

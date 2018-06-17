@@ -16,25 +16,25 @@
 #include "machine/6821pia.h"
 #include "machine/bankdev.h"
 #include "audio/williams.h"
+#include "emupal.h"
 #include "screen.h"
 
 class williams_state : public driver_device
 {
 public:
-	williams_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	williams_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_videoram(*this, "videoram"),
+		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_bankc000(*this, "bankc000"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_pia_0(*this, "pia_0"),
-		m_pia_1(*this, "pia_1"),
-		m_pia_2(*this, "pia_2") { }
+		m_paletteram(*this, "paletteram"),
+		m_pia(*this, "pia_%u", 0U) { }
 
 	enum
 	{
@@ -51,6 +51,7 @@ public:
 
 	required_shared_ptr<uint8_t> m_nvram;
 	required_shared_ptr<uint8_t> m_videoram;
+	optional_memory_bank m_mainbank;
 	uint8_t *m_mayday_protection;
 	uint8_t m_blitter_config;
 	uint16_t m_blitter_clip_address;
@@ -72,29 +73,25 @@ public:
 	DECLARE_WRITE8_MEMBER(sinistar_vram_select_w);
 	DECLARE_READ8_MEMBER(williams_video_counter_r);
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
-	DECLARE_DRIVER_INIT(sinistar);
-	DECLARE_DRIVER_INIT(stargate);
-	DECLARE_DRIVER_INIT(playball);
-	DECLARE_DRIVER_INIT(defender);
-	DECLARE_DRIVER_INIT(mayday);
-	DECLARE_DRIVER_INIT(lottofun);
-	DECLARE_DRIVER_INIT(alienaru);
-	DECLARE_DRIVER_INIT(defndjeu);
-	DECLARE_DRIVER_INIT(spdball);
-	DECLARE_DRIVER_INIT(splat);
-	DECLARE_DRIVER_INIT(joust);
-	DECLARE_DRIVER_INIT(alienar);
-	DECLARE_DRIVER_INIT(robotron);
-	DECLARE_DRIVER_INIT(bubbles);
+	void init_sinistar();
+	void init_stargate();
+	void init_playball();
+	void init_defender();
+	void init_mayday();
+	void init_lottofun();
+	void init_alienaru();
+	void init_defndjeu();
+	void init_splat();
+	void init_joust();
+	void init_alienar();
+	void init_robotron();
+	void init_bubbles();
 	DECLARE_MACHINE_START(defender);
 	DECLARE_MACHINE_RESET(defender);
 	DECLARE_VIDEO_START(williams);
 	DECLARE_MACHINE_START(williams);
-	DECLARE_MACHINE_RESET(williams);
 	DECLARE_MACHINE_START(williams_common);
-	DECLARE_MACHINE_RESET(williams_common);
 	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(williams_count240_off_callback);
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_count240_callback);
@@ -102,16 +99,12 @@ public:
 	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
 	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
+	DECLARE_PALETTE_INIT(williams);
 
 	void state_save_register();
-	void create_palette_lookup();
 	void blitter_init(int blitter_config, const uint8_t *remap_prom);
 	inline void blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte);
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
-
-	DECLARE_WRITE_LINE_MEMBER(williams_main_irq);
-	DECLARE_WRITE_LINE_MEMBER(williams_main_firq);
-	DECLARE_WRITE_LINE_MEMBER(williams_snd_irq);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -119,15 +112,12 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
-	required_device<pia6821_device> m_pia_0;
-	required_device<pia6821_device> m_pia_1;
-	required_device<pia6821_device> m_pia_2;
+	optional_shared_ptr<uint8_t> m_paletteram;
+	optional_device_array<pia6821_device, 4> m_pia;
 	void playball(machine_config &config);
 	void defender(machine_config &config);
 	void sinistar(machine_config &config);
 	void lottofun(machine_config &config);
-	void spdball(machine_config &config);
 	void williams(machine_config &config);
 	void williams_muxed(machine_config &config);
 	void jin(machine_config &config);
@@ -139,21 +129,32 @@ public:
 	void williams_map(address_map &map);
 };
 
+class spdball_state : public williams_state
+{
+public:
+	spdball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag) { }
+
+	void driver_init() override;
+
+	void spdball(machine_config &config);
+	void spdball_map(address_map &map);
+};
 
 class blaster_state : public williams_state
 {
 public:
-	blaster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams_state(mconfig, type, tag),
+	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
-		m_pia_2b(*this, "pia_2b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
-		m_blaster_scanline_control(*this, "blaster_scan") { }
+		m_blaster_scanline_control(*this, "blaster_scan"),
+		m_blaster_bankb(*this, "blaster_bankb") { }
 
 	optional_device<cpu_device> m_soundcpu_b;
-	optional_device<pia6821_device> m_pia_2b;
 	required_shared_ptr<uint8_t> m_blaster_palette_0;
 	required_shared_ptr<uint8_t> m_blaster_scanline_control;
+	optional_memory_bank m_blaster_bankb;
 
 	rgb_t m_blaster_color0;
 	uint8_t m_blaster_video_control;
@@ -166,11 +167,9 @@ public:
 	DECLARE_WRITE8_MEMBER(blaster_video_control_w);
 	TIMER_CALLBACK_MEMBER(blaster_deferred_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
-	DECLARE_WRITE_LINE_MEMBER(williams_snd_irq_b);
 
-	DECLARE_DRIVER_INIT(blaster);
+	void init_blaster();
 	DECLARE_MACHINE_START(blaster);
-	DECLARE_MACHINE_RESET(blaster);
 	DECLARE_VIDEO_START(blaster);
 	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -211,17 +210,14 @@ public:
 	DECLARE_WRITE8_MEMBER(williams2_xscroll_low_w);
 	DECLARE_WRITE8_MEMBER(williams2_xscroll_high_w);
 	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
-	TIMER_CALLBACK_MEMBER(williams2_endscreen_off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
 	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
-	DECLARE_WRITE_LINE_MEMBER(mysticm_main_irq);
-	DECLARE_WRITE_LINE_MEMBER(tshoot_main_irq);
 
-	DECLARE_DRIVER_INIT(mysticm);
-	DECLARE_DRIVER_INIT(tshoot);
-	DECLARE_DRIVER_INIT(inferno);
+	void init_mysticm();
+	void init_tshoot();
+	void init_inferno();
 	DECLARE_MACHINE_START(williams2);
 	DECLARE_MACHINE_RESET(williams2);
 	DECLARE_VIDEO_START(williams2);
@@ -240,17 +236,27 @@ public:
 class tshoot_state : public williams2_state
 {
 public:
-	tshoot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams2_state(mconfig, type, tag),
-		m_gun(*this, {"GUNX", "GUNY"}) { }
+	tshoot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams2_state(mconfig, type, tag),
+		m_gun(*this, {"GUNX", "GUNY"}),
+		m_grenade_lamp(*this, "Grenade_lamp"),
+		m_gun_lamp(*this, "Gun_lamp"),
+		m_p1_gun_recoil(*this, "Player1_Gun_Recoil"),
+		m_feather_blower(*this, "Feather_Blower") { }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
+	DECLARE_MACHINE_START(tshoot);
+
 	void tshoot(machine_config &config);
 private:
 	required_ioport_array<2> m_gun;
+	output_finder<> m_grenade_lamp;
+	output_finder<> m_gun_lamp;
+	output_finder<> m_p1_gun_recoil;
+	output_finder<> m_feather_blower;
 };
 
 class joust2_state : public williams2_state
@@ -263,7 +269,7 @@ public:
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
 	uint16_t m_joust2_current_sound_data;
 
-	DECLARE_DRIVER_INIT(joust2);
+	void init_joust2();
 	DECLARE_MACHINE_START(joust2);
 	DECLARE_MACHINE_RESET(joust2);
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);

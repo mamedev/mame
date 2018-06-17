@@ -22,40 +22,42 @@
 
 #if 0
 // this might be for an earlier revision of the device
-ADDRESS_MAP_START(interpro_arbga_device::map)
-	AM_RANGE(0x00, 0x03) AM_READWRITE(sdepid_r, sdepid_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(snapid_r, snapid_w)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE(prilo_r, prilo_w)
-	AM_RANGE(0x0c, 0x0f) AM_READWRITE(prihi_r, prihi_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(errdomlo_r, errdomlo_w)
-	AM_RANGE(0x14, 0x17) AM_READWRITE(errdomhi_r, errdomhi_w)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE(tmctrl_r, tmctrl_w)
+void interpro_arbga_device::map(address_map &map)
+{
+	map(0x00, 0x03).rw(FUNC(interpro_arbga_device::sdepid_r), FUNC(interpro_arbga_device::sdepid_w));
+	map(0x04, 0x07).rw(FUNC(interpro_arbga_device::snapid_r), FUNC(interpro_arbga_device::snapid_w));
+	map(0x08, 0x0b).rw(FUNC(interpro_arbga_device::prilo_r), FUNC(interpro_arbga_device::prilo_w));
+	map(0x0c, 0x0f).rw(FUNC(interpro_arbga_device::prihi_r), FUNC(interpro_arbga_device::prihi_w));
+	map(0x10, 0x13).rw(FUNC(interpro_arbga_device::errdomlo_r), FUNC(interpro_arbga_device::errdomlo_w));
+	map(0x14, 0x17).rw(FUNC(interpro_arbga_device::errdomhi_r), FUNC(interpro_arbga_device::errdomhi_w));
+	map(0x18, 0x1b).rw(FUNC(interpro_arbga_device::tmctrl_r), FUNC(interpro_arbga_device::tmctrl_w));
 
-	AM_RANGE(0x24, 0x27) AM_READWRITE(tmsrnem_r, tmsrnem_w)
-	AM_RANGE(0x28, 0x2b) AM_READWRITE(tmsrhog_r, tmsrhog_w)
-	AM_RANGE(0x2c, 0x2f) AM_READWRITE(tmscale_r, tmscale_w)
-ADDRESS_MAP_END
+	map(0x24, 0x27).rw(FUNC(interpro_arbga_device::tmsrnem_r), FUNC(interpro_arbga_device::tmsrnem_w));
+	map(0x28, 0x2b).rw(FUNC(interpro_arbga_device::tmsrhog_r), FUNC(interpro_arbga_device::tmsrhog_w));
+	map(0x2c, 0x2f).rw(FUNC(interpro_arbga_device::tmscale_r), FUNC(interpro_arbga_device::tmscale_w));
+}
 #endif
 
 // derived from the FDM "dump_arb" command
-ADDRESS_MAP_START(interpro_arbga_device::map)
-	AM_RANGE(0x00, 0x03) AM_READWRITE(sdepid_r, sdepid_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(arbsnap_r, arbsnap_w)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE(fixprils_r, fixprils_w)
-	AM_RANGE(0x0c, 0x0f) AM_READWRITE(fixprims_r, fixprims_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(sysdomls_r, sysdomls_w)
-	AM_RANGE(0x14, 0x17) AM_READWRITE(sysdomms_r, sysdomms_w)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE(tctrl_r, tctrl_w)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE8(inem_r, inem_w, 0x0000ff00) // boot code writes 0x10
-	AM_RANGE(0x20, 0x23) AM_READWRITE8(enem_r, enem_w, 0x0000ff00) // boot code writes 0x07
-	AM_RANGE(0x24, 0x27) AM_READWRITE(hog_r, hog_w)
-	AM_RANGE(0x28, 0x2b) AM_READWRITE(lock_r, lock_w)
-	AM_RANGE(0x2c, 0x2f) AM_READWRITE(lockprs_r, lockprs_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE(hiblockls_r, hiblockls_w)
-	AM_RANGE(0x34, 0x37) AM_READWRITE(hiblockms_r, hiblockms_w)
+void interpro_arbga_device::map(address_map &map)
+{
+	map(0x00, 0x03).rw(FUNC(interpro_arbga_device::sdepid_r), FUNC(interpro_arbga_device::sdepid_w));
+	map(0x04, 0x07).rw(FUNC(interpro_arbga_device::arbsnap_r), FUNC(interpro_arbga_device::arbsnap_w));
+	map(0x08, 0x0b).rw(FUNC(interpro_arbga_device::fixprils_r), FUNC(interpro_arbga_device::fixprils_w));
+	map(0x0c, 0x0f).rw(FUNC(interpro_arbga_device::fixprims_r), FUNC(interpro_arbga_device::fixprims_w));
+	map(0x10, 0x13).rw(FUNC(interpro_arbga_device::sysdomls_r), FUNC(interpro_arbga_device::sysdomls_w));
+	map(0x14, 0x17).rw(FUNC(interpro_arbga_device::sysdomms_r), FUNC(interpro_arbga_device::sysdomms_w));
+	map(0x18, 0x1b).rw(FUNC(interpro_arbga_device::tctrl_r), FUNC(interpro_arbga_device::tctrl_w));
+	map(0x1d, 0x1d).rw(FUNC(interpro_arbga_device::inem_r), FUNC(interpro_arbga_device::inem_w)); // boot code writes 0x10
+	map(0x21, 0x21).rw(FUNC(interpro_arbga_device::enem_r), FUNC(interpro_arbga_device::enem_w)); // boot code writes 0x07
+	map(0x24, 0x27).rw(FUNC(interpro_arbga_device::hog_r), FUNC(interpro_arbga_device::hog_w));
+	map(0x28, 0x2b).rw(FUNC(interpro_arbga_device::lock_r), FUNC(interpro_arbga_device::lock_w));
+	map(0x2c, 0x2f).rw(FUNC(interpro_arbga_device::lockprs_r), FUNC(interpro_arbga_device::lockprs_w));
+	map(0x30, 0x33).rw(FUNC(interpro_arbga_device::hiblockls_r), FUNC(interpro_arbga_device::hiblockls_w));
+	map(0x34, 0x37).rw(FUNC(interpro_arbga_device::hiblockms_r), FUNC(interpro_arbga_device::hiblockms_w));
 
-	AM_RANGE(0x3c, 0x3f) AM_READWRITE(arbrev_r, arbrev_w)
-ADDRESS_MAP_END
+	map(0x3c, 0x3f).rw(FUNC(interpro_arbga_device::arbrev_r), FUNC(interpro_arbga_device::arbrev_w));
+}
 
 DEFINE_DEVICE_TYPE(INTERPRO_ARBGA, interpro_arbga_device, "arbga", "SRX Arbiter Gate Array")
 

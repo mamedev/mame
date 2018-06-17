@@ -18,6 +18,7 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "machine/timer.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,7 +36,7 @@ public:
 		m_dma8257(*this, "dma8257")
 	{ }
 
-	DECLARE_DRIVER_INIT(fi6845);
+	void init_fi6845();
 
 	void fastinvaders(machine_config &config);
 	void fastinvaders_8275(machine_config &config);
@@ -527,18 +528,18 @@ void fastinvaders_state::fastinvaders_6845_io(address_map &map)
 	map(0x20, 0x20).w(m_crtc6845, FUNC(mc6845_device::address_w));
 	map(0x21, 0x21).rw(m_crtc6845, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x40, 0x4f).w(this, FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
+	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
-	map(0x60, 0x60).r(this, FUNC(fastinvaders_state::io_60_r));
-	map(0x70, 0x70).w(this, FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
+	map(0x60, 0x60).r(FUNC(fastinvaders_state::io_60_r));
+	map(0x70, 0x70).w(FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
 	map(0x80, 0x80).noprw(); //ds8  write here a LOT ?????
-	map(0x90, 0x90).w(this, FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
-	map(0xa0, 0xa0).w(this, FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
-	map(0xb0, 0xb0).w(this, FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
-	map(0xc0, 0xc0).w(this, FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
-	map(0xd0, 0xd0).w(this, FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
-	map(0xe0, 0xe0).w(this, FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
-	map(0xf0, 0xf0).w(this, FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
+	map(0x90, 0x90).w(FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
+	map(0xa0, 0xa0).w(FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
+	map(0xb0, 0xb0).w(FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
+	map(0xc0, 0xc0).w(FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
+	map(0xd0, 0xd0).w(FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
+	map(0xe0, 0xe0).w(FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
+	map(0xf0, 0xf0).w(FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
 }
 
 
@@ -550,19 +551,19 @@ void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 
 map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x40, 0x4f).w(this, FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
+	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
-	map(0x60, 0x60).r(this, FUNC(fastinvaders_state::io_60_r));
-	map(0x70, 0x70).w(this, FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
+	map(0x60, 0x60).r(FUNC(fastinvaders_state::io_60_r));
+	map(0x70, 0x70).w(FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
 	map(0x80, 0x80).noprw(); //write here a LOT
 	//AM_RANGE(0x80, 0x80) AM_WRITE(io_80_w)    //ds8 ????
-	map(0x90, 0x90).w(this, FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
-	map(0xa0, 0xa0).w(this, FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
-	map(0xb0, 0xb0).w(this, FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
-	map(0xc0, 0xc0).w(this, FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
-	map(0xd0, 0xd0).w(this, FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
-	map(0xe0, 0xe0).w(this, FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
-	map(0xf0, 0xf0).w(this, FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
+	map(0x90, 0x90).w(FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
+	map(0xa0, 0xa0).w(FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
+	map(0xb0, 0xb0).w(FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
+	map(0xc0, 0xc0).w(FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
+	map(0xd0, 0xd0).w(FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
+	map(0xe0, 0xe0).w(FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
+	map(0xf0, 0xf0).w(FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
 }
 
 
@@ -638,29 +639,29 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( fastinvaders )
+static GFXDECODE_START( gfx_fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
-	MCFG_CPU_PROGRAM_MAP(fastinvaders_map)
-//  MCFG_CPU_IO_MAP(fastinvaders_io_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
-	MCFG_I8085A_SID(READLINE(fastinvaders_state, sid_read))
-MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
+	MCFG_DEVICE_PROGRAM_MAP(fastinvaders_map)
+//  MCFG_DEVICE_IO_MAP(fastinvaders_io_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
+	MCFG_I8085A_SID(READLINE(*this, fastinvaders_state, sid_read))
+MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("dma8257", I8257, 6144100)
-	MCFG_I8257_IN_MEMR_CB(READ8(fastinvaders_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(fastinvaders_state, memory_write_byte))
-	MCFG_I8257_OUT_DACK_1_CB(WRITE8(fastinvaders_state, dark_1_clr))
-	MCFG_I8257_OUT_DACK_2_CB(WRITE8(fastinvaders_state, dark_2_clr))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, fastinvaders_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fastinvaders_state, memory_write_byte))
+	MCFG_I8257_OUT_DACK_1_CB(WRITE8(*this, fastinvaders_state, dark_1_clr))
+	MCFG_I8257_OUT_DACK_2_CB(WRITE8(*this, fastinvaders_state, dark_2_clr))
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("count_ar", fastinvaders_state, count_ar,  attotime::from_hz(11500000/2))
@@ -674,7 +675,7 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	MCFG_SCREEN_UPDATE_DRIVER(fastinvaders_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastinvaders)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastinvaders)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -683,39 +684,38 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_8275)
 	fastinvaders(config);
-	MCFG_CPU_MODIFY("maincpu" ) // guess
-	MCFG_CPU_IO_MAP(fastinvaders_8275_io)
+	MCFG_DEVICE_MODIFY("maincpu" ) // guess
+	MCFG_DEVICE_IO_MAP(fastinvaders_8275_io)
 
 	MCFG_DEVICE_ADD("8275", I8275, 10000000 ) /* guess */ // does not configure a very useful resolution(!)
 	MCFG_I8275_CHARACTER_WIDTH(16)
 //  MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
-//  MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+//  MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
 	fastinvaders(config);
-	MCFG_CPU_MODIFY("maincpu" ) // guess
-	MCFG_CPU_IO_MAP(fastinvaders_6845_io)
+	MCFG_DEVICE_MODIFY("maincpu" ) // guess
+	MCFG_DEVICE_IO_MAP(fastinvaders_6845_io)
 
 	MCFG_MC6845_ADD("6845", MC6845, "screen", 11500000/16) /* confirmed */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fastinvaders_state,vsync))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(fastinvaders_state,hsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fastinvaders_state,vsync))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, fastinvaders_state,hsync))
 MACHINE_CONFIG_END
 
 
 
 
-DRIVER_INIT_MEMBER(fastinvaders_state, fi6845)
+void fastinvaders_state::init_fi6845()
 {
-const uint8_t *prom = memregion("prom")->base();
-	int i;
-	for (i=0;i<256;i++){
-		m_prom[i]=prom[i];
+	const uint8_t *prom = memregion("prom")->base();
+	for (int i = 0; i < 256; i++){
+		m_prom[i] = prom[i];
 	}
-	m_dma1=0;
-	m_io_40=0;
+	m_dma1 = 0;
+	m_io_40 = 0;
 }
 
 
@@ -792,6 +792,6 @@ ROM_START( fi6845 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
 ROM_END
 
-//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT    ROT     COMPANY       FULLNAME                        FLAGS
-GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT         ROT     COMPANY       FULLNAME                        FLAGS
+GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

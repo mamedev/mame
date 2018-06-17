@@ -37,6 +37,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -94,7 +95,7 @@ void go2000_state::go2000_map(address_map &map)
 	map(0x800000, 0x800fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00001).portr("INPUTS");
 	map(0xa00002, 0xa00003).portr("DSW");
-	map(0x620002, 0x620003).w(this, FUNC(go2000_state::sound_cmd_w));
+	map(0x620002, 0x620003).w(FUNC(go2000_state::sound_cmd_w));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP
 //  AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
@@ -115,8 +116,8 @@ void go2000_state::go2000_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
 }
 
 
@@ -192,7 +193,7 @@ static const gfx_layout go2000_layout =
 	8*32
 };
 
-static GFXDECODE_START( go2000 )
+static GFXDECODE_START( gfx_go2000 )
 	GFXDECODE_ENTRY( "gfx1", 0, go2000_layout,   0x0, 0x80  ) /* tiles */
 GFXDECODE_END
 
@@ -342,16 +343,16 @@ void go2000_state::machine_start()
 
 MACHINE_CONFIG_START(go2000_state::go2000)
 
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(go2000_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", go2000_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(go2000_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", go2000_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(go2000_sound_map)
-	MCFG_CPU_IO_MAP(go2000_sound_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(go2000_sound_map)
+	MCFG_DEVICE_IO_MAP(go2000_sound_io)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", go2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_go2000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -367,10 +368,10 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.25) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( go2000 )
@@ -387,4 +388,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000, go2000_state,    0, ROT0,  "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, go2000, 0, go2000, go2000, go2000_state, empty_init, ROT0, "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )

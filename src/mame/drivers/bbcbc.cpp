@@ -31,7 +31,7 @@
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "machine/z80pio.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "softlist.h"
@@ -82,8 +82,8 @@ void bbcbc_state::io_map(address_map &map)
 						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 							 m_z80pio->write(space, offset >> 5, data, mem_mask);
 						 });
-	map(0x80, 0x80).rw("tms9129", FUNC(tms9129_device::vram_read), FUNC(tms9129_device::vram_write));
-	map(0x81, 0x81).rw("tms9129", FUNC(tms9129_device::register_read), FUNC(tms9129_device::register_write));
+	map(0x80, 0x80).rw("tms9129", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
+	map(0x81, 0x81).rw("tms9129", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
 }
 
 // Input bits are read through the PIO four at a time, then stored individually in RAM at E030-E03B
@@ -119,16 +119,16 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 
 
 MACHINE_CONFIG_START(bbcbc_state::bbcbc)
-	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(bbcbc_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MAIN_CLOCK/8)
 	//MCFG_Z80PIO_OUT_PA_CB(???)
 	//MCFG_Z80PIO_IN_STROBE_CB(???)
-	MCFG_Z80PIO_IN_PB_CB(READ8(bbcbc_state, input_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(bbcbc_state, input_select_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, bbcbc_state, input_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, bbcbc_state, input_select_w))
 
 	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -185,5 +185,5 @@ ROM_END
 
 ***************************************************************************/
 
-//   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  CLASS        INIT  COMPANY    FULLNAME                FLAGS
-CONS(1985, bbcbc, 0,      0,      bbcbc,  bbcbc, bbcbc_state, 0,    "Unicard", "BBC Bridge Companion", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME                FLAGS
+CONS(1985, bbcbc, 0,      0,      bbcbc,   bbcbc, bbcbc_state, empty_init, "Unicard", "BBC Bridge Companion", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

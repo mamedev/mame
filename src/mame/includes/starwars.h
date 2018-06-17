@@ -5,18 +5,24 @@
     Atari Star Wars hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_STARWARS_H
+#define MAME_INCLUDES_STARWARS_H
+
+#pragma once
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/x2212.h"
 #include "sound/pokey.h"
+#include "sound/tms5220.h"
 #include "includes/slapstic.h"
 
 
 class starwars_state : public driver_device
 {
 public:
-	starwars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	starwars_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_soundlatch(*this, "soundlatch"),
 		m_mainlatch(*this, "mainlatch"),
 		m_riot(*this, "riot"),
@@ -24,8 +30,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pokey(*this, "pokey%u", 1U),
+		m_tms(*this, "tms"),
+		m_novram(*this, "x2212"),
 		m_slapstic_device(*this, "slapstic")
-		{ }
+	{ }
 
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
@@ -34,6 +42,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<pokey_device, 4> m_pokey;
+	required_device<tms5220_device> m_tms;
+	required_device<x2212_device> m_novram;
 	optional_device<atari_slapstic_device> m_slapstic_device;
 
 	uint8_t *m_slapstic_source;
@@ -61,9 +71,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(recall_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
-	DECLARE_WRITE_LINE_MEMBER(led3_w);
 	DECLARE_READ8_MEMBER(starwars_prng_r);
 	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
 	DECLARE_READ8_MEMBER(starwars_div_reh_r);
@@ -74,8 +81,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DRIVER_INIT(esb);
-	DECLARE_DRIVER_INIT(starwars);
+	void init_esb();
+	void init_starwars();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	DECLARE_READ8_MEMBER(r6532_porta_r);
@@ -90,3 +97,5 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_STARWARS_H

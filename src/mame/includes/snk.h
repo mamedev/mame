@@ -9,6 +9,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class snk_state : public driver_device
@@ -162,7 +163,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
 	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
-	DECLARE_DRIVER_INIT(countryc);
+	void init_countryc();
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(marvins_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ikari_get_tx_tile_info);

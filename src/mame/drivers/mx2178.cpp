@@ -29,6 +29,7 @@ TODO:
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -120,7 +121,7 @@ static const gfx_layout mx2178_charlayout =
 	8*16                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mx2178 )
+static GFXDECODE_START( gfx_mx2178 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mx2178_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -130,9 +131,9 @@ void mx2178_state::machine_reset()
 
 MACHINE_CONFIG_START(mx2178_state::mx2178)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'869'600) / 5) // guess
-	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
-	MCFG_CPU_IO_MAP(mx2178_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'869'600) / 5) // guess
+	MCFG_DEVICE_PROGRAM_MAP(mx2178_mem)
+	MCFG_DEVICE_IO_MAP(mx2178_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -141,7 +142,7 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mx2178)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -152,28 +153,28 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(18'869'600) / 30)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232b", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -193,5 +194,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY    FULLNAME        FLAGS
-COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, mx2178_state, 0,    "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME        FLAGS
+COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )

@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "machine/taito68705interface.h"
@@ -118,8 +119,8 @@ public:
 	DECLARE_WRITE8_MEMBER(boblbobl_ic43_b_w);
 	DECLARE_READ8_MEMBER(boblbobl_ic43_b_r);
 
-	DECLARE_DRIVER_INIT(dland);
-	DECLARE_DRIVER_INIT(common);
+	void init_dland();
+	void init_common();
 	DECLARE_MACHINE_START(tokio);
 	DECLARE_MACHINE_RESET(tokio);
 	DECLARE_MACHINE_START(bublbobl);

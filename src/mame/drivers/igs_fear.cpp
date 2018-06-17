@@ -7,6 +7,7 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -22,7 +23,7 @@ public:
 
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(igs_fear);
+	void init_igs_fear();
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,7 +65,7 @@ static const gfx_layout fearlayout =
 };
 
 
-static GFXDECODE_START( igs_fear )
+static GFXDECODE_START( gfx_igs_fear )
 	GFXDECODE_ENTRY( "gfx1", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, fearlayout,   0, 16  )
@@ -79,10 +80,8 @@ WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
 
 
 MACHINE_CONFIG_START(igs_fear_state::igs_fear)
-	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
-	MCFG_CPU_PROGRAM_MAP(igs_igs_fear_map)
-
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_fear_state,  igs_majhong_interrupt)
+	MCFG_DEVICE_ADD("maincpu",ARM7, 50000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(igs_igs_fear_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -96,12 +95,12 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs_fear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(WRITELINE(igs_fear_state, sound_irq))
+	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs_fear_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 
 MACHINE_CONFIG_END
@@ -164,11 +163,11 @@ void igs_fear_state::pgm_create_dummy_internal_arm_region()
 
 
 
-DRIVER_INIT_MEMBER(igs_fear_state,igs_fear)
+void igs_fear_state::init_igs_fear()
 {
 	fearless_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-GAME( 2006,  fearless,  0, igs_fear,    fear, igs_fear_state, igs_fear,    ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2006, fearless, 0, igs_fear, fear, igs_fear_state, init_igs_fear, ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )

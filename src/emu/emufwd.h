@@ -103,6 +103,7 @@ class devcb_write_base;
 
 // declared in devfind.h
 class finder_base;
+template <class DeviceClass, bool Required> class device_finder;
 
 // declared in device.h
 class device_interface;
@@ -137,7 +138,7 @@ class driver_device;
 
 // declared in emumem.h
 class address_space;
-template<int addr_shift> class direct_read_data;
+template<int Width, int AddrShift, int Endian> class memory_access_cache;
 class memory_bank;
 class memory_block;
 class memory_manager;
@@ -146,9 +147,6 @@ class memory_share;
 
 // declared in emuopts.h
 class emu_options;
-
-// declared in emupal.h
-class palette_device;
 
 // declared in gamedrv.h
 class game_driver;
@@ -178,6 +176,7 @@ struct ioport_port_live;
 class running_machine;
 
 // declared in mconfig.h
+namespace emu { namespace detail { struct machine_config_replace; } }
 class machine_config;
 
 // declared in natkeyboard.h
@@ -224,6 +223,9 @@ class software_list_loader;
 // declared in sound.h
 class sound_manager;
 class sound_stream;
+
+// declared in speaker.h
+class speaker_device;
 
 // declared in tilemap.h
 class tilemap_device;

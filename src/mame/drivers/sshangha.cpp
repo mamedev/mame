@@ -180,31 +180,31 @@ void sshangha_state::sshangha_map(address_map &map)
 	map(0x206000, 0x2067ff).ram().share("pf2_rowscroll");
 	map(0x206800, 0x207fff).ram();
 	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x320001).w(this, FUNC(sshangha_state::sshangha_video_w));
+	map(0x320000, 0x320001).w(FUNC(sshangha_state::sshangha_video_w));
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
 
 	map(0x340000, 0x340fff).ram().share("spriteram2");
-	map(0x350000, 0x350001).r(this, FUNC(sshangha_state::deco_71_r));
+	map(0x350000, 0x350001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x350000, 0x350007).nopw();
 	map(0x360000, 0x360fff).ram().share("spriteram");
-	map(0x370000, 0x370001).r(this, FUNC(sshangha_state::deco_71_r));
+	map(0x370000, 0x370001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x370000, 0x370007).nopw();
 
-	map(0x380000, 0x3803ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
-	map(0x380400, 0x3807ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
-	map(0x380800, 0x380bff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
-	map(0x380c00, 0x380fff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x380000, 0x3803ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
+	map(0x380400, 0x3807ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
+	map(0x380800, 0x380bff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
+	map(0x380c00, 0x380fff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
 	map(0x381000, 0x383fff).ram(); // unused palette area
-	map(0x3e0000, 0x3e3fff).rw(this, FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
+	map(0x3e0000, 0x3e3fff).rw(FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
 	map(0x3ec000, 0x3f3fff).ram();
-	map(0x3f4000, 0x3f7fff).rw(this, FUNC(sshangha_state::sshangha_protection_region_d_146_r), FUNC(sshangha_state::sshangha_protection_region_d_146_w)).share("prot_data");
+	map(0x3f4000, 0x3f7fff).rw(FUNC(sshangha_state::sshangha_protection_region_d_146_r), FUNC(sshangha_state::sshangha_protection_region_d_146_w)).share("prot_data");
 }
 
 void sshangha_state::sshanghb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x084000, 0x0847ff).r(this, FUNC(sshangha_state::sshanghb_protection16_r));
+	map(0x084000, 0x0847ff).r(FUNC(sshangha_state::sshanghb_protection16_r));
 	map(0x101000, 0x10100f).ram().share("sound_shared"); /* the bootleg writes here */
 
 	map(0x200000, 0x201fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
@@ -213,16 +213,16 @@ void sshangha_state::sshanghb_map(address_map &map)
 	map(0x206000, 0x2067ff).ram().share("pf2_rowscroll");
 	map(0x206800, 0x207fff).ram();
 	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x320001).w(this, FUNC(sshangha_state::sshangha_video_w));
+	map(0x320000, 0x320001).w(FUNC(sshangha_state::sshangha_video_w));
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
 
 	map(0x340000, 0x340fff).ram(); // original spriteram
 
-	map(0x380000, 0x3803ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
-	map(0x380400, 0x3807ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
-	map(0x380800, 0x380bff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
-	map(0x380c00, 0x380fff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x380000, 0x3803ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
+	map(0x380400, 0x3807ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
+	map(0x380800, 0x380bff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
+	map(0x380c00, 0x380fff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
 	map(0x381000, 0x383fff).ram(); // unused palette area
 
 	map(0x3c0000, 0x3c0fff).ram().share("spriteram"); // bootleg spriteram
@@ -250,7 +250,7 @@ void sshangha_state::sshangha_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xc200, 0xc201).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xf800, 0xf807).rw(this, FUNC(sshangha_state::sshangha_sound_shared_r), FUNC(sshangha_state::sshangha_sound_shared_w));
+	map(0xf800, 0xf807).rw(FUNC(sshangha_state::sshangha_sound_shared_r), FUNC(sshangha_state::sshangha_sound_shared_w));
 	map(0xf808, 0xffff).ram();
 }
 
@@ -368,7 +368,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( sshangha )
+static GFXDECODE_START( gfx_sshangha )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x200, 64 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x200, 64 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 64 ) /* Sprites 16x16 */
@@ -384,12 +384,12 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 MACHINE_CONFIG_START(sshangha_state::sshangha)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(sshangha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(sshangha_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)
-	MCFG_CPU_PROGRAM_MAP(sshangha_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sshangha_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sshangha_state, screen_update_sshangha)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sshangha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sshangha)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
@@ -434,14 +434,15 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
+	SPEAKER(config, "lspeaker").front_left(); // sure it's stereo?
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16000000/4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.27)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
@@ -449,8 +450,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sshangha_state::sshanghb)
 	sshangha(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sshanghb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sshanghb_map)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -496,7 +497,7 @@ ROM_START( sshanghab )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sshangha_state,sshangha)
+void sshangha_state::init_sshangha()
 {
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
@@ -513,5 +514,5 @@ DRIVER_INIT_MEMBER(sshangha_state,sshangha)
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
-GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
+GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )

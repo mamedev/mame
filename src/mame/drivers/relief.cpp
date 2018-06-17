@@ -127,13 +127,13 @@ void relief_state::main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x140000, 0x140003).w(m_ym2413, FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x140011, 0x140011).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x140020, 0x140021).w(this, FUNC(relief_state::audio_volume_w));
-	map(0x140030, 0x140031).w(this, FUNC(relief_state::audio_control_w));
+	map(0x140020, 0x140021).w(FUNC(relief_state::audio_volume_w));
+	map(0x140030, 0x140031).w(FUNC(relief_state::audio_control_w));
 	map(0x180000, 0x180fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0xff00);
 	map(0x1c0030, 0x1c0031).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x260001).portr("260000");
 	map(0x260002, 0x260003).portr("260002");
-	map(0x260010, 0x260011).r(this, FUNC(relief_state::special_port2_r));
+	map(0x260010, 0x260011).r(FUNC(relief_state::special_port2_r));
 	map(0x260012, 0x260013).portr("260012");
 	map(0x2a0000, 0x2a0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x3e0000, 0x3e0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -256,7 +256,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( relief )
+static GFXDECODE_START( gfx_relief )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,   0, 64 )     /* alpha & playfield */
 	GFXDECODE_ENTRY( "gfx1", 1, molayout, 256, 16 )     /* sprites */
 GFXDECODE_END
@@ -272,8 +272,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(relief_state::relief)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -281,11 +281,11 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", relief)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_relief)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(relief_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, relief_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(relief_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_MOB(relief_state::s_mob_config, "gfxdecode")
@@ -299,13 +299,13 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -428,7 +428,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(relief_state,relief)
+void relief_state::init_relief()
 {
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(0);
@@ -443,6 +443,6 @@ DRIVER_INIT_MEMBER(relief_state,relief)
  *
  *************************************/
 
-GAME( 1992, relief,  0,      relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
-GAME( 1992, relief2, relief, relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
-GAME( 1992, relief3, relief, relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief,  0,      relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
+GAME( 1992, relief2, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief3, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )

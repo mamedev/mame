@@ -496,13 +496,14 @@ WRITE8_MEMBER(m3745x_device::adc_w)
 }
 
 /* M37450 - baseline for this familiy */
-ADDRESS_MAP_START(m37450_device::m37450_map)
-	AM_RANGE(0x0000, 0x00bf) AM_RAM
-	AM_RANGE(0x00d6, 0x00dd) AM_READWRITE(ports_r, ports_w)
-	AM_RANGE(0x00e2, 0x00e3) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_READWRITE(intregs_r, intregs_w)
-	AM_RANGE(0x0100, 0x01ff) AM_RAM
-ADDRESS_MAP_END
+void m37450_device::m37450_map(address_map &map)
+{
+	map(0x0000, 0x00bf).ram();
+	map(0x00d6, 0x00dd).rw(FUNC(m37450_device::ports_r), FUNC(m37450_device::ports_w));
+	map(0x00e2, 0x00e3).rw(FUNC(m37450_device::adc_r), FUNC(m37450_device::adc_w));
+	map(0x00fc, 0x00ff).rw(FUNC(m37450_device::intregs_r), FUNC(m37450_device::intregs_w));
+	map(0x0100, 0x01ff).ram();
+}
 
 m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m37450_device(mconfig, M37450, tag, owner, clock)

@@ -2,6 +2,7 @@
 // copyright-holders:Carlos A. Lozano
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
 
 class bloodbro_state : public driver_device, protected seibu_sound_common
 {
@@ -65,7 +66,7 @@ public:
 	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(weststry);
+	void init_weststry();
 	void bloodbro(machine_config &config);
 	void skysmash(machine_config &config);
 	void weststry(machine_config &config);

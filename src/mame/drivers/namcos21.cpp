@@ -614,8 +614,7 @@ void namcos21_state::transmit_word_to_slave(uint16_t data)
 	m_mpDspState->slaveActive = 1;
 	if( m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
 	{
-		logerror( "IDC overflow\n" );
-		exit(1);
+		fatalerror( "IDC overflow\n" );
 	}
 }
 
@@ -686,6 +685,10 @@ void namcos21_state::transfer_dsp_data()
 						else
 						{
 							int primWords = (uint16_t)read_pointrom_data(subAddr++);
+							// TODO: this function causes an IDC overflow in Solvalou, something else failed prior to that?
+							// In Header TFR when bad parameters happens there's a suspicious 0x000f 0x0003 as first two words,
+							// maybe it's supposed to have a different length there ...
+							// cfr: object code 0x17 in service mode
 							if( primWords>2 )
 							{
 								transmit_word_to_slave(0); /* pad1 */
@@ -745,7 +748,7 @@ void namcos21_kickstart(running_machine &machine, int internal)
 	state->m_mpDspState->masterFinished = 0;
 	state->m_mpDspState->slaveActive = 0;
 	state->m_dspmaster->set_input_line(0, HOLD_LINE);
-	state->m_dspslave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	state->m_dspslave->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 uint16_t namcos21_state::read_word_from_slave_input()
@@ -986,23 +989,23 @@ void namcos21_state::master_dsp_program(address_map &map)
 
 void namcos21_state::master_dsp_data(address_map &map)
 {
-	map(0x2000, 0x200f).rw(this, FUNC(namcos21_state::dspcuskey_r), FUNC(namcos21_state::dspcuskey_w));
-	map(0x8000, 0xffff).rw(this, FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<false>)); /* 0x8000 words */
+	map(0x2000, 0x200f).rw(FUNC(namcos21_state::dspcuskey_r), FUNC(namcos21_state::dspcuskey_w));
+	map(0x8000, 0xffff).rw(FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<false>)); /* 0x8000 words */
 }
 
 void namcos21_state::master_dsp_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(namcos21_state::dsp_port0_r), FUNC(namcos21_state::dsp_port0_w));
-	map(0x01, 0x01).rw(this, FUNC(namcos21_state::dsp_port1_r), FUNC(namcos21_state::dsp_port1_w));
-	map(0x02, 0x02).rw(this, FUNC(namcos21_state::dsp_port2_r), FUNC(namcos21_state::dsp_port2_w));
-	map(0x03, 0x03).rw(this, FUNC(namcos21_state::dsp_port3_idc_rcv_enable_r), FUNC(namcos21_state::dsp_port3_w));
-	map(0x04, 0x04).w(this, FUNC(namcos21_state::dsp_port4_w));
-	map(0x08, 0x08).rw(this, FUNC(namcos21_state::dsp_port8_r), FUNC(namcos21_state::dsp_port8_w));
-	map(0x09, 0x09).r(this, FUNC(namcos21_state::dsp_port9_r));
-	map(0x0a, 0x0a).rw(this, FUNC(namcos21_state::dsp_porta_r), FUNC(namcos21_state::dsp_porta_w));
-	map(0x0b, 0x0b).rw(this, FUNC(namcos21_state::dsp_portb_r), FUNC(namcos21_state::dsp_portb_w));
-	map(0x0c, 0x0c).w(this, FUNC(namcos21_state::dsp_portc_w));
-	map(0x0f, 0x0f).r(this, FUNC(namcos21_state::dsp_portf_r));
+	map(0x00, 0x00).rw(FUNC(namcos21_state::dsp_port0_r), FUNC(namcos21_state::dsp_port0_w));
+	map(0x01, 0x01).rw(FUNC(namcos21_state::dsp_port1_r), FUNC(namcos21_state::dsp_port1_w));
+	map(0x02, 0x02).rw(FUNC(namcos21_state::dsp_port2_r), FUNC(namcos21_state::dsp_port2_w));
+	map(0x03, 0x03).rw(FUNC(namcos21_state::dsp_port3_idc_rcv_enable_r), FUNC(namcos21_state::dsp_port3_w));
+	map(0x04, 0x04).w(FUNC(namcos21_state::dsp_port4_w));
+	map(0x08, 0x08).rw(FUNC(namcos21_state::dsp_port8_r), FUNC(namcos21_state::dsp_port8_w));
+	map(0x09, 0x09).r(FUNC(namcos21_state::dsp_port9_r));
+	map(0x0a, 0x0a).rw(FUNC(namcos21_state::dsp_porta_r), FUNC(namcos21_state::dsp_porta_w));
+	map(0x0b, 0x0b).rw(FUNC(namcos21_state::dsp_portb_r), FUNC(namcos21_state::dsp_portb_w));
+	map(0x0c, 0x0c).w(FUNC(namcos21_state::dsp_portc_w));
+	map(0x0f, 0x0f).r(FUNC(namcos21_state::dsp_portf_r));
 }
 
 /************************************************************************************/
@@ -1061,8 +1064,7 @@ void namcos21_state::render_slave_output(uint16_t data)
 		}
 		else if( count==0 )
 		{
-			if (ENABLE_LOGGING) logerror( "RenderSlaveOutput\n" );
-			exit(1);
+			fatalerror( "RenderSlaveOutput\n" );
 		}
 	}
 }
@@ -1117,10 +1119,10 @@ void namcos21_state::slave_dsp_data(address_map &map)
 
 void namcos21_state::slave_dsp_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(namcos21_state::slave_port0_r), FUNC(namcos21_state::slave_port0_w));
-	map(0x02, 0x02).r(this, FUNC(namcos21_state::slave_port2_r));
-	map(0x03, 0x03).rw(this, FUNC(namcos21_state::slave_port3_r), FUNC(namcos21_state::slave_port3_w));
-	map(0x0f, 0x0f).r(this, FUNC(namcos21_state::slave_portf_r));
+	map(0x00, 0x00).rw(FUNC(namcos21_state::slave_port0_r), FUNC(namcos21_state::slave_port0_w));
+	map(0x02, 0x02).r(FUNC(namcos21_state::slave_port2_r));
+	map(0x03, 0x03).rw(FUNC(namcos21_state::slave_port3_r), FUNC(namcos21_state::slave_port3_w));
+	map(0x0f, 0x0f).r(FUNC(namcos21_state::slave_portf_r));
 }
 
 /************************************************************************************/
@@ -1149,9 +1151,8 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 
 	/* m_pointram_control&0x20 : bank for depthcue data */
 #if 0
-	logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
-		cpu->tag,
-		cpu->safe_pc(),
+	logerror( "%s dsp_control_w:[%x]:=%04x ",
+		machine().describe_context(),
 		offset,
 		m_pointram_control );
 
@@ -1244,18 +1245,18 @@ WRITE8_MEMBER(namcos21_state::namcos2_dualportram_byte_w)
 void namcos21_state::common_map(address_map &map)
 {
 	map(0x280000, 0x280001).nopw(); /* written once on startup */
-	map(0x400000, 0x400001).w(this, FUNC(namcos21_state::pointram_control_w));
-	map(0x440000, 0x440001).rw(this, FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
+	map(0x400000, 0x400001).w(FUNC(namcos21_state::pointram_control_w));
+	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
 	map(0x440002, 0x47ffff).nopw(); /* (?) Air Combat */
-	map(0x480000, 0x4807ff).rw(this, FUNC(namcos21_state::namcos21_depthcue_r), FUNC(namcos21_state::namcos21_depthcue_w)); /* Air Combat */
-	map(0x700000, 0x71ffff).rw(this, FUNC(namcos21_state::c355_obj_ram_r), FUNC(namcos21_state::c355_obj_ram_w));
-	map(0x720000, 0x720007).rw(this, FUNC(namcos21_state::c355_obj_position_r), FUNC(namcos21_state::c355_obj_position_w));
+	map(0x480000, 0x4807ff).rw(FUNC(namcos21_state::namcos21_depthcue_r), FUNC(namcos21_state::namcos21_depthcue_w)); /* Air Combat */
+	map(0x700000, 0x71ffff).rw(FUNC(namcos21_state::c355_obj_ram_r), FUNC(namcos21_state::c355_obj_ram_w));
+	map(0x720000, 0x720007).rw(FUNC(namcos21_state::c355_obj_position_r), FUNC(namcos21_state::c355_obj_position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
-	map(0x760000, 0x760001).rw(this, FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
+	map(0x760000, 0x760001).rw(FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
 	map(0x800000, 0x8fffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
-	map(0xa00000, 0xa00fff).rw(this, FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
+	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
 	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 	map(0xc00000, 0xcfffff).rom().mirror(0x100000).region("edata", 0);
@@ -1266,9 +1267,9 @@ void namcos21_state::master_map(address_map &map)
 	common_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* private work RAM */
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	map(0x200000, 0x20ffff).rw(this, FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<true>)).share("dspram16");
+	map(0x200000, 0x20ffff).rw(FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<true>)).share("dspram16");
 }
 
 void namcos21_state::slave_map(address_map &map)
@@ -1277,7 +1278,7 @@ void namcos21_state::slave_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x13ffff).ram(); /* private work RAM */
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
-	map(0x200000, 0x20ffff).rw(this, FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<false>)).share("dspram16");
+	map(0x200000, 0x20ffff).rw(FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<false>)).share("dspram16");
 }
 
 
@@ -1406,7 +1407,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_complete_w)
 	if( data )
 	{
 		winrun_flush_poly();
-		m_dsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		clear_poly_framebuffer();
 	}
 }
@@ -1423,17 +1424,17 @@ void namcos21_state::winrun_dsp_program(address_map &map)
 
 void namcos21_state::winrun_dsp_data(address_map &map)
 {
-	map(0x2000, 0x200f).rw(this, FUNC(namcos21_state::winrun_cuskey_r), FUNC(namcos21_state::winrun_cuskey_w));
-	map(0x4000, 0x4fff).rw(this, FUNC(namcos21_state::winrun_dspcomram_r), FUNC(namcos21_state::winrun_dspcomram_w));
-	map(0x8000, 0xffff).r(this, FUNC(namcos21_state::winrun_table_r));
+	map(0x2000, 0x200f).rw(FUNC(namcos21_state::winrun_cuskey_r), FUNC(namcos21_state::winrun_cuskey_w));
+	map(0x4000, 0x4fff).rw(FUNC(namcos21_state::winrun_dspcomram_r), FUNC(namcos21_state::winrun_dspcomram_w));
+	map(0x8000, 0xffff).r(FUNC(namcos21_state::winrun_table_r));
 }
 
 void namcos21_state::winrun_dsp_io(address_map &map)
 {
-	map(0x08, 0x09).rw(this, FUNC(namcos21_state::winrun_dsp_pointrom_data_r), FUNC(namcos21_state::winrun_dsp_pointrom_addr_w));
-	map(0x0a, 0x0a).w(this, FUNC(namcos21_state::winrun_dsp_render_w));
+	map(0x08, 0x09).rw(FUNC(namcos21_state::winrun_dsp_pointrom_data_r), FUNC(namcos21_state::winrun_dsp_pointrom_addr_w));
+	map(0x0a, 0x0a).w(FUNC(namcos21_state::winrun_dsp_render_w));
 	map(0x0b, 0x0b).nopw();
-	map(0x0c, 0x0c).w(this, FUNC(namcos21_state::winrun_dsp_complete_w));
+	map(0x0c, 0x0c).w(FUNC(namcos21_state::winrun_dsp_complete_w));
 }
 
 WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
@@ -1480,19 +1481,19 @@ void namcos21_state::winrun_master_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 	map(0x250000, 0x25ffff).ram().share("winrun_polydata");
 	map(0x260000, 0x26ffff).ram(); /* unused? */
-	map(0x280000, 0x281fff).w(this, FUNC(namcos21_state::winrun_dspbios_w)).share("winrun_dspbios");
-	map(0x380000, 0x38000f).rw(this, FUNC(namcos21_state::winrun_dspcomram_control_r), FUNC(namcos21_state::winrun_dspcomram_control_w));
-	map(0x3c0000, 0x3c1fff).rw(this, FUNC(namcos21_state::winrun_68k_dspcomram_r), FUNC(namcos21_state::winrun_68k_dspcomram_w));
-	map(0x400000, 0x400001).w(this, FUNC(namcos21_state::pointram_control_w));
-	map(0x440000, 0x440001).rw(this, FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
+	map(0x280000, 0x281fff).w(FUNC(namcos21_state::winrun_dspbios_w)).share("winrun_dspbios");
+	map(0x380000, 0x38000f).rw(FUNC(namcos21_state::winrun_dspcomram_control_r), FUNC(namcos21_state::winrun_dspcomram_control_w));
+	map(0x3c0000, 0x3c1fff).rw(FUNC(namcos21_state::winrun_68k_dspcomram_r), FUNC(namcos21_state::winrun_68k_dspcomram_w));
+	map(0x400000, 0x400001).w(FUNC(namcos21_state::pointram_control_w));
+	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
 	map(0x600000, 0x60ffff).ram().share("gpu_comram");
 	map(0x800000, 0x87ffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
-	map(0xa00000, 0xa00fff).rw(this, FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
+	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
 	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
@@ -1505,7 +1506,7 @@ void namcos21_state::winrun_slave_map(address_map &map)
 	map(0x600000, 0x60ffff).ram().share("gpu_comram");
 	map(0x800000, 0x87ffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
-	map(0xa00000, 0xa00fff).rw(this, FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
+	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
 	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
@@ -1514,15 +1515,15 @@ void namcos21_state::winrun_slave_map(address_map &map)
 void namcos21_state::winrun_gpu_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x100001).rw(this, FUNC(namcos21_state::winrun_gpu_color_r), FUNC(namcos21_state::winrun_gpu_color_w)); /* ? */
+	map(0x100000, 0x100001).rw(FUNC(namcos21_state::winrun_gpu_color_r), FUNC(namcos21_state::winrun_gpu_color_w)); /* ? */
 	map(0x180000, 0x19ffff).ram(); /* work RAM */
 	map(0x1c0000, 0x1fffff).m(m_gpu_intc, FUNC(namco_c148_device::map));
 	map(0x200000, 0x20ffff).ram().share("gpu_comram");
 	map(0x400000, 0x40ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x410000, 0x41ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x600000, 0x6fffff).rom().region("gdata", 0);
-	map(0xc00000, 0xcfffff).rw(this, FUNC(namcos21_state::winrun_gpu_videoram_r), FUNC(namcos21_state::winrun_gpu_videoram_w));
-	map(0xd00000, 0xd0000f).rw(this, FUNC(namcos21_state::winrun_gpu_register_r), FUNC(namcos21_state::winrun_gpu_register_w));
+	map(0xc00000, 0xcfffff).rw(FUNC(namcos21_state::winrun_gpu_videoram_r), FUNC(namcos21_state::winrun_gpu_videoram_w));
+	map(0xd00000, 0xd0000f).rw(FUNC(namcos21_state::winrun_gpu_register_r), FUNC(namcos21_state::winrun_gpu_register_w));
 	map(0xe0000d, 0xe0000d).rw(m_gpu_intc, FUNC(namco_c148_device::ext_posirq_line_r), FUNC(namco_c148_device::ext_posirq_line_w));
 }
 
@@ -1537,12 +1538,12 @@ void namcos21_state::sound_map(address_map &map)
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x6fff).rw("c140", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(this, FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
-	map(0x7800, 0x7fff).rw(this, FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)); /* mirror */
+	map(0x7000, 0x77ff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
+	map(0x7800, 0x7fff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)); /* mirror */
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* amplifier enable on 1st write */
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
-	map(0xc000, 0xc001).w(this, FUNC(namcos21_state::namcos2_sound_bankselect_w));
+	map(0xc000, 0xc001).w(FUNC(namcos21_state::namcos2_sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
 	map(0xd000, 0xffff).rom();
 }
@@ -1558,10 +1559,10 @@ void namcos21_state::mcu_map(address_map &map)
 	map(0x0000, 0x0000).nopr();
 	map(0x0001, 0x0001).portr("PORTB");          /* p1,p2 start */
 	map(0x0002, 0x0002).portr("PORTC");          /* coins */
-	map(0x0003, 0x0003).rw(this, FUNC(namcos21_state::namcos2_mcu_port_d_r), FUNC(namcos21_state::namcos2_mcu_port_d_w));
+	map(0x0003, 0x0003).rw(FUNC(namcos21_state::namcos2_mcu_port_d_r), FUNC(namcos21_state::namcos2_mcu_port_d_w));
 	map(0x0007, 0x0007).portr("PORTH");          /* fire buttons */
-	map(0x0010, 0x0010).rw(this, FUNC(namcos21_state::namcos2_mcu_analog_ctrl_r), FUNC(namcos21_state::namcos2_mcu_analog_ctrl_w));
-	map(0x0011, 0x0011).rw(this, FUNC(namcos21_state::namcos2_mcu_analog_port_r), FUNC(namcos21_state::namcos2_mcu_analog_port_w));
+	map(0x0010, 0x0010).rw(FUNC(namcos21_state::namcos2_mcu_analog_ctrl_r), FUNC(namcos21_state::namcos2_mcu_analog_ctrl_w));
+	map(0x0011, 0x0011).rw(FUNC(namcos21_state::namcos2_mcu_analog_port_r), FUNC(namcos21_state::namcos2_mcu_analog_port_w));
 	map(0x0040, 0x01bf).ram();
 	map(0x01c0, 0x1fff).rom();
 	map(0x2000, 0x2000).portr("DSW");
@@ -1569,7 +1570,7 @@ void namcos21_state::mcu_map(address_map &map)
 	map(0x3001, 0x3001).portr("DIAL1");
 	map(0x3002, 0x3002).portr("DIAL2");
 	map(0x3003, 0x3003).portr("DIAL3");
-	map(0x5000, 0x57ff).rw(this, FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
+	map(0x5000, 0x57ff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
 	map(0x6000, 0x6fff).nopr();             /* watchdog */
 	map(0x8000, 0xffff).rom();
 }
@@ -1582,14 +1583,14 @@ void namcos21_state::mcu_map(address_map &map)
 
 void namcos21_state::driveyes_common_map(address_map &map)
 {
-	map(0x700000, 0x71ffff).rw(this, FUNC(namcos21_state::c355_obj_ram_r), FUNC(namcos21_state::c355_obj_ram_w));
-	map(0x720000, 0x720007).rw(this, FUNC(namcos21_state::c355_obj_position_r), FUNC(namcos21_state::c355_obj_position_w));
+	map(0x700000, 0x71ffff).rw(FUNC(namcos21_state::c355_obj_ram_r), FUNC(namcos21_state::c355_obj_ram_w));
+	map(0x720000, 0x720007).rw(FUNC(namcos21_state::c355_obj_position_r), FUNC(namcos21_state::c355_obj_position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
-	map(0x760000, 0x760001).rw(this, FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
+	map(0x760000, 0x760001).rw(FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
 	map(0x800000, 0x8fffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
-	map(0xa00000, 0xa00fff).rw(this, FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
+	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_state::namcos2_68k_dualportram_word_w));
 	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
@@ -1599,14 +1600,14 @@ void namcos21_state::driveyes_master_map(address_map &map)
 	driveyes_common_map(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* private work RAM */
-	map(0x180000, 0x183fff).rw(this, FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 	map(0x250000, 0x25ffff).ram().share("winrun_polydata");
-	map(0x280000, 0x281fff).w(this, FUNC(namcos21_state::winrun_dspbios_w)).share("winrun_dspbios");
-	map(0x380000, 0x38000f).rw(this, FUNC(namcos21_state::winrun_dspcomram_control_r), FUNC(namcos21_state::winrun_dspcomram_control_w));
-	map(0x3c0000, 0x3c1fff).rw(this, FUNC(namcos21_state::winrun_68k_dspcomram_r), FUNC(namcos21_state::winrun_68k_dspcomram_w));
-	map(0x400000, 0x400001).w(this, FUNC(namcos21_state::pointram_control_w));
-	map(0x440000, 0x440001).rw(this, FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
+	map(0x280000, 0x281fff).w(FUNC(namcos21_state::winrun_dspbios_w)).share("winrun_dspbios");
+	map(0x380000, 0x38000f).rw(FUNC(namcos21_state::winrun_dspcomram_control_r), FUNC(namcos21_state::winrun_dspcomram_control_w));
+	map(0x3c0000, 0x3c1fff).rw(FUNC(namcos21_state::winrun_68k_dspcomram_r), FUNC(namcos21_state::winrun_68k_dspcomram_w));
+	map(0x400000, 0x400001).w(FUNC(namcos21_state::pointram_control_w));
+	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
 }
 
 void namcos21_state::driveyes_slave_map(address_map &map)
@@ -1802,6 +1803,15 @@ static INPUT_PORTS_START( cybsled )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( starblad )
+	PORT_INCLUDE(s21default)
+
+	PORT_MODIFY("AN1")      /* IN#3: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10)
+	PORT_MODIFY("AN2")      /* IN#4: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( aircomb )
 	PORT_INCLUDE(s21default)
 
@@ -1861,7 +1871,7 @@ static const gfx_layout tile_layout =
 	8*64 /* sprite offset */
 };
 
-static GFXDECODE_START( namcos21 )
+static GFXDECODE_START( gfx_namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
@@ -1894,8 +1904,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
 	MCFG_NAMCO_C148_LINK("slave_intc")
-	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
-	MCFG_NAMCO_C148_EXT2_CB(WRITE8(namcos21_state, system_reset_w))
+	MCFG_NAMCO_C148_EXT1_CB(WRITE8(*this, namcos21_state, sound_reset_w))
+	MCFG_NAMCO_C148_EXT2_CB(WRITE8(*this, namcos21_state, system_reset_w))
 
 	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
 	MCFG_NAMCO_C148_LINK("master_intc")
@@ -1903,37 +1913,37 @@ MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos21_state::namcos21)
-	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
-	MCFG_CPU_DATA_MAP(master_dsp_data)
-	MCFG_CPU_IO_MAP(master_dsp_io)
+	MCFG_DEVICE_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
+	MCFG_DEVICE_DATA_MAP(master_dsp_data)
+	MCFG_DEVICE_IO_MAP(master_dsp_io)
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos21_state, dsp_xf_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, dsp_xf_w))
 
-	MCFG_CPU_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
-	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
-	MCFG_CPU_DATA_MAP(slave_dsp_data)
-	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_DEVICE_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
+	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
+	MCFG_DEVICE_IO_MAP(slave_dsp_io)
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos21_state, slave_XF_output_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, slave_XF_output_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1950,47 +1960,48 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(namcos21_state::driveyes)
-	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(driveyes_master_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(driveyes_slave_map)
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
-	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_CPU_DATA_MAP(winrun_dsp_data)
-	MCFG_CPU_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos21_state, winrun_poly_reset_r))
+	MCFG_DEVICE_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
+	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
+	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
@@ -2011,52 +2022,53 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_driveyes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos21_state::winrun)
-	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(winrun_master_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(winrun_slave_map)
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_CPU_DATA_MAP(winrun_dsp_data)
-	MCFG_CPU_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos21_state, winrun_poly_reset_r))
+	MCFG_DEVICE_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
+	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
+	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
-	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
-	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
+	MCFG_DEVICE_ADD("gpu", M68000,12288000) /* graphics coprocessor */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
 
 	configure_c148_standard(config);
 	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
@@ -2073,21 +2085,22 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_winrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -2724,7 +2737,7 @@ void namcos21_state::init(int game_type)
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,winrun)
+void namcos21_state::init_winrun()
 {
 	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
@@ -2739,23 +2752,23 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 	m_mbNeedsKickstart = 0;
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,aircomb)
+void namcos21_state::init_aircomb()
 {
 	init(NAMCOS21_AIRCOMBAT);
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,starblad)
+void namcos21_state::init_starblad()
 {
 	init(NAMCOS21_STARBLADE);
 }
 
 
-DRIVER_INIT_MEMBER(namcos21_state,cybsled)
+void namcos21_state::init_cybsled()
 {
 	init(NAMCOS21_CYBERSLED);
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,solvalou)
+void namcos21_state::init_solvalou()
 {
 	uint16_t *mem = (uint16_t *)memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
@@ -2766,7 +2779,7 @@ DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 	init(NAMCOS21_SOLVALOU );
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,driveyes)
+void namcos21_state::init_driveyes()
 {
 	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
@@ -2779,15 +2792,15 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 	m_mbNeedsKickstart = 0;
 }
 
-/*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,                      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
-GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
-GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, starbladj, starblad, namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
-GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
+GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, init_driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
+GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, init_solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1991, starblad,  0,        namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, starbladj, starblad, namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
+GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, init_cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )
+GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, init_cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )

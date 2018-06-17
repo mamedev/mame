@@ -10,6 +10,7 @@
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
 #include "video/k007121.h"
+#include "emupal.h"
 #include "screen.h"
 
 class combatsc_state : public driver_device
@@ -96,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
 	DECLARE_WRITE8_MEMBER(combatscb_msm_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sound_irq_ack);
-	DECLARE_DRIVER_INIT(combatsc);
+	void init_combatsc();
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_text_info);

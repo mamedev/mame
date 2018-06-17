@@ -188,9 +188,10 @@ void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, uint
 #include "hrg.h"
 #include "std.h"
 
-SLOT_INTERFACE_START( cbm2_expansion_cards )
-	SLOT_INTERFACE("24k", CBM2_24K)
-	SLOT_INTERFACE("hrga", CBM2_HRG_A)
-	SLOT_INTERFACE("hrgb", CBM2_HRG_B)
-	SLOT_INTERFACE_INTERNAL("standard", CBM2_STD)
-SLOT_INTERFACE_END
+void cbm2_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("24k", CBM2_24K);
+	device.option_add("hrga", CBM2_HRG_A);
+	device.option_add("hrgb", CBM2_HRG_B);
+	device.option_add_internal("standard", CBM2_STD);
+}

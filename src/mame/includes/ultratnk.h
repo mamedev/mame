@@ -12,6 +12,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ultratnk_state : public driver_device
@@ -46,8 +47,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(wram_w);
 	DECLARE_WRITE8_MEMBER(collision_reset_w);
 	DECLARE_WRITE8_MEMBER(da_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(lockout_w);
 	DECLARE_WRITE8_MEMBER(video_ram_w);
 	DECLARE_WRITE8_MEMBER(attract_w);

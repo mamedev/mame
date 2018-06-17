@@ -17,6 +17,7 @@
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class xexex_state : public driver_device
@@ -88,7 +89,7 @@ public:
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(xexex);
+	void init_xexex();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -58,6 +58,7 @@ enter  show next address
 #include "video/mc6845.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -108,8 +109,8 @@ void a6809_state::a6809_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().share("videoram");
-	map(0x0800, 0x0800).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(a6809_state::a6809_address_w));
-	map(0x0801, 0x0801).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(a6809_state::a6809_register_w));
+	map(0x0800, 0x0800).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(a6809_state::a6809_address_w));
+	map(0x0801, 0x0801).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(a6809_state::a6809_register_w));
 	map(0x0900, 0x090f).mirror(0xf0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xf000, 0xf7ff); // optional ROM
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
@@ -225,8 +226,8 @@ void a6809_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(a6809_state::a6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(a6809_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(a6809_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(a6809_state, a6809)
 
 	/* video hardware */
@@ -239,13 +240,12 @@ MACHINE_CONFIG_START(a6809_state::a6809)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(a6809_state, cass_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, a6809_state, cass_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_MC6845_ADD("mc6845", HD6845, "screen", XTAL(4'000'000) / 2)
@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(a6809_state::a6809)
 	MCFG_MC6845_CHAR_WIDTH(12)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
-	MCFG_SAA5050_D_CALLBACK(READ8(a6809_state, videoram_r))
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, a6809_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -274,5 +274,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, a6809,  0,      0,       a6809,     a6809, a6809_state,     0,     "Acorn",  "System 3 (6809 CPU)", 0 )
+/*    YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME               FLAGS */
+COMP( 1980, a6809, 0,      0,      a6809,   a6809, a6809_state, empty_init, "Acorn", "System 3 (6809 CPU)", 0 )

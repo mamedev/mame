@@ -112,8 +112,6 @@ private:
 
 
 // device type definition
-extern const device_type CRT9212;
+DECLARE_DEVICE_TYPE(CRT9212, crt9212_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_CRT9212_H

@@ -179,6 +179,7 @@ Notes:
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -192,7 +193,7 @@ public:
 			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
-	DECLARE_DRIVER_INIT(aleck64);
+	void init_aleck64();
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
 	DECLARE_READ16_MEMBER(e90_prot_r);
@@ -336,7 +337,7 @@ void aleck64_state::n64_map(address_map &map)
 
 	map(0xc0000000, 0xc07fffff).ram(); // SDRAM, Aleck 64 specific
 
-	map(0xc0800000, 0xc0800fff).rw(this, FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
+	map(0xc0800000, 0xc0800fff).rw(FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
 }
 
 /*
@@ -375,7 +376,7 @@ void aleck64_state::e90_map(address_map &map)
 	n64_map(map);
 	map(0xd0000000, 0xd0000fff).ram().share("e90vram");// x/y offsets
 	map(0xd0010000, 0xd0010fff).ram().share("e90pal");// RGB555 palette
-	map(0xd0030000, 0xd003001f).rw(this, FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
+	map(0xd0030000, 0xd003001f).rw(FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
 }
 
 void aleck64_state::rsp_map(address_map &map)
@@ -909,20 +910,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(aleck64_state::aleck64)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(62500000)
-	MCFG_CPU_PROGRAM_MAP(n64_map)
+	MCFG_DEVICE_PROGRAM_MAP(n64_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
-	MCFG_CPU_ADD("rsp", RSP, 62500000)
-	MCFG_RSP_DP_REG_R_CB(DEVREAD32("rcp",n64_periphs, dp_reg_r))
-	MCFG_RSP_DP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, dp_reg_w))
-	MCFG_RSP_SP_REG_R_CB(DEVREAD32("rcp",n64_periphs, sp_reg_r))
-	MCFG_RSP_SP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, sp_reg_w))
-	MCFG_RSP_SP_SET_STATUS_CB(DEVWRITE32("rcp",n64_periphs, sp_set_status))
-	MCFG_CPU_PROGRAM_MAP(rsp_map)
+	MCFG_DEVICE_ADD("rsp", RSP, 62500000)
+	MCFG_RSP_DP_REG_R_CB(READ32("rcp",n64_periphs, dp_reg_r))
+	MCFG_RSP_DP_REG_W_CB(WRITE32("rcp",n64_periphs, dp_reg_w))
+	MCFG_RSP_SP_REG_R_CB(READ32("rcp",n64_periphs, sp_reg_r))
+	MCFG_RSP_SP_REG_W_CB(WRITE32("rcp",n64_periphs, sp_reg_w))
+	MCFG_RSP_SP_SET_STATUS_CB(WRITE32("rcp",n64_periphs, sp_set_status))
+	MCFG_DEVICE_PROGRAM_MAP(rsp_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -931,15 +932,16 @@ MACHINE_CONFIG_START(aleck64_state::aleck64)
 	MCFG_SCREEN_SIZE(640, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(aleck64_state, screen_vblank_n64))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aleck64_state, screen_vblank_n64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_N64_PERIPHS_ADD("rcp");
@@ -948,9 +950,9 @@ MACHINE_CONFIG_END
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	screen_update_n64(screen,bitmap,cliprect);	
+	screen_update_n64(screen,bitmap,cliprect);
 	// TODO: extract from the real tables (maybe RLEd inside paletteram words 0xa - 0xf?)
-	static constexpr u8 pal_table[8*8] = 
+	static constexpr u8 pal_table[8*8] =
 	{
 		8, 6, 6, 6, 6, 5, 4, 3,
 		9, 7, 5, 6, 4, 1, 1, 4,
@@ -961,7 +963,7 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 		9, 8, 8, 8, 8, 8, 7, 6,
 		8, 9, 9, 9, 9, 9, 9, 8
 	};
-	
+
 	for(int offs=0;offs<0x1000/4;offs+=2)
 	{
 		int xi,yi;
@@ -970,14 +972,14 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 		int pal_shift;
 		// 0x400 is another enable? end code if off?
 		//uint16_t tile = m_e90_vram[offs] >> 16;
-		
-		// TODO: mask 0x300 on tile seems to be tile number 
+
+		// TODO: mask 0x300 on tile seems to be tile number
 		// (active piece drawn with 0x100, special square blocks drawn with cycling 0x1c0, 0x200 & 0x240)
 		uint16_t attr = m_e90_vram[offs] & 0xffff;
 		// bit 5 disables?
 		if(attr & 0x20)
 			continue;
-		
+
 		// guess: 0x1000 entries / word / 4bpp = 0x7f, divided by two below
 		// bits 5 and 6 of palette bank seems to be highlight and shadow, separated from this bank
 		uint16_t pal = (attr & 0x06) >> 1;
@@ -987,7 +989,7 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 		// ghost piece, probably enabled thru one bit of these (as weird as it sounds)
 		if((y & 0xff00) == 0xbc00)
 			pal |= (0x40 >> 1);
-	
+
 		// color banks
 		// some pieces needs this color adjustment (see T piece / 5 block version of I piece)
 		pal |= (attr & 0xc0) >> 4;
@@ -1011,7 +1013,7 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 				r = pal5bit(r);
 				g = pal5bit(g);
 				b = pal5bit(b);
-				
+
 				if(cliprect.contains(res_x, res_y))
 					bitmap.pix32(res_y, res_x) = r << 16 | g << 8 | b;
 			}
@@ -1022,14 +1024,14 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 
 MACHINE_CONFIG_START(aleck64_state::a64_e90)
 	aleck64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(e90_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(e90_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(aleck64_state,aleck64)
+void aleck64_state::init_aleck64()
 {
 	uint8_t *rom = memregion("user2")->base();
 
@@ -1265,16 +1267,16 @@ ROM_END
 
 
 // BIOS
-GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", MACHINE_IS_BIOS_ROOT)
+GAME( 1998, aleck64,  0,       aleck64, aleck64,  aleck64_state, init_aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", MACHINE_IS_BIOS_ROOT)
 
 // games
-GAME( 1998, 11beat,   aleck64,  aleck64, 11beat,   aleck64_state, aleck64, ROT0, "Hudson",                  "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
-GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
-GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta",           "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, vivdolls, aleck64,  aleck64, vivdolls, aleck64_state, aleck64, ROT0, "Visco",                   "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, srmvs,    aleck64,  aleck64, srmvs,    aleck64_state, aleck64, ROT0, "Seta",                    "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64,  aleck64_state, aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0, "Aruze",                   "Tower & Shaft", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, hipai,    aleck64,  aleck64, hipai,    aleck64_state, aleck64, ROT0, "Aruze / Seta",            "Hi Pai Paradise", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64_state, aleck64, ROT0, "Aruze",                   "Hanabi de Doon! - Don-chan Puzzle", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, kurufev,  aleck64,  aleck64, kurufev,  aleck64_state, aleck64, ROT0, "Aruze / Takumi",          "Kurukuru Fever", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, 11beat,   aleck64, aleck64, 11beat,   aleck64_state, init_aleck64, ROT0, "Hudson",                  "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
+GAME( 1998, mtetrisc, aleck64, a64_e90, mtetrisc, aleck64_state, init_aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
+GAME( 1998, starsldr, aleck64, aleck64, starsldr, aleck64_state, init_aleck64, ROT0, "Hudson / Seta",           "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, vivdolls, aleck64, aleck64, vivdolls, aleck64_state, init_aleck64, ROT0, "Visco",                   "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, srmvs,    aleck64, aleck64, srmvs,    aleck64_state, init_aleck64, ROT0, "Seta",                    "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, mayjin3,  aleck64, aleck64, aleck64,  aleck64_state, init_aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, twrshaft, aleck64, aleck64, twrshaft, aleck64_state, init_aleck64, ROT0, "Aruze",                   "Tower & Shaft", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, hipai,    aleck64, aleck64, hipai,    aleck64_state, init_aleck64, ROT0, "Aruze / Seta",            "Hi Pai Paradise", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, doncdoon, aleck64, aleck64, doncdoon, aleck64_state, init_aleck64, ROT0, "Aruze",                   "Hanabi de Doon! - Don-chan Puzzle", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, kurufev,  aleck64, aleck64, kurufev,  aleck64_state, init_aleck64, ROT0, "Aruze / Takumi",          "Kurukuru Fever", MACHINE_IMPERFECT_GRAPHICS )

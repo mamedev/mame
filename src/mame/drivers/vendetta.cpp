@@ -217,9 +217,9 @@ void vendetta_state::main_map(address_map &map)
 	map(0x5fc3, 0x5fc3).portr("P4");
 	map(0x5fd0, 0x5fd0).portr("EEPROM");
 	map(0x5fd1, 0x5fd1).portr("SERVICE");
-	map(0x5fe0, 0x5fe0).w(this, FUNC(vendetta_state::_5fe0_w));
-	map(0x5fe2, 0x5fe2).w(this, FUNC(vendetta_state::eeprom_w));
-	map(0x5fe4, 0x5fe4).rw(this, FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));
+	map(0x5fe0, 0x5fe0).w(FUNC(vendetta_state::_5fe0_w));
+	map(0x5fe2, 0x5fe2).w(FUNC(vendetta_state::eeprom_w));
+	map(0x5fe4, 0x5fe4).rw(FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));
 	map(0x5fe6, 0x5fe7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x5fe8, 0x5fe9).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x5fea, 0x5fea).r("watchdog", FUNC(watchdog_timer_device::reset_r));
@@ -244,9 +244,9 @@ void vendetta_state::esckids_map(address_map &map)
 	map(0x3fa0, 0x3fa7).w(m_k053246, FUNC(k053247_device::k053246_w));           // 053246 (Sprite)
 	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));           // 053251 (Priority Encoder)
 	map(0x3fc0, 0x3fcf).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));              // Not Emulated (053252 ???)
-	map(0x3fd0, 0x3fd0).w(this, FUNC(vendetta_state::_5fe0_w));      // Coin Counter, 052109 RMRD, 053246 OBJCHA
-	map(0x3fd2, 0x3fd2).w(this, FUNC(vendetta_state::eeprom_w));    // EEPROM, Video banking
-	map(0x3fd4, 0x3fd4).rw(this, FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));            // Sound
+	map(0x3fd0, 0x3fd0).w(FUNC(vendetta_state::_5fe0_w));      // Coin Counter, 052109 RMRD, 053246 OBJCHA
+	map(0x3fd2, 0x3fd2).w(FUNC(vendetta_state::eeprom_w));    // EEPROM, Video banking
+	map(0x3fd4, 0x3fd4).rw(FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));            // Sound
 	map(0x3fd6, 0x3fd7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)); // Sound
 	map(0x3fd8, 0x3fd9).r(m_k053246, FUNC(k053247_device::k053246_r));                // 053246 (Sprite)
 	map(0x3fda, 0x3fda).nopw();                // Not Emulated (Watchdog ???)
@@ -263,7 +263,7 @@ void vendetta_state::videobank0_map(address_map &map)
 
 void vendetta_state::videobank1_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(this, FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
+	map(0x0000, 0x0fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
 	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -272,7 +272,7 @@ void vendetta_state::sound_map(address_map &map)
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfa00, 0xfa00).w(this, FUNC(vendetta_state::z80_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(FUNC(vendetta_state::z80_arm_nmi_w));
 	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 }
 
@@ -422,7 +422,7 @@ void vendetta_state::machine_reset()
 WRITE8_MEMBER( vendetta_state::banking_callback )
 {
 	if (data >= 0x1c)
-		logerror("PC = %04x : Unknown bank selected %02x\n", machine().device("maincpu")->safe_pc(), data);
+		logerror("%s Unknown bank selected %02x\n", machine().describe_context(), data);
 	else
 		membank("bank1")->set_entry(data);
 }
@@ -430,10 +430,10 @@ WRITE8_MEMBER( vendetta_state::banking_callback )
 MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)   /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(vendetta_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)   /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, vendetta_state, banking_callback))
 
 	MCFG_DEVICE_ADD("videobank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(videobank0_map)
@@ -449,11 +449,11 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -484,9 +484,10 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified with PCB */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -500,8 +501,8 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	vendetta(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(esckids_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(esckids_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 //MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )    /* black areas on the edges */
@@ -827,15 +828,15 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pp, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, 0, ROT0, "Konami", "Escape Kids (Asia, 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, 0, ROT0, "Konami", "Escape Kids (Japan, 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
+GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pp, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)", MACHINE_SUPPORTS_SAVE )

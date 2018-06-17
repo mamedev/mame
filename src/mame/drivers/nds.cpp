@@ -588,36 +588,36 @@ void nds_state::nds_arm7_map(address_map &map)
 	map(0x02000000, 0x023fffff).ram().mirror(0x00400000).share("mainram");
 	map(0x03000000, 0x03007fff).mirror(0x007f8000).m(m_arm7wrambnk, FUNC(address_map_bank_device::amap32));
 	map(0x03800000, 0x0380ffff).ram().mirror(0x007f0000).share("arm7ram");
-	map(0x04000000, 0x0410ffff).rw(this, FUNC(nds_state::arm7_io_r), FUNC(nds_state::arm7_io_w));
+	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm7_io_r), FUNC(nds_state::arm7_io_w));
 }
 
 void nds_state::nds_arm9_map(address_map &map)
 {
 	map(0x02000000, 0x023fffff).ram().mirror(0x00400000).share("mainram");
 	map(0x03000000, 0x03007fff).mirror(0x00ff8000).m("nds9wram", FUNC(address_map_bank_device::amap32));
-	map(0x04000000, 0x0410ffff).rw(this, FUNC(nds_state::arm9_io_r), FUNC(nds_state::arm9_io_w));
+	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm9_io_r), FUNC(nds_state::arm9_io_w));
 	map(0xffff0000, 0xffff0fff).rom().mirror(0x1000).region("arm9", 0);
 }
 
 // ARM7 views of WRAM
 void nds_state::nds7_wram_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rw(this, FUNC(nds_state::wram_arm7mirror_r), FUNC(nds_state::wram_arm7mirror_w));
-	map(0x08000, 0x0bfff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x0c000, 0x0ffff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x10000, 0x13fff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x14000, 0x17fff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x18000, 0x1ffff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x00000, 0x07fff).rw(FUNC(nds_state::wram_arm7mirror_r), FUNC(nds_state::wram_arm7mirror_w));
+	map(0x08000, 0x0bfff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x0c000, 0x0ffff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x10000, 0x13fff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x14000, 0x17fff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x18000, 0x1ffff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
 }
 
 // ARM9 views of WRAM
 void nds_state::nds9_wram_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x08000, 0x0bfff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x0c000, 0x0ffff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x10000, 0x13fff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x14000, 0x17fff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x00000, 0x07fff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x08000, 0x0bfff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x0c000, 0x0ffff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x10000, 0x13fff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x14000, 0x17fff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
 	map(0x18000, 0x1ffff).noprw().nopw();       // probably actually open bus?  GBATEK describes as "random"
 }
 
@@ -971,12 +971,12 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 }
 
 MACHINE_CONFIG_START(nds_state::nds)
-	MCFG_CPU_ADD("arm7", ARM7, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nds_arm7_map)
+	MCFG_DEVICE_ADD("arm7", ARM7, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nds_arm7_map)
 
-	MCFG_CPU_ADD("arm9", ARM946ES, MASTER_CLOCK*2)
+	MCFG_DEVICE_ADD("arm9", ARM946ES, MASTER_CLOCK*2)
 	MCFG_ARM_HIGH_VECTORS()
-	MCFG_CPU_PROGRAM_MAP(nds_arm9_map)
+	MCFG_DEVICE_PROGRAM_MAP(nds_arm9_map)
 
 	// WRAM
 	MCFG_DEVICE_ADD("nds7wram", ADDRESS_MAP_BANK, 0)
@@ -1004,5 +1004,5 @@ ROM_START( nds )
 	ROM_LOAD( "firmware.bin", 0x0000, 0x40000, CRC(945f9dc9) SHA1(cfe072921ee3fb93f688743f8beef89043c3e9ad) )
 ROM_END
 
-//   YEAR  NAME PARENT COMPAT MACHINE INPUT  STATE      INIT  COMPANY     FULLNAME    FLAGS
-CONS(2004, nds, 0,     0,     nds,    nds,   nds_state, 0,    "Nintendo", "DS",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME  FLAGS
+CONS( 2004, nds,  0,      0,      nds,     nds,   nds_state, empty_init, "Nintendo", "DS",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

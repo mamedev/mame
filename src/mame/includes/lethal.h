@@ -13,6 +13,7 @@
 #include "video/k053244_k053245.h"
 #include "video/k054000.h"
 #include "machine/k054321.h"
+#include "emupal.h"
 
 class lethal_state : public driver_device
 {

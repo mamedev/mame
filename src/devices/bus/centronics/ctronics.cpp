@@ -122,14 +122,15 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "printer.h"
 #include "covox.h"
 
-SLOT_INTERFACE_START(centronics_devices)
-	SLOT_INTERFACE("pl80", COMX_PL80)
-	SLOT_INTERFACE("ex800", EPSON_EX800)
-	SLOT_INTERFACE("lx800", EPSON_LX800)
-	SLOT_INTERFACE("lx810l", EPSON_LX810L)
-	SLOT_INTERFACE("ap2000", EPSON_AP2000)
-	SLOT_INTERFACE("p72", NEC_P72)
-	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
-	SLOT_INTERFACE("covox", CENTRONICS_COVOX)
-	SLOT_INTERFACE("covox_stereo", CENTRONICS_COVOX_STEREO)
-SLOT_INTERFACE_END
+void centronics_devices(device_slot_interface &device)
+{
+	device.option_add("pl80", COMX_PL80);
+	device.option_add("ex800", EPSON_EX800);
+	device.option_add("lx800", EPSON_LX800);
+	device.option_add("lx810l", EPSON_LX810L);
+	device.option_add("ap2000", EPSON_AP2000);
+	device.option_add("p72", NEC_P72);
+	device.option_add("printer", CENTRONICS_PRINTER);
+	device.option_add("covox", CENTRONICS_COVOX);
+	device.option_add("covox_stereo", CENTRONICS_COVOX_STEREO);
+}

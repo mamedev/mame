@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 class wiz_state : public driver_device
 {
@@ -70,7 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
 	DECLARE_WRITE8_MEMBER(stinger_shot_w);
 
-	DECLARE_DRIVER_INIT(stinger);
+	void init_stinger();
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

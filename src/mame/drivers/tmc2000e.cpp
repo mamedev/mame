@@ -93,11 +93,11 @@ void tmc2000e_state::tmc2000e_io_map(address_map &map)
 {
 	map(0x01, 0x01).w(m_cti, FUNC(cdp1864_device::tone_latch_w));
 	map(0x02, 0x02).w(m_cti, FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x03, 0x03).rw(this, FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
-	map(0x04, 0x04).rw(this, FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
-	map(0x05, 0x05).rw(this, FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
-	map(0x06, 0x06).rw(this, FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
-	map(0x07, 0x07).portr("DSW0").w(this, FUNC(tmc2000e_state::io_select_w));
+	map(0x03, 0x03).rw(FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
+	map(0x04, 0x04).rw(FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
+	map(0x05, 0x05).rw(FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
+	map(0x06, 0x06).rw(FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
+	map(0x07, 0x07).portr("DSW0").w(FUNC(tmc2000e_state::io_select_w));
 }
 
 /* Input Ports */
@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 	m_cti->aoe_w(state);
 
 	// set Q led status
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	// tape out
 	m_cassette->output(state ? -1.0 : +1.0);
@@ -264,6 +264,8 @@ WRITE8_MEMBER( tmc2000e_state::dma_w )
 
 void tmc2000e_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_cdp1864_efx));
 	save_item(NAME(m_keylatch));
@@ -280,23 +282,23 @@ void tmc2000e_state::machine_reset()
 
 MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(tmc2000e_map)
-	MCFG_CPU_IO_MAP(tmc2000e_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(tmc2000e_map)
+	MCFG_DEVICE_IO_MAP(tmc2000e_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc2000e_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc2000e_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc2000e_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc2000e_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(tmc2000e_state, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc2000e_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc2000e_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc2000e_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc2000e_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, tmc2000e_state, dma_w))
 
 	// video hardware
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(tmc2000e_state, rdata_r), READLINE(tmc2000e_state, bdata_r), READLINE(tmc2000e_state, gdata_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, tmc2000e_state, rdata_r), READLINE(*this, tmc2000e_state, bdata_r), READLINE(*this, tmc2000e_state, gdata_r))
 	MCFG_CDP1864_CHROMINANCE(RES_K(2.2), RES_K(1), RES_K(5.1), RES_K(4.7)) // unverified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -320,5 +322,5 @@ ROM_START( tmc2000e )
 	ROM_LOAD( "4", 0xd800, 0x0800, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     STATE           INIT  COMPANY        FULLNAME        STATE
-COMP( 1980, tmc2000e, 0,       0,       tmc2000e, tmc2000e, tmc2000e_state, 0,    "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY        FULLNAME        STATE
+COMP( 1980, tmc2000e, 0,      0,      tmc2000e, tmc2000e, tmc2000e_state, empty_init, "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

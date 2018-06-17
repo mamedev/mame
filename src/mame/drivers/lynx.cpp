@@ -25,7 +25,7 @@ void lynx_state::lynx_mem(address_map &map)
 	map(0xfd00, 0xfdff).ram().share("mem_fd00");
 	map(0xfe00, 0xfff7).bankr("bank3").writeonly().share("mem_fe00");
 	map(0xfff8, 0xfff8).ram();
-	map(0xfff9, 0xfff9).rw(this, FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
+	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
 	map(0xfffa, 0xffff).bankr("bank4").writeonly().share("mem_fffa");
 }
 
@@ -77,8 +77,8 @@ void lynx_state::sound_cb()
 
 MACHINE_CONFIG_START(lynx_state::lynx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
-	MCFG_CPU_PROGRAM_MAP(lynx_mem)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	MCFG_DEVICE_PROGRAM_MAP(lynx_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -95,8 +95,8 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	MCFG_PALETTE_INIT_OWNER(lynx_state, lynx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", LYNX_SND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", LYNX_SND, 0)
 	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -118,9 +118,10 @@ static MACHINE_CONFIG_START( lynx2 )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_REMOVE("lynx")
-	MCFG_SOUND_ADD("custom", LYNX2_SND, 0)
+	MCFG_DEVICE_ADD("custom", LYNX2_SND, 0)
 	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -136,9 +137,9 @@ MACHINE_CONFIG_END
 ROM_START(lynx)
 	ROM_REGION(0x200,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "default",   "rom save" )
-	ROMX_LOAD( "lynx.bin",  0x00000, 0x200, BAD_DUMP CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(1))
+	ROMX_LOAD("lynx.bin",  0x00000, 0x200, BAD_DUMP CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
-	ROMX_LOAD( "lynxa.bin", 0x00000, 0x200, BAD_DUMP CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb), ROM_BIOS(2))
+	ROMX_LOAD("lynxa.bin", 0x00000, 0x200, BAD_DUMP CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb), ROM_BIOS(1))
 
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
 ROM_END
@@ -199,6 +200,6 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY   FULLNAME      FLAGS */
-CONS( 1989, lynx,   0,      0,      lynx,   lynx, lynx_state,   0,      "Atari",  "Lynx",       MACHINE_SUPPORTS_SAVE )
-// CONS( 1991, lynx2,  lynx,  0,      lynx2,  lynx, lynx_state,   0,      "Atari",  "Lynx II",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
+CONS( 1989, lynx, 0,      0,      lynx,    lynx,  lynx_state, empty_init, "Atari", "Lynx",   MACHINE_SUPPORTS_SAVE )
+// CONS( 1991, lynx2,  lynx,  0,      lynx2,  lynx, lynx_state, empty_init, "Atari",  "Lynx II",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

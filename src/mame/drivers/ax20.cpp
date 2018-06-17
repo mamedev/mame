@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "bus/isa/fdc.h"
 #include "cpu/i86/i86.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ax20_state : public driver_device
@@ -92,9 +93,9 @@ void ax20_state::ax20_map(address_map &map)
 void ax20_state::ax20_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xffc0, 0xffc0).w(this, FUNC(ax20_state::tc_w));
-	map(0xffd0, 0xffd0).w(this, FUNC(ax20_state::ctl_w));
-	map(0xffe0, 0xffe0).r(this, FUNC(ax20_state::unk_r));
+	map(0xffc0, 0xffc0).w(FUNC(ax20_state::tc_w));
+	map(0xffd0, 0xffd0).w(FUNC(ax20_state::ctl_w));
+	map(0xffe0, 0xffe0).r(FUNC(ax20_state::unk_r));
 	map(0xff80, 0xff81).m(m_fdc, FUNC(i8272a_device::map));
 }
 
@@ -118,19 +119,20 @@ static const gfx_layout ax20_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( ax20 )
+static GFXDECODE_START( gfx_ax20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ax20_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( ax20_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ax20_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(ax20_map)
-	MCFG_CPU_IO_MAP(ax20_io)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(ax20_map)
+	MCFG_DEVICE_IO_MAP(ax20_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -141,7 +143,7 @@ MACHINE_CONFIG_START(ax20_state::ax20)
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ax20)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ax20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_I8272A_ADD("fdc", true)
@@ -161,5 +163,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT STATE       INIT   COMPANY   FULLNAME  FLAGS
-COMP( 1982, ax20,  0,      0,       ax20,     ax20, ax20_state, 0,     "Axel",   "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1982, ax20, 0,      0,      ax20,    ax20, ax20_state, empty_init, "Axel",  "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -52,8 +52,8 @@ void timelimt_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();     /* rom */
 	map(0x8000, 0x87ff).ram();     /* ram */
-	map(0x8800, 0x8bff).ram().w(this, FUNC(timelimt_state::videoram_w)).share("videoram"); /* video ram */
-	map(0x9000, 0x97ff).ram().w(this, FUNC(timelimt_state::bg_videoram_w)).share("bg_videoram");/* background ram */
+	map(0x8800, 0x8bff).ram().w(FUNC(timelimt_state::videoram_w)).share("videoram"); /* video ram */
+	map(0x9000, 0x97ff).ram().w(FUNC(timelimt_state::bg_videoram_w)).share("bg_videoram");/* background ram */
 	map(0x9800, 0x98ff).ram().share("spriteram");   /* sprite ram */
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xa800, 0xa800).portr("SYSTEM");
@@ -61,9 +61,9 @@ void timelimt_state::main_map(address_map &map)
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound write */
 	map(0xb800, 0xb800).nopr();     /* NMI ack? */
-	map(0xc800, 0xc800).w(this, FUNC(timelimt_state::scroll_x_lsb_w));
-	map(0xc801, 0xc801).w(this, FUNC(timelimt_state::scroll_x_msb_w));
-	map(0xc802, 0xc802).w(this, FUNC(timelimt_state::scroll_y_w));
+	map(0xc800, 0xc800).w(FUNC(timelimt_state::scroll_x_lsb_w));
+	map(0xc801, 0xc801).w(FUNC(timelimt_state::scroll_x_msb_w));
+	map(0xc802, 0xc802).w(FUNC(timelimt_state::scroll_y_w));
 	map(0xc803, 0xc803).nopw();        /* ???? bit 0 used only */
 	map(0xc804, 0xc804).nopw();        /* ???? not used */
 }
@@ -206,7 +206,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( timelimt )
+static GFXDECODE_START( gfx_timelimt )
 	GFXDECODE_ENTRY( "tiles_1", 0, charlayout,   32, 1 )    /* seems correct */
 	GFXDECODE_ENTRY( "tiles_2", 0, charlayout,    0, 1 )    /* seems correct */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 64, 4 )    /* seems correct */
@@ -225,21 +225,21 @@ INTERRUPT_GEN_MEMBER(timelimt_state::irq)
 MACHINE_CONFIG_START(timelimt_state::timelimt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", timelimt_state,  irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  irq0_line_hold) /* ? */
+	MCFG_DEVICE_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", timelimt_state,  irq0_line_hold) /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(timelimt_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(timelimt_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, timelimt_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, timelimt_state, coin_lockout_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // probably flip screen
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // probably flip screen
@@ -255,20 +255,20 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timelimt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_timelimt)
 	MCFG_PALETTE_ADD("palette", 64+32)
 	MCFG_PALETTE_INIT_OWNER(timelimt_state, timelimt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("ay1", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay2", AY8910, 18432000/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -337,5 +337,5 @@ ROM_START( progress )
 	ROM_LOAD( "57.bin", 0x0040, 0x0020, CRC(18455a79) SHA1(e4d64368560e3116a922588129f5f91a4c520f7d) )
 ROM_END
 
-GAME( 1983, timelimt, 0, timelimt, timelimt, timelimt_state, 0, ROT90, "Chuo Co. Ltd", "Time Limit", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, progress, 0, timelimt, progress, timelimt_state, 0, ROT90, "Chuo Co. Ltd", "Progress",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, timelimt, 0, timelimt, timelimt, timelimt_state, empty_init, ROT90, "Chuo Co. Ltd", "Time Limit", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, progress, 0, timelimt, progress, timelimt_state, empty_init, ROT90, "Chuo Co. Ltd", "Progress",   MACHINE_SUPPORTS_SAVE )

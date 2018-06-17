@@ -66,7 +66,7 @@ void m1comm_device::m1comm_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xffff).mask(0x0fff).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
 }
 
 /*************************************
@@ -77,8 +77,8 @@ void m1comm_device::m1comm_io(address_map &map)
 	map.global_mask(0x7f);
 	map(0x00, 0x1f).rw(m_dlc, FUNC(mb89374_device::read), FUNC(mb89374_device::write));
 	map(0x20, 0x2f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x40, 0x5f).mask(0x01).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
-	map(0x60, 0x7f).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+	map(0x40, 0x5f).mask(0x01).rw(FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
 }
 
 ROM_START( m1comm )
@@ -87,11 +87,11 @@ ROM_START( m1comm )
 
 	// found on Virtua Racing and WingWar
 	ROM_SYSTEM_BIOS( 0, "epr15112", "EPR-15112" )
-	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(1) )
+	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(0) )
 
 	// found on Virtua Formula
 	ROM_SYSTEM_BIOS( 1, "epr15624", "EPR-15624" )
-	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(2) )
+	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(1) )
 ROM_END
 
 //**************************************************************************
@@ -105,24 +105,24 @@ DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(m1comm_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
-	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
-	MCFG_CPU_IO_MAP(m1comm_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
+	MCFG_DEVICE_PROGRAM_MAP(m1comm_mem)
+	MCFG_DEVICE_IO_MAP(m1comm_io)
 
 	MCFG_DEVICE_ADD(DMA_TAG, AM9517A, 8000000) /* 32 MHz / 4 */
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(m1comm_device, dma_hreq_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(m1comm_device, dma_mem_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(m1comm_device, dma_mem_w))
-	MCFG_I8237_OUT_DACK_2_CB(DEVWRITELINE(DLC_TAG, mb89374_device, pi3_w))
-	MCFG_I8237_OUT_DACK_3_CB(DEVWRITELINE(DLC_TAG, mb89374_device, pi2_w))
-	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(DLC_TAG, mb89374_device, ci_w))
-	MCFG_I8237_IN_IOR_2_CB(DEVREAD8(DLC_TAG, mb89374_device, dma_r))
-	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8(DLC_TAG, mb89374_device, dma_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, m1comm_device, dma_hreq_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, m1comm_device, dma_mem_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, m1comm_device, dma_mem_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(DLC_TAG, mb89374_device, pi3_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(DLC_TAG, mb89374_device, pi2_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(DLC_TAG, mb89374_device, ci_w))
+	MCFG_I8237_IN_IOR_2_CB(READ8(DLC_TAG, mb89374_device, dma_r))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(DLC_TAG, mb89374_device, dma_w))
 
 	MCFG_DEVICE_ADD(DLC_TAG, MB89374, 8000000) /* 32 MHz / 4 */
-	MCFG_MB89374_PO2_CB(DEVWRITELINE(DMA_TAG, am9517a_device, dreq3_w))
-	MCFG_MB89374_PO3_CB(DEVWRITELINE(DMA_TAG, am9517a_device, dreq2_w))
-	MCFG_MB89374_IRQ_CB(WRITELINE(m1comm_device, dlc_int7_w))
+	MCFG_MB89374_PO2_CB(WRITELINE(DMA_TAG, am9517a_device, dreq3_w))
+	MCFG_MB89374_PO3_CB(WRITELINE(DMA_TAG, am9517a_device, dreq2_w))
+	MCFG_MB89374_IRQ_CB(WRITELINE(*this, m1comm_device, dlc_int7_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -55,16 +55,16 @@ void mt735_state::mt735_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x278000, 0x287fff).ram();
 	map(0x400000, 0x4fffff).ram();
-	map(0xff8004, 0xff8004).r(this, FUNC(mt735_state::p4_r));
-	map(0xff8005, 0xff8005).r(this, FUNC(mt735_state::p5_r));
+	map(0xff8004, 0xff8004).r(FUNC(mt735_state::p4_r));
+	map(0xff8005, 0xff8005).r(FUNC(mt735_state::p5_r));
 }
 
 static INPUT_PORTS_START( mt735 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mt735_state::mt735)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(48'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(mt735_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(48'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(mt735_map)
 MACHINE_CONFIG_END
 
 ROM_START( mt735 )
@@ -73,4 +73,4 @@ ROM_START( mt735 )
 	ROM_LOAD16_BYTE( "spg_m_o_ic102.bin", 1, 0x20000, CRC(84d8446b) SHA1(b1cedd8b09556eb8118f79b012aeec5b61e3ff32) )
 ROM_END
 
-COMP( ????, mt735, 0, 0, mt735, mt735, mt735_state, 0, "Brother", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( ????, mt735, 0, 0, mt735, mt735, mt735_state, empty_init, "Brother", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

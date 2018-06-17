@@ -184,8 +184,8 @@ WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 void speedatk_state::speedatk_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).rw(this, FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
-	map(0x8001, 0x8001).rw(this, FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
+	map(0x8000, 0x8000).rw(FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
+	map(0x8001, 0x8001).rw(FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
 	map(0x8800, 0x8fff).ram();
 	map(0xa000, 0xa3ff).ram().share("videoram");
 	map(0xb000, 0xb3ff).ram().share("colorram");
@@ -195,7 +195,7 @@ void speedatk_state::speedatk_mem(address_map &map)
 void speedatk_state::speedatk_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
+	map(0x00, 0x01).w(FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
 	map(0x24, 0x24).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -293,7 +293,7 @@ static const gfx_layout charlayout_3bpp =
 };
 
 
-static GFXDECODE_START( speedatk )
+static GFXDECODE_START( gfx_speedatk )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
@@ -308,10 +308,10 @@ WRITE8_MEMBER(speedatk_state::output_w)
 
 MACHINE_CONFIG_START(speedatk_state::speedatk)
 
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
-	MCFG_CPU_PROGRAM_MAP(speedatk_mem)
-	MCFG_CPU_IO_MAP(speedatk_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
+	MCFG_DEVICE_PROGRAM_MAP(speedatk_mem)
+	MCFG_DEVICE_IO_MAP(speedatk_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
@@ -329,17 +329,17 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedatk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedatk)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(speedatk_state, output_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, speedatk_state, output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -364,4 +364,4 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )

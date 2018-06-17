@@ -42,6 +42,7 @@ TODO: boot tests fail
 #include "video/mc6845.h"
 #include "machine/terminal.h"
 //#include "machine/ins8250.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define HP9816_CHDIMX 8
@@ -144,7 +145,7 @@ public:
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
 
-	DECLARE_DRIVER_INIT(hp9k);
+	void init_hp9k();
 
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_WRITE16_MEMBER(buserror_w);
@@ -310,18 +311,18 @@ void hp9k_state::hp9k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x000909).rom().region("bootrom", 0);
-	map(0x00090a, 0x00090d).rw(this, FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
+	map(0x00090a, 0x00090d).rw(FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
 	map(0x00090e, 0x00ffff).rom().region("bootrom", 0x90e);
-	map(0x010000, 0x427fff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x428000, 0x428fff).rw(this, FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
-	map(0x429000, 0x50ffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x510000, 0x51ffff).rw(this, FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
-	map(0x520000, 0x52ffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x010000, 0x427fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x428000, 0x428fff).rw(FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
+	map(0x429000, 0x50ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x510000, 0x51ffff).rw(FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
+	map(0x520000, 0x52ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x530000, 0x53ffff).ram(); // graphic memory
-	map(0x540000, 0x5effff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x5f0000, 0x5f3fff).rw(this, FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
+	map(0x540000, 0x5effff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
 	//AM_RANGE(0x5f0000, 0x5f3fff) AM_READWRITE(buserror_r,buserror_w)
-	map(0x5f4000, 0xfbffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x5f4000, 0xfbffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0xFC0000, 0xffffff).ram(); // system ram
 }
 
@@ -331,7 +332,7 @@ static INPUT_PORTS_START( hp9k )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(hp9k_state,hp9k)
+void hp9k_state::init_hp9k()
 {
 }
 
@@ -348,7 +349,7 @@ static const gfx_layout hp9k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( hp9k )
+static GFXDECODE_START( gfx_hp9k )
 	GFXDECODE_ENTRY( "bootrom", 0x2000, hp9k_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -397,8 +398,8 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 
 MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hp9k_mem)
 
 	/* video hardware */
 
@@ -410,7 +411,7 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)
@@ -424,13 +425,13 @@ ROM_START( hp9816 )
 
 	ROM_DEFAULT_BIOS("bios40")
 	ROM_SYSTEM_BIOS(0, "bios40",  "Bios v4.0")
-	ROMX_LOAD( "rom40.bin", 0x0000, 0x10000, CRC(36005480) SHA1(645a077ffd95e4c31f05cd8bbd6e4554b12813f1), ROM_BIOS(1) )
+	ROMX_LOAD( "rom40.bin", 0x0000, 0x10000, CRC(36005480) SHA1(645a077ffd95e4c31f05cd8bbd6e4554b12813f1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "bios30",  "Bios v3.0")
-	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(2) )
+	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(1) )
 
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY            FULLNAME     FLAGS */
-COMP( 1982, hp9816, 0,      0,      hp9k,    hp9k,  hp9k_state, hp9k,  "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY            FULLNAME   FLAGS */
+COMP( 1982, hp9816, 0,      0,      hp9k,    hp9k,  hp9k_state, init_hp9k, "Hewlett Packard", "HP 9816", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

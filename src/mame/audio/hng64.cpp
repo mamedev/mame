@@ -220,7 +220,7 @@ READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 // but why not just use the V33/V53 XA mode??
 WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 {
-	logerror("%08x hng64_sound_bank_w? %02x %04x\n", space.device().safe_pc(), offset, data);
+	logerror("%s hng64_sound_bank_w? %02x %04x\n", machine().describe_context(), offset, data);
 	// buriki writes 0x3f to 0x200 before jumping to the low addresses..
 	// where it expects to find data from 0x1f0000
 
@@ -252,18 +252,18 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_000a_w)
 {
-	logerror("%08x: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
+	logerror("%s: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_000c_w)
 {
-	logerror("%08x: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
+	logerror("%s: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
 {
-	logerror("hng64_port 0x0080 %04x\n", data);
+	logerror("%s: hng64_port 0x0080 %04x\n", machine().describe_context(), data);
 }
 
 
@@ -306,15 +306,15 @@ void hng64_state::hng_sound_io(address_map &map)
 {
 	map(0x0000, 0x0007).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 
-	map(0x0008, 0x0009).rw(this, FUNC(hng64_state::hng64_sound_port_0008_r), FUNC(hng64_state::hng64_sound_port_0008_w));
-	map(0x000a, 0x000b).w(this, FUNC(hng64_state::hng64_sound_port_000a_w));
-	map(0x000c, 0x000d).w(this, FUNC(hng64_state::hng64_sound_port_000c_w));
+	map(0x0008, 0x0009).rw(FUNC(hng64_state::hng64_sound_port_0008_r), FUNC(hng64_state::hng64_sound_port_0008_w));
+	map(0x000a, 0x000b).w(FUNC(hng64_state::hng64_sound_port_000a_w));
+	map(0x000c, 0x000d).w(FUNC(hng64_state::hng64_sound_port_000c_w));
 
-	map(0x0080, 0x0081).w(this, FUNC(hng64_state::hng64_sound_port_0080_w));
+	map(0x0080, 0x0081).w(FUNC(hng64_state::hng64_sound_port_0080_w));
 
-	map(0x0100, 0x010f).rw(this, FUNC(hng64_state::sound_comms_r), FUNC(hng64_state::sound_comms_w));
+	map(0x0100, 0x010f).rw(FUNC(hng64_state::sound_comms_r), FUNC(hng64_state::sound_comms_w));
 
-	map(0x0200, 0x021f).w(this, FUNC(hng64_state::hng64_sound_bank_w)); // ??
+	map(0x0200, 0x021f).w(FUNC(hng64_state::hng64_sound_bank_w)); // ??
 
 }
 
@@ -389,20 +389,21 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 MACHINE_CONFIG_START(hng64_state::hng64_audio)
-	MCFG_CPU_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
-	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
-	MCFG_CPU_IO_MAP(hng_sound_io)
-	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(hng64_state, dma_hreq_cb))
-	MCFG_V53_DMAU_IN_MEMR_CB(READ8(hng64_state, dma_memr_cb))
-	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(hng64_state,dma_iow3_cb))
+	MCFG_DEVICE_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
+	MCFG_DEVICE_PROGRAM_MAP(hng_sound_map)
+	MCFG_DEVICE_IO_MAP(hng_sound_io)
+	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(*this, hng64_state, dma_hreq_cb))
+	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, hng64_state, dma_memr_cb))
+	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(*this, hng64_state,dma_iow3_cb))
 
-	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(hng64_state, tcu_tm0_cb))
-	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(hng64_state, tcu_tm1_cb))
-	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
+	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(*this, hng64_state, tcu_tm0_cb))
+	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(*this, hng64_state, tcu_tm1_cb))
+	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(*this, hng64_state, tcu_tm2_cb))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
+	MCFG_DEVICE_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

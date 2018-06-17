@@ -11,6 +11,7 @@
 #include "machine/315-5881_crypt.h"
 #include "machine/msm6242.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 typedef float MATRIX[4][4];
@@ -235,38 +236,38 @@ public:
 	void pci_device_set_reg(uint32_t value);
 	void configure_fast_ram();
 	void interleave_vroms();
-	DECLARE_DRIVER_INIT(lemans24);
-	DECLARE_DRIVER_INIT(vs298);
-	DECLARE_DRIVER_INIT(vs299);
-	DECLARE_DRIVER_INIT(swtrilgy);
-	DECLARE_DRIVER_INIT(scudplus);
-	DECLARE_DRIVER_INIT(model3_20);
-	DECLARE_DRIVER_INIT(bass);
-	DECLARE_DRIVER_INIT(vs2);
-	DECLARE_DRIVER_INIT(daytona2);
-	DECLARE_DRIVER_INIT(eca);
-	DECLARE_DRIVER_INIT(srally2);
-	DECLARE_DRIVER_INIT(harleya);
-	DECLARE_DRIVER_INIT(skichamp);
-	DECLARE_DRIVER_INIT(spikeofe);
-	DECLARE_DRIVER_INIT(scud);
-	DECLARE_DRIVER_INIT(harley);
-	DECLARE_DRIVER_INIT(swtrilga);
-	DECLARE_DRIVER_INIT(vs29815);
-	DECLARE_DRIVER_INIT(model3_10);
-	DECLARE_DRIVER_INIT(vs215);
-	DECLARE_DRIVER_INIT(getbass);
-	DECLARE_DRIVER_INIT(scudplusa);
-	DECLARE_DRIVER_INIT(dirtdvls);
-	DECLARE_DRIVER_INIT(vf3);
-	DECLARE_DRIVER_INIT(von2);
-	DECLARE_DRIVER_INIT(lostwsga);
-	DECLARE_DRIVER_INIT(oceanhun);
-	DECLARE_DRIVER_INIT(dayto2pe);
-	DECLARE_DRIVER_INIT(spikeout);
-	DECLARE_DRIVER_INIT(magtruck);
-	DECLARE_DRIVER_INIT(lamachin);
-	DECLARE_DRIVER_INIT(model3_15);
+	void init_lemans24();
+	void init_vs298();
+	void init_vs299();
+	void init_swtrilgy();
+	void init_scudplus();
+	void init_model3_20();
+	void init_bass();
+	void init_vs2();
+	void init_daytona2();
+	void init_eca();
+	void init_srally2();
+	void init_harleya();
+	void init_skichamp();
+	void init_spikeofe();
+	void init_scud();
+	void init_harley();
+	void init_swtrilga();
+	void init_vs29815();
+	void init_model3_10();
+	void init_vs215();
+	void init_getbass();
+	void init_scudplusa();
+	void init_dirtdvls();
+	void init_vf3();
+	void init_von2();
+	void init_lostwsga();
+	void init_oceanhun();
+	void init_dayto2pe();
+	void init_spikeout();
+	void init_magtruck();
+	void init_lamachin();
+	void init_model3_15();
 	DECLARE_MACHINE_START(model3_10);
 	DECLARE_MACHINE_RESET(model3_10);
 	DECLARE_MACHINE_START(model3_15);

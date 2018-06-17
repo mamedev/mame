@@ -116,10 +116,10 @@ void thunderj_state::main_map(address_map &map)
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x260011).portr("260010");
-	map(0x260012, 0x260013).r(this, FUNC(thunderj_state::special_port2_r));
+	map(0x260012, 0x260013).r(FUNC(thunderj_state::special_port2_r));
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360010, 0x360011).w(this, FUNC(thunderj_state::latch_w));
+	map(0x360010, 0x360011).w(FUNC(thunderj_state::latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -149,9 +149,9 @@ void thunderj_state::extra_map(address_map &map)
 	map(0x160000, 0x16ffff).ram().share("share1");
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x260011).portr("260010");
-	map(0x260012, 0x260013).r(this, FUNC(thunderj_state::special_port2_r));
+	map(0x260012, 0x260013).r(FUNC(thunderj_state::special_port2_r));
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
-	map(0x360010, 0x360011).w(this, FUNC(thunderj_state::latch_w));
+	map(0x360010, 0x360011).w(FUNC(thunderj_state::latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 }
@@ -226,7 +226,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( thunderj )
+static GFXDECODE_START( gfx_thunderj )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  512,  96 ) /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 112 ) /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,      0, 512 ) /* characters 8x8 */
@@ -243,11 +243,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(thunderj_state::thunderj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(extra_map)
+	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(extra_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -258,11 +258,11 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thunderj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(thunderj_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, thunderj_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(thunderj_state, "gfxdecode", get_alpha_tile_info)
@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260012", 1)
@@ -452,7 +452,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(thunderj_state,thunderj)
+void thunderj_state::init_thunderj()
 {
 }
 
@@ -464,5 +464,5 @@ DRIVER_INIT_MEMBER(thunderj_state,thunderj)
  *
  *************************************/
 
-GAME( 1990, thunderj,         0, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws (rev 3)", 0 )
-GAME( 1990, thunderja, thunderj, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws (rev 2)", 0 )
+GAME( 1990, thunderj,         0, thunderj, thunderj, thunderj_state, init_thunderj, ROT0, "Atari Games", "ThunderJaws (rev 3)", 0 )
+GAME( 1990, thunderja, thunderj, thunderj, thunderj, thunderj_state, init_thunderj, ROT0, "Atari Games", "ThunderJaws (rev 2)", 0 )

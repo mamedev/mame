@@ -190,7 +190,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(aquarius_state,aquarius)
+void aquarius_state::init_aquarius()
 {
 	/* install expansion memory if available */
 	if (m_ram->size() > 0x1000)
@@ -210,11 +210,11 @@ DRIVER_INIT_MEMBER(aquarius_state,aquarius)
 void aquarius_state::aquarius_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x3000, 0x33ff).ram().w(this, FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x3400, 0x37ff).ram().w(this, FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
+	map(0x3000, 0x33ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
+	map(0x3400, 0x37ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
 	map(0x3800, 0x3fff).ram();
 	map(0x4000, 0xbfff).noprw(); /* expansion ram */
-	map(0xc000, 0xffff).r(this, FUNC(aquarius_state::cartridge_r));
+	map(0xc000, 0xffff).r(FUNC(aquarius_state::cartridge_r));
 }
 
 void aquarius_state::aquarius_io(address_map &map)
@@ -222,10 +222,10 @@ void aquarius_state::aquarius_io(address_map &map)
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 	map(0xf6, 0xf6).mirror(0xff00).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf7, 0xf7).mirror(0xff00).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0xfc, 0xfc).mirror(0xff00).rw(this, FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
-	map(0xfd, 0xfd).mirror(0xff00).rw(this, FUNC(aquarius_state::vsync_r), FUNC(aquarius_state::mapper_w));
-	map(0xfe, 0xfe).mirror(0xff00).rw(this, FUNC(aquarius_state::printer_r), FUNC(aquarius_state::printer_w));
-	map(0xff, 0xff).select(0xff00).rw(this, FUNC(aquarius_state::keyboard_r), FUNC(aquarius_state::scrambler_w));
+	map(0xfc, 0xfc).mirror(0xff00).rw(FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
+	map(0xfd, 0xfd).mirror(0xff00).rw(FUNC(aquarius_state::vsync_r), FUNC(aquarius_state::mapper_w));
+	map(0xfe, 0xfe).mirror(0xff00).rw(FUNC(aquarius_state::printer_r), FUNC(aquarius_state::printer_w));
+	map(0xff, 0xff).select(0xff00).rw(FUNC(aquarius_state::keyboard_r), FUNC(aquarius_state::scrambler_w));
 }
 
 
@@ -340,7 +340,7 @@ static const gfx_layout aquarius_charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( aquarius )
+static GFXDECODE_START( gfx_aquarius )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -351,10 +351,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(aquarius_state::aquarius)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
-	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
-	MCFG_CPU_IO_MAP(aquarius_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
+	MCFG_DEVICE_PROGRAM_MAP(aquarius_mem)
+	MCFG_DEVICE_IO_MAP(aquarius_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -365,18 +365,18 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
 	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -408,9 +408,9 @@ ROM_START( aquarius )
 	/* basic rom */
 	ROM_DEFAULT_BIOS("rev2")
 	ROM_SYSTEM_BIOS(0, "rev1", "Revision 1")
-	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev2", "Revision 2")
-	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(2))
+	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(1))
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)
@@ -422,6 +422,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     STATE           INIT      COMPANY   FULLNAME               FLAGS
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",     0 )
-//COMP( 1984, aquariu2,    aquarius, 0,      aquarius,    aquarius, aquarius_state, 0,        "Mattel", "Aquarius II",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY   FULLNAME           FLAGS
+COMP( 1983, aquarius, 0,        0,      aquarius, aquarius, aquarius_state, init_aquarius, "Mattel", "Aquarius (NTSC)", 0 )
+//COMP( 1984, aquariu2, aquarius, 0,      aquarius, aquarius, aquarius_state, empty_init,    "Mattel", "Aquarius II",     MACHINE_NOT_WORKING )

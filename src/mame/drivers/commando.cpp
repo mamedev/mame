@@ -65,13 +65,13 @@ void commando_state::commando_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(this, FUNC(commando_state::commando_c804_w));
-	map(0xc808, 0xc809).w(this, FUNC(commando_state::commando_scrollx_w));
-	map(0xc80a, 0xc80b).w(this, FUNC(commando_state::commando_scrolly_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(commando_state::commando_videoram2_w)).share("videoram2");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(commando_state::commando_colorram2_w)).share("colorram2");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(commando_state::commando_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(commando_state::commando_colorram_w)).share("colorram");
+	map(0xc804, 0xc804).w(FUNC(commando_state::commando_c804_w));
+	map(0xc808, 0xc809).w(FUNC(commando_state::commando_scrollx_w));
+	map(0xc80a, 0xc80b).w(FUNC(commando_state::commando_scrolly_w));
+	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::commando_videoram2_w)).share("videoram2");
+	map(0xd400, 0xd7ff).ram().w(FUNC(commando_state::commando_colorram2_w)).share("colorram2");
+	map(0xd800, 0xdbff).ram().w(FUNC(commando_state::commando_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(commando_state::commando_colorram_w)).share("colorram");
 	map(0xe000, 0xfdff).ram();
 	map(0xfe00, 0xff7f).ram().share("spriteram");
 	map(0xff80, 0xffff).ram();
@@ -215,7 +215,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( commando )
+static GFXDECODE_START( gfx_commando )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   192, 16 ) // colors 192-255
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 16 ) // colors   0-127
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 128,  4 ) // colors 128-191
@@ -229,9 +229,10 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(commando_state::commando_interrupt)
+WRITE_LINE_MEMBER(commando_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); // RST 10h - VBLANK
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // RST 10h - VBLANK
 }
 
 /* Machine Driver */
@@ -254,14 +255,13 @@ void commando_state::machine_reset()
 MACHINE_CONFIG_START(commando_state::commando)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???
-	MCFG_CPU_PROGRAM_MAP(commando_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", commando_state,  commando_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, PHI_MAIN)  // ???
+	MCFG_DEVICE_PROGRAM_MAP(commando_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, PHI_B)    // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(commando_state, irq0_line_hold,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, PHI_B)    // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(commando_state, irq0_line_hold,  4*60)
 
 
 	/* video hardware */
@@ -271,23 +271,24 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(commando_state, screen_update_commando)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, commando_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_commando)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, PHI_B/2)
+	MCFG_DEVICE_ADD("ym1", YM2203, PHI_B/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, PHI_B/2)
+	MCFG_DEVICE_ADD("ym2", YM2203, PHI_B/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -668,7 +669,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(commando_state,commando)
+void commando_state::init_commando()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -681,7 +682,7 @@ DRIVER_INIT_MEMBER(commando_state,commando)
 	}
 }
 
-DRIVER_INIT_MEMBER(commando_state,spaceinv)
+void commando_state::init_spaceinv()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -695,12 +696,12 @@ DRIVER_INIT_MEMBER(commando_state,spaceinv)
 
 /* Game Drivers */
 
-GAME( 1985, commando,  0,        commando, commando, commando_state, commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou, commando, commando, commandou,commando_state, commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou2,commando, commando, commando, commando_state, commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandoj, commando, commando, commando, commando_state, commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob, commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob2,commando, commando, commando, commando_state, commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasn,   commando, commando, commando, commando_state, commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasnb,  commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, mercenario,commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commando,   0,        commando, commando, commando_state, init_commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou,  commando, commando, commandou,commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou2, commando, commando, commando, commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasn,    commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasnb,   commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mercenario, commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )

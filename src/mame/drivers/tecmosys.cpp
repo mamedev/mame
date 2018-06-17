@@ -297,39 +297,39 @@ void tecmosys_state::main_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram(); // work ram
 	map(0x210000, 0x210001).nopr(); // single byte overflow on stack defined as 0x210000
-	map(0x300000, 0x300fff).ram().w(this, FUNC(tecmosys_state::vram_w<1>)).share("vram_1"); // bg0 ram
-	map(0x301000, 0x3013ff).ram().w(this, FUNC(tecmosys_state::lineram_w<0>)).share("bg0_lineram");// bg0 linescroll? (guess)
+	map(0x300000, 0x300fff).ram().w(FUNC(tecmosys_state::vram_w<1>)).share("vram_1"); // bg0 ram
+	map(0x301000, 0x3013ff).ram().w(FUNC(tecmosys_state::lineram_w<0>)).share("bg0_lineram");// bg0 linescroll? (guess)
 
-	map(0x400000, 0x400fff).ram().w(this, FUNC(tecmosys_state::vram_w<2>)).share("vram_2"); // bg1 ram
-	map(0x401000, 0x4013ff).ram().w(this, FUNC(tecmosys_state::lineram_w<1>)).share("bg1_lineram");// bg1 linescroll? (guess)
+	map(0x400000, 0x400fff).ram().w(FUNC(tecmosys_state::vram_w<2>)).share("vram_2"); // bg1 ram
+	map(0x401000, 0x4013ff).ram().w(FUNC(tecmosys_state::lineram_w<1>)).share("bg1_lineram");// bg1 linescroll? (guess)
 
-	map(0x500000, 0x500fff).ram().w(this, FUNC(tecmosys_state::vram_w<3>)).share("vram_3"); // bg2 ram
-	map(0x501000, 0x5013ff).ram().w(this, FUNC(tecmosys_state::lineram_w<2>)).share("bg2_lineram"); // bg2 linescroll? (guess)
+	map(0x500000, 0x500fff).ram().w(FUNC(tecmosys_state::vram_w<3>)).share("vram_3"); // bg2 ram
+	map(0x501000, 0x5013ff).ram().w(FUNC(tecmosys_state::lineram_w<2>)).share("bg2_lineram"); // bg2 linescroll? (guess)
 
-	map(0x700000, 0x703fff).ram().w(this, FUNC(tecmosys_state::vram_w<0>)).share("vram_0"); // fix ram
+	map(0x700000, 0x703fff).ram().w(FUNC(tecmosys_state::vram_w<0>)).share("vram_0"); // fix ram
 	map(0x800000, 0x80ffff).ram().share("spriteram"); // obj ram
-	map(0x880000, 0x88000b).r(this, FUNC(tecmosys_state::unk880000_r));
-	map(0x880000, 0x88002f).w(this, FUNC(tecmosys_state::unk880000_w)).share("880000regs");  // 10 byte dta@88000c, 880022=watchdog?
+	map(0x880000, 0x88000b).r(FUNC(tecmosys_state::unk880000_r));
+	map(0x880000, 0x88002f).w(FUNC(tecmosys_state::unk880000_w)).share("880000regs");  // 10 byte dta@88000c, 880022=watchdog?
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // AM_WRITEONLY // obj pal
 
 	//map(0x980000, 0x9807ff).writeonly(); // bg pal
-	//map(0x980800, 0x980fff).w(this, FUNC(tecmosys_state::paletteram_xGGGGGRRRRRBBBBB_word_w)).share("paletteram"); // fix pal
+	//map(0x980800, 0x980fff).w(FUNC(tecmosys_state::paletteram_xGGGGGRRRRRBBBBB_word_w)).share("paletteram"); // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	map(0x980000, 0x980fff).ram().w(this, FUNC(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)).share("tmap_palette");
+	map(0x980000, 0x980fff).ram().w(FUNC(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)).share("tmap_palette");
 
-	map(0xa00000, 0xa00001).w(this, FUNC(tecmosys_state::eeprom_w));
+	map(0xa00000, 0xa00001).w(FUNC(tecmosys_state::eeprom_w));
 	map(0xa80000, 0xa80005).writeonly().share("scroll_2");    // a80000-3 scroll? a80004 inverted ? 3 : 0
 	map(0xb00000, 0xb00005).writeonly().share("scroll_3");    // b00000-3 scrool?, b00004 inverted ? 3 : 0
-	map(0xb80000, 0xb80001).rw(this, FUNC(tecmosys_state::prot_status_r), FUNC(tecmosys_state::prot_status_w));
+	map(0xb80000, 0xb80001).rw(FUNC(tecmosys_state::prot_status_r), FUNC(tecmosys_state::prot_status_w));
 	map(0xc00000, 0xc00005).writeonly().share("scroll_0");    // c00000-3 scroll? c00004 inverted ? 13 : 10
 	map(0xc80000, 0xc80005).writeonly().share("scroll_1");    // c80000-3 scrool? c80004 inverted ? 3 : 0
 	map(0xd00000, 0xd00001).portr("P1");
 	map(0xd00002, 0xd00003).portr("P2");
-	map(0xd80000, 0xd80001).r(this, FUNC(tecmosys_state::eeprom_r));
+	map(0xd80000, 0xd80001).r(FUNC(tecmosys_state::eeprom_r));
 	map(0xe00001, 0xe00001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xe80000, 0xe80001).w(this, FUNC(tecmosys_state::prot_data_w));
-	map(0xf00001, 0xf00001).r(this, FUNC(tecmosys_state::sound_command_pending_r));
-	map(0xf80000, 0xf80001).r(this, FUNC(tecmosys_state::prot_data_r));
+	map(0xe80000, 0xe80001).w(FUNC(tecmosys_state::prot_data_w));
+	map(0xf00001, 0xf00001).r(FUNC(tecmosys_state::sound_command_pending_r));
+	map(0xf80000, 0xf80001).r(FUNC(tecmosys_state::prot_data_r));
 }
 
 
@@ -363,10 +363,10 @@ void tecmosys_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymf", FUNC(ymf262_device::read), FUNC(ymf262_device::write));
 	map(0x10, 0x10).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x20, 0x20).w(this, FUNC(tecmosys_state::oki_bank_w));
-	map(0x30, 0x30).w(this, FUNC(tecmosys_state::z80_bank_w));
+	map(0x20, 0x20).w(FUNC(tecmosys_state::oki_bank_w));
+	map(0x30, 0x30).w(FUNC(tecmosys_state::z80_bank_w));
 	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x50, 0x50).w(this, FUNC(tecmosys_state::sound_nmi_disable_w));
+	map(0x50, 0x50).w(FUNC(tecmosys_state::sound_nmi_disable_w));
 	map(0x60, 0x61).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 }
 
@@ -435,7 +435,7 @@ static const gfx_layout gfxlayout2 =
 	16*16*4
 };
 
-static GFXDECODE_START( tecmosys )
+static GFXDECODE_START( gfx_tecmosys )
 	GFXDECODE_ENTRY( "layer0", 0, gfxlayout,   0x4400, 0x40 )
 	GFXDECODE_ENTRY( "layer1", 0, gfxlayout2,  0x4000, 0x40 )
 	GFXDECODE_ENTRY( "layer2", 0, gfxlayout2,  0x4000, 0x40 )
@@ -455,21 +455,20 @@ void tecmosys_state::machine_start()
 }
 
 MACHINE_CONFIG_START(tecmosys_state::tecmosys)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmosys)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmosys)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -483,27 +482,28 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf", YMF262, XTAL(14'318'181))
+	MCFG_DEVICE_ADD("ymf", YMF262, XTAL(14'318'181))
 	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -658,24 +658,24 @@ void tecmosys_state::descramble()
 	}
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,deroon)
+void tecmosys_state::init_deroon()
 {
 	descramble();
 	prot_init(0); // machine/tecmosys.c
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
+void tecmosys_state::init_tkdensho()
 {
 	descramble();
 	prot_init(1);
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
+void tecmosys_state::init_tkdensha()
 {
 	descramble();
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, init_tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

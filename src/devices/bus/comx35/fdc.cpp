@@ -85,10 +85,11 @@ FLOPPY_FORMATS_MEMBER( comx_fd_device::floppy_formats )
 	FLOPPY_COMX35_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( comx_fd_floppies )
-	SLOT_INTERFACE( "525sd35t", FLOPPY_525_SD_35T )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void comx_fd_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd35t", FLOPPY_525_SD_35T);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 //-------------------------------------------------
@@ -96,7 +97,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(comx_fd_device::device_add_mconfig)
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(8'000'000))
+	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 8_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", comx_fd_floppies, nullptr, comx_fd_device::floppy_formats)

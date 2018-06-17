@@ -45,15 +45,15 @@ READ8_MEMBER( alesis_state::kb_r )
 
 WRITE8_MEMBER( alesis_state::led_w )
 {
-	m_patt_led		= BIT(data, 0) ? 1 : 0;
-	m_song_led		= BIT(data, 0) ? 0 : 1;
-	m_play_led		= BIT(data, 1) ? 0 : 1;
-	m_record_led	= BIT(data, 2) ? 0 : 1;
-	m_voice_led		= BIT(data, 3) ? 0 : 1;
-	m_tune_led		= BIT(data, 4) ? 0 : 1;
-	m_mix_led		= BIT(data, 5) ? 0 : 1;
-	m_tempo_led		= BIT(data, 6) ? 0 : 1;
-	m_midi_led		= BIT(data, 7) ? 0 : 1;
+	m_patt_led      = BIT(data, 0) ? 1 : 0;
+	m_song_led      = BIT(data, 0) ? 0 : 1;
+	m_play_led      = BIT(data, 1) ? 0 : 1;
+	m_record_led    = BIT(data, 2) ? 0 : 1;
+	m_voice_led     = BIT(data, 3) ? 0 : 1;
+	m_tune_led      = BIT(data, 4) ? 0 : 1;
+	m_mix_led       = BIT(data, 5) ? 0 : 1;
+	m_tempo_led     = BIT(data, 6) ? 0 : 1;
+	m_midi_led      = BIT(data, 7) ? 0 : 1;
 }
 
 READ8_MEMBER( alesis_state::p3_r )
@@ -77,13 +77,13 @@ WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )
 {
-	m_play_led		= BIT(data, 0) ? 0 : 1;
-	m_record_led	= BIT(data, 1) ? 0 : 1;
-	m_part_led		= BIT(data, 2) ? 0 : 1;
-	m_edit_led		= BIT(data, 3) ? 0 : 1;
-	m_song_led		= BIT(data, 4) ? 0 : 1;
-	m_echo_led		= BIT(data, 5) ? 0 : 1;
-	m_loop_led		= BIT(data, 6) ? 0 : 1;
+	m_play_led      = BIT(data, 0) ? 0 : 1;
+	m_record_led    = BIT(data, 1) ? 0 : 1;
+	m_part_led      = BIT(data, 2) ? 0 : 1;
+	m_edit_led      = BIT(data, 3) ? 0 : 1;
+	m_song_led      = BIT(data, 4) ? 0 : 1;
+	m_echo_led      = BIT(data, 5) ? 0 : 1;
+	m_loop_led      = BIT(data, 6) ? 0 : 1;
 
 	m_leds = data;
 }
@@ -127,11 +127,11 @@ void alesis_state::hr16_mem(address_map &map)
 void alesis_state::hr16_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).r(this, FUNC(alesis_state::kb_r));
+	map(0x0000, 0x0000).r(FUNC(alesis_state::kb_r));
 	map(0x0002, 0x0002).w("dm3ag", FUNC(alesis_dm3ag_device::write));
-	map(0x0004, 0x0004).w(this, FUNC(alesis_state::led_w));
+	map(0x0004, 0x0004).w(FUNC(alesis_state::led_w));
 	map(0x0006, 0x0007).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
-	map(0x0008, 0x0008).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0x0008, 0x0008).w(FUNC(alesis_state::kb_matrix_w));
 	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
 }
 
@@ -145,9 +145,9 @@ void alesis_state::sr16_io(address_map &map)
 {
 	//ADDRESS_MAP_UNMAP_HIGH
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
-	map(0x0200, 0x0200).mirror(0xff).w(this, FUNC(alesis_state::sr16_lcd_w));
-	map(0x0300, 0x0300).mirror(0xff).w(this, FUNC(alesis_state::kb_matrix_w));
-	map(0x0400, 0x0400).mirror(0xff).r(this, FUNC(alesis_state::kb_r));
+	map(0x0200, 0x0200).mirror(0xff).w(FUNC(alesis_state::sr16_lcd_w));
+	map(0x0300, 0x0300).mirror(0xff).w(FUNC(alesis_state::kb_matrix_w));
+	map(0x0400, 0x0400).mirror(0xff).r(FUNC(alesis_state::kb_r));
 	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
 }
 
@@ -155,9 +155,9 @@ void alesis_state::mmt8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("nvram");   // 2x32Kx8 SRAM, (battery-backed)
-	map(0xff02, 0xff02).w(this, FUNC(alesis_state::track_led_w));
-	map(0xff04, 0xff04).rw(this, FUNC(alesis_state::mmt8_led_r), FUNC(alesis_state::mmt8_led_w));
-	map(0xff06, 0xff06).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0xff02, 0xff02).w(FUNC(alesis_state::track_led_w));
+	map(0xff04, 0xff04).rw(FUNC(alesis_state::mmt8_led_r), FUNC(alesis_state::mmt8_led_w));
+	map(0xff06, 0xff06).w(FUNC(alesis_state::kb_matrix_w));
 	map(0xff08, 0xff09).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0xff0e, 0xff0e).nopr();
 }
@@ -416,12 +416,12 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 
 MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, 12_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(hr16_mem)
-	MCFG_CPU_IO_MAP(hr16_io)
+	MCFG_DEVICE_ADD("maincpu",I8031, 12_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hr16_mem)
+	MCFG_DEVICE_IO_MAP(hr16_io)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SELECT"))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(alesis_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(alesis_state, p3_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, alesis_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, alesis_state, p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -452,9 +452,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(alesis_state::sr16)
 	hr16(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sr16_mem)
-	MCFG_CPU_IO_MAP(sr16_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sr16_mem)
+	MCFG_DEVICE_IO_MAP(sr16_io)
 	MCFG_MCS51_PORT_P1_IN_CB(NOOP)
 
 	/* video hardware */
@@ -471,11 +471,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(alesis_state::mmt8)
 	hr16(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mmt8_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(alesis_state, kb_r))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(alesis_state, mmt8_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(alesis_state, mmt8_p3_w))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mmt8_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, alesis_state, kb_r))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, alesis_state, mmt8_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, alesis_state, mmt8_p3_w))
 
 	MCFG_DEVICE_REMOVE("dm3ag")
 MACHINE_CONFIG_END
@@ -487,17 +487,17 @@ ROM_START( hr16 )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v109")
 	ROM_SYSTEM_BIOS(0, "v106", "ver 1.06")
-	ROMX_LOAD( "hr16-v1.06.bin",  0x0000, 0x8000, CRC(f0cdb899) SHA1(f21cd87af15ad5a0bfec992e38131c4f4e4c5102), ROM_BIOS(1))
+	ROMX_LOAD("hr16-v1.06.bin",  0x0000, 0x8000, CRC(f0cdb899) SHA1(f21cd87af15ad5a0bfec992e38131c4f4e4c5102), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v107", "ver 1.07")
-	ROMX_LOAD( "2-19-0256-v107.u11",  0x0000, 0x8000, CRC(2582b6a2) SHA1(f1f135335578c938be63b37ed207e82b7a0e13be), ROM_BIOS(2))
+	ROMX_LOAD("2-19-0256-v107.u11",  0x0000, 0x8000, CRC(2582b6a2) SHA1(f1f135335578c938be63b37ed207e82b7a0e13be), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v109", "ver 1.09")
-	ROMX_LOAD( "2-19-0256-v109.u11",  0x0000, 0x8000, CRC(a9bdbf20) SHA1(229b4230c7b5380efbfd42fa95645723d3fd6d55), ROM_BIOS(3))
+	ROMX_LOAD("2-19-0256-v109.u11",  0x0000, 0x8000, CRC(a9bdbf20) SHA1(229b4230c7b5380efbfd42fa95645723d3fd6d55), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v200", "ver 2.00")
-	ROMX_LOAD( "hr16-v2.0.bin",  0x0000, 0x8000, CRC(a3fcba12) SHA1(4c94be7e94e5a1d86443571cd4d375158a6e7b65), ROM_BIOS(4))
+	ROMX_LOAD("hr16-v2.0.bin",  0x0000, 0x8000, CRC(a3fcba12) SHA1(4c94be7e94e5a1d86443571cd4d375158a6e7b65), ROM_BIOS(3))
 
 	ROM_REGION( 0x100000, "dm3ag", 0 )
-	ROM_LOAD( "2-27-0004.u16", 0x00000, 0x80000, CRC(8e103536) SHA1(092e1cf649fbef171cfaf91e20707d89998b7a1e))
-	ROM_LOAD( "2-27-0003.u15", 0x80000, 0x80000, CRC(82e9b78c) SHA1(89728cb38ae172b5e347a03018617c94a087dce0))
+	ROM_LOAD("2-27-0004.u16", 0x00000, 0x80000, CRC(8e103536) SHA1(092e1cf649fbef171cfaf91e20707d89998b7a1e))
+	ROM_LOAD("2-27-0003.u15", 0x80000, 0x80000, CRC(82e9b78c) SHA1(89728cb38ae172b5e347a03018617c94a087dce0))
 ROM_END
 
 ROM_START( hr16b )
@@ -505,27 +505,27 @@ ROM_START( hr16b )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v200", "ver 2.00")
-	ROMX_LOAD( "2-19-0256-v200.u11",0x0000,  0x8000, CRC(19cf0fce) SHA1(f8b3786b32d68e3627a654b8b3916befbe9bc540), ROM_BIOS(1))
+	ROMX_LOAD("2-19-0256-v200.u11",0x0000,  0x8000, CRC(19cf0fce) SHA1(f8b3786b32d68e3627a654b8b3916befbe9bc540), ROM_BIOS(0))
 
 	ROM_REGION( 0x100000, "dm3ag", 0 )
-	ROM_LOAD( "2-27-0008.u16", 0x00000, 0x80000, CRC(11ca930e) SHA1(2f57fdd02f9b2146a551370a74cab1fa800145ab))
-	ROM_LOAD( "2-27-0007.u15", 0x80000, 0x80000, CRC(319746db) SHA1(46b32a3ab2fbad67fb4566f607f578a2e9defd63))
+	ROM_LOAD("2-27-0008.u16", 0x00000, 0x80000, CRC(11ca930e) SHA1(2f57fdd02f9b2146a551370a74cab1fa800145ab))
+	ROM_LOAD("2-27-0007.u15", 0x80000, 0x80000, CRC(319746db) SHA1(46b32a3ab2fbad67fb4566f607f578a2e9defd63))
 ROM_END
 
 ROM_START( mmt8 )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v111", "ver 1.11")
-	ROMX_LOAD( "mt8v1-11.bin", 0x00000, 0x08000, CRC(c9951946) SHA1(149bc5ea46466537de4074820c66a2296ea43bc1), ROM_BIOS(1))
+	ROMX_LOAD("mt8v1-11.bin", 0x00000, 0x08000, CRC(c9951946) SHA1(149bc5ea46466537de4074820c66a2296ea43bc1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v109", "ver 1.09")
-	ROMX_LOAD( "mt8v1-09.bin", 0x00000, 0x08000, CRC(0ec41dec) SHA1(2c283965e510b586a08f0290df4dd357e6b19b62), ROM_BIOS(2))
+	ROMX_LOAD("mt8v1-09.bin", 0x00000, 0x08000, CRC(0ec41dec) SHA1(2c283965e510b586a08f0290df4dd357e6b19b62), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v108", "ver 1.08")
-	ROMX_LOAD( "mt8v1-08.bin", 0x00000, 0x08000, CRC(a0615455) SHA1(77395c837b356b34d6b96f6f46eca8c89b57434e), ROM_BIOS(3))
+	ROMX_LOAD("mt8v1-08.bin", 0x00000, 0x08000, CRC(a0615455) SHA1(77395c837b356b34d6b96f6f46eca8c89b57434e), ROM_BIOS(2))
 ROM_END
 
 ROM_START( sr16 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v104", "ver 1.04")
-	ROMX_LOAD( "sr16_v1_04.bin", 0x0000, 0x10000, CRC(d049af6e) SHA1(0bbeb4bd25e33a9eca64d5a31480f96a0040617e), ROM_BIOS(1))
+	ROMX_LOAD( "sr16_v1_04.bin", 0x0000, 0x10000, CRC(d049af6e) SHA1(0bbeb4bd25e33a9eca64d5a31480f96a0040617e), ROM_BIOS(0))
 
 	ROM_REGION( 0x100000, "dm3ag", ROMREGION_ERASEFF )
 	ROM_LOAD( "sr16.u6", 0x00000, 0x80000, CRC(6da96987) SHA1(3ec8627d440bc73841e1408a19def09a8b0b77f7))
@@ -533,20 +533,19 @@ ROM_START( sr16 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(alesis_state,hr16)
+void alesis_state::init_hr16()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *orig = memregion("user1")->base();
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		ROM[bitswap<16>(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
 	}
 }
 
 /* Driver */
-/*    YEAR  NAME   PARENT   COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY   FULLNAME          FLAGS */
-SYST( 1987, hr16,  0,       0,       hr16,      hr16,  alesis_state, hr16, "Alesis", "HR-16",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1987, mmt8,  0,       0,       mmt8,      mmt8,  alesis_state, 0,    "Alesis", "MMT-8",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1989, hr16b, hr16,    0,       hr16,      hr16,  alesis_state, hr16, "Alesis", "HR-16B",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1990, sr16,  0,       0,       sr16,      sr16,  alesis_state, 0,    "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY   FULLNAME          FLAGS */
+SYST( 1987, hr16,  0,      0,      hr16,    hr16,  alesis_state, init_hr16,  "Alesis", "HR-16",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1987, mmt8,  0,      0,      mmt8,    mmt8,  alesis_state, empty_init, "Alesis", "MMT-8",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1989, hr16b, hr16,   0,      hr16,    hr16,  alesis_state, init_hr16,  "Alesis", "HR-16B",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1990, sr16,  0,      0,      sr16,    sr16,  alesis_state, empty_init, "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

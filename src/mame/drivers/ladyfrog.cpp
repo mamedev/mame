@@ -82,7 +82,7 @@ WRITE8_MEMBER(ladyfrog_state::sound_cpu_reset_w)
 TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
@@ -121,21 +121,21 @@ void ladyfrog_state::ladyfrog_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc07f).ram();
-	map(0xc080, 0xc87f).rw(this, FUNC(ladyfrog_state::ladyfrog_videoram_r), FUNC(ladyfrog_state::ladyfrog_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).w(this, FUNC(ladyfrog_state::ladyfrog_gfxctrl2_w));
-	map(0xd400, 0xd400).rw(this, FUNC(ladyfrog_state::from_snd_r), FUNC(ladyfrog_state::sound_command_w));
-	map(0xd401, 0xd401).r(this, FUNC(ladyfrog_state::snd_flag_r));
-	map(0xd403, 0xd403).w(this, FUNC(ladyfrog_state::sound_cpu_reset_w));
+	map(0xc080, 0xc87f).rw(FUNC(ladyfrog_state::ladyfrog_videoram_r), FUNC(ladyfrog_state::ladyfrog_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).w(FUNC(ladyfrog_state::ladyfrog_gfxctrl2_w));
+	map(0xd400, 0xd400).rw(FUNC(ladyfrog_state::from_snd_r), FUNC(ladyfrog_state::sound_command_w));
+	map(0xd401, 0xd401).r(FUNC(ladyfrog_state::snd_flag_r));
+	map(0xd403, 0xd403).w(FUNC(ladyfrog_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSW1");
 	map(0xd801, 0xd801).portr("DSW2");
 	map(0xd804, 0xd804).portr("INPUTS");
 	map(0xd806, 0xd806).portr("SYSTEM");
-	map(0xdc00, 0xdc9f).rw(this, FUNC(ladyfrog_state::ladyfrog_spriteram_r), FUNC(ladyfrog_state::ladyfrog_spriteram_w));
-	map(0xdca0, 0xdcbf).rw(this, FUNC(ladyfrog_state::ladyfrog_scrlram_r), FUNC(ladyfrog_state::ladyfrog_scrlram_w)).share("scrlram");
+	map(0xdc00, 0xdc9f).rw(FUNC(ladyfrog_state::ladyfrog_spriteram_r), FUNC(ladyfrog_state::ladyfrog_spriteram_w));
+	map(0xdca0, 0xdcbf).rw(FUNC(ladyfrog_state::ladyfrog_scrlram_r), FUNC(ladyfrog_state::ladyfrog_scrlram_w)).share("scrlram");
 	map(0xdcc0, 0xdcff).ram();
-	map(0xdd00, 0xdeff).rw(this, FUNC(ladyfrog_state::ladyfrog_palette_r), FUNC(ladyfrog_state::ladyfrog_palette_w));
+	map(0xdd00, 0xdeff).rw(FUNC(ladyfrog_state::ladyfrog_palette_r), FUNC(ladyfrog_state::ladyfrog_palette_w));
 	map(0xd0d0, 0xd0d0).nopr(); /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
-	map(0xdf03, 0xdf03).w(this, FUNC(ladyfrog_state::ladyfrog_gfxctrl_w));
+	map(0xdf03, 0xdf03).w(FUNC(ladyfrog_state::ladyfrog_gfxctrl_w));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -149,10 +149,10 @@ void ladyfrog_state::ladyfrog_sound_map(address_map &map)
 	map(0xca00, 0xca00).nopw();
 	map(0xcb00, 0xcb00).nopw();
 	map(0xcc00, 0xcc00).nopw();
-	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(ladyfrog_state::to_main_w));
-	map(0xd200, 0xd200).nopr().w(this, FUNC(ladyfrog_state::nmi_enable_w));
-	map(0xd400, 0xd400).w(this, FUNC(ladyfrog_state::nmi_disable_w));
-	map(0xd600, 0xd600).nopr().w("dac", FUNC(dac_byte_interface::write));       /* signed 8-bit DAC - unknown read */
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(ladyfrog_state::to_main_w));
+	map(0xd200, 0xd200).nopr().w(FUNC(ladyfrog_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(FUNC(ladyfrog_state::nmi_disable_w));
+	map(0xd600, 0xd600).nopr().w("dac", FUNC(dac_byte_interface::data_w));       /* signed 8-bit DAC - unknown read */
 	map(0xe000, 0xefff).noprw();
 }
 
@@ -262,7 +262,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( ladyfrog )
+static GFXDECODE_START( gfx_ladyfrog )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -291,13 +291,13 @@ void ladyfrog_state::machine_reset()
 MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ladyfrog_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladyfrog_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ladyfrog_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ladyfrog_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ladyfrog_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ladyfrog_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ladyfrog_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ladyfrog_state, irq0_line_hold, 2*60)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -312,21 +312,21 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladyfrog)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladyfrog)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ladyfrog_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ladyfrog_state, unk_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ladyfrog_state, unk_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ladyfrog_state, unk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -340,9 +340,9 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ladyfrog_state::toucheme)
@@ -399,8 +399,8 @@ ROM_START( touchemea )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ladyfrog,  0,        ladyfrog, ladyfrog, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
 
 // toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
-GAME( 19??, toucheme,  0,        toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 19??, touchemea, toucheme, toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, toucheme,  0,        toucheme, toucheme, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 19??, touchemea, toucheme, toucheme, toucheme, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )

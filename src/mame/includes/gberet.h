@@ -8,6 +8,7 @@
 
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 
 class gberet_state : public driver_device
 {
@@ -55,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gberet_scroll_w);
 	DECLARE_WRITE8_MEMBER(gberet_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(gberetb_scroll_w);
-	DECLARE_DRIVER_INIT(mrgoemon);
+	void init_mrgoemon();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(gberet);
 	DECLARE_MACHINE_RESET(gberet);

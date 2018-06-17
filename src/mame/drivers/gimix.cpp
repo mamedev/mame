@@ -185,8 +185,8 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x0e210, 0x0e21f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0e220, 0x0e23f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0x0e240, 0x0e3af).ram();
-	map(0x0e3b0, 0x0e3b3).rw(this, FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
-	map(0x0e3b4, 0x0e3b7).rw(this, FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
+	map(0x0e3b0, 0x0e3b3).rw(FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
+	map(0x0e3b4, 0x0e3b7).rw(FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
 	map(0x0e400, 0x0e7ff).ram();  // scratchpad RAM
 	map(0x0e800, 0x0efff).ram();
 	map(0x0f000, 0x0f7ff).bankr("rombank2");
@@ -212,7 +212,7 @@ void gimix_state::gimix_mem(address_map &map)
 	map(0xd000, 0xdfff).rw(m_bank14, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xe000, 0xefff).rw(m_bank15, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xf000, 0xfeff).rw(m_bank16, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xff00, 0xffff).bankr("fixedrombank").w(this, FUNC(gimix_state::system_w));
+	map(0xff00, 0xffff).bankr("fixedrombank").w(FUNC(gimix_state::system_w));
 }
 
 static INPUT_PORTS_START( gimix )
@@ -429,13 +429,13 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		if(DMA_DIRECTION)
 		{
 			// write to disk
-			m_fdc->data_w(m_ram->read(m_dma_current_addr));
+			m_fdc->write_data(m_ram->read(m_dma_current_addr));
 //          logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
 		}
 		else
 		{
 			// read from disk
-			m_ram->write(m_dma_current_addr,m_fdc->data_r());
+			m_ram->write(m_dma_current_addr,m_fdc->read_data());
 //          logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
 		}
 		m_dma_current_addr++;
@@ -448,9 +448,9 @@ INPUT_CHANGED_MEMBER(gimix_state::drive_size_cb)
 {
 	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
-		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 4); // 8 inch (2MHz)
+		m_fdc->set_unscaled_clock(8_MHz_XTAL / 4); // 8 inch (2MHz)
 	else
-		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 8); // 5.25 inch (1MHz)
+		m_fdc->set_unscaled_clock(8_MHz_XTAL / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_reset()
@@ -471,9 +471,9 @@ void gimix_state::machine_reset()
 
 	// initialise FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
-		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 4); // 8 inch (2MHz)
+		m_fdc->set_unscaled_clock(8_MHz_XTAL / 4); // 8 inch (2MHz)
 	else
-		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 8); // 5.25 inch (1MHz)
+		m_fdc->set_unscaled_clock(8_MHz_XTAL / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_start()
@@ -533,10 +533,11 @@ FLOPPY_FORMATS_MEMBER( gimix_state::floppy_formats )
 	FLOPPY_FLEX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( gimix_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void gimix_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("8dd", FLOPPY_8_DSDD);
+}
 
 #define MCFG_ADDRESS_BANK(tag) \
 MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
@@ -547,71 +548,71 @@ MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(gimix_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 8_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(gimix_mem)
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(gimix_state,irq_w))
+	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, gimix_state,irq_w))
 
 	/* timer */
-	MCFG_DEVICE_ADD("timer", PTM6840, XTAL(2'000'000))  // clock is a guess
-	MCFG_PTM6840_IRQ_CB(WRITELINE(gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
+	MCFG_DEVICE_ADD("timer", PTM6840, 2'000'000)  // clock is a guess
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_FD1797_ADD("fdc",XTAL(8'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(gimix_state,fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(gimix_state,fdc_drq_w))
+	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 
 	/* parallel ports */
-	MCFG_DEVICE_ADD("pia1",PIA6821,XTAL(2'000'000))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(gimix_state,pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(gimix_state,pia_pb_w))
-	MCFG_PIA_READPA_HANDLER(READ8(gimix_state,pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(gimix_state,pia_pb_r))
-	MCFG_DEVICE_ADD("pia2",PIA6821,XTAL(2'000'000))
+	MCFG_DEVICE_ADD("pia1", PIA6821, 2'000'000)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, gimix_state,pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, gimix_state,pia_pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, gimix_state,pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, gimix_state,pia_pb_r))
+	MCFG_DEVICE_ADD("pia2", PIA6821, 2'000'000)
 
 	/* serial ports */
-	MCFG_DEVICE_ADD("acia1",ACIA6850,XTAL(2'000'000))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1",rs232_port_device,write_rts))
+	MCFG_DEVICE_ADD("acia1", ACIA6850, 2'000'000)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial1",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial1",rs232_port_device,write_rts))
 
-	MCFG_DEVICE_ADD("acia2",ACIA6850,XTAL(2'000'000))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial2",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial2",rs232_port_device,write_rts))
+	MCFG_DEVICE_ADD("acia2", ACIA6850, 2'000'000)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial2",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial2",rs232_port_device,write_rts))
 
-	MCFG_DEVICE_ADD("acia3",ACIA6850,XTAL(2'000'000))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial3",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial3",rs232_port_device,write_rts))
+	MCFG_DEVICE_ADD("acia3", ACIA6850, 2'000'000)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial3",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial3",rs232_port_device,write_rts))
 
-	MCFG_DEVICE_ADD("acia4",ACIA6850,XTAL(2'000'000))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_rts))
+	MCFG_DEVICE_ADD("acia4", ACIA6850, 2'000'000)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial4",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial4",rs232_port_device,write_rts))
 
-	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1",acia6850_device,write_cts))
+	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1",acia6850_device,write_cts))
 
-	MCFG_RS232_PORT_ADD("serial2",default_rs232_devices,"terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2",acia6850_device,write_cts))
+	MCFG_DEVICE_ADD("serial2",RS232_PORT, default_rs232_devices,"terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2",acia6850_device,write_cts))
 
-	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia3",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia3",acia6850_device,write_cts))
+	MCFG_DEVICE_ADD("serial3",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia3",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia3",acia6850_device,write_cts))
 
-	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia4",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia4",acia6850_device,write_cts))
+	MCFG_DEVICE_ADD("serial4",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia4",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia4",acia6850_device,write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
 
 	/* banking */
 	MCFG_ADDRESS_BANK("bank1")
@@ -659,4 +660,4 @@ ROM_START( gimix )
 		ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
 ROM_END
 
-COMP( 1980, gimix,    0,      0,      gimix,        gimix, gimix_state, 0,      "Gimix",  "Gimix 6809 System",  MACHINE_IS_SKELETON )
+COMP( 1980, gimix, 0, 0, gimix, gimix, gimix_state, empty_init, "Gimix", "Gimix 6809 System", MACHINE_IS_SKELETON )

@@ -29,6 +29,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -69,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-	DECLARE_DRIVER_INIT(kingtut);
+	void init_kingtut();
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
@@ -244,21 +245,21 @@ void kongambl_state::kongambl_map(address_map &map)
 
 	map(0x4cc000, 0x4cc00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 
-	map(0x4d0000, 0x4d0000).w(this, FUNC(kongambl_state::kongambl_ff_w));
+	map(0x4d0000, 0x4d0000).w(FUNC(kongambl_state::kongambl_ff_w));
 
 	map(0x500000, 0x5007ff).ram();
-	map(0x500380, 0x500383).r(this, FUNC(kongambl_state::test_r));
+	map(0x500380, 0x500383).r(FUNC(kongambl_state::test_r));
 //  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
 //  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
 //  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
-	map(0x580000, 0x580007).r(this, FUNC(kongambl_state::test_r));
+	map(0x580000, 0x580007).r(FUNC(kongambl_state::test_r));
 
-	map(0x600000, 0x60000f).r(this, FUNC(kongambl_state::test_r));
+	map(0x600000, 0x60000f).r(FUNC(kongambl_state::test_r));
 
-	map(0x700000, 0x700003).r(this, FUNC(kongambl_state::eeprom_r));
+	map(0x700000, 0x700003).r(FUNC(kongambl_state::eeprom_r));
 	map(0x700004, 0x700007).portr("IN1");
 	map(0x700008, 0x70000b).portr("IN3");
-	map(0x780000, 0x780003).w(this, FUNC(kongambl_state::eeprom_w));
+	map(0x780000, 0x780003).w(FUNC(kongambl_state::eeprom_w));
 	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
 }
 
@@ -605,7 +606,7 @@ static const gfx_layout charlayout8_tasman =
 	8*64
 };
 
-static GFXDECODE_START( tasman )
+static GFXDECODE_START( gfx_tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
@@ -640,21 +641,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 }
 
 MACHINE_CONFIG_START(kongambl_state::kongambl)
-	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
-	MCFG_CPU_PROGRAM_MAP(kongambl_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(kongambl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
+	MCFG_DEVICE_ADD("sndcpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
 	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
 	MCFG_K053252_OFFSETS(0, 16) // TBD
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(kongambl_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(kongambl_state, hblank_irq_ack_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, kongambl_state, vblank_irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, kongambl_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD
@@ -674,15 +675,16 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K055673_PALETTE("palette")
 
 #if CUSTOM_DRAW
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
 #endif
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(kongambl_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 
@@ -812,7 +814,7 @@ ROM_START( vikingt )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(kongambl_state,kingtut)
+void kongambl_state::init_kingtut()
 {
 	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 
@@ -822,8 +824,8 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,  kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state, init_kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

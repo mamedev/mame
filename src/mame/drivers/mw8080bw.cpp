@@ -233,8 +233,8 @@ void mw8080bw_state::main_map(address_map &map)
 MACHINE_CONFIG_START(mw8080bw_state::mw8080bw_root)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080,MW8080BW_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu",I8080,MW8080BW_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state,mw8080bw)
 
@@ -334,16 +334,16 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
 void mw8080bw_state::seawolf_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::seawolf_explosion_lamp_w));
-	map(0x02, 0x02).w(this, FUNC(mw8080bw_state::seawolf_periscope_lamp_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::seawolf_explosion_lamp_w));
+	map(0x02, 0x02).w(FUNC(mw8080bw_state::seawolf_periscope_lamp_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::seawolf_audio_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::seawolf_audio_w));
 }
 
 
@@ -411,8 +411,8 @@ MACHINE_CONFIG_START(mw8080bw_state::seawolf)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(seawolf_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(seawolf_io_map)
 	/* there is no watchdog */
 
 	/* add shifter */
@@ -454,7 +454,7 @@ void mw8080bw_state::gunfight_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	/* no decoder, just 3 AND gates */
-	map(0x00, 0x07).w(this, FUNC(mw8080bw_state::gunfight_io_w));
+	map(0x00, 0x07).w(FUNC(mw8080bw_state::gunfight_io_w));
 }
 
 
@@ -513,8 +513,8 @@ MACHINE_CONFIG_START(mw8080bw_state::gunfight)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gunfight_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(gunfight_io_map)
 	/* there is no watchdog */
 
 	/* add shifter */
@@ -650,7 +650,7 @@ void mw8080bw_state::tornbase_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	/* no decoder, just 3 AND gates */
-	map(0x00, 0x07).w(this, FUNC(mw8080bw_state::tornbase_io_w));
+	map(0x00, 0x07).w(FUNC(mw8080bw_state::tornbase_io_w));
 }
 
 
@@ -743,8 +743,8 @@ MACHINE_CONFIG_START(mw8080bw_state::tornbase)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(tornbase_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(tornbase_io_map)
 	/* there is no watchdog */
 
 	/* add shifter */
@@ -771,10 +771,10 @@ void mw8080bw_state::zzzap_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x02, 0x02).w(this, FUNC(mw8080bw_state::zzzap_audio_1_w));
+	map(0x02, 0x02).w(FUNC(mw8080bw_state::zzzap_audio_1_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::zzzap_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::zzzap_audio_2_w));
 	map(0x07, 0x07).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -852,8 +852,8 @@ MACHINE_CONFIG_START(mw8080bw_state::zzzap)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(zzzap_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(zzzap_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1))) /* 1.1s */
@@ -930,7 +930,7 @@ void mw8080bw_state::maze_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 
 	/* no decoder, just a couple of AND gates */
-	map(0x00, 0x03).w(this, FUNC(mw8080bw_state::maze_io_w));
+	map(0x00, 0x03).w(FUNC(mw8080bw_state::maze_io_w));
 }
 
 
@@ -966,8 +966,8 @@ MACHINE_CONFIG_START(mw8080bw_state::maze)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(maze_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(maze_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,maze)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1001,14 +1001,14 @@ void mw8080bw_state::boothill_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
-	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
+	map(0x03, 0x03).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::boothill_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::boothill_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
 }
 
 
@@ -1060,8 +1060,8 @@ MACHINE_CONFIG_START(mw8080bw_state::boothill)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(boothill_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(boothill_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,boothill)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1100,7 +1100,7 @@ void mw8080bw_state::checkmat_io_map(address_map &map)
 	map(0x03, 0x03).portr("IN3");
 
 	/* no decoder, just a couple of AND gates */
-	map(0x00, 0x03).w(this, FUNC(mw8080bw_state::checkmat_io_w));
+	map(0x00, 0x03).w(FUNC(mw8080bw_state::checkmat_io_w));
 }
 
 
@@ -1169,8 +1169,8 @@ MACHINE_CONFIG_START(mw8080bw_state::checkmat)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(checkmat_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(checkmat_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
@@ -1230,18 +1230,18 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
 void mw8080bw_state::desertgu_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::desertgu_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::desertgu_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::desertgu_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::desertgu_audio_2_w));
 }
 
 
@@ -1298,8 +1298,8 @@ MACHINE_CONFIG_START(mw8080bw_state::desertgu)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(desertgu_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(desertgu_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,desertgu)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1363,10 +1363,10 @@ void mw8080bw_state::dplay_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::dplay_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::dplay_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
 }
 
 
@@ -1502,8 +1502,8 @@ MACHINE_CONFIG_START(mw8080bw_state::dplay)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(dplay_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(dplay_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -1539,15 +1539,15 @@ void mw8080bw_state::gmissile_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
-	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
+	map(0x03, 0x03).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::gmissile_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::gmissile_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::gmissile_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::gmissile_audio_2_w));
 	/* also writes 0x00 to 0x06, but it is not connected */
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::gmissile_audio_3_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::gmissile_audio_3_w));
 }
 
 
@@ -1599,8 +1599,8 @@ MACHINE_CONFIG_START(mw8080bw_state::gmissile)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gmissile_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(gmissile_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,gmissile)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1637,13 +1637,13 @@ void mw8080bw_state::m4_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
-	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
+	map(0x03, 0x03).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::m4_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::m4_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::m4_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::m4_audio_2_w));
 }
 
 
@@ -1695,8 +1695,8 @@ MACHINE_CONFIG_START(mw8080bw_state::m4)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(m4_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(m4_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,m4)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1758,11 +1758,11 @@ void mw8080bw_state::clowns_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::clowns_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::clowns_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::clowns_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::clowns_audio_2_w));
 }
 
 
@@ -1866,8 +1866,8 @@ MACHINE_CONFIG_START(mw8080bw_state::clowns)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(clowns_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(clowns_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,clowns)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1900,11 +1900,11 @@ void mw8080bw_state::spacwalk_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::spacwalk_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::spacwalk_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::spacwalk_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::spacwalk_audio_2_w));
 }
 
 static INPUT_PORTS_START( spacwalk )
@@ -1964,8 +1964,8 @@ MACHINE_CONFIG_START(mw8080bw_state::spacwalk)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spacwalk_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spacwalk_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,clowns)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1992,7 +1992,7 @@ void mw8080bw_state::shuffle_io_map(address_map &map)
 	map.global_mask(0xf);    /* yes, 4, and no mirroring on the read handlers */
 	map(0x01, 0x01).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 	map(0x02, 0x02).portr("IN0");
-	map(0x03, 0x03).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x03, 0x03).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x04, 0x04).portr("IN1");
 	map(0x05, 0x05).portr("IN2");
 	map(0x06, 0x06).portr("IN3");
@@ -2000,8 +2000,8 @@ void mw8080bw_state::shuffle_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x08).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).mirror(0x08).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).mirror(0x08).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).mirror(0x08).w(this, FUNC(mw8080bw_state::shuffle_audio_1_w));
-	map(0x06, 0x06).mirror(0x08).w(this, FUNC(mw8080bw_state::shuffle_audio_2_w));
+	map(0x05, 0x05).mirror(0x08).w(FUNC(mw8080bw_state::shuffle_audio_1_w));
+	map(0x06, 0x06).mirror(0x08).w(FUNC(mw8080bw_state::shuffle_audio_2_w));
 }
 
 
@@ -2049,8 +2049,8 @@ MACHINE_CONFIG_START(mw8080bw_state::shuffle)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(shuffle_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(shuffle_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2081,10 +2081,10 @@ void mw8080bw_state::dogpatch_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::dogpatch_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::dogpatch_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
 }
 
 
@@ -2138,8 +2138,8 @@ MACHINE_CONFIG_START(mw8080bw_state::dogpatch)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(dogpatch_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(dogpatch_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2232,7 +2232,7 @@ void mw8080bw_state::spcenctr_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0xfc).nopr();
 
 	/* complicated addressing logic */
-	map(0x00, 0xff).w(this, FUNC(mw8080bw_state::spcenctr_io_w));
+	map(0x00, 0xff).w(FUNC(mw8080bw_state::spcenctr_io_w));
 }
 
 
@@ -2290,8 +2290,8 @@ MACHINE_CONFIG_START(mw8080bw_state::spcenctr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spcenctr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spcenctr_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,spcenctr)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2335,7 +2335,7 @@ MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 void mw8080bw_state::phantom2_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
@@ -2343,8 +2343,8 @@ void mw8080bw_state::phantom2_io_map(address_map &map)
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::phantom2_audio_1_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::phantom2_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::phantom2_audio_1_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::phantom2_audio_2_w));
 }
 
 
@@ -2388,8 +2388,8 @@ MACHINE_CONFIG_START(mw8080bw_state::phantom2)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(phantom2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(phantom2_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,phantom2)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2398,7 +2398,7 @@ MACHINE_CONFIG_START(mw8080bw_state::phantom2)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mw8080bw_state, screen_update_phantom2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mw8080bw_state, screen_vblank_phantom2))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mw8080bw_state, screen_vblank_phantom2))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2464,9 +2464,9 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
 void mw8080bw_state::bowler_io_map(address_map &map)
 {
 	map.global_mask(0xf);  /* no masking on the reads, all 4 bits are decoded */
-	map(0x01, 0x01).r(this, FUNC(mw8080bw_state::bowler_shift_result_r));
+	map(0x01, 0x01).r(FUNC(mw8080bw_state::bowler_shift_result_r));
 	map(0x02, 0x02).portr("IN0");
-	map(0x03, 0x03).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x03, 0x03).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x04, 0x04).portr("IN1");
 	map(0x05, 0x05).portr("IN2");
 	map(0x06, 0x06).portr("IN3");
@@ -2474,14 +2474,14 @@ void mw8080bw_state::bowler_io_map(address_map &map)
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::bowler_audio_1_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::bowler_audio_2_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::bowler_lights_1_w));
-	map(0x08, 0x08).w(this, FUNC(mw8080bw_state::bowler_audio_3_w));
-	map(0x09, 0x09).w(this, FUNC(mw8080bw_state::bowler_audio_4_w));
-	map(0x0a, 0x0a).w(this, FUNC(mw8080bw_state::bowler_audio_5_w));
-	map(0x0e, 0x0e).w(this, FUNC(mw8080bw_state::bowler_lights_2_w));
-	map(0x0f, 0x0f).w(this, FUNC(mw8080bw_state::bowler_audio_6_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::bowler_audio_1_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::bowler_audio_2_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::bowler_lights_1_w));
+	map(0x08, 0x08).w(FUNC(mw8080bw_state::bowler_audio_3_w));
+	map(0x09, 0x09).w(FUNC(mw8080bw_state::bowler_audio_4_w));
+	map(0x0a, 0x0a).w(FUNC(mw8080bw_state::bowler_audio_5_w));
+	map(0x0e, 0x0e).w(FUNC(mw8080bw_state::bowler_lights_2_w));
+	map(0x0f, 0x0f).w(FUNC(mw8080bw_state::bowler_audio_6_w));
 }
 
 
@@ -2531,8 +2531,8 @@ MACHINE_CONFIG_START(mw8080bw_state::bowler)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(bowler_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(bowler_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2658,9 +2658,9 @@ void mw8080bw_state::invaders_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::invaders_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::invaders_audio_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::invaders_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::invaders_audio_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -2744,8 +2744,8 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(invaders_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invaders_io_map)
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,invaders)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2787,14 +2787,14 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
 void mw8080bw_state::blueshrk_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::blueshrk_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::blueshrk_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -2831,8 +2831,8 @@ MACHINE_CONFIG_START(mw8080bw_state::blueshrk)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(blueshrk_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(blueshrk_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2876,13 +2876,13 @@ void mw8080bw_state::invad2ct_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::invad2ct_audio_3_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::invad2ct_audio_3_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::invad2ct_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::invad2ct_audio_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::invad2ct_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::invad2ct_audio_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::invad2ct_audio_4_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::invad2ct_audio_4_w));
 }
 
 
@@ -2935,8 +2935,8 @@ MACHINE_CONFIG_START(mw8080bw_state::invad2ct)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(invad2ct_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invad2ct_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -3272,35 +3272,35 @@ ROM_END
 
 /* PCB #        year  rom         parent    machine   inp       init              monitor,company,fullname,flags */
 
-/* 596 */ GAMEL(1976, seawolf,    0,        seawolf,  seawolf,  mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 596 */ GAMEL(1976, seawolfo,   seawolf,  seawolf,  seawolf,  mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL(1975, gunfight,   0,        gunfight, gunfight, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
-/* 597 */ GAMEL(1975, gunfighto,  gunfight, gunfight, gunfight, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 596 */ GAMEL( 1976, seawolf,    0,        seawolf,  seawolf,  mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 596 */ GAMEL( 1976, seawolfo,   seawolf,  seawolf,  seawolf,  mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
-/* 605 */ GAME( 1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL(1976, 280zzzap,   0,        zzzap,    zzzap,    mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
-/* 611 */ GAMEL(1976, maze,       0,        maze,     maze,     mw8080bw_state, 0, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
-/* 612 */ GAME( 1977, boothill,   0,        boothill, boothill, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
-/* 615 */ GAME( 1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME( 1977, desertgu,   0,        desertgu, desertgu, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME( 1977, roadrunm,   desertgu, desertgu, desertgu, mw8080bw_state, 0, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 619 */ GAME( 1977, dplay,      0,        dplay,    dplay,    mw8080bw_state, 0, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL(1977, lagunar,    0,        zzzap,    lagunar,  mw8080bw_state, 0, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
-/* 623 */ GAME( 1977, gmissile,   0,        gmissile, gmissile, mw8080bw_state, 0, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 626 */ GAME( 1977, m4,         0,        m4,       m4,       mw8080bw_state, 0, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 630 */ GAMEL(1978, clowns,     0,        clowns,   clowns,   mw8080bw_state, 0, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 630 */ GAMEL(1978, clowns1,    clowns,   clowns,   clowns1,  mw8080bw_state, 0, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 640 */ GAMEL(1978, spacwalk,   0,        spacwalk, spacwalk, mw8080bw_state, 0, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
-/* 642 */ GAME( 1978, einning,    0,        dplay,    einning,  mw8080bw_state, 0, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
-/* 643 */ GAME( 1978, shuffle,    0,        shuffle,  shuffle,  mw8080bw_state, 0, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 644 */ GAME( 1977, dogpatch,   0,        dogpatch, dogpatch, mw8080bw_state, 0, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 645 */ GAMEL(1980, spcenctr,   0,        spcenctr, spcenctr, mw8080bw_state, 0, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
-/* 652 */ GAMEL(1979, phantom2,   0,        phantom2, phantom2, mw8080bw_state, 0, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
-/* 730 */ GAME( 1978, bowler,     0,        bowler,   bowler,   mw8080bw_state, 0, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 739 */ GAMEL(1978, invaders,   0,        invaders, invaders, mw8080bw_state, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
-/* 742 */ GAME( 1978, blueshrk,   0,        blueshrk, blueshrk, mw8080bw_state, 0, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-		  GAME( 1978, blueshrkmr, blueshrk, blueshrk, blueshrk, mw8080bw_state, 0, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
+/* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
+/* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME(  1977, desertgu,   0,        desertgu, desertgu, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME(  1977, roadrunm,   desertgu, desertgu, desertgu, mw8080bw_state, empty_init, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 619 */ GAME(  1977, dplay,      0,        dplay,    dplay,    mw8080bw_state, empty_init, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
+/* 622 */ GAMEL( 1977, lagunar,    0,        zzzap,    lagunar,  mw8080bw_state, empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
+/* 623 */ GAME(  1977, gmissile,   0,        gmissile, gmissile, mw8080bw_state, empty_init, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 626 */ GAME(  1977, m4,         0,        m4,       m4,       mw8080bw_state, empty_init, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   mw8080bw_state, empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 630 */ GAMEL( 1978, clowns1,    clowns,   clowns,   clowns1,  mw8080bw_state, empty_init, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 640 */ GAMEL( 1978, spacwalk,   0,        spacwalk, spacwalk, mw8080bw_state, empty_init, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
+/* 642 */ GAME(  1978, einning,    0,        dplay,    einning,  mw8080bw_state, empty_init, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
+/* 643 */ GAME(  1978, shuffle,    0,        shuffle,  shuffle,  mw8080bw_state, empty_init, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 644 */ GAME(  1977, dogpatch,   0,        dogpatch, dogpatch, mw8080bw_state, empty_init, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 645 */ GAMEL( 1980, spcenctr,   0,        spcenctr, spcenctr, mw8080bw_state, empty_init, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
+/* 652 */ GAMEL( 1979, phantom2,   0,        phantom2, phantom2, mw8080bw_state, empty_init, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
+/* 730 */ GAME(  1978, bowler,     0,        bowler,   bowler,   mw8080bw_state, empty_init, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 739 */ GAMEL( 1978, invaders,   0,        invaders, invaders, mw8080bw_state, empty_init, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
+/* 742 */ GAME(  1978, blueshrk,   0,        blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+		  GAME(  1978, blueshrkmr, blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
-/* 851 */ GAMEL(1980, invad2ct,   0,        invad2ct, invad2ct, mw8080bw_state, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
+/* 851 */ GAMEL( 1980, invad2ct,   0,        invad2ct, invad2ct, mw8080bw_state, empty_init, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
 /* 852 Space Invaders Deluxe (color hardware, not in this driver) */
 /* 870 Space Invaders Deluxe (cocktail, dump does not exist) */

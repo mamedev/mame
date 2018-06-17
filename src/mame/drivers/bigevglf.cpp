@@ -239,9 +239,9 @@ void bigevglf_state::main_map(address_map &map)
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd7ff).bankr("bank1");
 	map(0xd800, 0xdbff).ram().share("share1"); /* only half of the RAM is accessible, line a10 of IC73 (6116) is GNDed */
-	map(0xe000, 0xe7ff).w(this, FUNC(bigevglf_state::bigevglf_palette_w)).share("paletteram");
+	map(0xe000, 0xe7ff).w(FUNC(bigevglf_state::bigevglf_palette_w)).share("paletteram");
 	map(0xe800, 0xefff).writeonly().share("spriteram1"); /* sprite 'templates' */
-	map(0xf000, 0xf0ff).rw(this, FUNC(bigevglf_state::bigevglf_vidram_r), FUNC(bigevglf_state::bigevglf_vidram_w)); /* 41464 (64kB * 8 chips), addressed using ports 1 and 5 */
+	map(0xf000, 0xf0ff).rw(FUNC(bigevglf_state::bigevglf_vidram_r), FUNC(bigevglf_state::bigevglf_vidram_w)); /* 41464 (64kB * 8 chips), addressed using ports 1 and 5 */
 	map(0xf840, 0xf8ff).ram().share("spriteram2");  /* spriteram (x,y,offset in spriteram1,palette) */
 }
 
@@ -249,12 +249,12 @@ void bigevglf_state::bigevglf_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw();    /* video ram enable ???*/
-	map(0x01, 0x01).w(this, FUNC(bigevglf_state::bigevglf_gfxcontrol_w));  /* plane select */
-	map(0x02, 0x02).w(this, FUNC(bigevglf_state::beg_banking_w));
-	map(0x03, 0x03).w(this, FUNC(bigevglf_state::beg13_a_set_w));
-	map(0x04, 0x04).w(this, FUNC(bigevglf_state::beg13_b_clr_w));
-	map(0x05, 0x05).w(this, FUNC(bigevglf_state::bigevglf_vidram_addr_w));   /* video banking (256 banks) for f000-f0ff area */
-	map(0x06, 0x06).r(this, FUNC(bigevglf_state::beg_status_r));
+	map(0x01, 0x01).w(FUNC(bigevglf_state::bigevglf_gfxcontrol_w));  /* plane select */
+	map(0x02, 0x02).w(FUNC(bigevglf_state::beg_banking_w));
+	map(0x03, 0x03).w(FUNC(bigevglf_state::beg13_a_set_w));
+	map(0x04, 0x04).w(FUNC(bigevglf_state::beg13_b_clr_w));
+	map(0x05, 0x05).w(FUNC(bigevglf_state::bigevglf_vidram_addr_w));   /* video banking (256 banks) for f000-f0ff area */
+	map(0x06, 0x06).r(FUNC(bigevglf_state::beg_status_r));
 }
 
 
@@ -290,21 +290,21 @@ void bigevglf_state::bigevglf_sub_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("PORT00");
 	map(0x01, 0x01).nopr();
-	map(0x02, 0x02).r(this, FUNC(bigevglf_state::beg_trackball_x_r));
-	map(0x03, 0x03).r(this, FUNC(bigevglf_state::beg_trackball_y_r));
-	map(0x04, 0x04).r(this, FUNC(bigevglf_state::sub_cpu_mcu_coin_port_r));
+	map(0x02, 0x02).r(FUNC(bigevglf_state::beg_trackball_x_r));
+	map(0x03, 0x03).r(FUNC(bigevglf_state::beg_trackball_y_r));
+	map(0x04, 0x04).r(FUNC(bigevglf_state::sub_cpu_mcu_coin_port_r));
 	map(0x05, 0x05).portr("DSW1");
 	map(0x06, 0x06).portr("DSW2");
 	map(0x07, 0x07).nopr();
-	map(0x08, 0x08).w(this, FUNC(bigevglf_state::beg_port08_w)); /* muxed port select + other unknown stuff */
+	map(0x08, 0x08).w(FUNC(bigevglf_state::beg_port08_w)); /* muxed port select + other unknown stuff */
 	map(0x0b, 0x0b).r(m_bmcu, FUNC(taito68705_mcu_device::data_r));
 	map(0x0c, 0x0c).w(m_bmcu, FUNC(taito68705_mcu_device::data_w));
 	map(0x0e, 0x0e).nopw(); /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
-	map(0x10, 0x17).w(this, FUNC(bigevglf_state::beg13_a_clr_w));
-	map(0x18, 0x1f).w(this, FUNC(bigevglf_state::beg13_b_set_w));
+	map(0x10, 0x17).w(FUNC(bigevglf_state::beg13_a_clr_w));
+	map(0x18, 0x1f).w(FUNC(bigevglf_state::beg13_b_set_w));
 	map(0x20, 0x20).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x20, 0x20).w("soundlatch1", FUNC(generic_latch_8_device::write));
-	map(0x21, 0x21).r(this, FUNC(bigevglf_state::soundstate_r));
+	map(0x21, 0x21).r(FUNC(bigevglf_state::soundstate_r));
 }
 
 
@@ -323,10 +323,10 @@ void bigevglf_state::sound_map(address_map &map)
 	map(0xce00, 0xce00).nopw();
 	map(0xd800, 0xd800).r("soundlatch1", FUNC(generic_latch_8_device::read));
 	map(0xd800, 0xd800).w("soundlatch2", FUNC(generic_latch_8_device::write)); /* write to D800 sets bit 1 in status */
-	map(0xda00, 0xda00).r(this, FUNC(bigevglf_state::soundstate_r));
+	map(0xda00, 0xda00).r(FUNC(bigevglf_state::soundstate_r));
 	map(0xda00, 0xda00).w("soundnmi", FUNC(input_merger_device::in_set<1>)); // enable NMI
 	map(0xdc00, 0xdc00).w("soundnmi", FUNC(input_merger_device::in_clear<1>)); // disable NMI
-	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::write)); /* signed 8-bit DAC &  unknown read */
+	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* signed 8-bit DAC &  unknown read */
 	map(0xe000, 0xefff).nopr();     /* space for diagnostics ROM */
 }
 
@@ -344,7 +344,7 @@ static const gfx_layout gfxlayout =
 	8*8
 };
 
-static GFXDECODE_START( bigevglf )
+static GFXDECODE_START( gfx_bigevglf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0x20*16, 16 )
 GFXDECODE_END
 
@@ -380,24 +380,24 @@ void bigevglf_state::machine_reset()
 MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10000000/2)     /* 5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(bigevglf_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)   /* vblank */
+	MCFG_DEVICE_ADD("maincpu", Z80,10000000/2)     /* 5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(bigevglf_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)   /* vblank */
 
-	MCFG_CPU_ADD("sub", Z80,10000000/2)     /* 5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(bigevglf_sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)   /* vblank */
+	MCFG_DEVICE_ADD("sub", Z80,10000000/2)     /* 5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(bigevglf_sub_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)   /* vblank */
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bigevglf_state, irq0_line_hold, 2*60)  /* IRQ generated by ???;
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bigevglf_state, irq0_line_hold, 2*60)  /* IRQ generated by ???;
 	    2 irqs/frame give good music tempo but also SOUND ERROR in test mode,
 	    4 irqs/frame give SOUND OK in test mode but music seems to be running too fast */
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
@@ -418,16 +418,16 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	MCFG_SCREEN_UPDATE_DRIVER(bigevglf_state, screen_update_bigevglf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigevglf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigevglf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
+	MCFG_DEVICE_ADD("aysnd", YM2149, 8000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -441,9 +441,9 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -514,11 +514,11 @@ ROM_START( bigevglfj )
 	ROM_LOAD( "a67-15",   0x18000, 0x8000, CRC(1d261428) SHA1(0f3e6d83a8a462436fa414de4e1e4306db869d3e))
 ROM_END
 
-DRIVER_INIT_MEMBER(bigevglf_state,bigevglf)
+void bigevglf_state::init_bigevglf()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
 }
 
-GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, bigevglf, ROT270, "Taito Corporation",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, init_bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, init_bigevglf, ROT270, "Taito Corporation",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

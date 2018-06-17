@@ -185,16 +185,16 @@ void atarig1_state::main_map(address_map &map)
 	map(0xf90000, 0xf90000).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0xf98000, 0xf98001).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0xfa0001, 0xfa0001).w(m_rle, FUNC(atari_rle_objects_device::control_write));
-	map(0xfb0000, 0xfb0001).w(this, FUNC(atarig1_state::video_int_ack_w));
+	map(0xfb0000, 0xfb0001).w(FUNC(atarig1_state::video_int_ack_w));
 	map(0xfc0000, 0xfc0001).portr("IN0");
-	map(0xfc8000, 0xfc8007).rw(this, FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
+	map(0xfc8000, 0xfc8007).rw(FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	map(0xfe8000, 0xfe89ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
-	map(0xff2000, 0xff2001).w(this, FUNC(atarig1_state::mo_command_w)).share("mo_command");
+	map(0xff2000, 0xff2001).w(FUNC(atarig1_state::mo_command_w)).share("mo_command");
 	map(0xff4000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 }
@@ -347,7 +347,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarig1 )
+static GFXDECODE_START( gfx_atarig1 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x300, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x300, 8 )
@@ -398,8 +398,8 @@ static const atari_rle_objects_config modesc_pitfight =
 MACHINE_CONFIG_START(atarig1_state::atarig1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)
 	MCFG_PALETTE_ADD("palette", 1280)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -429,12 +429,12 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig1_state, screen_update_atarig1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarig1_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 14)
@@ -442,23 +442,22 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarig1_state::hydra)
+MACHINE_CONFIG_START(atarig1_state::hydrap)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
-	MCFG_SLAPSTIC_ADD("slapstic", 116)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarig1_state::hydrap)
-	hydra(config);
-	MCFG_DEVICE_REMOVE("slapstic")
+MACHINE_CONFIG_START(atarig1_state::hydra)
+	hydrap(config);
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 116, true)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfight9)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 114)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 114, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -466,7 +465,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig1_state::pitfight7)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 112)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 112, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -474,7 +473,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig1_state::pitfight)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 111)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 111, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -482,7 +481,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig1_state::pitfightj)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 113)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 113, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -1273,24 +1272,24 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig1_state,hydra)
+void atarig1_state::init_hydra()
 {
 	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = false;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,hydrap)
+void atarig1_state::init_hydrap()
 {
 	m_is_pitfight = false;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfight)
+void atarig1_state::init_pitfight()
 {
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = true;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
+void atarig1_state::init_pitfightb()
 {
 	pitfightb_cheap_slapstic_init();
 	save_item(NAME(m_bslapstic_bank));
@@ -1305,16 +1304,16 @@ DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
  *
  *************************************/
 
-GAME( 1990, hydra,     0,        hydra,     hydra,     atarig1_state, hydra,     ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap,    hydra,    hydrap,    hydra,     atarig1_state, hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,   hydra,    hydrap,    hydra,     atarig1_state, hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydra,     0,        hydra,     hydra,     atarig1_state, init_hydra,     ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap,    hydra,    hydrap,    hydra,     atarig1_state, init_hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,   hydra,    hydrap,    hydra,     atarig1_state, init_hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight,  0,        pitfight9, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight7, pitfight, pitfight7, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight6, pitfight, pitfightj, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight5, pitfight, pitfight7, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight4, pitfight, pitfight,  pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight3, pitfight, pitfight,  pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight2, pitfight, pitfight,  pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfightj, pitfight, pitfightj, pitfightj, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (Japan rev 3, 2 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, pitfightb, pitfight,  atarig1_state, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight,  0,        pitfight9, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight7, pitfight, pitfight7, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight6, pitfight, pitfightj, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight5, pitfight, pitfight7, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight4, pitfight, pitfight,  pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight3, pitfight, pitfight,  pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight2, pitfight, pitfight,  pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfightj, pitfight, pitfightj, pitfightj, atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (Japan rev 3, 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, pitfightb, pitfight,  atarig1_state, init_pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", MACHINE_SUPPORTS_SAVE )

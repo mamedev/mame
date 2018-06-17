@@ -97,8 +97,8 @@ void pmi80_state::pmi80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).w(this, FUNC(pmi80_state::leds_w));
-	map(0xfa, 0xfa).rw(this, FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
+	map(0xf8, 0xf8).w(FUNC(pmi80_state::leds_w));
+	map(0xfa, 0xfa).rw(FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
 }
 
 /* Input ports */
@@ -168,9 +168,9 @@ void pmi80_state::machine_start()
 
 MACHINE_CONFIG_START(pmi80_state::pmi80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
-	MCFG_CPU_IO_MAP(pmi80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pmi80_mem)
+	MCFG_DEVICE_IO_MAP(pmi80_io)
 
 
 	/* video hardware */
@@ -185,5 +185,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1982, pmi80,  0,       0,      pmi80,     pmi80, pmi80_state, 0,    "Tesla",  "PMI-80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1982, pmi80, 0,      0,      pmi80,   pmi80, pmi80_state, empty_init, "Tesla", "PMI-80", MACHINE_NO_SOUND_HW)

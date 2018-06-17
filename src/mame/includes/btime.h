@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class btime_state : public driver_device
@@ -98,16 +99,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
 	DECLARE_WRITE8_MEMBER(ay_audio_nmi_enable_w);
 
-	DECLARE_DRIVER_INIT(btime);
-	DECLARE_DRIVER_INIT(tisland);
-	DECLARE_DRIVER_INIT(cookrace);
-	DECLARE_DRIVER_INIT(zoar);
-	DECLARE_DRIVER_INIT(sdtennis);
-	DECLARE_DRIVER_INIT(wtennis);
-	DECLARE_DRIVER_INIT(bnj);
-	DECLARE_DRIVER_INIT(protennb);
-	DECLARE_DRIVER_INIT(disco);
-	DECLARE_DRIVER_INIT(lnc);
+	void init_btime();
+	void init_tisland();
+	void init_cookrace();
+	void init_zoar();
+	void init_sdtennis();
+	void init_wtennis();
+	void init_bnj();
+	void init_protennb();
+	void init_disco();
+	void init_lnc();
 	DECLARE_MACHINE_START(btime);
 	DECLARE_MACHINE_RESET(btime);
 	DECLARE_PALETTE_INIT(btime);

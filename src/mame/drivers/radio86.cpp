@@ -39,7 +39,7 @@ void radio86_state::radio86_mem(address_map &map)
 void radio86_state::radio86_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0xff).rw(this, FUNC(radio86_state::radio_io_r), FUNC(radio86_state::radio_io_w));
+	map(0x00, 0xff).rw(FUNC(radio86_state::radio_io_r), FUNC(radio86_state::radio_io_w));
 }
 
 void radio86_state::rk7007_io(address_map &map)
@@ -68,7 +68,7 @@ void radio86_state::radio86ram_mem(address_map &map)
 	map(0xf700, 0xf703).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf780, 0xf7bf).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)); // video
 	map(0xf684, 0xf687).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf688, 0xf688).w(this, FUNC(radio86_state::radio86_pagesel));
+	map(0xf688, 0xf688).w(FUNC(radio86_state::radio86_pagesel));
 	map(0xf800, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xf800, 0xffff).rom();  // System ROM page 1
 }
@@ -78,7 +78,7 @@ void radio86_state::radio86_16_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
 	map(0x1000, 0x3fff).ram();  // RAM
-	map(0x4000, 0x7fff).r(this, FUNC(radio86_state::radio_cpu_state_r));
+	map(0x4000, 0x7fff).r(FUNC(radio86_state::radio_cpu_state_r));
 	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
 	//AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
 	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
@@ -345,7 +345,7 @@ static const gfx_layout radio86_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( radio86 )
+static GFXDECODE_START( gfx_radio86 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, radio86_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -353,41 +353,38 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(radio86_state::radio86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(radio86_mem)
-	MCFG_CPU_IO_MAP(radio86_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(radio86_mem)
+	MCFG_DEVICE_IO_MAP(radio86_io)
 	MCFG_MACHINE_RESET_OVERRIDE(radio86_state, radio86 )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(radio86_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radio86)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radio86)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -402,20 +399,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(radio86_state::radio16)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(radio86_16_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86_16_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::radiorom)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(radio86rom_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86rom_mem)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86rom_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86rom_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_romdisk_portc_w))
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "radio86_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -426,53 +423,53 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(radio86_state::radioram)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(radio86ram_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86ram_mem)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86ram_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86ram_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_romdisk_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::rk7007)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(rk7007_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rk7007_io)
 
 	MCFG_DEVICE_ADD("ms7007", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::rk700716)
 	radio16(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(rk7007_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rk7007_io)
 
 	MCFG_DEVICE_ADD("ms7007", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::mikron2)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mikron2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mikron2_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::impuls03)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(impuls03_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(impuls03_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -510,9 +507,9 @@ ROM_END
 ROM_START( radiorom )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "32k", "32 KB rom disk")
-	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(1))
+	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "64k", "64 KB rom disk")
-	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(2))
+	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(1))
 	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
@@ -569,15 +566,15 @@ ROM_START( impuls03 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT    STATE          INIT      COMPANY        FULLNAME                       FLAGS
-COMP( 1986, radio86,  0,       0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK",                  0 )
-COMP( 1986, radio16,  radio86, 0,      radio16,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        0 )
-COMP( 1986, kr03,     radio86, 0,      radio86,   radio86, radio86_state, radio86,  "Elektronika", "KR-03",                       0 )
-COMP( 1986, radio4k,  radio86, 0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         0 )
-COMP( 1986, radiorom, radio86, 0,      radiorom,  radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       0 )
-COMP( 1986, radioram, radio86, 0,      radioram,  radio86, radio86_state, radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   0 )
-COMP( 1986, spektr01, radio86, 0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Spektr-001",                  0 )
-COMP( 1986, rk7007,   radio86, 0,      rk7007,    ms7007,  radio86_state, radio86,  "<unknown>",   "Radio-86RK (MS7007)",         0 )
-COMP( 1986, rk700716, radio86, 0,      rk700716,  ms7007,  radio86_state, radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", 0 )
-COMP( 1986, mikron2,  radio86, 0,      mikron2,   radio86, radio86_state, radio86,  "<unknown>",   "Mikron-2",                    0 )
-COMP( 1986, impuls03, radio86, 0,      impuls03,  radio86, radio86_state, radio86,  "<unknown>",   "Impuls-03",                   0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT           COMPANY        FULLNAME                       FLAGS
+COMP( 1986, radio86,  0,       0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK",                  0 )
+COMP( 1986, radio16,  radio86, 0,      radio16,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        0 )
+COMP( 1986, kr03,     radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "Elektronika", "KR-03",                       0 )
+COMP( 1986, radio4k,  radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         0 )
+COMP( 1986, radiorom, radio86, 0,      radiorom, radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       0 )
+COMP( 1986, radioram, radio86, 0,      radioram, radio86, radio86_state, init_radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   0 )
+COMP( 1986, spektr01, radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Spektr-001",                  0 )
+COMP( 1986, rk7007,   radio86, 0,      rk7007,   ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007)",         0 )
+COMP( 1986, rk700716, radio86, 0,      rk700716, ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", 0 )
+COMP( 1986, mikron2,  radio86, 0,      mikron2,  radio86, radio86_state, init_radio86,  "<unknown>",   "Mikron-2",                    0 )
+COMP( 1986, impuls03, radio86, 0,      impuls03, radio86, radio86_state, init_radio86,  "<unknown>",   "Impuls-03",                   0 )

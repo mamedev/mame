@@ -18,6 +18,7 @@
 #include "sound/2203intf.h"
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
+#include "emupal.h"
 
 
 // Interrupt flags
@@ -154,7 +155,7 @@ public:
 		m_avbank(*this, "av_bank%u", 1)
 	{
 	}
-	DECLARE_DRIVER_INIT(fm7);
+	void init_fm7();
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;

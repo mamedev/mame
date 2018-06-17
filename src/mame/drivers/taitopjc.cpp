@@ -90,6 +90,7 @@
 #include "cpu/tms32051/tms32051.h"
 #include "video/tc0780fpa.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
@@ -147,7 +148,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
 
-	DECLARE_DRIVER_INIT(optiger);
+	void init_optiger();
 
 	uint16_t m_dsp_ram[0x1000];
 	uint16_t m_io_share_ram[0x2000];
@@ -529,9 +530,9 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 void taitopjc_state::ppc603e_mem(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram(); // Work RAM
-	map(0x40000000, 0x4000000f).rw(this, FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
-	map(0x80000000, 0x80003fff).rw(this, FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
-	map(0xc0000000, 0xc0003fff).rw(this, FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
+	map(0x40000000, 0x4000000f).rw(FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
+	map(0x80000000, 0x80003fff).rw(FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
+	map(0xc0000000, 0xc0003fff).rw(FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
 	map(0xfe800000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffe00000, 0xffffffff).rom().region("user1", 0);
 }
@@ -629,10 +630,10 @@ WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
 void taitopjc_state::tlcs900h_mem(address_map &map)
 {
 	map(0x010000, 0x02ffff).ram();     // Work RAM
-	map(0x040000, 0x0400ff).rw(this, FUNC(taitopjc_state::tlcs_sound_r), FUNC(taitopjc_state::tlcs_sound_w));
+	map(0x040000, 0x0400ff).rw(FUNC(taitopjc_state::tlcs_sound_r), FUNC(taitopjc_state::tlcs_sound_w));
 	map(0x044000, 0x045fff).ram().share("nvram");
-	map(0x060000, 0x061fff).rw(this, FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
-	map(0x06c000, 0x06c00f).w(this, FUNC(taitopjc_state::tlcs_unk_w));
+	map(0x060000, 0x061fff).rw(FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
+	map(0x06c000, 0x06c00f).w(FUNC(taitopjc_state::tlcs_unk_w));
 	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
 }
 
@@ -689,17 +690,17 @@ void taitopjc_state::tms_data_map(address_map &map)
 {
 	map(0x4000, 0x6fff).rom().region("user2", 0x8000);
 	map(0x7000, 0xefff).ram();
-	map(0xf000, 0xffff).rw(this, FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
+	map(0xf000, 0xffff).rw(FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
 }
 
 void taitopjc_state::tms_io_map(address_map &map)
 {
-	map(0x0053, 0x0053).w(this, FUNC(taitopjc_state::dsp_roml_w));
-	map(0x0057, 0x0057).w(this, FUNC(taitopjc_state::dsp_romh_w));
+	map(0x0053, 0x0053).w(FUNC(taitopjc_state::dsp_roml_w));
+	map(0x0057, 0x0057).w(FUNC(taitopjc_state::dsp_romh_w));
 	map(0x0058, 0x0058).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
 	map(0x005a, 0x005a).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x005b, 0x005b).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
-	map(0x005f, 0x005f).r(this, FUNC(taitopjc_state::dsp_rom_r));
+	map(0x005f, 0x005f).r(FUNC(taitopjc_state::dsp_rom_r));
 }
 
 
@@ -766,12 +767,12 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 
 
 MACHINE_CONFIG_START(taitopjc_state::taitopjc)
-	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
+	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
-	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
+	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
 	MCFG_TMP95C063_PORT5_READ(IOPORT("INPUTS1"))
 	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS2"))
 	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS3"))
@@ -779,17 +780,17 @@ MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
 	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
 	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
-	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
+	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
 
 	/* TMS320C53 DSP */
-	MCFG_CPU_ADD("dsp", TMS32053, 40000000)
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_CPU_DATA_MAP(tms_data_map)
-	MCFG_CPU_IO_MAP(tms_io_map)
+	MCFG_DEVICE_ADD("dsp", TMS32053, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
+	MCFG_DEVICE_DATA_MAP(tms_data_map)
+	MCFG_DEVICE_IO_MAP(tms_io_map)
 
-	MCFG_CPU_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
-	MCFG_CPU_PROGRAM_MAP(mn10200_map)
+	MCFG_DEVICE_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+	MCFG_DEVICE_PROGRAM_MAP(mn10200_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -805,14 +806,14 @@ MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
 
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(taitopjc_state, optiger)
+void taitopjc_state::init_optiger()
 {
 	uint8_t *rom = (uint8_t*)memregion("io_cpu")->base();
 
@@ -869,4 +870,4 @@ ROM_START( optiger )
 	// TODO: There are 6 PALs in total on the main PCB.
 ROM_END
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

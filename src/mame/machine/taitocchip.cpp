@@ -200,7 +200,7 @@ void taito_cchip_device::cchip_map(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x0fff) AM_ROM // internal ROM of uPD7811
 	map(0x1000, 0x13ff).m("upd4464_bank", FUNC(address_map_bank_device::amap8));
-	map(0x1400, 0x17ff).rw(this, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
+	map(0x1400, 0x17ff).rw(FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
 	map(0x2000, 0x3fff).rom().region("cchip_eprom", 0);
 }
 
@@ -288,23 +288,23 @@ READ_LINE_MEMBER( taito_cchip_device::an7_r )
 
 
 MACHINE_CONFIG_START(taito_cchip_device::device_add_mconfig)
-	MCFG_CPU_ADD("upd7811", UPD7811, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(cchip_map)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(taito_cchip_device, porta_r))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(taito_cchip_device, portb_r))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(taito_cchip_device, portc_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(taito_cchip_device, porta_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(taito_cchip_device, portb_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(taito_cchip_device, portc_w))
-	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(taito_cchip_device, portf_w))
-	MCFG_UPD7810_AN0(READLINE(taito_cchip_device, an0_r))
-	MCFG_UPD7810_AN1(READLINE(taito_cchip_device, an1_r))
-	MCFG_UPD7810_AN2(READLINE(taito_cchip_device, an2_r))
-	MCFG_UPD7810_AN3(READLINE(taito_cchip_device, an3_r))
-	MCFG_UPD7810_AN4(READLINE(taito_cchip_device, an4_r))
-	MCFG_UPD7810_AN5(READLINE(taito_cchip_device, an5_r))
-	MCFG_UPD7810_AN6(READLINE(taito_cchip_device, an6_r))
-	MCFG_UPD7810_AN7(READLINE(taito_cchip_device, an7_r))
+	MCFG_DEVICE_ADD("upd7811", UPD7811, DERIVED_CLOCK(1,1))
+	MCFG_DEVICE_PROGRAM_MAP(cchip_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, taito_cchip_device, porta_r))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, taito_cchip_device, portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, taito_cchip_device, portc_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, taito_cchip_device, porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, taito_cchip_device, portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, taito_cchip_device, portc_w))
+	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(*this, taito_cchip_device, portf_w))
+	MCFG_UPD7810_AN0(READLINE(*this, taito_cchip_device, an0_r))
+	MCFG_UPD7810_AN1(READLINE(*this, taito_cchip_device, an1_r))
+	MCFG_UPD7810_AN2(READLINE(*this, taito_cchip_device, an2_r))
+	MCFG_UPD7810_AN3(READLINE(*this, taito_cchip_device, an3_r))
+	MCFG_UPD7810_AN4(READLINE(*this, taito_cchip_device, an4_r))
+	MCFG_UPD7810_AN5(READLINE(*this, taito_cchip_device, an5_r))
+	MCFG_UPD7810_AN6(READLINE(*this, taito_cchip_device, an6_r))
+	MCFG_UPD7810_AN7(READLINE(*this, taito_cchip_device, an7_r))
 
 	MCFG_DEVICE_ADD("upd4464_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cchip_ram_bank)

@@ -118,9 +118,9 @@ void pktgaldx_state::pktgaldx_map(address_map &map)
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 	map(0x161800, 0x16180f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
-	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
-	map(0x167800, 0x167fff).rw(this, FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
+	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
 
 	map(0x170000, 0x17ffff).ram();
 }
@@ -172,17 +172,17 @@ void pktgaldx_state::pktgaldb_map(address_map &map)
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
-	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
-	map(0x16500a, 0x16500b).r(this, FUNC(pktgaldx_state::pckgaldx_unknown_r));
-	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x16500a, 0x16500b).r(FUNC(pktgaldx_state::pckgaldx_unknown_r));
+	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
 	/* should we really be using these to read the i/o in the BOOTLEG?
 	  these look like i/o through protection ... */
 	map(0x167842, 0x167843).portr("INPUTS");
 	map(0x167c4c, 0x167c4d).portr("DSW");
 	map(0x167db2, 0x167db3).portr("SYSTEM");
 
-	map(0x167d10, 0x167d11).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
-	map(0x167d1a, 0x167d1b).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
+	map(0x167d10, 0x167d11).r(FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
+	map(0x167d1a, 0x167d1b).r(FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
 
 	map(0x170000, 0x17ffff).ram();
 
@@ -303,7 +303,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( pktgaldx )
+static GFXDECODE_START( gfx_pktgaldx )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites (16x16) */
@@ -321,7 +321,7 @@ static const gfx_layout bootleg_spritelayout =
 	16*64
 };
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_spritelayout,     0, 64 )
 GFXDECODE_END
 
@@ -339,9 +339,9 @@ void pktgaldx_state::machine_start()
 MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)
-	MCFG_CPU_PROGRAM_MAP(pktgaldx_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_PROGRAM_MAP(pktgaldx_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -350,13 +350,13 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pktgaldx_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pktgaldx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -385,13 +385,14 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -400,8 +401,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(pktgaldb_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(pktgaldb_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,22 +411,23 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pktgaldx_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bootleg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bootleg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -490,12 +492,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
+void pktgaldx_state::init_pktgaldx()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }
 
-GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, empty_init,    ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

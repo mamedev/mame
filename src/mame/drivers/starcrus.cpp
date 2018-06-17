@@ -32,18 +32,18 @@ void starcrus_state::starcrus_map(address_map &map)
 
 void starcrus_state::starcrus_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("P1").w(this, FUNC(starcrus_state::s1_x_w));
-	map(0x01, 0x01).portr("P2").w(this, FUNC(starcrus_state::s1_y_w));
-	map(0x02, 0x02).rw(this, FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
-	map(0x03, 0x03).portr("DSW").w(this, FUNC(starcrus_state::s2_y_w));
-	map(0x04, 0x04).w(this, FUNC(starcrus_state::p1_x_w));
-	map(0x05, 0x05).w(this, FUNC(starcrus_state::p1_y_w));
-	map(0x06, 0x06).w(this, FUNC(starcrus_state::p2_x_w));
-	map(0x07, 0x07).w(this, FUNC(starcrus_state::p2_y_w));
-	map(0x08, 0x08).w(this, FUNC(starcrus_state::ship_parm_1_w));
-	map(0x09, 0x09).w(this, FUNC(starcrus_state::ship_parm_2_w));
-	map(0x0a, 0x0a).w(this, FUNC(starcrus_state::proj_parm_1_w));
-	map(0x0b, 0x0b).w(this, FUNC(starcrus_state::proj_parm_2_w));
+	map(0x00, 0x00).portr("P1").w(FUNC(starcrus_state::s1_x_w));
+	map(0x01, 0x01).portr("P2").w(FUNC(starcrus_state::s1_y_w));
+	map(0x02, 0x02).rw(FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(starcrus_state::s2_y_w));
+	map(0x04, 0x04).w(FUNC(starcrus_state::p1_x_w));
+	map(0x05, 0x05).w(FUNC(starcrus_state::p1_y_w));
+	map(0x06, 0x06).w(FUNC(starcrus_state::p2_x_w));
+	map(0x07, 0x07).w(FUNC(starcrus_state::p2_y_w));
+	map(0x08, 0x08).w(FUNC(starcrus_state::ship_parm_1_w));
+	map(0x09, 0x09).w(FUNC(starcrus_state::ship_parm_2_w));
+	map(0x0a, 0x0a).w(FUNC(starcrus_state::proj_parm_1_w));
+	map(0x0b, 0x0b).w(FUNC(starcrus_state::proj_parm_2_w));
 }
 
 
@@ -113,7 +113,7 @@ static const gfx_layout spritelayout2 =
 	1 /* every sprite takes 1 consecutive bytes */
 };
 
-static GFXDECODE_START( starcrus )
+static GFXDECODE_START( gfx_starcrus )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout1, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0040, spritelayout1, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0080, spritelayout1, 0, 1 )
@@ -143,10 +143,10 @@ static const char *const starcrus_sample_names[] =
 MACHINE_CONFIG_START(starcrus_state::starcrus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
-	MCFG_CPU_PROGRAM_MAP(starcrus_map)
-	MCFG_CPU_IO_MAP(starcrus_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MCFG_DEVICE_PROGRAM_MAP(starcrus_map)
+	MCFG_DEVICE_IO_MAP(starcrus_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -157,14 +157,14 @@ MACHINE_CONFIG_START(starcrus_state::starcrus)
 	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starcrus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starcrus)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(starcrus_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -199,4 +199,4 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, 0, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, empty_init, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

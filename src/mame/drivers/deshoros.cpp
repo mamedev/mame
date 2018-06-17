@@ -32,6 +32,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -174,16 +175,16 @@ void destiny_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankr("bank1");
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).rw(this, FUNC(destiny_state::printer_status_r), FUNC(destiny_state::firq_ack_w));
-	map(0x9001, 0x9001).portr("SYSTEM").w(this, FUNC(destiny_state::nmi_ack_w));
-	map(0x9002, 0x9002).rw(this, FUNC(destiny_state::display_ready_r), FUNC(destiny_state::display_w));
+	map(0x9000, 0x9000).rw(FUNC(destiny_state::printer_status_r), FUNC(destiny_state::firq_ack_w));
+	map(0x9001, 0x9001).portr("SYSTEM").w(FUNC(destiny_state::nmi_ack_w));
+	map(0x9002, 0x9002).rw(FUNC(destiny_state::display_ready_r), FUNC(destiny_state::display_w));
 	map(0x9003, 0x9003).portr("KEY1");
 	map(0x9004, 0x9004).portr("KEY2");
-	map(0x9005, 0x9005).portr("DIPSW").w(this, FUNC(destiny_state::out_w));
+	map(0x9005, 0x9005).portr("DIPSW").w(FUNC(destiny_state::out_w));
 //  AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
 //  AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
-	map(0x900a, 0x900b).w(this, FUNC(destiny_state::sound_w));
-	map(0x900c, 0x900c).w(this, FUNC(destiny_state::bank_select_w));
+	map(0x900a, 0x900b).w(FUNC(destiny_state::sound_w));
+	map(0x900c, 0x900c).w(FUNC(destiny_state::bank_select_w));
 //  AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
 //  AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
 	map(0xc000, 0xffff).rom();
@@ -267,9 +268,9 @@ void destiny_state::machine_reset()
 MACHINE_CONFIG_START(destiny_state::destiny)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL(4'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 50) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
+	MCFG_DEVICE_ADD("maincpu", M6809, XTAL(4'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 50) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
 	/* video hardware (dummy) */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -284,8 +285,8 @@ MACHINE_CONFIG_START(destiny_state::destiny)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800) // TODO: determine exact frequency thru schematics
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 800) // TODO: determine exact frequency thru schematics
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
@@ -317,4 +318,4 @@ ROM_START( destiny )
 	ROM_LOAD( "ag11.18a",  0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
 
-GAME( 1983, destiny,  0,       destiny,  destiny, destiny_state,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )
+GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )

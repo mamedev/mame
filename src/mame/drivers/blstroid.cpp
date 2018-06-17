@@ -69,13 +69,13 @@ void blstroid_state::main_map(address_map &map)
 	map.global_mask(0x83ffff);
 	map(0x000000, 0x03ffff).mirror(0x000000).rom();
 	map(0x800000, 0x800001).mirror(0x0381fe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x800200, 0x800201).mirror(0x0381fe).w(this, FUNC(blstroid_state::scanline_int_ack_w));
-	map(0x800400, 0x800401).mirror(0x0381fe).w(this, FUNC(blstroid_state::video_int_ack_w));
+	map(0x800200, 0x800201).mirror(0x0381fe).w(FUNC(blstroid_state::scanline_int_ack_w));
+	map(0x800400, 0x800401).mirror(0x0381fe).w(FUNC(blstroid_state::video_int_ack_w));
 	map(0x800600, 0x800601).mirror(0x0381fe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x800800, 0x8009ff).mirror(0x038000).writeonly().share("priorityram");
 	map(0x800a01, 0x800a01).mirror(0x0381fe).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
 	map(0x800c00, 0x800c01).mirror(0x0381fe).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
-	map(0x800e00, 0x800e01).mirror(0x0381fe).w(this, FUNC(blstroid_state::blstroid_halt_until_hblank_0_w));
+	map(0x800e00, 0x800e01).mirror(0x0381fe).w(FUNC(blstroid_state::blstroid_halt_until_hblank_0_w));
 	map(0x801401, 0x801401).mirror(0x0383fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
 	map(0x801800, 0x801801).mirror(0x0383f8).portr("DIAL0");
 	map(0x801804, 0x801805).mirror(0x0383f8).portr("DIAL1");
@@ -161,7 +161,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( blstroid )
+static GFXDECODE_START( gfx_blstroid )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,    0, 16 )
 GFXDECODE_END
@@ -177,8 +177,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(blstroid_state::blstroid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blstroid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -202,12 +202,13 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(blstroid_state, screen_update_blstroid)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(blstroid_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, blstroid_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
@@ -412,7 +413,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blstroid_state,blstroid)
+void blstroid_state::init_blstroid()
 {
 }
 
@@ -424,8 +425,8 @@ DRIVER_INIT_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
-GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
-GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
-GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
-GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )
+GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
+GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
+GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
+GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
+GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )

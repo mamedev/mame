@@ -76,17 +76,17 @@ void vd_state::vd_io(address_map &map)
 	map(0x03, 0x03).portr("X3");
 	map(0x04, 0x04).portr("X4");
 	map(0x05, 0x05).portr("X5");
-	map(0x20, 0x27).w(this, FUNC(vd_state::lamp_w));
-	map(0x28, 0x28).w(this, FUNC(vd_state::sol_w));
-	map(0x40, 0x44).w(this, FUNC(vd_state::disp_w));
+	map(0x20, 0x27).w(FUNC(vd_state::lamp_w));
+	map(0x28, 0x28).w(FUNC(vd_state::sol_w));
+	map(0x40, 0x44).w(FUNC(vd_state::disp_w));
 	map(0x60, 0x60).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x61, 0x61).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x62, 0x62).w("ay1", FUNC(ay8910_device::data_w));
 	map(0x80, 0x80).w("ay2", FUNC(ay8910_device::address_w));
 	map(0x81, 0x81).r("ay2", FUNC(ay8910_device::data_r)); // probably never read
 	map(0x82, 0x82).w("ay2", FUNC(ay8910_device::data_w));
-	map(0xa0, 0xa0).r(this, FUNC(vd_state::ack_r));
-	map(0xc0, 0xc0).w(this, FUNC(vd_state::col_w));
+	map(0xa0, 0xa0).r(FUNC(vd_state::ack_r));
+	map(0xc0, 0xc0).w(FUNC(vd_state::col_w));
 }
 
 static INPUT_PORTS_START( break86 )
@@ -187,19 +187,20 @@ void vd_state::machine_reset()
 
 MACHINE_CONFIG_START(vd_state::vd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(vd_map)
-	MCFG_CPU_IO_MAP(vd_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(vd_map)
+	MCFG_DEVICE_IO_MAP(vd_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", vd_state, irq, attotime::from_hz(484))
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33/3)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000) //?
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33/3)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) //?
 
@@ -232,5 +233,5 @@ ROM_START(papillon)
 ROM_END
 
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, 0,  ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, 0,  ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  vd_state, empty_init, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, empty_init, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)

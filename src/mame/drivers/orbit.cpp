@@ -72,18 +72,6 @@ WRITE_LINE_MEMBER(orbit_state::coin_lockout_w)
 }
 
 
-WRITE_LINE_MEMBER(orbit_state::heat_rst_led_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(orbit_state::hyper_led_w)
-{
-	output().set_led_value(1, state);
-}
-
-
 
 /*************************************
  *
@@ -100,13 +88,13 @@ void orbit_state::orbit_map(address_map &map)
 	map(0x1800, 0x1800).mirror(0x07ff).portr("DSW1");
 	map(0x2000, 0x2000).mirror(0x07ff).portr("DSW2");
 	map(0x2800, 0x2800).mirror(0x07ff).portr("BUTTONS");
-	map(0x3000, 0x33bf).mirror(0x0400).ram().w(this, FUNC(orbit_state::orbit_playfield_w)).share("playfield_ram");
+	map(0x3000, 0x33bf).mirror(0x0400).ram().w(FUNC(orbit_state::orbit_playfield_w)).share("playfield_ram");
 	map(0x33c0, 0x33ff).mirror(0x0400).ram().share("sprite_ram");
-	map(0x3800, 0x3800).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_w));
-	map(0x3900, 0x3900).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_amp_w));
-	map(0x3a00, 0x3a00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_amp_w));
+	map(0x3800, 0x3800).mirror(0x00ff).w(FUNC(orbit_state::orbit_note_w));
+	map(0x3900, 0x3900).mirror(0x00ff).w(FUNC(orbit_state::orbit_noise_amp_w));
+	map(0x3a00, 0x3a00).mirror(0x00ff).w(FUNC(orbit_state::orbit_note_amp_w));
 	map(0x3c00, 0x3c0f).mirror(0x00f0).w(m_latch, FUNC(f9334_device::write_a0));
-	map(0x3e00, 0x3e00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_rst_w));
+	map(0x3e00, 0x3e00).mirror(0x00ff).w(FUNC(orbit_state::orbit_noise_rst_w));
 	map(0x3f00, 0x3f00).mirror(0x00ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x6000, 0x7fff).rom();
 }
@@ -244,7 +232,7 @@ static const gfx_layout orbit_tile_layout =
 };
 
 
-static GFXDECODE_START( orbit )
+static GFXDECODE_START( gfx_orbit )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_full_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_upper_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_lower_sprite_layout, 0, 1 )
@@ -279,9 +267,9 @@ void orbit_state::machine_reset()
 MACHINE_CONFIG_START(orbit_state::orbit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
-	MCFG_CPU_PROGRAM_MAP(orbit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK / 16)
+	MCFG_DEVICE_PROGRAM_MAP(orbit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
 
@@ -294,10 +282,10 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* BIT5 => PANEL STROBE */
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(orbit_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(orbit_state, heat_rst_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(orbit_state, hyper_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, orbit_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1"))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -307,15 +295,15 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbit)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(orbit)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, orbit_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -364,4 +352,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, orbit_state, 0, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, orbit, 0, orbit, orbit, orbit_state, empty_init, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )

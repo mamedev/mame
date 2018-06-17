@@ -304,9 +304,9 @@ void prof80_state::prof80_io(address_map &map)
 //  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
 //  AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
-	map(0xd8, 0xd8).mirror(0xff00).w(this, FUNC(prof80_state::flr_w));
-	map(0xda, 0xda).mirror(0xff00).r(this, FUNC(prof80_state::status_r));
-	map(0xdb, 0xdb).mirror(0xff00).r(this, FUNC(prof80_state::status2_r));
+	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(prof80_state::flr_w));
+	map(0xda, 0xda).mirror(0xff00).r(FUNC(prof80_state::status_r));
+	map(0xdb, 0xdb).mirror(0xff00).r(FUNC(prof80_state::status2_r));
 	map(0xdc, 0xdd).mirror(0xff00).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xde, 0xde).mirror(0x0001).select(0xff00).w(m_mmu, FUNC(prof80_mmu_device::par_w));
 }
@@ -395,9 +395,10 @@ INPUT_PORTS_END
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( prof80_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void prof80_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 
@@ -448,12 +449,12 @@ void prof80_state::machine_start()
 
 MACHINE_CONFIG_START(prof80_state::prof80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(prof80_mem)
-	MCFG_CPU_IO_MAP(prof80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(prof80_mem)
+	MCFG_DEVICE_IO_MAP(prof80_io)
 
 	// MMU
-	MCFG_PROF80_MMU_ADD(MMU_TAG, prof80_mmu)
+	MCFG_PROF80_MMU_ADD(m_mmu, prof80_mmu)
 
 	// RTC
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
@@ -466,25 +467,25 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", prof80_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
 	// DEMUX latches
-	MCFG_DEVICE_ADD(FLR_A_TAG, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, data_in_w)) // TDI
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, c0_w)) // C0
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, c1_w)) // C1
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, c2_w)) // C2
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(prof80_state, ready_w)) // READY
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, clk_w)) // TCK
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(prof80_state, inuse_w)) // IN USE
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(prof80_state, motor_w)) // _MOTOR
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(prof80_state, select_w)) // SELECT
-	MCFG_DEVICE_ADD(FLR_B_TAG, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(prof80_state, resf_w)) // RESF
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(prof80_state, mini_w)) // MINI
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts)) // _RTS
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd)) // TX
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(prof80_state, mstop_w)) // _MSTOP
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd)) // TXP
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, stb_w)) // TSTB
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE(MMU_TAG, prof80_mmu_device, mme_w)) // MME
+	MCFG_DEVICE_ADD(m_flra, LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, data_in_w)) // TDI
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(UPD1990A_TAG, upd1990a_device, c0_w)) // C0
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, c1_w)) // C1
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, c2_w)) // C2
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, prof80_state, ready_w)) // READY
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, clk_w)) // TCK
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, prof80_state, inuse_w)) // IN USE
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, prof80_state, motor_w)) // _MOTOR
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, prof80_state, select_w)) // SELECT
+	MCFG_DEVICE_ADD(m_flrb, LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, prof80_state, resf_w)) // RESF
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, prof80_state, mini_w)) // MINI
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m_rs232a, rs232_port_device, write_rts)) // _RTS
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(m_rs232a, rs232_port_device, write_txd)) // TX
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, prof80_state, mstop_w)) // _MSTOP
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(m_rs232b, rs232_port_device, write_txd)) // TXP
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, stb_w)) // TSTB
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m_mmu, prof80_mmu_device, mme_w)) // MME
 
 	// ECB bus
 	MCFG_ECBBUS_ADD()
@@ -495,8 +496,8 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", ecbbus_cards, nullptr)
 
 	// V24
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(m_rs232a, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(m_rs232b, RS232_PORT, default_rs232_devices, nullptr)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -520,11 +521,11 @@ ROM_START( prof80 )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v17" )
 	ROM_SYSTEM_BIOS( 0, "v15", "v1.5" )
-	ROMX_LOAD( "prof80v15.z7", 0x0000, 0x2000, CRC(8f74134c) SHA1(83f9dcdbbe1a2f50006b41d406364f4d580daa1f), ROM_BIOS(1) )
+	ROMX_LOAD( "prof80v15.z7", 0x0000, 0x2000, CRC(8f74134c) SHA1(83f9dcdbbe1a2f50006b41d406364f4d580daa1f), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v16", "v1.6" )
-	ROMX_LOAD( "prof80v16.z7", 0x0000, 0x2000, CRC(7d3927b3) SHA1(bcc15fd04dbf1d6640115be595255c7b9d2a7281), ROM_BIOS(2) )
+	ROMX_LOAD( "prof80v16.z7", 0x0000, 0x2000, CRC(7d3927b3) SHA1(bcc15fd04dbf1d6640115be595255c7b9d2a7281), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v17", "v1.7" )
-	ROMX_LOAD( "prof80v17.z7", 0x0000, 0x2000, CRC(53305ff4) SHA1(3ea209093ac5ac8a5db618a47d75b705965cdf44), ROM_BIOS(3) )
+	ROMX_LOAD( "prof80v17.z7", 0x0000, 0x2000, CRC(53305ff4) SHA1(3ea209093ac5ac8a5db618a47d75b705965cdf44), ROM_BIOS(2) )
 ROM_END
 
 
@@ -533,5 +534,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE          INIT  COMPANY                 FULLNAME    FLAGS
-COMP( 1984, prof80,  0,      0,      prof80,  prof80, prof80_state,  0,    "Conitec Datensysteme", "PROF-80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY                 FULLNAME    FLAGS
+COMP( 1984, prof80,  0,      0,      prof80,  prof80, prof80_state, empty_init, "Conitec Datensysteme", "PROF-80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

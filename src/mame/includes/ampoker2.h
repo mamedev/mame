@@ -2,6 +2,7 @@
 // copyright-holders:Roberto Fresca
 
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 class ampoker2_state : public driver_device
 {
@@ -27,8 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ampoker2_port36_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_watchdog_reset_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_videoram_w);
-	DECLARE_DRIVER_INIT(rabbitpk);
-	DECLARE_DRIVER_INIT(piccolop);
+	void init_rabbitpk();
+	void init_piccolop();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
 	DECLARE_PALETTE_INIT(ampoker2);

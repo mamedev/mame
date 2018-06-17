@@ -319,6 +319,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "video/vsystem_gga.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -339,14 +340,14 @@ void welltris_state::main_map(address_map &map)
 	map(0x800000, 0x81ffff).ram().share("pixelram");    /* Graph_1 & 2*/
 	map(0xff8000, 0xffbfff).ram();                             /* work */
 	map(0xffc000, 0xffc3ff).ram().share("spriteram");           /* Sprite */
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
+	map(0xffd000, 0xffdfff).ram().w(FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
 	map(0xffe000, 0xffefff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0xfff000, 0xfff001).portr("P1");                 /* Bottom Controls */
-	map(0xfff000, 0xfff001).w(this, FUNC(welltris_state::palette_bank_w));
+	map(0xfff000, 0xfff001).w(FUNC(welltris_state::palette_bank_w));
 	map(0xfff002, 0xfff003).portr("P2");                 /* Top Controls */
-	map(0xfff002, 0xfff003).w(this, FUNC(welltris_state::gfxbank_w));
+	map(0xfff002, 0xfff003).w(FUNC(welltris_state::gfxbank_w));
 	map(0xfff004, 0xfff005).portr("P3");                 /* Left Side Ctrls */
-	map(0xfff004, 0xfff007).w(this, FUNC(welltris_state::scrollreg_w));
+	map(0xfff004, 0xfff007).w(FUNC(welltris_state::scrollreg_w));
 	map(0xfff006, 0xfff007).portr("P4");                 /* Right Side Ctrls */
 	map(0xfff008, 0xfff009).portr("SYSTEM");             /* Bit 5 Tested at start of irq 1 */
 	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -366,7 +367,7 @@ void welltris_state::sound_map(address_map &map)
 void welltris_state::sound_port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(welltris_state::sound_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(welltris_state::sound_bankswitch_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x18, 0x18).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
@@ -649,13 +650,13 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( welltris )
+static GFXDECODE_START( gfx_welltris )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16* 0, 4*16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*96, 2*16 )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(welltris_state,welltris)
+void welltris_state::init_welltris()
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
@@ -673,13 +674,13 @@ void welltris_state::machine_start()
 MACHINE_CONFIG_START(welltris_state::welltris)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", welltris_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", welltris_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_port_map) /* IRQs are triggered by the YM2610 */
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_port_map) /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -690,7 +691,7 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", welltris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_welltris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -702,13 +703,13 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -811,6 +812,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, 0,        ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, empty_init,   ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

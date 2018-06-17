@@ -105,10 +105,10 @@ void sacstate_state::sacstate_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(sacstate_state::port00_r));
-	map(0x01, 0x01).r(this, FUNC(sacstate_state::port01_r));
-	map(0x04, 0x04).r(this, FUNC(sacstate_state::port04_r));
-	map(0x08, 0x08).w(this, FUNC(sacstate_state::port08_w));
+	map(0x00, 0x00).r(FUNC(sacstate_state::port00_r));
+	map(0x01, 0x01).r(FUNC(sacstate_state::port01_r));
+	map(0x04, 0x04).r(FUNC(sacstate_state::port04_r));
+	map(0x08, 0x08).w(FUNC(sacstate_state::port08_w));
 	map(0x16, 0x16).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x17, 0x1f).nopw();
 }
@@ -134,9 +134,9 @@ void sacstate_state::machine_reset()
 
 MACHINE_CONFIG_START(sacstate_state::sacstate)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(sacstate_mem)
-	MCFG_CPU_IO_MAP(sacstate_io)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(sacstate_mem)
+	MCFG_DEVICE_IO_MAP(sacstate_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -158,5 +158,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY     FULLNAME         FLAGS
-COMP( 1973, sacstate, 0,      0,      sacstate, sacstate, sacstate_state, 0,    "SacState", "SacState 8008", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME         FLAGS
+COMP( 1973, sacstate, 0,      0,      sacstate, sacstate, sacstate_state, empty_init, "SacState", "SacState 8008", MACHINE_NO_SOUND_HW )

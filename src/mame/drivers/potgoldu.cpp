@@ -82,8 +82,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(potgold_state::potgold)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(potgold_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(potgold_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -127,5 +127,5 @@ ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAM
 	ROM_LOAD( "mc68h705",     0x0000, 0x2000, NO_DUMP ) // not sure which type of mcu this is, size is a guess
 ROM_END
 
-GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )

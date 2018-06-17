@@ -13,6 +13,7 @@ Floppies were 8 inch IBM format.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -76,8 +77,8 @@ void terak_state::mem_map(address_map &map)
 
 	// octal
 	map(0173000, 0173177).rom(); // ROM
-	map(0177000, 0177001).rw(this, FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
-	map(0177002, 0177003).rw(this, FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
+	map(0177000, 0177001).rw(FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
+	map(0177002, 0177003).rw(FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
 }
 
 /* Input ports */
@@ -101,9 +102,9 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(terak_state::terak)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000))
 	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -131,5 +132,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1977, terak,  0,      0,       terak,     terak, terak_state, 0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1977, terak, 0,      0,      terak,   terak, terak_state, empty_init, "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

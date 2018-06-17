@@ -66,6 +66,7 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -141,7 +142,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 
 	if(scanline == 240 && m_nmi)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -333,9 +334,9 @@ WRITE_LINE_MEMBER(laserbas_state::pit_out_5_w)
 void laserbas_state::laserbas_memory(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0xbfff).rw(this, FUNC(laserbas_state::vram_r), FUNC(laserbas_state::vram_w));
+	map(0x4000, 0xbfff).rw(FUNC(laserbas_state::vram_r), FUNC(laserbas_state::vram_w));
 	map(0xc000, 0xf7ff).rom().nopw();
-	map(0xf800, 0xfbff).r(this, FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
+	map(0xf800, 0xfbff).r(FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
 	map(0xfc00, 0xffff).ram();
 }
 
@@ -344,12 +345,12 @@ void laserbas_state::laserbas_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x01, 0x01).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x10, 0x11).w(this, FUNC(laserbas_state::videoctrl_w));
+	map(0x10, 0x11).w(FUNC(laserbas_state::videoctrl_w));
 	map(0x20, 0x20).portr("DSW");
 	map(0x21, 0x21).portr("INPUTS");
-	map(0x22, 0x22).r(this, FUNC(laserbas_state::track_hi_r));
-	map(0x23, 0x23).r(this, FUNC(laserbas_state::track_lo_r));
-	map(0x20, 0x23).w(this, FUNC(laserbas_state::out_w));
+	map(0x22, 0x22).r(FUNC(laserbas_state::track_hi_r));
+	map(0x23, 0x23).r(FUNC(laserbas_state::track_lo_r));
+	map(0x20, 0x23).w(FUNC(laserbas_state::out_w));
 	map(0x40, 0x43).rw("pit0", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x44, 0x47).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x80, 0x9f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -412,9 +413,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(laserbas_state::laserbas)
 
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(laserbas_memory)
-	MCFG_CPU_IO_MAP(laserbas_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(laserbas_memory)
+	MCFG_DEVICE_IO_MAP(laserbas_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", laserbas_state, laserbas_scanline, "screen", 0, 1)
 
 	/* TODO: clocks aren't known */
@@ -422,17 +423,17 @@ MACHINE_CONFIG_START(laserbas_state::laserbas)
 	MCFG_PIT8253_CLK0(PIT_CLOCK)
 	MCFG_PIT8253_CLK1(PIT_CLOCK)
 	MCFG_PIT8253_CLK2(PIT_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(laserbas_state, pit_out_0_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(laserbas_state, pit_out_1_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(laserbas_state, pit_out_2_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, laserbas_state, pit_out_0_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, laserbas_state, pit_out_1_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, laserbas_state, pit_out_2_w))
 
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIT_CLOCK)
 	MCFG_PIT8253_CLK1(PIT_CLOCK)
 	MCFG_PIT8253_CLK2(PIT_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(laserbas_state, pit_out_3_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(laserbas_state, pit_out_4_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(laserbas_state, pit_out_5_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, laserbas_state, pit_out_3_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, laserbas_state, pit_out_4_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, laserbas_state, pit_out_5_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
@@ -447,20 +448,20 @@ MACHINE_CONFIG_START(laserbas_state::laserbas)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac3", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac4", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac5", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD("dac3", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD("dac4", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD("dac5", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 
@@ -552,6 +553,6 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
-GAME( 1980, futflash,  0,        laserbas, laserbas, laserbas_state, 0, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, laserbas,  futflash, laserbas, laserbas, laserbas_state, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, laserbasa, futflash, laserbas, laserbas, laserbas_state, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, futflash,  0,        laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbas,  futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbasa, futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

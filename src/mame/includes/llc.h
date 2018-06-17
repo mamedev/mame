@@ -13,7 +13,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/k7659kb.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
@@ -44,8 +44,8 @@ public:
 	DECLARE_READ8_MEMBER(llc2_port1_b_r);
 	DECLARE_READ8_MEMBER(llc2_port2_a_r);
 	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
-	DECLARE_DRIVER_INIT(llc2);
-	DECLARE_DRIVER_INIT(llc1);
+	void init_llc2();
+	void init_llc1();
 	DECLARE_MACHINE_START(llc1);
 	DECLARE_MACHINE_RESET(llc1);
 	DECLARE_MACHINE_RESET(llc2);

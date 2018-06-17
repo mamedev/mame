@@ -40,9 +40,9 @@ void epson_tf20_device::cpu_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw("3a", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
-	map(0xf6, 0xf6).r(this, FUNC(epson_tf20_device::rom_disable_r));
+	map(0xf6, 0xf6).r(FUNC(epson_tf20_device::rom_disable_r));
 	map(0xf7, 0xf7).portr("tf20_dip");
-	map(0xf8, 0xf8).rw(this, FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
+	map(0xf8, 0xf8).rw(FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
 	map(0xfa, 0xfb).m("5a", FUNC(upd765a_device::map));
 }
 
@@ -81,15 +81,16 @@ ioport_constructor epson_tf20_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( tf20_floppies )
-	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
-SLOT_INTERFACE_END
+static void tf20_floppies(device_slot_interface &device)
+{
+	device.option_add("sd320", EPSON_SD_320);
+}
 
 MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
-	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
-	MCFG_CPU_PROGRAM_MAP(cpu_mem)
-	MCFG_CPU_IO_MAP(cpu_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device, irq_callback)
+	MCFG_DEVICE_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
+	MCFG_DEVICE_IO_MAP(cpu_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device, irq_callback)
 
 	// 64k internal ram
 	MCFG_RAM_ADD("ram")
@@ -97,8 +98,8 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 
 	// upd7201 serial interface
 	MCFG_DEVICE_ADD("3a", UPD7201, XTAL_CR1 / 2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(epson_tf20_device, txda_w))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(epson_tf20_device, dtra_w))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, epson_tf20_device, txda_w))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(*this, epson_tf20_device, dtra_w))
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("5a", true, true)
@@ -110,8 +111,8 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 
 	// serial interface to another device
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(DEVWRITELINE(DEVICE_SELF, epson_tf20_device, rxc_w))
-	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_tf20_device, pinc_w))
+	MCFG_EPSON_SIO_RX(WRITELINE(DEVICE_SELF, epson_tf20_device, rxc_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(DEVICE_SELF, epson_tf20_device, pinc_w))
 MACHINE_CONFIG_END
 
 

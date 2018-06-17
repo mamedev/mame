@@ -33,6 +33,7 @@
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1097,27 +1098,27 @@ WRITE8_MEMBER( vboy_state::rfb1_w ) { m_r_frame_1[offset] = data; }
 void vboy_state::vboy_mem(address_map &map)
 {
 	map.global_mask(0x07ffffff);
-	map(0x00000000, 0x00005fff).rw(this, FUNC(vboy_state::lfb0_r), FUNC(vboy_state::lfb0_w)); // L frame buffer 0
-	map(0x00006000, 0x00007fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
-	map(0x00008000, 0x0000dfff).rw(this, FUNC(vboy_state::lfb1_r), FUNC(vboy_state::lfb1_w)); // L frame buffer 1
-	map(0x0000e000, 0x0000ffff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
-	map(0x00010000, 0x00015fff).rw(this, FUNC(vboy_state::rfb0_r), FUNC(vboy_state::rfb0_w));  // R frame buffer 0
-	map(0x00016000, 0x00017fff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
-	map(0x00018000, 0x0001dfff).rw(this, FUNC(vboy_state::rfb1_r), FUNC(vboy_state::rfb1_w));  // R frame buffer 1
-	map(0x0001e000, 0x0001ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
+	map(0x00000000, 0x00005fff).rw(FUNC(vboy_state::lfb0_r), FUNC(vboy_state::lfb0_w)); // L frame buffer 0
+	map(0x00006000, 0x00007fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
+	map(0x00008000, 0x0000dfff).rw(FUNC(vboy_state::lfb1_r), FUNC(vboy_state::lfb1_w)); // L frame buffer 1
+	map(0x0000e000, 0x0000ffff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
+	map(0x00010000, 0x00015fff).rw(FUNC(vboy_state::rfb0_r), FUNC(vboy_state::rfb0_w));  // R frame buffer 0
+	map(0x00016000, 0x00017fff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
+	map(0x00018000, 0x0001dfff).rw(FUNC(vboy_state::rfb1_r), FUNC(vboy_state::rfb1_w));  // R frame buffer 1
+	map(0x0001e000, 0x0001ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
 
-	map(0x00020000, 0x0003ffff).rw(this, FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
+	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	map(0x0005f800, 0x0005f87f).rw(this, FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
+	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
-	map(0x00078000, 0x00079fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
-	map(0x0007a000, 0x0007bfff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
-	map(0x0007c000, 0x0007dfff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
-	map(0x0007e000, 0x0007ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
+	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
+	map(0x0007a000, 0x0007bfff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
+	map(0x0007c000, 0x0007dfff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
+	map(0x0007e000, 0x0007ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(this, FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
+	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram");// Main RAM - 64K mask 0xffff
 	map(0x06000000, 0x06003fff).rw(m_cart, FUNC(vboy_cart_slot_device::read_eeprom), FUNC(vboy_cart_slot_device::write_eeprom)); // Cart RAM - 8K NVRAM
@@ -1128,26 +1129,26 @@ void vboy_state::vboy_io(address_map &map)
 {
 	map.global_mask(0x07ffffff);
 	map(0x00000000, 0x00005fff).ram().share("l_frame_0"); // L frame buffer 0
-	map(0x00006000, 0x00007fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
+	map(0x00006000, 0x00007fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
 	map(0x00008000, 0x0000dfff).ram().share("l_frame_1"); // L frame buffer 1
-	map(0x0000e000, 0x0000ffff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
+	map(0x0000e000, 0x0000ffff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
 	map(0x00010000, 0x00015fff).ram().share("r_frame_0"); // R frame buffer 0
-	map(0x00016000, 0x00017fff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
+	map(0x00016000, 0x00017fff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
 	map(0x00018000, 0x0001dfff).ram().share("r_frame_1"); // R frame buffer 1
-	map(0x0001e000, 0x0001ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
+	map(0x0001e000, 0x0001ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
 
-	map(0x00020000, 0x0003ffff).rw(this, FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
+	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	map(0x0005f800, 0x0005f87f).rw(this, FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
+	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
-	map(0x00078000, 0x00079fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
-	map(0x0007a000, 0x0007bfff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
-	map(0x0007c000, 0x0007dfff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
-	map(0x0007e000, 0x0007ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
+	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
+	map(0x0007a000, 0x0007bfff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
+	map(0x0007c000, 0x0007dfff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
+	map(0x0007e000, 0x0007ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(this, FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
+	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
 //  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram"); // Main RAM - 64K mask 0xffff
 	map(0x06000000, 0x06003fff).noprw(); // Cart RAM - 8K NVRAM ?
@@ -1344,17 +1345,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 #endif
 
 
-static SLOT_INTERFACE_START(vboy_cart)
-	SLOT_INTERFACE_INTERNAL("vb_rom",    VBOY_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
-SLOT_INTERFACE_END
+static void vboy_cart(device_slot_interface &device)
+{
+	device.option_add_internal("vb_rom",    VBOY_ROM_STD);
+	device.option_add_internal("vb_eeprom", VBOY_ROM_EEPROM);
+}
 
 MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", V810, XTAL(20'000'000) )
-	MCFG_CPU_PROGRAM_MAP(vboy_mem)
-	MCFG_CPU_IO_MAP(vboy_io)
+	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(20'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(vboy_mem)
+	MCFG_DEVICE_IO_MAP(vboy_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
 	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
 
@@ -1388,8 +1390,9 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_VBOYSND_ADD("vbsnd")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("vbsnd", VBOYSND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1401,5 +1404,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0,       vboy,      vboy,  vboy_state, 0,    "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY     FULLNAME       FLAGS */
+CONS( 1995, vboy, 0,      0,      vboy,    vboy,  vboy_state, empty_init, "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

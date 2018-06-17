@@ -6,12 +6,14 @@
 
 **************************************************************************/
 
-#include "video/poly.h"
 #include "audio/dcs.h"
+#include "machine/adc0844.h"
+#include "machine/ataintf.h"
 #include "machine/midwayic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "machine/adc0844.h"
+#include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
@@ -52,13 +54,13 @@ public:
 
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_ram_base(*this, "ram_base"),
-			m_fastram_base(*this, "fastram_base"),
-			m_tms32031_control(*this, "32031_control"),
-			m_midvplus_misc(*this, "midvplus_misc"),
-			m_videoram(*this, "videoram", 32),
-			m_textureram(*this, "textureram") ,
+		m_nvram(*this, "nvram"),
+		m_ram_base(*this, "ram_base"),
+		m_fastram_base(*this, "fastram_base"),
+		m_tms32031_control(*this, "32031_control"),
+		m_midvplus_misc(*this, "midvplus_misc"),
+		m_videoram(*this, "videoram", 32),
+		m_textureram(*this, "textureram") ,
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
@@ -67,6 +69,8 @@ public:
 		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
+		m_ata(*this, "ata"),
+		m_timer(*this, "timer%u", 0U),
 		m_dcs(*this, "dcs"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_optional_drivers(*this, "lamp%u", 0U),
@@ -85,7 +89,6 @@ public:
 	uint8_t m_adc_shift;
 	uint16_t m_last_port0;
 	uint8_t m_shifter_state;
-	timer_device *m_timer[2];
 	double m_timer_rate;
 	uint16_t m_bit_index;
 	int m_lastval;
@@ -143,12 +146,12 @@ public:
 	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
 	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
-	DECLARE_DRIVER_INIT(crusnu40);
-	DECLARE_DRIVER_INIT(crusnu21);
-	DECLARE_DRIVER_INIT(crusnwld);
-	DECLARE_DRIVER_INIT(wargods);
-	DECLARE_DRIVER_INIT(offroadc);
-	DECLARE_DRIVER_INIT(crusnusa);
+	void init_crusnu40();
+	void init_crusnu21();
+	void init_crusnwld();
+	void init_wargods();
+	void init_offroadc();
+	void init_crusnusa();
 	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
@@ -166,6 +169,8 @@ public:
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
+	optional_device<ata_interface_device> m_ata; // TODO(RH): This is horrible and midvplus should be split into its own device_driver that derives from midvunit.
+	required_device_array<timer_device, 2> m_timer;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	output_finder<8> m_optional_drivers;

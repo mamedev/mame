@@ -190,7 +190,7 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  str_w -
 //-------------------------------------------------
 
-void com8116_device::str_w(uint8_t data)
+void com8116_device::write_str(uint8_t data)
 {
 	int fr_divider = data & 0x0f;
 	int fr_clock = clock() / m_divisors[fr_divider];
@@ -200,17 +200,12 @@ void com8116_device::str_w(uint8_t data)
 	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::str_w )
-{
-	str_w(data);
-}
-
 
 //-------------------------------------------------
 //  stt_w -
 //-------------------------------------------------
 
-void com8116_device::stt_w(uint8_t data)
+void com8116_device::write_stt(uint8_t data)
 {
 	int ft_divider = data & 0x0f;
 	int ft_clock = clock() / m_divisors[ft_divider];
@@ -218,9 +213,4 @@ void com8116_device::stt_w(uint8_t data)
 	LOGMASKED(LOG_SELECTED, "Transmitter Divisor Select %01X: %u (%u Hz)\n", data & 0x0f, m_divisors[ft_divider], ft_clock);
 
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
-}
-
-WRITE8_MEMBER( com8116_device::stt_w )
-{
-	stt_w(data);
 }

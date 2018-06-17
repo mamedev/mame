@@ -14,6 +14,7 @@ Schleicher MES
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -68,8 +69,8 @@ void mes_state::mem_map(address_map &map)
 void mes_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(mes_state::port00_r));
-	map(0x08, 0x08).r(this, FUNC(mes_state::port08_r));
+	map(0x00, 0x00).r(FUNC(mes_state::port00_r));
+	map(0x08, 0x08).r(FUNC(mes_state::port08_r));
 	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
@@ -130,9 +131,9 @@ void mes_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(mes_state::mes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -169,5 +170,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT  COMPANY       FULLNAME  FLAGS
-COMP( 198?, mes,    0,      0,       mes,     mes,   mes_state, 0,    "Schleicher", "MES",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME  FLAGS
+COMP( 198?, mes,  0,      0,      mes,     mes,   mes_state, empty_init, "Schleicher", "MES",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

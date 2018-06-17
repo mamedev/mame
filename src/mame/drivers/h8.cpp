@@ -193,8 +193,8 @@ void h8_state::h8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).rw(this, FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
-	map(0xf1, 0xf1).w(this, FUNC(h8_state::portf1_w));
+	map(0xf0, 0xf0).rw(FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
+	map(0xf1, 0xf1).w(FUNC(h8_state::portf1_w));
 	map(0xf8, 0xf8).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9, 0xf9).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// optional connection to a serial terminal @ 600 baud
@@ -312,29 +312,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 
 MACHINE_CONFIG_START(h8_state::h8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(h8_mem)
-	MCFG_CPU_IO_MAP(h8_io)
-	MCFG_I8085A_STATUS(WRITE8(h8_state, h8_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(h8_state, h8_inte_callback))
+	MCFG_DEVICE_ADD("maincpu", I8080, H8_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(h8_mem)
+	MCFG_DEVICE_IO_MAP(h8_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, h8_state, h8_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, h8_state, h8_inte_callback))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, H8_BEEP_FRQ)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", H8_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(h8_state, txdata_callback))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, h8_state, txdata_callback))
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -352,23 +350,23 @@ ROM_START( h8 )
 	ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
 	ROM_SYSTEM_BIOS(0, "bios0", "Standard")
-	ROMX_LOAD( "2708_444-13_pam8.rom", 0x0000, 0x0400, CRC(e0745513) SHA1(0e170077b6086be4e5cd10c17e012c0647688c39), ROM_BIOS(1) )
+	ROMX_LOAD( "2708_444-13_pam8.rom", 0x0000, 0x0400, CRC(e0745513) SHA1(0e170077b6086be4e5cd10c17e012c0647688c39), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "bios1", "Alternate")
-	ROMX_LOAD( "2708_444-13_pam8go.rom", 0x0000, 0x0400, CRC(9dbad129) SHA1(72421102b881706877f50537625fc2ab0b507752), ROM_BIOS(2) )
+	ROMX_LOAD( "2708_444-13_pam8go.rom", 0x0000, 0x0400, CRC(9dbad129) SHA1(72421102b881706877f50537625fc2ab0b507752), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "bios2", "Disk OS")
-	ROMX_LOAD( "2716_444-13_pam8at.rom", 0x0000, 0x0800, CRC(fd95ddc1) SHA1(eb1f272439877239f745521139402f654e5403af), ROM_BIOS(3) )
+	ROMX_LOAD( "2716_444-13_pam8at.rom", 0x0000, 0x0800, CRC(fd95ddc1) SHA1(eb1f272439877239f745521139402f654e5403af), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS(3, "bios3", "Disk OS Alt")
-	ROMX_LOAD( "2732_444-70_xcon8.rom", 0x0000, 0x1000, CRC(b04368f4) SHA1(965244277a3a8039a987e4c3593b52196e39b7e7), ROM_BIOS(4) )
+	ROMX_LOAD( "2732_444-70_xcon8.rom", 0x0000, 0x1000, CRC(b04368f4) SHA1(965244277a3a8039a987e4c3593b52196e39b7e7), ROM_BIOS(3) )
 
 	// this one runs off into the weeds
 	ROM_SYSTEM_BIOS(4, "bios4", "not working")
-	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(5) )
+	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME PARENT  COMPAT  MACHINE  INPUT    CLASS,      INIT  COMPANY        FULLNAME       FLAGS */
-COMP( 1977, h8,  0,      0,      h8,      h8,      h8_state,   0,    "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT        COMPANY        FULLNAME       FLAGS */
+COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )

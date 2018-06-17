@@ -7,6 +7,7 @@
 
 #include "isa.h"
 #include "video/crtc_ega.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

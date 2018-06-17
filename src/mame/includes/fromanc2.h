@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
+#include "emupal.h"
 
 class fromanc2_state : public driver_device
 {
@@ -89,8 +90,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
-	DECLARE_DRIVER_INIT(fromanc4);
-	DECLARE_DRIVER_INIT(fromanc2);
+	void init_fromanc4();
+	void init_fromanc2();
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromanc2_get_tile_info);
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromancr_get_tile_info);
 	virtual void machine_reset() override;

@@ -143,7 +143,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x480000, 0x480003).mirror(0x019ffc).w(m_ym2413, FUNC(ym2413_device::write)).umask16(0xff00);
 	map(0x500000, 0x500fff).mirror(0x019000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x5a6000, 0x5a6001).mirror(0x019ffe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x640000, 0x640001).mirror(0x019ffe).w(this, FUNC(rampart_state::latch_w));
+	map(0x640000, 0x640001).mirror(0x019ffe).w(FUNC(rampart_state::latch_w));
 	map(0x640000, 0x640001).mirror(0x019ffc).portr("IN0");
 	map(0x640002, 0x640003).mirror(0x019ffc).portr("IN1");
 	map(0x6c0000, 0x6c0001).mirror(0x019ff8).portr("TRACK0");
@@ -151,7 +151,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x6c0004, 0x6c0005).mirror(0x019ff8).portr("TRACK2");
 	map(0x6c0006, 0x6c0007).mirror(0x019ff8).portr("TRACK3");
 	map(0x726000, 0x726001).mirror(0x019ffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x7e6000, 0x7e6001).mirror(0x019ffe).w(this, FUNC(rampart_state::scanline_int_ack_w));
+	map(0x7e6000, 0x7e6001).mirror(0x019ffe).w(FUNC(rampart_state::scanline_int_ack_w));
 }
 
 
@@ -325,7 +325,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( rampart )
+static GFXDECODE_START( gfx_rampart )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
@@ -340,10 +340,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(rampart_state::rampart)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 118)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rampart)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -367,15 +367,15 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(rampart_state, screen_update_rampart)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rampart_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rampart_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/4/3, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -479,7 +479,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rampart_state,rampart)
+void rampart_state::init_rampart()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -495,6 +495,6 @@ DRIVER_INIT_MEMBER(rampart_state,rampart)
  *
  *************************************/
 
-GAME( 1990, rampart,  0,       rampart, rampart,  rampart_state, rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart,  0,       rampart, rampart,  rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )

@@ -27,6 +27,7 @@
 #include "bus/tvc/tvc.h"
 #include "bus/tvc/hbf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -50,6 +51,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_cart(*this, "cartslot")
 		, m_centronics(*this, CENTRONICS_TAG)
+		, m_expansions(*this, "exp%u", 1)
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
@@ -60,10 +62,10 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
 	required_device<centronics_device> m_centronics;
+	required_device_array<tvcexp_slot_device, 4> m_expansions;
 	required_device<palette_device> m_palette;
 	required_ioport_array<16> m_keyboard;
 
-	tvcexp_slot_device *m_expansions[4];
 	memory_region *m_bios_rom;
 	memory_region *m_cart_rom;
 	memory_region *m_ext;
@@ -364,24 +366,24 @@ void tvc_state::tvc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(tvc_state::border_color_w));
-	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x02, 0x02).w(this, FUNC(tvc_state::bank_w));
-	map(0x03, 0x03).w(this, FUNC(tvc_state::keyboard_w));
-	map(0x04, 0x06).w(this, FUNC(tvc_state::sound_w));
-	map(0x07, 0x07).w(this, FUNC(tvc_state::flipflop_w));
-	map(0x0f, 0x0f).w(this, FUNC(tvc_state::vram_bank_w));
+	map(0x00, 0x00).w(FUNC(tvc_state::border_color_w));
+	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x02, 0x02).w(FUNC(tvc_state::bank_w));
+	map(0x03, 0x03).w(FUNC(tvc_state::keyboard_w));
+	map(0x04, 0x06).w(FUNC(tvc_state::sound_w));
+	map(0x07, 0x07).w(FUNC(tvc_state::flipflop_w));
+	map(0x0f, 0x0f).w(FUNC(tvc_state::vram_bank_w));
 	map(0x10, 0x1f).rw("exp1", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
 	map(0x20, 0x2f).rw("exp2", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
 	map(0x30, 0x3f).rw("exp3", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
 	map(0x40, 0x4f).rw("exp4", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
-	map(0x50, 0x50).w(this, FUNC(tvc_state::cassette_w));
-	map(0x58, 0x58).r(this, FUNC(tvc_state::keyboard_r));
-	map(0x59, 0x59).r(this, FUNC(tvc_state::int_state_r));
-	map(0x5a, 0x5a).r(this, FUNC(tvc_state::exp_id_r));
-	map(0x5b, 0x5b).r(this, FUNC(tvc_state::_5b_r));
-	map(0x58, 0x5b).w(this, FUNC(tvc_state::expint_ack_w));
-	map(0x60, 0x63).w(this, FUNC(tvc_state::palette_w));
+	map(0x50, 0x50).w(FUNC(tvc_state::cassette_w));
+	map(0x58, 0x58).r(FUNC(tvc_state::keyboard_r));
+	map(0x59, 0x59).r(FUNC(tvc_state::int_state_r));
+	map(0x5a, 0x5a).r(FUNC(tvc_state::exp_id_r));
+	map(0x5b, 0x5b).r(FUNC(tvc_state::_5b_r));
+	map(0x58, 0x5b).w(FUNC(tvc_state::expint_ack_w));
+	map(0x60, 0x63).w(FUNC(tvc_state::palette_w));
 	map(0x70, 0x70).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x71, 0x71).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -609,11 +611,6 @@ void tvc_state::machine_start()
 
 	m_int_flipflop = 0;
 
-	m_expansions[0] = machine().device<tvcexp_slot_device>("exp1");
-	m_expansions[1] = machine().device<tvcexp_slot_device>("exp2");
-	m_expansions[2] = machine().device<tvcexp_slot_device>("exp3");
-	m_expansions[3] = machine().device<tvcexp_slot_device>("exp4");
-
 	m_bios_rom = memregion("sys");
 	m_ext = memregion("ext");
 	m_vram = memregion("vram");
@@ -760,16 +757,17 @@ QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
 }
 
 
-extern SLOT_INTERFACE_START(tvc_exp)
-	SLOT_INTERFACE("hbf", TVC_HBF)          // Videoton HBF floppy interface
-SLOT_INTERFACE_END
+void tvc_exp(device_slot_interface &device)
+{
+	device.option_add("hbf", TVC_HBF);      // Videoton HBF floppy interface
+}
 
 
 MACHINE_CONFIG_START(tvc_state::tvc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 3125000)
-	MCFG_CPU_PROGRAM_MAP(tvc_mem)
-	MCFG_CPU_IO_MAP(tvc_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, 3125000)
+	MCFG_DEVICE_PROGRAM_MAP(tvc_mem)
+	MCFG_DEVICE_IO_MAP(tvc_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -786,7 +784,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(tvc_state, crtc_update_row)
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(tvc_state, int_ff_set))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, tvc_state, int_ff_set))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -794,13 +792,13 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", TVC_SOUND, 0)
-	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(tvc_state, int_ff_set))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", TVC_SOUND, 0)
+	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tvc_state, centronics_ack))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -856,11 +854,11 @@ ROM_END
 ROM_START( tvc64p )
 	ROM_REGION( 0x4000, "sys", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v22", "v2.2")
-	ROMX_LOAD( "tvc22_d6.64k", 0x0000, 0x2000, CRC(05ac3a34) SHA1(bdc7eda5fd53f806dca8c4929ee498e8e59eb787), ROM_BIOS(1) )
-	ROMX_LOAD( "tvc22_d4.64k", 0x2000, 0x2000, CRC(ba6ad589) SHA1(e5c8a6db506836a327d901387a8dc8c681a272db), ROM_BIOS(1) )
+	ROMX_LOAD( "tvc22_d6.64k", 0x0000, 0x2000, CRC(05ac3a34) SHA1(bdc7eda5fd53f806dca8c4929ee498e8e59eb787), ROM_BIOS(0) )
+	ROMX_LOAD( "tvc22_d4.64k", 0x2000, 0x2000, CRC(ba6ad589) SHA1(e5c8a6db506836a327d901387a8dc8c681a272db), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v21", "v2.1")
-	ROMX_LOAD( "tvc21_d6.64k", 0x0000, 0x2000, CRC(f197ffce) SHA1(7b27a91504dd864170451949ada5f938d6532cae), ROM_BIOS(2) )
-	ROMX_LOAD( "tvc21_d4.64k", 0x2000, 0x2000, CRC(b054c0b2) SHA1(c8ca8d5a4d092604de01e2cafc2a2dabe94e6380), ROM_BIOS(2) )
+	ROMX_LOAD( "tvc21_d6.64k", 0x0000, 0x2000, CRC(f197ffce) SHA1(7b27a91504dd864170451949ada5f938d6532cae), ROM_BIOS(1) )
+	ROMX_LOAD( "tvc21_d4.64k", 0x2000, 0x2000, CRC(b054c0b2) SHA1(c8ca8d5a4d092604de01e2cafc2a2dabe94e6380), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvc22_d7.64k", 0x2000, 0x2000, CRC(05e1c3a8) SHA1(abf119cf947ea32defd08b29a8a25d75f6bd4987))
@@ -881,7 +879,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT     STATE       INIT  COMPANY       FULLNAME             FLAGS
-COMP( 1985, tvc64,    0,      0,     tvc,       tvc,      tvc_state,  0,    "Videoton",   "TVC 64",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, tvc64p,   tvc64,  0,     tvc,       tvc,      tvc_state,  0,    "Videoton",   "TVC 64+",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, tvc64pru, tvc64,  0,     tvc,       tvc64pru, tvc_state,  0,    "Videoton",   "TVC 64+ (Russian)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     CLASS      INIT        COMPANY       FULLNAME             FLAGS
+COMP( 1985, tvc64,    0,      0,      tvc,     tvc,      tvc_state, empty_init, "Videoton",   "TVC 64",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, tvc64p,   tvc64,  0,      tvc,     tvc,      tvc_state, empty_init, "Videoton",   "TVC 64+",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, tvc64pru, tvc64,  0,      tvc,     tvc64pru, tvc_state, empty_init, "Videoton",   "TVC 64+ (Russian)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

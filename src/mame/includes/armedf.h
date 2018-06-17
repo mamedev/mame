@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
 
-#include "includes/nb1414m4.h"
+#include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class armedf_state : public driver_device
 {
@@ -79,14 +80,14 @@ public:
 	DECLARE_WRITE16_MEMBER(armedf_fg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrolly_w);
-	DECLARE_DRIVER_INIT(cclimbr2);
-	DECLARE_DRIVER_INIT(armedf);
-	DECLARE_DRIVER_INIT(legion);
-	DECLARE_DRIVER_INIT(terrafu);
-	DECLARE_DRIVER_INIT(legionjb);
-	DECLARE_DRIVER_INIT(kozure);
-	DECLARE_DRIVER_INIT(terraf);
-	DECLARE_DRIVER_INIT(terrafjb);
+	void init_cclimbr2();
+	void init_armedf();
+	void init_legion();
+	void init_terrafu();
+	void init_legionjb();
+	void init_kozure();
+	void init_terraf();
+	void init_terrafjb();
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type1);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type2);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type3);

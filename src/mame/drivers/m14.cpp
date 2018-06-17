@@ -50,6 +50,7 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -304,18 +305,18 @@ void m14_state::m14_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(m14_state::m14_vram_w)).share("video_ram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(m14_state::m14_cram_w)).share("color_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(m14_state::m14_vram_w)).share("video_ram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m14_state::m14_cram_w)).share("color_ram");
 }
 
 void m14_state::m14_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).portr("AN_PADDLE").w(this, FUNC(m14_state::ball_x_w));
-	map(0xf9, 0xf9).portr("IN0").w(this, FUNC(m14_state::ball_y_w));
-	map(0xfa, 0xfa).r(this, FUNC(m14_state::m14_rng_r)).w(this, FUNC(m14_state::paddle_x_w));
-	map(0xfb, 0xfb).portr("DSW").w(this, FUNC(m14_state::output_w));
-	map(0xfc, 0xfc).w(this, FUNC(m14_state::sound_w));
+	map(0xf8, 0xf8).portr("AN_PADDLE").w(FUNC(m14_state::ball_x_w));
+	map(0xf9, 0xf9).portr("IN0").w(FUNC(m14_state::ball_y_w));
+	map(0xfa, 0xfa).r(FUNC(m14_state::m14_rng_r)).w(FUNC(m14_state::paddle_x_w));
+	map(0xfb, 0xfb).portr("DSW").w(FUNC(m14_state::output_w));
+	map(0xfc, 0xfc).w(FUNC(m14_state::sound_w));
 }
 
 /*************************************
@@ -405,7 +406,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( m14 )
+static GFXDECODE_START( gfx_m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
@@ -432,10 +433,10 @@ void m14_state::machine_reset()
 MACHINE_CONFIG_START(m14_state::m14)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,6000000) //guess: 6 Mhz internally divided by 2
-	MCFG_CPU_PROGRAM_MAP(m14_map)
-	MCFG_CPU_IO_MAP(m14_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m14_state, m14_irq)
+	MCFG_DEVICE_ADD("maincpu",I8085A,6000000) //guess: 6 Mhz internally divided by 2
+	MCFG_DEVICE_PROGRAM_MAP(m14_map)
+	MCFG_DEVICE_IO_MAP(m14_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m14_state, m14_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -446,20 +447,20 @@ MACHINE_CONFIG_START(m14_state::m14)
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m14)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m14)
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(m14_state, m14)
 
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(m14_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+//  MCFG_DEVICE_ADD("discrete", DISCRETE)
 //  MCFG_DISCRETE_INTF(m14)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -487,4 +488,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
+GAME( 1979, ptrmj, 0, m14, m14, m14_state, empty_init, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer

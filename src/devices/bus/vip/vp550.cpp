@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(VP550, vp550_device, "vp550", "VP-550 Super Sound")
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vp550_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -117,8 +117,8 @@ void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 
 		switch (offset & 0x03)
 		{
-		case 1: m_pfg_a->str_w(data); break;
-		case 2: m_pfg_b->str_w(data); break;
+		case 1: m_pfg_a->write_str(data); break;
+		case 2: m_pfg_b->write_str(data); break;
 		case 3: octave_w(space, offset, data); break;
 		}
 

@@ -164,7 +164,7 @@ void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void olyboss_state::olyboss_mem(address_map &map)
 {
-	map(0x0000, 0x7ff).rw(this, FUNC(olyboss_state::rom_r), FUNC(olyboss_state::rom_w)).share("lowram");
+	map(0x0000, 0x7ff).rw(FUNC(olyboss_state::rom_r), FUNC(olyboss_state::rom_w)).share("lowram");
 	map(0x800, 0xffff).ram();
 }
 
@@ -179,10 +179,10 @@ void olyboss_state::olyboss_io(address_map &map)
 	map(0x31, 0x31).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x40, 0x43).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0x50, 0x53) COM2651
-	map(0x60, 0x60).rw(this, FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
+	map(0x60, 0x60).rw(FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
 	map(0x80, 0x81).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
-	map(0x82, 0x84).w(this, FUNC(olyboss_state::vchrmap_w));
-	map(0x90, 0x9f).w(this, FUNC(olyboss_state::vchrram_w));
+	map(0x82, 0x84).w(FUNC(olyboss_state::vchrmap_w));
+	map(0x90, 0x9f).w(FUNC(olyboss_state::vchrram_w));
 }
 
 void olyboss_state::olyboss85_io(address_map &map)
@@ -193,9 +193,9 @@ void olyboss_state::olyboss85_io(address_map &map)
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x20, 0x21).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x30, 0x31).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x42, 0x42).r(this, FUNC(olyboss_state::keyboard_read));
-	map(0x42, 0x44).w(this, FUNC(olyboss_state::vchrram85_w));
-	map(0x45, 0x45).w(this, FUNC(olyboss_state::fdcctrl85_w));
+	map(0x42, 0x42).r(FUNC(olyboss_state::keyboard_read));
+	map(0x42, 0x44).w(FUNC(olyboss_state::vchrram85_w));
+	map(0x45, 0x45).w(FUNC(olyboss_state::fdcctrl85_w));
 }
 
 static INPUT_PORTS_START( olyboss )
@@ -410,27 +410,30 @@ WRITE8_MEMBER( olyboss_state::fdcctrl85_w )
 		m_fdd1->get_device()->mon_w(!(data & 0x80));
 }
 
-static SLOT_INTERFACE_START( bossa_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void bossa_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
-static SLOT_INTERFACE_START( bossb_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void bossb_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( bosscd_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void bosscd_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
 MACHINE_CONFIG_START( olyboss_state::olybossd )
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
-	MCFG_CPU_IO_MAP(olyboss_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(olyboss_mem)
+	MCFG_DEVICE_IO_MAP(olyboss_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
 
 	/* video hardware */
 
@@ -446,30 +449,30 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_AM9519_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(READ8(olyboss_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(olyboss_state, fdcdma_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, olyboss_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, olyboss_state, dma_mem_r))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, olyboss_state, dma_mem_w))
+	MCFG_I8257_IN_IOR_0_CB(READ8(*this, olyboss_state, fdcdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, olyboss_state, fdcdma_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, olyboss_state, crtcdma_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, olyboss_state, tc_w))
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
-	MCFG_UPD3301_INT_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq0_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_UPD3301_INT_CALLBACK(WRITELINE("uic", am9519_device, ireq0_w)) MCFG_DEVCB_INVERT
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(olyboss_state, keyboard_read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(olyboss_state, ppic_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, olyboss_state, keyboard_read))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, olyboss_state, ppic_w))
 
 	/* keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -492,11 +495,11 @@ MACHINE_CONFIG_START( olyboss_state::olybossc )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( olyboss_state::bossb85 )
-	MCFG_CPU_ADD("maincpu", I8085A, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
-	MCFG_CPU_IO_MAP(olyboss85_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(olyboss_state, irq_cb)
-	MCFG_I8085A_SOD(WRITELINE(olyboss_state, romdis_w))
+	MCFG_DEVICE_ADD("maincpu", I8085A, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(olyboss_mem)
+	MCFG_DEVICE_IO_MAP(olyboss85_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(olyboss_state, irq_cb)
+	MCFG_I8085A_SOD(WRITELINE(*this, olyboss_state, romdis_w))
 
 	/* video hardware */
 
@@ -513,25 +516,25 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(READ8(olyboss_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(olyboss_state, fdcdma_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, olyboss_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, olyboss_state, dma_mem_r))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, olyboss_state, dma_mem_w))
+	MCFG_I8257_IN_IOR_0_CB(READ8(*this, olyboss_state, fdcdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, olyboss_state, fdcdma_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, olyboss_state, crtcdma_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, olyboss_state, tc_w))
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
 	MCFG_UPD3301_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
@@ -598,9 +601,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//   YEAR  NAME         PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT  COMPANY                     FULLNAME                FLAGS
-COMP(1981, bossa85,     olybossd,   0,      bossa85,    olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS A 8085",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, bossb85,     olybossd,   0,      bossb85,    olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS B 8085",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossb,    olybossd,   0,      olybossb,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS B",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossc,    olybossd,   0,      olybossc,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS C",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossd,    0,          0,      olybossd,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS D",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//   YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                  FULLNAME               FLAGS
+COMP(1981, bossa85,  olybossd, 0,      bossa85,  olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS A 8085", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, bossb85,  olybossd, 0,      bossb85,  olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS B 8085", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossb, olybossd, 0,      olybossb, olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS B",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossc, olybossd, 0,      olybossc, olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS C",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossd, 0,        0,      olybossd, olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS D",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

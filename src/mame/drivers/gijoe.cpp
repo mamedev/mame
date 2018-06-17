@@ -212,12 +212,12 @@ void gijoe_state::gijoe_map(address_map &map)
 	map(0x1a0000, 0x1a001f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x1b0000, 0x1b003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x1c0000, 0x1c001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x1d0000, 0x1d0001).w(this, FUNC(gijoe_state::sound_irq_w));
+	map(0x1d0000, 0x1d0001).w(FUNC(gijoe_state::sound_irq_w));
 	map(0x1e0000, 0x1e0001).portr("P1_P2");
 	map(0x1e0002, 0x1e0003).portr("P3_P4");
 	map(0x1e4000, 0x1e4001).portr("SYSTEM");
 	map(0x1e4002, 0x1e4003).portr("START");
-	map(0x1e8000, 0x1e8001).rw(this, FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
+	map(0x1e8000, 0x1e8001).rw(FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
 	map(0x1f0000, 0x1f0001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 #if JOE_DEBUG
 	map(0x110000, 0x110007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
@@ -294,14 +294,14 @@ void gijoe_state::machine_reset()
 MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
-	MCFG_CPU_PROGRAM_MAP(gijoe_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(gijoe_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(gijoe_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
@@ -330,9 +330,10 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -483,8 +484,8 @@ ROM_START( gijoea )
 ROM_END
 
 
-GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )

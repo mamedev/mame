@@ -20,6 +20,7 @@
 #include "machine/nvram.h"
 #include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define COP421_TAG      "u9f"
@@ -212,9 +213,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
 	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
-	DECLARE_DRIVER_INIT(lisa210);
-	DECLARE_DRIVER_INIT(mac_xl);
-	DECLARE_DRIVER_INIT(lisa2);
+	void init_lisa210();
+	void init_mac_xl();
+	void init_lisa2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

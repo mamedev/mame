@@ -16,6 +16,7 @@
 #include "machine/7474.h"
 #include "machine/74148.h"
 #include "machine/74153.h"
+#include "emupal.h"
 
 class carpolo_state : public driver_device
 {
@@ -43,7 +44,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(carpolo);
+	void init_carpolo();
 	void carpolo(machine_config &config);
 
 protected:

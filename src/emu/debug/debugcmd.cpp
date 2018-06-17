@@ -441,7 +441,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	}
 
 	/* first look for a tag match */
-	result = m_machine.device(param);
+	result = m_machine.root_device().subdevice(param);
 	if (result)
 		return true;
 
@@ -1031,57 +1031,57 @@ void debugger_commands::execute_observe(int ref, const std::vector<std::string> 
 
 void debugger_commands::execute_suspend(int ref, const std::vector<std::string> &params)
 {
-    /* if there are no parameters, dump the ignore list */
-    if (params.empty())
-    {
-        std::string buffer;
+	/* if there are no parameters, dump the ignore list */
+	if (params.empty())
+	{
+		std::string buffer;
 
-        /* loop over all executable devices */
-        for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		/* loop over all executable devices */
+		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 
-            /* build up a comma-separated list */
-            if (exec.device().debug()->suspended())
-            {
-                if (buffer.empty())
-                    buffer = string_format("Currently suspended device '%s'", exec.device().tag());
-                else
-                    buffer.append(string_format(", '%s'", exec.device().tag()));
-            }
+			/* build up a comma-separated list */
+			if (exec.device().debug()->suspended())
+			{
+				if (buffer.empty())
+					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				else
+					buffer.append(string_format(", '%s'", exec.device().tag()));
+			}
 
-        /* special message for none */
-        if (buffer.empty())
-            buffer = string_format("No currently suspended devices");
-        m_console.printf("%s\n", buffer.c_str());
-    }
-    else
-    {
-        device_t *devicelist[MAX_COMMAND_PARAMS];
+		/* special message for none */
+		if (buffer.empty())
+			buffer = string_format("No currently suspended devices");
+		m_console.printf("%s\n", buffer.c_str());
+	}
+	else
+	{
+		device_t *devicelist[MAX_COMMAND_PARAMS];
 
-        /* validate parameters */
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-            if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
-                return;
+		/* validate parameters */
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+			if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
+				return;
 
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-        {
-            /* make sure this isn't the last live CPU */
-            bool gotone = false;
-            for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
-                if (&exec.device() != devicelist[paramnum] && !exec.device().debug()->suspended())
-                {
-                    gotone = true;
-                    break;
-                }
-            if (!gotone)
-            {
-                m_console.printf("Can't suspend all devices!\n");
-                return;
-            }
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+		{
+			/* make sure this isn't the last live CPU */
+			bool gotone = false;
+			for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+				if (&exec.device() != devicelist[paramnum] && !exec.device().debug()->suspended())
+				{
+					gotone = true;
+					break;
+				}
+			if (!gotone)
+			{
+				m_console.printf("Can't suspend all devices!\n");
+				return;
+			}
 
-            devicelist[paramnum]->debug()->suspend(true);
-            m_console.printf("Suspended device '%s'\n", devicelist[paramnum]->tag());
-        }
-    }
+			devicelist[paramnum]->debug()->suspend(true);
+			m_console.printf("Suspended device '%s'\n", devicelist[paramnum]->tag());
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -1090,43 +1090,43 @@ void debugger_commands::execute_suspend(int ref, const std::vector<std::string> 
 
 void debugger_commands::execute_resume(int ref, const std::vector<std::string> &params)
 {
-    /* if there are no parameters, dump the ignore list */
-    if (params.empty())
-    {
-        std::string buffer;
+	/* if there are no parameters, dump the ignore list */
+	if (params.empty())
+	{
+		std::string buffer;
 
-        /* loop over all executable devices */
-        for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		/* loop over all executable devices */
+		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 
-            /* build up a comma-separated list */
-            if (exec.device().debug()->suspended())
-            {
-                if (buffer.empty())
-                    buffer = string_format("Currently suspended device '%s'", exec.device().tag());
-                else
-                    buffer.append(string_format(", '%s'", exec.device().tag()));
-            }
+			/* build up a comma-separated list */
+			if (exec.device().debug()->suspended())
+			{
+				if (buffer.empty())
+					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				else
+					buffer.append(string_format(", '%s'", exec.device().tag()));
+			}
 
-        /* special message for none */
-        if (buffer.empty())
-            buffer = string_format("No currently suspended devices");
-        m_console.printf("%s\n", buffer.c_str());
-    }
-    else
-    {
-        device_t *devicelist[MAX_COMMAND_PARAMS];
+		/* special message for none */
+		if (buffer.empty())
+			buffer = string_format("No currently suspended devices");
+		m_console.printf("%s\n", buffer.c_str());
+	}
+	else
+	{
+		device_t *devicelist[MAX_COMMAND_PARAMS];
 
-        /* validate parameters */
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-            if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
-                return;
+		/* validate parameters */
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+			if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
+				return;
 
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-        {
-            devicelist[paramnum]->debug()->suspend(false);
-            m_console.printf("Resumed device '%s'\n", devicelist[paramnum]->tag());
-        }
-    }
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+		{
+			devicelist[paramnum]->debug()->suspend(false);
+			m_console.printf("Resumed device '%s'\n", devicelist[paramnum]->tag());
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -2044,13 +2044,13 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 					switch (width)
 					{
 					case 8:
-						util::stream_format(output, " %016X", space->read_qword(i+j));
+						util::stream_format(output, " %016X", space->read_qword_unaligned(i+j));
 						break;
 					case 4:
-						util::stream_format(output, " %08X", space->read_dword(i+j));
+						util::stream_format(output, " %08X", space->read_dword_unaligned(i+j));
 						break;
 					case 2:
-						util::stream_format(output, " %04X", space->read_word(i+j));
+						util::stream_format(output, " %04X", space->read_word_unaligned(i+j));
 						break;
 					case 1:
 						util::stream_format(output, " %02X", space->read_byte(i+j));
@@ -2079,13 +2079,13 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 					switch (width)
 					{
 					case 8:
-						data = space->read_qword(i+j);
+						data = space->read_qword_unaligned(i+j);
 						break;
 					case 4:
-						data = space->read_dword(i+j);
+						data = space->read_dword_unaligned(i+j);
 						break;
 					case 2:
-						data = space->read_word(i+j);
+						data = space->read_word_unaligned(i+j);
 						break;
 					case 1:
 						data = space->read_byte(i+j);
@@ -2925,7 +2925,7 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
 		// Insert current pc
 		if (m_cpu.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->safe_pcbase();
+			const offs_t pc = cpu->state().pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");

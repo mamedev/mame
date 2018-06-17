@@ -19,7 +19,7 @@ public:
 	{ }
 
 	DECLARE_MACHINE_RESET(s11c);
-	DECLARE_DRIVER_INIT(s11c);
+	void init_s11c();
 
 	void s11c(machine_config &config);
 	void s11c_main_map(address_map &map);

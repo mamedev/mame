@@ -41,6 +41,7 @@ the devices themselves. An example shows a i8251 used as the US1 device.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -82,8 +83,8 @@ void modellot_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x77, 0x77).r(this, FUNC(modellot_state::port77_r));
-	map(0xff, 0xff).r(this, FUNC(modellot_state::portff_r));
+	map(0x77, 0x77).r(FUNC(modellot_state::port77_r));
+	map(0xff, 0xff).r(FUNC(modellot_state::portff_r));
 }
 
 
@@ -126,7 +127,7 @@ const gfx_layout modellot_charlayout =
 	8*8             /* space between characters */
 };
 
-static GFXDECODE_START( modellot )
+static GFXDECODE_START( gfx_modellot )
 	GFXDECODE_ENTRY( "chargen", 0x0000, modellot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -177,9 +178,9 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 
 MACHINE_CONFIG_START(modellot_state::modellot)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -190,7 +191,7 @@ MACHINE_CONFIG_START(modellot_state::modellot)
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", modellot )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_modellot)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -213,4 +214,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, empty_init, "General Processor", "Modello T", MACHINE_IS_SKELETON )

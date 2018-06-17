@@ -64,7 +64,7 @@ const tiny_rom_entry *powermate_ide_device::device_rom_region() const
 
 MACHINE_CONFIG_START(powermate_ide_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
@@ -178,7 +178,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, uint8_
 			break;
 
 		case 0x40:
-			m_cent_data_out->write(space, 0, data);
+			m_cent_data_out->write(data);
 			break;
 
 		case 0x42: // Bank Number

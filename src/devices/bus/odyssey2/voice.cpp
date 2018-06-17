@@ -44,10 +44,10 @@ void o2_voice_device::device_start()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(o2_voice_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(o2_voice_device, lrq_callback))
+	MCFG_DEVICE_ADD("sp0256_speech", SP0256, 3120000)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, o2_voice_device, lrq_callback))
 	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

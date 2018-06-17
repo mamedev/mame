@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/decbac06.h"
+#include "emupal.h"
 
 class pcktgal_state : public driver_device
 {
@@ -39,7 +40,7 @@ public:
 	DECLARE_READ8_MEMBER(adpcm_reset_r);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	DECLARE_DRIVER_INIT(pcktgal);
+	void init_pcktgal();
 	DECLARE_PALETTE_INIT(pcktgal);
 	virtual void machine_start() override;
 

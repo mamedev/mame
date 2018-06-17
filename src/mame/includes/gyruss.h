@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class gyruss_state : public driver_device
@@ -59,7 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gyruss_dac_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
-	DECLARE_DRIVER_INIT(gyruss);
+	void init_gyruss();
 	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
