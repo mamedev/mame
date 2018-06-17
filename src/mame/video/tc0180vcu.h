@@ -17,23 +17,24 @@ public:
 
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_fb_colorbase(int color) { m_fb_color_base = color * 16; }
 	void set_bg_colorbase(int color) { m_bg_color_base = color; }
 	void set_fg_colorbase(int color) { m_fg_color_base = color; }
 	void set_tx_colorbase(int color) { m_tx_color_base = color; }
 	template <class Object> devcb_base &set_inth_callback(Object &&cb) { return m_inth_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_intl_callback(Object &&cb) { return m_intl_callback.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_READ8_MEMBER( get_fb_page );
-	DECLARE_WRITE8_MEMBER( set_fb_page );
-	DECLARE_READ8_MEMBER( get_videoctrl );
-	DECLARE_READ16_MEMBER( ctrl_r );
+	uint8_t get_videoctrl() { return m_video_control; }
 	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_READ16_MEMBER( scroll_r );
-	DECLARE_WRITE16_MEMBER( scroll_w );
-	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
+	DECLARE_READ16_MEMBER( framebuffer_word_r );
+	DECLARE_WRITE16_MEMBER( framebuffer_word_w );
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
+	void tc0180vcu_memrw(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -49,10 +50,13 @@ private:
 	void vblank_callback(screen_device &screen, bool state);
 
 	// internal state
-	uint16_t         m_ctrl[0x10];
 
-	std::unique_ptr<uint16_t[]>       m_ram;
-	std::unique_ptr<uint16_t[]>       m_scrollram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_scrollram;
+	required_shared_ptr<uint16_t> m_ctrl;
+	/* framebuffer is a raw bitmap, remapped as a last step */
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	tilemap_t      *m_tilemap[3];
 
@@ -60,6 +64,7 @@ private:
 	uint8_t          m_framebuffer_page;
 	uint8_t          m_video_control;
 
+	int            m_fb_color_base;
 	int            m_bg_color_base;
 	int            m_fg_color_base;
 	int            m_tx_color_base;
@@ -78,6 +83,9 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
+
+#define MCFG_TC0180VCU_FB_COLORBASE(_color) \
+	downcast<tc0180vcu_device &>(*device).set_fb_colorbase(_color);
 
 #define MCFG_TC0180VCU_BG_COLORBASE(_color) \
 	downcast<tc0180vcu_device &>(*device).set_bg_colorbase(_color);

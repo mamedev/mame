@@ -195,51 +195,32 @@ TODO!
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 3);
+	m_audiobank->set_entry(data & 3);
 }
 
-
-
-READ16_MEMBER(taitob_state::tracky1_hi_r)
+template<int Player>
+READ16_MEMBER(taitob_state::tracky_hi_r)
 {
-	return ioport("TRACKX1")->read();
+	return m_trackx_io[Player]->read();
 }
 
-READ16_MEMBER(taitob_state::tracky1_lo_r)
+template<int Player>
+READ16_MEMBER(taitob_state::tracky_lo_r)
 {
-	return (ioport("TRACKX1")->read() & 0xff) << 8;
+	return (m_trackx_io[Player]->read() & 0xff) << 8;
 }
 
-READ16_MEMBER(taitob_state::trackx1_hi_r)
+template<int Player>
+READ16_MEMBER(taitob_state::trackx_hi_r)
 {
-	return ioport("TRACKY1")->read();
+	return m_tracky_io[Player]->read();
 }
 
-READ16_MEMBER(taitob_state::trackx1_lo_r)
+template<int Player>
+READ16_MEMBER(taitob_state::trackx_lo_r)
 {
-	return (ioport("TRACKY1")->read() & 0xff) << 8;
+	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
-
-READ16_MEMBER(taitob_state::tracky2_hi_r)
-{
-	return ioport("TRACKX2")->read();
-}
-
-READ16_MEMBER(taitob_state::tracky2_lo_r)
-{
-	return (ioport("TRACKX2")->read() & 0xff) << 8;
-}
-
-READ16_MEMBER(taitob_state::trackx2_hi_r)
-{
-	return ioport("TRACKY2")->read();
-}
-
-READ16_MEMBER(taitob_state::trackx2_lo_r)
-{
-	return (ioport("TRACKY2")->read() & 0xff) << 8;
-}
-
 
 WRITE16_MEMBER(taitob_state::gain_control_w)
 {
@@ -292,7 +273,7 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		ioport("EEPROMOUT")->write(data, 0xff);
+		m_eepromout_io->write(data, 0xff);
 	}
 }
 
@@ -348,22 +329,12 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 }
 
 
-void taitob_state::tc0180vcu_memrw(address_map &map, u32 addr)
-{
-	map(addr+0x00000, addr+0x0ffff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::word_r), FUNC(tc0180vcu_device::word_w));
-	map(addr+0x10000, addr+0x1197f).ram().share("spriteram");
-	map(addr+0x11980, addr+0x137ff).ram();
-	map(addr+0x13800, addr+0x13fff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::scroll_r), FUNC(tc0180vcu_device::scroll_w));
-	map(addr+0x18000, addr+0x1801f).rw(m_tc0180vcu, FUNC(tc0180vcu_device::ctrl_r), FUNC(tc0180vcu_device::ctrl_w));
-	map(addr+0x40000, addr+0x7ffff).rw(FUNC(taitob_state::tc0180vcu_framebuffer_word_r), FUNC(taitob_state::tc0180vcu_framebuffer_word_w));
-}
-
 void taitob_state::rastsag2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x607fff).ram(); /* Main RAM */ /*ashura up to 603fff only*/
-	tc0180vcu_memrw(map, 0x400000);
 	map(0x800000, 0x800001).nopr();
 	map(0x800000, 0x800000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x800002, 0x800002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -375,7 +346,7 @@ void taitob_state::crimec_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -390,7 +361,7 @@ void taitob_state::tetrist_map(address_map &map)
 	map(0x200000, 0x200001).nopr();
 	map(0x200000, 0x200000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x800000, 0x807fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -400,7 +371,7 @@ void taitob_state::tetrista_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x600003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0xff00);
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa00001).nopr();
@@ -412,7 +383,7 @@ void taitob_state::tetrista_map(address_map &map)
 void taitob_state::hitice_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x610000, 0x610001).portr("P3_P4");
 	map(0x700000, 0x700001).nopr();
@@ -432,16 +403,16 @@ void taitob_state::rambo3_map(address_map &map)
 	map(0x200000, 0x200001).nopr();
 	map(0x200000, 0x200000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	map(0x600010, 0x600011).r(FUNC(taitob_state::tracky1_lo_r)); /*player 1*/
-	map(0x600012, 0x600013).r(FUNC(taitob_state::tracky1_hi_r));
-	map(0x600014, 0x600015).r(FUNC(taitob_state::trackx1_lo_r));
-	map(0x600016, 0x600017).r(FUNC(taitob_state::trackx1_hi_r));
-	map(0x600018, 0x600019).r(FUNC(taitob_state::tracky2_lo_r)); /*player 2*/
-	map(0x60001a, 0x60001b).r(FUNC(taitob_state::tracky2_hi_r));
-	map(0x60001c, 0x60001d).r(FUNC(taitob_state::trackx2_lo_r));
-	map(0x60001e, 0x60001f).r(FUNC(taitob_state::trackx2_hi_r));
+	map(0x600010, 0x600011).r(FUNC(taitob_state::tracky_lo_r<0>)); /*player 1*/
+	map(0x600012, 0x600013).r(FUNC(taitob_state::tracky_hi_r<0>));
+	map(0x600014, 0x600015).r(FUNC(taitob_state::trackx_lo_r<0>));
+	map(0x600016, 0x600017).r(FUNC(taitob_state::trackx_hi_r<0>));
+	map(0x600018, 0x600019).r(FUNC(taitob_state::tracky_lo_r<1>)); /*player 2*/
+	map(0x60001a, 0x60001b).r(FUNC(taitob_state::tracky_hi_r<1>));
+	map(0x60001c, 0x60001d).r(FUNC(taitob_state::trackx_lo_r<1>));
+	map(0x60001e, 0x60001f).r(FUNC(taitob_state::trackx_hi_r<1>));
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
@@ -450,7 +421,7 @@ void taitob_state::rambo3_map(address_map &map)
 void taitob_state::pbobble_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x500024, 0x500025).portr("P3_P4_A");        /* shown in service mode, game omits to read it */
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
@@ -468,7 +439,7 @@ void taitob_state::pbobble_map(address_map &map)
 void taitob_state::spacedx_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x500024, 0x500025).portr("P3_P4_A");
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
@@ -496,7 +467,7 @@ void taitob_state::spacedxo_map(address_map &map)
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x302000, 0x303fff).readonly();
 	map(0x400000, 0x40ffff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x500000);
+	map(0x500000, 0x57ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
 
@@ -508,7 +479,7 @@ void taitob_state::qzshowby_map(address_map &map)
 	map(0x200026, 0x200027).w(FUNC(taitob_state::eeprom_w));
 	map(0x200028, 0x200029).rw(FUNC(taitob_state::player_34_coin_ctrl_r), FUNC(taitob_state::player_34_coin_ctrl_w));
 	map(0x20002e, 0x20002f).portr("P3_P4_B");    /* player 3,4 buttons */
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -524,7 +495,7 @@ void taitob_state::viofight_map(address_map &map)
 	map(0x200000, 0x200001).nopr();
 	map(0x200000, 0x200000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x200002, 0x200002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa03fff).ram(); /* Main RAM */
@@ -535,7 +506,7 @@ void taitob_state::masterw_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x203fff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x800003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa00001).nopr();
@@ -560,7 +531,7 @@ void taitob_state::silentd_map(address_map &map)
 //  map(0x240000, 0x240001).nopr(); /* read 4 times at init */
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x403fff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x500000);
+	map(0x500000, 0x57ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
 
@@ -568,7 +539,7 @@ void taitob_state::selfeena_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x200000);
+	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x410000, 0x41000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00); /* mirror address - seems to be only used for coin control */
@@ -587,7 +558,7 @@ void taitob_state::sbm_map(address_map &map)
 	map(0x320000, 0x320001).nopr();
 	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x900000);
+	map(0x900000, 0x97ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
 void taitob_state::realpunc_map(address_map &map)
@@ -603,7 +574,7 @@ void taitob_state::realpunc_map(address_map &map)
 	map(0x188002, 0x188003).nopr();
 	map(0x188002, 0x188002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
 	map(0x18c000, 0x18c001).w(FUNC(taitob_state::realpunc_output_w));
-	tc0180vcu_memrw(map, 0x200000);
+	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x300002, 0x300003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
@@ -620,7 +591,7 @@ void taitob_state::realpunc_hd63484_map(address_map &map)
 void taitob_state::masterw_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
@@ -630,7 +601,7 @@ void taitob_state::masterw_sound_map(address_map &map)
 void taitob_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
@@ -646,7 +617,7 @@ void taitob_state::sound_map(address_map &map)
 void taitob_state::viofight_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       /* yes, both addresses for the same chip */
@@ -1744,8 +1715,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 static const gfx_layout tilelayout =
@@ -1754,10 +1725,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			8*16+0, 8*16+1, 8*16+2, 8*16+3, 8*16+4, 8*16+5, 8*16+6, 8*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16 },
+	{ STEP8(0,1), STEP8(8*8*2,1) },
+	{ STEP8(0,8*2), STEP8(8*8*2*2,8*2) },
 	64*8
 };
 
@@ -1772,8 +1741,8 @@ static const gfx_layout rambo3_charlayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 static const gfx_layout rambo3_tilelayout =
@@ -1782,10 +1751,8 @@ static const gfx_layout rambo3_tilelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(8*8*2,8) },
 	32*8
 };
 
@@ -1859,16 +1826,17 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -1917,16 +1885,17 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -1996,16 +1965,17 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2054,16 +2024,17 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
@@ -2113,7 +2084,7 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
@@ -2124,6 +2095,7 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4) // nominally "6.6 MHZ"
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2177,16 +2149,17 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rambo3)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2236,16 +2209,17 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2300,16 +2274,17 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
@@ -2364,16 +2339,17 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
@@ -2422,16 +2398,17 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2486,16 +2463,17 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
@@ -2544,16 +2522,17 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2607,16 +2586,17 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2665,16 +2645,17 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2732,16 +2713,17 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2797,16 +2779,17 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -2854,7 +2837,7 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2866,6 +2849,7 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
@@ -3712,7 +3696,7 @@ ROM_END
 
 void taitob_state::init_taito_b()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, init_taito_b, ROT270, "Taito Corporation Japan",   "Master of Weapon (World)",  MACHINE_SUPPORTS_SAVE )
