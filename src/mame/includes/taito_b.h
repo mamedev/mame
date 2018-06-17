@@ -33,7 +33,8 @@ public:
 		m_audiobank(*this, "audiobank"),
 		m_eepromout_io(*this, "EEPROMOUT"),
 		m_trackx_io(*this, "TRACKX%u", 1U),
-		m_tracky_io(*this, "TRACKY%u", 1U) { }
+		m_tracky_io(*this, "TRACKY%u", 1U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	template<int Player> DECLARE_READ16_MEMBER(tracky_hi_r);

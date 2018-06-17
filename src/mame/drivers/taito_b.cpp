@@ -1908,7 +1908,7 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 24_MHz_XTAL / 8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitob_state, bankswitch_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
@@ -2108,7 +2108,7 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 24_MHz_XTAL / 8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitob_state, bankswitch_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
@@ -2545,7 +2545,7 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 24_MHz_XTAL / 8)   /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitob_state, bankswitch_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
