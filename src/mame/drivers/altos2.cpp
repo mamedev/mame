@@ -150,4 +150,4 @@ ROM_START( altos2 )
 	ROM_LOAD( "358_7258", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_IS_SKELETON )
