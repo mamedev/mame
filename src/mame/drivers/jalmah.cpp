@@ -186,7 +186,6 @@ private:
 	uint8_t m_mcu_prg;
 	int m_respcount;
 	uint8_t m_test_mode;
-	uint16_t m_dma_old;
 	uint16_t m_prg_prot;
 	uint8_t m_oki_rom;
 	uint8_t m_oki_bank;
