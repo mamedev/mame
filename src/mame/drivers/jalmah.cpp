@@ -219,6 +219,7 @@ public:
 	urashima_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jalmah_state(mconfig, type, tag),
 		  m_videoram(*this, "videoram%u", 0U),
+		  m_vreg(*this, "vreg%u", 0U),
    	  	  m_gfxdecode(*this, "gfxdecode")
 	{}
 
@@ -245,9 +246,9 @@ protected:
 
 private:
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_vreg;
 	required_device<gfxdecode_device> m_gfxdecode;
 	
-	uint16_t m_vreg[2][0x800];
 	tilemap_t *m_layer[2];
 	
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
@@ -270,11 +271,9 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 {
 	int code = m_videoram[TileChip][tile_index];
 	uint16_t tile = code & 0xfff;
-	
-	if(TileChip == 0)
-		tile |= m_tile_bank << 12;
-	
-	SET_TILE_INFO_MEMBER(TileChip,
+	int region = (TileChip == 0) ? m_tile_bank : 3;
+
+	SET_TILE_INFO_MEMBER(region,
 			tile,
 			code >> 12,
 			0);
@@ -430,10 +429,13 @@ WRITE8_MEMBER(jalmah_state::tilebank_w)
 
 WRITE8_MEMBER(urashima_state::urashima_bank_w)
 {
-	if (m_tile_bank != (data & 0x0f))
+	if (m_tile_bank != (data & 0x03))
 	{
-		m_tile_bank = (data & 0x0f);
+		m_tile_bank = (data & 0x03);
 		m_layer[0]->mark_all_dirty();
+		
+		if(m_tile_bank == 3)
+			popmessage("layer 0 bank == 3, contact MAMEdev");
 	}
 }
 
@@ -766,13 +768,14 @@ void urashima_state::urashima_map(address_map &map)
 //      0x084000, 0x084001  ?
 	map(0x088000, 0x0887ff).mirror(0x800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
 	map(0x090000, 0x093fff).mirror(0x4000).rw(FUNC(urashima_state::urashima_vram_r<0>),FUNC(urashima_state::urashima_vram_w<0>)).share("videoram0");
-//	map(0x098000, 0x09bfff) unused mirror?
-	map(0x09c000, 0x09c7ff).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>));
-	map(0x09c800, 0x09cfff).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>));
+	map(0x098000, 0x09bfff).noprw(); // unused mirror? set when coin up then never set anymore
+	map(0x09c000, 0x09c7ff).rw(FUNC(urashima_state::urashima_vregs_r<0>), FUNC(urashima_state::urashima_vregs_w<0>)).share("vreg0");
+	map(0x09c800, 0x09cfff).rw(FUNC(urashima_state::urashima_vregs_r<1>), FUNC(urashima_state::urashima_vregs_w<1>)).share("vreg1");
 	map(0x09d000, 0x09dfff).nopr().w(FUNC(urashima_state::urashima_vreg_log_w)); // cleared at POST then unused
 
 	// likely only 0x9e000-0x9ffff is connected (0xa0000-0xa1fff cleared at POST and nowhere else)
-	map(0x09e000, 0x0a1fff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
+	map(0x09e000, 0x09ffff).rw(FUNC(urashima_state::urashima_vram_r<1>),FUNC(urashima_state::urashima_vram_w<1>)).share("videoram1");
+	map(0x0a0000, 0x0a1fff).noprw();
 	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
 	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0);/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
@@ -1167,9 +1170,9 @@ static const gfx_layout tilelayout =
 
 static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "scroll0", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll3", 0, charlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "scroll1", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "scroll2", 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll3", 0, charlayout, 0x000, 16 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(jalmah_state::jalmahv1)
@@ -1229,24 +1232,25 @@ ROM_START ( urashima )
 	ROM_LOAD( "um-3.22c",      0x40000, 0x80000, CRC(9fd8c8fa) SHA1(0346f74c03a4daa7a84b64c9edf0e54297c82fd9) )
 	ROM_COPY( "oki" ,          0x40000, 0x00000, 0x40000 )
 
-	ROM_REGION( 0x080000, "scroll1", 0 )
-	ROM_LOAD( "um-7.4l",    0x000000, 0x080000, CRC(d2a68cfb) SHA1(eb6cb1fad306b697b2035a31ad48e8996722a032) )
 
-	ROM_REGION( 0x080000, "scroll2", 0 ) /* 16x16 Tiles */
+	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "um-6.2l",    0x000000, 0x080000, CRC(076be5b5) SHA1(77444025f149a960137d3c79abecf9b30defa341) )
 
-	ROM_REGION( 0x200000, "scroll0", 0 )
-	/*0*/
-	ROM_COPY( "scroll2" , 0x000000, 0x000000, 0x40000 )
-	ROM_COPY( "scroll2",  0x040000, 0x040000, 0x40000 )
-	/*1*/
-	ROM_COPY( "scroll2",  0x000000, 0x080000, 0x40000 )
-	ROM_COPY( "scroll1",  0x000000, 0x0c0000, 0x40000 )
-	/*2*/
-	ROM_COPY( "scroll2",  0x000000, 0x100000, 0x40000 )
-	ROM_COPY( "scroll1",  0x040000, 0x140000, 0x40000 )
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "um-7.4l",    0x000000, 0x080000, CRC(d2a68cfb) SHA1(eb6cb1fad306b697b2035a31ad48e8996722a032) )
 
-	ROM_REGION( 0x20000, "scroll3", 0 )
+	ROM_REGION( 0x080000, "scroll0", 0 )
+	ROM_COPY( "gfx1" , 0x000000, 0x000000, 0x80000 )
+
+	ROM_REGION( 0x080000, "scroll1", 0 )
+	ROM_COPY( "gfx1",  0x000000, 0x000000, 0x40000 )
+	ROM_COPY( "gfx2",  0x000000, 0x040000, 0x40000 )
+
+	ROM_REGION( 0x080000, "scroll2", 0 )
+	ROM_COPY( "gfx1",  0x000000, 0x000000, 0x40000 )
+	ROM_COPY( "gfx2",  0x040000, 0x040000, 0x40000 )
+
+	ROM_REGION( 0x020000, "scroll3", 0 )
 	ROM_LOAD( "um-5.22j",       0x000000, 0x020000, CRC(991776a2) SHA1(56740553d7d26aaeb9bec8557727030950bb01f7) )  /* 8x8 tiles */
 
 
