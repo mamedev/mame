@@ -1,5 +1,10 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+#ifndef MAME_INCLUDES_TAITO_B_H
+#define MAME_INCLUDES_TAITO_B_H
+
+#pragma once
+
 #include "machine/mb87078.h"
 #include "machine/taitoio.h"
 #include "video/hd63484.h"
@@ -145,3 +150,5 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
 	void realpunc(machine_config &config);
 };
+
+#endif // MAME_INCLUDES_TAITO_B_H
