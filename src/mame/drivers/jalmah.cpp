@@ -284,10 +284,10 @@ void jalmah_state::video_start()
 template<int TileChip>
 TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 {
-	int code = m_videoram[TileChip][tile_index];
+	int const code = m_videoram[TileChip][tile_index];
 	uint16_t tile = code & 0xfff;
 
-	// Tile bank is only affected when bit 11 is on,
+	// 16x16 Tile bank is only affected when bit 11 is on,
 	// and Each bank is 256KB(0x40000) each
 	if (TileChip == 0)
 		tile |= m_tile_bank << 12;
@@ -313,7 +313,7 @@ TILEMAP_MAPPER_MEMBER(urashima_state::range3_8x8)
 void urashima_state::video_start()
 {
 	jalmah_state::video_start();
-	
+
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
 	// range confirmed with title screen transition in attract mode
 	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
@@ -384,16 +384,16 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 
 	// reset scroll latches
 	sx[0] = sx[1] = sy[0] = sy[1] = 0;
-	
+
 	clip.min_x = cliprect.min_x;
 	clip.max_x = cliprect.max_x;
-	
+
 	bitmap.fill(m_palette->pen(0x1ff), cliprect); //selectable by a ram address?
-	
-	for(int y = cliprect.min_y; y < cliprect.max_y+1; y++)
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		clip.min_y = clip.max_y = y;
-		
+
 		// Urashima tilemaps interrogate the video register area to make row and column scrolling
 		// for every scanline the format is:
 		// ---- ---- ---- ---- [0] unused?
@@ -405,14 +405,14 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 		{
 			// latches fetch go in reverse order when flip screen is enabled
 			int y_base = flip_screen() ? 0x3fc-(y*4) : y*4;
-			
+
 			// is there a new latch?
 			if(m_vreg[layer_num][1+y_base] & 1)
 			{
 				sx[layer_num] = m_vreg[layer_num][2+y_base];
 				sy[layer_num] = m_vreg[layer_num][3+y_base];
 			}
-			
+
 			// set scroll values for this layer
 			m_layer[layer_num]->set_scrollx(0,sx[layer_num]);
 			m_layer[layer_num]->set_scrolly(0,sy[layer_num]);
@@ -1133,21 +1133,21 @@ void jalmah_state::machine_reset()
 {
 	m_pri = 0;
 	refresh_priority_system();
-	
+
 	mcu_check_test_mode();
 }
 
 void urashima_state::machine_reset()
 {
 //	m_pri = 0;
-	
+
 	// initialize tilemap vram to sane defaults (test mode cares)
 	for(int i=0;i<0x4000/2;i++)
 	{
 		m_videoram[0][i] = 0xffff;
 		m_videoram[1][i] = 0xffff;
 	}
-	
+
 	mcu_check_test_mode();
 }
 
@@ -1216,7 +1216,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(urashima_state::urashima)
 	jalmah(config);
-	
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(urashima_map)
 	
