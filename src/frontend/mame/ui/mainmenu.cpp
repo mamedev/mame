@@ -150,7 +150,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 //  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
-	/* add reset and exit menus */
+	/* add select new machine menu */
 	item_append(_("Select New Machine"), "", 0, (void *)SELECT_GAME);
 }
 
