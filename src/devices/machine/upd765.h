@@ -233,6 +233,7 @@ protected:
 		SEEK_WAIT_DONE,
 		SEEK_DONE,
 
+		HEAD_LOAD,
 		HEAD_LOAD_DONE,
 
 		WAIT_INDEX,

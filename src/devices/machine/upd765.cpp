@@ -1447,9 +1447,9 @@ void upd765_family_device::execute_command(int cmd)
 	}
 
 	case C_SPECIFY:
-		LOGCOMMAND("command specify %02x %02x\n",
-					command[1], command[2]);
 		spec = (command[1] << 8) | command[2];
+		LOGCOMMAND("command specify %02x %02x: step_rate=%d ms, head_unload=%d ms, head_load=%d ms, non_dma=%s\n",
+			command[1], command[2], 16-(command[1]>>4), (command[1]&0x0f)<<4, command[2]&0xfe, ((command[2]&1)==1)? "true":"false");
 		main_phase = PHASE_CMD;
 		break;
 
@@ -1585,7 +1585,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 void upd765_family_device::read_data_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
-	fi.sub_state = HEAD_LOAD_DONE;
+	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
 
 	LOGCOMMAND("command read%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
@@ -1629,7 +1629,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 void upd765_family_device::scan_start(floppy_info &fi)
 {
 	fi.main_state = SCAN_DATA;
-	fi.sub_state = HEAD_LOAD_DONE;
+	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
 
 	LOGCOMMAND("command scan%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x stp=%02x rate=%d\n",
@@ -1675,6 +1675,11 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 {
 	for(;;) {
 		switch(fi.sub_state) {
+		case HEAD_LOAD:
+			LOGSTATE("HEAD_LOAD\n");
+			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
 			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
@@ -1836,7 +1841,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 void upd765_family_device::write_data_start(floppy_info &fi)
 {
 	fi.main_state = WRITE_DATA;
-	fi.sub_state = HEAD_LOAD_DONE;
+	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
 	LOGRW("command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				command[0] & 0x08 ? " deleted" : "",
@@ -1879,6 +1884,11 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 {
 	for(;;) {
 		switch(fi.sub_state) {
+		case HEAD_LOAD:
+			LOGSTATE("HEAD_LOAD\n");
+			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
 			fi.counter = 0;
@@ -1969,7 +1979,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 void upd765_family_device::read_track_start(floppy_info &fi)
 {
 	fi.main_state = READ_TRACK;
-	fi.sub_state = HEAD_LOAD_DONE;
+	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
 	sectors_read = 0;
 
@@ -2010,6 +2020,11 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 {
 	for(;;) {
 		switch(fi.sub_state) {
+		case HEAD_LOAD:
+			LOGSTATE("HEAD_LOAD\n");
+			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
 			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
@@ -2155,7 +2170,7 @@ int upd765_family_device::calc_sector_size(uint8_t size)
 void upd765_family_device::format_track_start(floppy_info &fi)
 {
 	fi.main_state = FORMAT_TRACK;
-	fi.sub_state = HEAD_LOAD_DONE;
+	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
 
 	LOGCOMMAND("command format track %s h=%02x n=%02x sc=%02x gpl=%02x d=%02x\n",
@@ -2185,6 +2200,11 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 {
 	for(;;) {
 		switch(fi.sub_state) {
+		case HEAD_LOAD:
+			LOGSTATE("HEAD_LOAD\n");
+			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
 			fi.sub_state = WAIT_INDEX;
@@ -2226,7 +2246,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 void upd765_family_device::read_id_start(floppy_info &fi)
 {
 	fi.main_state = READ_ID;
-	fi.sub_state = HEAD_LOAD_DONE;
+	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
 
 	LOGCOMMAND("command read id%s %d, rate=%d\n",
@@ -2262,6 +2282,11 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 {
 	for(;;) {
 		switch(fi.sub_state) {
+		case HEAD_LOAD:
+			LOGSTATE("HEAD_LOAD\n");
+			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
 			fi.counter = 0;
@@ -2424,6 +2449,7 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
 		case SEEK_WAIT_STEP_TIME:
 		case SEEK_WAIT_STEP_TIME_DONE:
+		case HEAD_LOAD:
 		case HEAD_LOAD_DONE:
 		case SCAN_ID_FAILED:
 		case SECTOR_READ:
