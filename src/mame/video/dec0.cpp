@@ -23,7 +23,11 @@ WRITE16_MEMBER(dec0_state::dec0_update_sprites_w)
 
 uint32_t dec0_state::screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	m_tilegen3->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen->draw_sprites(bitmap, cliprect, m_buffered_spriteram, 0x08, 0x08, 0x0f);
@@ -40,7 +44,11 @@ uint32_t dec0_state::screen_update_hbarrel(screen_device &screen, bitmap_ind16 &
 
 uint32_t dec0_state::screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	/* WARNING: inverted wrt Midnight Resistance */
 	if ((m_pri & 0x01) == 0)
@@ -80,7 +88,11 @@ uint32_t dec0_state::screen_update_robocop(screen_device &screen, bitmap_ind16 &
 {
 	int trans;
 
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	if (m_pri & 0x04)
 		trans = 0x08;
@@ -154,7 +166,11 @@ uint32_t dec0_automat_state::screen_update_automat(screen_device &screen, bitmap
 	m_tilegen3->pf_control_1_w(space,1,m_automat_scroll_regs[0], 0xffff);
 
 
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	if (m_pri & 0x04)
 		trans = 0x08;
@@ -220,7 +236,11 @@ uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitma
 	m_tilegen3->pf_control_1_w(space,0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
 	m_tilegen3->pf_control_1_w(space,1,m_automat_scroll_regs[0], 0xffff);
 
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	m_tilegen3->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_tilegen2->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -240,7 +260,10 @@ uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitma
 
 uint32_t dec0_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	/* This game doesn't have the extra playfield chip on the game board, but
 	the palette does show through. */
@@ -255,7 +278,11 @@ uint32_t dec0_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &
 
 uint32_t dec0_state::screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	if (m_pri & 0x01)
 	{
@@ -277,7 +304,11 @@ uint32_t dec0_state::screen_update_hippodrm(screen_device &screen, bitmap_ind16 
 
 uint32_t dec0_state::screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	m_tilegen3->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_tilegen2->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -298,7 +329,11 @@ uint32_t dec0_state::screen_update_midres(screen_device &screen, bitmap_ind16 &b
 {
 	int trans;
 
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_tilegen3->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
 
 	if (m_pri & 0x04)
 		trans = 0x00;

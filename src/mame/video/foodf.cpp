@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(foodf_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(foodf_state,foodf)
+void foodf_state::video_start()
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 

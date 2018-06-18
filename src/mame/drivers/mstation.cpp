@@ -33,6 +33,7 @@
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -97,6 +98,10 @@ public:
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
+	void mstation(machine_config &config);
+	void mstation_banked_map(address_map &map);
+	void mstation_io(address_map &map);
+	void mstation_mem(address_map &map);
 };
 
 
@@ -252,33 +257,36 @@ READ8_MEMBER( mstation_state::kb_r )
 }
 
 
-static ADDRESS_MAP_START(mstation_banked_map, AS_PROGRAM, 8, mstation_state)
-	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
-	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0c00000, 0x0c7ffff) AM_MIRROR(0x0380000) AM_DEVREADWRITE("flash1", intelfsh8_device, read, write)
-	AM_RANGE(0x0800000, 0x0803fff) AM_MIRROR(0x03fc000) AM_READWRITE(lcd_left_r, lcd_left_w)
-	AM_RANGE(0x1000000, 0x1003fff) AM_MIRROR(0x03fc000) AM_READWRITE(lcd_right_r, lcd_right_w)
-	AM_RANGE(0x1400000, 0x1403fff) AM_MIRROR(0x03fc000) AM_READWRITE(modem_r, modem_w)
-ADDRESS_MAP_END
+void mstation_state::mstation_banked_map(address_map &map)
+{
+	map(0x0000000, 0x00fffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0400000, 0x041ffff).mirror(0x03e0000).ram().share("nvram");
+	map(0x0c00000, 0x0c7ffff).mirror(0x0380000).rw("flash1", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0800000, 0x0803fff).mirror(0x03fc000).rw(FUNC(mstation_state::lcd_left_r), FUNC(mstation_state::lcd_left_w));
+	map(0x1000000, 0x1003fff).mirror(0x03fc000).rw(FUNC(mstation_state::lcd_right_r), FUNC(mstation_state::lcd_right_w));
+	map(0x1400000, 0x1403fff).mirror(0x03fc000).rw(FUNC(mstation_state::modem_r), FUNC(mstation_state::modem_w));
+}
 
-static ADDRESS_MAP_START(mstation_mem, AS_PROGRAM, 8, mstation_state)
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("sysram")    // system ram always first RAM bank
-ADDRESS_MAP_END
+void mstation_state::mstation_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x4000, 0x7fff).rw(m_bankdev1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).rw(m_bankdev2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).bankrw("sysram");    // system ram always first RAM bank
+}
 
-static ADDRESS_MAP_START(mstation_io , AS_IO, 8, mstation_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READWRITE(kb_r, kb_w)
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(port2_w)
-	AM_RANGE( 0x03, 0x03 ) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE( 0x05, 0x06 ) AM_READWRITE(bank1_r, bank1_w)
-	AM_RANGE( 0x07, 0x08 ) AM_READWRITE(bank2_r, bank2_w)
-	AM_RANGE( 0x09, 0x09 ) AM_READ(battery_status_r)
-	AM_RANGE( 0x10, 0x1f ) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
+void mstation_state::mstation_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).rw(FUNC(mstation_state::kb_r), FUNC(mstation_state::kb_w));
+	map(0x02, 0x02).w(FUNC(mstation_state::port2_w));
+	map(0x03, 0x03).rw(FUNC(mstation_state::irq_r), FUNC(mstation_state::irq_w));
+	map(0x05, 0x06).rw(FUNC(mstation_state::bank1_r), FUNC(mstation_state::bank1_w));
+	map(0x07, 0x08).rw(FUNC(mstation_state::bank2_r), FUNC(mstation_state::bank2_w));
+	map(0x09, 0x09).r(FUNC(mstation_state::battery_status_r));
+	map(0x10, 0x1f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 	//AM_RANGE( 0x2c, 0x2c ) printer
-ADDRESS_MAP_END
+}
 
 
 /* Input ports */
@@ -436,11 +444,11 @@ PALETTE_INIT_MEMBER(mstation_state, mstation)
 }
 
 
-static MACHINE_CONFIG_START( mstation )
+MACHINE_CONFIG_START(mstation_state::mstation)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)      //unknown clock
-	MCFG_CPU_PROGRAM_MAP(mstation_mem)
-	MCFG_CPU_IO_MAP(mstation_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mstation_mem)
+	MCFG_DEVICE_IO_MAP(mstation_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -464,8 +472,8 @@ static MACHINE_CONFIG_START( mstation )
 	// IRQ 1 is used for scan the kb and for cursor blinking
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(mstation_state, rtc_irq))
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
@@ -488,12 +496,12 @@ MACHINE_CONFIG_END
 ROM_START( mstation )
 	ROM_REGION( 0x100000, "flash0", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v303a", "v3.03a" )
-	ROMX_LOAD( "ms303a.bin", 0x000000, 0x100000, CRC(7a5cf752) SHA1(15629ccaecd8094dd883987bed94c16eee6de7c2), ROM_BIOS(1))
+	ROMX_LOAD("ms303a.bin", 0x000000, 0x100000, CRC(7a5cf752) SHA1(15629ccaecd8094dd883987bed94c16eee6de7c2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v253", "v2.53" )
-	ROMX_LOAD( "ms253.bin",  0x000000, 0x0fc000, BAD_DUMP CRC(a27e7f8b) SHA1(ae5a0aa0f1e23f3b183c5c0bcf4d4c1ae54b1798), ROM_BIOS(2))
+	ROMX_LOAD("ms253.bin",  0x000000, 0x0fc000, BAD_DUMP CRC(a27e7f8b) SHA1(ae5a0aa0f1e23f3b183c5c0bcf4d4c1ae54b1798), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, 0,    "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, empty_init, "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

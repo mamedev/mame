@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "machine/74157.h"
+#include "cpu/h6280/h6280.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class dec0_state : public driver_device
 {
@@ -38,7 +40,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_subcpu;
+	optional_device<h6280_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
 	optional_device<deco_bac06_device> m_tilegen1;
@@ -76,8 +78,11 @@ public:
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port_w);
+	DECLARE_READ8_MEMBER(dec0_mcu_port0_r);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port0_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port2_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port3_w);
 	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
 	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
@@ -90,14 +95,14 @@ public:
 	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
 	DECLARE_READ8_MEMBER(slyspy_sound_state_reset_r);
 
-	DECLARE_DRIVER_INIT(robocop);
-	DECLARE_DRIVER_INIT(hippodrm);
-	DECLARE_DRIVER_INIT(hbarrel);
-	DECLARE_DRIVER_INIT(slyspy);
-	DECLARE_DRIVER_INIT(birdtry);
-	DECLARE_DRIVER_INIT(drgninja);
-	DECLARE_DRIVER_INIT(midresb);
-	DECLARE_DRIVER_INIT(ffantasybl);
+	void init_robocop();
+	void init_hippodrm();
+	void init_hbarrel();
+	void init_slyspy();
+	void init_birdtry();
+	void init_drgninja();
+	void init_midresb();
+	void init_ffantasybl();
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(slyspy);
@@ -117,6 +122,32 @@ public:
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
+	void dec0_base(machine_config &config);
+	void dec0(machine_config &config);
+	void dec1(machine_config &config);
+	void midres(machine_config &config);
+	void birdtry(machine_config &config);
+	void baddudes(machine_config &config);
+	void midresbj(machine_config &config);
+	void slyspy(machine_config &config);
+	void hbarrel(machine_config &config);
+	void midresb(machine_config &config);
+	void ffantasybl(machine_config &config);
+	void drgninjab(machine_config &config);
+	void robocop(machine_config &config);
+	void robocopb(machine_config &config);
+	void hippodrm(machine_config &config);
+	void dec0_map(address_map &map);
+	void dec0_s_map(address_map &map);
+	void hippodrm_sub_map(address_map &map);
+	void midres_map(address_map &map);
+	void midres_s_map(address_map &map);
+	void midresb_map(address_map &map);
+	void robocop_sub_map(address_map &map);
+	void slyspy_map(address_map &map);
+	void slyspy_protection_map(address_map &map);
+	void slyspy_s_map(address_map &map);
+	void slyspy_sound_protection_map(address_map &map);
 };
 
 
@@ -158,4 +189,10 @@ public:
 
 	uint32_t screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void secretab(machine_config &config);
+	void automat(machine_config &config);
+	void automat_map(address_map &map);
+	void automat_s_map(address_map &map);
+	void secretab_map(address_map &map);
+	void secretab_s_map(address_map &map);
 };

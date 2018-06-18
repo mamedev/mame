@@ -2,6 +2,7 @@
 // copyright-holders:Yochizo, Takahiro Nogi
 #include "sound/msm5205.h"
 #include "video/seta001.h"
+#include "emupal.h"
 
 struct iox_t
 {
@@ -74,4 +75,14 @@ public:
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
+	void mjyuugi_map(address_map &map);
+	void rmgoldyh_io_map(address_map &map);
+	void rmgoldyh_map(address_map &map);
+	void srmp2_map(address_map &map);
+	void srmp3_io_map(address_map &map);
+	void srmp3_map(address_map &map);
 };

@@ -14,7 +14,7 @@
 #include "8x300dasm.h"
 #include "debugger.h"
 
-#define FETCHOP(a)         (m_direct->read_word(a))
+#define FETCHOP(a)         (m_cache->read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)
 #define READPORT(a)        (m_io->read_byte(a))
 #define WRITEPORT(a,v)     (m_io->write_byte((a), (v)))
@@ -97,7 +97,7 @@ uint8_t n8x300_cpu_device::get_reg(uint8_t reg)
 void n8x300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_PC));
@@ -152,7 +152,7 @@ void n8x300_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_genPC).mask(0x3ffe).callimport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_genPC).mask(0x3ffe).callimport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -206,7 +206,7 @@ void n8x300_cpu_device::execute_run()
 
 		/* fetch the opcode */
 		m_genPC = m_AR << 1;
-		debugger_instruction_hook(this, m_genPC);
+		debugger_instruction_hook(m_genPC);
 		opcode = FETCHOP(m_genPC);
 
 		if (m_increment_pc)
@@ -591,7 +591,7 @@ void n8x300_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *n8x300_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> n8x300_cpu_device::create_disassembler()
 {
-	return new n8x300_disassembler;
+	return std::make_unique<n8x300_disassembler>();
 }

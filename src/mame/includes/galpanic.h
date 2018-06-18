@@ -3,6 +3,7 @@
 
 #include "machine/timer.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galpanic_state : public driver_device
@@ -41,4 +42,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void galpanica(machine_config &config);
+	void galpanic(machine_config &config);
+	void galpanic_map(address_map &map);
+	void galpanic_oki_map(address_map &map);
+	void galpanica_map(address_map &map);
 };

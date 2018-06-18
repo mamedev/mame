@@ -53,19 +53,7 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 	membank("mainbank")->set_entry(data & 0x07);
 
 	if (data & ~0x37)
-		logerror("CPU #0 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
-}
-
-READ8_MEMBER(yunsung8_state::sound_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
-WRITE8_MEMBER(yunsung8_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
+		logerror("CPU #0 - PC %04X: Bank %02X\n", m_maincpu->pc(), data);
 }
 
 WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
@@ -82,25 +70,27 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
     d000-dfff   Tiles   ""
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yunsung8_state )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(bankswitch_w)    // ROM Bank (again?)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")    // Banked ROM
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(videoram_r, videoram_w) // Video RAM (Banked)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void yunsung8_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x0001, 0x0001).w(FUNC(yunsung8_state::bankswitch_w));    // ROM Bank (again?)
+	map(0x8000, 0xbfff).bankr("mainbank");    // Banked ROM
+	map(0xc000, 0xdfff).rw(FUNC(yunsung8_state::videoram_r), FUNC(yunsung8_state::videoram_w)); // Video RAM (Banked)
+	map(0xe000, 0xffff).ram();
+}
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(videobank_w)  // video RAM bank
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(bankswitch_w) // ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(sound_command_w) // To Sound CPU
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06, 0x06) AM_WRITE(flipscreen_w)    // Flip Screen
-	AM_RANGE(0x07, 0x07) AM_WRITE(main_irq_ack_w)
-ADDRESS_MAP_END
+void yunsung8_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(FUNC(yunsung8_state::videobank_w));  // video RAM bank
+	map(0x01, 0x01).portr("P1").w(FUNC(yunsung8_state::bankswitch_w)); // ROM Bank + Layers Enable
+	map(0x02, 0x02).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); // To Sound CPU
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x06, 0x06).w(FUNC(yunsung8_state::flipscreen_w));    // Flip Screen
+	map(0x07, 0x07).w(FUNC(yunsung8_state::main_irq_ack_w));
+}
 
 
 
@@ -124,15 +114,16 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")      // Banked ROM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w) // ROM Bank
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r) // From Main CPU
-ADDRESS_MAP_END
+void yunsung8_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");      // Banked ROM
+	map(0xe000, 0xe000).w(FUNC(yunsung8_state::sound_bankswitch_w)); // ROM Bank
+	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r("soundlatch", FUNC(generic_latch_8_device::read)); // From Main CPU
+}
 
 
 
@@ -266,7 +257,7 @@ static INPUT_PORTS_START( cannbalv )
 	PORT_INCLUDE(cannball)
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  ) // always activated, otherwise the game resets. a simple check for horizontal / vertical version of the game?
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM  ) // always activated, otherwise the game resets. a simple check for horizontal / vertical version of the game?
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -302,7 +293,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8/4
 };
 
-static GFXDECODE_START( yunsung8 )
+static GFXDECODE_START( gfx_yunsung8 )
 	GFXDECODE_ENTRY( "bgfx", 0, layout_8x8x8, 0, 0x08 ) // [0] Tiles (Background)
 	GFXDECODE_ENTRY( "text", 0, layout_8x8x4, 0,    0x40 ) // [1] Tiles (Text)
 GFXDECODE_END
@@ -350,41 +341,43 @@ void yunsung8_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( yunsung8 )
+MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2)           /* Z80B @ 8MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)          /* ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)          /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsung8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsung8)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(yunsung8_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, yunsung8_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
@@ -608,8 +601,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, 0, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, 0, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
-GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, 0, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, empty_init, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, empty_init, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
+GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )

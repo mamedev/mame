@@ -8,22 +8,40 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_LIB_UTIL_ZIPPATH_H
 #define MAME_LIB_UTIL_ZIPPATH_H
 
+#pragma once
+
 #include "corefile.h"
-#include <string>
 #include "unzip.h"
+
+#include <string>
 
 
 namespace util {
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class zippath_directory;
+class zippath_directory
+{
+public:
+	typedef std::unique_ptr<zippath_directory> ptr;
+
+	// opens a directory
+	static osd_file::error open(std::string const &path, ptr &directory);
+
+	// closes a directory
+	virtual ~zippath_directory();
+
+	// reads a directory entry
+	virtual osd::directory::entry const *readdir() = 0;
+
+	// returns true if this directory is an archive or false if it is a filesystem directory
+	virtual bool is_archive() const = 0;
+};
 
 
 
@@ -51,22 +69,6 @@ std::string zippath_combine(const std::string &path1, const std::string &path2);
 // opens a zip path file
 osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path);
 
-
-// ----- directory operations ----- */
-
-// opens a directory
-osd_file::error zippath_opendir(const std::string &path, zippath_directory **directory);
-
-// closes a directory
-void zippath_closedir(zippath_directory *directory);
-
-// reads a directory entry
-const osd::directory::entry *zippath_readdir(zippath_directory *directory);
-
-// returns true if this path is a ZIP path or false if not
-bool zippath_is_zip(zippath_directory *directory);
-
 } // namespace util
-
 
 #endif // MAME_LIB_UTIL_ZIPPATH_H

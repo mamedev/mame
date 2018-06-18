@@ -30,14 +30,16 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/tms34010/tms34010.h"
-#include "machine/nvram.h"
+#include "machine/eeprompar.h"
+#include "machine/mc68681.h"
+#include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK_40MHz      (XTAL_40MHz)
-#define MASTER_CLOCK_25MHz      (XTAL_25MHz)
+#define MASTER_CLOCK_40MHz      (XTAL(40'000'000))
+#define MASTER_CLOCK_25MHz      (XTAL(25'000'000))
 
 
 /*************************************
@@ -101,12 +103,12 @@ WRITE16_MEMBER(artmagic_state::control_w)
 	COMBINE_DATA(&m_control[offset]);
 
 	/* OKI banking here */
-	if (offset == 0)
+	if (offset == 0 && !BIT(data, 0))
 	{
-		m_oki->set_rom_bank((data >> 4) & 1);
+		m_oki->set_rom_bank(BIT(data, 4));
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -134,7 +136,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	uint32_t pc = space.device().safe_pc();
+	uint32_t pc = m_maincpu->pc();
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		m_hack_irq = 1;
@@ -406,74 +408,57 @@ WRITE16_MEMBER(artmagic_state::protection_bit_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x220000, 0x23ffff) AM_RAM
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("300000")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("300002")
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
-	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
-ADDRESS_MAP_END
+void artmagic_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x220000, 0x23ffff).ram();
+	map(0x240000, 0x240fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x300000, 0x300001).portr("300000");
+	map(0x300002, 0x300003).portr("300002");
+	map(0x300004, 0x300005).portr("300004");
+	map(0x300006, 0x300007).portr("300006");
+	map(0x300008, 0x300009).portr("300008");
+	map(0x30000a, 0x30000b).portr("30000a");
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
+	map(0x360001, 0x360001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+}
 
 
-static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("300000")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("300002")
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
-	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
-	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("30000c")
-	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
-ADDRESS_MAP_END
+void artmagic_state::stonebal_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x27ffff).ram();
+	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x300000, 0x300001).portr("300000");
+	map(0x300002, 0x300003).portr("300002");
+	map(0x300004, 0x300005).portr("300004");
+	map(0x300006, 0x300007).portr("300006");
+	map(0x300008, 0x300009).portr("300008");
+	map(0x30000a, 0x30000b).portr("30000a");
+	map(0x30000c, 0x30000d).portr("30000c");
+	map(0x30000e, 0x30000f).portr("30000e");
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
+	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+}
 
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-READ16_MEMBER(artmagic_state::shtstar_unk_r)
+void artmagic_state::shtstar_map(address_map &map)
 {
-	// bits 7-4 should be 0
-	// bit 2 and 0 are status ready related.
-	return 4 | 1; //machine().rand();
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x27ffff).ram();
+	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+
+	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
+	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+	map(0x3c0000, 0x3c001f).rw("mainduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 }
-
-READ16_MEMBER(artmagic_state::shtstar_unk_2_r)
-{
-	return 1;
-}
-
-static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
-
-	AM_RANGE(0x3c0000, 0x3c0001) AM_READ_PORT("3c0000")
-	AM_RANGE(0x3c0002, 0x3c0003) AM_READ_PORT("3c0002")
-	AM_RANGE(0x3c0004, 0x3c0005) AM_READ_PORT("3c0004")
-	AM_RANGE(0x3c0006, 0x3c0007) AM_READ_PORT("3c0006")
-	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
-	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
-
-	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(shtstar_unk_r)
-	AM_RANGE(0x3c0016, 0x3c0017) AM_READ(shtstar_unk_2_r)
-
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
-ADDRESS_MAP_END
 
 
 /*************************************
@@ -482,24 +467,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::tms_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("vram0");
+	map(0x00400000, 0x005fffff).ram().share("vram1");
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xffe00000, 0xffffffff).ram();
+}
 
 
-static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::stonebal_tms_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("vram0");
+	map(0x00400000, 0x005fffff).ram().share("vram1");
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xffc00000, 0xffffffff).ram();
+}
 
 /*************************************
  *
@@ -509,18 +496,24 @@ ADDRESS_MAP_END
  *************************************/
 
 /* see adp.c */
-static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::shtstar_subcpu_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x800141, 0x800141).w("aysnd", FUNC(ym2149_device::address_w));
+	map(0x800143, 0x800143).rw("aysnd", FUNC(ym2149_device::data_r), FUNC(ym2149_device::data_w));
+	map(0x800180, 0x80019f).rw("subduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xffc000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( shtstar_guncpu_map, AS_PROGRAM, 8, artmagic_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void artmagic_state::shtstar_guncpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8, artmagic_state )
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::shtstar_guncpu_io_map(address_map &map)
+{
+	map(0xc000, 0xcfff).ram();
+}
 
 
 /*************************************
@@ -608,8 +601,8 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* protection ready */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -800,8 +793,8 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* protection ready */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -813,24 +806,25 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( artmagic )
+MACHINE_CONFIG_START(artmagic_state::artmagic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MASTER_CLOCK_40MHz/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(artmagic_state, scanline)              /* scanline update (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(artmagic_state, m68k_gen_int))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, artmagic_state, m68k_gen_int))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(artmagic_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1)) // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
@@ -841,48 +835,58 @@ static MACHINE_CONFIG_START( artmagic )
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cheesech, artmagic )
+MACHINE_CONFIG_START(artmagic_state::cheesech)
+	artmagic(config);
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
+MACHINE_CONFIG_START(artmagic_state::stonebal)
+	artmagic(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stonebal_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_map)
 
-	MCFG_CPU_MODIFY("tms")
-	MCFG_CPU_PROGRAM_MAP(stonebal_tms_map)
+	MCFG_DEVICE_MODIFY("tms")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_tms_map)
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtstar, artmagic )
+MACHINE_CONFIG_START(artmagic_state::shtstar)
+	artmagic(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(shtstar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_map)
+
+	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
 
 	/* sub cpu*/
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(shtstar_subcpu_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_subcpu_map)
+
+	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
+
+	MCFG_DEVICE_ADD("aysnd", YM2149, 3686400/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/*gun board cpu*/
-	MCFG_CPU_ADD("guncpu", I80C31, 6000000)
-	MCFG_CPU_IO_MAP(shtstar_guncpu_io_map)
-	MCFG_CPU_PROGRAM_MAP(shtstar_guncpu_map)
-
+	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)
+	MCFG_DEVICE_IO_MAP(shtstar_guncpu_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_guncpu_map)
+	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ?
 MACHINE_CONFIG_END
 
 
@@ -922,14 +926,14 @@ ROM_END
 
 ROM_START( ultennisj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "a&m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
-	ROM_LOAD16_BYTE( "a&m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
+	ROM_LOAD16_BYTE( "a+m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
+	ROM_LOAD16_BYTE( "a+m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
 
 	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "a&m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
+	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "a&m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
+	ROM_LOAD( "a+m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
 ROM_END
 
 
@@ -1094,26 +1098,26 @@ ROM_START( shtstar )
 	ROM_LOAD( "2207_7b42c5.u6", 0x00000, 0x8000, CRC(6dd4b4ed) SHA1(b37e9e5ddfb5d88c5412dc79643adfc4362fbb46) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "a&m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
-	ROM_LOAD( "a&m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
+	ROM_LOAD( "a+m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
+	ROM_LOAD( "a+m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "a&m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
+	ROM_LOAD( "a+m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
 
 	ROM_REGION( 0x1a00,  "plds", 0 )
-	ROM_LOAD( "a&m005c0494_06a.u126",   0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_03a.u125",   0x0200, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_02a.u307",   0x0400, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_18a.u306",   0x0600, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_17a.u305",   0x0800, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_05a.u206",   0x0a00, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_01a.u205",   0x0c00, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_04a.u601",   0x0e00, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_08a.u916",   0x1000, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_07a.u705",   0x1200, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_10a.u917",   0x1400, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_09a.u903",   0x1600, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_11a.u112",   0x1800, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_06a.u126",   0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_03a.u125",   0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_02a.u307",   0x0400, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_18a.u306",   0x0600, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_17a.u305",   0x0800, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_05a.u206",   0x0a00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_01a.u205",   0x0c00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_04a.u601",   0x0e00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_08a.u916",   0x1000, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_07a.u705",   0x1200, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_10a.u917",   0x1400, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_09a.u903",   0x1600, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_11a.u112",   0x1800, 0x0200, NO_DUMP )
 
 ROM_END
 
@@ -1153,7 +1157,7 @@ void artmagic_state::decrypt_cheesech()
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,ultennis)
+void artmagic_state::init_ultennis()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 0;
@@ -1164,7 +1168,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,cheesech)
+void artmagic_state::init_cheesech()
 {
 	decrypt_cheesech();
 	m_is_stoneball = 0;
@@ -1172,14 +1176,14 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,stonebal)
+void artmagic_state::init_stonebal()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-DRIVER_INIT_MEMBER(artmagic_state,shtstar)
+void artmagic_state::init_shtstar()
 {
 	/* wrong */
 	decrypt_ultennis();
@@ -1195,10 +1199,10 @@ DRIVER_INIT_MEMBER(artmagic_state,shtstar)
  *
  *************************************/
 
-GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
+GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, init_ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, init_ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, init_cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, init_shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )

@@ -50,17 +50,18 @@
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  XTAL_30MHz
-#define SND_CLOCK   XTAL_1MHz
+#define MAIN_CLOCK  XTAL(30'000'000)
+#define SND_CLOCK   XTAL(1'000'000)
 
-#define MNUMBER_MAIN_CLOCK  XTAL_24MHz
-#define MNUMBER_SND_CLOCK   XTAL_16MHz
+#define MNUMBER_MAIN_CLOCK  XTAL(24'000'000)
+#define MNUMBER_SND_CLOCK   XTAL(16'000'000)
 
-#define EJOLLYX5_MAIN_CLOCK XTAL_16MHz
+#define EJOLLYX5_MAIN_CLOCK XTAL(16'000'000)
 
 
 class itgamble_state : public driver_device
@@ -74,6 +75,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mnumber(machine_config &config);
+	void itgamble(machine_config &config);
+	void itgamble_map(address_map &map);
 protected:
 
 	// devices
@@ -105,10 +109,11 @@ uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgamble_map, AS_PROGRAM, 16, itgamble_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+void itgamble_state::itgamble_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0x000000, 0xffffff).rom();
+}
 
 
 /*************************
@@ -188,7 +193,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( itgamble )
+static GFXDECODE_START( gfx_itgamble )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
 GFXDECODE_END
 
@@ -208,11 +213,11 @@ void itgamble_state::machine_reset()
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgamble )
+MACHINE_CONFIG_START(itgamble_state::itgamble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83048, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(itgamble_map)
+	MCFG_DEVICE_ADD("maincpu", H83048, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(itgamble_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -223,32 +228,34 @@ static MACHINE_CONFIG_START( itgamble )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgamble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgamble)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH) /* 1MHz resonator */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_HIGH) /* 1MHz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mnumber, itgamble )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
+MACHINE_CONFIG_START(itgamble_state::mnumber)
+	itgamble(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_DERIVED( ejollyx5, itgamble )
+static MACHINE_CONFIG_START( ejollyx5 )
+	itgamble(config);
 	/* wrong CPU. we need a Renesas M16/62A 16bit microcomputer core */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif
@@ -703,16 +710,16 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT ROT   COMPANY                  FULLNAME                         FLAGS
-GAME( 2000, capunc,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
-GAME( 2001, capcor,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
-GAME( 2002, laperla,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
-GAME( 2001, laperlag, 0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
-GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
-GAME( 200?, abacus,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
-GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                         FLAGS
+GAME( 2000, capunc,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
+GAME( 2001, capcor,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
+GAME( 2002, laperla,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
+GAME( 2001, laperlag, 0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
+GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
+GAME( 200?, abacus,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
+GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
 
 /* different hardware */
-GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, 0,   ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )
+GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )

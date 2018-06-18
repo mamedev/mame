@@ -52,6 +52,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -85,6 +86,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mole(machine_config &config);
+	void mole_map(address_map &map);
 };
 
 
@@ -171,7 +174,7 @@ READ8_MEMBER(mole_state::mole_protection_r)
 	{
 	case 0x08: return 0xb0; /* random mole placement */
 	case 0x26:
-		if (space.device().safe_pc() == 0x53d5)
+		if (m_maincpu->pc() == 0x53d5)
 		{
 			return 0x06; /* bonus round */
 		}
@@ -199,23 +202,24 @@ READ8_MEMBER(mole_state::mole_protection_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
-	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
-	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
-	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(mole_tileram_w) AM_READNOP
-	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
-	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
-	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
-	AM_RANGE(0x8c81, 0x8c81) AM_WRITENOP // ???
-	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE(mole_irqack_w)
-	AM_RANGE(0x8d40, 0x8d40) AM_READ_PORT("IN0")
-	AM_RANGE(0x8d80, 0x8d80) AM_READ_PORT("IN1")
-	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)
-ADDRESS_MAP_END
+void mole_state::mole_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x08ff).r(FUNC(mole_state::mole_protection_r));
+	map(0x0800, 0x0800).nopw(); // ???
+	map(0x0820, 0x0820).nopw(); // ???
+	map(0x5000, 0x7fff).mirror(0x8000).rom();
+	map(0x8000, 0x83ff).w(FUNC(mole_state::mole_tileram_w)).nopr();
+	map(0x8400, 0x8400).w(FUNC(mole_state::mole_tilebank_w));
+	map(0x8c00, 0x8c01).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x8c40, 0x8c40).nopw(); // ???
+	map(0x8c80, 0x8c80).nopw(); // ???
+	map(0x8c81, 0x8c81).nopw(); // ???
+	map(0x8d00, 0x8d00).portr("DSW").w(FUNC(mole_state::mole_irqack_w));
+	map(0x8d40, 0x8d40).portr("IN0");
+	map(0x8d80, 0x8d80).portr("IN1");
+	map(0x8dc0, 0x8dc0).portr("IN2").w(FUNC(mole_state::mole_flipscreen_w));
+}
 
 
 /*************************************
@@ -295,7 +299,7 @@ static const gfx_layout tile_layout =
 };
 
 
-static GFXDECODE_START( mole )
+static GFXDECODE_START( gfx_mole )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0x00, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x3000, tile_layout, 0x00, 1 )
 GFXDECODE_END
@@ -317,12 +321,12 @@ void mole_state::machine_reset()
 	m_tile_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mole )
+MACHINE_CONFIG_START(mole_state::mole)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???
-	MCFG_CPU_PROGRAM_MAP(mole_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mole_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M6502, 4000000) // ???
+	MCFG_DEVICE_PROGRAM_MAP(mole_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mole_state, irq0_line_assert)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -333,13 +337,13 @@ static MACHINE_CONFIG_START( mole )
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mole)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mole)
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -372,4 +376,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, mole_state, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )

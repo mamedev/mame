@@ -113,22 +113,24 @@ void isa8_ibm_mfc_device::update_z80_interrupts(void)
 //  Z80 memory map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, isa8_ibm_mfc_device )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_RAM // Unknown - tested on startup
-	AM_RANGE(0xbfff, 0xbfff) AM_RAM // Unknown - tested on startup
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void isa8_ibm_mfc_device::prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).ram(); // Unknown - tested on startup
+	map(0xbfff, 0xbfff).ram(); // Unknown - tested on startup
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, isa8_ibm_mfc_device )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("d71051", i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("d71051", i8251_device, status_r, control_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("d71055c_1", i8255_device, read, write)
-ADDRESS_MAP_END
+void isa8_ibm_mfc_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x10, 0x10).rw("d71051", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x11, 0x11).rw("d71051", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x23).rw("d71055c_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 //-------------------------------------------------
@@ -372,38 +374,39 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_ibm_mfc_device::device_add_mconfig )
-	MCFG_CPU_ADD("ibm_mfc", Z80, XTAL_11_8MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
+MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("ibm_mfc", Z80, XTAL(11'800'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("d71055c_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(isa8_ibm_mfc_device, ppi0_i_a))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(isa8_ibm_mfc_device, ppi0_o_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(isa8_ibm_mfc_device, ppi0_i_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(isa8_ibm_mfc_device, ppi0_o_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, isa8_ibm_mfc_device, ppi0_i_a))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi0_o_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, isa8_ibm_mfc_device, ppi0_i_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi0_o_c))
 
 	MCFG_DEVICE_ADD("d71055c_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(isa8_ibm_mfc_device, ppi1_o_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(isa8_ibm_mfc_device, ppi1_i_b))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(isa8_ibm_mfc_device, ppi1_o_c))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi1_o_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, isa8_ibm_mfc_device, ppi1_i_b))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi1_o_c))
 
 	MCFG_DEVICE_ADD("d71051", I8251, 0)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_4MHz / 8) // 500KHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa8_ibm_mfc_device, write_usart_clock))
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, write_usart_clock))
 
 	MCFG_DEVICE_ADD("d8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_4MHz / 8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(isa8_ibm_mfc_device, d8253_out0))
+	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, d8253_out0))
 	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(isa8_ibm_mfc_device, d8253_out1))
-	MCFG_PIT8253_CLK2(XTAL_4MHz / 2)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("d8253", pit8253_device, write_clk1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, d8253_out1))
+	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("d8253", pit8253_device, write_clk1))
 
-	MCFG_SPEAKER_STANDARD_STEREO("ymleft", "ymright")
-	MCFG_YM2151_ADD("ym2151", XTAL_4MHz)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(isa8_ibm_mfc_device, ibm_mfc_ym_irq))
+	SPEAKER(config, "ymleft").front_left();
+	SPEAKER(config, "ymright").front_right();
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(4'000'000))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, ibm_mfc_ym_irq))
 	MCFG_SOUND_ROUTE(0, "ymleft", 1.00)
 	MCFG_SOUND_ROUTE(1, "ymright", 1.00)
 MACHINE_CONFIG_END

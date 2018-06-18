@@ -34,6 +34,7 @@
 #include "sound/mm5837.h"
 #include "sound/dac76.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -78,9 +79,9 @@ public:
 	DECLARE_READ8_MEMBER(via_audio_pa_r);
 	DECLARE_WRITE8_MEMBER(via_audio_pa_w);
 	DECLARE_WRITE8_MEMBER(via_audio_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_out2_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o1_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o2_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o3_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_clr_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_data_w);
 
@@ -90,6 +91,10 @@ public:
 	DECLARE_WRITE8_MEMBER(via_system_pb_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
+	void beezer(machine_config &config);
+	void banked_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -129,38 +134,41 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beezer_state )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("sysbank", address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xdfff) AM_ROM AM_REGION("maincpu", 0x0000) AM_WRITE(bankswitch_w) // g1
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("maincpu", 0x1000) // g3
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x2000) // g5
-ADDRESS_MAP_END
+void beezer_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0xc000, 0xcfff).m(m_sysbank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(FUNC(beezer_state::bankswitch_w)); // g1
+	map(0xe000, 0xefff).rom().region("maincpu", 0x1000); // g3
+	map(0xf000, 0xffff).rom().region("maincpu", 0x2000); // g5
+}
 
-static ADDRESS_MAP_START( banked_map, AS_PROGRAM, 8, beezer_state )
-	AM_RANGE(0x0600, 0x0600) AM_MIRROR(0x1ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x1f0) AM_WRITE(palette_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_MIRROR(0x1ff) AM_READ(line_r)
-	AM_RANGE(0x0e00, 0x0e0f) AM_MIRROR(0x1f0) AM_DEVREADWRITE("via_u6", via6522_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_ROMBANK("rombank_f1")
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("rombank_f3")
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("rombank_e1")
-	AM_RANGE(0x4000, 0x4fff) AM_ROMBANK("rombank_e3")
-	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("rombank_e5")
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("rombank_f5")
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("rombank_f7")
-ADDRESS_MAP_END
+void beezer_state::banked_map(address_map &map)
+{
+	map(0x0600, 0x0600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0800, 0x080f).mirror(0x1f0).w(FUNC(beezer_state::palette_w));
+	map(0x0a00, 0x0a00).mirror(0x1ff).r(FUNC(beezer_state::line_r));
+	map(0x0e00, 0x0e0f).mirror(0x1f0).rw("via_u6", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1000, 0x1fff).bankr("rombank_f1");
+	map(0x2000, 0x2fff).bankr("rombank_f3");
+	map(0x3000, 0x3fff).bankr("rombank_e1");
+	map(0x4000, 0x4fff).bankr("rombank_e3");
+	map(0x5000, 0x5fff).bankr("rombank_e5");
+	map(0x6000, 0x6fff).bankr("rombank_f5");
+	map(0x7000, 0x7fff).bankr("rombank_f7");
+}
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, beezer_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM // 0d
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // 2d, optional (can be rom)
-	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07f8) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via_u18", via6522_device, read, write)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(dac_w)
+void beezer_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); // 0d
+	map(0x0800, 0x0fff).ram(); // 2d, optional (can be rom)
+	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x1800, 0x180f).mirror(0x07f0).rw(m_via_audio, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(beezer_state::dac_w));
 //  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0) // 6d
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).rom().region("audiocpu", 0); // 6d
+}
 
 
 //**************************************************************************
@@ -328,12 +336,12 @@ WRITE8_MEMBER( beezer_state::via_audio_pb_w )
 	m_ch_sign[0] = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_out0_w )
+WRITE_LINE_MEMBER( beezer_state::ptm_o1_w )
 {
 	m_ch_sign[1] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_out1_w )
+WRITE_LINE_MEMBER( beezer_state::ptm_o2_w )
 {
 	// on rising edge, enable noise input to ptm c3
 	if (m_ch_sign[2] == 0 && state == 1)
@@ -342,7 +350,7 @@ WRITE_LINE_MEMBER( beezer_state::ptm_out1_w )
 	m_ch_sign[2] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_out2_w )
+WRITE_LINE_MEMBER( beezer_state::ptm_o3_w )
 {
 	m_ch_sign[3] = state;
 }
@@ -451,7 +459,7 @@ void beezer_state::machine_reset()
 	bankswitch_w(machine().dummy_space(), 0, 0);
 
 	// start timer
-	m_timer_count->adjust(attotime::zero, 0, attotime::from_hz((XTAL_12MHz / 12) / 16));
+	m_timer_count->adjust(attotime::zero, 0, attotime::from_hz((XTAL(4'000'000) / 4) / 16));
 }
 
 
@@ -459,10 +467,10 @@ void beezer_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( beezer )
+MACHINE_CONFIG_START(beezer_state::beezer)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz / 12)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(12'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("sysbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(banked_map)
@@ -473,13 +481,13 @@ static MACHINE_CONFIG_START( beezer )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", beezer_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("via_u6", VIA6522, 0)
-	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, via_system_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(beezer_state, via_system_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, via_system_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, via_system_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE("via_u18", via6522_device, write_ca2))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("via_u18", via6522_device, write_ca1))
+	MCFG_DEVICE_ADD("via_u6", VIA6522, XTAL(12'000'000) / 12)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, beezer_state, via_system_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, beezer_state, via_system_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, beezer_state, via_system_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, beezer_state, via_system_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE("via_u18", via6522_device, write_ca2))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE("via_u18", via6522_device, write_ca1))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -497,34 +505,34 @@ static MACHINE_CONFIG_START( beezer )
 	MCFG_PALETTE_INIT_OWNER(beezer_state, beezer)
 
 	// sound hardware
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz / 12)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("audio_irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via_u18", VIA6522, 0)
-	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, via_audio_pa_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, via_audio_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, via_audio_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("via_u6", via6522_device, write_cb1))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(beezer_state, dmod_clr_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(beezer_state, dmod_data_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("audio_irqs", input_merger_device, in_w<0>))
+	MCFG_DEVICE_ADD("via_u18", VIA6522, XTAL(4'000'000) / 4)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, beezer_state, via_audio_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, beezer_state, via_audio_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, beezer_state, via_audio_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE("via_u6", via6522_device, write_cb1))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, beezer_state, dmod_clr_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, beezer_state, dmod_data_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("audio_irqs", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_12MHz / 12)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(beezer_state, ptm_out0_w))
-	MCFG_PTM6840_OUT1_CB(WRITELINE(beezer_state, ptm_out1_w))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(beezer_state, ptm_out2_w))
-	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("audio_irqs", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, beezer_state, ptm_o1_w))
+	MCFG_PTM6840_O2_CB(WRITELINE(*this, beezer_state, ptm_o2_w))
+	MCFG_PTM6840_O3_CB(WRITELINE(*this, beezer_state, ptm_o3_w))
+	MCFG_PTM6840_IRQ_CB(WRITELINE("audio_irqs", input_merger_device, in_w<1>))
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 
 	MCFG_MM5837_ADD("noise")
 	MCFG_MM5837_VDD(12)
-	MCFG_MM5837_OUTPUT_CB(WRITELINE(beezer_state, noise_w))
+	MCFG_MM5837_OUTPUT_CB(WRITELINE(*this, beezer_state, noise_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC76, 0)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC76, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -597,6 +605,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, 0,    ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, 0,    ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY            FULLNAME          FLAGS
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )

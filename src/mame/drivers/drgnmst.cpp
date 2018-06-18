@@ -58,7 +58,7 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_snd_command = (data & 0xff);
-		space.device().execute().yield();
+		m_maincpu->yield();
 	}
 }
 
@@ -181,29 +181,30 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
-	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(drgnmst_coin_w)
-	AM_RANGE(0x800100, 0x80011f) AM_WRITEONLY AM_SHARE("vidregs")
-	AM_RANGE(0x800120, 0x800121) AM_WRITENOP
-	AM_RANGE(0x80014a, 0x80014b) AM_WRITENOP
-	AM_RANGE(0x800154, 0x800155) AM_WRITEONLY AM_SHARE("vidregs2") // seems to be priority control
-	AM_RANGE(0x800176, 0x800177) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(drgnmst_snd_command_w)
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
-	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(drgnmst_md_videoram_w) AM_SHARE("md_videoram")
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_SHARE("rowscrollram") // rowscroll ram
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void drgnmst_state::drgnmst_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x800000, 0x800001).portr("P1_P2");
+	map(0x800018, 0x800019).portr("SYSTEM");
+	map(0x80001a, 0x80001b).portr("DSW1");
+	map(0x80001c, 0x80001d).portr("DSW2");
+	map(0x800030, 0x800031).w(FUNC(drgnmst_state::drgnmst_coin_w));
+	map(0x800100, 0x80011f).writeonly().share("vidregs");
+	map(0x800120, 0x800121).nopw();
+	map(0x80014a, 0x80014b).nopw();
+	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
+	map(0x800176, 0x800177).portr("EXTRA");
+	map(0x800180, 0x800181).w(FUNC(drgnmst_state::drgnmst_snd_command_w));
+	map(0x800188, 0x800189).w(FUNC(drgnmst_state::drgnmst_snd_flag_w));
+	map(0x8001e0, 0x8001e1).nopw();
+	map(0x900000, 0x903fff).ram().w(FUNC(drgnmst_state::drgnmst_paletteram_w)).share("paletteram");
+	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_state::drgnmst_md_videoram_w)).share("md_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_state::drgnmst_bg_videoram_w)).share("bg_videoram");
+	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_state::drgnmst_fg_videoram_w)).share("fg_videoram");
+	map(0x920000, 0x923fff).ram().share("rowscrollram"); // rowscroll ram
+	map(0x930000, 0x9307ff).ram().share("spriteram");   // Sprites
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( drgnmst )
@@ -343,7 +344,7 @@ static const gfx_layout drgnmst_char32x32_layout =
 };
 
 
-static GFXDECODE_START( drgnmst )
+static GFXDECODE_START( gfx_drgnmst )
 	GFXDECODE_ENTRY( "gfx1", 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
@@ -373,21 +374,21 @@ void drgnmst_state::machine_reset()
 	m_oki0_bank = 0;
 }
 
-static MACHINE_CONFIG_START( drgnmst )
+MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(drgnmst_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
-	MCFG_PIC16C5x_READ_A_CB(READ8(drgnmst_state, pic16c5x_port0_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(drgnmst_state, drgnmst_pcm_banksel_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(drgnmst_state, drgnmst_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(drgnmst_state, drgnmst_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(drgnmst_state, drgnmst_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(drgnmst_state, drgnmst_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
+	MCFG_PIC16C5x_READ_A_CB(READ8(*this, drgnmst_state, pic16c5x_port0_r))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, drgnmst_pcm_banksel_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, drgnmst_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, drgnmst_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, drgnmst_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, drgnmst_snd_control_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnmst)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -398,18 +399,15 @@ static MACHINE_CONFIG_START( drgnmst )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 32000000/32, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki2", 32000000/32, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -463,21 +461,19 @@ uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 }
 
 
-DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
+void drgnmst_state::init_drgnmst()
 {
 	uint8_t *drgnmst_PICROM_HEX = memregion("user1")->base();
 	uint16_t *drgnmst_PICROM = (uint16_t *)memregion("audiocpu")->base();
 	uint8_t *drgnmst_PCM = memregion("oki1")->base();
-	int32_t   offs, data;
 	uint16_t  src_pos = 0;
 	uint16_t  dst_pos = 0;
-	uint8_t   data_hi, data_lo;
 
 	/* Configure the OKI-0 PCM data into a MAME friendly bank format */
 	/* $00000-1ffff is the same through all banks */
 	/* $20000-3ffff in each bank is actually the switched area */
 
-	for (offs = 0x1ffff; offs >= 0; offs--)
+	for (int32_t offs = 0x1ffff; offs >= 0; offs--)
 	{
 		drgnmst_PCM[0x120000 + offs] = drgnmst_PCM[0xa0000 + offs];
 		drgnmst_PCM[0x100000 + offs] = drgnmst_PCM[0x00000 + offs];
@@ -498,16 +494,18 @@ DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 		{
 			src_pos += 9;
 
-			for (offs = 0; offs < 32; offs += 4)
+			for (int32_t offs = 0; offs < 32; offs += 4)
 			{
-				data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + offs + 0]));
-				data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + offs + 1]));
-				if ((data_hi <= 0x0f) && (data_lo <= 0x0f)) {
-					data =  (data_hi <<  4) | (data_lo << 0);
+				uint8_t data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + offs + 0]));
+				uint8_t data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + offs + 1]));
+				if ((data_hi <= 0x0f) && (data_lo <= 0x0f))
+				{
+					int32_t data =  (data_hi <<  4) | (data_lo << 0);
 					data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + offs + 2]));
 					data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + offs + 3]));
 
-					if ((data_hi <= 0x0f) && (data_lo <= 0x0f)) {
+					if ((data_hi <= 0x0f) && (data_lo <= 0x0f))
+					{
 						data |= (data_hi << 12) | (data_lo << 8);
 						drgnmst_PICROM[dst_pos] = data;
 						dst_pos += 1;
@@ -526,9 +524,9 @@ DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 		{
 			src_pos += 9;
 
-			data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 0]));
-			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 1]));
-			data =  (data_hi <<  4) | (data_lo << 0);
+			uint8_t data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 0]));
+			uint8_t data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 1]));
+			int32_t data =  (data_hi <<  4) | (data_lo << 0);
 			data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 2]));
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
@@ -542,4 +540,4 @@ DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 }
 
 
-GAME( 1994, drgnmst, 0, drgnmst,  drgnmst, drgnmst_state, drgnmst, ROT0, "Unico", "Dragon Master", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst, 0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master", MACHINE_SUPPORTS_SAVE )

@@ -16,6 +16,7 @@ Espirit3: 2x R6551AP, HD46850P (6850), R6502BP, R6545-1AP, R6522AP, 1.8432, 17.9
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class esprit_state : public driver_device
@@ -30,8 +31,12 @@ public:
 	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
+	void esprit(machine_config &config);
+	void esprit3(machine_config &config);
+	void mem3_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -39,22 +44,24 @@ private:
 	optional_device<palette_device> m_palette;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, esprit_state )
-	ADDRESS_MAP_GLOBAL_MASK (0x7fff)
-	AM_RANGE(0x0058,0x0058) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x0059,0x0059) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0080,0x1fff) AM_RAM
-	AM_RANGE(0x2000,0x6fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x7000,0x7fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void esprit_state::mem_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0058, 0x0058).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0059, 0x0059).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0080, 0x1fff).ram();
+	map(0x2000, 0x6fff).ram().share("videoram");
+	map(0x7000, 0x7fff).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START( mem3_map, AS_PROGRAM, 8, esprit_state )
-	AM_RANGE(0x0000,0x202f) AM_RAM
-	AM_RANGE(0x2030,0x3fff) AM_RAM AM_SHARE("videoram") // it might start at 3000
-	AM_RANGE(0x81c0,0x81c0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x81c1,0x81c1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xe000,0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void esprit_state::mem3_map(address_map &map)
+{
+	map(0x0000, 0x202f).ram();
+	map(0x2030, 0x3fff).ram().share("videoram"); // it might start at 3000
+	map(0x81c0, 0x81c0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x81c1, 0x81c1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe000, 0xffff).rom().region("roms", 0);
+}
 
 static INPUT_PORTS_START( esprit )
 INPUT_PORTS_END
@@ -100,11 +107,11 @@ static const gfx_layout esprit_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( esprit )
+static GFXDECODE_START( gfx_esprit )
 	GFXDECODE_ENTRY( "chargen", 0x0000, esprit_charlayout, 0, 1 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER( esprit_state, init )
+void esprit_state::init_init()
 {
 	// chargen is incomplete, copy the first half into the vacant second half
 	for (u16 i = 0; i < 0x800; i++)
@@ -112,9 +119,9 @@ DRIVER_INIT_MEMBER( esprit_state, init )
 }
 
 
-static MACHINE_CONFIG_START( esprit )
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+MACHINE_CONFIG_START(esprit_state::esprit)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -123,7 +130,7 @@ static MACHINE_CONFIG_START( esprit )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprit)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -133,9 +140,10 @@ static MACHINE_CONFIG_START( esprit )
 	MCFG_MC6845_UPDATE_ROW_CB(esprit_state, crtc_update_row)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( esprit3, esprit )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mem3_map)
+MACHINE_CONFIG_START(esprit_state::esprit3)
+	esprit(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mem3_map)
 MACHINE_CONFIG_END
 
 ROM_START( esprit )
@@ -154,5 +162,5 @@ ROM_START( esprit3 )
 	ROM_LOAD( "hazeltine_espritiii.u19", 0x0000, 0x1000, CRC(33e4a8ef) SHA1(e19c84a3c5f94812928ea84bab3ede7970dd5e72) )
 ROM_END
 
-COMP( 1981, esprit,  0,         0, esprit,  esprit, esprit_state, init, "Hazeltine", "Esprit", MACHINE_IS_SKELETON )
-COMP( 1981, esprit3, esprit,    0, esprit3, esprit, esprit_state, 0,    "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )
+COMP( 1981, esprit,  0,      0, esprit,  esprit, esprit_state, init_init,  "Hazeltine", "Esprit",     MACHINE_IS_SKELETON )
+COMP( 1981, esprit3, esprit, 0, esprit3, esprit, esprit_state, empty_init, "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )

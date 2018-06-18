@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
-	DECLARE_DRIVER_INIT(asterix);
+	void init_asterix();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -58,6 +58,9 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
 
+	void asterix(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

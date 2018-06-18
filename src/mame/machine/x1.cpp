@@ -1,5 +1,13 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Barry Rodewald
+/****************************************************
+ *
+ * Sharp X1 Keyboard device
+ *
+ * TODO:
+ * - de-stateize X1 public variables
+ *
+ ***************************************************/
 
 #include "emu.h"
 #include "includes/x1.h"

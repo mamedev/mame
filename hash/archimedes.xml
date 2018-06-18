@@ -7,7 +7,6 @@
 <!--
 Undumped games, based on http://www.acorn-gaming.org.uk/index.php3?p=Database/
 
-3D Construction Kit by Domark
 Abuse by R-Comp Interactive (RiscPC & StrongARM)
 Ankh by Artex Software (RiscOS3+)
 Arcade 3 by Clares Micro Supplies (??)
@@ -197,6 +196,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="2067bc.adf" size="819200" crc="11383a74" sha1="af1441ef677fb02a864f709dd2c74e154f963511" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dconkit">
+		<description>3D Construction Kit</description>
+		<year>1991</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="3D Construction Kit (1991)(Domark).adf" size="819200" crc="80e7394a" sha1="521452f5101b2f1c85ba08c9add9826e6679de63" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2828,7 +2838,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="xfire">
 		<description>X-Fire</description>
-		<year>1992</year>
+		<year>1991</year>
 		<publisher>Fourth Dimension</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>

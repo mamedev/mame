@@ -40,7 +40,7 @@ custom CRTC on startup!! (writes to 000414)
 
 static uint32_t decrypt_tile(uint32_t val, int tileno, uint32_t key1, uint32_t key2, uint32_t key3)
 {
-	val = BITSWAP24(val, 18,19,9,5, 10,17,16,20, 21,22,6,11, 15,14,4,23, 0,1,7,8, 13,12,3,2);
+	val = bitswap<24>(val, 18,19,9,5, 10,17,16,20, 21,22,6,11, 15,14,4,23, 0,1,7,8, 13,12,3,2);
 
 	return partial_carry_sum24( val, tileno + key1, key2 ) ^ key3;
 }
@@ -293,7 +293,7 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 	/* fore layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		memcpy(&m_tilemap_ram[0x1800/4], &m_mainram[index], 0x800/4);
+		memcpy(&m_tilemap_ram[0x1800/4], &m_mainram[index], 0x800/4); // 0x2800/4?
 		index += 0x800/4;
 	}
 
@@ -313,7 +313,7 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 	/* middle layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		memcpy(&m_tilemap_ram[0x1800/4], &m_mainram[index], 0x800/4);
+		memcpy(&m_tilemap_ram[0x2800/4], &m_mainram[index], 0x800/4); // 0x1800/4?
 		index += 0x800/4;
 	}
 
@@ -764,6 +764,7 @@ void seibuspi_state::video_start()
 	m_midl_layer->set_transparent_pen(63);
 	m_fore_layer->set_transparent_pen(63);
 
+	// TODO : Differs per games?
 	// alpha blending (preliminary)
 	memset(m_alpha_table, 0, 0x2000);
 

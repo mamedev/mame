@@ -195,117 +195,117 @@ void vertigo_state::vertigo_vproc_reset()
  *
  ********************************************/
 
-void vertigo_state::am2901x4 (am2901 *bsp, microcode *mc)
+void vertigo_state::am2901x4(am2901 &bsp, microcode const &mc)
 {
-	switch (mc->inst)
+	switch (mc.inst)
 	{
-	case 000: bsp->f = ADD(bsp->ram[mc->a], bsp->q, mc->cn); break;
-	case 001: bsp->f = ADD(bsp->ram[mc->a], bsp->ram[mc->b], mc->cn); break;
-	case 002: bsp->f = ADD(0, bsp->q, mc->cn); break;
-	case 003: bsp->f = ADD(0, bsp->ram[mc->b], mc->cn); break;
-	case 004: bsp->f = ADD(0, bsp->ram[mc->a], mc->cn); break;
-	case 005: bsp->f = ADD(bsp->d, bsp->ram[mc->a], mc->cn); break;
-	case 006: bsp->f = ADD(bsp->d, bsp->q, mc->cn); break;
-	case 007: bsp->f = ADD(bsp->d, 0, mc->cn); break;
+	case 000: bsp.f = ADD(bsp.ram[mc.a], bsp.q, mc.cn); break;
+	case 001: bsp.f = ADD(bsp.ram[mc.a], bsp.ram[mc.b], mc.cn); break;
+	case 002: bsp.f = ADD(0, bsp.q, mc.cn); break;
+	case 003: bsp.f = ADD(0, bsp.ram[mc.b], mc.cn); break;
+	case 004: bsp.f = ADD(0, bsp.ram[mc.a], mc.cn); break;
+	case 005: bsp.f = ADD(bsp.d, bsp.ram[mc.a], mc.cn); break;
+	case 006: bsp.f = ADD(bsp.d, bsp.q, mc.cn); break;
+	case 007: bsp.f = ADD(bsp.d, 0, mc.cn); break;
 
-	case 010: bsp->f = SUBR(bsp->ram[mc->a], bsp->q, mc->cn); break;
-	case 011: bsp->f = SUBR(bsp->ram[mc->a], bsp->ram[mc->b], mc->cn); break;
-	case 012: bsp->f = SUBR(0, bsp->q, mc->cn); break;
-	case 013: bsp->f = SUBR(0, bsp->ram[mc->b], mc->cn); break;
-	case 014: bsp->f = SUBR(0, bsp->ram[mc->a], mc->cn); break;
-	case 015: bsp->f = SUBR(bsp->d, bsp->ram[mc->a], mc->cn); break;
-	case 016: bsp->f = SUBR(bsp->d, bsp->q, mc->cn); break;
-	case 017: bsp->f = SUBR(bsp->d, 0, mc->cn); break;
+	case 010: bsp.f = SUBR(bsp.ram[mc.a], bsp.q, mc.cn); break;
+	case 011: bsp.f = SUBR(bsp.ram[mc.a], bsp.ram[mc.b], mc.cn); break;
+	case 012: bsp.f = SUBR(0, bsp.q, mc.cn); break;
+	case 013: bsp.f = SUBR(0, bsp.ram[mc.b], mc.cn); break;
+	case 014: bsp.f = SUBR(0, bsp.ram[mc.a], mc.cn); break;
+	case 015: bsp.f = SUBR(bsp.d, bsp.ram[mc.a], mc.cn); break;
+	case 016: bsp.f = SUBR(bsp.d, bsp.q, mc.cn); break;
+	case 017: bsp.f = SUBR(bsp.d, 0, mc.cn); break;
 
-	case 020: bsp->f = SUBS(bsp->ram[mc->a], bsp->q, mc->cn); break;
-	case 021: bsp->f = SUBS(bsp->ram[mc->a], bsp->ram[mc->b], mc->cn); break;
-	case 022: bsp->f = SUBS(0, bsp->q, mc->cn); break;
-	case 023: bsp->f = SUBS(0, bsp->ram[mc->b], mc->cn); break;
-	case 024: bsp->f = SUBS(0, bsp->ram[mc->a], mc->cn); break;
-	case 025: bsp->f = SUBS(bsp->d, bsp->ram[mc->a], mc->cn); break;
-	case 026: bsp->f = SUBS(bsp->d, bsp->q, mc->cn); break;
-	case 027: bsp->f = SUBS(bsp->d, 0, mc->cn); break;
+	case 020: bsp.f = SUBS(bsp.ram[mc.a], bsp.q, mc.cn); break;
+	case 021: bsp.f = SUBS(bsp.ram[mc.a], bsp.ram[mc.b], mc.cn); break;
+	case 022: bsp.f = SUBS(0, bsp.q, mc.cn); break;
+	case 023: bsp.f = SUBS(0, bsp.ram[mc.b], mc.cn); break;
+	case 024: bsp.f = SUBS(0, bsp.ram[mc.a], mc.cn); break;
+	case 025: bsp.f = SUBS(bsp.d, bsp.ram[mc.a], mc.cn); break;
+	case 026: bsp.f = SUBS(bsp.d, bsp.q, mc.cn); break;
+	case 027: bsp.f = SUBS(bsp.d, 0, mc.cn); break;
 
-	case 030: bsp->f = OR(bsp->ram[mc->a], bsp->q); break;
-	case 031: bsp->f = OR(bsp->ram[mc->a], bsp->ram[mc->b]); break;
-	case 032: bsp->f = OR(0, bsp->q); break;
-	case 033: bsp->f = OR(0, bsp->ram[mc->b]); break;
-	case 034: bsp->f = OR(0, bsp->ram[mc->a]); break;
-	case 035: bsp->f = OR(bsp->d, bsp->ram[mc->a]); break;
-	case 036: bsp->f = OR(bsp->d, bsp->q); break;
-	case 037: bsp->f = OR(bsp->d, 0); break;
+	case 030: bsp.f = OR(bsp.ram[mc.a], bsp.q); break;
+	case 031: bsp.f = OR(bsp.ram[mc.a], bsp.ram[mc.b]); break;
+	case 032: bsp.f = OR(0, bsp.q); break;
+	case 033: bsp.f = OR(0, bsp.ram[mc.b]); break;
+	case 034: bsp.f = OR(0, bsp.ram[mc.a]); break;
+	case 035: bsp.f = OR(bsp.d, bsp.ram[mc.a]); break;
+	case 036: bsp.f = OR(bsp.d, bsp.q); break;
+	case 037: bsp.f = OR(bsp.d, 0); break;
 
-	case 040: bsp->f = AND(bsp->ram[mc->a], bsp->q); break;
-	case 041: bsp->f = AND(bsp->ram[mc->a], bsp->ram[mc->b]); break;
-	case 042: bsp->f = AND(0, bsp->q); break;
-	case 043: bsp->f = AND(0, bsp->ram[mc->b]); break;
-	case 044: bsp->f = AND(0, bsp->ram[mc->a]); break;
-	case 045: bsp->f = AND(bsp->d, bsp->ram[mc->a]); break;
-	case 046: bsp->f = AND(bsp->d, bsp->q); break;
-	case 047: bsp->f = AND(bsp->d, 0); break;
+	case 040: bsp.f = AND(bsp.ram[mc.a], bsp.q); break;
+	case 041: bsp.f = AND(bsp.ram[mc.a], bsp.ram[mc.b]); break;
+	case 042: bsp.f = AND(0, bsp.q); break;
+	case 043: bsp.f = AND(0, bsp.ram[mc.b]); break;
+	case 044: bsp.f = AND(0, bsp.ram[mc.a]); break;
+	case 045: bsp.f = AND(bsp.d, bsp.ram[mc.a]); break;
+	case 046: bsp.f = AND(bsp.d, bsp.q); break;
+	case 047: bsp.f = AND(bsp.d, 0); break;
 
-	case 050: bsp->f = NOTRS(bsp->ram[mc->a], bsp->q); break;
-	case 051: bsp->f = NOTRS(bsp->ram[mc->a], bsp->ram[mc->b]); break;
-	case 052: bsp->f = NOTRS(0, bsp->q); break;
-	case 053: bsp->f = NOTRS(0, bsp->ram[mc->b]); break;
-	case 054: bsp->f = NOTRS(0, bsp->ram[mc->a]); break;
-	case 055: bsp->f = NOTRS(bsp->d, bsp->ram[mc->a]); break;
-	case 056: bsp->f = NOTRS(bsp->d, bsp->q); break;
-	case 057: bsp->f = NOTRS(bsp->d, 0); break;
+	case 050: bsp.f = NOTRS(bsp.ram[mc.a], bsp.q); break;
+	case 051: bsp.f = NOTRS(bsp.ram[mc.a], bsp.ram[mc.b]); break;
+	case 052: bsp.f = NOTRS(0, bsp.q); break;
+	case 053: bsp.f = NOTRS(0, bsp.ram[mc.b]); break;
+	case 054: bsp.f = NOTRS(0, bsp.ram[mc.a]); break;
+	case 055: bsp.f = NOTRS(bsp.d, bsp.ram[mc.a]); break;
+	case 056: bsp.f = NOTRS(bsp.d, bsp.q); break;
+	case 057: bsp.f = NOTRS(bsp.d, 0); break;
 
-	case 060: bsp->f = EXOR(bsp->ram[mc->a], bsp->q); break;
-	case 061: bsp->f = EXOR(bsp->ram[mc->a], bsp->ram[mc->b]); break;
-	case 062: bsp->f = EXOR(0, bsp->q); break;
-	case 063: bsp->f = EXOR(0, bsp->ram[mc->b]); break;
-	case 064: bsp->f = EXOR(0, bsp->ram[mc->a]); break;
-	case 065: bsp->f = EXOR(bsp->d, bsp->ram[mc->a]); break;
-	case 066: bsp->f = EXOR(bsp->d, bsp->q); break;
-	case 067: bsp->f = EXOR(bsp->d, 0); break;
+	case 060: bsp.f = EXOR(bsp.ram[mc.a], bsp.q); break;
+	case 061: bsp.f = EXOR(bsp.ram[mc.a], bsp.ram[mc.b]); break;
+	case 062: bsp.f = EXOR(0, bsp.q); break;
+	case 063: bsp.f = EXOR(0, bsp.ram[mc.b]); break;
+	case 064: bsp.f = EXOR(0, bsp.ram[mc.a]); break;
+	case 065: bsp.f = EXOR(bsp.d, bsp.ram[mc.a]); break;
+	case 066: bsp.f = EXOR(bsp.d, bsp.q); break;
+	case 067: bsp.f = EXOR(bsp.d, 0); break;
 
-	case 070: bsp->f = EXNOR(bsp->ram[mc->a], bsp->q); break;
-	case 071: bsp->f = EXNOR(bsp->ram[mc->a], bsp->ram[mc->b]); break;
-	case 072: bsp->f = EXNOR(0, bsp->q); break;
-	case 073: bsp->f = EXNOR(0, bsp->ram[mc->b]); break;
-	case 074: bsp->f = EXNOR(0, bsp->ram[mc->a]); break;
-	case 075: bsp->f = EXNOR(bsp->d, bsp->ram[mc->a]); break;
-	case 076: bsp->f = EXNOR(bsp->d, bsp->q); break;
-	case 077: bsp->f = EXNOR(bsp->d, 0); break;
+	case 070: bsp.f = EXNOR(bsp.ram[mc.a], bsp.q); break;
+	case 071: bsp.f = EXNOR(bsp.ram[mc.a], bsp.ram[mc.b]); break;
+	case 072: bsp.f = EXNOR(0, bsp.q); break;
+	case 073: bsp.f = EXNOR(0, bsp.ram[mc.b]); break;
+	case 074: bsp.f = EXNOR(0, bsp.ram[mc.a]); break;
+	case 075: bsp.f = EXNOR(bsp.d, bsp.ram[mc.a]); break;
+	case 076: bsp.f = EXNOR(bsp.d, bsp.q); break;
+	case 077: bsp.f = EXNOR(bsp.d, 0); break;
 	}
 
-	switch (mc->dest)
+	switch (mc.dest)
 	{
 	case QREG:
-		bsp->q = bsp->f;
-		bsp->y = bsp->f;
+		bsp.q = bsp.f;
+		bsp.y = bsp.f;
 		break;
 	case NOP:
-		bsp->y = bsp->f;
+		bsp.y = bsp.f;
 		break;
 	case RAMA:
-		bsp->y = bsp->ram[mc->a];
-		bsp->ram[mc->b] = bsp->f;
+		bsp.y = bsp.ram[mc.a];
+		bsp.ram[mc.b] = bsp.f;
 		break;
 	case RAMF:
-		bsp->y = bsp->f;
-		bsp->ram[mc->b] = bsp->f;
+		bsp.y = bsp.f;
+		bsp.ram[mc.b] = bsp.f;
 		break;
 	case RAMQD:
-		bsp->y = bsp->f;
-		bsp->q = (bsp->q >> 1) & 0x7fff;          /* Q3 is low */
-		bsp->ram[mc->b] = (bsp->f >> 1) | 0x8000; /* IN3 is high! */
+		bsp.y = bsp.f;
+		bsp.q = (bsp.q >> 1) & 0x7fff;          /* Q3 is low */
+		bsp.ram[mc.b] = (bsp.f >> 1) | 0x8000; /* IN3 is high! */
 		break;
 	case RAMD:
-		bsp->y = bsp->f;
-		bsp->ram[mc->b] = (bsp->f >> 1) | 0x8000; /* IN3 is high! */
+		bsp.y = bsp.f;
+		bsp.ram[mc.b] = (bsp.f >> 1) | 0x8000; /* IN3 is high! */
 		break;
 	case RAMQU:
-		bsp->y = bsp->f;
-		bsp->ram[mc->b] = (bsp->f << 1) & 0xffff;
-		bsp->q = (bsp->q << 1) & 0xffff;
+		bsp.y = bsp.f;
+		bsp.ram[mc.b] = (bsp.f << 1) & 0xffff;
+		bsp.q = (bsp.q << 1) & 0xffff;
 		break;
 	case RAMU:
-		bsp->y = bsp->f;
-		bsp->ram[mc->b] = (bsp->f << 1) & 0xffff;
+		bsp.y = bsp.f;
+		bsp.ram[mc.b] = (bsp.f << 1) & 0xffff;
 		break;
 	}
 }
@@ -322,56 +322,56 @@ void vertigo_state::am2901x4 (am2901 *bsp, microcode *mc)
  *
  ********************************************/
 
-void vertigo_state::vertigo_vgen (vector_generator *vg)
+void vertigo_state::vertigo_vgen(vector_generator &vg)
 {
-	if (vg->c_l & 0x800)
+	if (vg.c_l & 0x800)
 	{
-		vg->vfin = 1;
-		vg->c_l = (vg->c_l+1) & 0xfff;
+		vg.vfin = 1;
+		vg.c_l = (vg.c_l+1) & 0xfff;
 
-		if ((vg->c_l & 0x800) == 0)
+		if ((vg.c_l & 0x800) == 0)
 		{
-			vg->brez = 0;
-			vg->vfin = 0;
+			vg.brez = 0;
+			vg.vfin = 0;
 		}
 
-		if (vg->brez) /* H/V counter enabled */
+		if (vg.brez) /* H/V counter enabled */
 		{
 			/* Depending on MSB of adder only one or both
 			   counters are de-/incremented. This is all
 			   defined by the shift register which is
 			   latched in bits 12-15 of L1/L2.
 			*/
-			if (vg->adder_s & 0x800)
+			if (vg.adder_s & 0x800)
 			{
-				if (vg->hc1)
-					vg->c_h += vg->hud1? -1: 1;
+				if (vg.hc1)
+					vg.c_h += vg.hud1? -1: 1;
 				else
-					vg->c_v += vg->vud1? -1: 1;
-				vg->adder_a = vg->l1;
+					vg.c_v += vg.vud1? -1: 1;
+				vg.adder_a = vg.l1;
 			}
 			else
 			{
-				vg->c_h += vg->hud2? -1: 1;
-				vg->c_v += vg->vud2? -1: 1;
-				vg->adder_a = vg->l2;
+				vg.c_h += vg.hud2? -1: 1;
+				vg.c_v += vg.vud2? -1: 1;
+				vg.adder_a = vg.l2;
 			}
 
 			/* H/V counters are 12 bit */
-			vg->c_v &= 0xfff;
-			vg->c_h &= 0xfff;
+			vg.c_v &= 0xfff;
+			vg.c_h &= 0xfff;
 		}
 
-		vg->adder_s = (vg->adder_s + vg->adder_a) & 0xfff;
+		vg.adder_s = (vg.adder_s + vg.adder_a) & 0xfff;
 	}
 
-	if (vg->brez ^ vg->ven)
+	if (vg.brez ^ vg.ven)
 	{
-		if (vg->brez)
-		V_ADDPOINT (vg->c_h, vg->c_v, 0, 0);
+		if (vg.brez)
+		V_ADDPOINT (vg.c_h, vg.c_v, 0, 0);
 		else
-			V_ADDPOINT (vg->c_h, vg->c_v, vg->color, vg->intensity);
-		vg->ven = vg->brez;
+			V_ADDPOINT (vg.c_h, vg.c_v, vg.color, vg.intensity);
+		vg.ven = vg.brez;
 	}
 }
 
@@ -427,7 +427,7 @@ void vertigo_state::vertigo_vproc(int cycles, int irq4)
 			}
 		}
 
-		am2901x4 (&m_bsp, cmc);
+		am2901x4(m_bsp, *cmc);
 
 		/* Store data */
 		switch (cmc->oa)
@@ -490,7 +490,7 @@ void vertigo_state::vertigo_vproc(int cycles, int irq4)
 			break;
 		}
 
-		vertigo_vgen (&m_vgen);
+		vertigo_vgen(m_vgen);
 
 		/* Microcode program flow */
 		switch (cmc->jcon)

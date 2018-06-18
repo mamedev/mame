@@ -89,7 +89,7 @@
 
 
 
-WRITE8_MEMBER(route16_state::route16_sharedram_w)
+template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
 {
 	m_sharedram[offset] = data;
 
@@ -97,7 +97,7 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		space.device().execute().yield();
+		(cpu1 ? m_cpu1 : m_cpu2)->yield();
 	}
 }
 
@@ -147,7 +147,7 @@ WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
 }
 
 
-READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
+READ8_MEMBER(route16_state::ttmahjng_p1_matrix_r)
 {
 	uint8_t ret = 0;
 
@@ -163,6 +163,21 @@ READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
 	return ret;
 }
 
+READ8_MEMBER(route16_state::ttmahjng_p2_matrix_r)
+{
+	uint8_t ret = 0;
+
+	switch (m_ttmahjng_port_select)
+	{
+	case 1:  ret = ioport("KEY4")->read(); break;
+	case 2:  ret = ioport("KEY5")->read(); break;
+	case 4:  ret = ioport("KEY6")->read(); break;
+	case 8:  ret = ioport("KEY7")->read(); break;
+	default: break;
+	}
+
+	return ret;
+}
 
 
 /***************************************************************************
@@ -202,81 +217,89 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	/*AM_RANGE(0x3000, 0x3001) AM_NOP   protection device */
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::route16_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3001).r(FUNC(route16_state::route16_prot_read));
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2");
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x6400, 0x6400) AM_READ(routex_prot_read)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::routex_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2");
+	map(0x6400, 0x6400).r(FUNC(route16_state::routex_prot_read));
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-static ADDRESS_MAP_START( stratvox_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::stratvox_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2");
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-static ADDRESS_MAP_START( speakres_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(speakres_out2_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ(speakres_in3_r)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::speakres_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2").w(FUNC(route16_state::speakres_out2_w));
+	map(0x6000, 0x6000).r(FUNC(route16_state::speakres_in3_r));
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::ttmahjng_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).r(FUNC(route16_state::ttmahjng_p2_matrix_r)).w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).rw(FUNC(route16_state::ttmahjng_p1_matrix_r), FUNC(route16_state::ttmahjng_input_port_matrix_w));
+	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
-ADDRESS_MAP_END
+void route16_state::route16_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<false>)).share("sharedram");
+	map(0x8000, 0xbfff).ram().share("videoram2");
+}
 
 
-static ADDRESS_MAP_START( stratvox_cpu2_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
-ADDRESS_MAP_END
+void route16_state::stratvox_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x8000, 0xbfff).ram().share("videoram2");
+}
 
 
-static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, route16_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-ADDRESS_MAP_END
+void route16_state::cpu1_io_map(address_map &map)
+{
+	map.global_mask(0x1ff);
+	map(0x0000, 0x0000).mirror(0x00ff).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x0100, 0x0100).mirror(0x00ff).w("ay8910", FUNC(ay8910_device::address_w));
+}
 
 
 
@@ -492,37 +515,27 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x80, "80" )
 
-	PORT_START("IN0")       /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("KEY0")      /* IN2 */
+	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )     // START2?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")      /* IN3 */
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )     // START1?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")      /* IN4 */
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -532,7 +545,7 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")      /* IN5 */
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -541,6 +554,46 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 MACHINE_START_MEMBER(route16_state, speakres)
@@ -553,17 +606,21 @@ MACHINE_START_MEMBER(route16_state, ttmahjng)
 	save_item(NAME(m_ttmahjng_port_select));
 }
 
+void route16_state::init_route16()
+{
+	save_item(NAME(m_protection_data));
+}
 
-static MACHINE_CONFIG_START( route16 )
+MACHINE_CONFIG_START(route16_state::route16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(route16_cpu1_map)
-	MCFG_CPU_IO_MAP(cpu1_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(route16_cpu1_map)
+	MCFG_DEVICE_IO_MAP(cpu1_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpu2", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(route16_cpu2_map)
+	MCFG_DEVICE_ADD("cpu2", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(route16_cpu2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -576,28 +633,30 @@ static MACHINE_CONFIG_START( route16 )
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("ay8910", AY8910, 10000000/8)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( routex, route16 )
+MACHINE_CONFIG_START(route16_state::routex)
+	route16(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(routex_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(routex_cpu1_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratvox, route16 )
+MACHINE_CONFIG_START(route16_state::stratvox)
+	route16(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(stratvox_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu1_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(stratvox_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu2_map)
 
 
 	/* video hardware */
@@ -605,10 +664,10 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("ay8910")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
+	MCFG_DEVICE_MODIFY("ay8910")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(150), CAP_U(0.001)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(3.3))                  // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1), RES_K(4.7))    // attack_decay_cap + attack_res
@@ -624,34 +683,37 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speakres, stratvox )
+MACHINE_CONFIG_START(route16_state::speakres)
+	stratvox(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(speakres_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(speakres_cpu1_map)
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacecho, speakres )
+MACHINE_CONFIG_START(route16_state::spacecho)
+	speakres(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
-	MCFG_CPU_IO_MAP(0)
+MACHINE_CONFIG_START(route16_state::ttmahjng)
+	route16(config);
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(ttmahjng_cpu1_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, ttmahjng)
 
@@ -1000,11 +1062,16 @@ ROM_END
 
 READ8_MEMBER(route16_state::routex_prot_read)
 {
-	if (space.device().safe_pc() == 0x2f) return 0xfb;
+	if (m_cpu1->pc() == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space.device().tag(), space.device().safe_pc());
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", m_cpu1->tag(), m_cpu1->pc());
 	return 0x00;
+}
 
+READ8_MEMBER(route16_state::route16_prot_read)
+{
+	m_protection_data++;
+	return (1 << ((m_protection_data >> 1) & 7));
 }
 
 
@@ -1014,58 +1081,6 @@ READ8_MEMBER(route16_state::routex_prot_read)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(route16_state,route16)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* TO DO : Replace these patches with simulation of the protection device */
-
-	/* patch the protection */
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
-	ROM[0x0106] = 0x00;
-	ROM[0x0107] = 0x00;
-
-	ROM[0x072a] = 0x00; /* jp nz,$4238 (nirvana) */
-	ROM[0x072b] = 0x00;
-	ROM[0x072c] = 0x00;
-
-	DRIVER_INIT_CALL(route16c);
-}
-
-DRIVER_INIT_MEMBER(route16_state,route16c)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* Is this actually a bootleg? some of the protection has
-	   been removed */
-
-	/* patch the protection */
-	ROM[0x00e9] = 0x3a;
-
-	ROM[0x0754] = 0xc3;
-	ROM[0x0755] = 0x63;
-	ROM[0x0756] = 0x07;
-}
-
-
-DRIVER_INIT_MEMBER(route16_state,route16a)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* TO DO : Replace these patches with simulation of the protection device */
-
-	/* patch the protection */
-	ROM[0x00e9] = 0x3a;
-
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
-	ROM[0x0106] = 0x00;
-	ROM[0x0107] = 0x00;
-
-	ROM[0x0731] = 0x00; /* jp nz,$4238 (nirvana) */
-	ROM[0x0732] = 0x00;
-	ROM[0x0733] = 0x00;
-
-	ROM[0x0747] = 0xc3;
-	ROM[0x0748] = 0x56;
-	ROM[0x0749] = 0x07;
-}
 
 
 
@@ -1077,19 +1092,19 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16,  route16_state, route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16,  route16_state, route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
-GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, 0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16,  route16_state, 0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres, 0,        speakres, speakres, route16_state, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, empty_init,    ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

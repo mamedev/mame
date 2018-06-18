@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class ginganin_state : public driver_device
 {
@@ -51,7 +52,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
 	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	DECLARE_DRIVER_INIT(ginganin);
+	void init_ginganin();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_txt_tile_info);
@@ -60,4 +61,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void ginganin(machine_config &config);
+	void ginganin_map(address_map &map);
+	void sound_map(address_map &map);
 };

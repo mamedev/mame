@@ -26,20 +26,27 @@ real hardware.
 class imds_state : public driver_device
 {
 public:
-	imds_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	imds_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	void imds(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_READ8_MEMBER(term_status_r);
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	void imds_io(address_map &map);
+	void imds_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 READ8_MEMBER( imds_state::term_status_r )
@@ -54,16 +61,18 @@ READ8_MEMBER( imds_state::term_r )
 	return (m_term_data) ? 0x21 : 0x20;
 }
 
-static ADDRESS_MAP_START(imds_mem, AS_PROGRAM, 8, imds_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void imds_state::imds_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START(imds_io, AS_IO, 8, imds_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void imds_state::imds_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( imds )
@@ -88,11 +97,11 @@ void imds_state::machine_reset()
 //  nullptr
 //};
 
-static MACHINE_CONFIG_START( imds )
+MACHINE_CONFIG_START(imds_state::imds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_4MHz) // no idea of clock.
-	MCFG_CPU_PROGRAM_MAP(imds_mem)
-	MCFG_CPU_IO_MAP(imds_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, 4_MHz_XTAL) // no idea of clock.
+	MCFG_DEVICE_PROGRAM_MAP(imds_mem)
+	MCFG_DEVICE_IO_MAP(imds_io)
 
 //  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
 
@@ -112,5 +121,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY  FULLNAME        FLAGS */
-COMP( 1983, imds,     0,    0,       imds,      imds,  imds_state,  0,    "Intel", "Intellec MDS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME        FLAGS */
+COMP( 1983, imds, 0,      0,      imds,    imds,  imds_state, empty_init, "Intel", "Intellec MDS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

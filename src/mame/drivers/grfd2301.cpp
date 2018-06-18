@@ -32,6 +32,7 @@ A sticker on the back panel says: GenRad, Culver City CA, Model 2301-9001
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -47,6 +48,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void grfd2301(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -54,15 +58,17 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, grfd2301_state )
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void grfd2301_state::mem_map(address_map &map)
+{
+	map(0xe000, 0xefff).rom().region("maincpu", 0);
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, grfd2301_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void grfd2301_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 static INPUT_PORTS_START( grfd2301 )
 INPUT_PORTS_END
@@ -108,11 +114,11 @@ uint32_t grfd2301_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static MACHINE_CONFIG_START( grfd2301 )
+MACHINE_CONFIG_START(grfd2301_state::grfd2301)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -135,4 +141,4 @@ ROM_START( grfd2301 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 198?, grfd2301, 0, 0, grfd2301, grfd2301, grfd2301_state, 0, "Genrad",  "Futuredata 2301 Network Processor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 198?, grfd2301, 0, 0, grfd2301, grfd2301, grfd2301_state, empty_init, "Genrad", "Futuredata 2301 Network Processor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 ///*************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -64,6 +66,8 @@ private:
 	uint8_t m_cmd, m_reg[32];
 	int m_x, m_y;
 	required_device<palette_device> m_palette;
+
+	void hd66421(address_map &map);
 
 	DECLARE_PALETTE_INIT(hd66421);
 };

@@ -69,12 +69,25 @@ bbc_fdc_slot_device::~bbc_fdc_slot_device()
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void bbc_fdc_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_bbc_fdc_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_bbc_fdc_interface\n", carddev->tag(), carddev->name());
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bbc_fdc_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_bbc_fdc_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_bbc_fdc_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_bbc_fdc_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_intrq_handler.resolve_safe();
@@ -87,10 +100,6 @@ void bbc_fdc_slot_device::device_start()
 
 void bbc_fdc_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 
@@ -110,21 +119,22 @@ void bbc_fdc_slot_device::device_reset()
 //#include "zdfs.h"
 
 
-SLOT_INTERFACE_START( bbc_fdc_devices )
-	SLOT_INTERFACE("acorn8271", BBC_ACORN8271)
-	SLOT_INTERFACE("acorn1770", BBC_ACORN1770)
-	SLOT_INTERFACE("cumana1",   BBC_CUMANA1)
-	SLOT_INTERFACE("cumana2",   BBC_CUMANA2)
-	SLOT_INTERFACE("cv1797",    BBC_CV1797)
-	//SLOT_INTERFACE("microware", BBC_MICROWARE)
-	SLOT_INTERFACE("opus8272",  BBC_OPUS8272)
-	SLOT_INTERFACE("opus2791",  BBC_OPUS2791)
-	SLOT_INTERFACE("opus2793",  BBC_OPUS2793)
-	SLOT_INTERFACE("opus1770",  BBC_OPUS1770)
-	//SLOT_INTERFACE("stl8271",   BBC_STL8271)
-	//SLOT_INTERFACE("stl1770_1", BBC_STL1770_1)
-	//SLOT_INTERFACE("stl1770_2", BBC_STL1770_2)
-	SLOT_INTERFACE("weddb2",    BBC_WEDDB2)
-	SLOT_INTERFACE("weddb3",    BBC_WEDDB3)
-	//SLOT_INTERFACE("zdfs",      BBC_ZDFS)
-SLOT_INTERFACE_END
+void bbc_fdc_devices(device_slot_interface &device)
+{
+	device.option_add("acorn8271", BBC_ACORN8271);
+	device.option_add("acorn1770", BBC_ACORN1770);
+	device.option_add("cumana1",   BBC_CUMANA1);
+	device.option_add("cumana2",   BBC_CUMANA2);
+	device.option_add("cv1797",    BBC_CV1797);
+	//device.option_add("microware", BBC_MICROWARE);
+	device.option_add("opus8272",  BBC_OPUS8272);
+	device.option_add("opus2791",  BBC_OPUS2791);
+	device.option_add("opus2793",  BBC_OPUS2793);
+	device.option_add("opus1770",  BBC_OPUS1770);
+	//device.option_add("stl8271",   BBC_STL8271);
+	//device.option_add("stl1770_1", BBC_STL1770_1);
+	//device.option_add("stl1770_2", BBC_STL1770_2);
+	device.option_add("weddb2",    BBC_WEDDB2);
+	device.option_add("weddb3",    BBC_WEDDB3);
+	//device.option_add("zdfs",      BBC_ZDFS);
+}

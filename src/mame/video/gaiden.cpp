@@ -17,8 +17,8 @@
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 {
-	uint16_t *videoram1 = &m_videoram3[0x0800];
-	uint16_t *videoram2 = m_videoram3;
+	uint16_t *videoram1 = &m_videoram[2][0x0800];
+	uint16_t *videoram2 = m_videoram[2];
 	SET_TILE_INFO_MEMBER(1,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
@@ -27,8 +27,8 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 {
-	uint16_t *videoram1 = &m_videoram2[0x0800];
-	uint16_t *videoram2 = m_videoram2;
+	uint16_t *videoram1 = &m_videoram[1][0x0800];
+	uint16_t *videoram2 = m_videoram[1];
 	SET_TILE_INFO_MEMBER(2,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
@@ -37,8 +37,8 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 {
-	uint16_t *videoram1 = &m_videoram2[0x0800];
-	uint16_t *videoram2 = m_videoram2;
+	uint16_t *videoram1 = &m_videoram[1][0x0800];
+	uint16_t *videoram2 = m_videoram[1];
 
 	int colour = ((videoram2[tile_index] & 0xf0) >> 4);
 
@@ -54,8 +54,8 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 {
-	uint16_t *videoram1 = &m_videoram[0x0400];
-	uint16_t *videoram2 = m_videoram;
+	uint16_t *videoram1 = &m_videoram[0][0x0400];
+	uint16_t *videoram2 = m_videoram[0];
 	SET_TILE_INFO_MEMBER(0,
 			videoram1[tile_index] & 0x07ff,
 			(videoram2[tile_index] & 0xf0) >> 4,
@@ -207,23 +207,23 @@ WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 }
 
 
-WRITE16_MEMBER(gaiden_state::gaiden_videoram3_w)
+WRITE16_MEMBER(gaiden_state::bg_videoram_w)
 {
-	COMBINE_DATA(&m_videoram3[offset]);
+	COMBINE_DATA(&m_videoram[2][offset]);
 	m_background->mark_tile_dirty(offset & 0x07ff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_videoram2_w)
+WRITE16_MEMBER(gaiden_state::fg_videoram_w)
 {
-	COMBINE_DATA(&m_videoram2[offset]);
+	COMBINE_DATA(&m_videoram[1][offset]);
 	m_foreground->mark_tile_dirty(offset & 0x07ff);
 }
-WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
+
+WRITE16_MEMBER(gaiden_state::tx_videoram_w)
 {
-	COMBINE_DATA(&m_videoram[offset]);
+	COMBINE_DATA(&m_videoram[0][offset]);
 	m_text_layer->mark_tile_dirty(offset & 0x03ff);
 }
-
 
 
 /***************************************************************************
@@ -293,13 +293,6 @@ void gaiden_state::drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 uint32_t gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen_update_raiga(screen, bitmap, cliprect);
-	return 0;
-
-}
-
-uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
 	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
 	m_sprite_bitmap.fill(0, cliprect);
@@ -313,7 +306,6 @@ uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &
 
 	// todo, this should go through the mixer!
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 0);
-
 
 	return 0;
 }

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
+#include "emupal.h"
 #include "screen.h"
 
 class nbmj8900_state : public driver_device
@@ -59,8 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vramsel_w);
 	DECLARE_WRITE8_MEMBER(romsel_w);
 
-	DECLARE_DRIVER_INIT(togenkyo);
-	DECLARE_DRIVER_INIT(ohpaipee);
+	void init_togenkyo();
+	void init_ohpaipee();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -70,6 +71,11 @@ public:
 	void gfxdraw();
 	void postload();
 
+	void ohpaipee(machine_config &config);
+	void togenkyo(machine_config &config);
+	void ohpaipee_io_map(address_map &map);
+	void ohpaipee_map(address_map &map);
+	void togenkyo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

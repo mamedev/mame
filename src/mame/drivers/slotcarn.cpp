@@ -21,11 +21,12 @@
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK            (XTAL_10MHz)
+#define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
 #define CRTC_CLOCK              (MASTER_CLOCK / 8)
@@ -59,6 +60,9 @@ public:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	void slotcarn(machine_config &config);
+	void slotcarn_map(address_map &map);
+	void spielbud_io_map(address_map &map);
 };
 
 
@@ -169,38 +173,40 @@ WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
 *          Memory Map          *
 *******************************/
 
-static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("backup_ram")
-	AM_RANGE(0x6800, 0x6fff) AM_RAM // spielbud
-	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
+void slotcarn_state::slotcarn_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("backup_ram");
+	map(0x6800, 0x6fff).ram(); // spielbud
+	map(0x7000, 0xafff).rom(); // spielbud
 
 
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	map(0xb000, 0xb000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xb100, 0xb100).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xbc00, 0xbc03) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xba00, 0xba03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xbc00, 0xbc03).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW3")
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW4")
+	map(0xc000, 0xc000).portr("DSW3");
+	map(0xc400, 0xc400).portr("DSW4");
 
-	AM_RANGE(0xd800, 0xd81f) AM_RAM // column scroll for reels?
+	map(0xd800, 0xd81f).ram(); // column scroll for reels?
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(slotcarn_state::palette_r), FUNC(slotcarn_state::palette_w));
+}
 
 // spielbud - is the ay mirrored, or are there now 2?
-static ADDRESS_MAP_START( spielbud_io_map, AS_IO, 8, slotcarn_state )
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xb100, 0xb100) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-ADDRESS_MAP_END
+void slotcarn_state::spielbud_io_map(address_map &map)
+{
+	map(0xb000, 0xb000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xb100, 0xb100).w("aysnd", FUNC(ay8910_device::data_w));
+}
 
 /********************************
 *          Input Ports          *
@@ -516,7 +522,7 @@ static const gfx_layout slotcarntiles8x8x1_layout =
 *          Graphics Decode          *
 ************************************/
 
-static GFXDECODE_START( slotcarn )
+static GFXDECODE_START( gfx_slotcarn )
 	GFXDECODE_ENTRY( "gfx1", 0, slotcarntiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 8, slotcarntiles8x8x3_layout, 0, 16 ) // flipped
 	GFXDECODE_ENTRY( "gfx2", 0, slotcarntiles8x8x1_layout, 0, 4 )
@@ -535,12 +541,12 @@ void slotcarn_state::machine_start()
 *          Machine Driver          *
 ***********************************/
 
-static MACHINE_CONFIG_START( slotcarn )
+MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
-	MCFG_CPU_PROGRAM_MAP(slotcarn_map)
-	MCFG_CPU_IO_MAP(spielbud_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
+	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
+	MCFG_DEVICE_IO_MAP(spielbud_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -564,16 +570,16 @@ static MACHINE_CONFIG_START( slotcarn )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(slotcarn_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(slotcarn_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(slotcarn_state, hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, slotcarn_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotcarn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -701,6 +707,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT   ROT   COMPANY           FULLNAME                FLAGS
-GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
-GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT        ROT   COMPANY           FULLNAME                FLAGS
+GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, empty_init, ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
+GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, empty_init, ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )

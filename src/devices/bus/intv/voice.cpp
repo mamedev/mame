@@ -69,10 +69,10 @@ void intv_voice_device::late_subslot_setup()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( intv_voice_device::device_add_mconfig )
-	MCFG_SPEAKER_STANDARD_MONO("mono_voice")
+MACHINE_CONFIG_START(intv_voice_device::device_add_mconfig)
+	SPEAKER(config, "mono_voice").front_center();
 
-	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
+	MCFG_DEVICE_ADD("sp0256_speech", SP0256, 3120000)
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_voice", 1.00)
 

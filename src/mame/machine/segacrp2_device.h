@@ -10,13 +10,13 @@
 
 
 #define MCFG_SEGAZ80_SET_DECRYPTED_TAG(_tag) \
-	segacrp2_z80_device::set_decrypted_tag(*device, _tag);
+	downcast<segacrp2_z80_device &>(*device).set_decrypted_tag(_tag);
 
 // base class
 class segacrp2_z80_device : public z80_device
 {
 public:
-	static void set_decrypted_tag(device_t &device, const char* decrypted_tag);
+	void set_decrypted_tag(const char* decrypted_tag) { m_decrypted_tag = decrypted_tag; }
 	const char*         m_decrypted_tag;
 protected:
 	segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

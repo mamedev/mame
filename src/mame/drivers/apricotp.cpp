@@ -38,6 +38,7 @@
 #include "machine/z80sio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "apricotp.lh"
@@ -154,6 +155,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	void fp(machine_config &config);
+	void fp_io(address_map &map);
+	void fp_mem(address_map &map);
+	void sound_io(address_map &map);
+	void sound_mem(address_map &map);
 };
 
 
@@ -208,7 +214,7 @@ static const gfx_layout charset_8x8 =
 };
 
 
-static GFXDECODE_START( act_f1 )
+static GFXDECODE_START( gfx_act_f1 )
 	GFXDECODE_ENTRY( I8086_TAG, 0x0800, charset_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -420,55 +426,59 @@ WRITE16_MEMBER( fp_state::mem_w )
 //  ADDRESS_MAP( fp_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fp_mem, AS_PROGRAM, 16, fp_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xf7fff) AM_READWRITE(mem_r, mem_w)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void fp_state::fp_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xf7fff).rw(FUNC(fp_state::mem_r), FUNC(fp_state::mem_w));
+	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fp_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
-	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
-	AM_RANGE(0x020, 0x021) AM_DEVWRITE8("cent_data_out", output_latch_device, write, 0x00ff)
-	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
-	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
-	AM_RANGE(0x026, 0x027) AM_DEVWRITE8(SN76489AN_TAG, sn76489a_device, write, 0x00ff)
-	AM_RANGE(0x028, 0x029) AM_WRITE8(contrast_w, 0x00ff)
-	AM_RANGE(0x02a, 0x02b) AM_WRITE8(palette_w, 0x00ff)
-	AM_RANGE(0x02e, 0x02f) AM_WRITE(video_w)
-	AM_RANGE(0x040, 0x05f) AM_DEVREADWRITE8(I8237_TAG, am9517a_device, read, write, 0x00ff)
-	AM_RANGE(0x068, 0x06b) AM_DEVREADWRITE8(I8259A_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x06c, 0x06d) AM_DEVWRITE8(MC6845_TAG, mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x06e, 0x06f) AM_DEVREADWRITE8(MC6845_TAG, mc6845_device, register_r, register_w, 0x00ff)
-ADDRESS_MAP_END
+void fp_state::fp_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x007).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
+	map(0x008, 0x00f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x018, 0x01f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
+	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x022, 0x022).w(FUNC(fp_state::pint_clr_w));
+	map(0x024, 0x024).r(FUNC(fp_state::prtr_snd_r));
+	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x028, 0x028).w(FUNC(fp_state::contrast_w));
+	map(0x02a, 0x02a).w(FUNC(fp_state::palette_w));
+	map(0x02e, 0x02f).w(FUNC(fp_state::video_w));
+	map(0x040, 0x05f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
+	map(0x068, 0x06b).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x06c, 0x06c).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x06e, 0x06e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( sound_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, fp_state )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD63B01V1_TAG, 0)
-ADDRESS_MAP_END
+void fp_state::sound_mem(address_map &map)
+{
+	map(0xf000, 0xffff).rom().region(HD63B01V1_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( sound_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, fp_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1)
-	AM_RANGE(M6801_PORT2, M6801_PORT2)
-	AM_RANGE(M6801_PORT3, M6801_PORT3)
-	AM_RANGE(M6801_PORT4, M6801_PORT4)
-ADDRESS_MAP_END
+void fp_state::sound_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1);
+	map(M6801_PORT2, M6801_PORT2);
+	map(M6801_PORT3, M6801_PORT3);
+	map(M6801_PORT4, M6801_PORT4);
+}
 
 
 
@@ -565,25 +575,26 @@ FLOPPY_FORMATS_MEMBER( fp_state::floppy_formats )
 	FLOPPY_APRIDISK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( fp_floppies )
-	SLOT_INTERFACE("d32w", SONY_OA_D32W)
-SLOT_INTERFACE_END
+static void fp_floppies(device_slot_interface &device)
+{
+	device.option_add("d32w", SONY_OA_D32W);
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( fp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( fp )
+MACHINE_CONFIG_START(fp_state::fp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_15MHz/3)
-	MCFG_CPU_PROGRAM_MAP(fp_mem)
-	MCFG_CPU_IO_MAP(fp_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 15_MHz_XTAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(fp_mem)
+	MCFG_DEVICE_IO_MAP(fp_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD(HD63B01V1_TAG, HD6301, 2000000)
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_DEVICE_ADD(HD63B01V1_TAG, HD6301, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_IO_MAP(sound_io)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -605,7 +616,7 @@ static MACHINE_CONFIG_START( fp )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -613,42 +624,42 @@ static MACHINE_CONFIG_START( fp )
 	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, 2000000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 250000)
-	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
-	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_device_base, data_r))
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_device_base, data_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(I8259A_TAG, pic8259_device, ir7_w))
+	MCFG_I8237_IN_IOR_1_CB(READ8(WD2797_TAG, wd_fdc_device_base, data_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(WD2797_TAG, wd_fdc_device_base, data_w))
 
 	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A_TAG, pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
 
 	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO, 2500000)
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(I8259A_TAG, pic8259_device, ir4_w))
 
-	MCFG_WD2797_ADD(WD2797_TAG, 2000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 2000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir1_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq1_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", fp_floppies, "d32w", fp_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, nullptr,   fp_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(fp_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fp_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fp_state, write_centronics_perror))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp_state, write_centronics_busy))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, fp_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fp_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fp_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -691,5 +702,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME                 FLAGS
-COMP( 1984, fp,    0,      0,      fp,      fp,    fp_state, 0,    "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 1984, fp,   0,      0,      fp,      fp,    fp_state, empty_init, "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )

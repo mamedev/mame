@@ -105,8 +105,8 @@ enum {
 // Part of r32-r37 that is actually output as address extension (6 bits of "BSC": block select code)
 #define BSC_REG_MASK    0x3f
 
-DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "HP-5061-3001")
-DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "HP-5061-3011")
+DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "Hewlett-Packard HP-5061-3001")
+DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "Hewlett-Packard HP-5061-3011")
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 {
@@ -202,7 +202,7 @@ void hp_hybrid_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_reg_A));
@@ -223,7 +223,7 @@ void hp_hybrid_cpu_device::device_start()
 	save_item(NAME(m_reg_I));
 	save_item(NAME(m_forced_bsc_25));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_pa_changed_func.resolve_safe();
 }
@@ -241,7 +241,7 @@ void hp_hybrid_cpu_device::execute_run()
 		if (BIT(m_flags , HPHYBRID_DMAEN_BIT) && BIT(m_flags , HPHYBRID_DMAR_BIT)) {
 			handle_dma();
 		} else {
-			debugger_instruction_hook(this, m_genpc);
+			debugger_instruction_hook(m_genpc);
 
 			m_reg_I = execute_one(m_reg_I);
 
@@ -682,9 +682,9 @@ void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-util::disasm_interface *hp_hybrid_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_hybrid_cpu_device::create_disassembler()
 {
-	return new hp_hybrid_disassembler;
+	return std::make_unique<hp_hybrid_disassembler>();
 }
 
 uint16_t hp_hybrid_cpu_device::remove_mae(uint32_t addr)
@@ -761,7 +761,7 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 			return read_non_common_reg(addr_wo_bsc);
 		}
 	} else {
-		return m_direct->read_word(addr << 1);
+		return m_cache->read_word(addr);
 	}
 }
 
@@ -1026,8 +1026,8 @@ void hp_hybrid_cpu_device::do_pw(uint16_t opcode)
 				WM(tmp_addr >> 1 , tmp);
 			} else {
 				// Extend address, form byte address
-				uint16_t val  = (tmp_addr & 1) ? uint8_t(tmp) << 8 : uint8_t(tmp);
-				uint16_t mask = (tmp_addr & 1) ? 0xff00 : 0x00ff;
+				uint16_t val  = (tmp_addr & 1) ? uint8_t(tmp) : (tmp << 8);
+				uint16_t mask = (tmp_addr & 1) ? 0x00ff : 0xff00;
 				tmp_addr = add_mae(AEC_CASE_C , tmp_addr >> 1);
 				m_program->write_word(tmp_addr , val, mask);
 			}
@@ -1125,12 +1125,12 @@ void hp_hybrid_cpu_device::handle_dma(void)
 
 uint16_t hp_hybrid_cpu_device::RIO(uint8_t pa , uint8_t ic)
 {
-	return m_io->read_word(HP_MAKE_IOADDR(pa, ic) << 1);
+	return m_io->read_word(HP_MAKE_IOADDR(pa, ic));
 }
 
 void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 {
-	m_io->write_word(HP_MAKE_IOADDR(pa, ic) << 1 , v);
+	m_io->write_word(HP_MAKE_IOADDR(pa, ic) , v);
 }
 
 hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1541,9 +1541,9 @@ uint16_t hp_5061_3001_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 	return m_reg_P + 1;
 }
 
-util::disasm_interface *hp_5061_3001_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_5061_3001_cpu_device::create_disassembler()
 {
-	return new hp_5061_3001_disassembler;
+	return std::make_unique<hp_5061_3001_disassembler>();
 }
 
 uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)

@@ -144,16 +144,17 @@ ioport_constructor nes_arcstick_device::device_input_ports() const
 
 
 
-static SLOT_INTERFACE_START( arcstick_daisy )
-	SLOT_INTERFACE("arcstick", NES_ARCSTICK)
-SLOT_INTERFACE_END
+static void arcstick_daisy(device_slot_interface &device)
+{
+	device.option_add("arcstick", NES_ARCSTICK);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_arcstick_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_arcstick_device::device_add_mconfig)
 	// expansion port to allow daisy chaining
 	MCFG_FC_EXPANSION_PORT_ADD("subexp", arcstick_daisy, nullptr)
 MACHINE_CONFIG_END

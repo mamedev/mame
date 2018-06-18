@@ -15,13 +15,13 @@
 
 
 #define MCFG_ACIA6850_TXD_HANDLER(_devcb) \
-	devcb = &acia6850_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<acia6850_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 #define MCFG_ACIA6850_RTS_HANDLER(_devcb) \
-	devcb = &acia6850_device::set_rts_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<acia6850_device &>(*device).set_rts_handler(DEVCB_##_devcb);
 
 #define MCFG_ACIA6850_IRQ_HANDLER(_devcb) \
-	devcb = &acia6850_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<acia6850_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class acia6850_device :  public device_t
 {
@@ -30,9 +30,9 @@ public:
 	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rts_handler(Object &&cb) { return m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( status_r );

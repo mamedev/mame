@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class kyugo_state : public driver_device
 {
 public:
@@ -33,11 +35,29 @@ public:
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_DRIVER_INIT(srdmissn);
+	void init_srdmissn();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
+	void kyugo_base(machine_config &config);
+	void repulse(machine_config &config);
+	void flashgala(machine_config &config);
+	void srdmissn(machine_config &config);
+	void legend(machine_config &config);
+	void gyrodine(machine_config &config);
+	void flashgala_sub_map(address_map &map);
+	void flashgala_sub_portmap(address_map &map);
+	void gyrodine_main_map(address_map &map);
+	void gyrodine_sub_map(address_map &map);
+	void gyrodine_sub_portmap(address_map &map);
+	void kyugo_main_map(address_map &map);
+	void kyugo_main_portmap(address_map &map);
+	void legend_sub_map(address_map &map);
+	void repulse_sub_map(address_map &map);
+	void repulse_sub_portmap(address_map &map);
+	void srdmissn_sub_map(address_map &map);
+	void srdmissn_sub_portmap(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

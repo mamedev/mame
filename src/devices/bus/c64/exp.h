@@ -59,31 +59,31 @@
 
 #define MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD() \
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, nullptr) \
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, irq_w)) \
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, nmi_w)) \
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)) \
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(DEVREAD8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_r)) \
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(DEVWRITE8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_w)) \
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_w))
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, irq_w)) \
+	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, nmi_w)) \
+	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)) \
+	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_r)) \
+	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_w)) \
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_w))
 
 
 #define MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &c64_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<c64_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	devcb = &c64_expansion_slot_device::set_nmi_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<c64_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(_write) \
-	devcb = &c64_expansion_slot_device::set_reset_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<c64_expansion_slot_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	devcb = &c64_expansion_slot_device::set_cd_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<c64_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
 
 #define MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	devcb = &c64_expansion_slot_device::set_cd_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<c64_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(_write) \
-	devcb = &c64_expansion_slot_device::set_dma_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<c64_expansion_slot_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
 
 
 
@@ -103,12 +103,12 @@ public:
 	// construction/destruction
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<c64_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<c64_expansion_slot_device &>(device).m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_reset_wr_callback(device_t &device, Object &&cb) { return downcast<c64_expansion_slot_device &>(device).m_write_reset.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_rd_callback(device_t &device, Object &&cb) { return downcast<c64_expansion_slot_device &>(device).m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_wr_callback(device_t &device, Object &&cb) { return downcast<c64_expansion_slot_device &>(device).m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_wr_callback(device_t &device, Object &&cb) { return downcast<c64_expansion_slot_device &>(device).m_write_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_write_reset.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_rd_callback(Object &&cb) { return m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
@@ -129,6 +129,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -194,8 +195,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( c64_expansion_cards );
-
-
+void c64_expansion_cards(device_slot_interface &device);
 
 #endif

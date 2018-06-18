@@ -25,9 +25,9 @@ namespace {
 
 struct device_registrations
 {
-	device_type_impl *first = nullptr;
-	device_type_impl *last = nullptr;
-	device_type_impl *unsorted = nullptr;
+	device_type_impl_base *first = nullptr;
+	device_type_impl_base *last = nullptr;
+	device_type_impl_base *unsorted = nullptr;
 };
 
 device_registrations &device_registration_data()
@@ -53,7 +53,7 @@ device_registrar::const_iterator device_registrar::cend() const
 }
 
 
-device_type_impl *device_registrar::register_device(device_type_impl &type)
+device_type_impl_base *device_registrar::register_device(device_type_impl_base &type)
 {
 	device_registrations &data(device_registration_data());
 
@@ -108,7 +108,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
 	else
 		m_tag.assign(":");
-	static_set_clock(*this, clock);
+	set_clock(clock);
 }
 
 
@@ -208,19 +208,34 @@ std::string device_t::parameter(const char *tag) const
 
 
 //-------------------------------------------------
-//  static_set_clock - set/change the clock on
+//  add_machine_configuration - add device-
+//  specific machine configuration
+//-------------------------------------------------
+
+void device_t::add_machine_configuration(machine_config &config)
+{
+	assert(&config == &m_machine_config);
+	machine_config::token const tok(config.begin_configuration(*this));
+	device_add_mconfig(config);
+	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
+		autodev->end_configuration();
+}
+
+
+//-------------------------------------------------
+//  set_clock - set/change the clock on
 //  a device
 //-------------------------------------------------
 
-void device_t::static_set_clock(device_t &device, u32 clock)
+void device_t::set_clock(u32 clock)
 {
-	device.m_configured_clock = clock;
+	m_configured_clock = clock;
 
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
-		device.calculate_derived_clock();
+		calculate_derived_clock();
 	else
-		device.set_unscaled_clock(clock);
+		set_unscaled_clock(clock);
 }
 
 
@@ -231,7 +246,56 @@ void device_t::static_set_clock(device_t &device, u32 clock)
 
 void device_t::config_complete()
 {
-	// first notify the interfaces
+	// resolve default BIOS
+	tiny_rom_entry const *const roms(rom_region());
+	if (roms)
+	{
+		// first pass: try to find default BIOS from ROM region or machine configuration
+		char const *defbios(m_default_bios_tag.empty() ? nullptr : m_default_bios_tag.c_str());
+		bool twopass(false), havebios(false);
+		u8 firstbios(0);
+		for (const tiny_rom_entry *rom = roms; !m_default_bios && !ROMENTRY_ISEND(rom); ++rom)
+		{
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+			{
+				if (!havebios)
+				{
+					havebios = true;
+					firstbios = ROM_GETBIOSFLAGS(rom);
+				}
+				if (!defbios)
+					twopass = true;
+				else if (!std::strcmp(rom->name, defbios))
+					m_default_bios = ROM_GETBIOSFLAGS(rom);
+			}
+			else if (!defbios && ROMENTRY_ISDEFAULT_BIOS(rom))
+			{
+				defbios = rom->name;
+			}
+		}
+
+		// second pass is needed if default BIOS came after one or more system BIOSes
+		if (havebios && !m_default_bios)
+		{
+			if (defbios && twopass)
+			{
+				for (const tiny_rom_entry *rom = roms; !m_default_bios && !ROMENTRY_ISEND(rom); ++rom)
+				{
+					if (ROMENTRY_ISSYSTEM_BIOS(rom) && !std::strcmp(rom->name, defbios))
+						m_default_bios = ROM_GETBIOSFLAGS(rom);
+				}
+			}
+
+			// no default BIOS declared but at least one system BIOS declared
+			if (!m_default_bios)
+				m_default_bios = firstbios;
+		}
+
+		// set system BIOS to the default unless something overrides it
+		set_system_bios(m_default_bios);
+	}
+
+	// notify the interfaces
 	for (device_interface &intf : interfaces())
 		intf.interface_config_complete();
 
@@ -430,8 +494,8 @@ bool device_t::findit(bool isvalidation) const
 		if (isvalidation)
 		{
 			// sanity checking
-			const char *tag = autodev->finder_tag();
-			if (tag == nullptr)
+			char const *const tag = autodev->finder_tag();
+			if (!tag)
 			{
 				osd_printf_error("Finder tag is null!\n");
 				allfound = false;
@@ -450,23 +514,31 @@ bool device_t::findit(bool isvalidation) const
 }
 
 //-------------------------------------------------
-//  resolve_objects - find objects referenced in
-//  configuration
+//  resolve_pre_map - find objects that may be used
+//  in memory maps
 //-------------------------------------------------
 
-void device_t::resolve_objects()
+void device_t::resolve_pre_map()
 {
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
+}
 
-	// find all the registered devices
+//-------------------------------------------------
+//  resolve - find objects
+//-------------------------------------------------
+
+void device_t::resolve_post_map()
+{
+	// find all the registered post-map objects
 	if (!findit(false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// allow implementation to do additional setup
 	device_resolve_objects();
 }
+
 
 //-------------------------------------------------
 //  start - start a device

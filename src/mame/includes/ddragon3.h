@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -86,6 +87,14 @@ public:
 
 	int vblank_level;
 	int raster_level;
+	void ctribe(machine_config &config);
+	void ddragon3b(machine_config &config);
+	void ddragon3(machine_config &config);
+	void ctribe_map(address_map &map);
+	void ctribe_sound_map(address_map &map);
+	void dd3b_map(address_map &map);
+	void ddragon3_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -124,4 +133,7 @@ public:
 	DECLARE_VIDEO_START(wwfwfstb);
 	uint32_t screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void wwfwfest(machine_config &config);
+	void wwfwfstb(machine_config &config);
+	void main_map(address_map &map);
 };

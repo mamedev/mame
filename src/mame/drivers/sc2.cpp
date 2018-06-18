@@ -25,10 +25,12 @@ public:
 	sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_beep(*this, "beeper"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
-	required_device<beep_device> m_beep;
+
 	DECLARE_READ8_MEMBER(pio_port_a_r);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
@@ -42,12 +44,19 @@ public:
 	void sc2_update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void sc2(machine_config &config);
+	void sc2_io(address_map &map);
+	void sc2_mem(address_map &map);
+
+	required_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_digits;
+	output_finder<2> m_leds;
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!machine().side_effect_disabled())
+	//if (!machine().side_effects_disabled())
 	{
 		m_beep_state = ~m_beep_state;
 
@@ -57,19 +66,21 @@ READ8_MEMBER( sc2_state::sc2_beep )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START(sc2_mem, AS_PROGRAM, 8, sc2_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x1000, 0x13ff ) AM_RAM
-	AM_RANGE( 0x2000, 0x33ff ) AM_ROM
-	AM_RANGE( 0x3c00, 0x3c00 ) AM_READ(sc2_beep)
-ADDRESS_MAP_END
+void sc2_state::sc2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+	map(0x2000, 0x33ff).rom();
+	map(0x3c00, 0x3c00).r(FUNC(sc2_state::sc2_beep));
+}
 
-static ADDRESS_MAP_START(sc2_io, AS_IO, 8, sc2_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xfc) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-ADDRESS_MAP_END
+void sc2_state::sc2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0xfc).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sc2 )
@@ -100,6 +111,9 @@ INPUT_PORTS_END
 
 void sc2_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
+
 	save_item(NAME(m_led_7seg_data));
 	save_item(NAME(m_kp_matrix));
 	save_item(NAME(m_led_selected));
@@ -118,33 +132,33 @@ void sc2_state::machine_reset()
 
 void sc2_state::sc2_update_display()
 {
-	uint8_t digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+	uint8_t digit_data = bitswap<8>( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
 	if (!BIT(m_led_selected, 0))
 	{
-		output().set_digit_value(0, digit_data);
+		m_digits[0] = digit_data;
 		m_led_7seg_data[0] = digit_data;
 
-		output().set_led_value(0, BIT(m_digit_data, 7));
+		m_leds[0] = BIT(m_digit_data, 7);
 	}
 
 	if (!BIT(m_led_selected, 1))
 	{
-		output().set_digit_value(1, digit_data);
+		m_digits[1] = digit_data;
 		m_led_7seg_data[1] = digit_data;
 
-		output().set_led_value(1, BIT(m_digit_data, 7));
+		m_leds[1] = BIT(m_digit_data, 7);
 	}
 
 	if (!BIT(m_led_selected, 2))
 	{
-		output().set_digit_value(2, digit_data);
+		m_digits[2] = digit_data;
 		m_led_7seg_data[2] = digit_data;
 	}
 
 	if (!BIT(m_led_selected, 3))
 	{
-		output().set_digit_value(3, digit_data);
+		m_digits[3] = digit_data;
 		m_led_7seg_data[3] = digit_data;
 	}
 }
@@ -197,26 +211,26 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 		m_kp_matrix = data;
 }
 
-static MACHINE_CONFIG_START( sc2 )
+MACHINE_CONFIG_START(sc2_state::sc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(sc2_mem)
-	MCFG_CPU_IO_MAP(sc2_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sc2_mem)
+	MCFG_DEVICE_IO_MAP(sc2_io)
 
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
-	MCFG_Z80PIO_IN_PA_CB(READ8(sc2_state, pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc2_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(sc2_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(sc2_state, pio_port_b_w))
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, sc2_state, pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, sc2_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, sc2_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, sc2_state, pio_port_b_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 MACHINE_CONFIG_END
 
@@ -236,5 +250,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY                       FULLNAME              FLAGS
-COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, 0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                       FULLNAME              FLAGS
+COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE )

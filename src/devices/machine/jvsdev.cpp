@@ -4,12 +4,6 @@
 #include "jvsdev.h"
 #include "jvshost.h"
 
-void jvs_device::static_set_jvs_host_tag(device_t &device, const char *jvs_host_tag)
-{
-	jvs_device &jvsdev = downcast<jvs_device &>(device);
-	jvsdev.jvs_host_tag = jvs_host_tag;
-}
-
 jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock), jvs_outputs(0), jvs_address(0), jvs_reset_counter(0)
 {

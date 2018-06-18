@@ -44,7 +44,7 @@ void neogeo_cmc_cart_device::device_reset()
 }
 
 
-MACHINE_CONFIG_MEMBER( neogeo_cmc_cart_device::device_add_mconfig )
+MACHINE_CONFIG_START(neogeo_cmc_cart_device::device_add_mconfig)
 	MCFG_CMC_PROT_ADD("cmc_prot")
 MACHINE_CONFIG_END
 

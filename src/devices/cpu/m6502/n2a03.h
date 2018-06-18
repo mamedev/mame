@@ -19,7 +19,7 @@ class n2a03_device : public m6502_device {
 public:
 	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
@@ -32,6 +32,7 @@ public:
 
 	required_device<nesapu_device> m_apu; // public for vgmplay
 
+	void n2a03_map(address_map &map);
 protected:
 	virtual void device_start() override;
 
@@ -58,8 +59,8 @@ private:
    manufacturing throughout the production of the 2A03. PALC_APU_CLOCK is
    the clock rate devised by UMC(?) for PAL Famicom clone hardware.        */
 
-#define N2A03_NTSC_XTAL           XTAL_21_4772MHz
-#define N2A03_PAL_XTAL            XTAL_26_601712MHz
+#define N2A03_NTSC_XTAL           XTAL(21'477'272)
+#define N2A03_PAL_XTAL            XTAL(26'601'712)
 #define NTSC_APU_CLOCK      (N2A03_NTSC_XTAL/12) /* 1.7897726666... MHz */
 #define PAL_APU_CLOCK       (N2A03_PAL_XTAL/16) /* 1.662607 MHz */
 #define PALC_APU_CLOCK      (N2A03_PAL_XTAL/15) /* 1.77344746666... MHz */

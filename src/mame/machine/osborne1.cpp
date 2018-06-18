@@ -12,8 +12,6 @@ There are three IRQ sources:
 #include "emu.h"
 #include "includes/osborne1.h"
 
-#include "screen.h"
-
 
 WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
 {
@@ -103,7 +101,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 
 READ8_MEMBER( osborne1_state::opcode_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
 		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
@@ -191,11 +189,11 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 	    6       NDAC
 	    7       NRFD
 	*/
-	m_ieee->eoi_w(BIT(data, 3));
-	m_ieee->atn_w(BIT(data, 4));
-	m_ieee->dav_w(BIT(data, 5));
-	m_ieee->ndac_w(BIT(data, 6));
-	m_ieee->nrfd_w(BIT(data, 7));
+	m_ieee->host_eoi_w(BIT(data, 3));
+	m_ieee->host_atn_w(BIT(data, 4));
+	m_ieee->host_dav_w(BIT(data, 5));
+	m_ieee->host_ndac_w(BIT(data, 6));
+	m_ieee->host_nrfd_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
@@ -256,7 +254,7 @@ INPUT_CHANGED_MEMBER( osborne1_state::reset_key )
 }
 
 
-DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
+void osborne1_state::init_osborne1()
 {
 	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
 	m_bank_0xxx->configure_entries(1, 1, m_region_maincpu->base(), 0);
@@ -344,8 +342,8 @@ void osborne1_state::machine_reset()
 
 void osborne1_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
-	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_video_timer->adjust(m_screen->time_until_pos(1, 0));
 }
 
 uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -357,7 +355,7 @@ uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
-	int const y = machine().first_screen()->vpos();
+	int const y = m_screen->vpos();
 	uint8_t const ra = y % 10;
 	uint8_t const port_b = m_pia1->b_output();
 
@@ -430,7 +428,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	m_beep_state = (ra & 0x04) ? 1 : 0;
 	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
 
-	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+	m_video_timer->adjust(m_screen->time_until_pos(y + 1, 0));
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)

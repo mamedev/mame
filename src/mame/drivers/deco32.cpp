@@ -7,7 +7,7 @@
     Captain America
     Dragon Gun
     Fighter's History
-    Locked 'N Loaded
+    Locked 'n Loaded
     Night Slashers
     Tattoo Assassins
 
@@ -24,7 +24,7 @@
      Captain America   - Reset with Player 1 start held
      Fighter's History - Reset with Player 1 button 1 & 2 held
      Night Slashers    - Reset with Player 1 & 2 start held
-     Locked 'N Loaded  - Reset with Player 1 & 2 start held
+     Locked 'n Loaded  - Reset with Player 1 & 2 start held
 
     Tattoo Assassins is a prototype, it is thought only 25 test units
     were manufactured and distributed to test arcades before the game
@@ -34,16 +34,18 @@
     Tattoo Assassins uses DE Pinball soundboard 520-5077-00 R
 
 
-    Todo:
+    TODO:
 
-    Tattoo Assassins & Dragongun use an unemulated chip (Ace/Jack) for
+    Tattoo Assassins & Night slashers use an less emulated chip (Ace/Jack) for
     special blending effects.  It's exact effect is unclear.
 
-    Video backgrounds in Dragongun?
+    Video backgrounds(intel DVI) in Dragongun?
 
-    Locked'N Loaded (parent set) is a slightly different hardware
+    Locked 'n Loaded (parent set) is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
     The sound is _not_ hooked up correctly for this set.
+
+    Z80 Sound cpu version games : Music tempo is unverified (it has external timer / IRQ controller?).
 
 
 
@@ -365,9 +367,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "emu.h"
 #include "includes/deco32.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/arm/arm.h"
-#include "cpu/h6280/h6280.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/decocrpt.h"
@@ -375,292 +375,319 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "machine/input_merger.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, captaven_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100007) AM_READ(_71_r)
-	AM_RANGE(0x100000, 0x100003) AM_WRITE(buffer_spriteram_w)
-	AM_RANGE(0x108000, 0x108003) AM_WRITENOP /* ? */
-	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0x120000, 0x127fff) AM_RAM AM_SHARE("ram") /* Main RAM */
-	AM_RANGE(0x128000, 0x12ffff) AM_READWRITE16(ioprot_r, ioprot_w, 0x0000ffff)
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x148000, 0x14800f) AM_DEVICE8("irq", deco_irq_device, map, 0x000000ff)
-	AM_RANGE(0x160000, 0x167fff) AM_RAM /* Extra work RAM */
-	AM_RANGE(0x168000, 0x168003) AM_READ8(captaven_dsw1_r, 0x000000ff)
-	AM_RANGE(0x168000, 0x168003) AM_READ8(captaven_dsw2_r, 0x0000ff00)
-	AM_RANGE(0x168000, 0x168003) AM_READ8(captaven_dsw3_r, 0x00ff0000)
-	AM_RANGE(0x168000, 0x168003) AM_READ8(captaven_soundcpu_status_r, 0xff000000)
-	AM_RANGE(0x178000, 0x178003) AM_WRITE(pri_w)
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x192000, 0x193fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w) /* Mirror address - bug in program code */
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w) // unused
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32") // unused
-ADDRESS_MAP_END
+void captaven_state::captaven_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x100007).r(FUNC(captaven_state::_71_r));
+	map(0x100000, 0x100003).w(FUNC(captaven_state::buffer_spriteram_w<0>));
+	map(0x108000, 0x108003).nopw(); /* ? */
+	map(0x110000, 0x111fff).rw(FUNC(captaven_state::spriteram_r<0>), FUNC(captaven_state::spriteram_w<0>));
+	map(0x120000, 0x127fff).ram(); /* Main RAM */
+	map(0x128000, 0x12ffff).rw(FUNC(captaven_state::ioprot_r), FUNC(captaven_state::ioprot_w)).umask32(0x0000ffff);
+	map(0x130000, 0x131fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x148000, 0x14800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
+	map(0x160000, 0x167fff).ram(); /* Extra work RAM */
+	map(0x168000, 0x168000).r(FUNC(captaven_state::captaven_dsw1_r));
+	map(0x168001, 0x168001).r(FUNC(captaven_state::captaven_dsw2_r));
+	map(0x168002, 0x168002).r(FUNC(captaven_state::captaven_dsw3_r));
+	map(0x168003, 0x168003).r(FUNC(captaven_state::captaven_soundcpu_status_r));
+	map(0x178000, 0x178003).w(FUNC(captaven_state::pri_w));
+	map(0x180000, 0x18001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x190000, 0x191fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x192000, 0x193fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w)); /* Mirror address - bug in program code */
+	map(0x194000, 0x195fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1a0000, 0x1a3fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x1a4000, 0x1a5fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x1c0000, 0x1c001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1d0000, 0x1d1fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1d4000, 0x1d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
+	map(0x1e0000, 0x1e3fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x1e4000, 0x1e5fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
+}
 
-static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, fghthist_state )
-	ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120020, 0x120023) AM_READ16(fghthist_in0_r, 0x0000ffff)
-	AM_RANGE(0x120024, 0x120027) AM_READ16(fghthist_in1_r, 0x0000ffff)
-	AM_RANGE(0x120028, 0x12002b) AM_READ8(eeprom_r, 0x000000ff)
-	AM_RANGE(0x12002c, 0x12002f) AM_WRITE8(eeprom_w, 0x000000ff)
-	AM_RANGE(0x12002c, 0x12002f) AM_WRITE8(volume_w, 0x0000ff00)
-	AM_RANGE(0x1201fc, 0x1201ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
-	AM_RANGE(0x16c010, 0x16c013) AM_READ(unk_status_r)
-	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram_w)
-	AM_RANGE(0x17c020, 0x17c023) AM_READ(unk_status_r)
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(ioprot_r, ioprot_w, 0xffff0000) AM_SHARE("prot32ram") // only maps on 16-bits
-	AM_RANGE(0x208800, 0x208803) AM_WRITENOP /* ? */
-ADDRESS_MAP_END
+void fghthist_state::fghthist_map(address_map &map)
+{
+	map.unmap_value_high();
+//  map(0x000000, 0x001fff).rom().w(FUNC(fghthist_state::pf1_data_w)); // wtf??
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x11ffff).ram();
+	map(0x120020, 0x120021).r(FUNC(fghthist_state::fghthist_in0_r));
+	map(0x120024, 0x120025).r(FUNC(fghthist_state::fghthist_in1_r));
+	map(0x120028, 0x120028).r(FUNC(fghthist_state::eeprom_r));
+	map(0x12002c, 0x12002c).w(FUNC(fghthist_state::eeprom_w));
+	map(0x12002d, 0x12002d).w(FUNC(fghthist_state::volume_w));
+	map(0x1201fc, 0x1201fc).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x140000, 0x140003).w(FUNC(fghthist_state::vblank_ack_w));
+	map(0x168000, 0x169fff).ram().w(FUNC(fghthist_state::buffered_palette_w)).share("paletteram");
+	map(0x16c008, 0x16c00b).w(FUNC(fghthist_state::palette_dma_w));
+	map(0x16c010, 0x16c013).r(FUNC(fghthist_state::unk_status_r));
+	map(0x178000, 0x179fff).rw(FUNC(fghthist_state::spriteram_r<0>), FUNC(fghthist_state::spriteram_w<0>));
+	map(0x17c010, 0x17c013).w(FUNC(fghthist_state::buffer_spriteram_w<0>));
+	map(0x17c020, 0x17c023).r(FUNC(fghthist_state::unk_status_r));
+	map(0x182000, 0x183fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x184000, 0x185fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x192000, 0x193fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x194000, 0x195fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x1a0000, 0x1a001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1c2000, 0x1c3fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1c4000, 0x1c5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1d2000, 0x1d3fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x1d4000, 0x1d5fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32");
+	map(0x1e0000, 0x1e001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
+	map(0x208800, 0x208803).nopw(); /* ? */
+}
 
-static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, fghthist_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
-	AM_RANGE(0x150000, 0x150003) AM_WRITE8(eeprom_w, 0x000000ff)
-	AM_RANGE(0x150000, 0x150003) AM_WRITE8(volume_w, 0x0000ff00)
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
-	AM_RANGE(0x16c010, 0x16c013) AM_READ(unk_status_r)
-	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram_w)
-	AM_RANGE(0x17c020, 0x17c023) AM_READ(unk_status_r)
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(ioprot_r, ioprot_w, 0xffff0000) AM_SHARE("prot32ram") // only maps on 16-bits
-ADDRESS_MAP_END
+void fghthist_state::fghthsta_memmap(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x11ffff).ram();
+	map(0x140000, 0x140003).w(FUNC(fghthist_state::vblank_ack_w));
+	map(0x150000, 0x150000).w(FUNC(fghthist_state::eeprom_w));
+	map(0x150001, 0x150001).w(FUNC(fghthist_state::volume_w));
+	map(0x168000, 0x169fff).ram().w(FUNC(fghthist_state::buffered_palette_w)).share("paletteram");
+	map(0x16c008, 0x16c00b).w(FUNC(fghthist_state::palette_dma_w));
+	map(0x16c010, 0x16c013).r(FUNC(fghthist_state::unk_status_r));
+	map(0x178000, 0x179fff).rw(FUNC(fghthist_state::spriteram_r<0>), FUNC(fghthist_state::spriteram_w<0>));
+	map(0x17c010, 0x17c013).w(FUNC(fghthist_state::buffer_spriteram_w<0>));
+	map(0x17c020, 0x17c023).r(FUNC(fghthist_state::unk_status_r));
+	map(0x182000, 0x183fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x184000, 0x185fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x192000, 0x193fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x194000, 0x195fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x1a0000, 0x1a001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1c2000, 0x1c3fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1c4000, 0x1c5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1d2000, 0x1d3fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x1d4000, 0x1d5fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32");
+	map(0x1e0000, 0x1e001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
+}
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
 // raster effects appear to need some work on it anyway?
-static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
-	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
-	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x0120000, 0x0127fff) AM_READWRITE16(ioprot_r, ioprot_w, 0x0000ffff)
-//  AM_RANGE(0x01204c0, 0x01204c3) AM_WRITE(sound_w)
-	AM_RANGE(0x0128000, 0x012800f) AM_DEVICE8("irq", deco_irq_device, map, 0x000000ff)
-	AM_RANGE(0x0130000, 0x0131fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0138000, 0x0138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
-	AM_RANGE(0x0138008, 0x013800b) AM_WRITE(palette_dma_w)
-	AM_RANGE(0x0170100, 0x0170103) AM_WRITENOP
-	AM_RANGE(0x0170038, 0x017003b) AM_WRITENOP
-	AM_RANGE(0x017002C, 0x017002f) AM_WRITENOP
-	AM_RANGE(0x0170224, 0x0170227) AM_WRITENOP
-	AM_RANGE(0x0180000, 0x018001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x0190000, 0x0191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x0194000, 0x0195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x01a0000, 0x01a3fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x01a4000, 0x01a5fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x01c0000, 0x01c001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x01d0000, 0x01d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x01d4000, 0x01d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w) // unused
-	AM_RANGE(0x01e0000, 0x01e3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x01e4000, 0x01e5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32") // unused
-	AM_RANGE(0x0204800, 0x0204fff) AM_RAM // ace? 0x10 byte increments only  // 13f ff stuff
-	AM_RANGE(0x0208000, 0x0208fff) AM_RAM AM_SHARE("lay0")
-	AM_RANGE(0x020c000, 0x020cfff) AM_RAM AM_SHARE("lay1")
-	AM_RANGE(0x0210000, 0x0217fff) AM_RAM AM_SHARE("look0")
-	AM_RANGE(0x0218000, 0x021ffff) AM_RAM AM_SHARE("look1")
-	AM_RANGE(0x0220000, 0x0221fff) AM_RAM AM_SHARE("spriteram") /* Main spriteram */
-	AM_RANGE(0x0228000, 0x02283ff) AM_RAM //0x10 byte increments only
-	AM_RANGE(0x0230000, 0x0230003) AM_WRITE(spriteram_dma_w)
-	AM_RANGE(0x0300000, 0x03fffff) AM_ROM
-	AM_RANGE(0x0400000, 0x0400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x0410000, 0x0410003) AM_WRITE(volume_w)
-	AM_RANGE(0x0418000, 0x0418003) AM_WRITE(speaker_switch_w)
-	AM_RANGE(0x0420000, 0x0420003) AM_READWRITE8(eeprom_r, eeprom_w, 0x000000ff)
-	AM_RANGE(0x0430000, 0x043001f) AM_WRITE(lightgun_w)
-	AM_RANGE(0x0438000, 0x0438003) AM_READ(lightgun_r)
-	AM_RANGE(0x0440000, 0x0440003) AM_READ_PORT("IN2")
-	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(sprite_control_w)
+void dragngun_state::dragngun_map(address_map &map)
+{
+	map(0x0000000, 0x00fffff).rom();
+	map(0x0100000, 0x011ffff).ram();
+	map(0x0120000, 0x0127fff).rw(FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
+//  map(0x01204c0, 0x01204c3) AM_WRITE(sound_w)
+	map(0x0128000, 0x012800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
+	map(0x0130000, 0x0131fff).ram().w(FUNC(dragngun_state::buffered_palette_w)).share("paletteram");
+	map(0x0138000, 0x0138003).noprw(); /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
+	map(0x0138008, 0x013800b).w(FUNC(dragngun_state::palette_dma_w));
+	map(0x0170100, 0x0170103).nopw();
+	map(0x0170038, 0x017003b).nopw();
+	map(0x017002C, 0x017002f).nopw();
+	map(0x0170224, 0x0170227).nopw();
+	map(0x0180000, 0x018001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x0190000, 0x0191fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x0194000, 0x0195fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x01a0000, 0x01a3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x01a4000, 0x01a5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x01c0000, 0x01c001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x01d0000, 0x01d1fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x01d4000, 0x01d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
+	map(0x01e0000, 0x01e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x01e4000, 0x01e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
+	map(0x0204800, 0x0204fff).ram(); // ace? 0x10 byte increments only  // 13f ff stuff
+	map(0x0208000, 0x0208fff).ram().share("lay0");
+	map(0x020c000, 0x020cfff).ram().share("lay1");
+	map(0x0210000, 0x0217fff).ram().share("look0");
+	map(0x0218000, 0x021ffff).ram().share("look1");
+	map(0x0220000, 0x0221fff).ram().share("spriteram"); /* Main spriteram */
+	map(0x0228000, 0x02283ff).ram(); //0x10 byte increments only
+	map(0x0230000, 0x0230003).w(FUNC(dragngun_state::spriteram_dma_w));
+	map(0x0300000, 0x03fffff).rom();
+	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0410000, 0x0410003).w(FUNC(dragngun_state::volume_w));
+	map(0x0418000, 0x0418003).w(FUNC(dragngun_state::speaker_switch_w));
+	map(0x0420000, 0x0420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
+	map(0x0430000, 0x043001f).w(FUNC(dragngun_state::lightgun_w));
+	map(0x0438000, 0x0438003).r(FUNC(dragngun_state::lightgun_r));
+	map(0x0440000, 0x0440003).portr("IN2");
+	map(0x0500000, 0x0500003).w(FUNC(dragngun_state::sprite_control_w));
 	// this is clearly the dvi video related area
-	AM_RANGE(0x1000000, 0x1000007) AM_READ(unk_video_r)
-	AM_RANGE(0x1000100, 0x1007fff) AM_RAM
-	AM_RANGE(0x10b0000, 0x10b01ff) AM_RAM
-	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are                                                                 // as a result it ends up writing what looks like pointers to the frame data in the ram area above
-ADDRESS_MAP_END
+	map(0x1000000, 0x1000007).r(FUNC(dragngun_state::unk_video_r));
+	map(0x1000100, 0x1007fff).ram();
+	map(0x10b0000, 0x10b01ff).ram();
+	map(0x1400000, 0x1ffffff).rom().region("dvi", 0x00000); // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are                                                                 // as a result it ends up writing what looks like pointers to the frame data in the ram area above
+}
 
-static ADDRESS_MAP_START( lockloadu_map, AS_PROGRAM, 32, dragngun_state )
-	AM_IMPORT_FROM(dragngun_map)
-	AM_RANGE(0x0170000, 0x0170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
-ADDRESS_MAP_END
+void dragngun_state::lockloadu_map(address_map &map)
+{
+	dragngun_map(map);
+	map(0x0170000, 0x0170007).r(FUNC(dragngun_state::lockload_gun_mirror_r)); /* Not on Dragongun */
+}
 
-static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120000, 0x127fff) AM_READWRITE16(ioprot_r, ioprot_w, 0x0000ffff)
-	AM_RANGE(0x128000, 0x12800f) AM_DEVICE8("irq", deco_irq_device, map, 0x000000ff)
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x138000, 0x138003) AM_READONLY AM_WRITENOP //palette dma complete in bit 0x8? ack?  return 0 else tight loop
-	AM_RANGE(0x138008, 0x13800b) AM_WRITE(palette_dma_w)
-	AM_RANGE(0x170000, 0x170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
-	AM_RANGE(0x178008, 0x17800f) AM_WRITE(gun_irq_ack_w) /* Gun read ACK's */
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w) // unused
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32") // unused
-	AM_RANGE(0x204800, 0x204fff) AM_RAM             //0x10 byte increments only
-	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_SHARE("lay0")
-	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_SHARE("lay1")
-	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_SHARE("look0")
-	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_SHARE("look1")
-	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_SHARE("spriteram") /* Main spriteram */
-	AM_RANGE(0x228000, 0x2283ff) AM_RAM             //0x10 byte increments only
-	AM_RANGE(0x230000, 0x230003) AM_WRITE(spriteram_dma_w)
-	AM_RANGE(0x300000, 0x3fffff) AM_ROM
-	AM_RANGE(0x410000, 0x410003) AM_WRITE(volume_w)
-	AM_RANGE(0x420000, 0x420003) AM_READWRITE8(eeprom_r, eeprom_w, 0x000000ff)
-	AM_RANGE(0x440000, 0x440003) AM_READ_PORT("IN2")
-	AM_RANGE(0x500000, 0x500003) AM_WRITE(sprite_control_w)
-ADDRESS_MAP_END
+void dragngun_state::lockload_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x11ffff).ram();
+	map(0x120000, 0x127fff).rw(FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
+	map(0x128000, 0x12800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
+	map(0x130000, 0x131fff).ram().w(FUNC(dragngun_state::buffered_palette_w)).share("paletteram");
+	map(0x138000, 0x138003).readonly().nopw(); //palette dma complete in bit 0x8? ack?  return 0 else tight loop
+	map(0x138008, 0x13800b).w(FUNC(dragngun_state::palette_dma_w));
+	map(0x170000, 0x170007).r(FUNC(dragngun_state::lockload_gun_mirror_r)); /* Not on Dragongun */
+	map(0x178008, 0x17800f).w(FUNC(dragngun_state::gun_irq_ack_w)); /* Gun read ACK's */
+	map(0x180000, 0x18001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x190000, 0x191fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x194000, 0x195fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1a0000, 0x1a3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x1a4000, 0x1a5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x1c0000, 0x1c001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1d0000, 0x1d1fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1d4000, 0x1d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
+	map(0x1e0000, 0x1e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x1e4000, 0x1e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
+	map(0x204800, 0x204fff).ram();             //0x10 byte increments only
+	map(0x208000, 0x208fff).ram().share("lay0");
+	map(0x20c000, 0x20cfff).ram().share("lay1");
+	map(0x210000, 0x217fff).ram().share("look0");
+	map(0x218000, 0x21ffff).ram().share("look1");
+	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
+	map(0x228000, 0x2283ff).ram();             //0x10 byte increments only
+	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
+	map(0x300000, 0x3fffff).rom();
+	map(0x410000, 0x410003).w(FUNC(dragngun_state::volume_w));
+	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
+	map(0x440000, 0x440003).portr("IN2");
+	map(0x500000, 0x500003).w(FUNC(dragngun_state::sprite_control_w));
+}
 
-static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, nslasher_state )
-	AM_RANGE(0x000000, 0x0f7fff) AM_ROM
-	AM_RANGE(0x0f8000, 0x0fffff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120000, 0x120003) AM_NOP             /* ACIA (unused) */
-	AM_RANGE(0x130000, 0x130003) AM_WRITENOP        /* Coin port (unused?) */
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
-	AM_RANGE(0x150000, 0x150003) AM_WRITE(tattass_control_w) /* Volume port/Eprom/Priority */
-	AM_RANGE(0x162000, 0x162fff) AM_RAM             /* 'Jack' RAM!? */
-	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(ace_ram_w) AM_SHARE("ace_ram")
-	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
-	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($6 constant) */
-	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($5 constant) */
-	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
-	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
-	AM_RANGE(0x174018, 0x17401b) AM_WRITENOP /* Sprite 'CPU' (unused) */
-	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(spriteram2_r, spriteram2_w)
-	AM_RANGE(0x17c000, 0x17c003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram2_w)
-	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(ioprot_r, ioprot_w, 0xffff0000)
-	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff)
-ADDRESS_MAP_END
+void nslasher_state::tattass_map(address_map &map)
+{
+	map(0x000000, 0x0f7fff).rom();
+	map(0x0f8000, 0x0fffff).rom().nopw();
+	map(0x100000, 0x11ffff).ram();
+	map(0x120000, 0x120003).noprw();             /* ACIA (unused) */
+	map(0x130000, 0x130003).nopw();        /* Coin port (unused?) */
+	map(0x140000, 0x140003).w(FUNC(nslasher_state::vblank_ack_w));
+	map(0x150000, 0x150003).w(FUNC(nslasher_state::tattass_control_w)); /* Volume port/Eprom/Priority */
+	map(0x162000, 0x162fff).ram();             /* 'Jack' RAM!? */
+	map(0x163000, 0x16309f).rw(m_deco_ace, FUNC(deco_ace_device::ace_r), FUNC(deco_ace_device::ace_w)).umask32(0x0000ffff); /* 'Ace' RAM */
+	map(0x164000, 0x164003).nopw(); /* Palette control BG2/3 ($1a constant) */
+	map(0x164004, 0x164007).nopw(); /* Palette control Obj1 ($6 constant) */
+	map(0x164008, 0x16400b).nopw(); /* Palette control Obj2 ($5 constant) */
+	map(0x16400c, 0x16400f).nopw();
+	map(0x168000, 0x169fff).rw(m_deco_ace, FUNC(deco_ace_device::buffered_palette_r), FUNC(deco_ace_device::buffered_palette_w));
+	map(0x16c000, 0x16c003).nopw();
+	map(0x16c008, 0x16c00b).w(m_deco_ace, FUNC(deco_ace_device::palette_dma_w));
+	map(0x170000, 0x171fff).rw(FUNC(nslasher_state::spriteram_r<0>), FUNC(nslasher_state::spriteram_w<0>));
+	map(0x174000, 0x174003).nopw(); /* Sprite DMA mode (2) */
+	map(0x174010, 0x174013).w(FUNC(nslasher_state::buffer_spriteram_w<0>));
+	map(0x174018, 0x17401b).nopw(); /* Sprite 'CPU' (unused) */
+	map(0x178000, 0x179fff).rw(FUNC(nslasher_state::spriteram_r<1>), FUNC(nslasher_state::spriteram_w<1>));
+	map(0x17c000, 0x17c003).nopw(); /* Sprite DMA mode (2) */
+	map(0x17c010, 0x17c013).w(FUNC(nslasher_state::buffer_spriteram_w<1>));
+	map(0x17c018, 0x17c01b).nopw(); /* Sprite 'CPU' (unused) */
+	map(0x182000, 0x183fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x184000, 0x185fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x192000, 0x193fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x194000, 0x195fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x1a0000, 0x1a001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1c2000, 0x1c3fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1c4000, 0x1c5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1d2000, 0x1d3fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x1d4000, 0x1d5fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32");
+	map(0x1e0000, 0x1e001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x200000, 0x207fff).rw(FUNC(nslasher_state::ioprot_r), FUNC(nslasher_state::ioprot_w)).umask32(0xffff0000);
+	map(0x200000, 0x207fff).r(FUNC(nslasher_state::nslasher_debug_r)).umask32(0x0000ffff);
+}
 
-static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, nslasher_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120000, 0x1200ff) AM_NOP                         /* ACIA (unused) */
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
-	AM_RANGE(0x150000, 0x150003) AM_WRITE8(eeprom_w, 0x000000ff)
-	AM_RANGE(0x150000, 0x150003) AM_WRITE8(volume_w, 0x0000ff00)
-	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(ace_ram_w) AM_SHARE("ace_ram") /* 'Ace' RAM!? */
-	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
-	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($4 constant) */
-	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($6 constant) */
-	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
-	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
-	AM_RANGE(0x174018, 0x17401b) AM_WRITENOP /* Sprite 'CPU' (unused) */
-	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(spriteram2_r, spriteram2_w)
-	AM_RANGE(0x17c000, 0x17c003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram2_w)
-	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(ioprot_r, ioprot_w, 0xffff0000)
-	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff) // seems to be debug switches / code activated by this?
-ADDRESS_MAP_END
+void nslasher_state::nslasher_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x11ffff).ram();
+	map(0x120000, 0x1200ff).noprw();                         /* ACIA (unused) */
+	map(0x140000, 0x140003).w(FUNC(nslasher_state::vblank_ack_w));
+	map(0x150000, 0x150000).w(FUNC(nslasher_state::eeprom_w));
+	map(0x150001, 0x150001).w(FUNC(nslasher_state::volume_w));
+	map(0x163000, 0x16309f).rw(m_deco_ace, FUNC(deco_ace_device::ace_r), FUNC(deco_ace_device::ace_w)).umask32(0x0000ffff); /* 'Ace' RAM */
+	map(0x164000, 0x164003).nopw(); /* Palette control BG2/3 ($1a constant) */
+	map(0x164004, 0x164007).nopw(); /* Palette control Obj1 ($4 constant) */
+	map(0x164008, 0x16400b).nopw(); /* Palette control Obj2 ($6 constant) */
+	map(0x16400c, 0x16400f).nopw();
+	map(0x168000, 0x169fff).rw(m_deco_ace, FUNC(deco_ace_device::buffered_palette_r), FUNC(deco_ace_device::buffered_palette_w));
+	map(0x16c000, 0x16c003).nopw();
+	map(0x16c008, 0x16c00b).w(m_deco_ace, FUNC(deco_ace_device::palette_dma_w));
+	map(0x170000, 0x171fff).rw(FUNC(nslasher_state::spriteram_r<0>), FUNC(nslasher_state::spriteram_w<0>));
+	map(0x174000, 0x174003).nopw(); /* Sprite DMA mode (2) */
+	map(0x174010, 0x174013).w(FUNC(nslasher_state::buffer_spriteram_w<0>));
+	map(0x174018, 0x17401b).nopw(); /* Sprite 'CPU' (unused) */
+	map(0x178000, 0x179fff).rw(FUNC(nslasher_state::spriteram_r<1>), FUNC(nslasher_state::spriteram_w<1>));
+	map(0x17c000, 0x17c003).nopw(); /* Sprite DMA mode (2) */
+	map(0x17c010, 0x17c013).w(FUNC(nslasher_state::buffer_spriteram_w<1>));
+	map(0x17c018, 0x17c01b).nopw(); /* Sprite 'CPU' (unused) */
+	map(0x182000, 0x183fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x184000, 0x185fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x192000, 0x193fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
+	map(0x194000, 0x195fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
+	map(0x1a0000, 0x1a001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1c2000, 0x1c3fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1c4000, 0x1c5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1d2000, 0x1d3fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
+	map(0x1d4000, 0x1d5fff).ram().w(FUNC(nslasher_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32");
+	map(0x1e0000, 0x1e001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x200000, 0x207fff).rw(FUNC(nslasher_state::ioprot_r), FUNC(nslasher_state::ioprot_w)).umask32(0xffff0000);
+	map(0x200000, 0x207fff).r(FUNC(nslasher_state::nslasher_debug_r)).umask32(0x0000ffff); // seems to be debug switches / code activated by this?
+}
 
 // H6280 based sound
-static ADDRESS_MAP_START( h6280_sound_map, AS_PROGRAM, 8, deco32_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void deco32_state::h6280_sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x110000, 0x110001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
+}
 
-static ADDRESS_MAP_START( h6280_sound_custom_latch_map, AS_PROGRAM, 8, deco32_state )
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_IMPORT_FROM(h6280_sound_map)
-ADDRESS_MAP_END
+void deco32_state::h6280_sound_custom_latch_map(address_map &map)
+{
+	h6280_sound_map(map);
+	map(0x140000, 0x140000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 // Z80 based sound
-static ADDRESS_MAP_START( z80_sound_mem, AS_PROGRAM, 8, deco32_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
-ADDRESS_MAP_END
+void deco32_state::z80_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xb000, 0xb000).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc000, 0xc000).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd000, 0xd000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
+}
 
-static ADDRESS_MAP_START( z80_sound_io, AS_IO, 8, deco32_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void deco32_state::z80_sound_io(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("audiocpu", 0);
+}
+
+// lockload needs hi bits of OKI2 bankswitching
+void dragngun_state::lockload_sound_map(address_map &map)
+{
+	z80_sound_map(map);
+	map(0xe000, 0xe000).w(FUNC(dragngun_state::lockload_okibank_hi_w));
+}
+
+void dragngun_state::lockloadu_sound_map(address_map &map)
+{
+	h6280_sound_map(map);
+	map(0x150000, 0x150000).w(FUNC(dragngun_state::lockload_okibank_hi_w));
+}
 
 
 //**************************************************************************
@@ -670,7 +697,7 @@ ADDRESS_MAP_END
 READ16_MEMBER( deco32_state::ioprot_r )
 {
 	offs_t real_address = 0 + (offset *2);
-	offs_t deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 
 	return m_ioprot->read_data( deco146_addr, mem_mask, cs );
@@ -679,7 +706,7 @@ READ16_MEMBER( deco32_state::ioprot_r )
 WRITE16_MEMBER( deco32_state::ioprot_w )
 {
 	offs_t real_address = 0 + (offset *2);
-	offs_t deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 
 	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
@@ -697,8 +724,8 @@ WRITE8_MEMBER( deco32_state::volume_w )
 	float vol_output = ((float)raw_vol) / 255.0f;
 
 	m_ym2151->set_output_gain(ALL_OUTPUTS, vol_output);
-	m_oki1->set_output_gain(ALL_OUTPUTS, vol_output);
-	m_oki2->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki[0]->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki[1]->set_output_gain(ALL_OUTPUTS, vol_output);
 }
 
 READ8_MEMBER( captaven_state::captaven_soundcpu_status_r )
@@ -715,9 +742,12 @@ WRITE32_MEMBER( dragngun_state::volume_w )
 	m_vol_main->clk_w(BIT(data, 1));
 	m_vol_main->di_w(BIT(data, 0));
 
-	m_vol_gun->ce_w(BIT(data, 2));
-	m_vol_gun->clk_w(BIT(data, 1));
-	m_vol_gun->di_w(BIT(data, 0));
+	if (m_vol_gun.found())
+	{
+		m_vol_gun->ce_w(BIT(data, 2));
+		m_vol_gun->clk_w(BIT(data, 1));
+		m_vol_gun->di_w(BIT(data, 0));
+	}
 }
 
 WRITE32_MEMBER( dragngun_state::speaker_switch_w )
@@ -739,19 +769,19 @@ LC7535_VOLUME_CHANGED( dragngun_state::volume_main_changed )
 
 	m_ym2151->set_output_gain(0, gain_l);
 	m_ym2151->set_output_gain(1, gain_r); // left and right are always set to the same value
-	m_oki1->set_output_gain(ALL_OUTPUTS, gain_l);
-	m_oki2->set_output_gain(ALL_OUTPUTS, gain_l);
+	m_oki[0]->set_output_gain(ALL_OUTPUTS, gain_l);
+	m_oki[1]->set_output_gain(ALL_OUTPUTS, gain_l);
 
-	if (m_oki3.found() && m_gun_speaker_disabled)
-		m_oki3->set_output_gain(ALL_OUTPUTS, gain_l);
+	if (m_oki[2].found() && m_gun_speaker_disabled)
+		m_oki[2]->set_output_gain(ALL_OUTPUTS, gain_l);
 }
 
 LC7535_VOLUME_CHANGED( dragngun_state::volume_gun_changed )
 {
 	logerror("Gun speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
 
-	if (m_oki3.found() && !m_gun_speaker_disabled)
-		m_oki3->set_output_gain(ALL_OUTPUTS, m_vol_gun->normalize(attenuation_left));
+	if (m_oki[2].found() && !m_gun_speaker_disabled)
+		m_oki[2]->set_output_gain(ALL_OUTPUTS, m_vol_gun->normalize(attenuation_left));
 }
 
 WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
@@ -760,15 +790,30 @@ WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
 	{
 		uint8_t data = m_ioprot->soundlatch_r(machine().dummy_space(), 0);
 		// Swap bits 0 and 3 to correct for design error from BSMT schematic
-		data = BITSWAP8(data, 7, 6, 5, 4, 0, 2, 1, 3);
+		data = bitswap<8>(data, 7, 6, 5, 4, 0, 2, 1, 3);
 		m_decobsmt->bsmt_comms_w(machine().dummy_space(), 0, data);
 	}
 }
 
 WRITE8_MEMBER( deco32_state::sound_bankswitch_w )
 {
-	m_oki1->set_rom_bank((data >> 0) & 1);
-	m_oki2->set_rom_bank((data >> 1) & 1);
+	m_oki[0]->set_rom_bank((data >> 0) & 1);
+	m_oki[1]->set_rom_bank((data >> 1) & 1);
+}
+
+WRITE8_MEMBER( dragngun_state::lockload_okibank_lo_w )
+{
+	m_oki2_bank = (m_oki2_bank & 2) | ((data >> 1) & 1);
+	logerror("Load OKI2 Bank Low bits: %02x, Current : %02x\n",(data >> 1) & 1, m_oki2_bank);
+	m_oki[0]->set_rom_bank((data >> 0) & 1);
+	m_oki[1]->set_rom_bank(m_oki2_bank);
+}
+
+WRITE8_MEMBER( dragngun_state::lockload_okibank_hi_w )
+{
+	m_oki2_bank = (m_oki2_bank & 1) | ((data & 1) << 1); // TODO : Actually value unverified
+	logerror("Load OKI2 Bank Hi bits: %02x, Current : %02x\n",((data & 1) << 1), m_oki2_bank);
+	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
 
 
@@ -781,45 +826,28 @@ WRITE32_MEMBER( deco32_state::vblank_ack_w )
 	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
+template<int Chip>
 READ32_MEMBER(deco32_state::spriteram_r)
 {
-	return m_spriteram16[offset] ^ 0xffff0000;
+	return m_spriteram16[Chip][offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER( deco32_state::spriteram_w )
+template<int Chip>
+WRITE32_MEMBER(deco32_state::spriteram_w)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
-	COMBINE_DATA(&m_spriteram16[offset]);
+	COMBINE_DATA(&m_spriteram16[Chip][offset]);
 }
 
-WRITE32_MEMBER( deco32_state::buffer_spriteram_w )
+template<int Chip>
+WRITE32_MEMBER(deco32_state::buffer_spriteram_w)
 {
-	memcpy(m_spriteram16_buffered, m_spriteram16, 0x1000);
-}
-
-READ32_MEMBER( nslasher_state::spriteram2_r )
-{
-	return m_spriteram16_2[offset] ^ 0xffff0000;
-}
-
-WRITE32_MEMBER( nslasher_state::spriteram2_w )
-{
-	data &= 0x0000ffff;
-	mem_mask &= 0x0000ffff;
-	COMBINE_DATA(&m_spriteram16_2[offset]);
-}
-
-WRITE32_MEMBER( nslasher_state::buffer_spriteram2_w )
-{
-	memcpy(m_spriteram16_2_buffered, m_spriteram16_2, 0x1000);
+	std::copy(&m_spriteram16[Chip][0], &m_spriteram16[Chip][0x2000/4], &m_spriteram16_buffered[Chip][0]);
 }
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-WRITE32_MEMBER( deco32_state::pf1_rowscroll_w ) { COMBINE_DATA(&m_pf1_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER( deco32_state::pf2_rowscroll_w ) { COMBINE_DATA(&m_pf2_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER( deco32_state::pf3_rowscroll_w ) { COMBINE_DATA(&m_pf3_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
-WRITE32_MEMBER( deco32_state::pf4_rowscroll_w ) { COMBINE_DATA(&m_pf4_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
+template <int TileMap> WRITE32_MEMBER( deco32_state::pf_rowscroll_w ) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
 
 READ32_MEMBER( dragngun_state::unk_video_r)
 {
@@ -902,7 +930,7 @@ WRITE32_MEMBER( dragngun_state::gun_irq_ack_w )
 // TODO: improve this, Y axis not understood at all
 READ32_MEMBER( dragngun_state::lockload_gun_mirror_r )
 {
-//logerror("%08x:Read gun %d\n",space.device().safe_pc(),offset);
+//logerror("%08x:Read gun %d\n",m_maincpu->pc(),offset);
 
 	switch(offset)
 	{
@@ -1140,7 +1168,7 @@ READ32_MEMBER( captaven_state::_71_r )
 	return 0xffffffff;
 }
 
-DRIVER_INIT_MEMBER( captaven_state, captaven )
+void captaven_state::init_captaven()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
@@ -1157,8 +1185,8 @@ void dragngun_state::dragngun_init_common()
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 
-	memcpy(DST_RAM+0x80000,SRC_RAM,0x10000);
-	memcpy(DST_RAM+0x110000,SRC_RAM+0x10000,0x10000);
+	std::copy(&SRC_RAM[0x00000], &SRC_RAM[0x10000], &DST_RAM[0x080000]);
+	std::copy(&SRC_RAM[0x10000], &SRC_RAM[0x20000], &DST_RAM[0x110000]);
 
 #if 0
 	{
@@ -1186,7 +1214,7 @@ void dragngun_state::dragngun_init_common()
 //  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, dragngun )
+void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
@@ -1194,7 +1222,7 @@ DRIVER_INIT_MEMBER( dragngun_state, dragngun )
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, dragngunj )
+void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
@@ -1202,43 +1230,41 @@ DRIVER_INIT_MEMBER( dragngun_state, dragngunj )
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER( fghthist_state, fghthist )
+void fghthist_state::init_fghthist()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, lockload )
+void dragngun_state::init_lockload()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
 //  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 
-	memcpy(RAM+0x300000,RAM+0x100000,0x100000);
-	memset(RAM+0x100000,0,0x100000);
-
 //  ROM[0x3fe3c0/4]=0xe1a00000;//  NOP test switch lock
 //  ROM[0x3fe3cc/4]=0xe1a00000;//  NOP test switch lock
 //  ROM[0x3fe40c/4]=0xe1a00000;//  NOP test switch lock
+
+	save_item(NAME(m_oki2_bank));
 }
 
-DRIVER_INIT_MEMBER( nslasher_state, tattass )
+void nslasher_state::init_tattass()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
-	memcpy(&tmp[0],RAM+0x80000,0x80000);
-	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,&tmp[0],0x80000);
+	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
+	std::copy(&RAM[0x100000], &RAM[0x180000], &RAM[0x080000]);
+	std::copy(tmp.begin(),    tmp.end(),      &RAM[0x100000]);
 
 	RAM = memregion("gfx2")->base();
-	memcpy(&tmp[0],RAM+0x80000,0x80000);
-	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,&tmp[0],0x80000);
+	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
+	std::copy(&RAM[0x100000], &RAM[0x180000], &RAM[0x080000]);
+	std::copy(tmp.begin(),    tmp.end(),      &RAM[0x100000]);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
@@ -1252,20 +1278,20 @@ DRIVER_INIT_MEMBER( nslasher_state, tattass )
 	save_item(NAME(m_byteAddr));
 }
 
-DRIVER_INIT_MEMBER( nslasher_state, nslasher )
+void nslasher_state::init_nslasher()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
-	memcpy(&tmp[0],RAM+0x80000,0x80000);
-	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,&tmp[0],0x80000);
+	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
+	std::copy(&RAM[0x100000], &RAM[0x180000], &RAM[0x080000]);
+	std::copy(tmp.begin(),    tmp.end(),      &RAM[0x100000]);
 
 	RAM = memregion("gfx2")->base();
-	memcpy(&tmp[0],RAM+0x80000,0x80000);
-	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,&tmp[0],0x80000);
+	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
+	std::copy(&RAM[0x100000], &RAM[0x180000], &RAM[0x080000]);
+	std::copy(tmp.begin(),    tmp.end(),      &RAM[0x100000]);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -1327,7 +1353,7 @@ COIN1n adds 100 energy points (based on "Coinage") for player n when ingame if e
 */
 
 static INPUT_PORTS_START( captaven )
-	PORT_START("INPUTS")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
@@ -1345,7 +1371,7 @@ static INPUT_PORTS_START( captaven )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW") // not dsw but the prot code expects dsw
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(3) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(3) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(3) PORT_8WAY
@@ -1624,7 +1650,7 @@ static INPUT_PORTS_START( lockload )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tattass )
-	PORT_START("INPUTS")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
@@ -1642,7 +1668,7 @@ static INPUT_PORTS_START( tattass )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1662,7 +1688,7 @@ static INPUT_PORTS_START( tattass )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nslasher )
-	PORT_START("INPUTS")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
@@ -1680,7 +1706,7 @@ static INPUT_PORTS_START( nslasher )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1710,8 +1736,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
 };
 
@@ -1721,10 +1747,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1734,10 +1758,8 @@ static const gfx_layout spritelayout_5bpp =
 	RGN_FRAC(1,2),
 	5,
 	{ RGN_FRAC(1,2), 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1747,10 +1769,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1760,10 +1780,8 @@ static const gfx_layout tilelayout_8bpp =
 	RGN_FRAC(1,4),
 	8,
 	{ RGN_FRAC(3,4)+8, RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+8, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1773,11 +1791,8 @@ static const gfx_layout spritelayout_5bpp_alt =
 	RGN_FRAC(1,5),
 	5,
 	{ 0x800000*8, 0x600000*8, 0x400000*8, 0x200000*8, 0 },
-	{
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-		0,1,2,3,4,5,6,7
-	},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
@@ -1789,8 +1804,7 @@ static const gfx_layout spritelayout4 =
 	{0,1,2,3},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
@@ -1802,26 +1816,25 @@ static const gfx_layout spritelayout5 =
 	{4,5,6,7},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
-static GFXDECODE_START( captaven )
+static GFXDECODE_START( gfx_captaven )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_8bpp,          0, 128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        0, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( fghthist )
+static GFXDECODE_START( gfx_fghthist )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0,  128 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0,  128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0,  128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     1024, 128 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( dragngun )
+static GFXDECODE_START( gfx_dragngun )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 64 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp,      0, 8 )   /* Tiles 16x16 */
@@ -1829,7 +1842,7 @@ static GFXDECODE_START( dragngun )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,       0, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( tattass )
+static GFXDECODE_START( gfx_tattass )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0, 128 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,            0, 128 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            0, 128 ) /* Tiles 16x16 */
@@ -1837,7 +1850,7 @@ static GFXDECODE_START( tattass )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,          1024+256, 32 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( nslasher )
+static GFXDECODE_START( gfx_nslasher )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
@@ -1850,34 +1863,35 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( captaven )
+MACHINE_CONFIG_START(captaven_state::captaven)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
-	MCFG_CPU_PROGRAM_MAP(captaven_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
+	MCFG_DEVICE_PROGRAM_MAP(captaven_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(captaven_state, screen_update_captaven)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", captaven)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_captaven)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -1890,7 +1904,8 @@ static MACHINE_CONFIG_START( captaven )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)    // pf3 is in 8bpp mode, pf4 is not used
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x00)
 	MCFG_DECO16IC_PF1_COL_BANK(0x10)
@@ -1903,58 +1918,60 @@ static MACHINE_CONFIG_START( captaven )
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_PRIORITY_CB(captaven_state, captaven_pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_VIDEO_START_OVERRIDE(captaven_state, captaven)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 // DE-0380-2
-static MACHINE_CONFIG_START( fghthist )
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(fghthist_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+MACHINE_CONFIG_START(fghthist_state::fghthist)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(fghthist_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_custom_latch_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_custom_latch_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(fghthist_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghthist)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1969,7 +1986,8 @@ static MACHINE_CONFIG_START( fghthist )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -1982,13 +2000,13 @@ static MACHINE_CONFIG_START( fghthist )
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
@@ -1996,33 +2014,35 @@ static MACHINE_CONFIG_START( fghthist )
 	MCFG_VIDEO_START_OVERRIDE(fghthist_state, fghthist)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 // DE-0395-1
-static MACHINE_CONFIG_DERIVED( fghthsta, fghthist )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fghthsta_memmap)
+MACHINE_CONFIG_START(fghthist_state::fghthsta)
+	fghthist(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fghthsta_memmap)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_DEVICE_REMOVE("soundlatch")
 
@@ -2031,55 +2051,58 @@ static MACHINE_CONFIG_DERIVED( fghthsta, fghthist )
 MACHINE_CONFIG_END
 
 // DE-0396-0
-static MACHINE_CONFIG_DERIVED( fghthistu, fghthsta )
+MACHINE_CONFIG_START(fghthist_state::fghthistu)
+	fghthsta(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz / 9)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_mem)
-	MCFG_CPU_IO_MAP(z80_sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_MODIFY("ioprot")
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
 
-	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dragngun )
+// DE-0359-2 + Bottom board DE-0360-4
+MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(dragngun_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(dragngun_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, 32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	//MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2094,7 +2117,8 @@ static MACHINE_CONFIG_START( dragngun )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF1_COL_BANK(0x04)
@@ -2110,7 +2134,7 @@ static MACHINE_CONFIG_START( dragngun )
 	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
@@ -2123,59 +2147,69 @@ static MACHINE_CONFIG_START( dragngun )
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_SPEAKER_STANDARD_MONO("gun_speaker")
+	SPEAKER(config, "gun_speaker").front_center();
 
-	MCFG_OKIM6295_ADD("oki3", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki3", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gun_speaker", 1.0)
 
-	MCFG_LC7535_ADD("vol_main")
+	MCFG_DEVICE_ADD("vol_main", LC7535)
 	MCFG_LC7535_SELECT_CB(VCC)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
 
-	MCFG_LC7535_ADD("vol_gun")
+	MCFG_DEVICE_ADD("vol_gun", LC7535)
 	MCFG_LC7535_SELECT_CB(GND)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lockloadu, dragngun )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lockloadu_map)
+MACHINE_CONFIG_START(dragngun_state::lockloadu)
+	dragngun(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lockloadu_map)
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(lockloadu_sound_map)
 
 	MCFG_DEVICE_MODIFY("irq")
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
 
 	MCFG_DEVICE_MODIFY("tilegen2")
-	MCFG_DECO16IC_WIDTH12(0)    // lockload definitely wants pf34 half width..
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
+
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lockload )
+// DE-0420-1 + Bottom board DE-0421-0
+MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(lockload_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lockload_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_mem)
-	MCFG_CPU_IO_MAP(z80_sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(lockload_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -2183,29 +2217,30 @@ static MACHINE_CONFIG_START( lockload )
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_LIGHTGUN1_CB(IOPORT("LIGHT0_Y"))
 	MCFG_DECO_IRQ_LIGHTGUN2_CB(IOPORT("LIGHT1_Y"))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_VIDEO_START_OVERRIDE(dragngun_state, lockload)
+	MCFG_VIDEO_START_OVERRIDE(dragngun_state, dragngun)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2220,7 +2255,8 @@ static MACHINE_CONFIG_START( lockload )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)    // lockload definitely wants pf34 half width..
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF1_COL_BANK(0x04)
@@ -2240,53 +2276,51 @@ static MACHINE_CONFIG_START( lockload )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_LC7535_ADD("vol_main")
+	MCFG_DEVICE_ADD("vol_main", LC7535)
 	MCFG_LC7535_SELECT_CB(VCC)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
-
-	MCFG_LC7535_ADD("vol_gun")
-	MCFG_LC7535_SELECT_CB(GND)
-	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tattass )
+MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) // unconfirmed
-	MCFG_CPU_PROGRAM_MAP(tattass_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) // unconfirmed
+	MCFG_DEVICE_PROGRAM_MAP(tattass_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
+
+	MCFG_DECO_ACE_ADD("deco_ace")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -2301,7 +2335,8 @@ static MACHINE_CONFIG_START( tattass )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2322,14 +2357,13 @@ static MACHINE_CONFIG_START( tattass )
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattass)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_tattass)
 
 	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(READ16(nslasher_state, port_b_tattass))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(nslasher_state, tattass_sound_irq_w))
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_DECO146_IN_PORTB_CB(READ16(*this, nslasher_state, port_b_tattass))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, nslasher_state, tattass_sound_irq_w))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state,nslasher)
@@ -2338,31 +2372,34 @@ static MACHINE_CONFIG_START( tattass )
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nslasher )
+MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(nslasher_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'322'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(nslasher_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32220000/9)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_mem)
-	MCFG_CPU_IO_MAP(z80_sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32220000/9)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28_322MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
+
+	MCFG_DECO_ACE_ADD("deco_ace")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -2377,7 +2414,8 @@ static MACHINE_CONFIG_START( nslasher )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2398,49 +2436,50 @@ static MACHINE_CONFIG_START( nslasher )
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nslasher)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_nslasher)
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state, nslasher)
 
 	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 MACHINE_CONFIG_END
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
-static MACHINE_CONFIG_DERIVED( nslasheru, nslasher )
-	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+MACHINE_CONFIG_START(nslasher_state::nslasheru)
+	nslasher(config);
+	MCFG_DEVICE_REPLACE("audiocpu", H6280, 32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
-	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 
 	MCFG_DEVICE_REMOVE("ioprot")
 	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 MACHINE_CONFIG_END
@@ -2869,8 +2908,8 @@ ROM_START( dragngun )
 	ROM_LOAD16_BYTE( "kb09.a17",  0x00001,  0x10000,  CRC(e9dcac3f) SHA1(0621e601ffae73bbf69623042c9c8ab0526c3de6) )
 
 	ROM_REGION( 0x120000, "gfx2", 0 )
-	ROM_LOAD( "mar-00.bin",  0x00000,  0x80000,  CRC(d0491a37) SHA1(cc0ae1e9e5f42ba30159fb79bccd2e237cd037d0) ) /* Encrypted tiles */
-	ROM_LOAD( "mar-01.bin",  0x90000,  0x80000,  CRC(d5970365) SHA1(729baf1efbef15c9f3e1d700717f5ba4f10d3014) )
+	ROM_LOAD( "mar-00.bin",    0x000000,  0x80000,  CRC(d0491a37) SHA1(cc0ae1e9e5f42ba30159fb79bccd2e237cd037d0) ) /* Encrypted tiles */
+	ROM_LOAD( "mar-01.bin",    0x090000,  0x80000,  CRC(d5970365) SHA1(729baf1efbef15c9f3e1d700717f5ba4f10d3014) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
 	ROM_LOAD( "mar-02.bin",  0x000000, 0x40000,  CRC(c6cd4baf) SHA1(350286829a330b64f463d0a9cbbfdb71eecf5188) ) /* Encrypted tiles 0/4 */
@@ -2922,8 +2961,12 @@ ROM_START( dragngun )
 	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mar-08.n21", 0x000000, 0x80000,  CRC(b9281dfd) SHA1(449faf5d36f3b970d0a9b483e2152a5f68604a77) )
 
+	// TODO : Japan version uses first bank of oki3, US version uses second half. it has bankswitched dynamic? or address shuffle?
 	ROM_REGION(0x80000, "oki3", 0 )
-	ROM_LOAD( "mar-07.n19", 0x000000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )
+	// Remove this hack if oki3 bankswitching is verified
+	ROM_LOAD( "mar-07.n19", 0x40000, 0x40000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )
+	ROM_CONTINUE(           0x00000, 0x40000 )
+	//ROM_LOAD( "mar-07.n19", 0x000000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )
 ROM_END
 
 ROM_START( dragngunj )
@@ -2945,8 +2988,8 @@ ROM_START( dragngunj )
 	ROM_LOAD16_BYTE( "ka-09.a17",  0x00001,  0x10000,  CRC(e9dcac3f) SHA1(0621e601ffae73bbf69623042c9c8ab0526c3de6) )
 
 	ROM_REGION( 0x120000, "gfx2", 0 )
-	ROM_LOAD( "mar-00.bin",  0x00000,  0x80000,  CRC(d0491a37) SHA1(cc0ae1e9e5f42ba30159fb79bccd2e237cd037d0) ) /* Encrypted tiles */
-	ROM_LOAD( "mar-01.bin",  0x90000,  0x80000,  CRC(d5970365) SHA1(729baf1efbef15c9f3e1d700717f5ba4f10d3014) )
+	ROM_LOAD( "mar-00.bin",    0x000000,  0x80000,  CRC(d0491a37) SHA1(cc0ae1e9e5f42ba30159fb79bccd2e237cd037d0) ) /* Encrypted tiles */
+	ROM_LOAD( "mar-01.bin",    0x090000,  0x80000,  CRC(d5970365) SHA1(729baf1efbef15c9f3e1d700717f5ba4f10d3014) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
 	ROM_LOAD( "mar-02.bin",  0x000000, 0x40000,  CRC(c6cd4baf) SHA1(350286829a330b64f463d0a9cbbfdb71eecf5188) ) /* Encrypted tiles 0/4 */
@@ -3351,10 +3394,14 @@ ROM_END
 
 ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly different hardware, a unique PCB and not a Dragongun conversion */
 	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_BYTE( "nl-00-1.a6", 0x000002, 0x80000, CRC(7a39bf8d) SHA1(8b1a6407bab74b3960a243a6c04c0005a82126f1) )
-	ROM_LOAD32_BYTE( "nl-01-1.a8", 0x000000, 0x80000, CRC(d23afcb7) SHA1(de7b5bc936a87cc6511d588b0bf082bbf745581c) )
-	ROM_LOAD32_BYTE( "nl-02-1.d6", 0x000003, 0x80000, CRC(730e0168) SHA1(fdfa0d335c03c2c528326f90948e642f9ea43150) )
-	ROM_LOAD32_BYTE( "nl-03-1.d8", 0x000001, 0x80000, CRC(51a53ece) SHA1(ee2c8858844a47fa1e83c30c06d78cf49219dc33) )
+	ROM_LOAD32_BYTE( "nl-00-1.a6", 0x000002, 0x40000, CRC(7a39bf8d) SHA1(8b1a6407bab74b3960a243a6c04c0005a82126f1) )
+	ROM_CONTINUE(                  0x300002, 0x40000 )
+	ROM_LOAD32_BYTE( "nl-01-1.a8", 0x000000, 0x40000, CRC(d23afcb7) SHA1(de7b5bc936a87cc6511d588b0bf082bbf745581c) )
+	ROM_CONTINUE(                  0x300000, 0x40000 )
+	ROM_LOAD32_BYTE( "nl-02-1.d6", 0x000003, 0x40000, CRC(730e0168) SHA1(fdfa0d335c03c2c528326f90948e642f9ea43150) )
+	ROM_CONTINUE(                  0x300003, 0x40000 )
+	ROM_LOAD32_BYTE( "nl-03-1.d8", 0x000001, 0x40000, CRC(51a53ece) SHA1(ee2c8858844a47fa1e83c30c06d78cf49219dc33) )
+	ROM_CONTINUE(                  0x300001, 0x40000 )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "nm-06-.p22",  0x00000,  0x10000,  CRC(31d1c245) SHA1(326e35e7ebd8ea761d90e856c50d86512327f2a5) )
@@ -3411,8 +3458,6 @@ ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly d
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000003, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400003, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
 
-	ROM_REGION( 0x1000000, "dvi", ROMREGION_ERASE00 ) /* Video data - unique PCB and this region is not used? */
-
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mbm-07.n19",  0x00000, 0x80000,  CRC(414f3793) SHA1(ed5f63e57390d503193fd1e9f7294ae1da6d3539) )
 
@@ -3422,10 +3467,14 @@ ROM_END
 
 ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly different hardware, a unique PCB and not a Dragongun conversion */
 	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_BYTE( "nf-00-1.a6", 0x000002, 0x80000, CRC(2c8045d4) SHA1(4c900951d56bd22e30905969b8eb687d9b4363bd) )
-	ROM_LOAD32_BYTE( "nf-01-1.a8", 0x000000, 0x80000, CRC(6f160117) SHA1(05738f61890e9d6d2b25330958c0e7369f2ff4a6) )
-	ROM_LOAD32_BYTE( "nf-02-1.d6", 0x000003, 0x80000, CRC(bd353948) SHA1(ddcc12b3d1c8919eb7eb961d61f6286e6b37a58e) )
-	ROM_LOAD32_BYTE( "nf-03-1.d8", 0x000001, 0x80000, CRC(118a9a72) SHA1(e0b2fd21f477e531d6a04256767874f13e031a48) )
+	ROM_LOAD32_BYTE( "nf-00-1.a6", 0x000002, 0x40000, CRC(2c8045d4) SHA1(4c900951d56bd22e30905969b8eb687d9b4363bd) )
+	ROM_CONTINUE(                  0x300002, 0x40000 )
+	ROM_LOAD32_BYTE( "nf-01-1.a8", 0x000000, 0x40000, CRC(6f160117) SHA1(05738f61890e9d6d2b25330958c0e7369f2ff4a6) )
+	ROM_CONTINUE(                  0x300000, 0x40000 )
+	ROM_LOAD32_BYTE( "nf-02-1.d6", 0x000003, 0x40000, CRC(bd353948) SHA1(ddcc12b3d1c8919eb7eb961d61f6286e6b37a58e) )
+	ROM_CONTINUE(                  0x300003, 0x40000 )
+	ROM_LOAD32_BYTE( "nf-03-1.d8", 0x000001, 0x40000, CRC(118a9a72) SHA1(e0b2fd21f477e531d6a04256767874f13e031a48) )
+	ROM_CONTINUE(                  0x300001, 0x40000 )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "nj-06-1.p22",  0x00000,  0x10000,  CRC(31d1c245) SHA1(326e35e7ebd8ea761d90e856c50d86512327f2a5) )
@@ -3482,8 +3531,6 @@ ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly di
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000003, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400003, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
 
-	ROM_REGION( 0x1000000, "dvi", ROMREGION_ERASE00 ) /* Video data - unique PCB and this region is not used? */
-
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mbm-07.n19",  0x00000, 0x80000,  CRC(414f3793) SHA1(ed5f63e57390d503193fd1e9f7294ae1da6d3539) )
 
@@ -3493,10 +3540,14 @@ ROM_END
 
 ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragongun conversion */
 	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_BYTE( "nh-00-0.b5", 0x000002, 0x80000, CRC(b8a57164) SHA1(b700a08db2ad1aa1bf0a32635ffbd5d3f08713ee) )
-	ROM_LOAD32_BYTE( "nh-01-0.b8", 0x000000, 0x80000, CRC(e371ac50) SHA1(c448b54bc8962844b490994607b21b0c806d7714) )
-	ROM_LOAD32_BYTE( "nh-02-0.d5", 0x000003, 0x80000, CRC(3e361e82) SHA1(b5445d44f2a775c141fdc561d5489234c39445a4) )
-	ROM_LOAD32_BYTE( "nh-03-0.d8", 0x000001, 0x80000, CRC(d08ee9c3) SHA1(9a85710a11940df047e83e8d5977a23d6c67d665) )
+	ROM_LOAD32_BYTE( "nh-00-0.b5", 0x000002, 0x40000, CRC(b8a57164) SHA1(b700a08db2ad1aa1bf0a32635ffbd5d3f08713ee) )
+	ROM_CONTINUE(                  0x300002, 0x40000 )
+	ROM_LOAD32_BYTE( "nh-01-0.b8", 0x000000, 0x40000, CRC(e371ac50) SHA1(c448b54bc8962844b490994607b21b0c806d7714) )
+	ROM_CONTINUE(                  0x300000, 0x40000 )
+	ROM_LOAD32_BYTE( "nh-02-0.d5", 0x000003, 0x40000, CRC(3e361e82) SHA1(b5445d44f2a775c141fdc561d5489234c39445a4) )
+	ROM_CONTINUE(                  0x300003, 0x40000 )
+	ROM_LOAD32_BYTE( "nh-03-0.d8", 0x000001, 0x40000, CRC(d08ee9c3) SHA1(9a85710a11940df047e83e8d5977a23d6c67d665) )
+	ROM_CONTINUE(                  0x300001, 0x40000 )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "nh-06-0.n25",  0x00000,  0x10000,  CRC(7a1af51d) SHA1(54e6b16d3f5b787d3c6eb7203d8854e6e0fb9803) )
@@ -3575,7 +3626,7 @@ ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragon
 	ROM_LOAD( "mbm-06.n17",  0x00000, 0x100000,  CRC(f34d5999) SHA1(265b5f4e8598bcf9183bf9bd95db69b01536acb2) )
 
 	ROM_REGION(0x80000, "oki3", ROMREGION_ERASE00 )
-	ROM_LOAD( "mar-07.n19",  0x00000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )  // same as dragngun, unused?
+	ROM_LOAD( "mar-07.n19",  0x00000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )  // same as dragngun, unused
 ROM_END
 
 ROM_START( tattass )
@@ -3893,44 +3944,44 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT    MACHINE    INPUT     CLASS           INIT       ROT   COMPANY                  FULLNAME                                              FLAGS
-GAME( 1991, captaven,   0,        captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.4)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavena,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.0)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavene,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (UK Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenu,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.9)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenuu, captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.6)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenua, captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenj,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT     CLASS           INIT            ROT   COMPANY                  FULLNAME                                              FLAGS
+GAME( 1991, captaven,   0,        captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.4)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavena,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavene,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (UK Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenu,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.9)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenuu, captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.6)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenua, captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenj,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)",   MACHINE_SUPPORTS_SAVE )
 
 // DE-0396-0 PCB sets (Z80 for sound)
-GAME( 1993, fghthistu,  fghthist, fghthistu, fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-09, DE-0396-0 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistu,  fghthist, fghthistu, fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-09, DE-0396-0 PCB)",    MACHINE_SUPPORTS_SAVE )
 // DE-0395-1 PCB sets (HuC6280 for sound)
-GAME( 1993, fghthist,   0       , fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-09, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistua, fghthist, fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistub, fghthist, fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistj,  fghthist, fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-07, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthist,   0,        fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-09, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistua, fghthist, fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistub, fghthist, fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistj,  fghthist, fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-07, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
 // DE-0380-2 PCB sets (HuC6280 for sound)
-GAME( 1993, fghthista,  fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistb,  fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistuc, fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistja, fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthista,  fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistb,  fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistuc, fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistja, fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
 // DE-0380-1 PCB sets (HuC6280 for sound)
-GAME( 1993, fghthistjb, fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-04, DE-0380-1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistjb, fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-04, DE-0380-1 PCB)", MACHINE_SUPPORTS_SAVE )
 
 // DE-0397-0 PCB sets (Z80 for sound)
-GAME( 1994, nslasher,   0,        nslasher,  nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslasherj,  nslasher, nslasher,  nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslashers,  nslasher, nslasher,  nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2, DE-0397-0 PCB)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasher,   0,        nslasher,  nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasherj,  nslasher, nslasher,  nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslashers,  nslasher, nslasher,  nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2, DE-0397-0 PCB)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // DE-0395-1 PCB sets (HuC6280 for sound)
-GAME( 1994, nslasheru,  nslasher, nslasheru, nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, DE-0395-1 PCB)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasheru,  nslasher, nslasheru, nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, DE-0395-1 PCB)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, tattass,    0,        tattass,   tattass,  nslasher_state, tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, tattassa,   tattass,  tattass,   tattass,  nslasher_state, tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tattass,    0,        tattass,   tattass,  nslasher_state, init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tattassa,   tattass,  tattass,   tattass,  nslasher_state, init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-// Dragon Gun / Lock 'n' Loaded have very different sprite hardware
-GAME( 1993, dragngun,   0,        dragngun,  dragngun, dragngun_state, dragngun,  ROT0, "Data East Corporation", "Dragon Gun (US)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, dragngunj,  dragngun, dragngun,  dragngun, dragngun_state, dragngunj, ROT0, "Data East Corporation", "Dragon Gun (Japan)",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Dragon Gun / Locked 'n Loaded have very different sprite hardware
+GAME( 1993, dragngun,   0,        dragngun,  dragngun, dragngun_state, init_dragngun,  ROT0, "Data East Corporation", "Dragon Gun (US)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI3 Bankswitching aren't verified
+GAME( 1993, dragngunj,  dragngun, dragngun,  dragngun, dragngun_state, init_dragngunj, ROT0, "Data East Corporation", "Dragon Gun (Japan)",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ""
 
-GAME( 1994, lockload,   0,        lockload,  lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (World)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunhard,    lockload, lockload,  lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Gun Hard (Japan)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lockloadu,  lockload, lockloadu, lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (US, Dragon Gun conversion)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lockload,   0,        lockload,  lockload, dragngun_state, init_lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (World)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunhard,    lockload, lockload,  lockload, dragngun_state, init_lockload,  ROT0, "Data East Corporation", "Gun Hard (Japan)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lockloadu,  lockload, lockloadu, lockload, dragngun_state, init_lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (US, Dragon Gun conversion)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

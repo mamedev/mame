@@ -47,10 +47,12 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 
 WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 {
-//  logerror("%04x: port c0 = %02x\n",space.device().safe_pc(),data);
+//  logerror("%s: port c0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = NMI enable */
 	m_nmi_enable = data & 1;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	/* bit 1 = flip screen */
 	flip_screen_set(data & 0x02);

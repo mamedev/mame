@@ -38,66 +38,70 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "S
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ayboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ayboard_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via1_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, a2bus_ayboard_device, via1_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via1_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via1_irq_w))
 
 	MCFG_DEVICE_ADD(VIA2_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via2_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via2_irq_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD(AY1_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
+	MCFG_DEVICE_ADD(AY2_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_phasor_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_phasor_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via1_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, a2bus_ayboard_device, via1_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via1_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via1_irq_w))
 
 	MCFG_DEVICE_ADD(VIA2_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via2_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via2_irq_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
-	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "lspeaker2").front_left();
+	SPEAKER(config, "rspeaker2").front_right();
+	MCFG_DEVICE_ADD(AY1_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
+	MCFG_DEVICE_ADD(AY2_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker2", 1.0)
-	MCFG_SOUND_ADD(AY3_TAG, AY8913, 1022727)
+	MCFG_DEVICE_ADD(AY3_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD(AY4_TAG, AY8913, 1022727)
+	MCFG_DEVICE_ADD(AY4_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_echoplus_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_echoplus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via1_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, a2bus_ayboard_device, via1_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via1_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via1_irq_w))
 
 	MCFG_DEVICE_ADD(VIA2_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via2_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via2_irq_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD(AY1_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
+	MCFG_DEVICE_ADD(AY2_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SPEAKER_STANDARD_MONO("echosp")
-	MCFG_SOUND_ADD(E2P_TMS_TAG, TMS5220, 640000)
+	SPEAKER(config, "echosp").front_center();
+	MCFG_DEVICE_ADD(E2P_TMS_TAG, TMS5220, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echosp", 1.0)
 MACHINE_CONFIG_END
 
@@ -145,9 +149,6 @@ a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, cons
 
 void a2bus_ayboard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_porta1));
 	save_item(NAME(m_porta2));
 }
@@ -161,9 +162,8 @@ void a2bus_ayboard_device::device_reset()
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_ayboard_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_ayboard_device::read_cnxx(uint8_t offset)
 {
-//    printf("Mockingboard(%d): read @ Cn%02X (PC=%x)\n", m_slot, offset, space.device().safe_pc());
 	if (m_isPhasor)
 	{
 		uint8_t retVal = 0;
@@ -182,12 +182,12 @@ uint8_t a2bus_ayboard_device::read_cnxx(address_space &space, uint8_t offset)
 		{
 			if (viaSel & 1)
 			{
-				retVal |= m_via1->read(space, offset & 0xf);
+				retVal |= m_via1->read(machine().dummy_space(), offset & 0xf);
 			}
 
 			if (viaSel & 2)
 			{
-				retVal |=  m_via2->read(space, offset & 0xf);
+				retVal |= m_via2->read(machine().dummy_space(), offset & 0xf);
 			}
 		}
 
@@ -197,11 +197,11 @@ uint8_t a2bus_ayboard_device::read_cnxx(address_space &space, uint8_t offset)
 	{
 		if (offset <= 0x10)
 		{
-			return m_via1->read(space, offset & 0xf);
+			return m_via1->read(machine().dummy_space(), offset & 0xf);
 		}
 		else if (offset >= 0x80 && offset <= 0x90)
 		{
-			return m_via2->read(space, offset & 0xf);
+			return m_via2->read(machine().dummy_space(), offset & 0xf);
 		}
 	}
 
@@ -212,7 +212,7 @@ uint8_t a2bus_ayboard_device::read_cnxx(address_space &space, uint8_t offset)
     write_cnxx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_ayboard_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	if (m_isPhasor)
 	{
@@ -229,15 +229,13 @@ void a2bus_ayboard_device::write_cnxx(address_space &space, uint8_t offset, uint
 				viaSel = (offset & 0x80) ? 2 : 1;
 			}
 
-//            printf("Phasor(%d): write %02x to Cn%02X (PC=%x) (native %d viaSel %d)\n", m_slot, data, offset, space.device().safe_pc(), m_PhasorNative ? 1 : 0, viaSel);
-
 			if (viaSel & 1)
 			{
-				m_via1->write(space, offset&0xf, data);
+				m_via1->write(machine().dummy_space(), offset&0xf, data);
 			}
 			if (viaSel & 2)
 			{
-				m_via2->write(space, offset&0xf, data);
+				m_via2->write(machine().dummy_space(), offset&0xf, data);
 			}
 		}
 	}
@@ -245,15 +243,15 @@ void a2bus_ayboard_device::write_cnxx(address_space &space, uint8_t offset, uint
 	{
 		if (offset <= 0x10)
 		{
-			m_via1->write(space, offset & 0xf, data);
+			m_via1->write(machine().dummy_space(), offset & 0xf, data);
 		}
 		else if (offset >= 0x80 && offset <= 0x90)
 		{
-			m_via2->write(space, offset & 0xf, data);
+			m_via2->write(machine().dummy_space(), offset & 0xf, data);
 		}
 		else
 		{
-			printf("Mockingboard(%d): unk write %02x to Cn%02X (PC=%x)\n", m_slot, data, offset, space.device().safe_pc());
+			logerror("Mockingboard(%d): unk write %02x to Cn%02X (%s)\n", slotno(), data, offset, machine().describe_context());
 		}
 	}
 }
@@ -308,15 +306,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 					break;
 
 				case 1: // BDIR=0, BC1=1 (read PSG)
-					m_porta1 = m_ay1->data_r(space, 0);
+					m_porta1 = m_ay1->read_data();
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
-					m_ay1->data_w(space, 0, m_porta1);
+					m_ay1->write_data(m_porta1);
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
-					m_ay1->address_w(space, 0, m_porta1);
+					m_ay1->write_address(m_porta1);
 					break;
 			}
 		}
@@ -333,7 +331,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 				chipSel = 1;
 			}
 
-//            printf("Phasor: %02x to AY1/2 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta1, chipSel, data & 3, data);
+//            logerror("Phasor: %02x to AY1/2 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta1, chipSel, data & 3, data);
 			switch (data & 3)
 			{
 				case 0: // BDIR=0, BC1=0 (inactive)
@@ -342,33 +340,33 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 				case 1: // BDIR=0, BC1=1 (read PSG)
 					if (chipSel & 1)
 					{
-						m_porta1 = m_ay1->data_r(space, 0);
+						m_porta1 = m_ay1->read_data();
 					}
 					if (chipSel & 2)
 					{
-						m_porta1 = m_ay2->data_r(space, 0);
+						m_porta1 = m_ay2->read_data();
 					}
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
 					if (chipSel & 1)
 					{
-						m_ay1->data_w(space, 0, m_porta1);
+						m_ay1->write_data(m_porta1);
 					}
 					if (chipSel & 2)
 					{
-						m_ay2->data_w(space, 0, m_porta1);
+						m_ay2->write_data(m_porta1);
 					}
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
 					if (chipSel & 1)
 					{
-						m_ay1->address_w(space, 0, m_porta1);
+						m_ay1->write_address(m_porta1);
 					}
 					if (chipSel & 2)
 					{
-						m_ay2->address_w(space, 0, m_porta1);
+						m_ay2->write_address(m_porta1);
 					}
 					break;
 			}
@@ -405,15 +403,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 					break;
 
 				case 1: // BDIR=0, BC1=1 (read PSG)
-					m_porta2 = m_ay2->data_r(space, 0);
+					m_porta2 = m_ay2->read_data();
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
-					m_ay2->data_w(space, 0, m_porta2);
+					m_ay2->write_data(m_porta2);
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
-					m_ay2->address_w(space, 0, m_porta2);
+					m_ay2->write_data(m_porta2);
 					break;
 			}
 		}
@@ -430,7 +428,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				chipSel = 1;
 			}
 
-//            printf("Phasor: %02x to AY3/4 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta2, chipSel, data & 3, data);
+//            logerror("Phasor: %02x to AY3/4 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta2, chipSel, data & 3, data);
 			switch (data & 3)
 			{
 				case 0: // BDIR=0, BC1=0 (inactive)
@@ -439,33 +437,33 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				case 1: // BDIR=0, BC1=1 (read PSG)
 					if (chipSel & 1)
 					{
-						m_porta2 = m_ay3->data_r(space, 0);
+						m_porta2 = m_ay3->read_data();
 					}
 					if (chipSel & 2)
 					{
-						m_porta2 = m_ay4->data_r(space, 0);
+						m_porta2 = m_ay4->read_data();
 					}
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
 					if (chipSel & 1)
 					{
-						m_ay3->data_w(space, 0, m_porta2);
+						m_ay3->write_data(m_porta2);
 					}
 					if (chipSel & 2)
 					{
-						m_ay4->data_w(space, 0, m_porta2);
+						m_ay4->write_data(m_porta2);
 					}
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
 					if (chipSel & 1)
 					{
-						m_ay3->address_w(space, 0, m_porta2);
+						m_ay3->write_address(m_porta2);
 					}
 					if (chipSel & 2)
 					{
-						m_ay4->address_w(space, 0, m_porta2);
+						m_ay4->write_address(m_porta2);
 					}
 					break;
 			}
@@ -473,7 +471,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 	}
 }
 
-uint8_t a2bus_ayboard_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_ayboard_device::read_c0nx(uint8_t offset)
 {
 	if (m_isPhasor)
 	{
@@ -483,7 +481,7 @@ uint8_t a2bus_ayboard_device::read_c0nx(address_space &space, uint8_t offset)
 	return 0xff;
 }
 
-void a2bus_ayboard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_ayboard_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (m_isPhasor)
 	{
@@ -491,23 +489,23 @@ void a2bus_ayboard_device::write_c0nx(address_space &space, uint8_t offset, uint
 	}
 }
 
-uint8_t a2bus_echoplus_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->status_r(space, 0);
+			return 0x1f | m_tms->read_status();
 	}
 
 	return 0;
 }
 
-void a2bus_echoplus_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_echoplus_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_tms->data_w(space, offset, data);
+			m_tms->write_data(data);
 			break;
 	}
 }

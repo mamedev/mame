@@ -12,6 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -37,6 +38,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	void ipds(machine_config &config);
+	void ipds_io(address_map &map);
+	void ipds_mem(address_map &map);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -60,19 +64,21 @@ WRITE8_MEMBER( ipds_state::ipds_b1_w )
 {
 }
 
-static ADDRESS_MAP_START(ipds_mem, AS_PROGRAM, 8, ipds_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ipds_state::ipds_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( ipds_io, AS_IO, 8, ipds_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb0, 0xb0) AM_READ(ipds_b0_r)
-	AM_RANGE(0xb1, 0xb1) AM_READWRITE(ipds_b1_r,ipds_b1_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(ipds_c0_r)
-ADDRESS_MAP_END
+void ipds_state::ipds_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xb0, 0xb0).r(FUNC(ipds_state::ipds_b0_r));
+	map(0xb1, 0xb1).rw(FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
+	map(0xc0, 0xc0).r(FUNC(ipds_state::ipds_c0_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ipds )
@@ -116,7 +122,7 @@ static const gfx_layout ipds_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( ipds )
+static GFXDECODE_START( gfx_ipds )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ipds_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -126,11 +132,11 @@ void ipds_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ipds )
+MACHINE_CONFIG_START(ipds_state::ipds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(ipds_mem)
-	MCFG_CPU_IO_MAP(ipds_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ipds_mem)
+	MCFG_DEVICE_IO_MAP(ipds_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -139,10 +145,10 @@ static MACHINE_CONFIG_START( ipds )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL_19_6608MHz / 4)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL(19'660'800) / 4)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
 
@@ -168,5 +174,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT   COMPANY   FULLNAME  FLAGS */
-COMP( 1982, ipds,  0,      0,       ipds,    ipds,  ipds_state,  0,     "Intel",  "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1982, ipds, 0,      0,      ipds,    ipds,  ipds_state, empty_init, "Intel", "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

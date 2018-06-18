@@ -7,15 +7,12 @@
     Device execution interfaces.
 
 ***************************************************************************/
+#ifndef MAME_EMU_DIEXEC_H
+#define MAME_EMU_DIEXEC_H
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef MAME_EMU_DIEXEC_H
-#define MAME_EMU_DIEXEC_H
+#include "debug/debugcpu.h"
 
 
 //**************************************************************************
@@ -38,8 +35,7 @@ enum line_state
 {
 	CLEAR_LINE = 0,             // clear (a fired or held) line
 	ASSERT_LINE,                // assert an interrupt immediately
-	HOLD_LINE,                  // hold interrupt line until acknowledged
-	PULSE_LINE                  // pulse interrupt line instantaneously (only for NMI, RESET)
+	HOLD_LINE                   // hold interrupt line until acknowledged
 };
 
 
@@ -71,8 +67,6 @@ enum
 //  MACROS
 //**************************************************************************
 
-#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
-
 // IRQ callback to be called by device implementations when an IRQ is actually taken
 #define IRQ_CALLBACK_MEMBER(func)       int func(device_t &device, int irqline)
 
@@ -86,25 +80,25 @@ enum
 //**************************************************************************
 
 #define MCFG_DEVICE_DISABLE() \
-	device_execute_interface::static_set_disable(*device);
+	dynamic_cast<device_execute_interface &>(*device).set_disable();
 #define MCFG_DEVICE_VBLANK_INT_DRIVER(_tag, _class, _func) \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), _tag);
+	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), _tag);
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), _tag);
+	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), nullptr);
+	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(), nullptr);
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
-	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), attotime::from_hz(_rate));
+	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
-	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), attotime::from_hz(_rate));
+	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_REMOVE()  \
-	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(), attotime());
+	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(), attotime());
 #define MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(_class, _func) \
-	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr));
+	dynamic_cast<device_execute_interface &>(*device).set_irq_acknowledge_callback(device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr));
 #define MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(_devtag, _class, _func) \
-	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr));
+	dynamic_cast<device_execute_interface &>(*device).set_irq_acknowledge_callback(device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr));
 #define MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()  \
-	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate());
+	dynamic_cast<device_execute_interface &>(*device).set_irq_acknowledge_callback(device_irq_acknowledge_delegate());
 
 
 //**************************************************************************
@@ -141,20 +135,29 @@ public:
 	attotime cycles_to_attotime(u64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
 	u64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	u32 input_lines() const { return execute_input_lines(); }
-	u32 default_irq_vector() const { return execute_default_irq_vector(); }
+	u32 default_irq_vector(int linenum) const { return execute_default_irq_vector(linenum); }
+	bool input_edge_triggered(int linenum) const { return execute_input_edge_triggered(linenum); }
 
-	// static inline configuration helpers
-	static void static_set_disable(device_t &device);
-	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
-	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, const attotime &rate);
-	static void static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback);
+	// inline configuration helpers
+	void set_disable() { m_disabled = true; }
+	template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
+	{
+		m_vblank_interrupt = std::forward<Object>(cb);
+		m_vblank_interrupt_screen = tag;
+	}
+	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
+	{
+		m_timed_interrupt = std::forward<Object>(cb);
+		m_timed_interrupt_period = rate;
+	}
+	template <typename Object> void set_irq_acknowledge_callback(Object &&cb) { m_driver_irq = std::forward<Object>(cb); }
 
 	// execution management
 	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
-	bool executing() const;
-	s32 cycles_remaining() const;
-	void eat_cycles(int cycles);
-	void adjust_icount(int delta);
+	bool executing() const { return scheduler().currently_executing() == this; }
+	s32 cycles_remaining() const { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
+	void eat_cycles(int cycles) { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
+	void adjust_icount(int delta) { if (executing()) *m_icountptr += delta; }
 	void abort_timeslice();
 
 	// input and interrupt management
@@ -200,7 +203,8 @@ protected:
 
 	// input line information getters
 	virtual u32 execute_input_lines() const;
-	virtual u32 execute_default_irq_vector() const;
+	virtual u32 execute_default_irq_vector(int linenum) const;
+	virtual bool execute_input_edge_triggered(int linenum) const;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;
@@ -216,9 +220,30 @@ protected:
 	virtual void interface_clock_changed() override;
 
 	// for use by devcpu for now...
+	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
+	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
 	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
 	int standard_irq_callback(int irqline);
 
+	// debugger hooks
+	bool debugger_enabled() const { return bool(device().machine().debug_flags & DEBUG_FLAG_ENABLED); }
+	void debugger_instruction_hook(offs_t curpc)
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
+			device().debug()->instruction_hook(curpc);
+	}
+	void debugger_exception_hook(int exception)
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+			device().debug()->exception_hook(exception);
+	}
+	void debugger_interrupt_hook(int irqline)
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+			device().debug()->interrupt_hook(irqline);
+	}
+
+private:
 	// internal information about the state of inputs
 	class device_input
 	{
@@ -246,6 +271,18 @@ protected:
 	private:
 		TIMER_CALLBACK_MEMBER(empty_event_queue);
 	};
+
+	// internal debugger hooks
+	void debugger_start_cpu_hook(const attotime &endtime)
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+			device().debug()->start_hook(endtime);
+	}
+	void debugger_stop_cpu_hook()
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+			device().debug()->stop_hook();
+	}
 
 	// scheduler
 	device_scheduler *      m_scheduler;                // pointer to the machine scheduler
@@ -280,21 +317,22 @@ protected:
 	s32                     m_inttrigger;               // interrupt trigger index
 
 	// clock and timing information
+protected: // FIXME: MIPS3 accesses m_totalcycles directly from execute_burn - devise a better solution
 	u64                     m_totalcycles;              // total device cycles executed
+private:
 	attotime                m_localtime;                // local time, relative to the timer system's global time
 	s32                     m_divisor;                  // 32-bit attoseconds_per_cycle divisor
 	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
 
-private:
 	// callbacks
-	TIMER_CALLBACK_MEMBER(timed_trigger_callback);
+	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
 	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_pulse_clear);
+	TIMER_CALLBACK_MEMBER(irq_pulse_clear) { set_input_line(int(param), CLEAR_LINE); }
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;
@@ -306,5 +344,4 @@ public:
 // iterator
 typedef device_interface_iterator<device_execute_interface> execute_interface_iterator;
 
-
-#endif  /* MAME_EMU_DIEXEC_H */
+#endif // MAME_EMU_DIEXEC_H

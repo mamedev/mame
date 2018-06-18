@@ -39,7 +39,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
-	, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
+	, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_cache(nullptr)
 	, m_pixclock(0)
 	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
 	, m_output_int_cb(*this)
@@ -182,32 +182,32 @@ inline uint32_t tms340x0_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_direct->read_word(pc);
+	return m_cache->read_word(pc);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_direct->read_word(pc);
+	return m_cache->read_word(pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG()
 {
 	uint32_t pc = m_pc;
 	m_pc += 4 << 3;
-	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD_NO_INC()
 {
-	return m_direct->read_word(m_pc);
+	return m_cache->read_word(m_pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG_NO_INC()
 {
 	uint32_t pc = m_pc;
-	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
 }
 
 /* read memory byte */
@@ -588,7 +588,7 @@ void tms340x0_device::device_start()
 	m_external_host_access = false;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<03>();
+	m_cache = m_program->cache<1, 3, ENDIANNESS_LITTLE>();
 
 	/* set up the state table */
 	{
@@ -627,7 +627,7 @@ void tms340x0_device::device_start()
 	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
 	machine().save().register_postload(save_prepost_delegate(FUNC(tms340x0_device::tms34010_state_postload), this));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms340x0_device::device_reset()
@@ -751,7 +751,7 @@ void tms340x0_device::execute_run()
 		{
 			uint16_t op;
 			m_ppc = m_pc;
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 			op = ROPCODE();
 			(this->*s_opcode_table[op >> 4])(op);
 		} while (m_icount > 0);
@@ -849,7 +849,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	int master;
 
 	/* fetch the core timing parameters */
-	const rectangle &current_visarea = m_screen->visible_area();
+	const rectangle &current_visarea = screen().visible_area();
 	enabled = SMART_IOREG(DPYCTL) & 0x8000;
 	master = (m_is_34020 || (SMART_IOREG(DPYCTL) & 0x2000));
 	vsblnk = SMART_IOREG(VSBLNK);
@@ -857,8 +857,8 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	vtotal = SMART_IOREG(VTOTAL);
 	if (!master)
 	{
-		vtotal = std::min(m_screen->height() - 1, vtotal);
-		vcount = m_screen->vpos();
+		vtotal = std::min(screen().height() - 1, vtotal);
+		vcount = screen().vpos();
 	}
 
 	/* update the VCOUNT */
@@ -916,13 +916,13 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
 					   if they are the only thing that has changed, unless they are stable for a couple
 					   of frames */
-					int current_width  = m_screen->width();
-					int current_height = m_screen->height();
+					int current_width  = screen().width();
+					int current_height = screen().height();
 
 					if (width != current_width || height != current_height || visarea.min_y != current_visarea.min_y || visarea.max_y != current_visarea.max_y ||
 						(m_hblank_stable > 2 && (visarea.min_x != current_visarea.min_x || visarea.max_x != current_visarea.max_x)))
 					{
-						m_screen->configure(width, height, visarea, refresh);
+						screen().configure(width, height, visarea, refresh);
 					}
 					m_hblank_stable++;
 				}
@@ -939,7 +939,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* force a partial update within the visible area */
 	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && (!m_scanline_ind16_cb.isnull() || !m_scanline_rgb32_cb.isnull()))
-		m_screen->update_partial(vcount);
+		screen().update_partial(vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
 	if (vcount >= veblnk && vcount < vsblnk)
@@ -975,7 +975,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	m_scantimer->adjust(m_screen->time_until_pos(vcount) + attotime(0, !master), vcount);
+	m_scantimer->adjust(screen().time_until_pos(vcount) + attotime(0, !master), vcount);
 }
 
 
@@ -1119,7 +1119,7 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", space.device().safe_pc());
+			if (data) logerror("Plane masking not supported. %s\n", machine().describe_context());
 			break;
 
 		case REG_DPYCTL:
@@ -1210,7 +1210,7 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 			break;
 	}
 
-	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), m_screen->vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), screen().vpos());
 }
 
 
@@ -1245,7 +1245,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 	oldreg = IOREG(offset);
 	IOREG(offset) = data;
 
-	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), m_screen->vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), screen().vpos());
 
 	switch (offset)
 	{
@@ -1274,7 +1274,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", space.device().safe_pc());
+			if (data) logerror("Plane masking not supported. %s\n", machine().describe_context());
 			break;
 
 		case REG020_DPYCTL:
@@ -1408,9 +1408,9 @@ READ16_MEMBER( tms34010_device::io_register_r )
 	{
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = m_screen->hpos();
+			result = screen().hpos();
 			total = IOREG(REG_HTOTAL) + 1;
-			result = result * total / m_screen->width();
+			result = result * total / screen().width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG_HEBLNK);
@@ -1449,9 +1449,9 @@ READ16_MEMBER( tms34020_device::io_register_r )
 	{
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = m_screen->hpos();
+			result = screen().hpos();
 			total = IOREG(REG020_HTOTAL) + 1;
-			result = result * total / m_screen->width();
+			result = result * total / screen().width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG020_HEBLNK);
@@ -1626,12 +1626,12 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 	}
 }
 
-util::disasm_interface *tms34010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms34010_device::create_disassembler()
 {
-	return new tms34010_disassembler(false);
+	return std::make_unique<tms34010_disassembler>(false);
 }
 
-util::disasm_interface *tms34020_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms34020_device::create_disassembler()
 {
-	return new tms34010_disassembler(true);
+	return std::make_unique<tms34010_disassembler>(true);
 }

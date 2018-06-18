@@ -6,6 +6,8 @@
 #include "video/mc6845.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
+#include "machine/pic8259.h"
+#include "emupal.h"
 
 #define T1000_SCREEN_NAME   "screen"
 #define T1000_MC6845_NAME   "mc6845_t1000"
@@ -25,6 +27,8 @@ public:
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
+
+	void vram_map(address_map &map);
 
 protected:
 	// used in tandy1000hx; used in pcjr???
@@ -96,7 +100,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( disable_w );
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -131,6 +134,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
+	required_device<pic8259_device> m_pic8259;
 	uint8_t   *m_jxkanji;
 
 private:
@@ -145,9 +149,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(PCVIDEO_PCJR, pcvideo_pcjr_device)
-
-#define MCFG_PCVIDEO_PCJR_ADD(_tag) \
-		MCFG_DEVICE_ADD(_tag, PCVIDEO_PCJR, 0)
-
 
 #endif // MAME_VIDEO_PC_T1T_H

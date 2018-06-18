@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef radio86_H_
-#define radio86_H_
+#ifndef MAME_INCLUDES_RADIO86_H
+#define MAME_INCLUDES_RADIO86_H
 
 #include "machine/i8255.h"
 #include "machine/i8257.h"
@@ -15,6 +15,7 @@
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 
 
 class radio86_state : public driver_device
@@ -68,8 +69,8 @@ public:
 	DECLARE_READ8_MEMBER(radio_io_r);
 	DECLARE_WRITE8_MEMBER(radio_io_w);
 	DECLARE_WRITE8_MEMBER(radio86_pagesel);
-	DECLARE_DRIVER_INIT(radioram);
-	DECLARE_DRIVER_INIT(radio86);
+	void init_radioram();
+	void init_radio86();
 	DECLARE_MACHINE_RESET(radio86);
 	DECLARE_PALETTE_INIT(radio86);
 	DECLARE_READ8_MEMBER(radio86_8255_portb_r2);
@@ -88,6 +89,22 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	required_device<cpu_device> m_maincpu;
 
+	void impuls03(machine_config &config);
+	void mikron2(machine_config &config);
+	void rk7007(machine_config &config);
+	void rk700716(machine_config &config);
+	void radiorom(machine_config &config);
+	void radio86(machine_config &config);
+	void radio16(machine_config &config);
+	void radioram(machine_config &config);
+	void impuls03_mem(address_map &map);
+	void mikron2_mem(address_map &map);
+	void radio86_16_mem(address_map &map);
+	void radio86_io(address_map &map);
+	void radio86_mem(address_map &map);
+	void radio86ram_mem(address_map &map);
+	void radio86rom_mem(address_map &map);
+	void rk7007_io(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?
@@ -126,4 +143,4 @@ public:
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
 
-#endif /* radio86_H_ */
+#endif // MAME_INCLUDES_RADIO86_H

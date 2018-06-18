@@ -46,9 +46,6 @@ a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, co
 
 void a2bus_ssramcard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	memset(m_ram, 0, 128*1024);
 
 	save_item(NAME(m_inh_state));
@@ -139,7 +136,7 @@ void a2bus_ssramcard_device::do_io(int offset)
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_ssramcard_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_ssramcard_device::read_c0nx(uint8_t offset)
 {
 	do_io(offset & 0xf);
 	return 0xff;
@@ -150,12 +147,12 @@ uint8_t a2bus_ssramcard_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_ssramcard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_ssramcard_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	do_io(offset & 0xf);
 }
 
-uint8_t a2bus_ssramcard_device::read_inh_rom(address_space &space, uint16_t offset)
+uint8_t a2bus_ssramcard_device::read_inh_rom(uint16_t offset)
 {
 	assert(m_inh_state & INH_READ); // this should never happen
 
@@ -167,7 +164,7 @@ uint8_t a2bus_ssramcard_device::read_inh_rom(address_space &space, uint16_t offs
 	return m_ram[(offset & 0x1fff) + 0x2000 + m_main_bank];
 }
 
-void a2bus_ssramcard_device::write_inh_rom(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_ssramcard_device::write_inh_rom(uint16_t offset, uint8_t data)
 {
 	// are writes enabled?
 	if (!(m_inh_state & INH_WRITE))

@@ -8,4 +8,5 @@ This section covers various extra tools that come with your MAME distribution (e
 
 	imgtool
 	castool
+	floptool
 	othertools

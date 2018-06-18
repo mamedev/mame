@@ -11,76 +11,74 @@
 
 
 #define MCFG_HD63450_DMA_END_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_end_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_end_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_ERROR_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_error_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_error_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_0_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_read_0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_1_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_read_1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_2_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_read_2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_2_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_3_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_read_3_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_3_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_0_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_write_0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_1_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_write_1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_2_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_write_2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_2_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
-	devcb = &hd63450_device::set_dma_write_3_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_3_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_CPU(_tag) \
-	hd63450_device::set_cpu_tag(*device, _tag);
+	downcast<hd63450_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_HD63450_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
-	hd63450_device::set_our_clocks(*device, _clk1, _clk2, _clk3, _clk4);
+	downcast<hd63450_device &>(*device).set_our_clocks(_clk1, _clk2, _clk3, _clk4);
 
 #define MCFG_HD63450_BURST_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
-	hd63450_device::set_burst_clocks(*device, _clk1, _clk2, _clk3, _clk4);
+	downcast<hd63450_device &>(*device).set_burst_clocks(_clk1, _clk2, _clk3, _clk4);
 
 class hd63450_device : public device_t
 {
 public:
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_dma_end_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_end.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_error_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_error.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_read_0_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_read_0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_read_1_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_read_1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_read_2_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_read_2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_read_3_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_read_3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_write_0_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_write_0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_write_1_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_write_1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_write_2_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_write_2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_write_3_callback(device_t &device, Object &&cb) { return downcast<hd63450_device &>(device).m_dma_write_3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_end_callback(Object &&cb) { return m_dma_end.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_error_callback(Object &&cb) { return m_dma_error.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_read_0_callback(Object &&cb) { return m_dma_read_0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_read_1_callback(Object &&cb) { return m_dma_read_1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_read_2_callback(Object &&cb) { return m_dma_read_2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_read_3_callback(Object &&cb) { return m_dma_read_3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_write_0_callback(Object &&cb) { return m_dma_write_0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_write_1_callback(Object &&cb) { return m_dma_write_1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_write_2_callback(Object &&cb) { return m_dma_write_2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_write_3_callback(Object &&cb) { return m_dma_write_3.set_callback(std::forward<Object>(cb)); }
 
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<hd63450_device &>(device).m_cpu_tag = tag; }
-	static void set_our_clocks(device_t &device, const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
+	void set_cpu_tag(const char *tag) { m_cpu_tag = tag; }
+	void set_our_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
-		hd63450_device &dev = downcast<hd63450_device &>(device);
-		dev.m_our_clock[0] = clk1;
-		dev.m_our_clock[1] = clk2;
-		dev.m_our_clock[2] = clk3;
-		dev.m_our_clock[3] = clk4;
+		m_our_clock[0] = clk1;
+		m_our_clock[1] = clk2;
+		m_our_clock[2] = clk3;
+		m_our_clock[3] = clk4;
 	}
-	static void set_burst_clocks(device_t &device, const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
+	void set_burst_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
-		hd63450_device &dev = downcast<hd63450_device &>(device);
-		dev.m_burst_clock[0] = clk1;
-		dev.m_burst_clock[1] = clk2;
-		dev.m_burst_clock[2] = clk3;
-		dev.m_burst_clock[3] = clk4;
+		m_burst_clock[0] = clk1;
+		m_burst_clock[1] = clk2;
+		m_burst_clock[2] = clk3;
+		m_burst_clock[3] = clk4;
 	}
 
 	DECLARE_READ16_MEMBER( read );

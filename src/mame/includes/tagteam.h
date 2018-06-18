@@ -2,6 +2,7 @@
 // copyright-holders:Steve Ellenoff, Brad Oliver
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tagteam_state : public driver_device
 {
@@ -51,4 +52,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tagteam(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

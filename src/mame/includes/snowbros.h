@@ -5,6 +5,7 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora
+#include "emupal.h"
 
 class snowbros_state : public driver_device
 {
@@ -42,8 +43,9 @@ public:
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
-	DECLARE_READ8_MEMBER(prot_io_r);
-	DECLARE_WRITE8_MEMBER(prot_io_w);
+	DECLARE_WRITE8_MEMBER(prot_p0_w);
+	DECLARE_WRITE8_MEMBER(prot_p1_w);
+	DECLARE_WRITE8_MEMBER(prot_p2_w);
 	DECLARE_READ16_MEMBER(sb3_sound_r);
 	DECLARE_READ16_MEMBER(_4in1_02_read);
 	DECLARE_READ16_MEMBER(_3in1_read);
@@ -52,15 +54,15 @@ public:
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
 
-	DECLARE_DRIVER_INIT(pzlbreak);
-	DECLARE_DRIVER_INIT(snowbro3);
-	DECLARE_DRIVER_INIT(cookbib3);
-	DECLARE_DRIVER_INIT(4in1boot);
-	DECLARE_DRIVER_INIT(3in1semi);
-	DECLARE_DRIVER_INIT(cookbib2);
-	DECLARE_DRIVER_INIT(toto);
-	DECLARE_DRIVER_INIT(hyperpac);
-	DECLARE_DRIVER_INIT(yutnori);
+	void init_pzlbreak();
+	void init_snowbro3();
+	void init_cookbib3();
+	void init_4in1boot();
+	void init_3in1semi();
+	void init_cookbib2();
+	void init_toto();
+	void init_hyperpac();
+	void init_yutnori();
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);
 
@@ -76,4 +78,29 @@ public:
 
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);
+	void _4in1(machine_config &config);
+	void semiprot(machine_config &config);
+	void semicom_mcu(machine_config &config);
+	void yutnori(machine_config &config);
+	void snowbros(machine_config &config);
+	void semicom(machine_config &config);
+	void twinadv(machine_config &config);
+	void wintbob(machine_config &config);
+	void honeydol(machine_config &config);
+	void snowbro3(machine_config &config);
+	void finalttr(machine_config &config);
+	void finalttr_map(address_map &map);
+	void honeydol_map(address_map &map);
+	void honeydol_sound_io_map(address_map &map);
+	void honeydol_sound_map(address_map &map);
+	void hyperpac_map(address_map &map);
+	void hyperpac_sound_map(address_map &map);
+	void snowbros3_map(address_map &map);
+	void snowbros_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void twinadv_map(address_map &map);
+	void twinadv_sound_io_map(address_map &map);
+	void wintbob_map(address_map &map);
+	void yutnori_map(address_map &map);
 };

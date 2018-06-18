@@ -30,6 +30,8 @@
 #include "16c62xdsm.h"
 
 #include <ctype.h>
+#include <stdexcept>
+
 
 /* Registers bank 0/1 */
 const char *const pic16c62x_disassembler::regfile[32] = { "Reg$00 (INDF)",    "Reg$01 (TMR0/OPTION)",    "Reg$02 (PCL)",  "Reg$03 (STATUS)", "Reg$04 (FSR)", "Reg$05 (PORTA/TRISA)", "Reg$06 (PORTB/TRISB)", "Reg$07",
@@ -112,14 +114,13 @@ pic16c62x_disassembler::pic16c62x_disassembler()
 				case 'x':
 					bit --;
 					break;
-				default: fatalerror("Invalid instruction encoding '%s %s'\n",
-					ops[0],ops[1]);
+				default:
+					throw std::logic_error(util::string_format("Invalid instruction encoding '%s %s'\n", ops[0],ops[1]));
 			}
 		}
 		if (bit != -1 )
 		{
-			fatalerror("not enough bits in encoding '%s %s' %d\n",
-				ops[0],ops[1],bit);
+			throw std::logic_error(util::string_format("not enough bits in encoding '%s %s' %d\n", ops[0],ops[1],bit));
 		}
 		while (isspace((uint8_t)*p)) p++;
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
@@ -190,7 +191,7 @@ offs_t pic16c62x_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 			case 'k': k <<=1; k |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
 			case ' ': break;
 			case '1': case '0': case 'x':  bit--; break;
-			case '\0': fatalerror("premature end of parse string, opcode %x, bit = %d\n",code,bit);
+			case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
 		}
 		cp++;
 	}
@@ -215,7 +216,7 @@ offs_t pic16c62x_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 				case 'F': if (f < 0x20) util::stream_format(stream, "%s",regfile[f]); else util::stream_format(stream, "Reg$%02X",f); break;
 				case 'K': util::stream_format(stream, "%02Xh", k); break;
 				default:
-					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
+					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
 			}
 		}
 		else

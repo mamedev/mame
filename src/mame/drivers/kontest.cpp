@@ -23,10 +23,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_24MHz
+#define MAIN_CLOCK XTAL(24'000'000)
 
 class kontest_state : public driver_device
 {
@@ -52,6 +53,9 @@ public:
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void kontest(machine_config &config);
+	void kontest_io(address_map &map);
+	void kontest_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -165,21 +169,23 @@ WRITE8_MEMBER(kontest_state::control_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( kontest_map, AS_PROGRAM, 8, kontest_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void kontest_state::kontest_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram().share("ram");
+}
 
-static ADDRESS_MAP_START( kontest_io, AS_IO, 8, kontest_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0x08, 0x08) AM_WRITE(control_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("IN1")
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("IN2")
-	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("IN3")
-ADDRESS_MAP_END
+void kontest_state::kontest_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x04, 0x04).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x08, 0x08).w(FUNC(kontest_state::control_w));
+	map(0x0c, 0x0c).portr("IN0");
+	map(0x0d, 0x0d).portr("IN1");
+	map(0x0e, 0x0e).portr("IN2");
+	map(0x0f, 0x0f).portr("IN3");
+}
 
 
 /***************************************************************************
@@ -247,13 +253,13 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kontest )
+MACHINE_CONFIG_START(kontest_state::kontest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(kontest_map)
-	MCFG_CPU_IO_MAP(kontest_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(kontest_map)
+	MCFG_DEVICE_IO_MAP(kontest_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,12 +273,13 @@ static MACHINE_CONFIG_START( kontest )
 	MCFG_PALETTE_INIT_OWNER(kontest_state, kontest)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -291,4 +298,4 @@ ROM_START( kontest )
 	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
-GAME( 1987?, kontest,  0,   kontest,  kontest, kontest_state,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988
+GAME( 1987?, kontest, 0, kontest, kontest, kontest_state, empty_init, ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988

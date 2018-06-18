@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "sstrangr.lh"
@@ -35,6 +36,10 @@ public:
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sstrngr2(machine_config &config);
+	void sstrangr(machine_config &config);
+	void sstrangr_io_map(address_map &map);
+	void sstrangr_map(address_map &map);
 };
 
 
@@ -132,19 +137,21 @@ WRITE8_MEMBER(sstrangr_state::port_w)
 
 
 
-static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8, sstrangr_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x6000, 0x63ff) AM_ROM
-ADDRESS_MAP_END
+void sstrangr_state::sstrangr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram().share("ram");
+	map(0x6000, 0x63ff).rom();
+}
 
 
-static ADDRESS_MAP_START( sstrangr_io_map, AS_IO, 8, sstrangr_state )
-	AM_RANGE(0x41, 0x41) AM_READ_PORT("DSW")
-	AM_RANGE(0x42, 0x42) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x44, 0x44) AM_READ_PORT("EXT") AM_WRITE(port_w)
-ADDRESS_MAP_END
+void sstrangr_state::sstrangr_io_map(address_map &map)
+{
+	map(0x41, 0x41).portr("DSW");
+	map(0x42, 0x42).portr("INPUTS");
+	map(0x44, 0x44).portr("EXT").w(FUNC(sstrangr_state::port_w));
+}
 
 
 
@@ -184,13 +191,13 @@ static INPUT_PORTS_START( sstrangr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sstrangr )
+MACHINE_CONFIG_START(sstrangr_state::sstrangr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
-	MCFG_CPU_PROGRAM_MAP(sstrangr_map)
-	MCFG_CPU_IO_MAP(sstrangr_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
+	MCFG_DEVICE_PROGRAM_MAP(sstrangr_map)
+	MCFG_DEVICE_IO_MAP(sstrangr_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -254,7 +261,8 @@ static INPUT_PORTS_START( sstrngr2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
+MACHINE_CONFIG_START(sstrangr_state::sstrngr2)
+	sstrangr(config);
 
 	/* basic machine hardware */
 
@@ -289,5 +297,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
-GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

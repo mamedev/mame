@@ -771,7 +771,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 
 			add_rom_entry(std::move(name), std::move(hashdata), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}
-		else if (status.empty() || (status == "nodump")) // a no_dump chd is not an incomplete entry
+		else if (status != "nodump") // a no_dump chd is not an incomplete entry
 			parse_error("Incomplete disk definition");
 	}
 

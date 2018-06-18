@@ -98,29 +98,31 @@ const tiny_rom_entry *wangpc_keyboard_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_keyboard_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
+void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
+{
 	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
-	AM_RANGE(0x47, 0x58) AM_MIRROR(0xff00) AM_READNOP
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_device, write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(kb_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(kb_p3_w)
-ADDRESS_MAP_END
+	map(0x47, 0x58).mirror(0xff00).nopr();
+	map(0x00, 0x00).mirror(0xff00).w(SN76496_TAG, FUNC(sn76496_device::command_w));
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_keyboard_device::device_add_mconfig )
-	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL_4MHz)
-	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_device, mcs51_rx_callback))
+MACHINE_CONFIG_START(wangpc_keyboard_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(I8051_TAG, I8051, XTAL(4'000'000))
+	MCFG_DEVICE_IO_MAP(wangpc_keyboard_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, wangpc_keyboard_device, kb_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, wangpc_keyboard_device, kb_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, wangpc_keyboard_device, kb_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, wangpc_keyboard_device, kb_p3_w))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, wangpc_keyboard_device, mcs51_tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, wangpc_keyboard_device, mcs51_rx_callback))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76496_TAG, SN76496, 2000000) // ???
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -369,6 +371,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 	m_maincpu(*this, I8051_TAG),
 	m_y(*this, "Y%u", 0),
 	m_txd_handler(*this),
+	m_leds(*this, "led%u", 0U),
 	m_keylatch(0),
 	m_rxd(1)
 {
@@ -382,6 +385,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 void wangpc_keyboard_device::device_start()
 {
 	m_txd_handler.resolve_safe();
+	m_leds.resolve();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 
@@ -531,7 +535,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 	for (int i = 0; i < 6; i++)
 	{
-		machine().output().set_led_value(i, !BIT(data, i));
+		m_leds[i] = BIT(~data, i);
 	}
 
 	//if (LOG) logerror("P1 %02x\n", data);

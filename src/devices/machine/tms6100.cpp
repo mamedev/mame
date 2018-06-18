@@ -182,7 +182,7 @@ void tms6100_device::handle_command(u8 cmd)
 
 					// M58819S reads serial data reversed
 					if (m_reverse_bits)
-						m_sa = BITSWAP8(m_sa,0,1,2,3,4,5,6,7);
+						m_sa = bitswap<8>(m_sa,0,1,2,3,4,5,6,7);
 				}
 				else
 				{

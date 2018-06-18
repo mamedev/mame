@@ -70,12 +70,27 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void vic20_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_vic20_expansion_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_vic20_expansion_card_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void vic20_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_vic20_expansion_card_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_vic20_expansion_card_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_vic20_expansion_card_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -98,10 +113,6 @@ void vic20_expansion_slot_device::device_start()
 
 void vic20_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 
@@ -207,17 +218,18 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "videopak.h"
 #include "speakeasy.h"
 
-SLOT_INTERFACE_START( vic20_expansion_cards )
-	SLOT_INTERFACE("exp", VIC1010)
-	SLOT_INTERFACE("3k", VIC1210)
-	SLOT_INTERFACE("8k", VIC1110)
-	SLOT_INTERFACE("16k", VIC1111)
-	SLOT_INTERFACE("fe3", VIC20_FE3)
-	SLOT_INTERFACE("speakez", VIC20_SPEAKEASY)
-	SLOT_INTERFACE("videopak", VIC20_VIDEO_PAK)
+void vic20_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("exp", VIC1010);
+	device.option_add("3k", VIC1210);
+	device.option_add("8k", VIC1110);
+	device.option_add("16k", VIC1111);
+	device.option_add("fe3", VIC20_FE3);
+	device.option_add("speakez", VIC20_SPEAKEASY);
+	device.option_add("videopak", VIC20_VIDEO_PAK);
 
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", VIC20_STD)
-	SLOT_INTERFACE_INTERNAL("ieee488", VIC1112)
-	SLOT_INTERFACE_INTERNAL("megacart", VIC20_MEGACART)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", VIC20_STD);
+	device.option_add_internal("ieee488", VIC1112);
+	device.option_add_internal("megacart", VIC20_MEGACART);
+}

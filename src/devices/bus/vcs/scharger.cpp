@@ -87,13 +87,13 @@ void a26_rom_ss_device::device_reset()
 }
 
 
-MACHINE_CONFIG_MEMBER( a26_rom_ss_device::device_add_mconfig )
+MACHINE_CONFIG_START(a26_rom_ss_device::device_add_mconfig)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(a26_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("a2600_cass")
 
-//  MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+//  MCFG_SOUND_WAVE_ADD("wave", "cassette")
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -111,7 +111,7 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 
 READ8_MEMBER(a26_rom_ss_device::read_rom)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return read_byte(offset);
 
 	// Bankswitch

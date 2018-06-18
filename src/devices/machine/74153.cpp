@@ -126,6 +126,14 @@ WRITE_LINE_MEMBER( ttl153_device::s1_w )
 	update_b();
 }
 
+WRITE8_MEMBER( ttl153_device::s_w )
+{
+	m_s[0] = bool(BIT(data, 0));
+	m_s[1] = bool(BIT(data, 1));
+	update_a();
+	update_b();
+}
+
 WRITE_LINE_MEMBER( ttl153_device::i0a_w )
 {
 	m_ia[0] = bool(state);
@@ -147,6 +155,15 @@ WRITE_LINE_MEMBER( ttl153_device::i2a_w )
 WRITE_LINE_MEMBER( ttl153_device::i3a_w )
 {
 	m_ia[3] = bool(state);
+	update_a();
+}
+
+WRITE8_MEMBER( ttl153_device::ia_w )
+{
+	m_ia[0] = bool(BIT(data, 0));
+	m_ia[1] = bool(BIT(data, 1));
+	m_ia[2] = bool(BIT(data, 2));
+	m_ia[3] = bool(BIT(data, 3));
 	update_a();
 }
 
@@ -172,4 +189,23 @@ WRITE_LINE_MEMBER( ttl153_device::i3b_w )
 {
 	m_ib[3] = bool(state);
 	update_b();
+}
+
+WRITE8_MEMBER( ttl153_device::ib_w )
+{
+	m_ib[0] = bool(BIT(data, 0));
+	m_ib[1] = bool(BIT(data, 1));
+	m_ib[2] = bool(BIT(data, 2));
+	m_ib[3] = bool(BIT(data, 3));
+	update_b();
+}
+
+READ_LINE_MEMBER( ttl153_device::za_r )
+{
+	return m_z[0] ? 1 : 0;
+}
+
+READ_LINE_MEMBER( ttl153_device::zb_r )
+{
+	return m_z[1] ? 1 : 0;
 }

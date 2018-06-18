@@ -58,6 +58,9 @@ public:
 	required_device<rs232_port_device> m_rs232;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
+	void pipbug(machine_config &config);
+	void pipbug_data(address_map &map);
+	void pipbug_mem(address_map &map);
 };
 
 WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
@@ -65,16 +68,18 @@ WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
 // 0x80 is written here - not connected in the baby 2650
 }
 
-static ADDRESS_MAP_START(pipbug_mem, AS_PROGRAM, 8, pipbug_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff) AM_ROM
-	AM_RANGE( 0x0400, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void pipbug_state::pipbug_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x7fff).ram();
+}
 
-static ADDRESS_MAP_START(pipbug_data, AS_DATA, 8, pipbug_state)
+void pipbug_state::pipbug_data(address_map &map)
+{
 //  ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(pipbug_ctrl_w)
-ADDRESS_MAP_END
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(pipbug_state::pipbug_ctrl_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pipbug )
@@ -153,17 +158,17 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-static MACHINE_CONFIG_START( pipbug )
+MACHINE_CONFIG_START(pipbug_state::pipbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
-	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
-	MCFG_CPU_DATA_MAP(pipbug_data)
-	MCFG_S2650_FLAG_OUTPUT(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pipbug_mem)
+	MCFG_DEVICE_DATA_MAP(pipbug_data)
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)
@@ -178,5 +183,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1979, pipbug, 0,      0,      pipbug,   pipbug, pipbug_state, 0,    "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1979, pipbug, 0,      0,      pipbug,  pipbug, pipbug_state, empty_init, "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

@@ -10,14 +10,15 @@
  *
  ****************************************************************************/
 
-#ifndef GAMECOM_H_
-#define GAMECOM_H_
+#ifndef MAME_INCLUDES_GAMECOM_H
+#define MAME_INCLUDES_GAMECOM_H
 
 #include "cpu/sm8500/sm8500.h"
 #include "sound/dac.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 /* SM8521 register addresses */
 enum
@@ -216,6 +217,7 @@ public:
 		, m_p_videoram(*this,"videoram")
 		, m_p_nvram(*this,"nvram")
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_dac(*this, "dac")
 		, m_dac0(*this, "dac0")
 		, m_dac1(*this, "dac1")
@@ -238,7 +240,7 @@ public:
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
-	DECLARE_DRIVER_INIT(gamecom);
+	void init_gamecom();
 	DECLARE_PALETTE_INIT(gamecom);
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
@@ -250,6 +252,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gamecom(machine_config &config);
+	void gamecom_mem_map(address_map &map);
 private:
 	uint8_t *m_p_ram;
 	uint8_t *m_cart_ptr;
@@ -280,6 +284,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<dac_byte_interface> m_dac;
 	required_device<dac_byte_interface> m_dac0;
 	required_device<dac_byte_interface> m_dac1;
@@ -297,4 +302,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif /* GAMECOM_H_ */
+#endif // MAME_INCLUDES_GAMECOM_H

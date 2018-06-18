@@ -54,6 +54,7 @@
 #include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -69,6 +70,7 @@ public:
 	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_rtc(*this, RP5C15_TAG),
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
@@ -83,6 +85,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<rp5c15_device> m_rtc;
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
@@ -237,6 +240,9 @@ public:
 	uint8_t pal_256_param(int index, int param);
 	void mz2500_reset(mz2500_state *state, uint8_t type);
 	required_device<palette_device> m_palette;
+	void mz2500(machine_config &config);
+	void mz2500_io(address_map &map);
+	void mz2500_map(address_map &map);
 };
 
 
@@ -731,7 +737,7 @@ void mz2500_state::mz2500_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	machine().first_screen()->configure(720, 480, visarea, machine().first_screen()->frame_period().attoseconds());
+	m_screen->configure(720, 480, visarea, m_screen->frame_period().attoseconds());
 
 	/* calculate CG window parameters here */
 	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
@@ -1049,8 +1055,8 @@ READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
 {
 	uint8_t vblank_bit, hblank_bit;
 
-	vblank_bit = machine().first_screen()->vblank() ? 0 : 1;
-	hblank_bit = machine().first_screen()->hblank() ? 0 : 2;
+	vblank_bit = m_screen->vblank() ? 0 : 1;
+	hblank_bit = m_screen->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
 }
@@ -1222,16 +1228,17 @@ WRITE8_MEMBER(mz2500_state::floppy_side_w)
 }
 
 
-static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(bank0_r,bank0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bank1_r,bank1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(bank2_r,bank2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(bank3_r,bank3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(bank4_r,bank4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(bank5_r,bank5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(bank6_r,bank6_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bank7_r,bank7_w)
-ADDRESS_MAP_END
+void mz2500_state::mz2500_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(FUNC(mz2500_state::bank0_r), FUNC(mz2500_state::bank0_w));
+	map(0x2000, 0x3fff).rw(FUNC(mz2500_state::bank1_r), FUNC(mz2500_state::bank1_w));
+	map(0x4000, 0x5fff).rw(FUNC(mz2500_state::bank2_r), FUNC(mz2500_state::bank2_w));
+	map(0x6000, 0x7fff).rw(FUNC(mz2500_state::bank3_r), FUNC(mz2500_state::bank3_w));
+	map(0x8000, 0x9fff).rw(FUNC(mz2500_state::bank4_r), FUNC(mz2500_state::bank4_w));
+	map(0xa000, 0xbfff).rw(FUNC(mz2500_state::bank5_r), FUNC(mz2500_state::bank5_w));
+	map(0xc000, 0xdfff).rw(FUNC(mz2500_state::bank6_r), FUNC(mz2500_state::bank6_w));
+	map(0xe000, 0xffff).rw(FUNC(mz2500_state::bank7_r), FUNC(mz2500_state::bank7_w));
+}
 
 
 READ8_MEMBER(mz2500_state::mz2500_rom_r)
@@ -1296,7 +1303,7 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 	{
 		uint8_t vblank_bit;
 
-		vblank_bit = machine().first_screen()->vblank() ? 0 : 0x80 | m_cg_clear_flag;
+		vblank_bit = m_screen->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
 		return vblank_bit;
 	}
@@ -1506,46 +1513,47 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 		m_emm_ram[m_emm_offset] = data;
 }
 
-static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void mz2500_state::mz2500_io(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
 //  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio", z80sio_device, ba_cd_r, ba_cd_w)
+	map(0xa0, 0xa3).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
-	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
-	AM_RANGE(0xac, 0xac) AM_WRITE(mz2500_emm_addr_w)
-	AM_RANGE(0xad, 0xad) AM_READ(mz2500_emm_data_r) AM_WRITE(mz2500_emm_data_w)
-	AM_RANGE(0xae, 0xae) AM_WRITE(palette4096_io_w)
+	map(0xa8, 0xa8).w(FUNC(mz2500_state::mz2500_rom_w));
+	map(0xa9, 0xa9).r(FUNC(mz2500_state::mz2500_rom_r));
+	map(0xac, 0xac).w(FUNC(mz2500_state::mz2500_emm_addr_w));
+	map(0xad, 0xad).r(FUNC(mz2500_state::mz2500_emm_data_r)).w(FUNC(mz2500_state::mz2500_emm_data_w));
+	map(0xae, 0xae).w(FUNC(mz2500_state::palette4096_io_w));
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
-	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
-	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
-	AM_RANGE(0xb7, 0xb7) AM_WRITENOP
-	AM_RANGE(0xb8, 0xb9) AM_READWRITE(mz2500_kanji_r,mz2500_kanji_w)
-	AM_RANGE(0xbc, 0xbc) AM_READ(mz2500_bplane_latch_r) AM_WRITE(mz2500_cg_addr_w)
-	AM_RANGE(0xbd, 0xbd) AM_READ(mz2500_rplane_latch_r) AM_WRITE(mz2500_cg_data_w)
-	AM_RANGE(0xbe, 0xbe) AM_READ(mz2500_gplane_latch_r)
-	AM_RANGE(0xbf, 0xbf) AM_READ(mz2500_iplane_latch_r)
-	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
-	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
-	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_device, read, write)
+	map(0xb4, 0xb4).rw(FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
+	map(0xb5, 0xb5).rw(FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
+	map(0xb7, 0xb7).nopw();
+	map(0xb8, 0xb9).rw(FUNC(mz2500_state::mz2500_kanji_r), FUNC(mz2500_state::mz2500_kanji_w));
+	map(0xbc, 0xbc).r(FUNC(mz2500_state::mz2500_bplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_addr_w));
+	map(0xbd, 0xbd).r(FUNC(mz2500_state::mz2500_rplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_data_w));
+	map(0xbe, 0xbe).r(FUNC(mz2500_state::mz2500_gplane_latch_r));
+	map(0xbf, 0xbf).r(FUNC(mz2500_state::mz2500_iplane_latch_r));
+	map(0xc6, 0xc6).w(FUNC(mz2500_state::mz2500_irq_sel_w));
+	map(0xc7, 0xc7).w(FUNC(mz2500_state::mz2500_irq_data_w));
+	map(0xc8, 0xc9).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
-	AM_RANGE(0xcc, 0xcc) AM_READWRITE(rp5c15_8_r, rp5c15_8_w)
-	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
-	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xdc, 0xdc) AM_WRITE(floppy_select_w)
-	AM_RANGE(0xdd, 0xdd) AM_WRITE(floppy_side_w)
-	AM_RANGE(0xde, 0xde) AM_WRITENOP
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
-	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
-	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_tv_crtc_w)
+	map(0xcc, 0xcc).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
+	map(0xce, 0xce).w(FUNC(mz2500_state::mz2500_dictionary_bank_w));
+	map(0xcf, 0xcf).w(FUNC(mz2500_state::mz2500_kanji_bank_w));
+	map(0xd8, 0xdb).rw(FUNC(mz2500_state::fdc_r), FUNC(mz2500_state::fdc_w));
+	map(0xdc, 0xdc).w(FUNC(mz2500_state::floppy_select_w));
+	map(0xdd, 0xdd).w(FUNC(mz2500_state::floppy_side_w));
+	map(0xde, 0xde).nopw();
+	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xef, 0xef).rw(FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
+	map(0xf0, 0xf3).w(FUNC(mz2500_state::timer_w));
+	map(0xf4, 0xf7).r(FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(FUNC(mz2500_state::mz2500_tv_crtc_w));
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mz2500 )
@@ -1564,7 +1572,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8 (PAD)") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9 (PAD)") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") //PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") PORT_CODE(KEYCODE_COMMA_PAD)
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(". (PAD)") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("+ (PAD)") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("- (PAD)") PORT_CODE(KEYCODE_MINUS_PAD)
@@ -1849,7 +1857,7 @@ static const gfx_layout mz2500_16_layout =
 };
 
 /* these are just for viewer sake, actually they aren't used in drawing routines */
-static GFXDECODE_START( mz2500 )
+static GFXDECODE_START( gfx_mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
@@ -1893,7 +1901,7 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 {
 	uint8_t vblank_bit;
 
-	vblank_bit = machine().first_screen()->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
+	vblank_bit = m_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 
 	return 0xfe | vblank_bit;
 }
@@ -1929,7 +1937,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 	{
 		mz2500_reset(this, WRAM_RESET);
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	/* bit 2 is speaker */
@@ -2071,46 +2079,47 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 }
 
 
-static SLOT_INTERFACE_START( mz2500_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void mz2500_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
-static MACHINE_CONFIG_START( mz2500 )
+MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(mz2500_map)
-	MCFG_CPU_IO_MAP(mz2500_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(mz2500_map)
+	MCFG_DEVICE_IO_MAP(mz2500_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mz2500_state, mz2500_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz2500_state, mz2500_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz2500_state, mz2500_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz2500_state, mz2500_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz2500_state, mz2500_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2500_state, mz2500_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2500_state, mz2500_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2500_state, mz2500_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2500_state, mz2500_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2500_state, mz2500_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2500_state, mz2500_portc_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 6000000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2500_state, mz2500_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2500_state, mz2500_pio1_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
-	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
+	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz2500_state, pit8253_clk0_irq))
 	// TODO: is this really right?
 	MCFG_PIT8253_CLK1(0)
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit", pit8253_device, write_clk1))
 
-	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
+	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
@@ -2121,28 +2130,28 @@ static MACHINE_CONFIG_START( mz2500 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+	MCFG_SCREEN_RAW_PARAMS(21'477'272, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2500)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_READ_CB(READ8(mz2500_state, opn_porta_r))  // read A
+	MCFG_DEVICE_ADD("ym", YM2203, 2000000) //unknown clock / divider
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mz2500_state, opn_porta_r))  // read A
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))   // read B
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mz2500_state, opn_porta_w))  // write A
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mz2500_state, opn_porta_w))  // write A
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 4096)
+	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
@@ -2199,5 +2208,5 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,             0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2500, 0,      0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, mz2520, mz2500, 0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface

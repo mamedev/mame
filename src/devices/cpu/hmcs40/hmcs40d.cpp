@@ -181,7 +181,7 @@ offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			// reverse bits
 			if (bits < 0)
 			{
-				param = BITSWAP8(param,0,1,2,3,4,5,6,7);
+				param = bitswap<8>(param,0,1,2,3,4,5,6,7);
 				param >>= (8 + bits);
 				bits = -bits;
 			}

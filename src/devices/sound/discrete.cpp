@@ -824,17 +824,6 @@ int discrete_device::same_module_index(const discrete_base_node &node)
 //**************************************************************************
 
 //-------------------------------------------------
-//  static_set_intf - configuration helper to set
-//  the interface
-//-------------------------------------------------
-
-void discrete_device::static_set_intf(device_t &device, const discrete_block *intf)
-{
-	discrete_device &disc = downcast<discrete_device &>(device);
-	disc.m_intf = intf;
-}
-
-//-------------------------------------------------
 //  discrete_device - constructor
 //-------------------------------------------------
 

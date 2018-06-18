@@ -41,11 +41,8 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_ZX8301_CPU(_tag) \
-	zx8301_device::static_set_cpu_tag(*device, "^" _tag);
-
 #define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
-	devcb = &zx8301_device::set_vsync_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<zx8301_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
 
 
 
@@ -61,10 +58,15 @@ class zx8301_device :   public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T> zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: zx8301_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_vsync_wr_callback(device_t &device, Object &&cb) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(std::forward<Object>(cb)); }
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
+	template <class Object> devcb_base &set_vsync_wr_callback(Object &&cb) { return m_write_vsync.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( data_r );
@@ -72,6 +74,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void zx8301(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

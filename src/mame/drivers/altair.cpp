@@ -41,29 +41,37 @@ public:
 		, m_ram(*this, "ram")
 	{ }
 
+	void altair(machine_config &config);
+
+protected:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
-private:
 	virtual void machine_reset() override;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 };
 
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, altair_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_SHARE("ram")
-	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
-	AM_RANGE( 0xff00, 0xffff ) AM_ROM
-ADDRESS_MAP_END
+void altair_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xfcff).ram().share("ram");
+	map(0xfd00, 0xfdff).rom();
+	map(0xff00, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, altair_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void altair_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-ADDRESS_MAP_END
+	map(0x00, 0x01).mirror(0x10).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( altair )
@@ -90,25 +98,25 @@ void altair_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xFD00);
 }
 
-static MACHINE_CONFIG_START( altair )
+MACHINE_CONFIG_START(altair_state::altair)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600) // TODO: this is set using jumpers S3/S2/S1/S0
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)
@@ -123,5 +131,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME         FLAGS
-COMP( 1977, al8800bt,  0,       0,       altair,    altair,  altair_state,  0,     "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME         FLAGS
+COMP( 1977, al8800bt, 0,      0,      altair,  altair,  altair_state, empty_init, "MITS",  "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

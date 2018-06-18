@@ -84,16 +84,6 @@ void deco_irq_device::device_reset()
 }
 
 //-------------------------------------------------
-//  set_screen_tag - set screen we are attached to
-//-------------------------------------------------
-
-void deco_irq_device::set_screen_tag(device_t &device, const char *tag)
-{
-	deco_irq_device &dev = dynamic_cast<deco_irq_device &>(device);
-	dev.m_screen.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  scanline_callback - called on each scanline
 //-------------------------------------------------
 
@@ -140,12 +130,13 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 //  INTERFACE
 //**************************************************************************
 
-DEVICE_ADDRESS_MAP_START(map, 8, deco_irq_device)
-	AM_RANGE(0x0, 0x0) AM_WRITE(control_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(scanline_r, scanline_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(raster_irq_ack_r, vblank_irq_ack_w)
-	AM_RANGE(0x3, 0x3) AM_READ(status_r)
-ADDRESS_MAP_END
+void deco_irq_device::map(address_map &map)
+{
+	map(0x0, 0x0).w(FUNC(deco_irq_device::control_w));
+	map(0x1, 0x1).rw(FUNC(deco_irq_device::scanline_r), FUNC(deco_irq_device::scanline_w));
+	map(0x2, 0x2).rw(FUNC(deco_irq_device::raster_irq_ack_r), FUNC(deco_irq_device::vblank_irq_ack_w));
+	map(0x3, 0x3).r(FUNC(deco_irq_device::status_r));
+}
 
 WRITE8_MEMBER( deco_irq_device::control_w )
 {

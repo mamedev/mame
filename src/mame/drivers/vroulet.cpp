@@ -41,6 +41,7 @@ Tomasz Slanina 20050225
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,6 +82,9 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vroulet(machine_config &config);
+	void vroulet_io_map(address_map &map);
+	void vroulet_map(address_map &map);
 };
 
 
@@ -147,24 +151,26 @@ uint32_t vroulet_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa001) AM_RAM AM_SHARE("ball")
-	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc000, 0xc000) AM_NOP
-ADDRESS_MAP_END
+void vroulet_state::vroulet_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x8000, 0x8000).noprw();
+	map(0x9000, 0x93ff).ram().w(FUNC(vroulet_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(vroulet_state::colorram_w)).share("colorram");
+	map(0xa000, 0xa001).ram().share("ball");
+	map(0xb000, 0xb0ff).w(FUNC(vroulet_state::paletteram_w)).share("paletteram");
+	map(0xc000, 0xc000).noprw();
+}
 
-static ADDRESS_MAP_START( vroulet_io_map, AS_IO, 8, vroulet_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-ADDRESS_MAP_END
+void vroulet_state::vroulet_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x13).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input Ports */
 
@@ -259,7 +265,7 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( vroulet )
+static GFXDECODE_START( gfx_vroulet )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0, 32 )
 GFXDECODE_END
 
@@ -271,12 +277,12 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vroulet )
+MACHINE_CONFIG_START(vroulet_state::vroulet)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   //???
-	MCFG_CPU_PROGRAM_MAP(vroulet_map)
-	MCFG_CPU_IO_MAP(vroulet_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   //???
+	MCFG_DEVICE_PROGRAM_MAP(vroulet_map)
+	MCFG_DEVICE_IO_MAP(vroulet_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -286,9 +292,9 @@ static MACHINE_CONFIG_START( vroulet )
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vroulet_state, ppi8255_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vroulet_state, ppi8255_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vroulet_state, ppi8255_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vroulet_state, ppi8255_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vroulet_state, ppi8255_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vroulet_state, ppi8255_c_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -299,13 +305,13 @@ static MACHINE_CONFIG_START( vroulet )
 	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vroulet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vroulet)
 	MCFG_PALETTE_ADD("palette", 128*4)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -326,4 +332,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, empty_init, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

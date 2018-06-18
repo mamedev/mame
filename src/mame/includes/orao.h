@@ -28,12 +28,14 @@ public:
 
 	DECLARE_READ8_MEMBER(orao_io_r);
 	DECLARE_WRITE8_MEMBER(orao_io_w);
-	DECLARE_DRIVER_INIT(orao);
-	DECLARE_DRIVER_INIT(orao103);
+	void init_orao();
+	void init_orao103();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void orao(machine_config &config);
+	void orao_mem(address_map &map);
 private:
 	required_shared_ptr<uint8_t> m_memory;
 	required_shared_ptr<uint8_t> m_video_ram;

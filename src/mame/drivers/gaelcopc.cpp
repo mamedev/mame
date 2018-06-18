@@ -26,6 +26,7 @@ motherboard bioses.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -39,6 +40,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void gaelcopc(machine_config &config);
+	void gaelcopc_map(address_map &map);
 protected:
 
 	// devices
@@ -58,18 +61,19 @@ uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( gaelcopc_map, AS_PROGRAM, 32, gaelcopc_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-ADDRESS_MAP_END
+void gaelcopc_state::gaelcopc_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
+}
 
 static INPUT_PORTS_START( gaelcopc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gaelcopc )
+MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
-	MCFG_CPU_PROGRAM_MAP(gaelcopc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
+	MCFG_DEVICE_PROGRAM_MAP(gaelcopc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -130,8 +134,8 @@ ROM_START(tuningrc)
 ROM_END
 
 
-GAME( 2003, tokyocop,  0,         gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_IS_SKELETON )
-GAME( 2003, tokyocopk, tokyocop,  gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Tokyo Cop (US, kit version)",         MACHINE_IS_SKELETON )
-GAME( 2003, tokyocopi, tokyocop,  gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)",                   MACHINE_IS_SKELETON )
-GAME( 2004, rriders,   0,         gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
-GAME( 2005, tuningrc,  0,         gaelcopc, gaelcopc, gaelcopc_state, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race",     MACHINE_IS_SKELETON )
+GAME( 2003, tokyocop,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopk, tokyocop, gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, kit version)",         MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopi, tokyocop, gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (Italy)",                   MACHINE_IS_SKELETON )
+GAME( 2004, rriders,   0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
+GAME( 2005, tuningrc,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Gaelco Championship Tuning Race",     MACHINE_IS_SKELETON )

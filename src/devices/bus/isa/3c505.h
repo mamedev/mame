@@ -138,7 +138,7 @@ protected:
 	virtual int tx_data(device_t *, const uint8_t *, int);
 	virtual int setfilter(device_t *, int);
 
-	const char *cpu_context();
+	std::string cpu_context() const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	// device-level overrides
@@ -178,7 +178,7 @@ private:
 		void log(const char *title) const;
 
 	private:
-		const char *cpu_context() { return m_device->cpu_context(); }
+		std::string cpu_context() const { return m_device->cpu_context(); }
 
 		threecom3c505_device *m_device; // pointer back to our device
 		uint16_t m_length;
@@ -198,7 +198,7 @@ private:
 		int is_empty () { return m_get_index == m_put_index; }
 		int is_full () { return ((m_put_index + 1) % m_size) == m_get_index; }
 	private:
-		const char *cpu_context() { return m_device->cpu_context(); }
+		std::string cpu_context() const { return m_device->cpu_context(); }
 
 		threecom3c505_device *m_device; // pointer back to our device
 		uint16_t m_size;

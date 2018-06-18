@@ -241,21 +241,21 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
- MACHINE_CONFIG_MEMBER( pce_cd_device::device_add_mconfig )
+ MACHINE_CONFIG_START(pce_cd_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("bram", pce_cd_device, nvram_init)
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("pce_cdrom")
 
-	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(pce_cd_device, msm5205_int)) /* interrupt function */
+	MCFG_DEVICE_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pce_cd_device, msm5205_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 1/48 prescaler, 4bit data */
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:rspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^rspeaker", 0.50 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "^:lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "^:rspeaker", 1.00 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
+	MCFG_SOUND_ROUTE( 0, "^lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "^rspeaker", 1.00 )
 MACHINE_CONFIG_END
 
 
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 	/* Supply new ADPCM data */
 	msm_data = (m_msm_nibble) ? (m_adpcm_ram[m_msm_start_addr] & 0x0f) : ((m_adpcm_ram[m_msm_start_addr] & 0xf0) >> 4);
 
-	m_msm->data_w(msm_data);
+	m_msm->write_data(msm_data);
 	m_msm_nibble ^= 1;
 
 	if (m_msm_nibble == 0)
@@ -1072,7 +1072,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 
 WRITE8_MEMBER(pce_cd_device::intf_w)
 {
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", space.device().safe_pc(), offset, data);
+	logerror("%s write to CD interface offset %02X, data %02X\n", machine().describe_context(), offset, data);
 
 	switch (offset & 0xf)
 	{
@@ -1307,7 +1307,7 @@ READ8_MEMBER(pce_cd_device::intf_r)
 {
 	uint8_t data = m_regs[offset & 0x0F];
 
-	logerror("%04X: read from CD interface offset %02X\n", space.device().safe_pc(), offset );
+	logerror("%s: read from CD interface offset %02X\n", machine().describe_context(), offset );
 
 	switch (offset & 0xf)
 	{

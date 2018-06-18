@@ -109,6 +109,7 @@ TODO:
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -174,6 +175,10 @@ public:
 	memory_region *m_cart_rom;
 	uint8_t m_ems_index;
 	uint16_t m_ems_bank[28];
+	void pasogo(machine_config &config);
+	void emsbank_map(address_map &map);
+	void pasogo_io(address_map &map);
+	void pasogo_mem(address_map &map);
 };
 
 
@@ -438,24 +443,27 @@ WRITE16_MEMBER( pasogo_state::emsram_w )
 	m_ems->write16(space, offset & 0x1fff, data, mem_mask);
 }
 
-static ADDRESS_MAP_START(emsbank_map, AS_PROGRAM, 16, pasogo_state)
-	AM_RANGE(0x04080000, 0x040fffff) AM_RAM
-	AM_RANGE(0x08000000, 0x080fffff) AM_ROMBANK("bank27")
-	AM_RANGE(0x10000000, 0x1000ffff) AM_RAM // cart ram?
-ADDRESS_MAP_END
+void pasogo_state::emsbank_map(address_map &map)
+{
+	map(0x04080000, 0x040fffff).ram();
+	map(0x08000000, 0x080fffff).bankr("bank27");
+	map(0x10000000, 0x1000ffff).ram(); // cart ram?
+}
 
-static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
-	AM_RANGE(0xb8000, 0xbffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x80000, 0xeffff) AM_READWRITE(emsram_r, emsram_w)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
-ADDRESS_MAP_END
+void pasogo_state::pasogo_mem(address_map &map)
+{
+	map(0x80000, 0xeffff).rw(FUNC(pasogo_state::emsram_r), FUNC(pasogo_state::emsram_w));
+	map(0xb8000, 0xbffff).ram().share("vram");
+	map(0xf0000, 0xfffff).bankr("bank27");
+}
 
 
-static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
-	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
-	AM_RANGE(0x006c, 0x006f) AM_READWRITE(ems_r, ems_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-ADDRESS_MAP_END
+void pasogo_state::pasogo_io(address_map &map)
+{
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x0026, 0x0027).rw(FUNC(pasogo_state::vg230_io_r), FUNC(pasogo_state::vg230_io_w));
+	map(0x006c, 0x006f).rw(FUNC(pasogo_state::ems_r), FUNC(pasogo_state::ems_w));
+}
 
 
 static INPUT_PORTS_START( pasogo )
@@ -516,7 +524,7 @@ uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 
 
 INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 {
-//  m_maincpu->set_input_line(UPD7810_INTFE1, PULSE_LINE);
+//  m_maincpu->pulse_input_line(UPD7810_INTFE1, attotime::zero);
 }
 
 void pasogo_state::machine_reset()
@@ -533,13 +541,13 @@ void pasogo_state::machine_reset()
 	contrast(*color->fields().first(), nullptr, 0, color->read());
 }
 
-static MACHINE_CONFIG_START( pasogo )
+MACHINE_CONFIG_START(pasogo_state::pasogo)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL_32_22MHz/2)
-	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
-	MCFG_CPU_IO_MAP(pasogo_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(32'220'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(pasogo_mem)
+	MCFG_DEVICE_IO_MAP(pasogo_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("ems", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(emsbank_map)
@@ -575,5 +583,5 @@ ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
 
-//    YEAR   NAME    PARENT  COMPAT    MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, pasogo_state, 0,    "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+CONS( 1996, pasogo, 0,      0,      pasogo,  pasogo, pasogo_state, empty_init, "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

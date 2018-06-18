@@ -7,33 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/midway.h"
 #include "includes/mcr.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-uint8_t mcr_cocktail_flip;
-
-uint32_t mcr_cpu_board;
-uint32_t mcr_sprite_board;
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static emu_timer *ipu_watchdog_timer;
 
 /*************************************
  *
@@ -99,23 +77,23 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
  *
  *************************************/
 
-MACHINE_START_MEMBER(mcr_state,mcr)
+void mcr_state::machine_start()
 {
-	save_item(NAME(mcr_cocktail_flip));
+	save_item(NAME(m_mcr_cocktail_flip));
 }
 
 
-MACHINE_START_MEMBER(mcr_state,nflfoot)
+void mcr_nflfoot_state::machine_start()
 {
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr_state::ipu_watchdog_reset),this));
+	m_ipu_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr_nflfoot_state::ipu_watchdog_reset), this));
 }
 
 
-MACHINE_RESET_MEMBER(mcr_state,mcr)
+void mcr_state::machine_reset()
 {
 	/* reset cocktail flip */
-	mcr_cocktail_flip = 0;
+	m_mcr_cocktail_flip = 0;
 }
 
 
@@ -128,37 +106,35 @@ MACHINE_RESET_MEMBER(mcr_state,mcr)
 
 TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_interrupt)
 {
-	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
 	if(scanline == 0 || scanline == 240)
 	{
-		ctc->trg2(1);
-		ctc->trg2(0);
+		m_ctc->trg2(1);
+		m_ctc->trg2(0);
 	}
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (scanline == 0)
 	{
-		ctc->trg3(1);
-		ctc->trg3(0);
+		m_ctc->trg3(1);
+		m_ctc->trg3(0);
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_nflfoot_state::ipu_interrupt)
 {
-	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (scanline == 0)
 	{
-		ctc->trg3(1);
-		ctc->trg3(0);
+		m_ctc->trg3(1);
+		m_ctc->trg3(0);
 	}
 }
 
@@ -169,51 +145,50 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(mcr_state::sio_txda_w)
+WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txda_w)
 {
-	m_sio_txda = !state;
+	m_ipu_sio_txda = !state;
 }
 
-WRITE_LINE_MEMBER(mcr_state::sio_txdb_w)
+WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txdb_w)
 {
 	// disc player
-	m_sio_txdb = !state;
+	m_ipu_sio_txdb = !state;
 
-	m_sio->rxb_w(state);
+	m_ipu_sio->rxb_w(state);
 }
 
-WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
+WRITE8_MEMBER(mcr_nflfoot_state::ipu_laserdisk_w)
 {
 	/* bit 3 enables (1) LD video regardless of PIX SW */
 	/* bit 2 enables (1) LD right channel audio */
 	/* bit 1 enables (1) LD left channel audio */
 	/* bit 0 enables (1) LD video if PIX SW == 1 */
 	if (data != 0)
-		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", m_ipu->pc(), offset, data);
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
+TIMER_CALLBACK_MEMBER(mcr_nflfoot_state::ipu_watchdog_reset)
 {
 	logerror("ipu_watchdog_reset\n");
-	m_ipu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-	machine().device("ipu_ctc")->reset();
-	machine().device("ipu_pio0")->reset();
-	machine().device("ipu_pio1")->reset();
-	machine().device("ipu_sio")->reset();
+	m_ipu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_ipu_ctc->reset();
+	m_ipu_pio0->reset();
+	m_ipu_pio1->reset();
+	m_ipu_sio->reset();
 }
 
-
-READ8_MEMBER(mcr_state::mcr_ipu_watchdog_r)
+READ8_MEMBER(mcr_nflfoot_state::ipu_watchdog_r)
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
-	ipu_watchdog_timer->adjust(attotime::from_hz(7372800 / 16 / 32768));
+	m_ipu_watchdog_timer->adjust(attotime::from_hz(7372800 / 16 / 32768));
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_ipu_watchdog_w)
+WRITE8_MEMBER(mcr_nflfoot_state::ipu_watchdog_w)
 {
-	mcr_ipu_watchdog_r(space,0);
+	ipu_watchdog_r(space,0);
 }

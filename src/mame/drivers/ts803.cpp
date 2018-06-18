@@ -48,13 +48,14 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -81,9 +82,12 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	DECLARE_DRIVER_INIT(ts803);
+	void init_ts803();
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ts803(machine_config &config);
+	void ts803_io(address_map &map);
+	void ts803_mem(address_map &map);
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
@@ -99,11 +103,12 @@ private:
 	required_ioport m_io_dsw;
 };
 
-static ADDRESS_MAP_START(ts803_mem, AS_PROGRAM, 8, ts803_state)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x4000, 0xbfff) AM_RAMBANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ts803_state::ts803_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x4000, 0xbfff).bankrw("bank4");
+	map(0xc000, 0xffff).ram();
+}
 
 /*
 
@@ -128,20 +133,21 @@ Winchester Disk Controller                              B0-BF (WDC CE)
 Graphics Controller                                     C0-CF (GIO SEL)
 
 */
-static ADDRESS_MAP_START(ts803_io, AS_IO, 8, ts803_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_READ_PORT("DSW")
-	AM_RANGE(0x10, 0x1f) AM_READWRITE(port10_r, port10_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("sti", z80sti_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x90, 0x9f) AM_READWRITE(disk_0_control_r,disk_0_control_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(porta0_r, porta0_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("crtc", sy6545_1_device, status_r, address_w)
-	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE("crtc", sy6545_1_device, register_r, register_w)
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(crtc_controlreg_w)
-ADDRESS_MAP_END
+void ts803_state::ts803_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x0f).portr("DSW");
+	map(0x10, 0x1f).rw(FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
+	map(0x20, 0x2f).rw("sti", FUNC(z80sti_device::read), FUNC(z80sti_device::write));
+	map(0x30, 0x33).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x80, 0x83).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x90, 0x9f).rw(FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
+	map(0xa0, 0xbf).rw(FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
+	map(0xc0, 0xc0).rw("crtc", FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w));
+	map(0xc2, 0xc2).rw("crtc", FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w));
+	map(0xc4, 0xc4).w(FUNC(ts803_state::crtc_controlreg_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ts803 )
@@ -178,9 +184,10 @@ INPUT_PORTS_END
 
 /* disk drive */
 
-static SLOT_INTERFACE_START( ts803_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ts803_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE8_MEMBER( ts803_state::disk_0_control_w )
 {
@@ -380,7 +387,7 @@ void ts803_state::machine_reset()
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER( ts803_state, ts803 )
+void ts803_state::init_ts803()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	m_56kram = std::make_unique<uint8_t[]>(0xc000);
@@ -411,10 +418,10 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( ts803 )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
-	MCFG_CPU_PROGRAM_MAP(ts803_mem)
-	MCFG_CPU_IO_MAP(ts803_io)
+MACHINE_CONFIG_START(ts803_state::ts803)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ts803_mem)
+	MCFG_DEVICE_IO_MAP(ts803_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
@@ -432,28 +439,28 @@ static MACHINE_CONFIG_START( ts803 )
 	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
 
-	MCFG_DEVICE_ADD("sti_clock", CLOCK, XTAL_16MHz / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sti", z80sti_device, tc_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sti", z80sti_device, rc_w))
+	MCFG_DEVICE_ADD("sti_clock", CLOCK, 16_MHz_XTAL / 13)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sti", z80sti_device, tc_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sti", z80sti_device, rc_w))
 
-	MCFG_DEVICE_ADD("dart_clock", CLOCK, (XTAL_16MHz / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_DEVICE_ADD("dart_clock", CLOCK, (16_MHz_XTAL / 13) / 8)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
 
-	MCFG_DEVICE_ADD("sti", Z80STI, XTAL_16MHz/4)
-	MCFG_Z80STI_OUT_TBO_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))
+	MCFG_DEVICE_ADD("sti", Z80STI, 16_MHz_XTAL / 4)
+	MCFG_Z80STI_OUT_TBO_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))
 	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
 
 	/* floppy disk */
-	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("sti", z80sti_device, i7_w))
+	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("sti", z80sti_device, i7_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -474,5 +481,5 @@ ROM_END
 
 
 
-//   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME  FLAGS
-COMP(1983, ts803h,  0,      0,      ts803,     ts803, ts803_state, ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP(1983, ts803h, 0,      0,      ts803,   ts803, ts803_state, init_ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )

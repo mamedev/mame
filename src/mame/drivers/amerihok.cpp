@@ -40,6 +40,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
+	void amerihok(machine_config &config);
+	void amerihok_data_map(address_map &map);
+	void amerihok_map(address_map &map);
 };
 
 WRITE8_MEMBER(amerihok_state::control_w)
@@ -48,14 +51,16 @@ WRITE8_MEMBER(amerihok_state::control_w)
 	m_oki->ch2_w(!BIT(data, 7));
 }
 
-static ADDRESS_MAP_START(amerihok_map, AS_PROGRAM, 8, amerihok_state)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void amerihok_state::amerihok_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START(amerihok_data_map, AS_DATA, 8, amerihok_state)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(control_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("oki", okim6376_device, write)
-ADDRESS_MAP_END
+void amerihok_state::amerihok_data_map(address_map &map)
+{
+	map(0x2000, 0x2000).w(FUNC(amerihok_state::control_w));
+	map(0x4000, 0x4000).w(m_oki, FUNC(okim6376_device::write));
+}
 
 static INPUT_PORTS_START( amerihok )
 INPUT_PORTS_END
@@ -71,17 +76,17 @@ void amerihok_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( amerihok )
+MACHINE_CONFIG_START(amerihok_state::amerihok)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8681, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(amerihok_map)
-	MCFG_CPU_DATA_MAP(amerihok_data_map)
+	MCFG_DEVICE_ADD("maincpu", Z8681, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(amerihok_map)
+	MCFG_DEVICE_DATA_MAP(amerihok_data_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("oki", OKIM6376, 1000000) // 64-pin QFP (probably actually MSM6650)
+	MCFG_DEVICE_ADD("oki", OKIM6376, 1000000) // 64-pin QFP (probably actually MSM6650)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -97,4 +102,4 @@ ROM_START( amerihok )
 	ROM_LOAD( "airh-u10", 0x80000, 0x40000, CRC(71ee6421) SHA1(10131fc7c009158308c4a8bb2b037101622c07a1) )
 ROM_END
 
-GAME( 199?, amerihok,  0,    amerihok, amerihok, amerihok_state,  0, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 199?, amerihok, 0, amerihok, amerihok, amerihok_state, empty_init, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

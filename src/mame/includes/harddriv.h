@@ -21,6 +21,7 @@
 #include "cpu/tms34010/tms34010.h"
 
 #include "machine/74259.h"
+#include "machine/adc0808.h"
 #include "machine/asic65.h"
 #include "machine/eeprompar.h"
 #include "machine/mc68681.h"
@@ -29,14 +30,15 @@
 
 #include "sound/dac.h"
 
+#include "emupal.h"
 #include "screen.h"
 
-#define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
-#define HARDDRIV_GSP_CLOCK      XTAL_48MHz
+#define HARDDRIV_MASTER_CLOCK   XTAL(32'000'000)
+#define HARDDRIV_GSP_CLOCK      XTAL(48'000'000)
 
 DECLARE_DEVICE_TYPE(HARDDRIV_BOARD,               harddriv_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIVC_BOARD,              harddrivc_board_device_state)
-DECLARE_DEVICE_TYPE(RACEDRIV_BOARD,               racedrivc_board_device_state)
+DECLARE_DEVICE_TYPE(RACEDRIV_BOARD,               racedriv_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVB1_BOARD,             racedrivb1_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVC_BOARD,              racedrivc_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVC1_BOARD,             racedrivc1_board_device_state)
@@ -99,7 +101,6 @@ public:
 
 	DECLARE_READ16_MEMBER( hd68k_a80000_r );
 	DECLARE_READ16_MEMBER( hd68k_port0_r );
-	DECLARE_READ16_MEMBER( hd68k_adc8_r );
 	DECLARE_READ16_MEMBER( hd68k_adc12_r );
 	DECLARE_READ16_MEMBER( hdc68k_port1_r );
 	DECLARE_READ16_MEMBER( hda68k_port1_r );
@@ -202,7 +203,7 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 
 
@@ -254,6 +255,33 @@ public:
 	DECLARE_WRITE32_MEMBER(hdds3xdsp_serial_tx_callback);
 	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
 
+
+	void driver_msp(machine_config &config);
+	void driver_nomsp(machine_config &config);
+	void multisync_msp(machine_config &config);
+	void multisync_nomsp(machine_config &config);
+	void dsk(machine_config &config);
+	void dsk2(machine_config &config);
+	void ds3(machine_config &config);
+	void multisync2(machine_config &config);
+	void adsp(machine_config &config);
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void driver_68k_map(address_map &map);
+	void driver_gsp_map(address_map &map);
+	void driver_msp_map(address_map &map);
+	void ds3_data_map(address_map &map);
+	void ds3_program_map(address_map &map);
+	void ds3sdsp_data_map(address_map &map);
+	void ds3sdsp_program_map(address_map &map);
+	void ds3xdsp_data_map(address_map &map);
+	void ds3xdsp_program_map(address_map &map);
+	void dsk2_dsp32_map(address_map &map);
+	void dsk_dsp32_map(address_map &map);
+	void multisync2_68k_map(address_map &map);
+	void multisync2_gsp_map(address_map &map);
+	void multisync_68k_map(address_map &map);
+	void multisync_gsp_map(address_map &map);
 protected:
 	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -273,6 +301,8 @@ protected:
 	optional_device<atari_jsa_base_device> m_jsa;
 	optional_device<screen_device> m_screen;
 	optional_device<mc68681_device> m_duartn68681;
+	required_device<adc0808_device> m_adc8;
+	output_finder<2> m_lamps;
 
 	uint8_t                   m_hd34010_host_access;
 
@@ -327,7 +357,6 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_sw1;
 	required_ioport m_a80000;
-	optional_ioport_array<8> m_8badc;
 	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
@@ -389,8 +418,6 @@ protected:
 	optional_device<timer_device> m_ds3xdsp_internal_timer;
 
 	uint16_t                  m_adc_control;
-	uint8_t                   m_adc8_select;
-	uint8_t                   m_adc8_data;
 	uint8_t                   m_adc12_select;
 	uint8_t                   m_adc12_byte;
 	uint16_t                  m_adc12_data;
@@ -511,6 +538,9 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
 
+	void driversnd_68k_map(address_map &map);
+	void driversnd_dsp_io_map(address_map &map);
+	void driversnd_dsp_program_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

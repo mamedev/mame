@@ -3,7 +3,9 @@
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/74259.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class splash_state : public driver_device
 {
@@ -16,6 +18,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_outlatch(*this, "outlatch"),
 		m_pixelram(*this, "pixelram"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
@@ -30,6 +33,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<ls259_device> m_outlatch;
 
 	required_shared_ptr<uint16_t> m_pixelram;
 	required_shared_ptr<uint16_t> m_videoram;
@@ -73,10 +77,10 @@ public:
 	//roldfrog and funystrp specific
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
-	DECLARE_DRIVER_INIT(splash10);
-	DECLARE_DRIVER_INIT(roldfrog);
-	DECLARE_DRIVER_INIT(splash);
-	DECLARE_DRIVER_INIT(rebus);
+	void init_splash10();
+	void init_roldfrog();
+	void init_splash();
+	void init_rebus();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
@@ -91,6 +95,14 @@ public:
 
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq(  );
+	void roldfrog(machine_config &config);
+	void splash(machine_config &config);
+	void funystrp_sound_map(address_map &map);
+	void roldfrog_map(address_map &map);
+	void roldfrog_sound_io_map(address_map &map);
+	void roldfrog_sound_map(address_map &map);
+	void splash_map(address_map &map);
+	void splash_sound_map(address_map &map);
 };
 
 class funystrp_state : public splash_state
@@ -119,11 +131,14 @@ public:
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
-	DECLARE_DRIVER_INIT(funystrp);
+	void init_funystrp();
 
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void funystrp(machine_config &config);
+	void funystrp_map(address_map &map);
+	void funystrp_sound_io_map(address_map &map);
 private:
 	virtual void machine_start() override;
 

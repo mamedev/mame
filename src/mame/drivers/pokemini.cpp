@@ -15,6 +15,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "sound/spkrdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -54,13 +55,14 @@ class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_ram(*this, "p_ram"),
-		m_speaker(*this, "speaker"),
-		m_i2cmem(*this, "i2cmem"),
-		m_cart(*this, "cartslot"),
-		m_inputs(*this, "INPUTS")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_p_ram(*this, "p_ram")
+		, m_speaker(*this, "speaker")
+		, m_i2cmem(*this, "i2cmem")
+		, m_cart(*this, "cartslot")
+		, m_inputs(*this, "INPUTS")
 	{ }
 
 	uint8_t m_pm_reg[0x100];
@@ -77,6 +79,8 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
+	void pokemini(machine_config &config);
+	void pokemini_mem_map(address_map &map);
 protected:
 	enum
 	{
@@ -94,6 +98,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<i2cmem_device> m_i2cmem;
@@ -121,12 +126,13 @@ READ8_MEMBER( pokemini_state::rom_r )
 	return m_cart->read_rom(space, offset & 0x1fffff);
 }
 
-static ADDRESS_MAP_START( pokemini_mem_map, AS_PROGRAM, 8, pokemini_state )
-	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
-	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
-	AM_RANGE( 0x002100, 0x1fffff )  AM_READ(rom_r)                    /* cartridge area */
-ADDRESS_MAP_END
+void pokemini_state::pokemini_mem_map(address_map &map)
+{
+	map(0x000000, 0x000fff).rom();                            /* bios */
+	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
+	map(0x002000, 0x0020ff).rw(FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(FUNC(pokemini_state::rom_r));                    /* cartridge area */
+}
 
 
 static INPUT_PORTS_START( pokemini )
@@ -524,7 +530,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	//logerror( "%0X: Write to hardware address: %02X, %02X\n", space.device() .safe_pc( ), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 
 	switch( offset )
 	{
@@ -1742,7 +1748,7 @@ static const int16_t speaker_levels[] = {-32768, 0, 32767};
 
 void pokemini_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 
@@ -1753,10 +1759,10 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( pokemini )
+MACHINE_CONFIG_START(pokemini_state::pokemini)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MINX, 4000000)
-	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
+	MCFG_DEVICE_ADD("maincpu", MINX, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(pokemini_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1777,8 +1783,8 @@ static MACHINE_CONFIG_START( pokemini )
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(3, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1797,4 +1803,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

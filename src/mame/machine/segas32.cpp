@@ -46,7 +46,7 @@ void segas32_v25_state::decrypt_protrom()
 
 	// unscramble the address lines
 	for(i = 0; i < 0x10000; i++)
-		rom[i] = temp[BITSWAP16(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
+		rom[i] = temp[bitswap<16>(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
 }
 
 
@@ -103,7 +103,7 @@ WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 		}
 		else
 		{
-			const uint8_t *ROM = memregion("maincpu")->base();
+			const uint8_t *ROM = m_maincpu_region->base();
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -153,7 +153,7 @@ WRITE16_MEMBER(segas32_state::brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = m_maincpu_region->base();
 
 	switch (offset)
 	{
@@ -213,15 +213,15 @@ void segas32_state::darkedge_fd1149_vblank()
 
 WRITE16_MEMBER(segas32_state::darkedge_protection_w)
 {
-	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		space.device().safe_pc(), 0xa00000 + 2*offset, data, mem_mask);
+	logerror("%s:darkedge_prot_w(%06X) = %04X & %04X\n",
+		machine().describe_context(), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
 READ16_MEMBER(segas32_state::darkedge_protection_r)
 {
-	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		space.device().safe_pc(), 0xa00000 + 2*offset, mem_mask);
+	logerror("%s:darkedge_prot_r(%06X) & %04X\n",
+		machine().describe_context(), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 
@@ -296,12 +296,12 @@ const uint8_t segas32_v25_state::arf_opcode_table[256] = {
 #if 0 // old simulation
 READ16_MEMBER(segas32_state::arabfgt_protection_r)
 {
-	int PC = space.device().safe_pc();
+	int PC = m_maincpu->pc();
 	int cmpVal;
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)
 	{
-		cmpVal = space.device().state().state_int(1);
+		cmpVal = m_maincpu->state_int(V60_R0);
 
 		// R0 always contains the value the protection is supposed to return (!)
 		return cmpVal;

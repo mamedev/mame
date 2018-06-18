@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+  <!-- All dimensions are in 0.01 inch units -->
+	<view name="Standard (2:1)">
+	  <screen index="0">
+		<bounds left="0" top="0" right="1000" bottom="500" />
+	  </screen>
+	</view>
+</mamelayout>

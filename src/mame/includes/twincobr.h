@@ -8,6 +8,7 @@
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 #include "video/toaplan_scu.h"
+#include "emupal.h"
 #include "screen.h"
 
 class twincobr_state : public driver_device
@@ -101,15 +102,15 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_videoram_w);
 	DECLARE_READ8_MEMBER(wardner_sprite_r);
 	DECLARE_WRITE8_MEMBER(wardner_sprite_w);
-	DECLARE_DRIVER_INIT(twincobr);
+	void init_twincobr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
-	INTERRUPT_GEN_MEMBER(wardner_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
 	void twincobr_restore_dsp();
 	void twincobr_create_tilemaps();
 	DECLARE_WRITE_LINE_MEMBER(display_on_w);
@@ -124,4 +125,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void twincobr(machine_config &config);
+	void fsharkbt(machine_config &config);
+	void fshark(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
+	void fsharkbt_i8741_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map);
 };

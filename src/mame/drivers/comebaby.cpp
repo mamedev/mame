@@ -5,6 +5,8 @@
 
 TODO:
 Nearly everything.
+- [:maincpu] WRMSR: invalid MSR write 00000250 (0404040404040404) at 0002e3b6
+  then jumps to 0?
 
   There also appears to be a sequel which may be running on the same hardware, but which does not seem to have been released.
   Come On Baby - Ballympic Heroes!  (c) 2001
@@ -182,23 +184,26 @@ Nearly everything.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
-class comebaby_state : public driver_device
+class comebaby_state : public pcat_base_state
 {
 public:
 	comebaby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: pcat_base_state(mconfig, type, tag)
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void comebaby(machine_config &config);
+	void comebaby_io(address_map &map);
+	void comebaby_map(address_map &map);
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -214,18 +219,30 @@ uint32_t comebaby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( comebaby_map, AS_PROGRAM, 32, comebaby_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-ADDRESS_MAP_END
+void comebaby_state::comebaby_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).ram();
+	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
+
+void comebaby_state::comebaby_io(address_map &map)
+{
+	pcat32_io_common(map);
+}
 
 static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( comebaby )
+MACHINE_CONFIG_START(comebaby_state::comebaby)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
-	MCFG_CPU_PROGRAM_MAP(comebaby_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, (66666666*19)/2) /* Actually a Celeron */
+	MCFG_DEVICE_PROGRAM_MAP(comebaby_map)
+	MCFG_DEVICE_IO_MAP(comebaby_io)
+
+	pcat_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -241,7 +258,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START(comebaby)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
 	DISK_REGION( "disks" )
@@ -249,4 +266,4 @@ ROM_START(comebaby)
 ROM_END
 
 
-GAME( 2000, comebaby,  0,   comebaby,  comebaby, comebaby_state,  0,  ROT0,  "ExPotato",    "Come On Baby",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

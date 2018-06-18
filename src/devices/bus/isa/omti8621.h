@@ -65,6 +65,8 @@ protected:
 
 	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
+	std::string cpu_context() const;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );

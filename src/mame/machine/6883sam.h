@@ -14,12 +14,8 @@
 #pragma once
 
 
-#define MCFG_SAM6883_ADD(_tag, _clock, _cputag, _cpuspace) \
-	MCFG_DEVICE_ADD(_tag, SAM6883, _clock) \
-	sam6883_device::configure_cpu(*device, _cputag, _cpuspace);
-
 #define MCFG_SAM6883_RES_CALLBACK(_read) \
-	devcb = &sam6883_device::set_res_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
 
 
 //**************************************************************************
@@ -27,10 +23,10 @@
 //**************************************************************************
 
 // base class so that GIME emulation can use some functionality
-class sam6883_friend_device
+class sam6883_friend_device_interface : public device_interface
 {
 public:
-	sam6883_friend_device() { m_cpu = nullptr; m_sam_state = 0x0000; }
+	sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider);
 
 protected:
 	// SAM state constants
@@ -52,10 +48,13 @@ protected:
 	static const uint16_t SAM_STATE_V0 = 0x0001;
 
 	// incidentals
-	cpu_device *            m_cpu;
+	required_device<cpu_device> m_cpu;
 
 	// device state
-	uint16_t                  m_sam_state;
+	uint16_t m_sam_state;
+
+	// base clock divider (/4 for MC6883, /8 for GIME)
+	int m_divider;
 
 	ATTR_FORCE_INLINE uint16_t display_offset(void)
 	{
@@ -83,19 +82,19 @@ protected:
 	void update_cpu_clock(void);
 };
 
-class sam6883_device : public device_t, public sam6883_friend_device
+class sam6883_device : public device_t, public sam6883_friend_device_interface
 {
 public:
-	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <class Object> static devcb_base &set_res_rd_callback(device_t &device, Object &&cb) { return downcast<sam6883_device &>(device).m_read_res.set_callback(std::forward<Object>(cb)); }
-
-	static void configure_cpu(device_t &device, const char *tag, int space)
+	template <typename T>
+    sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+        : sam6883_device(mconfig, tag, owner, clock)
 	{
-		sam6883_device &dev = downcast<sam6883_device &>(device);
-		dev.m_cpu_tag = tag;
-		dev.m_cpu_space_ref = space;
-	}
+        m_cpu.set_tag(std::forward<T>(cpu_tag));
+    }
+    
+    sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> devcb_base &set_res_rd_callback(Object &&cb) { return m_read_res.set_callback(std::forward<Object>(cb)); }
 
 	// called to configure banks
 	void configure_bank(int bank, uint8_t *memory, uint32_t memory_size, bool is_read_only);
@@ -167,9 +166,6 @@ private:
 		address_space &cpu_space() const;
 		void point_specific_bank(const sam_bank &bank, uint32_t offset, uint32_t mask, memory_bank *&memory_bank, uint32_t addrstart, uint32_t addrend, bool is_write);
 	};
-
-	const char *        m_cpu_tag;
-	int    m_cpu_space_ref;
 
 	// incidentals
 	address_space *             m_cpu_space;

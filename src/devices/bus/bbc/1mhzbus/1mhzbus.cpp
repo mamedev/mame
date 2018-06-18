@@ -71,12 +71,27 @@ bbc_1mhzbus_slot_device::~bbc_1mhzbus_slot_device()
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void bbc_1mhzbus_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_bbc_1mhzbus_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_bbc_1mhzbus_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bbc_1mhzbus_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_bbc_1mhzbus_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_bbc_1mhzbus_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_bbc_1mhzbus_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
@@ -90,10 +105,6 @@ void bbc_1mhzbus_slot_device::device_start()
 
 void bbc_1mhzbus_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 WRITE_LINE_MEMBER(bbc_1mhzbus_slot_device::rst_w)
@@ -120,18 +131,19 @@ WRITE_LINE_MEMBER(bbc_1mhzbus_slot_device::rst_w)
 #include "cfa3000opt.h"
 
 
-SLOT_INTERFACE_START(bbc_1mhzbus_devices)
-//  SLOT_INTERFACE("teletext",   BBC_TELETEXT)        /* Acorn ANE01 Teletext Adapter */
-//  SLOT_INTERFACE("ieee488",    BBC_IEEE488)         /* Acorn ANK01 IEEE488 Interface */
-//  SLOT_INTERFACE("m500",       BBC_M500)            /* Acorn ANV02 Music 500 */
-//  SLOT_INTERFACE("m2000",      BBC_M2000)           /* Hybrid Music 2000 MIDI Interface */
-//  SLOT_INTERFACE("m3000",      BBC_M3000)           /* Hybrid Music 3000 Expander */
-//  SLOT_INTERFACE("m5000",      BBC_M5000)           /* Hybrid Music 5000 Synthesiser */
-//  SLOT_INTERFACE("multiform",  BBC_MULTIFORM)       /* Technomatic Multiform Z80 */
-	SLOT_INTERFACE("opus3",      BBC_OPUS3)           /* Opus Challenger 3 */
-//  SLOT_INTERFACE("ramdisc",    BBC_RAMDISC)         /* Morley Electronics RAM Disc */
-//  SLOT_INTERFACE("graduate",   BBC_GRADUATE)        /* The Torch Graduate G400/G800 */
-	SLOT_INTERFACE("beebsid",    BBC_BEEBSID)         /* BeebSID */
-//  SLOT_INTERFACE("prisma3",    BBC_PRISMA3)         /* PRISMA-3 - Millipede 1989 */
-	SLOT_INTERFACE("cfa3000opt", CFA3000_OPT)         /* Henson CFA 3000 Option Board */
-SLOT_INTERFACE_END
+void bbc_1mhzbus_devices(device_slot_interface &device)
+{
+//  device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
+//  device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
+//  device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
+//  device.option_add("m2000",      BBC_M2000);           /* Hybrid Music 2000 MIDI Interface */
+//  device.option_add("m3000",      BBC_M3000);           /* Hybrid Music 3000 Expander */
+//  device.option_add("m5000",      BBC_M5000);           /* Hybrid Music 5000 Synthesiser */
+//  device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
+	device.option_add("opus3",      BBC_OPUS3);           /* Opus Challenger 3 */
+//  device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
+//  device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
+	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
+//  device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
+	device.option_add("cfa3000opt", CFA3000_OPT);         /* Henson CFA 3000 Option Board */
+}

@@ -119,14 +119,30 @@ void debug_view_state::recompute()
 	// add a cycles entry: cycles:99999999
 	m_state_list.emplace_back(REG_CYCLES, "cycles", 8);
 
-	// add a beam entry: beamx:1234
-	m_state_list.emplace_back(REG_BEAMX, "beamx", 4);
+	screen_device_iterator screen_iterator = screen_device_iterator(machine().root_device());
+	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
+	const int screen_count = screen_iterator.count();
 
-	// add a beam entry: beamy:5678
-	m_state_list.emplace_back(REG_BEAMY, "beamy", 4);
+	if (screen_count == 1)
+	{
+		// add a beam entry: beamx:1234
+		m_state_list.emplace_back(REG_BEAMX, "beamx", 4);
 
-	// add a beam entry: frame:123456
-	m_state_list.emplace_back(REG_FRAME, "frame", 6);
+		// add a beam entry: beamy:5678
+		m_state_list.emplace_back(REG_BEAMY, "beamy", 4);
+
+		// add a beam entry: frame:123456
+		m_state_list.emplace_back(REG_FRAME, "frame", 6);
+	}
+	else if (screen_count > 1)
+	{
+		for (int i = 0; (i < screen_count) && (i < 8); i++, iter++)
+		{
+			m_state_list.emplace_back(REG_BEAMX_S0 - i, string_format("beamx%d", i).c_str(), 4);
+			m_state_list.emplace_back(REG_BEAMY_S0 - i, string_format("beamy%d", i).c_str(), 4);
+			m_state_list.emplace_back(REG_FRAME_S0 - i, string_format("frame%d", i).c_str(), 6);
+		}
+	}
 
 	// add a flags entry: flags:xxxxxxxx
 	m_state_list.emplace_back(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS));
@@ -196,7 +212,6 @@ void debug_view_state::view_update()
 
 	// loop over rows
 	auto it(m_state_list.begin());
-	screen_device const *const screen(machine().first_screen());
 	debug_view_char *dest(&m_viewdata[0]);
 	for (s32 index = 0, limit = m_topleft.y + m_visible.y; (index < limit) || (it != m_state_list.end()); ++index)
 	{
@@ -218,35 +233,26 @@ void debug_view_state::view_update()
 				break;
 
 			case REG_CYCLES:
-				if (source.m_execintf)
-				{
-					curitem.update(source.m_execintf->cycles_remaining(), cycles_changed);
-					valstr = string_format("%-8d", curitem.value());
-				}
+				curitem.update(source.m_execintf ? source.m_execintf->cycles_remaining() : 0, cycles_changed);
+				valstr = string_format("%-8d", curitem.value());
 				break;
 
-			case REG_BEAMX:
-				if (screen)
-				{
-					curitem.update(screen->hpos(), cycles_changed);
-					valstr = string_format("%4d", curitem.value());
-				}
+			case REG_BEAMX_S0: case REG_BEAMX_S1: case REG_BEAMX_S2: case REG_BEAMX_S3:
+			case REG_BEAMX_S4: case REG_BEAMX_S5: case REG_BEAMX_S6: case REG_BEAMX_S7:
+				curitem.update(screen_device_iterator(machine().root_device()).byindex(-(curitem.index() - REG_BEAMX_S0))->hpos(), cycles_changed);
+				valstr = string_format("%4d", curitem.value());
 				break;
 
-			case REG_BEAMY:
-				if (screen)
-				{
-					curitem.update(screen->vpos(), cycles_changed);
-					valstr = string_format("%4d", curitem.value());
-				}
+			case REG_BEAMY_S0: case REG_BEAMY_S1: case REG_BEAMY_S2: case REG_BEAMY_S3:
+			case REG_BEAMY_S4: case REG_BEAMY_S5: case REG_BEAMY_S6: case REG_BEAMY_S7:
+				curitem.update(screen_device_iterator(machine().root_device()).byindex(-(curitem.index() - REG_BEAMY_S0))->vpos(), cycles_changed);
+				valstr = string_format("%4d", curitem.value());
 				break;
 
-			case REG_FRAME:
-				if (screen)
-				{
-					curitem.update(screen->frame_number(), cycles_changed);
-					valstr = string_format("%6d", curitem.value());
-				}
+			case REG_FRAME_S0: case REG_FRAME_S1: case REG_FRAME_S2: case REG_FRAME_S3:
+			case REG_FRAME_S4: case REG_FRAME_S5: case REG_FRAME_S6: case REG_FRAME_S7:
+				curitem.update(screen_device_iterator(machine().root_device()).byindex(-(curitem.index() - REG_FRAME_S0))->frame_number(), cycles_changed);
+				valstr = string_format("%-6d", curitem.value());
 				break;
 
 			default:

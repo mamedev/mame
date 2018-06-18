@@ -22,7 +22,6 @@ public:
 	READ8_MEMBER( data_r );
 
 	void vck_callback( int st );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,17 +32,14 @@ protected:
 
 	private:
 	// internal state
+	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	msm5205_device *m_msm;
-	address_space *m_space;
+	required_device<msm5205_device> m_msm;
 	uint8_t    m_adpcm_ready; // only bootlegs
 	uint8_t    m_adpcm_busy;
 	uint8_t    m_vck_ready;
 };
 
-MACHINE_CONFIG_EXTERN( hyprolyb_adpcm );
-
-extern const device_type HYPROLYB_ADPCM;
 DECLARE_DEVICE_TYPE(HYPROLYB_ADPCM, hyprolyb_adpcm_device)
 
 #endif // MAME_AUDIO_HYPROLYB_H

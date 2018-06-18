@@ -30,6 +30,7 @@
 #include "sound/beep.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -38,7 +39,7 @@
 #include "formats/mz_cas.h"
 
 
-#define MASTER_CLOCK XTAL_17_73447MHz/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
+#define MASTER_CLOCK 17.73447_MHz_XTAL  / 5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 
 #define UTF8_POUND "\xc2\xa3"
 #define UTF8_YEN "\xc2\xa5"
@@ -57,6 +58,7 @@ public:
 		m_cass(*this, "cassette"),
 		m_floppy(nullptr),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_mb8877a(*this, "mb8877a"),
 		m_floppy0(*this, "mb8877a:0"),
 		m_floppy1(*this, "mb8877a:1"),
@@ -127,8 +129,14 @@ public:
 	DECLARE_READ8_MEMBER(mz2000_pio1_portb_r);
 	DECLARE_READ8_MEMBER(mz2000_pio1_porta_r);
 
+	void mz2000(machine_config &config);
+	void mz80b(machine_config &config);
+	void mz2000_io(address_map &map);
+	void mz2000_map(address_map &map);
+	void mz80b_io(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<mb8877_device> m_mb8877a;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -397,32 +405,35 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_mask_w)
 	m_gvram_mask = data;
 }
 
-static ADDRESS_MAP_START(mz2000_map, AS_PROGRAM, 8, mz2000_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
-ADDRESS_MAP_END
+void mz2000_state::mz2000_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(mz2000_state::mz2000_mem_r), FUNC(mz2000_state::mz2000_mem_w));
+}
 
-static ADDRESS_MAP_START(mz80b_io, AS_IO, 8, mz2000_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xdc, 0xdc) AM_WRITE(floppy_select_w)
-	AM_RANGE(0xdd, 0xdd) AM_WRITE(floppy_side_w)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+void mz2000_state::mz80b_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xd8, 0xdb).rw(FUNC(mz2000_state::fdc_r), FUNC(mz2000_state::fdc_w));
+	map(0xdc, 0xdc).w(FUNC(mz2000_state::floppy_select_w));
+	map(0xdd, 0xdd).w(FUNC(mz2000_state::floppy_side_w));
+	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe4, 0xe7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xf0, 0xf3).w(FUNC(mz2000_state::timer_w));
 //  AM_RANGE(0xf4, 0xf4) AM_WRITE(vram_bank_w)
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
-	AM_IMPORT_FROM(mz80b_io)
-ADDRESS_MAP_END
+void mz2000_state::mz2000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	mz80b_io(map);
+	map(0xf5, 0xf5).w(FUNC(mz2000_state::mz2000_tvram_attr_w));
+	map(0xf6, 0xf6).w(FUNC(mz2000_state::mz2000_gvram_mask_w));
+	map(0xf7, 0xf7).w(FUNC(mz2000_state::mz2000_gvram_bank_w));
+}
 
 
 /*
@@ -683,7 +694,7 @@ static const gfx_layout mz2000_charlayout_16 =
 	8*16
 };
 
-static GFXDECODE_START( mz2000 )
+static GFXDECODE_START( gfx_mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz2000_charlayout_8, 0, 1 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
 GFXDECODE_END
@@ -715,7 +726,7 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	else
 		res |= 0x20;
 
-	res |= (machine().first_screen()->vblank()) ? 0x00 : 0x01;
+	res |= (m_screen->vblank()) ? 0x00 : 0x01;
 
 	return res;
 }
@@ -812,7 +823,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	{
 		m_ipl_enable = 0;
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	m_beeper->set_state(data & 0x04);
@@ -856,29 +867,30 @@ FLOPPY_FORMATS_MEMBER( mz2000_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( mz2000_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void mz2000_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 
-static MACHINE_CONFIG_START( mz2000 )
+MACHINE_CONFIG_START(mz2000_state::mz2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mz2000_map)
-	MCFG_CPU_IO_MAP(mz2000_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mz2000_map)
+	MCFG_DEVICE_IO_MAP(mz2000_io)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mz2000_state, mz2000_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz2000_state, mz2000_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz2000_state, mz2000_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz2000_state, mz2000_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz2000_state, mz2000_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2000_state, mz2000_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2000_state, mz2000_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2000_state, mz2000_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2000_state, mz2000_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2000_state, mz2000_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2000_state, mz2000_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2000_state, mz2000_portc_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_IN_PA_CB(READ8(mz2000_state, mz2000_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2000_state, mz2000_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mz2000_state, mz2000_pio1_portb_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2000_state, mz2000_pio1_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2000_state, mz2000_pio1_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2000_state, mz2000_pio1_portb_r))
 
 	/* TODO: clocks aren't known */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -886,7 +898,7 @@ static MACHINE_CONFIG_START( mz2000 )
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
+	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
@@ -911,21 +923,20 @@ static MACHINE_CONFIG_START( mz2000 )
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("beeper", BEEP, 4096)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
+	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mz80b, mz2000 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mz80b_io)
+MACHINE_CONFIG_START(mz2000_state::mz80b)
+	mz2000(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mz80b_io)
 MACHINE_CONFIG_END
 
 
@@ -994,7 +1005,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT   STATE         INIT  COMPANY    FULLNAME   FLAGS
-COMP( 1981, mz80b,    0,        0,       mz80b,    mz80be, mz2000_state, 0,    "Sharp",   "MZ-80B",  MACHINE_NOT_WORKING )
-COMP( 1982, mz2000,   0,        0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1982, mz2200,   mz2000,   0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2200", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz2000_state, empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
+COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
+COMP( 1982, mz2200, mz2000, 0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )

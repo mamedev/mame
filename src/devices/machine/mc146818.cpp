@@ -528,7 +528,7 @@ READ8_MEMBER( mc146818_device::read )
 			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
 			/// TODO: support other dividers
 			/// TODO: don't set this if update is stopped
-			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
+			if ((machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
 				data |= REG_A_UIP;
 			break;
 
@@ -582,8 +582,11 @@ WRITE8_MEMBER( mc146818_device::write )
 
 		case REG_A:
 			// top bit of A is read only
-			m_data[REG_A] = data & ~REG_A_UIP;
-			update_timer();
+			if ((data ^ m_data[REG_A]) & ~REG_A_UIP)
+			{
+				m_data[REG_A] = data & ~REG_A_UIP;
+				update_timer();
+			}
 			break;
 
 		case REG_B:

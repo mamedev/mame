@@ -9,7 +9,7 @@
 
 
 #define MCFG_KAYPRO10KBD_RXD_CB(cb) \
-		devcb = &kaypro_10_keyboard_device::set_rxd_cb(*device, DEVCB_##cb);
+		devcb = &downcast<kaypro_10_keyboard_device &>(*device).set_rxd_cb(DEVCB_##cb);
 
 
 class kaypro_10_keyboard_device : public device_t
@@ -21,8 +21,7 @@ public:
 			device_t *owner,
 			std::uint32_t clock);
 
-	template <class Object> static devcb_base &set_rxd_cb(device_t &device, Object &&cb)
-	{ return downcast<kaypro_10_keyboard_device &>(device).m_rxd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxd_cb(Object &&cb) { return m_rxd_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(txd_w) { m_txd = state ? 1U : 0U; }
 

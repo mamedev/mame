@@ -628,47 +628,47 @@ READ16_MEMBER(md_rom_chinf3_device::read)
 		 04dc10 chifi3, prot_r? 2800
 		 04cefa chifi3, prot_r? 65262
 		 */
-		if (space.machine().device("maincpu")->safe_pc() == 0x01782) // makes 'VS' screen appear
+		if (machine().device<cpu_device>("maincpu")->pc() == 0x01782) // makes 'VS' screen appear
 		{
-			retdat = space.machine().device("maincpu")->state().state_int(M68K_D3) & 0xff;
+			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (space.machine().device("maincpu")->safe_pc() == 0x1c24) // background gfx etc.
+		else if (machine().device<cpu_device>("maincpu")->pc() == 0x1c24) // background gfx etc.
 		{
-			retdat = space.machine().device("maincpu")->state().state_int(M68K_D3) & 0xff;
+			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (space.machine().device("maincpu")->safe_pc() == 0x10c4a) // unknown
+		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c4a) // unknown
 		{
-			return space.machine().rand();
+			return machine().rand();
 		}
-		else if (space.machine().device("maincpu")->safe_pc() == 0x10c50) // unknown
+		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c50) // unknown
 		{
-			return space.machine().rand();
+			return machine().rand();
 		}
-		else if (space.machine().device("maincpu")->safe_pc() == 0x10c52) // relates to the game speed..
+		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c52) // relates to the game speed..
 		{
-			retdat = space.machine().device("maincpu")->state().state_int(M68K_D4) & 0xff;
+			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D4) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (space.machine().device("maincpu")->safe_pc() == 0x061ae)
+		else if (machine().device<cpu_device>("maincpu")->pc() == 0x061ae)
 		{
-			retdat = space.machine().device("maincpu")->state().state_int(M68K_D3) & 0xff;
+			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (space.machine().device("maincpu")->safe_pc() == 0x061b0)
+		else if (machine().device<cpu_device>("maincpu")->pc() == 0x061b0)
 		{
-			retdat = space.machine().device("maincpu")->state().state_int(M68K_D3) & 0xff;
+			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
 		else
 		{
-			logerror("%06x chifi3, prot_r? %04x\n", space.machine().device("maincpu")->safe_pc(), offset);
+			logerror("%06x chifi3, prot_r? %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset);
 		}
 		return 0;
 	}
@@ -693,7 +693,7 @@ WRITE16_MEMBER(md_rom_chinf3_device::write)
 		else if (data == 0x0000)
 			m_bank = 0;
 		else
-			logerror("%06x chifi3, bankw? %04x %04x\n", space.device().safe_pc(), offset, data);
+			logerror("%06x chifi3, bankw? %04x %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
 	}
 }
 
@@ -1293,22 +1293,22 @@ READ16_MEMBER(md_rom_topf_device::read)
 		 cpu #0 (PC=001771A2): unmapped program memory word read from 006BD294 & 00FF
 		 */
 
-		if (space.device().safe_pc()==0x1771a2) return 0x50;
+		if (machine().device<cpu_device>("maincpu")->pc()==0x1771a2) return 0x50;
 		else
 		{
 			m_latch++;
-			logerror("%06x topfig_6BD294_r %04x\n",space.device().safe_pc(), m_latch);
+			logerror("%06x topfig_6BD294_r %04x\n",machine().device<cpu_device>("maincpu")->pc(), m_latch);
 			return m_latch;
 		}
 	}
 	if (offset == 0x6f5344/2)
 	{
-		if (space.device().safe_pc()==0x4C94E)
-			return space.machine().device("maincpu")->state().state_int((M68K_D0)) & 0xff;
+		if (machine().device<cpu_device>("maincpu")->pc()==0x4C94E)
+			return machine().device<cpu_device>("maincpu")->state_int((M68K_D0)) & 0xff;
 		else
 		{
 			m_latch++;
-			logerror("%06x topfig_6F5344_r %04x\n", space.device().safe_pc(), m_latch);
+			logerror("%06x topfig_6F5344_r %04x\n", machine().device<cpu_device>("maincpu")->pc(), m_latch);
 			return m_latch;
 		}
 	}
@@ -1346,7 +1346,7 @@ WRITE16_MEMBER(md_rom_topf_device::write)
 			m_bank[2] = 0;
 		}
 		else
-			logerror("%06x offset %06x, data %04x\n", space.device().safe_pc(), offset, data);
+			logerror("%06x offset %06x, data %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
 	}
 }
 

@@ -14,7 +14,7 @@
 
 #define DECO16_VERBOSE 1
 
-DEFINE_DEVICE_TYPE(DECO16, deco16_device, "deco16", "DECO16")
+DEFINE_DEVICE_TYPE(DECO16, deco16_device, "deco16", "Data East DECO16")
 
 deco16_device::deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, DECO16, tag, owner, clock),
@@ -23,17 +23,17 @@ deco16_device::deco16_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-util::disasm_interface *deco16_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco16_device::create_disassembler()
 {
-	return new deco16_disassembler;
+	return std::make_unique<deco16_disassembler>();
 }
 
 void deco16_device::device_start()
 {
-	if(direct_disabled)
-		mintf = new mi_default_nd;
+	if(cache_disabled)
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 

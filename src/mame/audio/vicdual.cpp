@@ -58,7 +58,7 @@ static const discrete_mixer_desc frogsMixer =
 	0, RES_K(56), 0, CAP_U(0.1), 0, 10000
 };
 
-static DISCRETE_SOUND_START(frogs)
+static DISCRETE_SOUND_START(frogs_discrete)
 	/************************************************
 	 * Input register mapping for frogs
 	 *
@@ -111,14 +111,13 @@ static const char *const frogs_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START( frogs_audio )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+MACHINE_CONFIG_START(vicdual_state::frogs_audio)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(frogs_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(frogs)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, frogs_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -313,7 +312,7 @@ static const discrete_op_amp_filt_info headon_sallen_key_info =
 	CAP_N(470), CAP_N(47), 0
 };
 
-static DISCRETE_SOUND_START(headon)
+static DISCRETE_SOUND_START(headon_discrete)
 	/************************************************
 	 * Input register mapping for headon
 	 *
@@ -445,10 +444,9 @@ static DISCRETE_SOUND_START(headon)
 
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_START( headon_audio )
+MACHINE_CONFIG_START(vicdual_state::headon_audio)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(headon)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, headon_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -507,7 +505,7 @@ WRITE8_MEMBER( vicdual_state::invho2_audio_w )
 #define BRDRLINE_WALK_TRG_SND       NODE_97
 #define BRDRLINE_CRY_TRG_SND        NODE_98
 
-DISCRETE_SOUND_START(brdrline)
+DISCRETE_SOUND_START(brdrline_discrete)
 	/************************************************
 	 * Input register mapping
 	 ************************************************/
@@ -592,8 +590,8 @@ static const char *const brdrline_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START( brdrline_audio )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+MACHINE_CONFIG_START(vicdual_state::brdrline_audio)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(7)
 	MCFG_SAMPLES_NAMES(brdrline_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)

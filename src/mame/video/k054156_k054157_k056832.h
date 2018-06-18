@@ -5,15 +5,16 @@
 
 #pragma once
 
+#include "video/k055555.h" // still needs k055555_get_palette_index
 
 typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
 #define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)
 
 #define MCFG_K056832_CB(_class, _method) \
-	k056832_device::set_k056832_callback(*device, k056832_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<k056832_device &>(*device).set_k056832_callback(k056832_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
-#define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack, _k055555) \
-	k056832_device::set_config(*device, "^" _gfx_reg, _bpp, _big, _djmain_hack, _k055555);
+#define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack) \
+	downcast<k056832_device &>(*device).set_config(_gfx_reg, _bpp, _big, _djmain_hack);
 
 
 #define K056832_PAGE_COUNT 16
@@ -37,17 +38,21 @@ class k055555_device;
 class k056832_device : public device_t, public device_gfx_interface
 {
 public:
+	template <typename T> k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
+		: k056832_device(mconfig, tag, owner, clock)
+	{
+		m_k055555.set_tag(std::forward<T>(mixer_tag));
+	}
+
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_k056832_callback(device_t &device, k056832_cb_delegate callback) { downcast<k056832_device &>(device).m_k056832_cb = callback; }
-	static void set_config(device_t &device, const char *gfx_reg, int bpp, int big, int djmain_hack, const char *k055555)
+	void set_k056832_callback(k056832_cb_delegate callback) { m_k056832_cb = callback; }
+	void set_config(const char *gfx_reg, int bpp, int big, int djmain_hack)
 	{
-		k056832_device &dev = downcast<k056832_device &>(device);
-		dev.m_rombase.set_tag(gfx_reg);
-		dev.m_bpp = bpp;
-		dev.m_big = big;
-		dev.m_djmain_hack = djmain_hack;
-		dev.m_k055555_tag = k055555;
+		m_rombase.set_tag(gfx_reg);
+		m_bpp = bpp;
+		m_big = big;
+		m_djmain_hack = djmain_hack;
 	}
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
@@ -136,9 +141,6 @@ private:
 	int                m_big;
 	int                m_djmain_hack;
 
-	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555
-
-
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
 	// RAM window resets this state so you get the first half.
@@ -168,10 +170,7 @@ private:
 	int       m_use_ext_linescroll;
 	int       m_uses_tile_banks, m_cur_tile_bank;
 
-
-
-
-	k055555_device *m_k055555;  /* used to choose colorbase */
+	optional_device<k055555_device> m_k055555;  /* used to choose colorbase */
 
 	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
 

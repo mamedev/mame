@@ -8,6 +8,7 @@
 
 #include "machine/74259.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class zaxxon_state : public driver_device
 {
@@ -49,6 +50,7 @@ public:
 	uint8_t m_bg_color;
 	uint16_t m_bg_position;
 	uint8_t m_fg_color;
+	bool m_flip_screen;
 
 	uint8_t m_congo_fg_bank;
 	uint8_t m_congo_color_bank;
@@ -77,8 +79,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
-	DECLARE_DRIVER_INIT(razmataz);
-	DECLARE_DRIVER_INIT(zaxxonj);
+	void init_razmataz();
+	void init_zaxxonj();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
@@ -103,9 +105,20 @@ public:
 	inline int find_minimum_y(uint8_t value, int flip);
 	inline int find_minimum_x(uint8_t value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask);
+	void root(machine_config &config);
+	void ixion(machine_config &config);
+	void futspye(machine_config &config);
+	void congo(machine_config &config);
+	void szaxxon(machine_config &config);
+	void razmataze(machine_config &config);
+	void szaxxone(machine_config &config);
+	void zaxxon(machine_config &config);
+	void zaxxon_samples(machine_config &config);
+	void congo_samples(machine_config &config);
+	void congo_map(address_map &map);
+	void congo_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void ixion_map(address_map &map);
+	void zaxxon_map(address_map &map);
 };
 
-
-/*----------- defined in audio/zaxxon.c -----------*/
-MACHINE_CONFIG_EXTERN( zaxxon_samples );
-MACHINE_CONFIG_EXTERN( congo_samples );

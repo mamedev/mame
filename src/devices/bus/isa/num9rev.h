@@ -8,6 +8,7 @@
 #include "isa.h"
 #include "video/upd7220.h"
 #include "machine/bankdev.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -23,6 +24,19 @@ public:
 	// construction/destruction
 	isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_display_pixels);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	DECLARE_READ8_MEMBER(pal8_r);
 	DECLARE_WRITE8_MEMBER(pal8_w);
 	DECLARE_READ8_MEMBER(pal12_r);
@@ -36,18 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(read8);
 	DECLARE_WRITE8_MEMBER(write8);
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_display_pixels);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void upd7220_map(address_map &map);
 
 	required_device<upd7220_device> m_upd7220;
 	required_device<palette_device> m_palette;

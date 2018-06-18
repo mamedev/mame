@@ -14,7 +14,7 @@
 #define CURSOR_XPOS         168
 #define CURSOR_YPOS         239
 #define FRAMEBUFFER_MAX_X   431
-#define FRAMEBUFFER_MAX_Y   (uint32_t)((FRAMEBUFFER_CLOCK / (float)(FRAMEBUFFER_MAX_X-1)) / ((float)PIXEL_CLOCK/(HTOTAL*VTOTAL)))
+#define FRAMEBUFFER_MAX_Y   (uint32_t)((FRAMEBUFFER_CLOCK / (FRAMEBUFFER_MAX_X-1)).dvalue() / (PIXEL_CLOCK/(HTOTAL*VTOTAL)).dvalue())
 
 
 /*************************************

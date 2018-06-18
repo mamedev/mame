@@ -41,16 +41,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void c68ksbc(machine_config &config);
+	void c68ksbc_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x002fff) AM_ROM
-	AM_RANGE(0x003000, 0x5fffff) AM_RAM
-	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void c68ksbc_state::c68ksbc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x002fff).rom();
+	map(0x003000, 0x5fffff).ram();
+	map(0x600000, 0x600003).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
 
 /* Input ports */
@@ -58,22 +61,22 @@ static INPUT_PORTS_START( c68ksbc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( c68ksbc )
+MACHINE_CONFIG_START(c68ksbc_state::c68ksbc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
-	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
+	MCFG_DEVICE_PROGRAM_MAP(c68ksbc_mem)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -84,5 +87,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY             FULLNAME                     FLAGS */
-COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, c68ksbc_state,  0,    "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                     FLAGS */
+COMP( 2002, 68ksbc, 0,      0,      c68ksbc, c68ksbc, c68ksbc_state, empty_init, "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)

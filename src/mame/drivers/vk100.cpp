@@ -244,7 +244,7 @@ public:
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
-	DECLARE_DRIVER_INIT(vk100);
+	void init_vk100();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
@@ -257,6 +257,9 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void vram_write(uint8_t data);
 
+	void vk100(machine_config &config);
+	void vk100_io(address_map &map);
+	void vk100_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -422,7 +425,7 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		m_vgPAT_Mask >>= 1; // shift the mask
 		if (m_vgPAT_Mask == 0) m_vgPAT_Mask = 0x80; // reset mask if it hits 0
 	}
-	if (m_vgGO) timer_set(attotime::from_hz(XTAL_45_6192MHz/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+	if (m_vgGO) timer_set(attotime::from_hz(XTAL(45'619'200)/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
@@ -616,8 +619,8 @@ WRITE8_MEMBER(vk100_state::KBDW)
  */
 WRITE8_MEMBER(vk100_state::BAUD)
 {
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
+	m_dbrg->write_str(data & 0x0f);
+	m_dbrg->write_stt(data >> 4);
 }
 
 /* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
@@ -684,12 +687,13 @@ READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 	return code;
 }
 
-static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x700f ) AM_MIRROR(0x0ff0) AM_READ(vk100_keyboard_column_r)
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
-ADDRESS_MAP_END
+void vk100_state::vk100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x700f).mirror(0x0ff0).r(FUNC(vk100_state::vk100_keyboard_column_r));
+	map(0x8000, 0xbfff).ram();
+}
 
 /*
  * 8085 IO address map (x = ignored; * = selects address within this range; ? = not sure; ** = subparts check this bit)
@@ -732,37 +736,38 @@ ADDRESS_MAP_END
    x   1   1   1   1   0   x   x     W     unused
    x   1   1   1   1   1   x   x     W     unused
 */
-static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff) // guess, probably correct
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xBE) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xBE) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+void vk100_state::vk100_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff); // guess, probably correct
+	map(0x00, 0x00).mirror(0xBE).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).mirror(0xBE).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
-	AM_RANGE (0x40, 0x41) AM_MIRROR(0x98) AM_WRITE(vgLD_X)  //LD X LO + HI 12 bits
-	AM_RANGE (0x42, 0x43) AM_MIRROR(0x98) AM_WRITE(vgLD_Y)  //LD Y LO + HI 12 bits
-	AM_RANGE (0x44, 0x44) AM_MIRROR(0x98) AM_WRITE(vgERR)    //LD ERR ('error' in bresenham algorithm)
-	AM_RANGE (0x45, 0x45) AM_MIRROR(0x98) AM_WRITE(vgSOPS)   //LD SOPS (screen options (plus uart dest))
-	AM_RANGE (0x46, 0x46) AM_MIRROR(0x98) AM_WRITE(vgPAT)    //LD PAT (pattern register)
-	AM_RANGE (0x47, 0x47) AM_MIRROR(0x98) AM_WRITE(vgPMUL)   //LD PMUL (pattern multiplier)
-	AM_RANGE (0x60, 0x63) AM_MIRROR(0x80) AM_WRITE(vgREG)     //LD DU, DVM, DIR, WOPS (register file)
-	AM_RANGE (0x64, 0x67) AM_MIRROR(0x80) AM_WRITE(vgEX)    //EX MOV, DOT, VEC, ER
-	AM_RANGE (0x68, 0x68) AM_MIRROR(0x83) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
-	AM_RANGE (0x6C, 0x6C) AM_MIRROR(0x83) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
-	AM_RANGE (0x70, 0x70) AM_MIRROR(0x82) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
-	AM_RANGE (0x71, 0x71) AM_MIRROR(0x82) AM_DEVWRITE("i8251", i8251_device, control_w) //LD COM (i8251 control reg)
+	map(0x40, 0x41).mirror(0x98).w(FUNC(vk100_state::vgLD_X));  //LD X LO + HI 12 bits
+	map(0x42, 0x43).mirror(0x98).w(FUNC(vk100_state::vgLD_Y));  //LD Y LO + HI 12 bits
+	map(0x44, 0x44).mirror(0x98).w(FUNC(vk100_state::vgERR));    //LD ERR ('error' in bresenham algorithm)
+	map(0x45, 0x45).mirror(0x98).w(FUNC(vk100_state::vgSOPS));   //LD SOPS (screen options (plus uart dest))
+	map(0x46, 0x46).mirror(0x98).w(FUNC(vk100_state::vgPAT));    //LD PAT (pattern register)
+	map(0x47, 0x47).mirror(0x98).w(FUNC(vk100_state::vgPMUL));   //LD PMUL (pattern multiplier)
+	map(0x60, 0x63).mirror(0x80).w(FUNC(vk100_state::vgREG));     //LD DU, DVM, DIR, WOPS (register file)
+	map(0x64, 0x67).mirror(0x80).w(FUNC(vk100_state::vgEX));    //EX MOV, DOT, VEC, ER
+	map(0x68, 0x68).mirror(0x83).w(FUNC(vk100_state::KBDW));   //KBDW (probably AM_MIRROR(0x03))
+	map(0x6C, 0x6C).mirror(0x83).w(FUNC(vk100_state::BAUD));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
+	map(0x70, 0x70).mirror(0x82).w(m_uart, FUNC(i8251_device::data_w)); //LD COMD (i8251 data reg)
+	map(0x71, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::control_w)); //LD COM (i8251 control reg)
 	//AM_RANGE (0x74, 0x74) AM_MIRROR(0x83) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_MIRROR(0x83) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_MIRROR(0x83) AM_WRITE(unknown_7C)
-	AM_RANGE (0x40, 0x47) AM_MIRROR(0x80) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
-	AM_RANGE (0x48, 0x48) AM_MIRROR(0x87/*0x80*/) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff)
-	AM_RANGE (0x50, 0x50) AM_MIRROR(0x86) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
-	AM_RANGE (0x51, 0x51) AM_MIRROR(0x86) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
+	map(0x40, 0x47).mirror(0x80).r(FUNC(vk100_state::SYSTAT_A)); // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
+	map(0x48, 0x48).mirror(0x87/*0x80*/).r(FUNC(vk100_state::SYSTAT_B)); // SYSTAT B (uart stuff)
+	map(0x50, 0x50).mirror(0x86).r(m_uart, FUNC(i8251_device::data_r)); // UART O
+	map(0x51, 0x51).mirror(0x86).r(m_uart, FUNC(i8251_device::status_r)); // UAR
 	//AM_RANGE (0x58, 0x58) AM_MIRROR(0x87) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_MIRROR(0x87) AM_READ(unknown_60)
 	//AM_RANGE (0x68, 0x68) AM_MIRROR(0x87) AM_READ(unknown_68) // NOT USED
 	//AM_RANGE (0x70, 0x70) AM_MIRROR(0x87) AM_READ(unknown_70)
 	//AM_RANGE (0x78, 0x7f) AM_MIRROR(0x87) AM_READ(unknown_78)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vk100 )
@@ -983,7 +988,7 @@ WRITE_LINE_MEMBER(vk100_state::i8251_rts)
 	m_ACTS = state;
 }
 
-DRIVER_INIT_MEMBER(vk100_state,vk100)
+void vk100_state::init_vk100()
 {
 	// figure out how the heck to initialize the timers here
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
@@ -1032,43 +1037,43 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( vk100 )
+MACHINE_CONFIG_START(vk100_state::vk100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
-	MCFG_CPU_PROGRAM_MAP(vk100_mem)
-	MCFG_CPU_IO_MAP(vk100_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'068'800))
+	MCFG_DEVICE_PROGRAM_MAP(vk100_mem)
+	MCFG_DEVICE_IO_MAP(vk100_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192MHz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
+	MCFG_SCREEN_RAW_PARAMS(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192MHz/3/12)
+	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL(45'619'200)/3/12)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(vk100_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(vk100_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, vk100_state, crtc_vsync))
 
 	/* i8251 uart */
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vk100_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vk100_state, i8251_txrdy_int))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vk100_state, i8251_rxrdy_int))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vk100_state, i8251_txrdy_int))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 
@@ -1266,5 +1271,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY                          FULLNAME        FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100, vk100_state,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME        FLAGS */
+COMP( 1980, vk100, 0,      0,      vk100,   vk100, vk100_state, init_vk100, "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

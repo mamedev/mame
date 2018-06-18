@@ -23,26 +23,6 @@ public:
 	// construction/destruction
 	stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// mcu ports
-	DECLARE_READ8_MEMBER( dev_dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dev_dsp_data_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_WRITE8_MEMBER( dev_host_irq_w );
-	DECLARE_WRITE8_MEMBER( raise_drq_w );
-	DECLARE_WRITE8_MEMBER( port20_w );
-	DECLARE_WRITE8_MEMBER( port00_w );
-
-	// host ports
-	DECLARE_READ8_MEMBER( dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dsp_cmd_w );
-	DECLARE_WRITE8_MEMBER( dsp_reset_w );
-	DECLARE_READ8_MEMBER( dsp_wbuf_status_r );
-	DECLARE_READ8_MEMBER( dsp_rbuf_status_r );
-	DECLARE_READ8_MEMBER( invalid_r );
-	DECLARE_WRITE8_MEMBER( invalid_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,6 +52,29 @@ private:
 	emu_timer *m_timer;
 	uint8_t m_t0;
 	uint8_t m_t1;
+
+	// mcu ports
+	DECLARE_READ8_MEMBER( dev_dsp_data_r );
+	DECLARE_WRITE8_MEMBER( dev_dsp_data_w );
+	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_READ8_MEMBER( p3_r );
+	DECLARE_WRITE8_MEMBER( p3_w );
+	DECLARE_WRITE8_MEMBER( dev_host_irq_w );
+	DECLARE_WRITE8_MEMBER( raise_drq_w );
+	DECLARE_WRITE8_MEMBER( port20_w );
+	DECLARE_WRITE8_MEMBER( port00_w );
+
+	// host ports
+	DECLARE_READ8_MEMBER( dsp_data_r );
+	DECLARE_WRITE8_MEMBER( dsp_cmd_w );
+	DECLARE_WRITE8_MEMBER( dsp_reset_w );
+	DECLARE_READ8_MEMBER( dsp_wbuf_status_r );
+	DECLARE_READ8_MEMBER( dsp_rbuf_status_r );
+	DECLARE_READ8_MEMBER( invalid_r );
+	DECLARE_WRITE8_MEMBER( invalid_w );
+
+	void stereo_fx_io(address_map &map);
+	void stereo_fx_rom(address_map &map);
 };
 
 // device type definition

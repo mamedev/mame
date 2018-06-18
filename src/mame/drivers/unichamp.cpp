@@ -44,6 +44,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -64,7 +65,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 
 	uint8_t m_ram[256];
-	DECLARE_DRIVER_INIT(unichamp);
+	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(unichamp);
@@ -81,6 +82,8 @@ public:
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void unichamp(machine_config &config);
+	void unichamp_mem(address_map &map);
 protected:
 	required_ioport m_ctrls;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -104,12 +107,13 @@ PALETTE_INIT_MEMBER(unichamp_state, unichamp)
 }
 
 
-static ADDRESS_MAP_START( unichamp_mem, AS_PROGRAM, 16, unichamp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) //B13/B14/B15 are grounded!
-	AM_RANGE(0x0000, 0x00FF) AM_READWRITE8(unichamp_gicram_r, unichamp_gicram_w, 0x00ff)
-	AM_RANGE(0x0100, 0x07FF) AM_READWRITE(unichamp_trapl_r, unichamp_trapl_w)
-	AM_RANGE(0x0800, 0x0FFF) AM_ROM AM_REGION("maincpu", 0)   // Carts and EXE ROM, 10-bits wide
-ADDRESS_MAP_END
+void unichamp_state::unichamp_mem(address_map &map)
+{
+	map.global_mask(0x1FFF); //B13/B14/B15 are grounded!
+	map(0x0000, 0x00FF).rw(FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
+	map(0x0100, 0x07FF).rw(FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
+	map(0x0800, 0x0FFF).rom().region("maincpu", 0);   // Carts and EXE ROM, 10-bits wide
+}
 
 
 static INPUT_PORTS_START( unichamp )
@@ -152,7 +156,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 }
 
 
-DRIVER_INIT_MEMBER(unichamp_state,unichamp)
+void unichamp_state::init_unichamp()
 {
 }
 
@@ -231,22 +235,22 @@ WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }
 
-static MACHINE_CONFIG_START( unichamp )
+MACHINE_CONFIG_START(unichamp_state::unichamp)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
-	//MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)
+	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will me the same though)
-	MCFG_CPU_ADD("maincpu", CP1610, (int)((7752.0/29868.0)*XTAL_3_579545MHz/4))
+	MCFG_DEVICE_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
 
-	MCFG_CPU_PROGRAM_MAP(unichamp_mem)
+	MCFG_DEVICE_PROGRAM_MAP(unichamp_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_CP1610_BEXT_CALLBACK(READ8(unichamp_state, bext_r))
+	MCFG_CP1610_BEXT_CALLBACK(READ8(*this, unichamp_state, bext_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_3_579545MHz,
+	MCFG_SCREEN_RAW_PARAMS( XTAL(3'579'545),
 							gic_device::LINE_CLOCKS,
 							gic_device::START_ACTIVE_SCAN,
 							gic_device::END_ACTIVE_SCAN,
@@ -261,8 +265,8 @@ static MACHINE_CONFIG_START( unichamp )
 	MCFG_PALETTE_INIT_OWNER(unichamp_state, unichamp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_GIC_ADD( "gic", XTAL_3_579545MHz, "screen", READ8(unichamp_state, unichamp_gicram_r) )
+	SPEAKER(config, "mono").front_center();
+	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(*this, unichamp_state, unichamp_gicram_r) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* cartridge */
@@ -286,4 +290,4 @@ ROM_START(unichamp)
 ROM_END
 
 
-CONS( 1977, unichamp, 0,  0, unichamp, unichamp,  unichamp_state,   unichamp,  "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )
+CONS( 1977, unichamp, 0, 0, unichamp, unichamp, unichamp_state, init_unichamp, "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )

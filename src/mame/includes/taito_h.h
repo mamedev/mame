@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "machine/taitoio.h"
 #include "video/tc0080vco.h"
+#include "emupal.h"
 
 
 class taitoh_state : public driver_device
@@ -45,4 +46,13 @@ public:
 	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void taitoh_log_vram();
+	void recordbr(machine_config &config);
+	void syvalion(machine_config &config);
+	void dleague(machine_config &config);
+	void tetristh(machine_config &config);
+	void dleague_map(address_map &map);
+	void recordbr_map(address_map &map);
+	void sound_map(address_map &map);
+	void syvalion_map(address_map &map);
+	void tetristh_map(address_map &map);
 };

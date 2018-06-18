@@ -42,11 +42,14 @@ protected:
 	void cbm_iec_atn(int state) override;
 	void cbm_iec_data(int state) override;
 	void cbm_iec_reset(int state) override;
+
+private:
+	void vic1520_mem(address_map &map);
 };
 
 
 // device type definition
-extern const device_type VIC1520;
+DECLARE_DEVICE_TYPE(VIC1520, vic1520_device)
 
 
 #endif // MAME_BUS_CBMIEC_VIC1520_H

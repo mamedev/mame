@@ -23,7 +23,6 @@
  *
  * TODO
  *   - fault register values
- *   - alignment faults
  *   - c3 protection faults
  *   - hard-wired and dynamic tlb
  *   - cache
@@ -33,6 +32,8 @@
 #include "emu.h"
 #include "cammu.h"
 
+#include <algorithm>
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_ACCESS  (1U << 1)
 #define LOG_DTU     (1U << 2)
@@ -41,89 +42,92 @@
 #include "logmacro.h"
 
 // each variant of the cammu has different registers and a different addressing map
-DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4t_device)
-	AM_RANGE(0x008, 0x00b) AM_READWRITE(ram_line_r, ram_line_w)
-	AM_RANGE(0x010, 0x013) AM_READWRITE(s_pdo_r, s_pdo_w)
-	AM_RANGE(0x018, 0x01b) AM_READWRITE(u_pdo_r, u_pdo_w)
-	AM_RANGE(0x020, 0x023) AM_READWRITE(htlb_offset_r, htlb_offset_w)
-	AM_RANGE(0x028, 0x02b) AM_READWRITE(i_fault_r, i_fault_w)
-	AM_RANGE(0x030, 0x033) AM_READWRITE(fault_address_1_r, fault_address_1_w)
-	AM_RANGE(0x038, 0x03b) AM_READWRITE(fault_address_2_r, fault_address_2_w)
-	AM_RANGE(0x040, 0x043) AM_READWRITE(fault_data_1_lo_r, fault_data_1_lo_w)
-	AM_RANGE(0x048, 0x04b) AM_READWRITE(fault_data_1_hi_r, fault_data_1_hi_w)
-	AM_RANGE(0x050, 0x053) AM_READWRITE(fault_data_2_lo_r, fault_data_2_lo_w)
-	AM_RANGE(0x058, 0x05b) AM_READWRITE(fault_data_2_hi_r, fault_data_2_hi_w)
-	AM_RANGE(0x060, 0x063) AM_READWRITE(c4_bus_poll_r, c4_bus_poll_w)
-	AM_RANGE(0x068, 0x06b) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x070, 0x073) AM_READWRITE(bio_control_r, bio_control_w)
-	AM_RANGE(0x078, 0x07b) AM_READWRITE(bio_address_tag_r, bio_address_tag_w)
+void cammu_c4t_device::map(address_map &map)
+{
+	map(0x008, 0x00b).rw(FUNC(cammu_c4t_device::ram_line_r), FUNC(cammu_c4t_device::ram_line_w));
+	map(0x010, 0x013).rw(FUNC(cammu_c4t_device::s_pdo_r), FUNC(cammu_c4t_device::s_pdo_w));
+	map(0x018, 0x01b).rw(FUNC(cammu_c4t_device::u_pdo_r), FUNC(cammu_c4t_device::u_pdo_w));
+	map(0x020, 0x023).rw(FUNC(cammu_c4t_device::htlb_offset_r), FUNC(cammu_c4t_device::htlb_offset_w));
+	map(0x028, 0x02b).rw(FUNC(cammu_c4t_device::i_fault_r), FUNC(cammu_c4t_device::i_fault_w));
+	map(0x030, 0x033).rw(FUNC(cammu_c4t_device::fault_address_1_r), FUNC(cammu_c4t_device::fault_address_1_w));
+	map(0x038, 0x03b).rw(FUNC(cammu_c4t_device::fault_address_2_r), FUNC(cammu_c4t_device::fault_address_2_w));
+	map(0x040, 0x043).rw(FUNC(cammu_c4t_device::fault_data_1_lo_r), FUNC(cammu_c4t_device::fault_data_1_lo_w));
+	map(0x048, 0x04b).rw(FUNC(cammu_c4t_device::fault_data_1_hi_r), FUNC(cammu_c4t_device::fault_data_1_hi_w));
+	map(0x050, 0x053).rw(FUNC(cammu_c4t_device::fault_data_2_lo_r), FUNC(cammu_c4t_device::fault_data_2_lo_w));
+	map(0x058, 0x05b).rw(FUNC(cammu_c4t_device::fault_data_2_hi_r), FUNC(cammu_c4t_device::fault_data_2_hi_w));
+	map(0x060, 0x063).rw(FUNC(cammu_c4t_device::c4_bus_poll_r), FUNC(cammu_c4t_device::c4_bus_poll_w));
+	map(0x068, 0x06b).rw(FUNC(cammu_c4t_device::control_r), FUNC(cammu_c4t_device::control_w));
+	map(0x070, 0x073).rw(FUNC(cammu_c4t_device::bio_control_r), FUNC(cammu_c4t_device::bio_control_w));
+	map(0x078, 0x07b).rw(FUNC(cammu_c4t_device::bio_address_tag_r), FUNC(cammu_c4t_device::bio_address_tag_w));
 
-	AM_RANGE(0x100, 0x103) AM_READWRITE(cache_data_lo_r, cache_data_lo_w)
-	AM_RANGE(0x104, 0x107) AM_READWRITE(cache_data_hi_r, cache_data_hi_w)
-	AM_RANGE(0x108, 0x10b) AM_READWRITE(cache_cpu_tag_r, cache_cpu_tag_w)
-	AM_RANGE(0x10c, 0x10f) AM_READWRITE(cache_system_tag_valid_r, cache_system_tag_valid_w)
-	AM_RANGE(0x110, 0x113) AM_READWRITE(cache_system_tag_r, cache_system_tag_w)
-	AM_RANGE(0x118, 0x11b) AM_READWRITE(tlb_va_line_r, tlb_va_line_w)
-	AM_RANGE(0x11c, 0x11f) AM_READWRITE(tlb_ra_line_r, tlb_ra_line_w)
-ADDRESS_MAP_END
+	map(0x100, 0x103).rw(FUNC(cammu_c4t_device::cache_data_lo_r), FUNC(cammu_c4t_device::cache_data_lo_w));
+	map(0x104, 0x107).rw(FUNC(cammu_c4t_device::cache_data_hi_r), FUNC(cammu_c4t_device::cache_data_hi_w));
+	map(0x108, 0x10b).rw(FUNC(cammu_c4t_device::cache_cpu_tag_r), FUNC(cammu_c4t_device::cache_cpu_tag_w));
+	map(0x10c, 0x10f).rw(FUNC(cammu_c4t_device::cache_system_tag_valid_r), FUNC(cammu_c4t_device::cache_system_tag_valid_w));
+	map(0x110, 0x113).rw(FUNC(cammu_c4t_device::cache_system_tag_r), FUNC(cammu_c4t_device::cache_system_tag_w));
+	map(0x118, 0x11b).rw(FUNC(cammu_c4t_device::tlb_va_line_r), FUNC(cammu_c4t_device::tlb_va_line_w));
+	map(0x11c, 0x11f).rw(FUNC(cammu_c4t_device::tlb_ra_line_r), FUNC(cammu_c4t_device::tlb_ra_line_w));
+}
 
-DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4i_device)
-	AM_RANGE(0x000, 0x003) AM_READWRITE(reset_r, reset_w)
-	AM_RANGE(0x010, 0x013) AM_READWRITE(s_pdo_r, s_pdo_w)
-	AM_RANGE(0x018, 0x01b) AM_READWRITE(u_pdo_r, u_pdo_w)
-	AM_RANGE(0x020, 0x023) AM_READWRITE(clr_s_data_tlb_r, clr_s_data_tlb_w)
-	AM_RANGE(0x028, 0x02b) AM_READWRITE(clr_u_data_tlb_r, clr_u_data_tlb_w)
-	AM_RANGE(0x030, 0x033) AM_READWRITE(clr_s_insn_tlb_r, clr_s_insn_tlb_w)
-	AM_RANGE(0x038, 0x03b) AM_READWRITE(clr_u_insn_tlb_r, clr_u_insn_tlb_w)
+void cammu_c4i_device::map(address_map &map)
+{
+	map(0x000, 0x003).rw(FUNC(cammu_c4i_device::reset_r), FUNC(cammu_c4i_device::reset_w));
+	map(0x010, 0x013).rw(FUNC(cammu_c4i_device::s_pdo_r), FUNC(cammu_c4i_device::s_pdo_w));
+	map(0x018, 0x01b).rw(FUNC(cammu_c4i_device::u_pdo_r), FUNC(cammu_c4i_device::u_pdo_w));
+	map(0x020, 0x023).rw(FUNC(cammu_c4i_device::clr_s_data_tlb_r), FUNC(cammu_c4i_device::clr_s_data_tlb_w));
+	map(0x028, 0x02b).rw(FUNC(cammu_c4i_device::clr_u_data_tlb_r), FUNC(cammu_c4i_device::clr_u_data_tlb_w));
+	map(0x030, 0x033).rw(FUNC(cammu_c4i_device::clr_s_insn_tlb_r), FUNC(cammu_c4i_device::clr_s_insn_tlb_w));
+	map(0x038, 0x03b).rw(FUNC(cammu_c4i_device::clr_u_insn_tlb_r), FUNC(cammu_c4i_device::clr_u_insn_tlb_w));
 
-	AM_RANGE(0x068, 0x06b) AM_READWRITE(control_r, control_w)
+	map(0x068, 0x06b).rw(FUNC(cammu_c4i_device::control_r), FUNC(cammu_c4i_device::control_w));
 
-	AM_RANGE(0x080, 0x083) AM_READWRITE(test_data_r, test_data_w)
-	AM_RANGE(0x088, 0x08b) AM_READWRITE(i_fault_r, i_fault_w)
-	AM_RANGE(0x090, 0x093) AM_READWRITE(fault_address_1_r, fault_address_1_w)
-	AM_RANGE(0x098, 0x09b) AM_READWRITE(fault_address_2_r, fault_address_2_w)
-	AM_RANGE(0x0a0, 0x0a3) AM_READWRITE(fault_data_1_lo_r, fault_data_1_lo_w)
-	AM_RANGE(0x0a8, 0x0ab) AM_READWRITE(fault_data_1_hi_r, fault_data_1_hi_w)
-	AM_RANGE(0x0b0, 0x0b3) AM_READWRITE(fault_data_2_lo_r, fault_data_2_lo_w)
-	AM_RANGE(0x0b8, 0x0bb) AM_READWRITE(fault_data_2_hi_r, fault_data_2_hi_w)
-	AM_RANGE(0x0c0, 0x0c3) AM_READWRITE(test_address_r, test_address_w)
-ADDRESS_MAP_END
+	map(0x080, 0x083).rw(FUNC(cammu_c4i_device::test_data_r), FUNC(cammu_c4i_device::test_data_w));
+	map(0x088, 0x08b).rw(FUNC(cammu_c4i_device::i_fault_r), FUNC(cammu_c4i_device::i_fault_w));
+	map(0x090, 0x093).rw(FUNC(cammu_c4i_device::fault_address_1_r), FUNC(cammu_c4i_device::fault_address_1_w));
+	map(0x098, 0x09b).rw(FUNC(cammu_c4i_device::fault_address_2_r), FUNC(cammu_c4i_device::fault_address_2_w));
+	map(0x0a0, 0x0a3).rw(FUNC(cammu_c4i_device::fault_data_1_lo_r), FUNC(cammu_c4i_device::fault_data_1_lo_w));
+	map(0x0a8, 0x0ab).rw(FUNC(cammu_c4i_device::fault_data_1_hi_r), FUNC(cammu_c4i_device::fault_data_1_hi_w));
+	map(0x0b0, 0x0b3).rw(FUNC(cammu_c4i_device::fault_data_2_lo_r), FUNC(cammu_c4i_device::fault_data_2_lo_w));
+	map(0x0b8, 0x0bb).rw(FUNC(cammu_c4i_device::fault_data_2_hi_r), FUNC(cammu_c4i_device::fault_data_2_hi_w));
+	map(0x0c0, 0x0c3).rw(FUNC(cammu_c4i_device::test_address_r), FUNC(cammu_c4i_device::test_address_w));
+}
 
-DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
-	AM_RANGE(0x000, 0x0ff) AM_NOP // tlb
-	AM_RANGE(0x104, 0x107) AM_READWRITE(s_pdo_r, s_pdo_w)
-	AM_RANGE(0x108, 0x10b) AM_READWRITE(u_pdo_r, u_pdo_w)
-	AM_RANGE(0x110, 0x113) AM_READWRITE(fault_r, fault_w)
-	AM_RANGE(0x140, 0x143) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x180, 0x183) AM_READWRITE(reset_r, reset_w)
-ADDRESS_MAP_END
+void cammu_c3_device::map(address_map &map)
+{
+	map(0x000, 0x0ff).noprw(); // tlb
+	map(0x104, 0x107).rw(FUNC(cammu_c3_device::s_pdo_r), FUNC(cammu_c3_device::s_pdo_w));
+	map(0x108, 0x10b).rw(FUNC(cammu_c3_device::u_pdo_r), FUNC(cammu_c3_device::u_pdo_w));
+	map(0x110, 0x113).rw(FUNC(cammu_c3_device::fault_r), FUNC(cammu_c3_device::fault_w));
+	map(0x140, 0x143).rw(FUNC(cammu_c3_device::control_r), FUNC(cammu_c3_device::control_w));
+	map(0x180, 0x183).rw(FUNC(cammu_c3_device::reset_r), FUNC(cammu_c3_device::reset_w));
+}
 
-DEVICE_ADDRESS_MAP_START(map_global, 32, cammu_c3_device)
-	AM_RANGE(0x000, 0x0ff) AM_NOP // global tlb
-	AM_RANGE(0x104, 0x107) AM_WRITE(g_s_pdo_w)
-	AM_RANGE(0x108, 0x10b) AM_WRITE(g_u_pdo_w)
-	AM_RANGE(0x110, 0x113) AM_WRITE(g_fault_w)
-	AM_RANGE(0x140, 0x143) AM_WRITE(g_control_w)
-	AM_RANGE(0x180, 0x183) AM_WRITE(g_reset_w)
-ADDRESS_MAP_END
+void cammu_c3_device::map_global(address_map &map)
+{
+	map(0x000, 0x0ff).noprw(); // global tlb
+	map(0x104, 0x107).w(FUNC(cammu_c3_device::g_s_pdo_w));
+	map(0x108, 0x10b).w(FUNC(cammu_c3_device::g_u_pdo_w));
+	map(0x110, 0x113).w(FUNC(cammu_c3_device::g_fault_w));
+	map(0x140, 0x143).w(FUNC(cammu_c3_device::g_control_w));
+	map(0x180, 0x183).w(FUNC(cammu_c3_device::g_reset_w));
+}
 
 DEFINE_DEVICE_TYPE(CAMMU_C4T, cammu_c4t_device, "c4t", "C4E/C4T CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device, "c4i", "C4I CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device,  "c3",  "C1/C3 CAMMU")
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock, CID_C4T)
+	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock)
 {
 }
 
 cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_c4_device(mconfig, CAMMU_C4I, tag, owner, clock, CID_C4I)
+	: cammu_c4_device(mconfig, CAMMU_C4I, tag, owner, clock)
 {
 }
 
-cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 cammu_id)
+cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_device(mconfig, type, tag, owner, clock)
-	, m_control(cammu_id)
 {
 }
 
@@ -136,42 +140,13 @@ cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag,
 
 cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_main_space_config("main", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_boot_space_config("boot", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_main_space(nullptr)
-	, m_io_space(nullptr)
-	, m_boot_space(nullptr)
-	, m_ssw_func(*this)
 	, m_exception_func(*this)
 {
 }
 
-device_memory_interface::space_config_vector cammu_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_main_space_config),
-		std::make_pair(1, &m_io_space_config),
-		std::make_pair(2, &m_boot_space_config)
-	};
-}
-
-void cammu_c3_device::static_add_linked(device_t &device, const char *const tag)
-{
-	cammu_c3_device &parent = downcast<cammu_c3_device &>(device);
-
-	parent.m_linked.push_back(downcast<cammu_c3_device *>(parent.siblingdevice(tag)));
-}
-
 void cammu_device::device_start()
 {
-	m_ssw_func.resolve();
 	m_exception_func.resolve();
-
-	m_main_space = &space(0);
-	m_io_space = &space(1);
-	m_boot_space = &space(2);
 }
 
 void cammu_device::device_reset()
@@ -246,238 +221,186 @@ void cammu_c3_device::device_reset()
 	m_reset = 0;
 }
 
-READ32_MEMBER(cammu_device::read)
+void cammu_device::set_spaces(std::vector<address_space *> spaces)
 {
-	const u32 virtual_address = (offset << 2) | (
-		(mem_mask & 0x00ffffff) == 0 ? 0x3 :
-		(mem_mask & 0x0000ffff) == 0 ? 0x2 :
-		(mem_mask & 0x000000ff) == 0 ? 0x1 : 0x0);
-	offs_t physical_address;
+	assert_always(spaces.size() == 8, "exactly 8 address space pointers are required");
 
-	LOGMASKED(LOG_ACCESS, "%s read address 0x%08x mem_mask 0x%08x (%s)\n",
-		space.name(), virtual_address, mem_mask, machine().describe_context());
-
-	address_space *physical_space = translate_address(virtual_address, space.spacenum() == AS_PROGRAM ? ACCESS_X : ACCESS_R, &physical_address);
-
-	if (physical_space != nullptr)
-		return physical_space->read_dword(physical_address, mem_mask);
-	else
-		return space.unmap();
+	std::copy(spaces.begin(), spaces.end(), std::begin(m_space));
 }
 
-WRITE32_MEMBER(cammu_device::write)
+bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address)
 {
-	const u32 virtual_address = (offset << 2) | (
-		(mem_mask & 0x00ffffff) == 0 ? 0x3 :
-		(mem_mask & 0x0000ffff) == 0 ? 0x2 :
-		(mem_mask & 0x000000ff) == 0 ? 0x1 : 0x0);
-	offs_t physical_address;
+	// translate the address
+	translated_t translated = translate_address(ssw, address, BYTE,
+		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ ? READ :
+		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE ? WRITE :
+		EXECUTE);
 
-	LOGMASKED(LOG_ACCESS, "%s write address 0x%08x data 0x%08x mem_mask 0x%08x (%s)\n",
-		space.name(), virtual_address, data, mem_mask, machine().describe_context());
+	// check that the requested space number matches the mapped space
+	if (translated.space != nullptr && translated.space->spacenum() == spacenum)
+	{
+		address = translated.address;
 
-	address_space *physical_space = translate_address(virtual_address, ACCESS_W, &physical_address);
+		return true;
+	}
 
-	if (physical_space != nullptr)
-		physical_space->write_dword(physical_address, data, mem_mask);
+	return false;
 }
 
-address_space *cammu_device::translate_address(const offs_t virtual_address, const access_t mode, offs_t *physical_address)
+cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode)
 {
-	// get ssw and user/supervisor mode
-	const u32 ssw = m_ssw_func();
-	const bool user = mode == ACCESS_X ? ssw & SSW_U : ssw & (SSW_U | SSW_UU);
+	// get effective user/supervisor mode
+	const bool user = mode == EXECUTE ? ssw & SSW_U : ssw & (SSW_U | SSW_UU);
 
-	// TODO: check for alignment faults
+	// check for alignment faults
+	if (!machine().side_effects_disabled() && get_alignment())
+	{
+		if ((mode == EXECUTE && (virtual_address & 0x1)) || (mode != EXECUTE && virtual_address & (size - 1)))
+		{
+			set_fault_address(virtual_address);
+			m_exception_func(mode == EXECUTE ? EXCEPTION_I_ALIGNMENT_FAULT : EXCEPTION_D_ALIGNMENT_FAULT);
+
+			return { nullptr, 0 };
+		}
+	}
 
 	// in supervisor mode, the first 8 pages are always mapped via the hard-wired tlb
 	if (!user && (virtual_address & ~0x7fff) == 0)
 	{
 		switch (virtual_address & 0x7000)
 		{
-		case 0x0000:
-		case 0x1000:
-		case 0x2000:
-		case 0x3000:
 			// pages 0-3: main space pages 0-3
-			*physical_address = virtual_address & 0x3fff;
-			return m_main_space;
+		case 0x0000: return { m_space[ST1], virtual_address & 0x3fff };
+		case 0x1000: return { m_space[ST2], virtual_address & 0x3fff };
+		case 0x2000: return { m_space[ST3], virtual_address & 0x3fff };
+		case 0x3000: return { m_space[ST3], virtual_address & 0x3fff };
 
-		case 0x4000:
-		case 0x5000:
 			// pages 4-5: i/o space pages 0-1
-			*physical_address = virtual_address & 0x1fff;
-			return m_io_space;
+		case 0x4000: return { m_space[ST4], virtual_address & 0x1fff };
+		case 0x5000: return { m_space[ST4], virtual_address & 0x1fff };
 
-		case 0x6000:
-		case 0x7000:
 			// pages 6-7: boot space pages 0-1
-			*physical_address = virtual_address & 0x1fff;
-			return m_boot_space;
+		case 0x6000: return { m_space[ST5], virtual_address & 0x1fff };
+		case 0x7000: return { m_space[ST5], virtual_address & 0x1fff };
 		}
 	}
 
 	// if not in mapped mode, use unmapped system tag
 	if ((ssw & SSW_M) == 0)
-	{
-		*physical_address = virtual_address;
-
-		return get_ust_space();
-	}
+		return { m_space[get_ust_space()], virtual_address };
 
 	// get the page table entry
-	const u32 pte = get_pte(virtual_address, user);
+	pte_t pte = get_pte(virtual_address, user);
 
 	// check for page faults
-	if (pte & PTE_F)
+	if (pte.entry & PTE_F)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			LOG("%s page fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
-				mode == ACCESS_X ? "instruction" : "data",
-				virtual_address, ssw, pte, machine().describe_context());
+				mode == EXECUTE ? "instruction" : "data",
+				virtual_address, ssw, pte.entry, machine().describe_context());
 
 			set_fault_address(virtual_address);
-			m_exception_func(mode == ACCESS_X ? EXCEPTION_I_PAGE_FAULT : EXCEPTION_D_PAGE_FAULT);
+			m_exception_func(mode == EXECUTE ? EXCEPTION_I_PAGE_FAULT : EXCEPTION_D_PAGE_FAULT);
 		}
 
-		return nullptr;
+		return { nullptr, 0 };
 	}
 
 	// check for protection level faults
-	if (!machine().side_effect_disabled() && !get_access(mode, pte, ssw))
+	if (!machine().side_effects_disabled() && !get_access(mode, pte.entry, ssw))
 	{
 		LOG("%s protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
-			mode == ACCESS_X ? "execute" : mode == ACCESS_R ? "read" : "write",
-			virtual_address, ssw, pte, machine().describe_context());
+			mode == EXECUTE ? "execute" : mode == READ ? "read" : "write",
+			virtual_address, ssw, pte.entry, machine().describe_context());
 
 		set_fault_address(virtual_address);
 		m_exception_func(
-			mode == ACCESS_X ? EXCEPTION_I_EXECUTE_PROTECT_FAULT :
-			mode == ACCESS_R ? EXCEPTION_D_READ_PROTECT_FAULT :
+			mode == EXECUTE ? EXCEPTION_I_EXECUTE_PROTECT_FAULT :
+			mode == READ ? EXCEPTION_D_READ_PROTECT_FAULT :
 			EXCEPTION_D_WRITE_PROTECT_FAULT);
 
-		return nullptr;
+		return { nullptr, 0 };
 	}
+
+	// set pte referenced and dirty flags
+	if (mode & WRITE && !(pte.entry & PTE_D))
+		m_space[ST0]->write_dword(pte.address, pte.entry | PTE_D | PTE_R);
+	else if (!(pte.entry & PTE_R))
+		m_space[ST0]->write_dword(pte.address, pte.entry | PTE_R);
 
 	// translate the address
-	*physical_address = (pte & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK);
-	LOGMASKED(LOG_DTU, "%s address translated 0x%08x\n", mode == ACCESS_X ? "instruction" : "data", *physical_address);
+	LOGMASKED(LOG_DTU, "%s address translated 0x%08x\n", mode == EXECUTE ? "instruction" : "data",
+		(pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK));
 
-	// return the physical space based on the system tag
-	switch (pte & PTE_ST)
-	{
-	case ST_0:
-	case ST_1:
-	case ST_2:
-	case ST_3:
-		// main memory space
-		return m_main_space;
-
-	case ST_4:
-		// i/o space
-		return m_io_space;
-
-	case ST_5:
-		// boot space
-		return m_boot_space;
-
-	case ST_6:
-		// cache purge
-	case ST_7:
-		// main memory, slave mode
-		if (!machine().side_effect_disabled())
-			fatalerror("%s page table entry system tag %d not supported\n",
-				mode == ACCESS_X ? "instruction" : "data", (pte & PTE_ST) >> 9);
-		break;
-	}
-
-	return nullptr;
+	// return the system tag and translated address
+	return { m_space[system_tag_t((pte.entry & PTE_ST) >> PTE_ST_SHIFT)], (pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK) };
 }
 
 // return the page table entry for a given virtual address
-u32 cammu_device::get_pte(const u32 va, const bool user)
+cammu_device::pte_t cammu_device::get_pte(const u32 va, const bool user)
 {
-	const u32 tlb_index = user ? 1 : 0;
-	if ((va & ~CAMMU_PAGE_MASK) != m_tlb[tlb_index].va)
-	{
-		// get page table directory origin from user or supervisor pdo register
-		const u32 pdo = get_pdo(user);
+	// get page table directory origin from user or supervisor pdo register
+	const u32 pdo = get_pdo(user);
 
-		// get page table directory index from top 12 bits of virtual address
-		const u32 ptdi = (va & VA_PTDI) >> 20;
+	// get page table directory index from top 12 bits of virtual address
+	const u32 ptdi = (va & VA_PTDI) >> 20;
 
-		// fetch page table directory entry
-		const u32 ptde = m_main_space->read_dword(pdo | ptdi);
+	// fetch page table directory entry
+	const u32 ptde = m_space[ST0]->read_dword(pdo | ptdi);
 
-		LOGMASKED(LOG_DTU, "get_pte pdo 0x%08x ptdi 0x%08x ptde 0x%08x\n", pdo, ptdi, ptde);
+	LOGMASKED(LOG_DTU, "get_pte pdo 0x%08x ptdi 0x%08x ptde 0x%08x\n", pdo, ptdi, ptde);
 
-		// check for page table directory entry fault
-		if (ptde & PTDE_F)
-			return PTE_F;
+	// check for page table directory entry fault
+	if (ptde & PTDE_F)
+		return { PTE_F, pdo | ptdi };
 
-		// get the page table origin from the page table directory entry
-		const u32 pto = ptde & PTDE_PTO;
+	// get the page table origin from the page table directory entry
+	const u32 pto = ptde & PTDE_PTO;
 
-		// get the page table index from the middle 12 bits of the virtual address
-		const u32 pti = (va & VA_PTI) >> 10;
+	// get the page table index from the middle 12 bits of the virtual address
+	const u32 pti = (va & VA_PTI) >> 10;
 
-		// fetch page table entry
-		const u32 pte = m_main_space->read_dword(pto | pti);
+	// fetch page table entry
+	pte_t pte = { m_space[ST0]->read_dword(pto | pti), pto | pti };
 
-		LOGMASKED(LOG_DTU, "get_pte pto 0x%08x pti 0x%08x pte 0x%08x\n", pto, pti, pte);
+	LOGMASKED(LOG_DTU, "get_pte pto 0x%08x pti 0x%08x pte 0x%08x\n", pto, pti, pte.entry);
 
-		// check for page table entry fault
-		if (pte & PTE_F)
-			return PTE_F;
+	// check for page table entry fault
+	if (!(pte.entry & PTE_F))
+		LOGMASKED(LOG_DTU, "get_pte address 0x%08x pte 0x%08x (%s)\n", va, pte.entry, machine().describe_context());
 
-		// add the pte to the tlb
-		m_tlb[tlb_index].va = va & ~CAMMU_PAGE_MASK;
-		m_tlb[tlb_index].pte = pte;
-
-		LOGMASKED(LOG_DTU, "get_pte address 0x%08x pte 0x%08x (%s)\n", va, pte, machine().describe_context());
-	}
-
-	return m_tlb[tlb_index].pte;
+	return pte;
 }
 
-address_space *cammu_c4i_device::get_ust_space() const
-{
-	switch (m_control & CNTL_UMM)
-	{
-	case UMM_MM: return m_main_space;
-	case UMM_MMRIO: return m_main_space; // FIXME: what determines main or i/o?
-	case UMM_IO: return m_io_space;
-	}
-
-	return m_main_space;
-}
-
-bool cammu_c4_device::get_access(const access_t mode, const u32 pte, const u32 ssw) const
+bool cammu_c4_device::get_access(const access_type mode, const u32 pte, const u32 ssw) const
 {
 	switch (mode)
 	{
-	case ACCESS_R: return pte & 0x20;
-	case ACCESS_W: return pte & 0x10;
-	case ACCESS_X: return pte & 0x08;
+	case READ: return pte & 0x20;
+	case WRITE: return pte & 0x10;
+	case RMW: return (pte & 0x30) == 0x30;
+	case EXECUTE: return pte & 0x08;
 	}
 
 	return false;
 }
 
-bool cammu_c3_device::get_access(const access_t mode, const u32 pte, const u32 ssw) const
+bool cammu_c3_device::get_access(const access_type mode, const u32 pte, const u32 ssw) const
 {
 	// FIXME: logic is not correct yet
 	return true;
 
-	const u8 column = (mode == ACCESS_X ? i_cammu_column : d_cammu_column)[(ssw & SSW_PL) >> 9];
+	const u8 column = (mode == EXECUTE ? i_cammu_column : d_cammu_column)[(ssw & SSW_PL) >> 9];
 	const u8 access = cammu_matrix[column][(pte & PTE_PL) >> 3];
 
 	switch (mode)
 	{
-	case ACCESS_R: return access & R;
-	case ACCESS_W: return access & W;
-	case ACCESS_X: return access & E;
+	case READ: return access & R;
+	case WRITE: return access & W;
+	case RMW: return (access & (R | W)) == (R | W);
+	case EXECUTE: return access & E;
 	}
 
 	return false;
@@ -494,5 +417,3 @@ const cammu_c3_device::c3_access_t cammu_c3_device::cammu_matrix[][16] =
 	{ N,   N,   RW,  RW,  RW,  R,   R,   RWE, N,   N,   RE,  RE,  N,   RE,  N,   N },
 	{ N,   N,   N,   RW,  R,   R,   R,   RWE, N,   N,   N,   RE,  RE,  N,   RE,  N }
 };
-
-

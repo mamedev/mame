@@ -116,6 +116,11 @@ public:
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
+	void pdp11ub2(machine_config &config);
+	void pdp11(machine_config &config);
+	void pdp11qb(machine_config &config);
+	void pdp11_mem(address_map &map);
+	void pdp11qb_mem(address_map &map);
 };
 
 READ16_MEMBER(pdp11_state::teletype_ctrl_r)
@@ -156,21 +161,23 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	}
 }
 
-static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
-	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
-	AM_RANGE( 0xff70, 0xff77 ) AM_READWRITE(teletype_ctrl_r,teletype_ctrl_w)
+void pdp11_state::pdp11_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).ram();  // RAM
+	map(0xea00, 0xfeff).rom();
+	map(0xff70, 0xff77).rw(FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
 
-	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
-ADDRESS_MAP_END
+	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
+}
 
-static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xe9ff ) AM_RAM  // RAM
-	AM_RANGE( 0xea00, 0xefff ) AM_ROM
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void pdp11_state::pdp11qb_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xe9ff).ram();  // RAM
+	map(0xea00, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 #define M9312_PORT_CONFSETTING \
 PORT_CONFSETTING ( 0x00, "'DL' BOOT prom for RL11 controller") \
@@ -346,11 +353,11 @@ void pdp11_state::kbd_put(u8 data)
 	m_teletype_status |= 0x80;
 }
 
-static MACHINE_CONFIG_START( pdp11 )
+MACHINE_CONFIG_START(pdp11_state::pdp11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_CPU_PROGRAM_MAP(pdp11_mem)
+	MCFG_DEVICE_PROGRAM_MAP(pdp11_mem)
 
 
 	/* video hardware */
@@ -360,16 +367,18 @@ static MACHINE_CONFIG_START( pdp11 )
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pdp11ub2, pdp11 )
+MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
+	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pdp11qb, pdp11 )
+MACHINE_CONFIG_START(pdp11_state::pdp11qb)
+	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_T11_INITIAL_MODE(0 << 13)
-	MCFG_CPU_PROGRAM_MAP(pdp11qb_mem)
+	MCFG_DEVICE_PROGRAM_MAP(pdp11qb_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -463,8 +472,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE         INIT  COMPANY                          FULLNAME                          FLAGS */
-COMP( ????, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state,  0,    "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY                          FULLNAME                          FLAGS */
+COMP( ????, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, sms1000,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )

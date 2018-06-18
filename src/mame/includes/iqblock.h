@@ -36,12 +36,15 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
-	DECLARE_DRIVER_INIT(grndtour);
-	DECLARE_DRIVER_INIT(iqblock);
+	void init_grndtour();
+	void init_iqblock();
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void iqblock(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };

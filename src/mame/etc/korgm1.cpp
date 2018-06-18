@@ -16,8 +16,9 @@
 #include "cpu/nec/nec.h"
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 
-#define MAIN_CLOCK XTAL_16MHz // Unknown clock
+#define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 
 class korgm1_state : public driver_device
 {
@@ -33,6 +34,10 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void korgm1(machine_config &config);
+
+	void korgm1_io(address_map &map);
+	void korgm1_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -50,28 +55,30 @@ uint32_t korgm1_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( korgm1_map, AS_PROGRAM, 16, korgm1_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM // 64 KB
-//  AM_RANGE(0x50000, 0x57fff) AM_RAM // memory card 32 KB
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void korgm1_state::korgm1_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram(); // 64 KB
+//  map(0x50000, 0x57fff).ram(); // memory card 32 KB
+	map(0xe0000, 0xfffff).rom().region("ipl", 0);
+}
 
-static ADDRESS_MAP_START( korgm1_io, AS_IO, 16, korgm1_state )
-//  AM_RANGE(0x0000, 0x00ff) internal peripheral (?)
-//  AM_RANGE(0x0100, 0x01ff) VDF 1 (MB87404)
-//  AM_RANGE(0x0200, 0x02ff) VDF 2 (MB87404)
-//  AM_RANGE(0x0500, 0x0503) MDE (MB87405)
-//  AM_RANGE(0x0600, 0x0601) OPZ 1 (8-bit port)
-//  AM_RANGE(0x0700, 0x0701) OPZ 2 (8-bit port)
-//  AM_RANGE(0x0800, 0x0801) SCAN (8-bit port) (keyboard)
-//  AM_RANGE(0x0900, 0x0900) ADC (M58990P, compatible with ADC0808; Joystick, "value" and After Touch routes here)
-//  AM_RANGE(0x0a00, 0x0a07) PIO (CXD1095Q; LCD, LED and SW routes here; also controls ADC channel select and TG/VDF/MDE reset line)
-//  AM_RANGE(0x0b00, 0x0b01) LCDC (8-bit port)
-//  AM_RANGE(0x1000, 0x11ff) TG (MB87402)
-//  AM_RANGE(0x2000, 0x23ff) SCSI
-//  AM_RANGE(0x3000, 0x33ff) FDC
+void korgm1_state::korgm1_io(address_map &map)
+{
+//  map(0x0000, 0x00ff); internal peripheral (?)
+//  map(0x0100, 0x01ff); VDF 1 (MB87404)
+//  map(0x0200, 0x02ff); VDF 2 (MB87404)
+//  map(0x0500, 0x0503); MDE (MB87405)
+//  map(0x0600, 0x0601); OPZ 1 (8-bit port)
+//  map(0x0700, 0x0701); OPZ 2 (8-bit port)
+//  map(0x0800, 0x0801); SCAN (8-bit port) (keyboard)
+//  map(0x0900, 0x0900); ADC (M58990P, compatible with ADC0808; Joystick, "value" and After Touch routes here)
+//  map(0x0a00, 0x0a07); PIO (CXD1095Q; LCD, LED and SW routes here; also controls ADC channel select and TG/VDF/MDE reset line)
+//  map(0x0b00, 0x0b01); LCDC (8-bit port)
+//  map(0x1000, 0x11ff); TG (MB87402)
+//  map(0x2000, 0x23ff); SCSI
+//  map(0x3000, 0x33ff); FDC
 //  TG 2?
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( korgm1 )
 	/* dummy active high structure */
@@ -142,7 +149,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( korgm1 )
+static GFXDECODE_START( gfx_korgm1 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -160,12 +167,12 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 {
 }
 
-static MACHINE_CONFIG_START( korgm1, korgm1_state )
+MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
-	MCFG_CPU_PROGRAM_MAP(korgm1_map)
-	MCFG_CPU_IO_MAP(korgm1_io)
+	MCFG_DEVICE_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
+	MCFG_DEVICE_PROGRAM_MAP(korgm1_map)
+	MCFG_DEVICE_IO_MAP(korgm1_io)
 
 	MCFG_DEVICE_ADD("pio", CXD1095, 0)
 
@@ -178,13 +185,13 @@ static MACHINE_CONFIG_START( korgm1, korgm1_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", korgm1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korgm1)
 
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -205,4 +212,4 @@ ROM_START( korgm1 )
 //  ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 1988, korgm1,  0,   korgm1,  korgm1,  0,       ROT0, "Korg",      "M1", MACHINE_IS_SKELETON )
+GAME( 1988, korgm1,  0,   korgm1,  korgm1,  empty_init, ROT0, "Korg",      "M1", MACHINE_IS_SKELETON )

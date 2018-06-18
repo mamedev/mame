@@ -7,10 +7,9 @@
     driver by Mathis Rosenhauer
 
     TODO:
-    - tile/sprite priority in holeland - sprites appearing on top of text for
-      example GAME OVER, is still incorrect
     - missing high bit of sprite X coordinate? (see round 2 and 3 of attract
       mode in crzrally)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -30,35 +29,38 @@ WRITE_LINE_MEMBER(holeland_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
-	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("latch", ls259_device, write_d0) AM_READNOP
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void holeland_state::holeland_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xbfff).rom();
+	map(0xa000, 0xa000).w("speech", FUNC(sp0256_device::ald_w));
+	map(0xc000, 0xc007).w(m_latch, FUNC(ls259_device::write_d0)).nopr();
+	map(0xe000, 0xe3ff).ram().w(FUNC(holeland_state::colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(holeland_state::videoram_w)).share("videoram");
+	map(0xf000, 0xf3ff).ram().share("spriteram");
+}
 
-static ADDRESS_MAP_START( crzrally_map, AS_PROGRAM, 8, holeland_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(scroll_w)
-	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void holeland_state::crzrally_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(holeland_state::colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(holeland_state::videoram_w)).share("videoram");
+	map(0xe800, 0xebff).ram().share("spriteram");
+	map(0xf000, 0xf000).w(FUNC(holeland_state::scroll_w));
+	map(0xf800, 0xf807).w(m_latch, FUNC(ls259_device::write_d0));
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, holeland_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  /* ? */
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void holeland_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("watchdog", FUNC(watchdog_timer_device::reset_r));  /* ? */
+	map(0x04, 0x04).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x04, 0x05).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
 /* Note - manual states cocktail mode should be default */
 static INPUT_PORTS_START( holeland )
@@ -261,30 +263,30 @@ static const gfx_layout crzrally_spritelayout =
 	8*16
 };
 
-static GFXDECODE_START( holeland )
+static GFXDECODE_START( gfx_holeland )
 	GFXDECODE_ENTRY( "gfx1", 0, holeland_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, holeland_spritelayout, 0, 256 )
 GFXDECODE_END
 
-static GFXDECODE_START( crzrally )
+static GFXDECODE_START( gfx_crzrally )
 	GFXDECODE_ENTRY( "gfx1", 0, crzrally_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, crzrally_spritelayout, 0, 256 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( holeland )
+MACHINE_CONFIG_START(holeland_state::holeland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3355700) /* measured 298ns on PCB */
-	MCFG_CPU_PROGRAM_MAP(holeland_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3355700) /* measured 298ns on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(holeland_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 3J
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(holeland_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(holeland_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(holeland_state, flipscreen_y_w))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, holeland_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, holeland_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, holeland_state, flipscreen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -297,24 +299,24 @@ static MACHINE_CONFIG_START( holeland )
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", holeland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 20000000/32) /* verified on PCB */
+	MCFG_DEVICE_ADD("ay1", AY8910, 20000000/32) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 20000000/16) /* verified on PCB */
+	MCFG_DEVICE_ADD("ay2", AY8910, 20000000/16) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("speech", SP0256, 3355700) /* measured 298ns on PCB */
+	MCFG_DEVICE_ADD("speech", SP0256, 3355700) /* measured 298ns on PCB */
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -353,19 +355,19 @@ Notes:
 
 */
 
-static MACHINE_CONFIG_START( crzrally )
+MACHINE_CONFIG_START(holeland_state::crzrally)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
-	MCFG_CPU_PROGRAM_MAP(crzrally_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(crzrally_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_DEVICE_ADD("latch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(holeland_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, holeland_state, coin_counter_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -378,19 +380,19 @@ static MACHINE_CONFIG_START( crzrally )
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crzrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 20000000/16)
+	MCFG_DEVICE_ADD("ay1", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 20000000/16)
+	MCFG_DEVICE_ADD("ay2", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -544,11 +546,17 @@ ROM_START( crzrallyg )
 
 	ROM_REGION( 0x0200, "user1", 0 ) // unknown
 	ROM_LOAD( "82s147.1f",    0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "pal16r6a.5k",  0x0000, 0x0104, CRC(3d12afba) SHA1(60245089947e4a4f7bfa94a8cc96d4d8eebe4afc) )
+	ROM_LOAD( "pal16r4a.5l",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r4a.5m",  0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r8a.1d",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 
-GAME( 1984, holeland,  0,        holeland, holeland,  holeland_state, 0, ROT0,   "Tecfri",                 "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, holeland2, holeland, holeland, holeland2, holeland_state, 0, ROT0,   "Tecfri",                 "Hole Land (Spain)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
-GAME( 1985, crzrally,  0,        crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri",                 "Crazy Rally (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallya, crzrally, crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri",                 "Crazy Rally (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallyg, crzrally, crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland,  0,        holeland, holeland,  holeland_state, empty_init, ROT0,   "Tecfri",                 "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland2, holeland, holeland, holeland2, holeland_state, empty_init, ROT0,   "Tecfri",                 "Hole Land (Spain)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
+GAME( 1985, crzrally,  0,        crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                 "Crazy Rally (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallya, crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                 "Crazy Rally (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallyg, crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

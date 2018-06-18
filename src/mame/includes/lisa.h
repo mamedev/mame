@@ -20,9 +20,12 @@
 #include "machine/nvram.h"
 #include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
+#include "screen.h"
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
+#define SCREEN_TAG      "screen"
 
 /* lisa MMU segment regs */
 struct real_mmu_entry
@@ -123,7 +126,8 @@ public:
 		m_io_line7(*this, "LINE7"),
 		m_io_mouse_x(*this, "MOUSE_X"),
 		m_io_mouse_y(*this, "MOUSE_Y"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, SCREEN_TAG)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -150,6 +154,7 @@ public:
 	required_ioport m_io_mouse_y;
 
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	uint8_t *m_ram_ptr;
 	uint8_t *m_rom_ptr;
@@ -208,9 +213,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
 	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
-	DECLARE_DRIVER_INIT(lisa210);
-	DECLARE_DRIVER_INIT(mac_xl);
-	DECLARE_DRIVER_INIT(lisa2);
+	void init_lisa210();
+	void init_mac_xl();
+	void init_lisa2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -238,6 +243,12 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
+	void lisa(machine_config &config);
+	void lisa210(machine_config &config);
+	void macxl(machine_config &config);
+	void lisa210_fdc_map(address_map &map);
+	void lisa_fdc_map(address_map &map);
+	void lisa_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_LISA_H

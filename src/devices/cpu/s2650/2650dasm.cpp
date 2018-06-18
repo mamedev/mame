@@ -550,3 +550,13 @@ u32 s2650_disassembler::opcode_alignment() const
 {
 	return 1;
 }
+
+u32 s2650_disassembler::interface_flags() const
+{
+	return PAGED;
+}
+
+u32 s2650_disassembler::page_address_bits() const
+{
+	return 13;
+}

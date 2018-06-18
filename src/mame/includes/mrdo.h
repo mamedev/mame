@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class mrdo_state : public driver_device
 {
 public:
@@ -42,4 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void mrlo(machine_config &config);
+	void mrdo(machine_config &config);
+	void main_map(address_map &map);
 };

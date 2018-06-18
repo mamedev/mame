@@ -68,6 +68,7 @@ Summary of Monitor commands.
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -82,8 +83,12 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
+	void init_rx78();
+	void rx78(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_READ8_MEMBER( cass_r );
 	DECLARE_READ8_MEMBER( vram_r );
@@ -96,8 +101,11 @@ public:
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
-	DECLARE_DRIVER_INIT(rx78);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual void machine_reset() override;
+	void rx78_io(address_map &map);
+	void rx78_mem(address_map &map);
 
 private:
 	uint8_t m_vram_read_bank;
@@ -105,7 +113,6 @@ private:
 	uint8_t m_pal_reg[7];
 	uint8_t m_pri_mask;
 	uint8_t m_key_mux;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -114,7 +121,7 @@ private:
 };
 
 
-#define MASTER_CLOCK XTAL_28_63636MHz
+#define MASTER_CLOCK XTAL(28'636'363)
 
 
 WRITE8_MEMBER( rx78_state::cass_w )
@@ -269,29 +276,31 @@ WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
 }
 
 
-static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8, rx78_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
+void rx78_state::rx78_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom().region("roms", 0);
 	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
-	AM_RANGE(0x6000, 0xafff) AM_RAM //ext RAM
-	AM_RANGE(0xb000, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+	map(0x6000, 0xafff).ram(); //ext RAM
+	map(0xb000, 0xebff).ram();
+	map(0xec00, 0xffff).rw(FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
+}
 
-static ADDRESS_MAP_START(rx78_io, AS_IO, 8, rx78_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void rx78_state::rx78_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(cass_r, cass_w) //cmt
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
-	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r, key_w) //keyboard
-	AM_RANGE(0xf5, 0xfb) AM_WRITE(vdp_reg_w) //vdp
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(vdp_bg_reg_w) //vdp
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(vdp_pri_mask_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE("sn1", sn76489a_device, write) //psg
-ADDRESS_MAP_END
+	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
+	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
+	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
+	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
+	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
+	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
+	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
+}
 
 /* Input ports */
 static INPUT_PORTS_START( rx78 )
@@ -457,17 +466,17 @@ static const gfx_layout rx78_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( rx78 )
+static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rx78 )
+MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
-	MCFG_CPU_PROGRAM_MAP(rx78_mem)
-	MCFG_CPU_IO_MAP(rx78_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
+	MCFG_DEVICE_PROGRAM_MAP(rx78_mem)
+	MCFG_DEVICE_IO_MAP(rx78_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -482,7 +491,7 @@ static MACHINE_CONFIG_START( rx78 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -494,12 +503,11 @@ static MACHINE_CONFIG_START( rx78 )
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */
@@ -514,7 +522,7 @@ ROM_START( rx78 )
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(rx78_state,rx78)
+void rx78_state::init_rx78()
 {
 	uint32_t ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
@@ -525,5 +533,5 @@ DRIVER_INIT_MEMBER(rx78_state,rx78)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS       INIT   COMPANY     FULLNAME     FLAGS */
-COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY   FULLNAME     FLAGS */
+COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )

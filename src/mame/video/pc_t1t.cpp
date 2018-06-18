@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "pc_t1t.h"
 
-#include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "screen.h"
 
@@ -65,6 +64,7 @@ pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const 
 
 pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
+	m_pic8259(*this, ":pic8259"),
 	m_jxkanji(nullptr)
 {
 }
@@ -110,25 +110,26 @@ void pcvideo_pcjr_device::device_start()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START(vram_map, 0, 8, pcvideo_t1000_device)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x20000, 0x3ffff) AM_NOP
-ADDRESS_MAP_END
+void pc_t1t_device::vram_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x20000, 0x3ffff).noprw();
+}
 
-MACHINE_CONFIG_MEMBER( pcvideo_t1000_device::device_add_mconfig )
+MACHINE_CONFIG_START(pcvideo_t1000_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_PALETTE_ADD( "palette", 32 )
 	MCFG_PALETTE_INIT_OWNER(pc_t1t_device, pcjr)
 
-	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL_14_31818MHz/8)
+	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL(14'318'181)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pc_t1t_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(pc_t1t_device, t1000_de_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(pcvideo_t1000_device, t1000_vsync_changed))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_t1000_device, t1000_vsync_changed))
 
 	MCFG_DEVICE_ADD("vram", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vram_map)
@@ -139,20 +140,20 @@ MACHINE_CONFIG_MEMBER( pcvideo_t1000_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( pcvideo_pcjr_device::device_add_mconfig )
+MACHINE_CONFIG_START(pcvideo_pcjr_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 912, 0, 640, 262, 0, 200)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), 912, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_PALETTE_ADD( "palette", 32 )
 	MCFG_PALETTE_INIT_OWNER(pc_t1t_device, pcjr)
 
-	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL_14_31818MHz/16)
+	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL(14'318'181)/16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pcvideo_pcjr_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(pc_t1t_device, t1000_de_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(pcvideo_pcjr_device, pcjr_vsync_changed))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_pcjr_device, pcjr_vsync_changed))
 	MCFG_DEVICE_ADD("vram", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vram_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -616,11 +617,11 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 	/* Determine mc6845 input clock */
 	if ( m_reg.data[0] & 0x01 )
 	{
-		m_mc6845->set_clock( XTAL_14_31818MHz/8 );
+		m_mc6845->set_clock( XTAL(14'318'181)/8 );
 	}
 	else
 	{
-		m_mc6845->set_clock( XTAL_14_31818MHz/16 );
+		m_mc6845->set_clock( XTAL(14'318'181)/16 );
 	}
 
 	/* color or b/w? */
@@ -1033,5 +1034,5 @@ WRITE_LINE_MEMBER( pcvideo_pcjr_device::pcjr_vsync_changed )
 	{
 		m_pc_framecnt++;
 	}
-	machine().device<pic8259_device>("pic8259")->ir5_w(state);
+	m_pic8259->ir5_w(state);
 }

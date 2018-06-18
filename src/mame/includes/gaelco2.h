@@ -5,6 +5,7 @@
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class gaelco2_state : public driver_device
 {
@@ -37,9 +38,10 @@ public:
 	DECLARE_WRITE16_MEMBER(play2000_shareram_68k_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
-	DECLARE_DRIVER_INIT(touchgo);
-	DECLARE_DRIVER_INIT(snowboar);
-	DECLARE_DRIVER_INIT(alighunt);
+	void init_touchgo();
+	void init_snowboar();
+	void init_alighunt();
+	void init_wrally2();
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
@@ -53,10 +55,24 @@ public:
 	uint32_t dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
 
+	void maniacsq_d5002fp(machine_config &config);
+	void play2000(machine_config &config);
+	void alighunt(machine_config &config);
+	void touchgo(machine_config &config);
+	void alighunt_d5002fp(machine_config &config);
+	void snowboar(machine_config &config);
+	void maniacsq(machine_config &config);
+	void maniacsqs(machine_config &config);
+	void touchgo_d5002fp(machine_config &config);
+	void alighunt_map(address_map &map);
+	void maniacsq_map(address_map &map);
+	void mcu_hostmem_map(address_map &map);
+	void play2000_map(address_map &map);
+	void snowboar_map(address_map &map);
+	void touchgo_map(address_map &map);
 protected:
 	required_device<m68000_device> m_maincpu;
 
-private:
 	uint32_t snowboard_latch;
 
 	uint16_t *m_videoram;
@@ -99,7 +115,9 @@ public:
 	DECLARE_READ16_MEMBER(p2_gun_y);
 	DECLARE_WRITE16_MEMBER(bang_clr_gun_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
-	DECLARE_DRIVER_INIT(bang);
+	void init_bang();
+	void bang(machine_config &config);
+	void bang_map(address_map &map);
 };
 
 
@@ -120,4 +138,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(wrally2_adc_clk);
 	DECLARE_WRITE_LINE_MEMBER(wrally2_adc_cs);
 	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
+	void wrally2(machine_config &config);
+	void wrally2_map(address_map &map);
 };

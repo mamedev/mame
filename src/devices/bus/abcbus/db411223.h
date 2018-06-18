@@ -51,6 +51,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	bool m_cs;
+
+	void databoard_4112_23_io(address_map &map);
+	void databoard_4112_23_mem(address_map &map);
 };
 
 

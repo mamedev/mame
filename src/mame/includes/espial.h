@@ -9,6 +9,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class espial_state : public driver_device
 {
@@ -70,4 +71,10 @@ public:
 	INTERRUPT_GEN_MEMBER(espial_sound_nmi_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(espial_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void espial(machine_config &config);
+	void netwars(machine_config &config);
+	void espial_map(address_map &map);
+	void espial_sound_io_map(address_map &map);
+	void espial_sound_map(address_map &map);
+	void netwars_map(address_map &map);
 };

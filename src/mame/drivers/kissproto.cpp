@@ -19,6 +19,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void kissp(machine_config &config);
+	void kissp_map(address_map &map);
 protected:
 
 	// devices
@@ -27,13 +29,14 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(kissp);
+	void init_kissp();
 };
 
 
-static ADDRESS_MAP_START( kissp_map, AS_PROGRAM, 8, kissp_state )
-	AM_RANGE(0x0000, 0x0fff) AM_NOP
-ADDRESS_MAP_END
+void kissp_state::kissp_map(address_map &map)
+{
+	map(0x0000, 0x0fff).noprw();
+}
 
 static INPUT_PORTS_START( kissp )
 INPUT_PORTS_END
@@ -42,14 +45,14 @@ void kissp_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(kissp_state,kissp)
+void kissp_state::init_kissp()
 {
 }
 
-static MACHINE_CONFIG_START( kissp )
+MACHINE_CONFIG_START(kissp_state::kissp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8035, 6000000/15)
-	MCFG_CPU_PROGRAM_MAP(kissp_map)
+	MCFG_DEVICE_ADD("maincpu", I8035, 6000000/15)
+	MCFG_DEVICE_PROGRAM_MAP(kissp_map)
 MACHINE_CONFIG_END
 
 ROM_START(kissp)
@@ -72,5 +75,5 @@ ROM_START(kissp2)
 	ROM_RELOAD( 0x4800, 0x0800)
 ROM_END
 
-GAME( 1979,  kissp,  kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  kissp2, kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype v.2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, kissp,  kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, kissp2, kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype v.2)", MACHINE_IS_SKELETON_MECHANICAL )

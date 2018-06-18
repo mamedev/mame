@@ -28,10 +28,10 @@
           1       01    aaaaaaaaa   ddddddd     WRITE data
           1       10    aaaaaaaaa               READ data
           1       11    aaaaaaaaa               ERASE data
-          1       00    00xxxxxxx               WREN = WRite ENable
+          1       00    11xxxxxxx               WREN = WRite ENable
           1       00    01xxxxxxx   ddddddd     WRAL = WRite ALl cells
           1       00    10xxxxxxx               ERAL = ERase ALl cells
-          1       00    11xxxxxxx               WRDS = WRite DiSable
+          1       00    00xxxxxxx               WRDS = WRite DiSable
 
     The number of address bits (a) clocked varies based on the size of the
     chip, though it does not always map 1:1 with the size of the chip.
@@ -155,10 +155,10 @@ ALLOW_SAVE_TYPE(eeprom_serial_base_device::eeprom_state);
 //  eeprom_serial_base_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming)
 	: eeprom_base_device(mconfig, devtype, tag, owner),
 		m_command_address_bits(0),
-		m_streaming_enabled(false),
+		m_streaming_enabled(bool(enable_streaming)),
 		m_output_on_falling_clock_enabled(false),
 		m_do_cb(*this),
 		m_state(STATE_IN_RESET),
@@ -174,40 +174,6 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 		m_address(0),
 		m_shift_register(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_address_bits - configuration helper
-//  to set the number of address bits in the
-//  serial commands
-//-------------------------------------------------
-
-void eeprom_serial_base_device::static_set_address_bits(device_t &device, int addrbits)
-{
-	downcast<eeprom_serial_base_device &>(device).m_command_address_bits = addrbits;
-}
-
-
-//-------------------------------------------------
-//  static_enable_streaming - configuration helper
-//  to enable streaming data
-//-------------------------------------------------
-
-void eeprom_serial_base_device::static_enable_streaming(device_t &device)
-{
-	downcast<eeprom_serial_base_device &>(device).m_streaming_enabled = true;
-}
-
-
-//-----------------------------------------------------------------
-//  static_enable_output_on_falling_clock - configuration helper
-//  to enable updating the output on the falling edge of the clock
-//-----------------------------------------------------------------
-
-void eeprom_serial_base_device::static_enable_output_on_falling_clock(device_t &device)
-{
-	downcast<eeprom_serial_base_device &>(device).m_output_on_falling_clock_enabled = true;
 }
 
 
@@ -655,15 +621,11 @@ void eeprom_serial_base_device::execute_write_command()
 //  STANDARD INTERFACE IMPLEMENTATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  eeprom_serial_93cxx_device - constructor
-//-------------------------------------------------
-
-eeprom_serial_93cxx_device::eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
-	: eeprom_serial_base_device(mconfig, devtype, tag, owner)
+eeprom_serial_s29x90_device::eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming ignored)
+	: eeprom_serial_93cxx_device(mconfig, devtype, tag, owner, eeprom_serial_streaming::ENABLE)
 {
+	enable_output_on_falling_clock(true);
 }
-
 
 //-------------------------------------------------
 //  parse_command_and_address - extract the
@@ -723,16 +685,6 @@ WRITE_LINE_MEMBER(eeprom_serial_93cxx_device::di_write) { base_di_write(state); 
 //**************************************************************************
 
 //-------------------------------------------------
-//  eeprom_serial_er5911_device - constructor
-//-------------------------------------------------
-
-eeprom_serial_er5911_device::eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
-	: eeprom_serial_base_device(mconfig, devtype, tag, owner)
-{
-}
-
-
-//-------------------------------------------------
 //  parse_command_and_address - extract the
 //  command and address from a bitstream
 //-------------------------------------------------
@@ -789,17 +741,6 @@ WRITE_LINE_MEMBER(eeprom_serial_er5911_device::di_write) { base_di_write(state);
 //**************************************************************************
 //  X24c44 DEVICE IMPLEMENTATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  eeprom_serial_x24c44_device - constructor
-//-------------------------------------------------
-
-eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
-	: eeprom_serial_base_device(mconfig, devtype, tag, owner)
-{
-}
-
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -1007,9 +948,9 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 				if (bit_index % m_data_bits == 0 && (bit_index == 0 || m_streaming_enabled)){
 					m_shift_register=m_ram_data[m_address];
 
-					//m_shift_register=BITSWAP16(m_shift_register,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-					//m_shift_register=BITSWAP16(m_shift_register,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8);
-					m_shift_register= BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+					//m_shift_register=bitswap<16>(m_shift_register,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+					//m_shift_register=bitswap<16>(m_shift_register,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8);
+					m_shift_register= bitswap<16>(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 
 					m_shift_register=m_shift_register<<16;
 
@@ -1046,9 +987,9 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 				m_shift_register = (m_shift_register << 1) | m_di_state;
 				if (++m_bits_accum == m_data_bits)
 				{
-					//m_shift_register=BITSWAP16(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
-					//m_shift_register=BITSWAP16(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
-					m_shift_register=BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+					//m_shift_register=bitswap<16>(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
+					//m_shift_register=bitswap<16>(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
+					m_shift_register=bitswap<16>(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 					m_ram_data[m_address]=m_shift_register;
 
 					LOG1("write to RAM addr=%02X data=%04X\n",m_address,m_shift_register);
@@ -1157,11 +1098,17 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
-	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming) \
+	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner, enable_streaming) \
 { \
-	static_set_size(*this, _cells, _bits); \
-	static_set_address_bits(*this, _addrbits); \
+	set_size(_cells, _bits); \
+	set_address_bits(_addrbits); \
+} \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) \
+	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner, eeprom_serial_streaming::DISABLE) \
+{ \
+	set_size(_cells, _bits); \
+	set_address_bits(_addrbits); \
 } \
 DEFINE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
 
@@ -1176,9 +1123,9 @@ DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c86, 93C86, 16, 1024, 10)
 
 // Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
 // The output is updated on the falling edge of the clock. Streaming is enabled
-DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16, 64, 13)
-DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16, 128, 13)
-DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16, 256, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(s29x90, s29190, S29190, 16, 64, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(s29x90, s29290, S29290, 16, 128, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(s29x90, s29390, S29390, 16, 256, 13)
 
 // some manufacturers use pin 6 as an "ORG" pin which, when pulled low, configures memory for 8-bit accesses
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 8, 128, 7)

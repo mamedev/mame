@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class mrjong_state : public driver_device
 {
 public:
@@ -35,4 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void mrjong(machine_config &config);
+	void mrjong_io_map(address_map &map);
+	void mrjong_map(address_map &map);
 };

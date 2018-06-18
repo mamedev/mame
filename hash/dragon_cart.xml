@@ -347,13 +347,24 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="deltados" supported="no">
+	<software name="fftrainer">
+		<description>FarmFax Trainer</description>
+		<year>1983</year>
+		<publisher>FarmFax</publisher>
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="trainer.rom" size="8192" crc="9fa36a89" sha1="aacfcba60e976807917340ee4f5af47c17fe8d43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltados">
 		<description>Delta DOS</description>
 		<year>1983</year>
 		<publisher>Premier Microsystems</publisher>
 		<info name="author" value="J.G. Johnson &amp; P.J. Rihan" />
 		<part name="cart" interface="coco_cart">
-			<!--<feature name="slot" value="premier_fdc" />-->
+			<feature name="slot" value="premier_fdc" />
 			<dataarea name="rom" size="8192">
 				<rom name="deltados (1983)(premier micros).rom" size="8192" crc="149eb4dd" sha1="eb686ce6afe63e4d4011b333a882ca812c69307f" offset="0" />
 			</dataarea>

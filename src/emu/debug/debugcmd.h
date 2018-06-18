@@ -110,6 +110,8 @@ private:
 	void execute_focus(int ref, const std::vector<std::string> &params);
 	void execute_ignore(int ref, const std::vector<std::string> &params);
 	void execute_observe(int ref, const std::vector<std::string> &params);
+	void execute_suspend(int ref, const std::vector<std::string> &params);
+	void execute_resume(int ref, const std::vector<std::string> &params);
 	void execute_next(int ref, const std::vector<std::string> &params);
 	void execute_comment_add(int ref, const std::vector<std::string> &params);
 	void execute_comment_del(int ref, const std::vector<std::string> &params);
@@ -131,6 +133,7 @@ private:
 	void execute_hotspot(int ref, const std::vector<std::string> &params);
 	void execute_statesave(int ref, const std::vector<std::string> &params);
 	void execute_stateload(int ref, const std::vector<std::string> &params);
+	void execute_rewind(int ref, const std::vector<std::string> &params);
 	void execute_save(int ref, const std::vector<std::string> &params);
 	void execute_load(int ref, const std::vector<std::string> &params);
 	void execute_dump(int ref, const std::vector<std::string> &params);

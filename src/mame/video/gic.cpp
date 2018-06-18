@@ -112,10 +112,10 @@ const tiny_rom_entry *gic_device::device_rom_region() const
 void gic_device::device_start()
 {
 	// Let the screen create our temporary bitmap with the screen's dimensions
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust( m_screen->time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, m_screen->scan_period() );
+	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	// allocate the audio stream
 	m_stream = stream_alloc( 0, 1, clock()/(2*228) );

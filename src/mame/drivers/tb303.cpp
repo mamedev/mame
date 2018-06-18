@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "includes/hh_ucom4.h"
-#include "machine/timer.h"
 
 #include "tb303.lh"
 
@@ -46,6 +45,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 	virtual void machine_start() override;
+	void tb303(machine_config &config);
 };
 
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
@@ -247,20 +247,20 @@ void tb303_state::machine_start()
 	save_item(NAME(m_ram_we));
 }
 
-static MACHINE_CONFIG_START( tb303 )
+MACHINE_CONFIG_START(tb303_state::tb303)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)
-	MCFG_UCOM4_READ_A_CB(READ8(tb303_state, input_r))
-	MCFG_UCOM4_READ_B_CB(READ8(tb303_state, input_r))
-	MCFG_UCOM4_READ_C_CB(READ8(tb303_state, ram_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(tb303_state, switch_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(tb303_state, switch_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(tb303_state, strobe_w))
+	MCFG_DEVICE_ADD("maincpu", NEC_D650, TP2_HZ)
+	MCFG_UCOM4_READ_A_CB(READ8(*this, tb303_state, input_r))
+	MCFG_UCOM4_READ_B_CB(READ8(*this, tb303_state, input_r))
+	MCFG_UCOM4_READ_C_CB(READ8(*this, tb303_state, ram_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tb303_state, ram_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tb303_state, ram_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tb303_state, ram_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tb303_state, ram_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tb303_state, switch_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tb303_state, switch_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tb303_state, strobe_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tb303_state, tp3_clock, TP3_PERIOD)
 	MCFG_TIMER_START_DELAY(TP3_PERIOD - TP3_LOW)
@@ -287,4 +287,4 @@ ROM_START( tb303 )
 ROM_END
 
 
-CONS( 1982, tb303, 0, 0, tb303, tb303, tb303_state, 0, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tb303, 0, 0, tb303, tb303, tb303_state, empty_init, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

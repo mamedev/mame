@@ -35,30 +35,6 @@
 #include "emu.h"
 #include "includes/airbustr.h"
 
-WRITE8_MEMBER(airbustr_state::videoram_w)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(airbustr_state::colorram_w)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(airbustr_state::videoram2_w)
-{
-	m_videoram2[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(airbustr_state::colorram2_w)
-{
-	m_colorram2[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
 /*  Scroll Registers
 
     Port:
@@ -75,60 +51,51 @@ WRITE8_MEMBER(airbustr_state::scrollregs_w)
 {
 	switch (offset)     // offset 0 <-> port 4
 	{
-		case 0x00:  m_fg_scrolly = data;    break;  // low 8 bits
-		case 0x02:  m_fg_scrollx = data;    break;
-		case 0x04:  m_bg_scrolly = data;    break;
-		case 0x06:  m_bg_scrollx = data;    break;
+		case 0x00:
+		case 0x04:  m_scrolly[((offset & 4) >> 2) ^ 1] = data;    break;  // low 8 bits
+		case 0x02:
+		case 0x06:  m_scrollx[((offset & 4) >> 2) ^ 1] = data;    break;
 		case 0x08:  m_highbits   = ~data;   break;  // complemented high bits
 
-		default:    logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, space.device().safe_pc());
+		default:    logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, m_slave->pc());
 	}
 
-	m_bg_tilemap->set_scrolly(0, ((m_highbits << 5) & 0x100) + m_bg_scrolly);
-	m_bg_tilemap->set_scrollx(0, ((m_highbits << 6) & 0x100) + m_bg_scrollx);
-	m_fg_tilemap->set_scrolly(0, ((m_highbits << 7) & 0x100) + m_fg_scrolly);
-	m_fg_tilemap->set_scrollx(0, ((m_highbits << 8) & 0x100) + m_fg_scrollx);
+	for (int layer = 0; layer < 2; layer++)
+	{
+		m_tilemap[layer]->set_scrolly(0, ((m_highbits << (5+(layer<<1))) & 0x100) + m_scrolly[layer]);
+		m_tilemap[layer]->set_scrollx(0, ((m_highbits << (6+(layer<<1))) & 0x100) + m_scrollx[layer]);
+	}
 }
 
-TILE_GET_INFO_MEMBER(airbustr_state::get_fg_tile_info)
+template<int Layer>
+TILE_GET_INFO_MEMBER(airbustr_state::get_tile_info)
 {
-	int attr = m_colorram2[tile_index];
-	int code = m_videoram2[tile_index] + ((attr & 0x0f) << 8);
-	int color = attr >> 4;
-
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
-}
-
-TILE_GET_INFO_MEMBER(airbustr_state::get_bg_tile_info)
-{
-	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
-	int color = (attr >> 4) + 16;
+	int attr = m_colorram[Layer][tile_index];
+	int code = m_videoram[Layer][tile_index] + ((attr & 0x0f) << 8);
+	int color = (attr >> 4) + ((Layer ^ 1) << 4);
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void airbustr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airbustr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airbustr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airbustr_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airbustr_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_screen->register_screen_bitmap(m_sprites_bitmap);
-	m_fg_tilemap->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scrolldx(0x094, 0x06a);
-	m_bg_tilemap->set_scrolldy(0x100, 0x1ff);
-	m_fg_tilemap->set_scrolldx(0x094, 0x06a);
-	m_fg_tilemap->set_scrolldy(0x100, 0x1ff);
-
-	save_item(NAME(m_sprites_bitmap));
+	for (int layer = 0; layer < 2; layer++)
+	{
+		m_tilemap[layer]->set_scrolldx(0x094, 0x06a);
+		m_tilemap[layer]->set_scrolldy(0x100, 0x1ff);
+	}
 }
 
 
 uint32_t airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// copy the sprite bitmap to the screen
 	m_pandora->update(bitmap, cliprect);

@@ -51,7 +51,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_cffa2000_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_cffa2000_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", nullptr, false)
 
 // not yet, the core explodes
@@ -102,9 +102,6 @@ a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, 
 
 void a2bus_cffa2000_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(CFFA2_ROM_REGION).c_str())->base();
 
 	// patch default setting so slave device is enabled and up to 13 devices on both connectors
@@ -129,7 +126,7 @@ void a2bus_cffa2000_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_cffa2000_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -148,7 +145,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(address_space &space, uint8_t offset)
 			// Apple /// driver uses sta $c080,x when writing, which causes spurious reads of c088
 			if (!m_inwritecycle)
 			{
-				m_lastreaddata = m_ata->read_cs0(space, offset - 8, 0xffff);
+				m_lastreaddata = m_ata->read_cs0(offset - 8);
 			}
 			return m_lastreaddata & 0xff;
 
@@ -159,7 +156,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(address_space &space, uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0(space, offset-8, 0xff);
+			return m_ata->read_cs0(offset-8, 0xff);
 	}
 
 	return 0xff;
@@ -170,7 +167,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_cffa2000_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	m_inwritecycle = false;
 
@@ -195,7 +192,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, uint8_t offset, uin
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
 //          printf("%02x to 8, m_lastdata = %x\n", data, m_lastdata);
-			m_ata->write_cs0(space, offset-8, m_lastdata, 0xffff);
+			m_ata->write_cs0(offset-8, m_lastdata);
 			break;
 
 		case 9:
@@ -205,7 +202,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, uint8_t offset, uin
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0(space, offset-8, data, 0xff);
+			m_ata->write_cs0(offset-8, data, 0xff);
 			break;
 	}
 }
@@ -214,9 +211,9 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, uint8_t offset, uin
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_cffa2000_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_cffa2000_device::read_cnxx(uint8_t offset)
 {
-	int slotimg = m_slot * 0x100;
+	int const slotimg = slotno() * 0x100;
 
 	// ROM contains a CnXX image for each of slots 1-7
 	return m_eeprom[offset+slotimg];
@@ -226,16 +223,15 @@ uint8_t a2bus_cffa2000_device::read_cnxx(address_space &space, uint8_t offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_cffa2000_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_cffa2000_device::read_c800(uint16_t offset)
 {
 	return m_eeprom[offset+0x800];
 }
 
-void a2bus_cffa2000_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_cffa2000_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (!m_writeprotect)
 	{
-//      printf("Write %02x to EEPROM at %x (PC=%x)\n", data, offset, space.device().safe_pc());
 		m_eeprom[offset + 0x800] = data;
 	}
 }

@@ -140,8 +140,8 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 class octopus_state : public driver_device
 {
 public:
-	octopus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	octopus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_crtc(*this, "crtc"),
@@ -224,6 +224,12 @@ public:
 		BEEP_TIMER = 100
 	};
 
+	void octopus(machine_config &config);
+	void octopus_io(address_map &map);
+	void octopus_mem(address_map &map);
+	void octopus_sub_io(address_map &map);
+	void octopus_sub_mem(address_map &map);
+	void octopus_vram(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -279,56 +285,61 @@ private:
 };
 
 
-static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
-	AM_RANGE(0x00000, 0xcffff) AM_RAMBANK("main_ram_bank")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
-	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
-	AM_RANGE(0xe6000, 0xe7fff) AM_ROM AM_REGION("chargen",0)
-	AM_RANGE(0xe8000, 0xfbfff) AM_NOP
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void octopus_state::octopus_mem(address_map &map)
+{
+	map(0x00000, 0xcffff).bankrw("main_ram_bank");
+	map(0xd0000, 0xdffff).ram().share("vram");
+	map(0xe0000, 0xe3fff).noprw();
+	map(0xe4000, 0xe5fff).ram().share("fram");
+	map(0xe6000, 0xe7fff).rom().region("chargen", 0);
+	map(0xe8000, 0xfbfff).noprw();
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("dma1", am9517a_device, read, write)
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma2", am9517a_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWA")
-	AM_RANGE(0x21, 0x2f) AM_READWRITE(system_r, system_w)
-	AM_RANGE(0x31, 0x33) AM_READWRITE(bank_sel_r, bank_sel_w)
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("keyboard", i8251_device, data_r, data_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("keyboard", i8251_device, status_r, control_w)
+void octopus_state::octopus_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x0f).rw(m_dma1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x10, 0x1f).rw(m_dma2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x20, 0x20).portr("DSWA");
+	map(0x21, 0x2f).rw(FUNC(octopus_state::system_r), FUNC(octopus_state::system_w));
+	map(0x31, 0x33).rw(FUNC(octopus_state::bank_sel_r), FUNC(octopus_state::bank_sel_w));
+	map(0x50, 0x50).rw(m_kb_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x51, 0x51).rw(m_kb_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x70-73: HD controller
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("serial", z80sio_device, da_r, da_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("serial", z80sio_device, ca_r, ca_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("serial", z80sio_device, db_r, db_w)
-	AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("serial", z80sio_device, cb_r, cb_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVREADWRITE("pic_master", pic8259_device, read, write)
-	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
-	AM_RANGE(0xc0, 0xc7) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
-	AM_RANGE(0xc8, 0xc8) AM_READWRITE(vidcontrol_r, vidcontrol_w)
-	AM_RANGE(0xc9, 0xca) AM_READWRITE(video_latch_r, video_latch_w)
+	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xa0, 0xa0).rw(m_serial, FUNC(z80sio_device::da_r), FUNC(z80sio_device::da_w));
+	map(0xa1, 0xa1).rw(m_serial, FUNC(z80sio_device::ca_r), FUNC(z80sio_device::ca_w));
+	map(0xa2, 0xa2).rw(m_serial, FUNC(z80sio_device::db_r), FUNC(z80sio_device::db_w));
+	map(0xa3, 0xa3).rw(m_serial, FUNC(z80sio_device::cb_r), FUNC(z80sio_device::cb_w));
+	map(0xb0, 0xb1).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xb4, 0xb5).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xc0, 0xc7).rw(m_crtc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0xc8, 0xc8).rw(FUNC(octopus_state::vidcontrol_r), FUNC(octopus_state::vidcontrol_w));
+	map(0xc9, 0xca).rw(FUNC(octopus_state::video_latch_r), FUNC(octopus_state::video_latch_w));
 	// 0xcf: mode control
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0xe0, 0xe4) AM_READWRITE(z80_vector_r, z80_vector_w)
-	AM_RANGE(0xf0, 0xf1) AM_READWRITE(parallel_r, parallel_w)
-	AM_RANGE(0xf8, 0xff) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+	map(0xd0, 0xd3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0xe0, 0xe4).rw(FUNC(octopus_state::z80_vector_r), FUNC(octopus_state::z80_vector_w));
+	map(0xf0, 0xf1).rw(FUNC(octopus_state::parallel_r), FUNC(octopus_state::parallel_w));
+	map(0xf8, 0xff).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-static ADDRESS_MAP_START( octopus_sub_mem, AS_PROGRAM, 8, octopus_state )
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("z80_bank", address_map_bank_device, read8, write8)
-ADDRESS_MAP_END
+void octopus_state::octopus_sub_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(m_z80_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
-static ADDRESS_MAP_START( octopus_sub_io, AS_IO, 8, octopus_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
-ADDRESS_MAP_END
+void octopus_state::octopus_sub_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(octopus_state::z80_io_r), FUNC(octopus_state::z80_io_w));
+}
 
-static ADDRESS_MAP_START( octopus_vram, 0, 8, octopus_state )
-	AM_RANGE(0x0000,0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void octopus_state::octopus_vram(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(octopus_state::vram_r), FUNC(octopus_state::vram_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( octopus )
@@ -610,7 +621,7 @@ WRITE8_MEMBER(octopus_state::vidcontrol_w)
 {
 	m_vidctrl = data;
 	m_fdc->dden_w(data & 0x04);
-	m_fdc->set_unscaled_clock((data & 0x08) ? XTAL_16MHz / 16 : XTAL_16MHz / 8);
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / ((data & 0x08) ? 16 : 8));
 }
 
 // Sound hardware
@@ -848,38 +859,41 @@ READ8_MEMBER( octopus_state::get_slave_ack )
 	return 0x00;
 }
 
-static SLOT_INTERFACE_START( octopus_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void octopus_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("octopus", OCTOPUS_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("octopus", OCTOPUS_KEYBOARD);
+}
 
-SLOT_INTERFACE_START(octopus_centronics_devices)
-	SLOT_INTERFACE("pl80", COMX_PL80)
-	SLOT_INTERFACE("ex800", EPSON_EX800)
-	SLOT_INTERFACE("lx800", EPSON_LX800)
-	SLOT_INTERFACE("lx810l", EPSON_LX810L)
-	SLOT_INTERFACE("ap2000", EPSON_AP2000)
-	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
-SLOT_INTERFACE_END
+void octopus_centronics_devices(device_slot_interface &device)
+{
+	device.option_add("pl80", COMX_PL80);
+	device.option_add("ex800", EPSON_EX800);
+	device.option_add("lx800", EPSON_LX800);
+	device.option_add("lx810l", EPSON_LX810L);
+	device.option_add("ap2000", EPSON_AP2000);
+	device.option_add("printer", CENTRONICS_PRINTER);
+}
 
-static MACHINE_CONFIG_START( octopus )
+MACHINE_CONFIG_START(octopus_state::octopus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
-	MCFG_CPU_PROGRAM_MAP(octopus_mem)
-	MCFG_CPU_IO_MAP(octopus_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
+	MCFG_DEVICE_ADD("maincpu",I8088, 24_MHz_XTAL / 3)  // 8MHz
+	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)
+	MCFG_DEVICE_IO_MAP(octopus_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
 
-	MCFG_CPU_ADD("subcpu",Z80, XTAL_24MHz / 4) // 6MHz
-	MCFG_CPU_PROGRAM_MAP(octopus_sub_mem)
-	MCFG_CPU_IO_MAP(octopus_sub_io)
+	MCFG_DEVICE_ADD("subcpu",Z80, 24_MHz_XTAL / 4) // 6MHz
+	MCFG_DEVICE_PROGRAM_MAP(octopus_sub_mem)
+	MCFG_DEVICE_IO_MAP(octopus_sub_io)
 
-	MCFG_DEVICE_ADD("dma1", AM9517A, XTAL_24MHz / 6)  // 4MHz
-	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
+	MCFG_DEVICE_ADD("dma1", AM9517A, 24_MHz_XTAL / 6)  // 4MHz
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma2", am9517a_device, dreq0_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, octopus_state,dma_read))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, octopus_state,dma_write))
 	//MCFG_I8237_IN_IOR_0_CB(NOOP)
 	//MCFG_I8237_IN_IOR_1_CB(NOOP)  // HDC
 	//MCFG_I8237_IN_IOR_2_CB(NOOP)  // RAM Refresh
@@ -888,97 +902,98 @@ static MACHINE_CONFIG_START( octopus )
 	//MCFG_I8237_OUT_IOW_1_CB(NOOP)  // HDC
 	//MCFG_I8237_OUT_IOW_2_CB(NOOP)  // RAM Refresh
 	//MCFG_I8237_OUT_IOW_3_CB(NOOP)
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(octopus_state, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(octopus_state, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(octopus_state, dack3_w))
-	MCFG_DEVICE_ADD("dma2", AM9517A, XTAL_24MHz / 6)  // 4MHz
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(octopus_state, dma_hrq_changed))
-	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, octopus_state, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, octopus_state, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, octopus_state, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, octopus_state, dack3_w))
+	MCFG_DEVICE_ADD("dma2", AM9517A, 24_MHz_XTAL / 6)  // 4MHz
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, octopus_state, dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, octopus_state,dma_read))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, octopus_state,dma_write))
 	//MCFG_I8237_IN_IOR_0_CB(NOOP)
-	MCFG_I8237_IN_IOR_1_CB(DEVREAD8("fdc",fd1793_device,data_r))  // FDC
+	MCFG_I8237_IN_IOR_1_CB(READ8("fdc",fd1793_device,data_r))  // FDC
 	//MCFG_I8237_IN_IOR_2_CB(NOOP)
 	//MCFG_I8237_IN_IOR_3_CB(NOOP)
 	//MCFG_I8237_OUT_IOW_0_CB(NOOP)
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("fdc",fd1793_device,data_w))  // FDC
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8("fdc",fd1793_device,data_w))  // FDC
 	//MCFG_I8237_OUT_IOW_2_CB(NOOP)
 	//MCFG_I8237_OUT_IOW_3_CB(NOOP)
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(octopus_state, dack4_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(octopus_state, dack5_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack6_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(octopus_state, dack7_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, octopus_state, dack4_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, octopus_state, dack5_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, octopus_state, dack6_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, octopus_state, dack7_w))
 
 	MCFG_DEVICE_ADD("pic_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(octopus_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, octopus_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	// RTC (MC146818 via i8255 PPI)
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(octopus_state,rtc_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(octopus_state,cntl_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(octopus_state,gpo_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(octopus_state,rtc_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(octopus_state,cntl_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
-	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir2_w)) MCFG_DEVCB_INVERT
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, octopus_state,rtc_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, octopus_state,cntl_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, octopus_state,gpo_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, octopus_state,rtc_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, octopus_state,cntl_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, octopus_state,gpo_w))
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic_slave",pic8259_device, ir2_w)) MCFG_DEVCB_INVERT
 
 	// Keyboard UART
 	MCFG_DEVICE_ADD("keyboard", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(octopus_state,spk_w))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(octopus_state,beep_w))
-	MCFG_RS232_PORT_ADD("keyboard_port", keyboard, "octopus")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("keyboard", i8251_device, write_rxd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_slave",pic8259_device, ir4_w))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, octopus_state,spk_w))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, octopus_state,beep_w))
+	MCFG_DEVICE_ADD("keyboard_port", RS232_PORT, keyboard, "octopus")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("keyboard", i8251_device, write_rxd))
 	MCFG_DEVICE_ADD("keyboard_clock_rx", CLOCK, 9600 * 64)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("keyboard",i8251_device,write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("keyboard",i8251_device,write_rxc))
 	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("keyboard",i8251_device,write_txc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("keyboard",i8251_device,write_txc))
 
-	MCFG_FD1793_ADD("fdc",XTAL_16MHz / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic_master",pic8259_device, ir5_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma2",am9517a_device, dreq1_w))
+	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic_master",pic8259_device, ir5_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma2",am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2457500)  // DART channel A
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(octopus_state,serial_clock_w))  // being able to write both Rx and Tx clocks at one time would be nice
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, octopus_state,serial_clock_w))  // being able to write both Rx and Tx clocks at one time would be nice
 	MCFG_PIT8253_CLK1(2457500)  // DART channel B
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("serial",z80sio_device,rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("serial",z80sio_device,rxtxcb_w))
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(octopus_state,spk_freq_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, octopus_state,spk_freq_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("serial", Z80SIO, XTAL_16MHz / 4) // clock rate not mentioned in tech manual
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("serial", Z80SIO, 16_MHz_XTAL / 4) // clock rate not mentioned in tech manual
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic_master",pic8259_device, ir1_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("serial_a",rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("serial_b",rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("serial_a",rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("serial_b",rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("serial_a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
-	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio_device, ria_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_PORT_ADD("serial_b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
-	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio_device, rib_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_ADD("serial_a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("serial",z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("serial",z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
+	//MCFG_RS232_RI_HANDLER(WRITELINE("serial",z80sio_device, ria_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_ADD("serial_b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("serial",z80sio_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("serial",z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
+	//MCFG_RS232_RI_HANDLER(WRITELINE("serial",z80sio_device, rib_w)) MCFG_DEVCB_INVERT
 
-	MCFG_CENTRONICS_ADD("parallel", octopus_centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(octopus_state, parallel_busy_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(octopus_state, parallel_slctout_w))
+	MCFG_DEVICE_ADD(m_parallel, CENTRONICS, octopus_centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, octopus_state, parallel_busy_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, octopus_state, parallel_slctout_w))
 	// TODO: Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
 
 	/* video hardware */
@@ -992,9 +1007,8 @@ static MACHINE_CONFIG_START( octopus )
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("crtc", SCN2674, 0)  // character clock can be selectable, either 16MHz or 17.6MHz
-	MCFG_SCN2674_INTR_CALLBACK(DEVWRITELINE("pic_slave", pic8259_device, ir0_w))
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_INTR_CALLBACK(WRITELINE("pic_slave", pic8259_device, ir0_w))
+	MCFG_SCN2674_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
 	MCFG_DEVICE_ADDRESS_MAP(0, octopus_vram)
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -1023,5 +1037,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                 FULLNAME       FLAGS
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, octopus_state, 0,    "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                 FULLNAME       FLAGS
+COMP( 1986, octopus, 0,      0,      octopus, octopus, octopus_state, empty_init, "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)

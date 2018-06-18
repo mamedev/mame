@@ -12,15 +12,15 @@ struct ssg_callbacks;
 
 
 #define MCFG_YM2203_IRQ_HANDLER(cb) \
-		devcb = &ym2203_device::set_irq_handler(*device, (DEVCB_##cb));
+		devcb = &downcast<ym2203_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 class ym2203_device : public ay8910_device
 {
 public:
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2203_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -45,6 +45,13 @@ protected:
 	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
+	enum
+	{
+		TIMER_A,
+		TIMER_B,
+		TIMER_IRQ_SYNC
+	};
+
 	void irq_handler(int irq);
 	void timer_handler(int c, int count, int clock);
 	void update_request() { m_stream->update(); }
@@ -56,7 +63,7 @@ private:
 
 	// internal state
 	sound_stream *  m_stream;
-	emu_timer *     m_timer[2];
+	emu_timer *     m_timer[3];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
 

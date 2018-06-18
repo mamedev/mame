@@ -14,6 +14,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/am9513.h"
 #include "machine/i8255.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -29,6 +30,9 @@ public:
 	DECLARE_PALETTE_INIT(unistar);
 	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void unistar(machine_config &config);
+	void unistar_io(address_map &map);
+	void unistar_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -36,20 +40,22 @@ private:
 };
 
 
-static ADDRESS_MAP_START(unistar_mem, AS_PROGRAM, 8, unistar_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-ADDRESS_MAP_END
+void unistar_state::unistar_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x8fff).ram();
+}
 
-static ADDRESS_MAP_START(unistar_io, AS_IO, 8, unistar_state)
+void unistar_state::unistar_io(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("stc", am9513_device, read8, write8)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map.global_mask(0xff);
+	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
+	map(0x94, 0x97).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
 	// if nonzero returned from port 94, it goes into test mode.
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( unistar )
@@ -86,18 +92,18 @@ static const gfx_layout unistar_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( unistar )
+static GFXDECODE_START( gfx_unistar )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unistar_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( unistar )
+MACHINE_CONFIG_START(unistar_state::unistar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
-	MCFG_CPU_PROGRAM_MAP(unistar_mem)
-	MCFG_CPU_IO_MAP(unistar_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(unistar_mem)
+	MCFG_DEVICE_IO_MAP(unistar_io)
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL_8MHz)
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL(8'000'000))
+	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("stc", am9513_device, source1_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
@@ -110,7 +116,7 @@ static MACHINE_CONFIG_START( unistar )
 	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unistar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unistar)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unistar_state, unistar)
 MACHINE_CONFIG_END
@@ -128,5 +134,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                FULLNAME                FLAGS
-COMP( 198?, unistar, 0,      0,       unistar,   unistar, unistar_state, 0,    "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                FULLNAME                FLAGS
+COMP( 198?, unistar, 0,      0,      unistar, unistar, unistar_state, empty_init, "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )

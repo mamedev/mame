@@ -7,11 +7,10 @@
     Common MIPS III/IV definitions and functions
 
 ***************************************************************************/
+#ifndef MAME_CPU_MIPS_MIPS3COM_H
+#define MAME_CPU_MIPS_MIPS3COM_H
 
 #pragma once
-
-#ifndef __MIPS3COM_H__
-#define __MIPS3COM_H__
 
 #include "mips3.h"
 
@@ -37,8 +36,8 @@
 ***************************************************************************/
 
 /* map variables */
-#define MAPVAR_PC                       M0
-#define MAPVAR_CYCLES                   M1
+#define MAPVAR_PC                       uml::M0
+#define MAPVAR_CYCLES                   uml::M1
 
 /* modes */
 #define MODE_KERNEL                     0
@@ -187,4 +186,4 @@
 #define LIMMVAL         (op & 0x03ffffff)
 
 
-#endif /* __MIPS3COM_H__ */
+#endif // MAME_CPU_MIPS_MIPS3COM_H

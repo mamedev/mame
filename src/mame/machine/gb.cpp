@@ -723,14 +723,14 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 	data = m_ppu->video_r(space, offset);
 	if (offset)
 		return data;
-	return BITSWAP8(data,7,0,5,4,6,3,2,1);
+	return bitswap<8>(data,7,0,5,4,6,3,2,1);
 }
 
 WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 {
 	if (!offset)
 	{
-		data = BITSWAP8(data,7,3,5,4,2,1,0,6);
+		data = bitswap<8>(data,7,3,5,4,2,1,0,6);
 	}
 	if ((offset & 0x0C) && ((offset & 0x0C) ^ 0x0C))
 	{

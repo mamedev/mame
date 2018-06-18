@@ -42,12 +42,13 @@ uint32_t tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( tandy200_lcdc, 0, 8, tandy200_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void tandy200_state::tandy200_lcdc(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).ram();
+}
 
-MACHINE_CONFIG_START( kc85_video )
+MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(44)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_state, screen_update)
@@ -75,7 +76,7 @@ MACHINE_CONFIG_START( kc85_video )
 //  MCFG_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( tandy200_video )
+MACHINE_CONFIG_START(tandy200_state::tandy200_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
 	MCFG_SCREEN_UPDATE_DRIVER(tandy200_state, screen_update)
@@ -88,7 +89,7 @@ MACHINE_CONFIG_START( tandy200_video )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, tandy200_lcdc)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END

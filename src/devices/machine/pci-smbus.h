@@ -5,12 +5,21 @@
 
 #include "pci.h"
 
-#define MCFG_SMBUS_ADD(_tag, _main_id, _revision, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, SMBUS, _main_id, _revision, 0x0c0500, _subdevice_id)
-
 class smbus_device : public pci_device {
 public:
+	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+		: smbus_device(mconfig, tag, owner, clock)
+	{
+		set_ids(main_id, revision, 0x0c0500, subdevice_id);
+	}
 	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER  (hst_sts_r);
 	DECLARE_WRITE8_MEMBER (hst_sts_w);
@@ -47,13 +56,6 @@ public:
 	DECLARE_READ8_MEMBER  (notify_daddr_r);
 	DECLARE_READ8_MEMBER  (notify_dlow_r);
 	DECLARE_READ8_MEMBER  (notify_dhigh_r);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	DECLARE_ADDRESS_MAP(map, 32);
 
 	uint16_t slv_data;
 

@@ -31,9 +31,10 @@ DEFINE_DEVICE_TYPE(A2BUS_TRANSWARP, a2bus_transwarp_device, "a2twarp", "Applied 
 
 #define CPU_TAG         "tw65c02"
 
-static ADDRESS_MAP_START( m65c02_mem, AS_PROGRAM, 8, a2bus_transwarp_device )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
-ADDRESS_MAP_END
+void a2bus_transwarp_device::m65c02_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
+}
 
 ROM_START( warprom )
 	ROM_REGION(0x1000, "twrom", 0)
@@ -120,9 +121,9 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_transwarp_device::device_add_mconfig )
-	MCFG_CPU_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(m65c02_mem)
+MACHINE_CONFIG_START(a2bus_transwarp_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(m65c02_mem)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -151,9 +152,6 @@ a2bus_transwarp_device::a2bus_transwarp_device(const machine_config &mconfig, co
 
 void a2bus_transwarp_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_bEnabled));

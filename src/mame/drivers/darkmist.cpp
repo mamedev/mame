@@ -44,34 +44,36 @@ WRITE8_MEMBER(darkmist_state::hw_w)
 	membank("bank1")->set_entry((data&0x80)?1:0);
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1")
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2")
-	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("START")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(hw_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITEONLY AM_SHARE("spritebank")
-	AM_RANGE(0xc806, 0xc806) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc808, 0xc808) AM_READ_PORT("UNK")
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd400, 0xd41f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0xd600, 0xd67f) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
-	AM_RANGE(0xd680, 0xd680) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0xd681, 0xd681) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
-	AM_RANGE(0xd682, 0xd682) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd683, 0xd683) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void darkmist_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc801, 0xc801).portr("P1");
+	map(0xc802, 0xc802).portr("P2");
+	map(0xc803, 0xc803).portr("START");
+	map(0xc804, 0xc804).w(FUNC(darkmist_state::hw_w));
+	map(0xc805, 0xc805).writeonly().share("spritebank");
+	map(0xc806, 0xc806).portr("DSW1");
+	map(0xc807, 0xc807).portr("DSW2");
+	map(0xc808, 0xc808).portr("UNK");
+	map(0xd000, 0xd0ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0xd200, 0xd2ff).ram().w(m_palette, FUNC(palette_device::write_indirect_ext)).share("palette_ext");
+	map(0xd400, 0xd41f).ram().share("scroll");
+	map(0xd600, 0xd67f).rw(m_t5182, FUNC(t5182_device::sharedram_r), FUNC(t5182_device::sharedram_w));
+	map(0xd680, 0xd680).w(m_t5182, FUNC(t5182_device::sound_irq_w));
+	map(0xd681, 0xd681).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
+	map(0xd682, 0xd682).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
+	map(0xd683, 0xd683).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0xd800, 0xdfff).ram().w(FUNC(darkmist_state::tx_vram_w)).share("videoram");
+	map(0xe000, 0xefff).ram().share("workram");
+	map(0xf000, 0xffff).ram().share("spriteram");
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, darkmist_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void darkmist_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+}
 
 static INPUT_PORTS_START( darkmist )
 	PORT_START("P1")
@@ -217,7 +219,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( darkmist )
+static GFXDECODE_START( gfx_darkmist )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout,  0x300, 16 )
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout,  0x000, 16 )
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout,  0x100, 16 )
@@ -237,11 +239,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( darkmist )
+MACHINE_CONFIG_START(darkmist_state::darkmist)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -255,17 +257,17 @@ static MACHINE_CONFIG_START( darkmist )
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkmist)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkmist)
 	MCFG_PALETTE_ADD("palette", 0x100*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)    /* 3.579545 MHz */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -336,7 +338,7 @@ void darkmist_state::decrypt_fgbgtiles(uint8_t* rom, int size)
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+		w1 = bitswap<16>(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -345,7 +347,7 @@ void darkmist_state::decrypt_fgbgtiles(uint8_t* rom, int size)
 	/* address lines */
 	for (int i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13, 5,4,3,2, 12,11,10,9,8, 1,0, 7,6)];
+		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13, 5,4,3,2, 12,11,10,9,8, 1,0, 7,6)];
 	}
 }
 
@@ -368,7 +370,7 @@ void darkmist_state::decrypt_gfx()
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+		w1 = bitswap<16>(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -377,7 +379,7 @@ void darkmist_state::decrypt_gfx()
 	/* address lines */
 	for (i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12, 3,2,1, 11,10,9,8, 0, 7,6,5,4)];
+		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12, 3,2,1, 11,10,9,8, 0, 7,6,5,4)];
 	}
 
 	decrypt_fgbgtiles(memregion("bg_gfx")->base(), memregion("bg_gfx")->bytes());
@@ -394,7 +396,7 @@ void darkmist_state::decrypt_gfx()
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+		w1 = bitswap<16>(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -403,7 +405,7 @@ void darkmist_state::decrypt_gfx()
 	/* address lines */
 	for (i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
+		rom[i] = buf[bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
 	}
 }
 
@@ -412,12 +414,11 @@ void darkmist_state::decrypt_snd()
 	uint8_t *ROM = memregion("t5182_z80")->base();
 
 	for (int i = 0x0000; i < 0x8000; i++)
-		ROM[i] = BITSWAP8(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
+		ROM[i] = bitswap<8>(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
 }
 
-DRIVER_INIT_MEMBER(darkmist_state,darkmist)
+void darkmist_state::init_darkmist()
 {
-	int i, len;
 	uint8_t *ROM = memregion("maincpu")->base();
 	std::vector<uint8_t> buffer(0x10000);
 
@@ -425,10 +426,10 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	decrypt_snd();
 
-	for(i=0;i<0x8000;i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
-		uint8_t p, d;
-		p = d = ROM[i];
+		uint8_t p = ROM[i];
+		uint8_t d = p;
 
 		if(((i & 0x20) == 0x00) && ((i & 0x8) != 0))
 			p ^= 0x20;
@@ -441,8 +442,8 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 		if((i & 0x220) != 0x200)
 		{
-			p = BITSWAP8(p, 7,6,5,2,3,4,1,0);
-			d = BITSWAP8(d, 7,6,5,2,3,4,1,0);
+			p = bitswap<8>(p, 7,6,5,2,3,4,1,0);
+			d = bitswap<8>(d, 7,6,5,2,3,4,1,0);
 		}
 
 		ROM[i] = d;
@@ -453,23 +454,23 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	/* adr line swaps */
 	ROM = memregion("bg_map")->base();
-	len = memregion("bg_map")->bytes();
+	int len = memregion("bg_map")->bytes();
 	memcpy( &buffer[0], ROM, len );
 
-	for(i=0;i<len;i++)
+	for (int i = 0; i < len; i++)
 	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,7,6,5,4,3,15,14,13,12,9,8,2,1,11,10, 0)];
+		ROM[i]=buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,7,6,5,4,3,15,14,13,12,9,8,2,1,11,10, 0)];
 	}
 
 
 	ROM = memregion("fg_map")->base();
 	len = memregion("fg_map")->bytes();
 	memcpy( &buffer[0], ROM, len );
-	for(i=0;i<len;i++)
+	for (int i = 0; i < len; i++)
 	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15 ,6,5,4,3,12,11,10,9,14,13,2,1,8,7 ,0  )];
+		ROM[i]=buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,15 ,6,5,4,3,12,11,10,9,14,13,2,1,8,7 ,0  )];
 	}
 
 }
 
-GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Seibu Kaihatsu (Taito license)", "The Lost Castle In Darkmist", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, init_darkmist, ROT270, "Seibu Kaihatsu (Taito license)", "The Lost Castle In Darkmist", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

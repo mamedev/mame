@@ -144,15 +144,15 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "OUT  $%02X", opcodes.r8(pc++));
 		break;
 	case 0x28: /* 0010 1000 */
-		util::stream_format(stream, "PI   $%02X%02X", opcodes.r16(pc));
+		util::stream_format(stream, "PI   $%04X", opcodes.r16(pc));
 		pc += 2;
 		break;
 	case 0x29: /* 0010 1001 */
-		util::stream_format(stream, "JMP  $%02X%02X", opcodes.r16(pc));
+		util::stream_format(stream, "JMP  $%04X", opcodes.r16(pc));
 		pc += 2;
 		break;
 	case 0x2a: /* 0010 1010 */
-		util::stream_format(stream, "DCI  $%02X%02X", opcodes.r16(pc));
+		util::stream_format(stream, "DCI  $%04X", opcodes.r16(pc));
 		pc += 2;
 		break;
 	case 0x2b: /* 0010 1011 */

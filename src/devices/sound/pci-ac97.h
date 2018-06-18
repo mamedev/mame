@@ -7,11 +7,13 @@
 
 #include "machine/pci.h"
 
-#define MCFG_AC97_ADD(_tag, _main_id, _revision, _subdevice_id) \
-		MCFG_PCI_DEVICE_ADD(_tag, AC97, _main_id, _revision, 0x040300, _subdevice_id)
-
 class ac97_device : public pci_device {
 public:
+	ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+		: ac97_device(mconfig, tag, owner, clock)
+	{
+		set_ids(main_id, revision, 0x040300, subdevice_id);
+	}
 	ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -19,10 +21,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(native_audio_mixer_map, 32);
-	DECLARE_ADDRESS_MAP(native_audio_bus_mastering_map, 32);
-	DECLARE_ADDRESS_MAP(mixer_map, 32);
-	DECLARE_ADDRESS_MAP(bus_mastering_map, 32);
+	void native_audio_mixer_map(address_map &map);
+	void native_audio_bus_mastering_map(address_map &map);
+	void mixer_map(address_map &map);
+	void bus_mastering_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(AC97, ac97_device)

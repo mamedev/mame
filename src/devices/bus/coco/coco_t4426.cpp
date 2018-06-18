@@ -45,7 +45,6 @@
 #include "emu.h"
 #include "coco_t4426.h"
 
-#include "cococart.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
 #include "machine/mc14411.h"
@@ -149,51 +148,50 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_MEMBER(coco_t4426_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_t4426_device, pia_A_w))
 
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(SERIAL_TAG, rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(SERIAL_TAG, rs232_port_device, write_rts))
 
-	MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_rts))
-
-	MCFG_RS232_PORT_ADD (SERIAL_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD(SERIAL_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(UART_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UART_TAG, acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD (BRG_TAG, XTAL_1_8432MHz)
-	MCFG_MC14411_F1_CB(WRITELINE (coco_t4426_device, write_f1_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (coco_t4426_device, write_f3_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (coco_t4426_device, write_f5_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (coco_t4426_device, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (coco_t4426_device, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (coco_t4426_device, write_f9_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (coco_t4426_device, write_f11_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (coco_t4426_device, write_f13_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (coco_t4426_device, write_f15_clock))
+	MCFG_DEVICE_ADD(BRG_TAG, MC14411, 1.8432_MHz_XTAL)
+	MCFG_MC14411_F1_CB(WRITELINE(*this, coco_t4426_device, write_f1_clock))
+	MCFG_MC14411_F3_CB(WRITELINE(*this, coco_t4426_device, write_f3_clock))
+	MCFG_MC14411_F5_CB(WRITELINE(*this, coco_t4426_device, write_f5_clock))
+	MCFG_MC14411_F7_CB(WRITELINE(*this, coco_t4426_device, write_f7_clock))
+	MCFG_MC14411_F8_CB(WRITELINE(*this, coco_t4426_device, write_f8_clock))
+	MCFG_MC14411_F9_CB(WRITELINE(*this, coco_t4426_device, write_f9_clock))
+	MCFG_MC14411_F11_CB(WRITELINE(*this, coco_t4426_device, write_f11_clock))
+	MCFG_MC14411_F13_CB(WRITELINE(*this, coco_t4426_device, write_f13_clock))
+	MCFG_MC14411_F15_CB(WRITELINE(*this, coco_t4426_device, write_f15_clock))
 MACHINE_CONFIG_END
 
 ROM_START( coco_t4426 )
 	// Part of this region is filled by set_bank
 	ROM_REGION(0x4000, CARTSLOT_TAG, ROMREGION_ERASE00)
 	// Main cartridge ROM
-	ROM_LOAD("tercoPMOS4426-8549-4.31.bin", 0x2000, 0x1000, CRC(bc65c45c) SHA1(e50cfd1d61e29fe05eb795d8bf6303e7b91ed8e5))
+	ROM_LOAD("tercopmos4426-8549-4.31.bin", 0x2000, 0x1000, CRC(bc65c45c) SHA1(e50cfd1d61e29fe05eb795d8bf6303e7b91ed8e5))
 	ROM_RELOAD(0x03000,0x1000) // Mirrored
 
 	// this region is loaded from separate ROM images
 	ROM_REGION(0x1a000, CARTBANK_TAG, ROMREGION_ERASE00)
 
 	// 8 banked ROM:s
-	ROM_LOAD("tercoED4426-0-8549-5.3.bin",  0x0000, 0x2000, CRC(45665428) SHA1(ff49a79275772c4c4ab1ae29db662c9b10a744a7))
-	ROM_LOAD("tercoED4426-1-8549-5.3.bin",  0x2000, 0x2000, CRC(854cd50d) SHA1(0786391b4e7a78af0a984b6313eec7f71fb4ad9e))
-	ROM_LOAD("tercoPD4426-2-8632-6.4.bin",  0x4000, 0x2000, CRC(258e443a) SHA1(9d8901f3e70ae4f8526dde1b5208b22f066f801f))
-	ROM_LOAD("tercoPD4426-3-8638-6.4.bin",  0x6000, 0x2000, CRC(640d1de4) SHA1(5ae7427cb5729fd3920361855d954ea1f97f6ae5))
-	ROM_LOAD("tercoCA4426-4-8549-3.4.bin",  0x8000, 0x2000, CRC(df18397b) SHA1(2f9de210c039619c649be223c37a4eff873fa600))
-	ROM_LOAD("tercoCA4426-5-8549-3.4.bin",  0xa000, 0x2000, CRC(3fcdf92e) SHA1(ec1589f8d62701ca3faf2a85a57ab2e1f61d2137))
-	ROM_LOAD("tercoCA4426-6-8549-3.4.bin",  0xc000, 0x2000, CRC(27652ccf) SHA1(529a6f736666ae6660483e547d076725606b1c1d))
-	ROM_LOAD("tercoCA4426-7-8549-3.4.bin",  0xe000, 0x2000, CRC(f6640569) SHA1(03f70dcc5f7ab60cd908427d45ebd85b6f464b93))
+	ROM_LOAD("tercoed4426-0-8549-5.3.bin",  0x0000, 0x2000, CRC(45665428) SHA1(ff49a79275772c4c4ab1ae29db662c9b10a744a7))
+	ROM_LOAD("tercoed4426-1-8549-5.3.bin",  0x2000, 0x2000, CRC(854cd50d) SHA1(0786391b4e7a78af0a984b6313eec7f71fb4ad9e))
+	ROM_LOAD("tercopd4426-2-8632-6.4.bin",  0x4000, 0x2000, CRC(258e443a) SHA1(9d8901f3e70ae4f8526dde1b5208b22f066f801f))
+	ROM_LOAD("tercopd4426-3-8638-6.4.bin",  0x6000, 0x2000, CRC(640d1de4) SHA1(5ae7427cb5729fd3920361855d954ea1f97f6ae5))
+	ROM_LOAD("tercoca4426-4-8549-3.4.bin",  0x8000, 0x2000, CRC(df18397b) SHA1(2f9de210c039619c649be223c37a4eff873fa600))
+	ROM_LOAD("tercoca4426-5-8549-3.4.bin",  0xa000, 0x2000, CRC(3fcdf92e) SHA1(ec1589f8d62701ca3faf2a85a57ab2e1f61d2137))
+	ROM_LOAD("tercoca4426-6-8549-3.4.bin",  0xc000, 0x2000, CRC(27652ccf) SHA1(529a6f736666ae6660483e547d076725606b1c1d))
+	ROM_LOAD("tercoca4426-7-8549-3.4.bin",  0xe000, 0x2000, CRC(f6640569) SHA1(03f70dcc5f7ab60cd908427d45ebd85b6f464b93))
 ROM_END
 
 //-------------------------------------------------
@@ -226,7 +224,9 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_T4426, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 //**************************************************************************
 //  LIVE DEVICE

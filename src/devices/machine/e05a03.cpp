@@ -92,7 +92,7 @@ void e05a03_device::device_reset()
 
 WRITE8_MEMBER( e05a03_device::write )
 {
-	logerror("%s: e05a03_w(%02x): %02x\n", space.machine().describe_context(), offset, data);
+	logerror("%s: e05a03_w(%02x): %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -131,7 +131,7 @@ READ8_MEMBER( e05a03_device::read )
 {
 	uint8_t result = 0;
 
-	logerror("%s: e05a03_r(%02x)\n", space.machine().describe_context(), offset);
+	logerror("%s: e05a03_r(%02x)\n", machine().describe_context(), offset);
 
 	switch (offset)
 	{

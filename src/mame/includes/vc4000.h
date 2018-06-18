@@ -7,8 +7,8 @@
  *
  ****************************************************************************/
 
-#ifndef VC4000_H_
-#define VC4000_H_
+#ifndef MAME_INCLUDES_VC4000_H
+#define MAME_INCLUDES_VC4000_H
 
 #include "audio/vc4000.h"
 #include "cpu/s2650/s2650.h"
@@ -19,6 +19,7 @@
 #include "bus/vc4000/slot.h"
 #include "bus/vc4000/rom.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 // define this to use digital inputs instead of the slow
@@ -127,6 +128,15 @@ public:
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
+	void cx3000tc(machine_config &config);
+	void mpu1000(machine_config &config);
+	void vc4000(machine_config &config);
+	void database(machine_config &config);
+	void h21(machine_config &config);
+	void rwtrntcs(machine_config &config);
+	void elektor(machine_config &config);
+	void elektor_mem(address_map &map);
+	void vc4000_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -156,4 +166,4 @@ protected:
 	inline void vc4000_draw_grid(uint8_t *collision);
 };
 
-#endif /* VC4000_H_ */
+#endif // MAME_INCLUDES_VC4000_H

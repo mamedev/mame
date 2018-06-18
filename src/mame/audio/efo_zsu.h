@@ -7,7 +7,7 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/gen_latch.h"
 #include "machine/40105.h"
@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_fifo_w);
 
+	void zsu_io(address_map &map);
+	void zsu_map(address_map &map);
 protected:
 	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -76,6 +78,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
+	void cedar_magnet_sound_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

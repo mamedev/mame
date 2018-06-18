@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/sysctl.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <dlfcn.h>
@@ -92,13 +93,22 @@ void osd_free_executable(void *ptr, size_t size)
 
 void osd_break_into_debugger(const char *message)
 {
-	#ifdef MAME_DEBUG
-	printf("MAME exception: %s\n", message);
-	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP);
-	#else
-	printf("Ignoring MAME exception: %s\n", message);
-	#endif
+	pid_t const mypid = getpid();
+	int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, int(mypid) };
+	struct kinfo_proc info;
+	info.kp_proc.p_flag = 0;
+	std::size_t infosz = sizeof(info);
+	sysctl(mib, ARRAY_LENGTH(mib), &info, &infosz, nullptr, 0);
+	if (info.kp_proc.p_flag & P_TRACED)
+	{
+		printf("MAME exception: %s\n", message);
+		printf("Attempting to fall into debugger\n");
+		kill(mypid, SIGTRAP);
+	}
+	else
+	{
+		printf("Ignoring MAME exception: %s\n", message);
+	}
 }
 
 
@@ -178,6 +188,15 @@ char *osd_get_clipboard_text(void)
 	CFRelease(pasteboard_ref);
 
 	return result;
+}
+
+//============================================================
+//  osd_getpid
+//============================================================
+
+int osd_getpid(void)
+{
+	return getpid();
 }
 
 //============================================================

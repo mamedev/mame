@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -39,6 +40,9 @@ public:
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void homez80(machine_config &config);
+	void homez80_io(address_map &map);
+	void homez80_mem(address_map &map);
 private:
 	bool m_irq;
 	virtual void machine_reset() override;
@@ -55,17 +59,19 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 	return ioport(kbdrow)->read();
 }
 
-static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_SHARE("videoram") // Video RAM
-	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
-ADDRESS_MAP_END
+void homez80_state::homez80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();  // Monitor
+	map(0x2000, 0x23ff).ram().share("videoram"); // Video RAM
+	map(0x7020, 0x702f).r(FUNC(homez80_state::homez80_keyboard_r));
+	map(0x8000, 0xffff).ram();  // 32 K RAM
+}
 
-static ADDRESS_MAP_START( homez80_io, AS_IO, 8, homez80_state)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void homez80_state::homez80_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 /* Input ports */
 INPUT_PORTS_START( homez80 )
@@ -267,7 +273,7 @@ const gfx_layout homez80_charlayout =
 	8*8                 /* size of one char */
 };
 
-static GFXDECODE_START( homez80 )
+static GFXDECODE_START( gfx_homez80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homez80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -278,12 +284,12 @@ INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
 	m_irq ^= 1;
 }
 
-static MACHINE_CONFIG_START( homez80 )
+MACHINE_CONFIG_START(homez80_state::homez80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(homez80_mem)
-	MCFG_CPU_IO_MAP(homez80_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(homez80_state, homez80_interrupt,  50)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(homez80_mem)
+	MCFG_DEVICE_IO_MAP(homez80_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(homez80_state, homez80_interrupt,  50)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -295,7 +301,7 @@ static MACHINE_CONFIG_START( homez80 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homez80 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homez80)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -309,5 +315,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY             FULLNAME                 FLAGS */
-COMP( 2008, homez80,  0,     0,      homez80,   homez80, homez80_state, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                 FLAGS */
+COMP( 2008, homez80, 0,      0,      homez80, homez80, homez80_state, empty_init, "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)

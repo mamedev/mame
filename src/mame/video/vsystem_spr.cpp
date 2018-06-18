@@ -64,7 +64,7 @@ Abstracts the VS9210
 #include "screen.h"
 
 
-DEFINE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device, "vsystem_spr", "Video System Sprites")
+DEFINE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device, "vsystem_spr", "Video System VS9108 Sprites")
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR, tag, owner, clock)
@@ -81,74 +81,10 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 {
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
 {
 	return tile;
 }
-
-
-// static
-void vsystem_spr_device::set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_newtilecb = newtilecb;
-}
-
-
-// static
-void vsystem_spr_device::set_offsets(device_t &device, int xoffs, int yoffs)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_xoffs = xoffs;
-	dev.m_yoffs = yoffs;
-}
-
-// static
-void vsystem_spr_device::set_pdraw(device_t &device, bool pdraw)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_pdraw = pdraw;
-}
-
-// static
-void vsystem_spr_device::set_gfx_region(device_t &device, int gfx_region)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_gfx_region = gfx_region;
-}
-
-// static
-void vsystem_spr_device::CG10103_set_pal_base(device_t &device, int pal_base)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_pal_base = pal_base;
-}
-
-
-// static
-void vsystem_spr_device::set_pal_mask(device_t &device, int pal_mask)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_pal_mask = pal_mask;
-}
-
-// static
-void vsystem_spr_device::CG10103_set_transpen(device_t &device, int transpen)
-{
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_transpen = transpen;
-}
-
 
 void vsystem_spr_device::device_start()
 {

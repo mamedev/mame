@@ -68,7 +68,8 @@ function maintargetosdoptions(_target,_subtarget)
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				configuration { "mingw*"}
 					links {
-						"SDL2.dll",
+						"SDL2main",
+						"SDL2",
 					}
 				configuration { "vs*" }
 					links {
@@ -461,6 +462,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	if BASE_TARGETOS=="unix" then
 		files {
 			MAME_DIR .. "src/osd/modules/file/posixdir.cpp",
+			MAME_DIR .. "src/osd/modules/file/posixdomain.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.h",
 			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",

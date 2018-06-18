@@ -37,6 +37,9 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tgtpanic(machine_config &config);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 };
 
 
@@ -99,16 +102,18 @@ WRITE8_MEMBER(tgtpanic_state::color_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tgtpanic_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void tgtpanic_state::prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram().share("ram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tgtpanic_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void tgtpanic_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(FUNC(tgtpanic_state::color_w));
+	map(0x01, 0x01).portr("IN1");
+}
 
 
 /*************************************
@@ -146,13 +151,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tgtpanic )
+MACHINE_CONFIG_START(tgtpanic_state::tgtpanic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tgtpanic_state, irq0_line_hold,  20) /* Unverified */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tgtpanic_state, irq0_line_hold,  20) /* Unverified */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -182,4 +187,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, tgtpanic_state, 0, ROT0, "Konami", "Target Panic", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, tgtpanic_state, empty_init, ROT0, "Konami", "Target Panic", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

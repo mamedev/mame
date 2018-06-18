@@ -34,6 +34,7 @@
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -92,6 +93,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom );
+	void tmmjprd(machine_config &config);
+	void tmpdoki(machine_config &config);
+	void tmmjprd_map(address_map &map);
 };
 
 
@@ -571,7 +575,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Right Screen Coin B") // might actually be service 1
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // CHECK!
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // CHECK!
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -689,37 +693,38 @@ WRITE32_MEMBER(tmmjprd_state::brt_2_w)
 	}
 }
 
-static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200010, 0x200013) AM_READ(randomtmmjprds) // gfx chip status?
+void tmmjprd_state::tmmjprd_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200010, 0x200013).r(FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
 	/* check these are used .. */
 //  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("viewregs0")
-	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
-	AM_RANGE(0x200120, 0x200137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
-	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
-	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
-	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
+	map(0x200100, 0x200117).writeonly().share("tilemap_regs.0"); // tilemap regs1
+	map(0x200120, 0x200137).writeonly().share("tilemap_regs.1"); // tilemap regs2
+	map(0x200140, 0x200157).writeonly().share("tilemap_regs.2"); // tilemap regs3
+	map(0x200160, 0x200177).writeonly().share("tilemap_regs.3"); // tilemap regs4
+	map(0x200200, 0x20021b).writeonly().share("spriteregs"); // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
-	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(brt_1_w)
-	AM_RANGE(0x200410, 0x200413) AM_WRITE(brt_2_w)
+	map(0x20040c, 0x20040f).w(FUNC(tmmjprd_state::brt_1_w));
+	map(0x200410, 0x200413).w(FUNC(tmmjprd_state::brt_2_w));
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
 //  AM_RANGE(0x200700, 0x20070f) AM_WRITE(blitter_w) AM_SHARE("blitterregs")
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
-	AM_RANGE(0x200900, 0x2009ff) AM_DEVREADWRITE16("i5000snd", i5000snd_device, read, write, 0xffffffff)
+	map(0x200900, 0x2009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
 //  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("viewregs10")
 	/* tilemaps */
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(tilemap0_r,tilemap0_w)
-	AM_RANGE(0x284000, 0x287fff) AM_READWRITE(tilemap1_r,tilemap1_w)
-	AM_RANGE(0x288000, 0x28bfff) AM_READWRITE(tilemap2_r,tilemap2_w)
-	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
+	map(0x280000, 0x283fff).rw(FUNC(tmmjprd_state::tilemap0_r), FUNC(tmmjprd_state::tilemap0_w));
+	map(0x284000, 0x287fff).rw(FUNC(tmmjprd_state::tilemap1_r), FUNC(tmmjprd_state::tilemap1_w));
+	map(0x288000, 0x28bfff).rw(FUNC(tmmjprd_state::tilemap2_r), FUNC(tmmjprd_state::tilemap2_w));
+	map(0x28c000, 0x28ffff).rw(FUNC(tmmjprd_state::tilemap3_r), FUNC(tmmjprd_state::tilemap3_w));
 	/* ?? is palette ram shared with sprites in this case or just a different map */
-	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	map(0x290000, 0x29bfff).ram().share("spriteram");
+	map(0x29c000, 0x29ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	AM_RANGE(0x400000, 0x400003) AM_READ(mux_r) AM_WRITE(eeprom_write)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x400000, 0x400003).r(FUNC(tmmjprd_state::mux_r)).w(FUNC(tmmjprd_state::eeprom_write));
+	map(0xf00000, 0xffffff).ram();
+}
 
 
 
@@ -743,7 +748,7 @@ static const gfx_layout sprite_16x16x8_layout =
 
 
 // gfx decoding is ugly.. 16*16 tiles can start at varying different offsets..
-static GFXDECODE_START( tmmjprd )
+static GFXDECODE_START( gfx_tmmjprd )
 	/* this seems to be sprites */
 //  GFXDECODE_ENTRY( "gfx1", 0, sprite_8x8x4_layout,   0x0, 0x1000  )
 //  GFXDECODE_ENTRY( "gfx1", 0, sprite_16x16x4_layout, 0x0, 0x1000  )
@@ -764,15 +769,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-static MACHINE_CONFIG_START( tmmjprd )
-	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
+MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
+	MCFG_DEVICE_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmmjprd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmmjprd)
 
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -806,14 +810,16 @@ static MACHINE_CONFIG_START( tmmjprd )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_I5000_SND_ADD("i5000snd", XTAL_40MHz)
+	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tmpdoki, tmmjprd )
+MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
+	tmmjprd(config);
 	MCFG_DEFAULT_LAYOUT(layout_horizont)
 MACHINE_CONFIG_END
 
@@ -887,5 +893,5 @@ ROM_START( tmpdoki )
 ROM_END
 
 
-GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?
+GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?

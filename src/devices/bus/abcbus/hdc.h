@@ -13,7 +13,7 @@
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "bus/scsi/scsihd.h"
 
 
@@ -45,6 +45,9 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void abc_hdc_io(address_map &map);
+	void abc_hdc_mem(address_map &map);
 };
 
 

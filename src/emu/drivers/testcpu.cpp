@@ -162,6 +162,9 @@ public:
 		printf("Write to %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((data&0xffffffff00000000LL) >> 32), (int)(data&0xffffffff));
 	}
 
+	void testcpu(machine_config &config);
+
+	void ppc_mem(address_map &map);
 private:
 	// internal state
 	required_device<ppc603e_device> m_cpu;
@@ -175,10 +178,11 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( ppc_mem, AS_PROGRAM, 64, testcpu_state )
-	AM_RANGE(RAM_BASE, RAM_BASE+7) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(general_r, general_w)
-ADDRESS_MAP_END
+void testcpu_state::ppc_mem(address_map &map)
+{
+	map(RAM_BASE, RAM_BASE+7).ram().share("ram");
+	map(0x00000000, 0xffffffff).rw(this, FUNC(testcpu_state::general_r), FUNC(testcpu_state::general_w));
+}
 
 
 
@@ -186,12 +190,12 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( testcpu, testcpu_state )
+MACHINE_CONFIG_START(testcpu_state::testcpu)
 
 	// CPUs
-	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 66000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)  // Multiplier 1, Bus = 66MHz, Core = 66MHz
-	MCFG_CPU_PROGRAM_MAP(ppc_mem)
+	MCFG_DEVICE_PROGRAM_MAP(ppc_mem)
 MACHINE_CONFIG_END
 
 

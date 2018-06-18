@@ -30,6 +30,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,24 +39,24 @@ class limenko_state : public driver_device
 {
 public:
 	limenko_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_qs1000(*this, "qs1000"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_mainram(*this, "mainram"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_md_videoram(*this, "md_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
-		m_videoreg(*this, "videoreg") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_mainram(*this, "mainram")
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_md_videoram(*this, "md_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_videoreg(*this, "videoreg")
+		, m_gfx_region(*this, "gfx")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
-	optional_device<qs1000_device> m_qs1000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -65,8 +66,8 @@ public:
 	required_shared_ptr<uint32_t> m_md_videoram;
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_spriteram;
-	required_shared_ptr<uint32_t> m_spriteram2;
 	required_shared_ptr<uint32_t> m_videoreg;
+	required_region_ptr<uint8_t> m_gfx_region;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
@@ -82,8 +83,6 @@ public:
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 	DECLARE_WRITE32_MEMBER(md_videoram_w);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
-	DECLARE_WRITE32_MEMBER(spotty_soundlatch_w);
-	DECLARE_WRITE32_MEMBER(limenko_soundlatch_w);
 	DECLARE_WRITE32_MEMBER(spriteram_buffer_w);
 	DECLARE_WRITE8_MEMBER(spotty_sound_cmd_w);
 	DECLARE_READ8_MEMBER(spotty_sound_cmd_r);
@@ -92,18 +91,17 @@ public:
 	DECLARE_READ32_MEMBER(legendoh_speedup_r);
 	DECLARE_READ32_MEMBER(sb2003_speedup_r);
 	DECLARE_READ32_MEMBER(spotty_speedup_r);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(sb2003);
-	DECLARE_DRIVER_INIT(dynabomb);
-	DECLARE_DRIVER_INIT(legendoh);
-	DECLARE_DRIVER_INIT(spotty);
+	void init_common();
+	void init_sb2003();
+	void init_dynabomb();
+	void init_legendoh();
+	void init_spotty();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
@@ -112,8 +110,14 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
-	void draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count);
+	void draw_sprites(const rectangle &cliprect);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
+	void limenko(machine_config &config);
+	void spotty(machine_config &config);
+	void limenko_io_map(address_map &map);
+	void limenko_map(address_map &map);
+	void spotty_io_map(address_map &map);
+	void spotty_map(address_map &map);
 };
 
 /*****************************************************************************************************
@@ -124,7 +128,6 @@ WRITE32_MEMBER(limenko_state::limenko_coincounter_w)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x10000);
 }
-
 
 
 WRITE32_MEMBER(limenko_state::bg_videoram_w)
@@ -160,16 +163,8 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 	// toggle spriterams location in the memory map
 	m_spriteram_bit ^= 1;
 
-	if(m_spriteram_bit)
-	{
-		// draw the sprites to the frame buffer
-		draw_sprites(m_spriteram2,clip,m_prev_sprites_count);
-	}
-	else
-	{
-		// draw the sprites to the frame buffer
-		draw_sprites(m_spriteram,clip,m_prev_sprites_count);
-	}
+	// draw the sprites to the frame buffer
+	draw_sprites(clip);
 
 	// buffer the next number of sprites to draw
 	m_prev_sprites_count = (m_videoreg[0] & 0x1ff0000) >> 16;
@@ -178,24 +173,6 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 /*****************************************************************************************************
  SOUND FUNCTIONS
  *****************************************************************************************************/
-
-WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data >> 16);
-	m_qs1000->set_irq(ASSERT_LINE);
-
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
-WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data >> 16);
-}
-
-READ8_MEMBER(limenko_state::qs1000_p1_r)
-{
-	return m_soundlatch->read(space, 0);
-}
 
 WRITE8_MEMBER(limenko_state::qs1000_p1_w)
 {
@@ -215,63 +192,65 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_qs1000->set_irq(CLEAR_LINE);
+		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
 }
 
 /*****************************************************************************************************
   MEMORY MAPS
 *****************************************************************************************************/
 
-static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_SHARE("md_videoram")
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void limenko_state::limenko_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x40000000, 0x403fffff).rom().region("maindata", 0);
+	map(0x80000000, 0x80007fff).ram().w(FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
+	map(0x80008000, 0x8000ffff).ram().w(FUNC(limenko_state::md_videoram_w)).share("md_videoram");
+	map(0x80010000, 0x80017fff).ram().w(FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
+	map(0x80018000, 0x80019fff).ram().share("spriteram");
+	map(0x8001c000, 0x8001dfff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8001e000, 0x8001ebff).ram(); // ? not used
+	map(0x8001ffec, 0x8001ffff).ram().share("videoreg");
+	map(0x8003e000, 0x8003e003).w(FUNC(limenko_state::spriteram_buffer_w));
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32, limenko_state )
-	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
-	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
-	AM_RANGE(0x4000, 0x4003) AM_WRITE(limenko_coincounter_w)
-	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x5000, 0x5003) AM_WRITE(limenko_soundlatch_w)
-ADDRESS_MAP_END
+void limenko_state::limenko_io_map(address_map &map)
+{
+	map(0x0000, 0x0003).portr("IN0");
+	map(0x0800, 0x0803).portr("IN1");
+	map(0x1000, 0x1003).portr("IN2");
+	map(0x4000, 0x4003).w(FUNC(limenko_state::limenko_coincounter_w));
+	map(0x4800, 0x4803).portw("EEPROMOUT");
+	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
+}
 
 
 /* Spotty memory map */
 
-static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_SHARE("md_videoram")
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void limenko_state::spotty_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x40002000, 0x400024d3).ram(); //?
+	map(0x80000000, 0x80007fff).ram().w(FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
+	map(0x80008000, 0x8000ffff).ram().w(FUNC(limenko_state::md_videoram_w)).share("md_videoram");
+	map(0x80010000, 0x80017fff).ram().w(FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
+	map(0x80018000, 0x80019fff).ram().share("spriteram");
+	map(0x8001c000, 0x8001dfff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8001e000, 0x8001ebff).ram(); // ? not used
+	map(0x8001ffec, 0x8001ffff).ram().share("videoreg");
+	map(0x8003e000, 0x8003e003).w(FUNC(limenko_state::spriteram_buffer_w));
+	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32, limenko_state )
-	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
-	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
-	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
-	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
-ADDRESS_MAP_END
+void limenko_state::spotty_io_map(address_map &map)
+{
+	map(0x0000, 0x0003).portr("IN0");
+	map(0x0800, 0x0803).portr("IN1");
+	map(0x0800, 0x0803).nopw(); // hopper related
+	map(0x1000, 0x1003).portr("IN2");
+	map(0x4800, 0x4803).portw("EEPROMOUT");
+	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
+}
 
 WRITE8_MEMBER(limenko_state::spotty_sound_cmd_w)
 {
@@ -292,11 +271,6 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	else
 		return m_oki->read(space,0);
 }
-
-static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8, limenko_state )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE("oki", okim6295_device, write) //? sound latch and ?
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
-ADDRESS_MAP_END
 
 /*****************************************************************************************************
   VIDEO HARDWARE EMULATION
@@ -422,16 +396,15 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 }
 
 // sprites aren't tile based (except for 8x8 ones)
-void limenko_state::draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count)
+void limenko_state::draw_sprites(const rectangle &cliprect)
 {
 	int i;
-
-	uint8_t *base_gfx = memregion("gfx1")->base();
-	uint8_t *gfx_max  = base_gfx + memregion("gfx1")->bytes();
+	uint32_t *sprites = m_spriteram + (0x200*2 * m_spriteram_bit);
+	uint8_t *gfx_max  = m_gfx_region + m_gfx_region.bytes();
 
 	uint8_t *gfxdata;
 
-	for(i = 0; i <= count*2; i += 2)
+	for(i = 0; i <= m_prev_sprites_count*2; i += 2)
 	{
 		int x, width, flipx, y, height, flipy, code, color, pri;
 
@@ -457,7 +430,7 @@ void limenko_state::draw_sprites(uint32_t *sprites, const rectangle &cliprect, i
 			pri = 2;
 		}
 
-		gfxdata = base_gfx + 64 * code;
+		gfxdata = m_gfx_region + 64 * code;
 
 		/* Bounds checking */
 		if ( (gfxdata + width * height - 1) >= gfx_max )
@@ -595,8 +568,8 @@ static INPUT_PORTS_START( legendoh )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) //security bit
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -605,7 +578,7 @@ static INPUT_PORTS_START( legendoh )
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
 	PORT_BIT( 0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -644,12 +617,12 @@ static INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) //security bit
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // checked in dynabomb I/O test, but doesn't work in game
 	PORT_BIT( 0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -687,10 +660,10 @@ static INPUT_PORTS_START( spotty )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) //security bit
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( On ) )
@@ -714,14 +687,14 @@ static const gfx_layout tile_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56 },
-	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7 },
-	64*8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8,
 };
 
-static GFXDECODE_START( limenko )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 16 ) /* tiles */
+static GFXDECODE_START( gfx_limenko )
+	GFXDECODE_ENTRY( "gfx", 0, tile_layout, 0, 16 ) /* tiles */
 GFXDECODE_END
 
 
@@ -730,13 +703,13 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_CONFIG_START( limenko )
-	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(limenko_map)
-	MCFG_CPU_IO_MAP(limenko_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+MACHINE_CONFIG_START(limenko_state::limenko)
+	MCFG_DEVICE_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(limenko_map)
+	MCFG_DEVICE_IO_MAP(limenko_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -747,35 +720,41 @@ static MACHINE_CONFIG_START( limenko )
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", limenko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(limenko_state, qs1000_p1_r))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(limenko_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(limenko_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(limenko_state, qs1000_p3_w))
+	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, limenko_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, limenko_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, limenko_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spotty )
-	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(spotty_map)
-	MCFG_CPU_IO_MAP(spotty_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+MACHINE_CONFIG_START(limenko_state::spotty)
+	MCFG_DEVICE_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(spotty_map)
+	MCFG_DEVICE_IO_MAP(spotty_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_CPU_IO_MAP(spotty_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, limenko_state, spotty_sound_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("oki", okim6295_device, write)) //? sound latch and ?
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -786,17 +765,17 @@ static MACHINE_CONFIG_START( spotty )
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", limenko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , PIN7_HIGH) //?
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000 / 4 , okim6295_device::PIN7_HIGH) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -838,17 +817,17 @@ Notes:
 */
 
 ROM_START( dynabomb )
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "rom.u6", 0x000000, 0x200000, CRC(457e015d) SHA1(3afb56cdf903c9084c1f283dc50ec504ce3e199f) )
 
-	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x400000, "maindata", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "rom.u5", 0x000000, 0x200000, CRC(7e837adf) SHA1(8613fa187b8d4574b3935aa439aec2515033d64c) )
 
 	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
 	ROM_LOAD( "rom.u16", 0x00000, 0x20000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a) )
 	ROM_FILL(            0x20000, 0x60000, 0xff)
 
-	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_REGION( 0x800000, "gfx", 0 )
 	ROM_LOAD32_BYTE( "rom.u1", 0x000000, 0x200000, CRC(bf33eff6) SHA1(089b6d88d6d744bcfa036c6869f0444d6ceb26c9) )
 	ROM_LOAD32_BYTE( "rom.u2", 0x000001, 0x200000, CRC(790bbcd5) SHA1(fc52c15fffc77dc3b3bc89a9606223c4fbaa578c) )
 	ROM_LOAD32_BYTE( "rom.u3", 0x000002, 0x200000, CRC(ec094b12) SHA1(13c105df066ff308cc7e1842907644790946e5b5) )
@@ -863,17 +842,17 @@ ROM_START( dynabomb )
 ROM_END
 
 ROM_START( sb2003 ) /* No specific Country/Region */
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "sb2003_05.u6", 0x00000000, 0x200000, CRC(8aec4554) SHA1(57a12b142eb7bf08dd1e78d3c79222001bbaa636) )
 
-	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x400000, "maindata", ROMREGION_ERASEFF )
 	// u5 empty
 
 	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
 	ROM_LOAD( "07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
 	ROM_FILL(           0x20000, 0x60000, 0xff)
 
-	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_REGION( 0x800000, "gfx", 0 )
 	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
 	ROM_LOAD32_BYTE( "02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402) )
 	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
@@ -888,17 +867,17 @@ ROM_START( sb2003 ) /* No specific Country/Region */
 ROM_END
 
 ROM_START( sb2003a ) /* Asia Region */
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "sb2003a_05.u6", 0x000000, 0x200000, CRC(265e45a7) SHA1(b9c8b63aa89c08f3d9d404621e301b122f85389a) )
 
-	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x400000, "maindata", ROMREGION_ERASEFF )
 	// u5 empty
 
 	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
 	ROM_LOAD( "07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
 	ROM_FILL(           0x20000, 0x60000, 0xff)
 
-	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_REGION( 0x800000, "gfx", 0 )
 	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
 	ROM_LOAD32_BYTE( "02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402) )
 	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
@@ -985,19 +964,19 @@ Link up 2 cabinets, up to 4 players can play at a time as a team
 */
 
 ROM_START( legendoh )
-	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "maincpu", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
 	/* sys_rom1 empty */
 	/* sys_rom2 empty */
 	/* sys_rom3 empty */
 	ROM_LOAD16_WORD_SWAP( "01.sys_rom4", 0x180000, 0x80000, CRC(49b4a91f) SHA1(21619e8cd0b2fba8c2e08158497575a1760f52c5) )
 
-	ROM_REGION32_BE( 0x400000, "user2", 0 )
+	ROM_REGION32_BE( 0x400000, "maindata", 0 )
 	ROM_LOAD16_WORD_SWAP( "sys_rom6", 0x000000, 0x200000, CRC(5c13d467) SHA1(ed07b7e1b22293e256787ab079d00c2fb070bf4f) )
 	ROM_LOAD16_WORD_SWAP( "sys_rom5", 0x200000, 0x200000, CRC(19dc8d23) SHA1(433687c6aa24b9456436eecb1dcb57814af3009d) )
 	/* sys_rom8 empty */
 	/* sys_rom7 empty */
 
-	ROM_REGION( 0x1200000, "gfx1", 0 )
+	ROM_REGION( 0x1200000, "gfx", 0 )
 	ROM_LOAD32_BYTE( "cg_rom10",     0x0000000, 0x200000, CRC(93a48489) SHA1(a14157d31b4e9c8eb7ebe1b2f1b707ec8c8561a0) )
 	ROM_LOAD32_BYTE( "cg_rom20",     0x0000001, 0x200000, CRC(1a6c0258) SHA1(ac7c3b8c2fdfb542103032144a30293d44759fd1) )
 	ROM_LOAD32_BYTE( "cg_rom30",     0x0000002, 0x200000, CRC(a0559ef4) SHA1(6622f7107b374c9da816b9814fe93347e7422190) )
@@ -1047,7 +1026,7 @@ SW2 = Reset
 */
 
 ROM_START( spotty )
-	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
 	/* sys_rom1 empty */
 	ROM_LOAD16_WORD_SWAP( "sys_rom2",     0x080000, 0x80000, CRC(6ded8d9b) SHA1(547c532f4014d818c4412244b60dbc439496de20) )
 
@@ -1055,9 +1034,9 @@ ROM_START( spotty )
 	ROM_LOAD( "at89c4051.mcu", 0x000000, 0x01000, CRC(82ceab26) SHA1(9bbc454bdcbc70dc01f10a13c9fc01c884918fe8) )
 
 	/* Expand the gfx roms here */
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "gfx", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x200000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "maindata", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "gc_rom1",      0x000000, 0x80000, CRC(ea03f9c5) SHA1(5038c03c519c774da253f9ae4fa205e7eeaa2780) )
 	ROM_LOAD32_BYTE( "gc_rom3",      0x000001, 0x80000, CRC(0ddac0b9) SHA1(f4ac8e6dd7f1cbdeb97139008982e6c17a3d18b9) )
 	/* gc_rom2 empty */
@@ -1108,7 +1087,7 @@ READ32_MEMBER(limenko_state::spotty_speedup_r)
 	return m_mainram[0x6626c/4];
 }
 
-DRIVER_INIT_MEMBER(limenko_state,common)
+void limenko_state::init_common()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
@@ -1117,36 +1096,35 @@ DRIVER_INIT_MEMBER(limenko_state,common)
 	m_spriteram_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(limenko_state,dynabomb)
+void limenko_state::init_dynabomb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(limenko_state,legendoh)
+void limenko_state::init_legendoh()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(limenko_state,sb2003)
+void limenko_state::init_sb2003()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 
-DRIVER_INIT_MEMBER(limenko_state,spotty)
+void limenko_state::init_spotty()
 {
-	uint8_t *dst    = memregion("gfx1")->base();
-	uint8_t *src    = memregion("user2")->base();
-	int x;
+	uint8_t *dst    = memregion("gfx")->base();
+	uint8_t *src    = memregion("maindata")->base();
 
 	/* expand 4bpp roms to 8bpp space */
-	for (x=0; x<0x200000;x+=4)
+	for (int x = 0; x < 0x200000; x += 4)
 	{
 		dst[x+1] = (src[x+0]&0xf0) >> 4;
 		dst[x+0] = (src[x+0]&0x0f) >> 0;
@@ -1161,10 +1139,10 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 	save_item(NAME(m_spotty_sound_cmd));
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // this game only uses the same graphics chip used in Limenko's system
-GAME( 2001, spotty,   0,      spotty,  spotty,   limenko_state, spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, spotty,   0,      spotty,  spotty,   limenko_state, init_spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -59,27 +59,29 @@ const tiny_rom_entry *s100_djdma_device::device_rom_region() const
 //  ADDRESS_MAP( djdma_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( djdma_mem, AS_PROGRAM, 8, s100_djdma_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("14a", 0)
-ADDRESS_MAP_END
+void s100_djdma_device::djdma_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("14a", 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( djdma_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( djdma_io, AS_IO, 8, s100_djdma_device )
-ADDRESS_MAP_END
+void s100_djdma_device::djdma_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( s100_djdma_device::device_add_mconfig )
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(djdma_mem)
-	MCFG_CPU_IO_MAP(djdma_io)
+MACHINE_CONFIG_START(s100_djdma_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(djdma_mem)
+	MCFG_DEVICE_IO_MAP(djdma_io)
 MACHINE_CONFIG_END
 
 

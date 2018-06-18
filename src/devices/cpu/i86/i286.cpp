@@ -165,7 +165,7 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "I80286")
+DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "Intel I80286")
 
 i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I80286, tag, owner, clock)
@@ -176,7 +176,6 @@ i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *
 {
 	memcpy(m_timing, m_i80286_timing, sizeof(m_i80286_timing));
 	m_amask = 0xffffff;
-	m_fetch_xor = BYTE_XOR_LE(0);
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 	m_sregs[CS] = 0xf000;
 	memset(m_base, 0x00, sizeof(m_base));
@@ -204,7 +203,7 @@ void i80286_cpu_device::device_reset()
 	m_sregs[DS] = m_sregs[SS] = m_sregs[ES] = 0;
 	m_base[DS] = m_base[SS] = m_base[ES] = 0;
 	m_rights[DS] = m_rights[SS] = m_rights[ES] = 0x93;
-	m_rights[CS] = 0x9b;
+	m_rights[CS] = 0x93;
 	m_valid[CS] = m_valid[SS] = m_valid[DS] = m_valid[ES] = true;
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -592,7 +591,7 @@ void i80286_cpu_device::switch_task(uint16_t ntask, int type)
 	uint8_t r, lr;
 	uint32_t naddr, oaddr, ldtaddr;
 	int i;
-	logerror("i286: %06x This program uses TSSs, how rare. Please report this to the developers.\n", pc());
+	logerror("i286: %06x This program uses TSSs, how rare. Please report this to the developers.\n", m_pc);
 
 	if(TBL(ntask))
 		throw TRAP(FAULT_TS, IDXTBL(ntask));
@@ -866,7 +865,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 		m_ip = offset;
 		m_sregs[CS]=selector;
 		m_base[CS]=selector<<4;
-		m_rights[CS]=0x9b;
+		m_rights[CS]=0x93;
 		m_limit[CS]=0xffff;
 	}
 }
@@ -1020,24 +1019,13 @@ void i80286_cpu_device::write_port_word(uint16_t port, uint16_t data)
 	m_io->write_word_unaligned(port, data);
 }
 
-uint8_t i80286_cpu_device::fetch_op()
-{
-	uint8_t data;
-	if(m_ip > m_limit[CS])
-		throw TRAP(FAULT_GP, 0);
-
-	data = m_direct_opcodes->read_byte( pc() & m_amask, m_fetch_xor );
-	m_ip++;
-	return data;
-}
-
 uint8_t i80286_cpu_device::fetch()
 {
 	uint8_t data;
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct_opcodes->read_byte( pc() & m_amask, m_fetch_xor );
+	data = m_or8(update_pc() & m_amask);
 	m_ip++;
 	return data;
 }
@@ -1112,7 +1100,7 @@ void i80286_cpu_device::execute_run()
 				}
 			}
 
-			debugger_instruction_hook( this, pc() & m_amask );
+			debugger_instruction_hook( update_pc() & m_amask );
 
 			uint8_t op = fetch_op();
 
@@ -1428,7 +1416,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if (tmp<low || tmp>high)
 						interrupt(5);
 					CLK(BOUND);
-					logerror("%06x: bound %04x high %04x low %04x tmp\n", pc(), high, low, tmp);
+					logerror("%06x: bound %04x high %04x low %04x tmp\n", m_pc, high, low, tmp);
 				}
 				break;
 
@@ -1505,7 +1493,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					m_modrm = fetch();
 					if((m_modrm & 0x38) > 0x18)
 					{
-						logerror("%06x: Mov Sreg - Invalid register\n", pc());
+						logerror("%06x: Mov Sreg - Invalid register\n", m_pc);
 						throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
@@ -1529,7 +1517,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							data_descriptor(DS, m_src);
 							break;
 						default:
-							logerror("%06x: Mov Sreg - Invalid register\n", pc());
+							logerror("%06x: Mov Sreg - Invalid register\n", m_pc);
 							throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					break;
@@ -1792,7 +1780,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xf0: // i_lock
 					if(PM && (CPL > m_IOPL))
 						throw TRAP(FAULT_GP, 0);
-					logerror("%06x: Warning - BUSLOCK\n", pc());
+					logerror("%06x: Warning - BUSLOCK\n", m_pc);
 					m_no_interrupt = 1;
 					CLK(NOP);
 					break;
@@ -1869,7 +1857,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							CLKM(PUSH_R16,PUSH_M16);
 							break;
 						default:
-							logerror("%06x: FF Pre with unimplemented mod\n", pc());
+							logerror("%06x: FF Pre with unimplemented mod\n", m_pc);
 							throw TRAP(FAULT_UD,(uint16_t)-1);
 						}
 					}
@@ -1905,7 +1893,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if(!common_op(op))
 					{
 						m_icount -= 10; // UD fault timing?
-						logerror("%06x: Invalid Opcode %02x\n", pc(), op);
+						logerror("%06x: Invalid Opcode %02x\n", m_pc, op);
 						m_ip = m_prev_ip;
 						throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
@@ -2021,7 +2009,7 @@ uint16_t i80286_cpu_device::far_return(int iret, int bytes)
 		m_regs.w[SP] += (iret ? 6 : 4) + bytes;
 		m_sregs[CS] = sel;
 		m_base[CS] = sel << 4;
-		m_rights[CS] = 0x9b;
+		m_rights[CS] = 0x93;
 		m_limit[CS] = 0xffff;
 		m_ip = off;
 	}

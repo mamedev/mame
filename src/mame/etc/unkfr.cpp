@@ -25,6 +25,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
+
+	void unkfr(machine_config &config);
 };
 
 
@@ -58,7 +60,7 @@ static INPUT_PORTS_START( unkfr )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( unkfr, unkfr_state )
+MACHINE_CONFIG_START( unkfr_state::unkfr )
 MACHINE_CONFIG_END
 
 ROM_START( unkfr )
@@ -743,7 +745,7 @@ ROM_START( unkfra )
 	ROM_LOAD( "taker-over-008.bin", 0x0000, 0x008000, CRC(2dad1088) SHA1(b8bdf5bf4e0ef5bee44d1f7031b08e4e6a8ae5ca) )//looks a bit ACE ish, but no strings to make sure
 ROM_END
 
-//GAME(19??,  unkfr,   0,  unkfr,  unkfr, driver_device,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 1)",     MACHINE_IS_SKELETON_MECHANICAL)
-//GAME(19??,  unkfra,  0,  unkfr,  unkfr, driver_device,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 2)",     MACHINE_IS_SKELETON_MECHANICAL)
+//GAME(19??,  unkfr,   0,  unkfr,  unkfr, driver_device, empty_init, ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 1)",     MACHINE_IS_SKELETON_MECHANICAL)
+//GAME(19??,  unkfra,  0,  unkfr,  unkfr, driver_device, empty_init, ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 2)",     MACHINE_IS_SKELETON_MECHANICAL)
 
 #endif

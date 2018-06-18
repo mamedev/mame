@@ -10,7 +10,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"
@@ -19,12 +19,13 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  XTAL_23_9616MHz
+#define MAIN_CLOCK  XTAL(23'961'600)
 
 #define MODEM_PORT_TAG "modem"
 #define PRINTER_PORT_TAG "printer"
@@ -34,19 +35,21 @@ class osbexec_state : public driver_device
 {
 public:
 	osbexec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu( *this, "maincpu" ),
-			m_mb8877( *this, "mb8877" ),
-			m_messram( *this, RAM_TAG ),
-			m_pia_0( *this, "pia_0" ),
-			m_pia_1( *this, "pia_1" ),
-			m_sio( *this, "sio" ),
-			m_speaker( *this, "speaker" ),
-			m_floppy0( *this, "mb8877:0:525ssdd" ),
-			m_floppy1( *this, "mb8877:1:525ssdd" )
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_mb8877(*this, "mb8877")
+		, m_messram( *this, RAM_TAG)
+		, m_pia_0(*this, "pia_0")
+		, m_pia_1(*this, "pia_1")
+		, m_sio(*this, "sio")
+		, m_speaker(*this, "speaker")
+		, m_floppy0(*this, "mb8877:0:525ssdd")
+		, m_floppy1(*this, "mb8877:1:525ssdd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<mb8877_device>  m_mb8877;
 	required_device<ram_device> m_messram;
 	required_device<pia6821_device> m_pia_0;
@@ -112,7 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
-	DECLARE_DRIVER_INIT(osbexec);
+	void init_osbexec();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
@@ -126,6 +129,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
 	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
 	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
+	void osbexec(machine_config &config);
+	void osbexec_io(address_map &map);
+	void osbexec_mem(address_map &map);
 };
 
 
@@ -206,27 +212,29 @@ READ8_MEMBER(osbexec_state::osbexec_rtc_r)
 }
 
 
-static ADDRESS_MAP_START( osbexec_mem, AS_PROGRAM, 8, osbexec_state )
-	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE(osbexec_0000_w )   /* ROM and maybe also banked ram */
-	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")                               /* Banked RAM */
-	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")                               /* Banked RAM */
-	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE(osbexec_c000_r, osbexec_c000_w )    /* Video ram / Banked RAM */
-	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")                               /* Banked RAM */
-	AM_RANGE( 0xF000, 0xFFFF ) AM_RAM                                           /* 4KB of non-banked RAM for system stack etc */
-ADDRESS_MAP_END
+void osbexec_state::osbexec_mem(address_map &map)
+{
+	map(0x0000, 0x1FFF).bankr("0000").w(FUNC(osbexec_state::osbexec_0000_w));   /* ROM and maybe also banked ram */
+	map(0x2000, 0x3FFF).bankrw("2000");                               /* Banked RAM */
+	map(0x4000, 0xBFFF).bankrw("4000");                               /* Banked RAM */
+	map(0xC000, 0xDFFF).rw(FUNC(osbexec_state::osbexec_c000_r), FUNC(osbexec_state::osbexec_c000_w));    /* Video ram / Banked RAM */
+	map(0xE000, 0xEFFF).bankrw("e000");                               /* Banked RAM */
+	map(0xF000, 0xFFFF).ram();                                           /* 4KB of non-banked RAM for system stack etc */
+}
 
 
-static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)       /* 6821 PIA @ UD12 */
-	AM_RANGE( 0x04, 0x07 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("ctc", pit8253_device, read, write)          /* 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_device_base, read, write )  /* MB8877 @ UB17 input clock = 1MHz */
-	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w )    /* SIO @ UD4 */
-	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)       /* 6821 PIA @ UD8 */
-	AM_RANGE( 0x14, 0x17 ) AM_SELECT( 0xff00 ) AM_READ(osbexec_kbd_r )                                      /* KBD */
-	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ(osbexec_rtc_r )                                      /* "RTC" @ UE13/UF13 */
+void osbexec_state::osbexec_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0xff00).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));       /* 6821 PIA @ UD12 */
+	map(0x04, 0x07).mirror(0xff00).rw("ctc", FUNC(pit8253_device::read), FUNC(pit8253_device::write));          /* 8253 @UD1 */
+	map(0x08, 0x0B).mirror(0xff00).rw(m_mb8877, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));  /* MB8877 @ UB17 input clock = 1MHz */
+	map(0x0C, 0x0F).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));    /* SIO @ UD4 */
+	map(0x10, 0x13).mirror(0xff00).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));       /* 6821 PIA @ UD8 */
+	map(0x14, 0x17).select(0xff00).r(FUNC(osbexec_state::osbexec_kbd_r));                                      /* KBD */
+	map(0x18, 0x1b).mirror(0xff00).r(FUNC(osbexec_state::osbexec_rtc_r));                                      /* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( osbexec )
@@ -316,7 +324,7 @@ INPUT_PORTS_END
 
 void osbexec_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 uint32_t osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -462,14 +470,15 @@ WRITE_LINE_MEMBER(osbexec_state::comm_clk_a_w)
  *
  */
 
-static SLOT_INTERFACE_START( osborne2_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void osborne2_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
-	int y = machine().first_screen()->vpos();
+	int y = m_screen->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
@@ -516,11 +525,11 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 		}
 	}
 
-	m_video_timer->adjust( machine().first_screen()->time_until_pos( y + 1, 0 ) );
+	m_video_timer->adjust( m_screen->time_until_pos( y + 1, 0 ) );
 }
 
 
-DRIVER_INIT_MEMBER(osbexec_state,osbexec)
+void osbexec_state::init_osbexec()
 {
 	m_fontram_region = machine().memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
 	m_vram_region = machine().memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
@@ -541,7 +550,7 @@ void osbexec_state::machine_reset()
 
 	set_banks();
 
-	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( m_screen->time_until_pos( 0, 0 ) );
 
 	m_rtc = 0;
 
@@ -557,70 +566,70 @@ static const z80_daisy_config osbexec_daisy_config[] =
 };
 
 
-static MACHINE_CONFIG_START( osbexec )
-	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
-	MCFG_CPU_PROGRAM_MAP( osbexec_mem)
-	MCFG_CPU_IO_MAP( osbexec_io)
-	MCFG_Z80_DAISY_CHAIN( osbexec_daisy_config )
+MACHINE_CONFIG_START(osbexec_state::osbexec)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(osbexec_mem)
+	MCFG_DEVICE_IO_MAP(osbexec_io)
+	MCFG_Z80_DAISY_CHAIN(osbexec_daisy_config)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_ADD_MONOCHROME(m_screen, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240)    /* May not be correct */
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(osbexec_state, osbexec_pia0_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(osbexec_state, osbexec_pia0_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osbexec_state, osbexec_pia0_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osbexec_state, osbexec_pia0_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD(m_pia_0, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, osbexec_state, osbexec_pia0_a_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, osbexec_state, osbexec_pia0_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, osbexec_state, osbexec_pia0_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osbexec_state, osbexec_pia0_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, osbexec_state, osbexec_pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, osbexec_state, osbexec_pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<3>))
+	MCFG_DEVICE_ADD(m_pia_1, PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<3>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(m_maincpu, 0))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, MAIN_CLOCK/6)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<4>))
+	MCFG_DEVICE_ADD(m_sio, Z80SIO, MAIN_CLOCK/6)
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(MODEM_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(MODEM_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(MODEM_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<4>))
 
 	MCFG_DEVICE_ADD("ctc", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
 	MCFG_PIT8253_CLK1(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
 	MCFG_PIT8253_CLK2(MAIN_CLOCK / 12)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(osbexec_state, comm_clk_a_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
-	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(osbexec_state, spindle_clk_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, osbexec_state, comm_clk_a_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_sio, z80sio_device, rxtxcb_w))
+	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, osbexec_state, spindle_clk_w))
 
-	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DSR_HANDLER(WRITELINE(osbexec_state, modem_dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(osbexec_state, modem_ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_ADD(MODEM_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxa_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcda_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, osbexec_state, modem_dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(*this, osbexec_state, modem_ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
 
-	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_ADD(PRINTER_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcdb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_pia_1, pia6821_device, cb1_w))
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
@@ -638,5 +647,5 @@ ROM_START( osbexec )
 	ROM_LOAD( "execv12.ud18", 0x0000, 0x2000, CRC(70798c2f) SHA1(2145a72da563bed1d6d455c77e48cc011a5f1153) )    /* Checksum C6B2 */
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY     FULLNAME        FLAGS
-COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec, osbexec_state, osbexec,  "Osborne",  "Executive",    MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME     FLAGS
+COMP( 1982, osbexec, 0,      0,      osbexec, osbexec, osbexec_state, init_osbexec, "Osborne", "Executive", MACHINE_NOT_WORKING )

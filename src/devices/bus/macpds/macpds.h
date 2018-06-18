@@ -21,12 +21,12 @@
 
 #define MCFG_MACPDS_BUS_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, MACPDS, 0) \
-	macpds_device::static_set_cputag(*device, _cputag);
+	downcast<macpds_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_MACPDS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, MACPDS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	macpds_slot_device::static_set_macpds_slot(*device, _nbtag, _tag);
+	downcast<macpds_slot_device &>(*device).set_macpds_slot(_nbtag, _tag);
 
 #define MCFG_MACPDS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
@@ -34,7 +34,7 @@
 #define MCFG_MACPDS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_macpds_card_interface::static_set_macpds_tag(*device, _nbtag, _tag);
+	downcast<device_macpds_card_interface &>(*device).set_macpds_tag(_nbtag, _tag);
 
 #define MCFG_MACPDS_BUS_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
@@ -53,7 +53,7 @@ public:
 	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_macpds_slot(device_t &device, const char *tag, const char *slottag);
+	void set_macpds_slot(const char *tag, const char *slottag) { m_macpds_tag = tag; m_macpds_slottag = slottag; }
 
 protected:
 	macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -79,7 +79,7 @@ public:
 	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~macpds_device() { m_device_list.detach_all(); }
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
+	void set_cputag(const char *tag) { m_cputag = tag; }
 
 	void add_macpds_card(device_macpds_card_interface *card);
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask=0xffffffff);
@@ -125,7 +125,7 @@ public:
 	void install_rom(device_t *dev, const char *romregion, uint32_t addr);
 
 	// inline configuration
-	static void static_set_macpds_tag(device_t &device, const char *tag, const char *slottag);
+	void set_macpds_tag(const char *tag, const char *slottag) { m_macpds_tag = tag; m_macpds_slottag = slottag; }
 
 protected:
 	device_macpds_card_interface(const machine_config &mconfig, device_t &device);

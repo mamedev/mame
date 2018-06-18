@@ -148,12 +148,17 @@ class magictg_state : public driver_device
 {
 public:
 	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mips(*this, "mips"),
-		m_adsp(*this, "adsp"),
-		m_pci(*this, "pcibus"),
-		m_adsp_pram(*this, "adsp_pram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_mips(*this, "mips")
+		, m_adsp(*this, "adsp")
+		, m_pci(*this, "pcibus")
+		, m_adsp_pram(*this, "adsp_pram")
+		, m_voodoo(*this, "voodoo_%u", 0U)
+	{ }
 
+	void magictg(machine_config &config);
+
+private:
 	required_device<cpu_device>         m_mips;
 	required_device<adsp2181_device>    m_adsp;
 	required_device<pci_bus_legacy_device>      m_pci;
@@ -182,7 +187,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	voodoo_device*                           m_voodoo[2];
+	required_device_array<voodoo_device, 2> m_voodoo;
 
 	struct
 	{
@@ -226,10 +231,25 @@ public:
 
 	void zr36120_reset();
 
+	void adsp_data_map(address_map &map);
+	void adsp_io_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void magictg_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+	uint32_t pci_dev0_r(int function, int reg, uint32_t mem_mask);
+	void pci_dev0_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint32_t voodoo_0_pci_r(int function, int reg, uint32_t mem_mask);
+	void voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+#if defined(USE_TWO_3DFX)
+	uint32_t voodoo_1_pci_r(int function, int reg, uint32_t mem_mask);
+	void voodoo_1_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+#endif
+	uint32_t zr36120_pci_r(int function, int reg, uint32_t mem_mask);
+	void zr36120_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 public:
 	uint32_t screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -243,8 +263,6 @@ public:
 
 void magictg_state::machine_start()
 {
-	m_voodoo[0] = (voodoo_device*)machine().device("voodoo_0");
-	m_voodoo[1] = (voodoo_device*)machine().device("voodoo_1");
 }
 
 
@@ -290,20 +308,19 @@ uint32_t magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-static uint32_t pci_dev0_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t magictg_state::pci_dev0_r(int function, int reg, uint32_t mem_mask)
 {
 	osd_printf_debug("PCI[0] READ: %x\n", reg);
 	return 0x00000000; // TODO
 }
 
-static void pci_dev0_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void magictg_state::pci_dev0_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 }
 
 
-static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t magictg_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	magictg_state* state = device->machine().driver_data<magictg_state>();
 	uint32_t val = 0;
 
 	switch (reg)
@@ -312,10 +329,10 @@ static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int functi
 			val = 0x0001121a;
 			break;
 		case 0x10:
-			val = state->m_voodoo_pci_regs[0].base_addr;
+			val = m_voodoo_pci_regs[0].base_addr;
 			break;
 		case 0x40:
-			val = state->m_voodoo_pci_regs[0].init_enable;
+			val = m_voodoo_pci_regs[0].init_enable;
 			break;
 		default:
 			osd_printf_debug("Voodoo[0] PCI R: %x\n", reg);
@@ -323,24 +340,22 @@ static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int functi
 	return val;
 }
 
-static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void magictg_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	magictg_state* state = device->machine().driver_data<magictg_state>();
-
 	switch (reg)
 	{
 		case 0x04:
-			state->m_voodoo_pci_regs[0].command = data & 0x3;
+			m_voodoo_pci_regs[0].command = data & 0x3;
 			break;
 		case 0x10:
 			if (data == 0xffffffff)
-				state->m_voodoo_pci_regs[0].base_addr = 0xff000000;
+				m_voodoo_pci_regs[0].base_addr = 0xff000000;
 			else
-				state->m_voodoo_pci_regs[0].base_addr = data;
+				m_voodoo_pci_regs[0].base_addr = data;
 			break;
 		case 0x40:
-			state->m_voodoo_pci_regs[0].init_enable = data;
-			state->m_voodoo[0]->voodoo_set_init_enable(data);
+			m_voodoo_pci_regs[0].init_enable = data;
+			m_voodoo[0]->voodoo_set_init_enable(data);
 			break;
 
 		default:
@@ -349,9 +364,8 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 }
 
 #if defined(USE_TWO_3DFX)
-static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t magictg_state::voodoo_1_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	magictg_state* state = space.machine().driver_data<magictg_state>();
 	uint32_t val = 0;
 
 	switch (reg)
@@ -360,10 +374,10 @@ static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int functi
 			val = 0x0001121a;
 			break;
 		case 0x10:
-			val = state->m_voodoo_pci_regs[1].base_addr;
+			val = m_voodoo_pci_regs[1].base_addr;
 			break;
 		case 0x40:
-			val = state->m_voodoo_pci_regs[1].init_enable;
+			val = m_voodoo_pci_regs[1].init_enable;
 			break;
 		default:
 			osd_printf_debug("Voodoo[1] PCI R: %x\n", reg);
@@ -371,10 +385,8 @@ static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int functi
 	return val;
 }
 
-static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void magictg_state::voodoo_1_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	magictg_state* state = space.machine().driver_data<magictg_state>();
-
 	switch (reg)
 	{
 		case 0x04:
@@ -382,12 +394,12 @@ static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, 
 			break;
 		case 0x10:
 			if (data == 0xffffffff)
-				state->m_voodoo_pci_regs[1].base_addr = 0xff000000;
+				m_voodoo_pci_regs[1].base_addr = 0xff000000;
 			else
-				state->m_voodoo_pci_regs[1].base_addr = data;
+				m_voodoo_pci_regs[1].base_addr = data;
 			break;
 		case 0x40:
-			state->m_voodoo_pci_regs[1].init_enable = data;
+			m_voodoo_pci_regs[1].init_enable = data;
 			voodoo_set_init_enable(state->m_voodoo[1], data);
 			break;
 
@@ -431,9 +443,8 @@ void magictg_state::zr36120_reset()
 	m_zr36120.as_regs[0x48/4] = 1 << 23;
 }
 
-static uint32_t zr36120_pci_r(device_t* busdevice, device_t* device, int function, int reg, uint32_t mem_mask)
+uint32_t magictg_state::zr36120_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	magictg_state* state = busdevice->machine().driver_data<magictg_state>();
 	uint32_t val = 0;
 
 	switch (reg)
@@ -442,13 +453,13 @@ static uint32_t zr36120_pci_r(device_t* busdevice, device_t* device, int functio
 			val = 0x612011de;
 			break;
 		case 0x04:
-			val = state->m_zr36120.command;
+			val = m_zr36120.command;
 			break;
 		case 0x08:
 			val = 0x04000002;
 			break;
 		case 0x10:
-			val = state->m_zr36120.base_addr;
+			val = m_zr36120.base_addr;
 			break;
 		default:
 			osd_printf_debug("ZR36120 R[%x]\n", reg);
@@ -456,17 +467,15 @@ static uint32_t zr36120_pci_r(device_t* busdevice, device_t* device, int functio
 	return val;
 }
 
-static void zr36120_pci_w(device_t* busdevice, device_t* device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void magictg_state::zr36120_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	magictg_state* state = busdevice->machine().driver_data<magictg_state>();
-
 	switch (reg)
 	{
 		case 0x04:
-			state->m_zr36120.command = data & 0x6;
+			m_zr36120.command = data & 0x6;
 			break;
 		case 0x10:
-			state->m_zr36120.base_addr = data & 0xfffff000;
+			m_zr36120.base_addr = data & 0xfffff000;
 			break;
 		default:
 			osd_printf_debug("ZR36120 [%x]: %x\n", reg, data);
@@ -490,7 +499,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 	else
 	{
 		/* Post office */
-		res = 0;//mame_rand(space.machine);//m_zr36120.as_regs[0x48/4];
+		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
 	osd_printf_debug("PINKEYE_R[%x]\n", offset);
 	return res;
@@ -728,7 +737,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 READ32_MEMBER( magictg_state::adsp_status_r )
 {
 	// ADSP_IACK = Bit 2
-	return (0 << 2) | (space.machine().rand() & 1);
+	return (0 << 2) | (machine().rand() & 1);
 }
 
 READ16_MEMBER( magictg_state::adsp_control_r )
@@ -741,7 +750,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 			res = m_adsp_regs.bdma_word_count;
 			break;
 		case 0x5:
-			res = space.machine().rand() & 0xff;
+			res = machine().rand() & 0xff;
 			break;
 		default:
 			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
@@ -817,7 +826,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 				m_adsp_regs.bdma_control |= ((src_addr >> 14) & 0xff) << 8;
 
 				if (m_adsp_regs.bdma_control & 8)
-					m_adsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_adsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			}
 			break;
 		}
@@ -836,25 +845,26 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( magictg_map, AS_PROGRAM, 32, magictg_state )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8MB RAM
-	AM_RANGE(0x00800000, 0x0081003f) AM_RAM // ?
-	AM_RANGE(0x0a000000, 0x0affffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
+void magictg_state::magictg_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram(); // 8MB RAM
+	map(0x00800000, 0x0081003f).ram(); // ?
+	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 #if defined(USE_TWO_3DFX)
-	AM_RANGE(0x0b000000, 0x0bffffff) AM_DEVREADWRITE("voodoo_1", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(zr36120_r, zr36120_w)
+	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
-	AM_RANGE(0x0b000000, 0x0b000fff) AM_READWRITE(zr36120_r, zr36120_w)
+	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #endif
-	AM_RANGE(0x0f000000, 0x0f000fff) AM_READWRITE(f0_r, f0_w) // Split this up?
-	AM_RANGE(0x14000100, 0x14000103) AM_READWRITE(adsp_idma_data_r, adsp_idma_data_w)
-	AM_RANGE(0x14000104, 0x14000107) AM_WRITE(adsp_idma_addr_w)
-	AM_RANGE(0x1b001024, 0x1b001027) AM_READ(adsp_status_r)
-	AM_RANGE(0x1b001108, 0x1b00110b) AM_READ(unk_r)
-	AM_RANGE(0x1e000000, 0x1e002fff) AM_RAM // NVRAM?
-	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(unk2_r, serial_w)
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("mips", 0)
-ADDRESS_MAP_END
+	map(0x0f000000, 0x0f000fff).rw(FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
+	map(0x14000100, 0x14000103).rw(FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
+	map(0x14000104, 0x14000107).w(FUNC(magictg_state::adsp_idma_addr_w));
+	map(0x1b001024, 0x1b001027).r(FUNC(magictg_state::adsp_status_r));
+	map(0x1b001108, 0x1b00110b).r(FUNC(magictg_state::unk_r));
+	map(0x1e000000, 0x1e002fff).ram(); // NVRAM?
+	map(0x1e800000, 0x1e800007).rw(FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
+	map(0x1fc00000, 0x1fffffff).rom().region("mips", 0);
+}
 
 
 /*************************************
@@ -863,21 +873,24 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, magictg_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
-ADDRESS_MAP_END
+void magictg_state::adsp_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("adsp_pram");
+}
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, magictg_state )
-	ADDRESS_MAP_UNMAP_HIGH
+void magictg_state::adsp_data_map(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
-	AM_RANGE(0x0400, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+	map(0x0400, 0x3fdf).ram();
+	map(0x3fe0, 0x3fff).rw(FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
+}
 
-static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, magictg_state )
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void magictg_state::adsp_io_map(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 /*************************************
@@ -897,33 +910,34 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( magictg )
-	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
+MACHINE_CONFIG_START(magictg_state::magictg)
+	MCFG_DEVICE_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
-	MCFG_CPU_PROGRAM_MAP(magictg_map)
+	MCFG_DEVICE_PROGRAM_MAP(magictg_map)
 
-	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2181, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, pci_dev0_r, pci_dev0_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, magictg_state, pci_dev0_r, pci_dev0_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, magictg_state, voodoo_0_pci_r, voodoo_0_pci_w)
 
 #if defined(USE_TWO_3DFX)
-	MCFG_PCI_BUS_LEGACY_DEVICE(8, "voodoo_1", voodoo_1_pci_r, voodoo_1_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(8, DEVICE_SELF, magictg_state, voodoo_1_pci_r, voodoo_1_pci_w)
 #endif
-	MCFG_PCI_BUS_LEGACY_DEVICE(9, "zr36120", zr36120_pci_r, zr36120_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(9, DEVICE_SELF, magictg_state, zr36120_pci_r, zr36120_pci_w) // TODO: ZR36120 device
 
 	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1013,5 +1027,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

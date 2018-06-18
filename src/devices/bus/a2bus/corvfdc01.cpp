@@ -31,9 +31,10 @@ FLOPPY_FORMATS_MEMBER( a2bus_corvfdc01_device::corv_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
-SLOT_INTERFACE_END
+static void corv_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", FLOPPY_8_SSSD);
+}
 
 ROM_START( fdc01 )
 	ROM_REGION(0x20, FDC01_ROM_REGION, 0)
@@ -82,10 +83,10 @@ enum
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_corvfdc01_device::device_add_mconfig )
-	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
+MACHINE_CONFIG_START(a2bus_corvfdc01_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(FDC01_FDC_TAG, FD1793, 16_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
@@ -128,9 +129,6 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc01_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(FDC01_ROM_REGION).c_str())->base();
 
 	save_item(NAME(m_fdc_local_status));
@@ -148,7 +146,7 @@ void a2bus_corvfdc01_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc01_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc01_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -161,16 +159,16 @@ uint8_t a2bus_corvfdc01_device::read_c0nx(address_space &space, uint8_t offset)
 			return m_fdc_local_status | LS_8IN_mask;
 
 		case  8:    // WD1793 at 8-11
-			return m_wdfdc->status_r(space, offset);
+			return m_wdfdc->read_status();
 
 		case  9:
-			return m_wdfdc->track_r(space, offset);
+			return m_wdfdc->read_track();
 
 		case 10:
-			return m_wdfdc->sector_r(space, offset);
+			return m_wdfdc->read_sector();
 
 		case 11:
-			return m_wdfdc->data_r(space, offset);
+			return m_wdfdc->read_data();
 	}
 
 	return 0xff;
@@ -181,7 +179,7 @@ uint8_t a2bus_corvfdc01_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_corvfdc01_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_corvfdc01_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	int current_drive;
 	floppy_image_device *floppy = nullptr;
@@ -228,19 +226,19 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, uint8_t offset, ui
 			break;
 
 		case  8:    // FDC COMMAMD REG
-			m_wdfdc->cmd_w(space, offset, data);
+			m_wdfdc->write_cmd(data);
 			break;
 
 		case  9:    // FDC TRACK REG
-			m_wdfdc->track_w(space, offset, data);
+			m_wdfdc->write_track(data);
 			break;
 
 		case 10:    // FDC SECTOR REG
-			m_wdfdc->sector_w(space, offset, data);
+			m_wdfdc->write_sector(data);
 			break;
 
 		case 11:    // FDC DATA REG
-			m_wdfdc->data_w(space, offset, data);
+			m_wdfdc->write_data(data);
 			break;
 	}
 }
@@ -249,7 +247,7 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, uint8_t offset, ui
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc01_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc01_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset & 0x1f];
 }

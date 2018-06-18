@@ -35,13 +35,6 @@ wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, cons
 {
 }
 
-void wangpcbus_slot_device::static_set_wangpcbus_slot(device_t &device, int sid)
-{
-	wangpcbus_slot_device &wangpcbus_card = dynamic_cast<wangpcbus_slot_device &>(device);
-	wangpcbus_card.m_sid = sid;
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -269,13 +262,14 @@ device_wangpcbus_card_interface::device_wangpcbus_card_interface(const machine_c
 #include "tig.h"
 #include "wdc.h"
 
-SLOT_INTERFACE_START( wangpc_cards )
-	SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board
-	SLOT_INTERFACE("lic", WANGPC_LIC) // local interconnect option card
-	SLOT_INTERFACE("lvc", WANGPC_LVC) // low-resolution video controller
-	SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
-	SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
-	SLOT_INTERFACE("rtc", WANGPC_RTC) // remote telecommunications controller
-	SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
-	SLOT_INTERFACE("wdc", WANGPC_WDC) // Winchester disk controller
-SLOT_INTERFACE_END
+void wangpc_cards(device_slot_interface &device)
+{
+	device.option_add("emb", WANGPC_EMB); // extended memory board
+	device.option_add("lic", WANGPC_LIC); // local interconnect option card
+	device.option_add("lvc", WANGPC_LVC); // low-resolution video controller
+	device.option_add("mcc", WANGPC_MCC); // multiport communications controller
+	device.option_add("mvc", WANGPC_MVC); // medium-resolution video controller
+	device.option_add("rtc", WANGPC_RTC); // remote telecommunications controller
+	device.option_add("tig", WANGPC_TIG); // text/image/graphics controller
+	device.option_add("wdc", WANGPC_WDC); // Winchester disk controller
+}

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -23,14 +24,17 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void dct11em(machine_config &config);
+	void dct11em_mem(address_map &map);
 };
 
-static ADDRESS_MAP_START( dct11em_mem, AS_PROGRAM, 16, dct11em_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAM  // RAM
-	AM_RANGE( 0x2000, 0x2fff ) AM_RAM  // Optional RAM
-	AM_RANGE( 0xa000, 0xdfff ) AM_ROM  // RAM
-ADDRESS_MAP_END
+void dct11em_state::dct11em_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();  // RAM
+	map(0x2000, 0x2fff).ram();  // Optional RAM
+	map(0xa000, 0xdfff).rom();  // RAM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dct11em )
@@ -51,11 +55,11 @@ uint32_t dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind1
 }
 
 
-static MACHINE_CONFIG_START( dct11em )
+MACHINE_CONFIG_START(dct11em_state::dct11em)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
+	MCFG_DEVICE_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
 	MCFG_T11_INITIAL_MODE(0x1403)  /* according to specs */
-	MCFG_CPU_PROGRAM_MAP(dct11em_mem)
+	MCFG_DEVICE_PROGRAM_MAP(dct11em_mem)
 
 
 	/* video hardware */
@@ -81,5 +85,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                          FULLNAME    FLAGS */
-COMP( 1983, dct11em,  0,      0,       dct11em,   dct11em, dct11em_state, 0,    "Digital Equipment Corporation", "DCT11-EM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME    FLAGS */
+COMP( 1983, dct11em, 0,      0,      dct11em, dct11em, dct11em_state, empty_init, "Digital Equipment Corporation", "DCT11-EM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

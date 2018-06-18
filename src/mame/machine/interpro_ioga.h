@@ -7,30 +7,30 @@
 #pragma once
 
 #define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
-	devcb = &interpro_ioga_device::static_set_out_nmi_callback(*device, DEVCB_##_out_nmi);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_nmi_callback(DEVCB_##_out_nmi);
 
 #define MCFG_INTERPRO_IOGA_IRQ_CB(_out_irq) \
-	devcb = &interpro_ioga_device::static_set_out_irq_callback(*device, DEVCB_##_out_irq);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
 
 #define MCFG_INTERPRO_IOGA_IVEC_CB(_out_ivec) \
-	devcb = &interpro_ioga_device::static_set_out_ivec_callback(*device, DEVCB_##_out_ivec);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_ivec_callback(DEVCB_##_out_ivec);
 
 #define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
-	devcb = &interpro_ioga_device::static_set_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
-	devcb = &interpro_ioga_device::static_set_dma_w_callback(*device, _channel, DEVCB_##_dma_w);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_w_callback(_channel, DEVCB_##_dma_w);
 
 #define MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(_channel, _dma_r, _dma_w) \
-	devcb = &interpro_ioga_device::static_set_serial_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
-	devcb = &interpro_ioga_device::static_set_serial_dma_w_callback(*device, _channel, DEVCB_##_dma_w);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_w_callback(_channel, DEVCB_##_dma_w);
 
 #define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
-	devcb = &interpro_ioga_device::static_set_fdc_tc_callback(*device, DEVCB_##_tc);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_fdc_tc_callback(DEVCB_##_tc);
 
 #define MCFG_INTERPRO_IOGA_ETH_CA_CB(_ca) \
-	devcb = &interpro_ioga_device::static_set_eth_ca_callback(*device, DEVCB_##_ca);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_eth_ca_callback(DEVCB_##_ca);
 
 #define MCFG_INTERPRO_IOGA_MEMORY(_tag, _spacenum) \
-	interpro_ioga_device::static_set_memory(*device, _tag, _spacenum);
+	downcast<interpro_ioga_device &>(*device).set_memory(_tag, _spacenum);
 
 class interpro_ioga_device : public device_t
 {
@@ -59,7 +59,7 @@ protected:
 		IRQ_9        =  9, // external int  7 (6e)
 		IRQ_CBUS3    = 10, // external int  8 (70)
 		IRQ_RTC      = 11, // external int  9 (72)
-		IRQ_12       = 12, // external int 10 (74) SGA?
+		IRQ_60HZ     = 12, // external int 10 (74)
 		IRQ_MOUSE    = 13, // internal int  0 (76)
 		IRQ_TIMER0   = 14, // internal int  1 (78)
 		IRQ_TIMER1   = 15, // internal int  2 (7a)
@@ -106,19 +106,23 @@ protected:
 	};
 
 public:
-	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_out_irq_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_irq_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_out_ivec_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_ivec_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_r.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_w.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_serial_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_serial_dma_channel[channel].device_r.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_serial_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_serial_dma_channel[channel].device_w.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_fdc_tc_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_fdc_tc_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_eth_ca_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_eth_ca_func.set_callback(object); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ivec_callback(Object &&cb) { return m_out_ivec_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_r_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_w_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_r_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_w_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fdc_tc_callback(Object &&cb) { return m_fdc_tc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eth_ca_callback(Object &&cb) { return m_eth_ca_func.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_memory(device_t &device, const char *const tag, const int spacenum);
+	void set_memory(const char *const tag, const int spacenum)
+	{
+		m_memory_tag = tag;
+		m_memory_spacenum = spacenum;
+	}
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
+	virtual void map(address_map &map) = 0;
 
 	// interrupt request lines
 	DECLARE_WRITE_LINE_MEMBER(ir0_w) { set_int_line(INT_HARD_EX, IRQ_SCSI, state); }
@@ -132,7 +136,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(INT_HARD_EX, IRQ_CBUS3, state); }
 	// FIXME: mc146818 inverts the normal irq state convention
 	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(INT_HARD_EX, IRQ_RTC, !state); }
-	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(INT_HARD_EX, IRQ_12, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(INT_HARD_EX, IRQ_60HZ, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(INT_HARD_EX, IRQ_SERIAL, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(INT_HARD_EX, IRQ_ETHERNET, state); }
 
@@ -152,9 +156,9 @@ public:
 		IRQ_NEGPOL          = 0x0800,
 		IRQ_ENABLE_INTERNAL = 0x1000
 	};
-	DECLARE_READ16_MEMBER(icr_r) const { return m_hwicr[offset]; }
+	DECLARE_READ16_MEMBER(icr_r) { return m_hwicr[offset]; }
 	DECLARE_WRITE16_MEMBER(icr_w);
-	DECLARE_READ16_MEMBER(icr18_r) const { return icr_r(space, 18, mem_mask); }
+	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); }
 	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); }
 
 	enum nmictrl_mask
@@ -167,12 +171,12 @@ public:
 
 		NMI_IE      = NMI_ENABLE1 | NMI_ENABLE2
 	};
-	DECLARE_READ8_MEMBER(nmictrl_r) const { return m_nmictrl; }
+	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
 	DECLARE_WRITE8_MEMBER(nmictrl_w);
 
-	DECLARE_READ8_MEMBER(softint_r) const { return m_softint; }
+	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
 	DECLARE_WRITE8_MEMBER(softint_w);
-	DECLARE_READ16_MEMBER(softint_vector_r) const { return m_swicr[offset]; }
+	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
 	// dma request lines
@@ -191,39 +195,38 @@ public:
 		DMA_CTRL_BERR    = 0x00400000, // bus error
 		DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
 
-		DMA_CTRL_BGR     = 0x01000000, // cleared when command complete (maybe bus grant required?)
-		DMA_CTRL_WAIT    = 0x02000000, // waiting for bus grant
+		DMA_CTRL_ENABLE  = 0x01000000, // transfer enabled
+		DMA_CTRL_VIRTUAL = 0x02000000, // virtual address translation required
 		DMA_CTRL_DOUBLE  = 0x04000000, // double transfer size (double or quad quad)
 
-		DMA_CTRL_VIRTUAL = 0x20000000, // use virtual addressing
 		DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
 		DMA_CTRL_QUAD    = 0x80000000, // select quad transfer size (quad quad when combined with double)
 
-		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields
+		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields (quad not writable for floppy/plotter?)
 	};
-	DECLARE_READ32_MEMBER(dma_plotter_r) const { return dma_r(space, offset, mem_mask, DMA_PLOTTER); }
+	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, DMA_PLOTTER); }
 	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, DMA_PLOTTER); }
-	DECLARE_READ32_MEMBER(dma_scsi_r) const { return dma_r(space, offset, mem_mask, DMA_SCSI); }
+	DECLARE_READ32_MEMBER(dma_scsi_r) { return dma_r(space, offset, mem_mask, DMA_SCSI); }
 	DECLARE_WRITE32_MEMBER(dma_scsi_w) { dma_w(space, offset, data, mem_mask, DMA_SCSI); }
-	DECLARE_READ32_MEMBER(dma_floppy_r) const { return dma_r(space, offset, mem_mask, DMA_FLOPPY); }
+	DECLARE_READ32_MEMBER(dma_floppy_r) { return dma_r(space, offset, mem_mask, DMA_FLOPPY); }
 	DECLARE_WRITE32_MEMBER(dma_floppy_w) { dma_w(space, offset, data, mem_mask, DMA_FLOPPY); }
 
-	DECLARE_READ32_MEMBER(serial_dma0_addr_r) const { return serial_dma_addr_r(space, offset, mem_mask, 0); }
+	DECLARE_READ32_MEMBER(serial_dma0_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 0); }
 	DECLARE_WRITE32_MEMBER(serial_dma0_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 0); }
-	DECLARE_READ32_MEMBER(serial_dma0_ctrl_r) const { return serial_dma_ctrl_r(space, offset, mem_mask, 0); }
+	DECLARE_READ32_MEMBER(serial_dma0_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 0); }
 	DECLARE_WRITE32_MEMBER(serial_dma0_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 0); }
 
-	DECLARE_READ32_MEMBER(serial_dma1_addr_r) const { return serial_dma_addr_r(space, offset, mem_mask, 1); }
+	DECLARE_READ32_MEMBER(serial_dma1_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 1); }
 	DECLARE_WRITE32_MEMBER(serial_dma1_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 1); }
-	DECLARE_READ32_MEMBER(serial_dma1_ctrl_r) const { return serial_dma_ctrl_r(space, offset, mem_mask, 1); }
+	DECLARE_READ32_MEMBER(serial_dma1_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 1); }
 	DECLARE_WRITE32_MEMBER(serial_dma1_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 1); }
 
-	DECLARE_READ32_MEMBER(serial_dma2_addr_r) const { return serial_dma_addr_r(space, offset, mem_mask, 2); }
+	DECLARE_READ32_MEMBER(serial_dma2_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 2); }
 	DECLARE_WRITE32_MEMBER(serial_dma2_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 2); }
-	DECLARE_READ32_MEMBER(serial_dma2_ctrl_r) const { return serial_dma_ctrl_r(space, offset, mem_mask, 2); }
+	DECLARE_READ32_MEMBER(serial_dma2_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 2); }
 	DECLARE_WRITE32_MEMBER(serial_dma2_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 2); }
 
-	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) const { return m_dma_plotter_eosl; }
+	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) { return m_dma_plotter_eosl; }
 	DECLARE_WRITE32_MEMBER(dma_plotter_eosl_w) { m_dma_plotter_eosl = data ^ 0xffff0000; }
 
 	// bus arbitration and control
@@ -239,7 +242,7 @@ public:
 		ARBCTL_BGR_ETHB = 0x0080,
 		ARBCTL_BGR_ETHA = 0x0100
 	};
-	DECLARE_READ16_MEMBER(arbctl_r) const { return m_arbctl; }
+	DECLARE_READ16_MEMBER(arbctl_r) { return m_arbctl; }
 	DECLARE_WRITE16_MEMBER(arbctl_w);
 
 	enum error_businfo_mask
@@ -260,14 +263,14 @@ public:
 		BINFO_BG_SRMASTER = 0x0c00
 	};
 	DECLARE_READ32_MEMBER(error_businfo_r);
-	DECLARE_READ32_MEMBER(error_address_r) const { return m_error_address; }
-	DECLARE_READ32_MEMBER(bus_timeout_r) const { return m_bus_timeout; }
+	DECLARE_READ32_MEMBER(error_address_r) { return m_error_address; }
+	DECLARE_READ32_MEMBER(bus_timeout_r) { return m_bus_timeout; }
 	DECLARE_WRITE32_MEMBER(bus_timeout_w) { m_bus_timeout = data; }
 
 	DECLARE_WRITE32_MEMBER(bus_error) { m_error_address = data; m_error_businfo = offset; }
 
 	// timers
-	DECLARE_READ32_MEMBER(timer0_r) const;
+	DECLARE_READ32_MEMBER(timer0_r);
 	DECLARE_WRITE32_MEMBER(timer0_w);
 
 	enum timer1_mask
@@ -276,12 +279,12 @@ public:
 		TIMER1_START   = 0x00010000,
 		TIMER1_EXPIRED = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(timer1_r) const;
+	DECLARE_READ32_MEMBER(timer1_r);
 	DECLARE_WRITE32_MEMBER(timer1_w);
 
-	DECLARE_READ32_MEMBER(timer2_count_r) const;
+	DECLARE_READ32_MEMBER(timer2_count_r);
 	DECLARE_WRITE32_MEMBER(timer2_count_w);
-	DECLARE_READ32_MEMBER(timer2_value_r) const;
+	DECLARE_READ32_MEMBER(timer2_value_r);
 	DECLARE_WRITE32_MEMBER(timer2_value_w);
 
 	enum timer3_mask
@@ -290,10 +293,10 @@ public:
 		TIMER3_START   = 0x40000000,
 		TIMER3_EXPIRED = 0x80000000
 	};
-	DECLARE_READ32_MEMBER(timer3_r) const;
+	DECLARE_READ32_MEMBER(timer3_r);
 	DECLARE_WRITE32_MEMBER(timer3_w);
 
-	DECLARE_READ32_MEMBER(prescaler_r) const;
+	DECLARE_READ32_MEMBER(prescaler_r);
 	DECLARE_WRITE32_MEMBER(prescaler_w);
 
 	// mouse
@@ -305,20 +308,15 @@ public:
 		MOUSE_MBUTTON = 0x00020000,
 		MOUSE_RBUTTON = 0x00040000,
 
-		MOUSE_COUNTER = 0x0000ffff,
 		MOUSE_BUTTONS = 0x00070000
 	};
 	DECLARE_READ32_MEMBER(mouse_status_r);
 	DECLARE_WRITE32_MEMBER(mouse_status_w);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_button);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_x);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
 
 	const char *m_memory_tag;
 	int m_memory_spacenum;
@@ -342,6 +340,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(timer1);
 	TIMER_CALLBACK_MEMBER(timer2) {}
 	TIMER_CALLBACK_MEMBER(timer3);
+	TIMER_CALLBACK_MEMBER(timer_60hz);
 	TIMER_CALLBACK_MEMBER(mouse_timer);
 
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) = 0;
@@ -389,15 +388,6 @@ private:
 
 	// dma state
 	static const int DMA_CHANNEL_COUNT = 3;
-	enum dma_state
-	{
-		IDLE,
-		WAIT,
-		COMMAND,
-		TRANSFER,
-		COMPLETE,
-		FINAL
-	};
 	struct dma_channel_t
 	{
 		u32 real_address;
@@ -406,7 +396,6 @@ private:
 		u32 control;
 
 		int drq_state;
-		dma_state state;
 		devcb_read8 device_r;
 		devcb_write8 device_w;
 
@@ -434,7 +423,6 @@ private:
 
 	// timers
 	u8 m_timer0_count;
-	u8 m_timer0_limit;
 	u16 m_timer1_count;
 	u32 m_timer2_count;
 	u32 m_timer2_value;
@@ -448,6 +436,7 @@ private:
 	emu_timer *m_timer1;
 	emu_timer *m_timer2;
 	emu_timer *m_timer3;
+	emu_timer *m_timer_60hz;
 
 	// bus arbitration and control
 	u16 m_arbctl;
@@ -465,10 +454,10 @@ class turquoise_ioga_device : public interpro_ioga_device
 public:
 	turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
 	DECLARE_WRITE16_MEMBER(eth_w);
-	DECLARE_READ16_MEMBER(eth_r) const;
+	DECLARE_READ16_MEMBER(eth_r);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
@@ -477,7 +466,7 @@ protected:
 	{
 		ETH_BASE_MASK = 0xffe00000
 	};
-	DECLARE_READ32_MEMBER(eth_base_r) const { return m_eth_base; }
+	DECLARE_READ32_MEMBER(eth_base_r) { return m_eth_base; }
 	DECLARE_WRITE32_MEMBER(eth_base_w);
 
 	enum eth_control_mask
@@ -494,7 +483,7 @@ protected:
 
 		//ETH_MASK     = 0x4ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ16_MEMBER(eth_control_r) const { return m_eth_control; }
+	DECLARE_READ16_MEMBER(eth_control_r) { return m_eth_control; }
 	DECLARE_WRITE16_MEMBER(eth_control_w);
 
 private:
@@ -507,10 +496,10 @@ class sapphire_ioga_device : public interpro_ioga_device
 public:
 	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE32_MEMBER(eth_w);
-	DECLARE_READ32_MEMBER(eth_r) const;
+	DECLARE_WRITE16_MEMBER(eth_w);
+	DECLARE_READ16_MEMBER(eth_r);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
@@ -524,7 +513,7 @@ protected:
 		ETH_CHA_RTAG   = 0x00000e00,
 		ETH_REMAP_ADDR = 0xfffff000
 	};
-	DECLARE_READ32_MEMBER(eth_remap_r) const { return m_eth_remap; }
+	DECLARE_READ32_MEMBER(eth_remap_r) { return m_eth_remap; }
 	DECLARE_WRITE32_MEMBER(eth_remap_w);
 
 	enum eth_mappg_mask
@@ -536,7 +525,7 @@ protected:
 		ETH_CHB_RTAG  = 0x00000e00,
 		ETH_MAPPG     = 0xfffff000
 	};
-	DECLARE_READ32_MEMBER(eth_mappg_r) const { return m_eth_mappg; }
+	DECLARE_READ32_MEMBER(eth_mappg_r) { return m_eth_mappg; }
 	DECLARE_WRITE32_MEMBER(eth_mappg_w);
 
 	enum eth_control_mask
@@ -553,7 +542,7 @@ protected:
 
 		ETH_MASK     = 0x00004ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ32_MEMBER(eth_control_r) const;
+	DECLARE_READ32_MEMBER(eth_control_r);
 	DECLARE_WRITE32_MEMBER(eth_control_w);
 
 private:

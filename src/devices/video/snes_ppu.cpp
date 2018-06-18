@@ -378,7 +378,7 @@ void snes_ppu_device::device_reset()
 	m_beam.current_vert = 0;
 
 	/* Set STAT78 to NTSC or PAL */
-	m_stat78 = (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59.0) ? SNES_NTSC : SNES_PAL;
+	m_stat78 = (ATTOSECONDS_TO_HZ(screen().frame_period().attoseconds()) >= 59.0) ? SNES_NTSC : SNES_PAL;
 	m_beam.last_visible_line = m_stat78 & SNES_PAL ? 240 : 225;
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
@@ -1995,7 +1995,7 @@ void snes_ppu_device::set_latch_hv(int16_t x, int16_t y)
 
 void snes_ppu_device::dynamic_res_change()
 {
-	rectangle visarea = m_screen->visible_area();
+	rectangle visarea = screen().visible_area();
 	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
@@ -2012,12 +2012,12 @@ void snes_ppu_device::dynamic_res_change()
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
-		m_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
+		screen().configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
-		m_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
+		screen().configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }
 
@@ -2060,8 +2060,8 @@ READ8_MEMBER( snes_ppu_device::vram_read )
 		res = m_vram[offset];
 	else
 	{
-		uint16_t v = m_screen->vpos();
-		uint16_t h = m_screen->hpos();
+		uint16_t v = screen().vpos();
+		uint16_t h = screen().hpos();
 		uint16_t ls = (((m_stat78 & 0x10) == SNES_NTSC ? 525 : 625) >> 1) - 1;
 
 		if (m_interlace == 2)
@@ -2095,8 +2095,8 @@ WRITE8_MEMBER( snes_ppu_device::vram_write )
 		m_vram[offset] = data;
 	else
 	{
-		uint16_t v = m_screen->vpos();
-		uint16_t h = m_screen->hpos();
+		uint16_t v = screen().vpos();
+		uint16_t h = screen().hpos();
 		if (v == 0)
 		{
 			if (h <= 4)
@@ -2161,7 +2161,7 @@ READ8_MEMBER( snes_ppu_device::oam_read )
 
 	if (!m_screen_disabled)
 	{
-		uint16_t v = m_screen->vpos();
+		uint16_t v = screen().vpos();
 
 		if (v < m_beam.last_visible_line)
 			offset = 0x010c;
@@ -2179,7 +2179,7 @@ WRITE8_MEMBER( snes_ppu_device::oam_write )
 
 	if (!m_screen_disabled)
 	{
-		uint16_t v = m_screen->vpos();
+		uint16_t v = screen().vpos();
 
 		if (v < m_beam.last_visible_line)
 			offset = 0x010c;
@@ -2220,8 +2220,8 @@ READ8_MEMBER( snes_ppu_device::cgram_read )
 #if 0
 	if (!m_screen_disabled)
 	{
-		uint16_t v = m_screen->vpos();
-		uint16_t h = m_screen->hpos();
+		uint16_t v = screen().vpos();
+		uint16_t h = screen().hpos();
 
 		if (v < m_beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
@@ -2248,8 +2248,8 @@ WRITE8_MEMBER( snes_ppu_device::cgram_write )
 	// writes to the cgram address
 	if (!m_screen_disabled)
 	{
-		uint16_t v = m_screen->vpos();
-		uint16_t h = m_screen->hpos();
+		uint16_t v = screen().vpos();
+		uint16_t h = screen().hpos();
 
 		if (v < m_beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
@@ -2312,7 +2312,7 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 				return m_ppu1_open_bus;
 			}
 		case SLHV:      /* Software latch for H/V counter */
-			set_latch_hv(m_screen->hpos() / m_htmult, m_screen->vpos());
+			set_latch_hv(screen().hpos() / m_htmult, screen().vpos());
 			return m_openbus_cb(space, 0);       /* Return value is meaningless */
 
 		case ROAMDATA:  /* Read data from OAM (DR) */

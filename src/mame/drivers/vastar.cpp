@@ -140,35 +140,39 @@ WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_SHARE("sprite_priority")   /* sprite/BG priority */
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") // fg videoram + sprites
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("sharedram")
-ADDRESS_MAP_END
+void vastar_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(FUNC(vastar_state::bg2videoram_w)).share("bg2videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(FUNC(vastar_state::bg1videoram_w)).share("bg1videoram").mirror(0x2000);
+	map(0xc000, 0xc000).writeonly().share("sprite_priority");   /* sprite/BG priority */
+	map(0xc400, 0xcfff).ram().w(FUNC(vastar_state::fgvideoram_w)).share("fgvideoram"); // fg videoram + sprites
+	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0xf000, 0xf7ff).ram().share("sharedram");
+}
 
-static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void vastar_state::main_port_map(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
-	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
-	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+void vastar_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram().share("sharedram");
+	map(0x8000, 0x8000).portr("P2");
+	map(0x8040, 0x8040).portr("P1");
+	map(0x8080, 0x8080).portr("SYSTEM");
+}
 
-static ADDRESS_MAP_START( cpu2_port_map, AS_IO, 8, vastar_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void vastar_state::cpu2_port_map(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 static INPUT_PORTS_START( vastar )
@@ -398,7 +402,7 @@ static const gfx_layout spritelayoutdw =
 	128*8
 };
 
-static GFXDECODE_START( vastar )
+static GFXDECODE_START( gfx_vastar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayoutdw, 0, 64 )
@@ -410,27 +414,27 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-static MACHINE_CONFIG_START( vastar )
+MACHINE_CONFIG_START(vastar_state::vastar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vastar_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vastar_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(cpu2_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242) /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(cpu2_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242) /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(vastar_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(vastar_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, vastar_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, vastar_state, flip_screen_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -444,13 +448,13 @@ static MACHINE_CONFIG_START( vastar )
 	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vastar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vastar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -652,8 +656,8 @@ ROM_START( pprobe )
 ROM_END
 
 
-GAME( 1983, vastar,  0,      vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)",            MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
-GAME( 1983, vastar2, vastar, vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar3, vastar, vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar4, vastar, vastar, vastar4, vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pprobe,  0,      vastar, pprobe,  vastar_state, 0, ROT90, "Crux / Kyugo?",               "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?
+GAME( 1983, vastar,  0,      vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)",            MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
+GAME( 1983, vastar2, vastar, vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar3, vastar, vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar4, vastar, vastar, vastar4, vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pprobe,  0,      vastar, pprobe,  vastar_state, empty_init, ROT90, "Crux / Kyugo?",               "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?

@@ -53,6 +53,8 @@ public:
 
 	DECLARE_MACHINE_RESET(votrtnt);
 
+	void votrtnt(machine_config &config);
+	void _6802_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
@@ -78,13 +80,14 @@ private:
       x   1   1   x     *   *   *   *     *   *   *   *     *   *   *   *    R  ROM (2332 4kx8 Mask ROM, inside potted brick)
 */
 
-static ADDRESS_MAP_START(6802_mem, AS_PROGRAM, 8, votrtnt_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x9c00) AM_RAM /* RAM, 2114*2 (0x400 bytes) mirrored 4x */
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x9fff) AM_DEVWRITE("votrax", votrax_sc01_device, write)
-	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x9000) AM_ROM /* ROM in potted block */
-ADDRESS_MAP_END
+void votrtnt_state::_6802_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).mirror(0x9c00).ram(); /* RAM, 2114*2 (0x400 bytes) mirrored 4x */
+	map(0x2000, 0x2001).mirror(0x9ffe).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x4000, 0x4000).mirror(0x9fff).w(m_votrax, FUNC(votrax_sc01_device::write));
+	map(0x6000, 0x6fff).mirror(0x9000).rom(); /* ROM in potted block */
+}
 
 
 /******************************************************************************
@@ -132,10 +135,10 @@ MACHINE_RESET_MEMBER( votrtnt_state, votrtnt )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrtnt )
+MACHINE_CONFIG_START(votrtnt_state::votrtnt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
-	MCFG_CPU_PROGRAM_MAP(6802_mem)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(2'457'600))  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
+	MCFG_DEVICE_PROGRAM_MAP(_6802_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(votrtnt_state, votrtnt)
 
@@ -144,19 +147,19 @@ static MACHINE_CONFIG_START( votrtnt )
 
 	/* serial hardware */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720kHz? needs verify */
 	MCFG_VOTRAX_SC01_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -178,5 +181,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT  COMPANY   FULLNAME        FLAGS
-COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, 0,    "Votrax", "Type 'N Talk", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY   FULLNAME        FLAGS
+COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, empty_init, "Votrax", "Type 'N Talk", 0 )

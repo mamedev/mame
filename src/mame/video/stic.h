@@ -41,7 +41,7 @@ struct intv_sprite_type
 
 // ======================> stic_device
 
-class stic_device :  public device_t
+class stic_device :  public device_t, public device_video_interface
 {
 public:
 	// GROM/GRAM cards are 8x8
@@ -182,14 +182,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(STIC, stic_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define MCFG_STIC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, STIC, 0)
 
 
 #endif // MAME_VIDEO_STIC_H

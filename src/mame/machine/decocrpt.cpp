@@ -622,7 +622,7 @@ static void deco_decrypt(running_machine &machine,const char *rgntag,const uint8
 		if (remap_only)
 			rom[i] = buffer[addr];
 		else
-			rom[i] = BITSWAP16(buffer[addr] ^ xor_masks[xor_table[addr & 0x7ff]],
+			rom[i] = bitswap<16>(buffer[addr] ^ xor_masks[xor_table[addr & 0x7ff]],
 						swap_patterns[pat][0],
 						swap_patterns[pat][1],
 						swap_patterns[pat][2],

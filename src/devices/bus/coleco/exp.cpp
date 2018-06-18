@@ -136,8 +136,9 @@ uint8_t colecovision_cartridge_slot_device::bd_r(address_space &space, offs_t of
 #include "std.h"
 #include "xin1.h"
 
-SLOT_INTERFACE_START( colecovision_cartridges )
+void colecovision_cartridges(device_slot_interface &device)
+{
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", COLECOVISION_STANDARD)
-	SLOT_INTERFACE_INTERNAL("xin1", COLECOVISION_XIN1)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", COLECOVISION_STANDARD);
+	device.option_add_internal("xin1", COLECOVISION_XIN1);
+}

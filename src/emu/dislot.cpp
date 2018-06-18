@@ -15,8 +15,9 @@
 // ctor
 // -------------------------------------------------
 
-device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "slot"),
+device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "slot"),
+	m_default_clock(DERIVED_CLOCK(1, 1)),
 	m_default_option(nullptr),
 	m_fixed(false),
 	m_card_device(nullptr)
@@ -37,10 +38,10 @@ device_slot_interface::~device_slot_interface()
 // device_slot_option ctor
 // -------------------------------------------------
 
-device_slot_option::device_slot_option(const char *name, const device_type &devtype):
+device_slot_interface::slot_option::slot_option(const char *name, const device_type &devtype, bool selectable) :
 	m_name(name),
 	m_devtype(devtype),
-	m_selectable(true),
+	m_selectable(selectable),
 	m_default_bios(nullptr),
 	m_machine_config(nullptr),
 	m_input_device_defaults(nullptr),
@@ -50,46 +51,50 @@ device_slot_option::device_slot_option(const char *name, const device_type &devt
 
 
 // -------------------------------------------------
-// static_option_reset
+// option_add
 // -------------------------------------------------
 
-void device_slot_interface::static_option_reset(device_t &device)
+device_slot_interface::slot_option &device_slot_interface::option_add(const char *name, const device_type &devtype)
 {
-	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
+	const slot_option *const existing = option(name);
+	if (existing)
+		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device().tag(), name);
 
-	intf.m_options.clear();
+	if (m_options.count(name))
+		throw tag_add_exception(name);
+
+	return m_options.emplace(name, std::make_unique<slot_option>(name, devtype, true)).first->second->clock(m_default_clock);
 }
 
 
 // -------------------------------------------------
-// static_option_add
+// option_add_internal
 // -------------------------------------------------
 
-void device_slot_interface::static_option_add(device_t &device, const char *name, const device_type &devtype)
+device_slot_interface::slot_option &device_slot_interface::option_add_internal(const char *name, const device_type &devtype)
 {
-	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
-	device_slot_option *option = intf.option(name);
+	const slot_option *const existing = option(name);
+	if (existing)
+		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device().tag(), name);
 
-	if (option != nullptr)
-		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device.tag(), name);
-	if (intf.m_options.count(name) != 0) throw tag_add_exception(name);
-	intf.m_options.emplace(std::make_pair(name, std::make_unique<device_slot_option>(name, devtype)));
+	if (m_options.count(name))
+		throw tag_add_exception(name);
+
+	return m_options.emplace(name, std::make_unique<slot_option>(name, devtype, false)).first->second->clock(m_default_clock);
 }
 
 
 // -------------------------------------------------
-// static_option
+// option
 // -------------------------------------------------
 
-device_slot_option *device_slot_interface::static_option(device_t &device, const char *name)
+device_slot_interface::slot_option *device_slot_interface::config_option(const char *name)
 {
-	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
-	device_slot_option *option = intf.option(name);
+	auto const search = m_options.find(name);
+	if (search != m_options.end())
+		return search->second.get();
 
-	if (option == nullptr)
-		throw emu_fatalerror("slot '%s' has no option '%s'\n", device.tag(), name);
-
-	return option;
+	throw emu_fatalerror("slot '%s' has no option '%s'\n", device().tag(), name);
 }
 
 
@@ -113,16 +118,15 @@ bool device_slot_interface::has_selectable_options() const
 // option
 // -------------------------------------------------
 
-device_slot_option *device_slot_interface::option(const char *name) const
+const device_slot_interface::slot_option *device_slot_interface::option(const char *name) const
 {
-	device_slot_option *result = nullptr;
 	if (name)
 	{
-		auto search = m_options.find(name);
+		auto const search = m_options.find(name);
 		if (search != m_options.end())
-			result = search->second.get();
+			return search->second.get();
 	}
-	return result;
+	return nullptr;
 }
 
 

@@ -46,16 +46,16 @@
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
 
 #define MCFG_SH2_IS_SLAVE(_slave) \
-	sh2_device::set_is_slave(*device, _slave);
+	downcast<sh2_device &>(*device).set_is_slave(_slave);
 
 #define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
-	sh2_device::set_dma_kludge_callback(*device, sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<sh2_device &>(*device).set_dma_kludge_callback(sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
-	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<sh2_device &>(*device).set_dma_fifo_data_available_callback(sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
-	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<sh2_device &>(*device).set_ftcsr_read_callback(sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class sh2_frontend;
@@ -71,20 +71,22 @@ public:
 
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~sh2_device() override;
 
-	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
-	static void set_dma_kludge_callback(device_t &device, dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
-	static void set_dma_fifo_data_available_callback(device_t &device, dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
-	static void set_ftcsr_read_callback(device_t &device, ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
+	void set_is_slave(int slave) { m_is_slave = slave; }
+	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
 
 	DECLARE_WRITE32_MEMBER( sh7604_w );
 	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
-	void sh2_set_frt_input(int state);
+	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
 	void func_fastirq();
 
+	void sh7604_map(address_map &map);
 protected:
 	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
 
@@ -97,7 +99,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 4; }
 	virtual uint32_t execute_input_lines() const override { return 16; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -109,7 +112,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space *m_decrypted_program;
 
@@ -156,12 +159,12 @@ private:
 
 	uint32_t m_debugger_temp;
 
-	inline uint8_t RB(offs_t A) override;
-	inline uint16_t RW(offs_t A) override;
-	inline uint32_t RL(offs_t A) override;
-	inline void WB(offs_t A, uint8_t V) override;
-	inline void WW(offs_t A, uint16_t V) override;
-	inline void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t RB(offs_t A) override;
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
+	virtual void WB(offs_t A, uint8_t V) override;
+	virtual void WW(offs_t A, uint16_t V) override;
+	virtual void WL(offs_t A, uint32_t V) override;
 
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void LDCSR(const uint16_t opcode) override;
@@ -183,9 +186,9 @@ private:
 	virtual void init_drc_frontend() override;
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 
-	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) override;
+	virtual void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception) override;
 	virtual void static_generate_entry_point() override;
-	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr) override;
 
 };
 
@@ -209,6 +212,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sh7021_w);
 	void sh7032_dma_exec(int ch);
 
+	void sh7021_map(address_map &map);
 private:
 	uint16_t m_sh7021_regs[0x200];
 	struct
@@ -230,6 +234,7 @@ public:
 
 	DECLARE_READ16_MEMBER(sh7032_r);
 	DECLARE_WRITE16_MEMBER(sh7032_w);
+	void sh7032_map(address_map &map);
 private:
 	uint16_t m_sh7032_regs[0x200];
 };

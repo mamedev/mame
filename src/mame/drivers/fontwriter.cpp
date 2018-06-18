@@ -43,6 +43,9 @@ public:
 		m_vbl ^= 0xff;
 		return m_vbl;
 	}
+	void fontwriter(machine_config &config);
+	void io_map(address_map &map);
+	void main_map(address_map &map);
 protected:
 
 	// devices
@@ -71,25 +74,27 @@ uint32_t fontwriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, fontwriter_state )
-	AM_RANGE(0x002000, 0x007fff) AM_RAM
-	AM_RANGE(0x008000, 0x00ffff) AM_ROM AM_REGION("maincpu", 0x0000)
-	AM_RANGE(0x020000, 0x04ffff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM
-	AM_RANGE(0x200000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0x0000)
-ADDRESS_MAP_END
+void fontwriter_state::main_map(address_map &map)
+{
+	map(0x002000, 0x007fff).ram();
+	map(0x008000, 0x00ffff).rom().region("maincpu", 0x0000);
+	map(0x020000, 0x04ffff).ram();
+	map(0x100000, 0x1007ff).ram();
+	map(0x200000, 0x3fffff).rom().region("maincpu", 0x0000);
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, fontwriter_state )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ(vbl_r)
-ADDRESS_MAP_END
+void fontwriter_state::io_map(address_map &map)
+{
+	map(M37710_PORT6, M37710_PORT6).r(FUNC(fontwriter_state::vbl_r));
+}
 
 static INPUT_PORTS_START( fontwriter )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( fontwriter )
-	MCFG_CPU_ADD("maincpu", M37720S1, XTAL_16MHz) /* M37720S1 @ 16MHz - main CPU */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(io_map)
+MACHINE_CONFIG_START(fontwriter_state::fontwriter)
+	MCFG_DEVICE_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -104,4 +109,4 @@ ROM_START(fw700ger)
 	ROM_LOAD( "lh5370pd.ic7", 0x000000, 0x200000, CRC(29083e13) SHA1(7e1605f91b53580e75f638f9e6b0917305c35f84) )
 ROM_END
 
-SYST( 1994, fw700ger, 0, 0, fontwriter, fontwriter, fontwriter_state, 0, "Sharp", "FontWriter FW-700 (German)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1994, fw700ger, 0, 0, fontwriter, fontwriter, fontwriter_state, empty_init, "Sharp", "FontWriter FW-700 (German)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

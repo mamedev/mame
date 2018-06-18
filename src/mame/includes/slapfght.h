@@ -9,6 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 #include "screen.h"
 
 class slapfght_state : public driver_device
@@ -99,9 +100,9 @@ public:
 	virtual void machine_reset() override;
 
 	void init_banks();
-	DECLARE_DRIVER_INIT(getstarb1);
-	DECLARE_DRIVER_INIT(slapfigh);
-	DECLARE_DRIVER_INIT(getstarb2);
+	void init_getstarb1();
+	void init_slapfigh();
+	void init_getstarb2();
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
@@ -114,6 +115,31 @@ public:
 	uint32_t screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void tigerhb2(machine_config &config);
+	void tigerhb1(machine_config &config);
+	void tigerh(machine_config &config);
+	void getstarb2(machine_config &config);
+	void slapfighb2(machine_config &config);
+	void getstarb1(machine_config &config);
+	void perfrman(machine_config &config);
+	void slapfigh(machine_config &config);
+	void slapfighb1(machine_config &config);
+	void getstar_map(address_map &map);
+	void getstarb1_io_map(address_map &map);
+	void getstarb2_io_map(address_map &map);
+	void io_map_mcu(address_map &map);
+	void io_map_nomcu(address_map &map);
+	void perfrman_map(address_map &map);
+	void perfrman_sound_map(address_map &map);
+	void slapfigh_map(address_map &map);
+	void slapfigh_map_mcu(address_map &map);
+	void slapfighb1_map(address_map &map);
+	void slapfighb2_map(address_map &map);
+	void tigerh_map(address_map &map);
+	void tigerh_map_mcu(address_map &map);
+	void tigerh_sound_map(address_map &map);
+	void tigerhb1_map(address_map &map);
+	void tigerhb2_map(address_map &map);
 };

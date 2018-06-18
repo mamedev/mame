@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class vulgus_state : public driver_device
 {
 public:
@@ -52,4 +54,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vulgus(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

@@ -176,7 +176,7 @@ menu_cheat::~menu_cheat()
 
 menu_autofire::menu_autofire(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_toggle(false)
 {
-	const screen_device *screen = mui.machine().first_screen();
+	const screen_device *screen = screen_device_iterator(mui.machine().root_device()).first();
 
 	if (screen == nullptr)
 	{

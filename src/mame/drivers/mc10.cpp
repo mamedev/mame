@@ -49,6 +49,13 @@ public:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 
+	void alice90(machine_config &config);
+	void alice32(machine_config &config);
+	void mc10(machine_config &config);
+	void alice32_mem(address_map &map);
+	void alice90_mem(address_map &map);
+	void mc10_io(address_map &map);
+	void mc10_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void driver_start() override;
@@ -288,37 +295,41 @@ void mc10_state::driver_start()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START( mc10_mem, AS_PROGRAM, 8 , mc10_state)
-	AM_RANGE(0x0100, 0x3fff) AM_NOP /* unused */
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") /* 4k internal ram */
-	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
-	AM_RANGE(0x9000, 0xbffe) AM_NOP /* unused */
-	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, mc10_bfff_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
-ADDRESS_MAP_END
+void mc10_state::mc10_mem(address_map &map)
+{
+	map(0x0100, 0x3fff).noprw(); /* unused */
+	map(0x4000, 0x4fff).bankrw("bank1"); /* 4k internal ram */
+	map(0x5000, 0x8fff).bankrw("bank2"); /* 16k memory expansion */
+	map(0x9000, 0xbffe).noprw(); /* unused */
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
+	map(0xe000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
+}
 
-ADDRESS_MAP_START( mc10_io, AS_IO, 8 , mc10_state)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(mc10_port1_r, mc10_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(mc10_port2_r, mc10_port2_w)
-ADDRESS_MAP_END
+void mc10_state::mc10_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(mc10_state::mc10_port1_r), FUNC(mc10_state::mc10_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(mc10_state::mc10_port2_r), FUNC(mc10_state::mc10_port2_w));
+}
 
-ADDRESS_MAP_START( alice32_mem, AS_PROGRAM, 8 , mc10_state)
-	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
-	AM_RANGE(0x3000, 0x4fff) AM_RAMBANK("bank1") /* 8k internal ram */
-	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
-	AM_RANGE(0x9000, 0xafff) AM_NOP /* unused */
-	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
-	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, alice32_bfff_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
-ADDRESS_MAP_END
+void mc10_state::alice32_mem(address_map &map)
+{
+	map(0x0100, 0x2fff).noprw(); /* unused */
+	map(0x3000, 0x4fff).bankrw("bank1"); /* 8k internal ram */
+	map(0x5000, 0x8fff).bankrw("bank2"); /* 16k memory expansion */
+	map(0x9000, 0xafff).noprw(); /* unused */
+	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::alice32_bfff_w));
+	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
+}
 
-ADDRESS_MAP_START( alice90_mem, AS_PROGRAM, 8 , mc10_state)
-	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
-	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")    /* 32k internal ram */
-	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
-	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(alice90_bfff_r, alice32_bfff_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
-ADDRESS_MAP_END
+void mc10_state::alice90_mem(address_map &map)
+{
+	map(0x0100, 0x2fff).noprw(); /* unused */
+	map(0x3000, 0xafff).bankrw("bank1");    /* 32k internal ram */
+	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::alice90_bfff_r), FUNC(mc10_state::alice32_bfff_w));
+	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -497,24 +508,24 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START( mc10 )
+MACHINE_CONFIG_START(mc10_state::mc10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
-	MCFG_CPU_PROGRAM_MAP(mc10_mem)
-	MCFG_CPU_IO_MAP(mc10_io)
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))  /* 0,894886 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mc10_mem)
+	MCFG_DEVICE_IO_MAP(mc10_io)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(mc10_state, mc6847_videoram_r))
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc10_state, mc6847_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -533,12 +544,12 @@ MACHINE_CONFIG_START( mc10 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( alice32 )
+MACHINE_CONFIG_START(mc10_state::alice32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(alice32_mem)
-	MCFG_CPU_IO_MAP(mc10_io)
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(alice32_mem)
+	MCFG_DEVICE_IO_MAP(mc10_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -553,10 +564,10 @@ MACHINE_CONFIG_START( alice32 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(alice32_cassette_formats)
@@ -576,9 +587,10 @@ MACHINE_CONFIG_START( alice32 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mc10_cass", "mc10")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( alice90, alice32 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alice90_mem)
+MACHINE_CONFIG_START(mc10_state::alice90)
+	alice32(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alice90_mem)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -628,8 +640,8 @@ ALLOW_SAVE_TYPE(mc10_state::printer_state);
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY              FULLNAME     FLAGS
-COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state, 0,    "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, alice,   mc10,    0,      mc10,    alice, mc10_state, 0,    "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state, 0,    "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state, 0,    "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME     FLAGS
+COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state, empty_init, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alice,   mc10,    0,      mc10,    alice, mc10_state, empty_init, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state, empty_init, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state, empty_init, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

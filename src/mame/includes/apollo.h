@@ -32,8 +32,9 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/3c505.h"
 
-
 #include "bus/rs232/rs232.h"
+
+#include "diserial.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -87,8 +88,10 @@ uint8_t apollo_get_ram_config_byte(void);
 //apollo_get_node_id - get the node id
 uint32_t apollo_get_node_id(void);
 
+#if 0
 	// should be called by the CPU core before executing each instruction
 int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
+#endif
 
 void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 
@@ -116,21 +119,21 @@ class apollo_ni;
 class apollo_state : public driver_device
 {
 public:
-	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag),
-			m_maincpu(*this, MAINCPU),
-			m_messram_ptr(*this, "messram"),
-			m_dma8237_1(*this, APOLLO_DMA1_TAG),
-			m_dma8237_2(*this, APOLLO_DMA2_TAG),
-			m_pic8259_master(*this, APOLLO_PIC1_TAG),
-			m_pic8259_slave(*this, APOLLO_PIC2_TAG),
-			m_ptm(*this, APOLLO_PTM_TAG),
-			m_sio(*this, APOLLO_SIO_TAG),
-			m_sio2(*this, APOLLO_SIO2_TAG),
-			m_rtc(*this, APOLLO_RTC_TAG),
-			m_node_id(*this, APOLLO_NI_TAG),
-			m_isa(*this, APOLLO_ISA_TAG)
-			{ }
+	apollo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MAINCPU),
+		m_messram_ptr(*this, "messram"),
+		m_dma8237_1(*this, APOLLO_DMA1_TAG),
+		m_dma8237_2(*this, APOLLO_DMA2_TAG),
+		m_pic8259_master(*this, APOLLO_PIC1_TAG),
+		m_pic8259_slave(*this, APOLLO_PIC2_TAG),
+		m_ptm(*this, APOLLO_PTM_TAG),
+		m_sio(*this, APOLLO_SIO_TAG),
+		m_sio2(*this, APOLLO_SIO2_TAG),
+		m_rtc(*this, APOLLO_RTC_TAG),
+		m_node_id(*this, APOLLO_NI_TAG),
+		m_isa(*this, APOLLO_ISA_TAG)
+	{ }
 
 	required_device<m68000_base_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_messram_ptr;
@@ -193,13 +196,13 @@ public:
 	DECLARE_READ8_MEMBER(dn5500_11500_r);
 	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
 	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
-	DECLARE_DRIVER_INIT(dsp3000);
-	DECLARE_DRIVER_INIT(dsp5500);
-	DECLARE_DRIVER_INIT(dn3500);
-	DECLARE_DRIVER_INIT(dn3000);
-	DECLARE_DRIVER_INIT(dsp3500);
-	DECLARE_DRIVER_INIT(dn5500);
-	DECLARE_DRIVER_INIT(apollo);
+	void init_dsp3000();
+	void init_dsp5500();
+	void init_dn3500();
+	void init_dn3000();
+	void init_dsp3500();
+	void init_dn5500();
+	void init_apollo();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -252,6 +255,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
 	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
+	void common(machine_config &config);
+	void apollo(machine_config &config);
+	void apollo_terminal(machine_config &config);
+	void apollo_graphics(machine_config &config);
+	void apollo_mono19i(machine_config &config);
+	void dn3500(machine_config &config);
+	void dn5500_19i(machine_config &config);
+	void dn3000(machine_config &config);
+	void dn3000_15i(machine_config &config);
+	void dn3000_19i(machine_config &config);
+	void dn3500_15i(machine_config &config);
+	void dsp3000(machine_config &config);
+	void dsp3500(machine_config &config);
+	void dsp5500(machine_config &config);
+	void dn5500(machine_config &config);
+	void dn5500_15i(machine_config &config);
+	void dn3500_19i(machine_config &config);
+	void dn3000_map(address_map &map);
+	void dn3500_map(address_map &map);
+	void dn5500_map(address_map &map);
+	void dsp3000_map(address_map &map);
+	void dsp3500_map(address_map &map);
+	void dsp5500_map(address_map &map);
 private:
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;
@@ -259,9 +285,6 @@ private:
 	bool m_cur_eop;
 	emu_timer *m_dn3000_timer;
 };
-
-MACHINE_CONFIG_EXTERN( apollo );
-MACHINE_CONFIG_EXTERN( apollo_terminal );
 
 /*----------- machine/apollo_config.c -----------*/
 
@@ -316,16 +339,16 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 	MCFG_DEVICE_ADD(_tag, APOLLO_SIO, _clock)
 
 #define MCFG_APOLLO_SIO_IRQ_CALLBACK(_cb) \
-	devcb = &apollo_sio::set_irq_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_sio &>(*device).set_irq_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_SIO_A_TX_CALLBACK(_cb) \
-	devcb = &apollo_sio::set_a_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_sio &>(*device).set_a_tx_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_SIO_B_TX_CALLBACK(_cb) \
-	devcb = &apollo_sio::set_b_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_sio &>(*device).set_b_tx_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_SIO_OUTPORT_CALLBACK(_cb) \
-	devcb = &apollo_sio::set_outport_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_sio &>(*device).set_outport_cb(DEVCB_##_cb);
 
 class apollo_sio: public duart_base_device
 {
@@ -632,10 +655,8 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 
 #define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
-	MCFG_FRAGMENT_ADD(apollo_graphics) \
+	apollo_graphics(config); \
 	MCFG_DEVICE_ADD(_tag, APOLLO_GRAPHICS, 0)
-
-MACHINE_CONFIG_EXTERN( apollo_graphics );
 
 class apollo_graphics_19i : public apollo_graphics_15i
 {
@@ -653,10 +674,8 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
-	MCFG_FRAGMENT_ADD(apollo_mono19i) \
+	apollo_mono19i(config); \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
-
-MACHINE_CONFIG_EXTERN( apollo_mono19i );
 
 #ifdef APOLLO_XXL
 
@@ -667,7 +686,7 @@ MACHINE_CONFIG_EXTERN( apollo_mono19i );
 //**************************************************************************
 
 #define MCFG_APOLLO_STDIO_TX_CALLBACK(_cb) \
-	devcb = &apollo_stdio_device::set_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_stdio_device &>(*device).set_tx_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -682,9 +701,9 @@ public:
 	apollo_stdio_device(const machine_config &mconfig, const char *tag,
 			device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object)
+	template<class Object> devcb_base &set_tx_cb(Object &&object)
 	{
-		return downcast<apollo_stdio_device &> (device).m_tx_w.set_callback(object);
+		return m_tx_w.set_callback(std::forward<Object>(object));
 	}
 
 	devcb_write_line m_tx_w;

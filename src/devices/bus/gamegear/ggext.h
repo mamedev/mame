@@ -30,11 +30,11 @@
 
 
 #define MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(_devcb) \
-	devcb = &gg_ext_port_device::set_th_input_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<gg_ext_port_device &>(*device).set_th_input_handler(DEVCB_##_devcb);
 
 
 #define MCFG_GG_EXT_PORT_PIXEL_HANDLER(_devcb) \
-	devcb = &gg_ext_port_device::set_pixel_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<gg_ext_port_device &>(*device).set_pixel_handler(DEVCB_##_devcb);
 
 
 
@@ -46,8 +46,7 @@
 
 class device_gg_ext_port_interface;
 
-class gg_ext_port_device : public device_t,
-								public device_slot_interface
+class gg_ext_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -55,9 +54,9 @@ public:
 	virtual ~gg_ext_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_th_input_handler(device_t &device, Object &&cb) { return downcast<gg_ext_port_device &>(device).m_th_pin_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_th_input_handler(Object &&cb) { return m_th_pin_handler.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_pixel_handler(device_t &device, Object &&cb) { return downcast<gg_ext_port_device &>(device).m_pixel_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pixel_handler(Object &&cb) { return m_pixel_handler.set_callback(std::forward<Object>(cb)); }
 
 	// Currently, only the support for SMS Controller Adaptor is emulated,
 	// for when SMS Compatibility mode is enabled. In that mode, the 10 pins
@@ -113,10 +112,10 @@ protected:
 
 
 // device type definition
-extern const device_type GG_EXT_PORT;
+DECLARE_DEVICE_TYPE(GG_EXT_PORT, gg_ext_port_device)
 
 
-SLOT_INTERFACE_EXTERN( gg_ext_port_devices );
+void gg_ext_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_GAMEGEAR_GGEXT_H

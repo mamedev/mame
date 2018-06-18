@@ -85,7 +85,8 @@ WRITE_LINE_MEMBER(oricext_device::irq_w)
 	connector->irq_w(state);
 }
 
-SLOT_INTERFACE_START(oricext_intf)
-	SLOT_INTERFACE("jasmin", JASMIN)
-	SLOT_INTERFACE("microdisc", MICRODISC)
-SLOT_INTERFACE_END
+void oricext_intf(device_slot_interface &device)
+{
+	device.option_add("jasmin", JASMIN);
+	device.option_add("microdisc", MICRODISC);
+}

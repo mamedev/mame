@@ -2,7 +2,9 @@
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "machine/ticket.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "emupal.h"
 
 class playmark_state : public driver_device
 {
@@ -21,7 +23,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_ticket(*this, "ticket"),
+		m_token(*this, "token") { }
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_bgvideoram;
@@ -82,7 +86,7 @@ public:
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
 	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
-	DECLARE_DRIVER_INIT(pic_decode);
+	void init_pic_decode();
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);
@@ -116,4 +120,21 @@ public:
 	optional_device<pic16c57_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_ticket;
+	optional_device<ticket_dispenser_device> m_token;
+	void wbeachvl(machine_config &config);
+	void hrdtimes(machine_config &config);
+	void luckboomh(machine_config &config);
+	void bigtwin(machine_config &config);
+	void hotmind(machine_config &config);
+	void bigtwinb(machine_config &config);
+	void excelsr(machine_config &config);
+	void bigtwin_main_map(address_map &map);
+	void bigtwinb_main_map(address_map &map);
+	void excelsr_main_map(address_map &map);
+	void hotmind_main_map(address_map &map);
+	void hrdtimes_main_map(address_map &map);
+	void luckboomh_main_map(address_map &map);
+	void oki_map(address_map &map);
+	void wbeachvl_main_map(address_map &map);
 };

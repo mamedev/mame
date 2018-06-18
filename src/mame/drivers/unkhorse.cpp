@@ -23,6 +23,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -53,7 +54,9 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void horse(machine_config &config);
+	void horse_io_map(address_map &map);
+	void horse_map(address_map &map);
 };
 
 void horse_state::machine_start()
@@ -96,16 +99,18 @@ uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_READWRITE(colorram_r, colorram_w)
-ADDRESS_MAP_END
+void horse_state::horse_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0x4000, 0x40ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x6000, 0x7fff).ram().share("vram");
+	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+}
 
-static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
-	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void horse_state::horse_io_map(address_map &map)
+{
+	map(0x40, 0x47).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 
 READ8_MEMBER(horse_state::input_r)
@@ -185,24 +190,17 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(horse_state::interrupt)
-{
-	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
-}
-
-static MACHINE_CONFIG_START( horse )
+MACHINE_CONFIG_START(horse_state::horse)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(horse_map)
-	MCFG_CPU_IO_MAP(horse_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(horse_map)
+	MCFG_DEVICE_IO_MAP(horse_io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL_12MHz / 2) // port A input, B output, C output but unused
-	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, horse_state, input_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, horse_state, output_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -211,12 +209,13 @@ static MACHINE_CONFIG_START( horse )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -240,4 +239,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 1981?, unkhorse, 0, horse, horse, horse_state, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
+GAME( 1981?, unkhorse, 0, horse, horse, horse_state, empty_init, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981

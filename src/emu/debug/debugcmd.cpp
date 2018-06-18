@@ -163,6 +163,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("focus",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1, _2));
 	m_console.register_command("ignore",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_ignore, this, _1, _2));
 	m_console.register_command("observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_observe, this, _1, _2));
+	m_console.register_command("suspend",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1, _2));
+	m_console.register_command("resume",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1, _2));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
 	m_console.register_command("//",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
@@ -205,6 +207,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("ss",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
 	m_console.register_command("stateload", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
 	m_console.register_command("sl",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
+
+	m_console.register_command("rewind",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
+	m_console.register_command("rw",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
 
 	m_console.register_command("save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
@@ -436,7 +441,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	}
 
 	/* first look for a tag match */
-	result = m_machine.device(param);
+	result = m_machine.root_device().subdevice(param);
 	if (result)
 		return true;
 
@@ -1020,6 +1025,109 @@ void debugger_commands::execute_observe(int ref, const std::vector<std::string> 
 	}
 }
 
+/*-------------------------------------------------
+    execute_suspend - suspend execution on cpu
+-------------------------------------------------*/
+
+void debugger_commands::execute_suspend(int ref, const std::vector<std::string> &params)
+{
+	/* if there are no parameters, dump the ignore list */
+	if (params.empty())
+	{
+		std::string buffer;
+
+		/* loop over all executable devices */
+		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+
+			/* build up a comma-separated list */
+			if (exec.device().debug()->suspended())
+			{
+				if (buffer.empty())
+					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				else
+					buffer.append(string_format(", '%s'", exec.device().tag()));
+			}
+
+		/* special message for none */
+		if (buffer.empty())
+			buffer = string_format("No currently suspended devices");
+		m_console.printf("%s\n", buffer.c_str());
+	}
+	else
+	{
+		device_t *devicelist[MAX_COMMAND_PARAMS];
+
+		/* validate parameters */
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+			if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
+				return;
+
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+		{
+			/* make sure this isn't the last live CPU */
+			bool gotone = false;
+			for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+				if (&exec.device() != devicelist[paramnum] && !exec.device().debug()->suspended())
+				{
+					gotone = true;
+					break;
+				}
+			if (!gotone)
+			{
+				m_console.printf("Can't suspend all devices!\n");
+				return;
+			}
+
+			devicelist[paramnum]->debug()->suspend(true);
+			m_console.printf("Suspended device '%s'\n", devicelist[paramnum]->tag());
+		}
+	}
+}
+
+/*-------------------------------------------------
+    execute_resume - Resume execution on CPU
+-------------------------------------------------*/
+
+void debugger_commands::execute_resume(int ref, const std::vector<std::string> &params)
+{
+	/* if there are no parameters, dump the ignore list */
+	if (params.empty())
+	{
+		std::string buffer;
+
+		/* loop over all executable devices */
+		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+
+			/* build up a comma-separated list */
+			if (exec.device().debug()->suspended())
+			{
+				if (buffer.empty())
+					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				else
+					buffer.append(string_format(", '%s'", exec.device().tag()));
+			}
+
+		/* special message for none */
+		if (buffer.empty())
+			buffer = string_format("No currently suspended devices");
+		m_console.printf("%s\n", buffer.c_str());
+	}
+	else
+	{
+		device_t *devicelist[MAX_COMMAND_PARAMS];
+
+		/* validate parameters */
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+			if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
+				return;
+
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+		{
+			devicelist[paramnum]->debug()->suspend(false);
+			m_console.printf("Resumed device '%s'\n", devicelist[paramnum]->tag());
+		}
+	}
+}
 
 /*-------------------------------------------------
     execute_comment - add a comment to a line
@@ -1413,8 +1521,8 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 				for (device_debug::watchpoint *wp = device.debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
 					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							wp->space().addrchars(), wp->space().byte_to_address(wp->address()),
-							wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1,
+							wp->space().addrchars(), wp->address(),
+							wp->space().addrchars(), wp->address() + wp->length() - 1,
 							types[wp->type() & 3]);
 					if (std::string(wp->condition()).compare("1") != 0)
 						buffer.append(string_format(" if %s", wp->condition()));
@@ -1627,13 +1735,32 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
 	const std::string &filename(params[0]);
 	m_machine.immediate_load(filename.c_str());
 
-	// Clear all PC & memory tracks
+	// clear all PC & memory tracks
 	for (device_t &device : device_iterator(m_machine.root_device()))
 	{
 		device.debug()->track_pc_data_clear();
 		device.debug()->track_mem_data_clear();
 	}
 	m_console.printf("State load attempted.  Please refer to window message popup for results.\n");
+}
+
+
+/*-------------------------------------------------
+    execute_rewind - execute the rewind command
+-------------------------------------------------*/
+
+void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &params)
+{
+	bool success = m_machine.rewind_step();
+	if (success)
+		// clear all PC & memory tracks
+		for (device_t &device : device_iterator(m_machine.root_device()))
+		{
+			device.debug()->track_pc_data_clear();
+			device.debug()->track_mem_data_clear();
+		}
+	else
+		m_console.printf("Rewind error occured.  See error.log for details.\n");
 }
 
 
@@ -1669,7 +1796,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effects();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -1895,7 +2022,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	else if(shift < 0)
 		width >>= -shift;
 
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
 	for (offs_t i = offset; i <= endoffset; i += rowsize)
@@ -1917,13 +2044,13 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 					switch (width)
 					{
 					case 8:
-						util::stream_format(output, " %016X", space->read_qword(i+j));
+						util::stream_format(output, " %016X", space->read_qword_unaligned(i+j));
 						break;
 					case 4:
-						util::stream_format(output, " %08X", space->read_dword(i+j));
+						util::stream_format(output, " %08X", space->read_dword_unaligned(i+j));
 						break;
 					case 2:
-						util::stream_format(output, " %04X", space->read_word(i+j));
+						util::stream_format(output, " %04X", space->read_word_unaligned(i+j));
 						break;
 					case 1:
 						util::stream_format(output, " %02X", space->read_byte(i+j));
@@ -1943,7 +2070,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
@@ -1952,20 +2079,20 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 					switch (width)
 					{
 					case 8:
-						data = space->read_qword(i+j);
+						data = space->read_qword_unaligned(i+j);
 						break;
 					case 4:
-						data = space->read_dword(i+j);
+						data = space->read_dword_unaligned(i+j);
 						break;
 					case 2:
-						data = space->read_word(i+j);
+						data = space->read_word_unaligned(i+j);
 						break;
 					case 1:
 						data = space->read_byte(i+j);
 						break;
 					}
 					for (unsigned int b = 0; b != width; b++) {
-						u8 byte = data >> (8 * (be ? (width-i-b) : b));
+						u8 byte = data >> (8 * (be ? (width-1-b) : b));
 						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 					}
 				}
@@ -2452,8 +2579,8 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 		return;
 
 	/* further validation */
-	endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	endoffset = space->address_to_byte_end((offset + length - 1) & space->addrmask());
+	offset = space->address_to_byte(offset & space->addrmask());
 	cur_data_size = space->addr_shift() > 0 ? 2 : 1 << -space->addr_shift();
 	if (cur_data_size == 0)
 		cur_data_size = 1;
@@ -2505,10 +2632,10 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 		{
 			switch (data_size[j])
 			{
-				case 1: match = (u8(m_cpu.read_byte(*space, i + suboffset, true)) == u8(data_to_find[j]));    break;
-				case 2: match = (u16(m_cpu.read_word(*space, i + suboffset, true)) == u16(data_to_find[j]));  break;
-				case 4: match = (u32(m_cpu.read_dword(*space, i + suboffset, true)) == u32(data_to_find[j])); break;
-				case 8: match = (u64(m_cpu.read_qword(*space, i + suboffset, true)) == u64(data_to_find[j])); break;
+				case 1: match = (u8(m_cpu.read_byte(*space, space->byte_to_address(i + suboffset), true)) == u8(data_to_find[j]));    break;
+				case 2: match = (u16(m_cpu.read_word(*space, space->byte_to_address(i + suboffset), true)) == u16(data_to_find[j]));  break;
+				case 4: match = (u32(m_cpu.read_dword(*space, space->byte_to_address(i + suboffset), true)) == u32(data_to_find[j])); break;
+				case 8: match = (u64(m_cpu.read_qword(*space, space->byte_to_address(i + suboffset), true)) == u64(data_to_find[j])); break;
 				default:    /* all other cases are wildcards */     break;
 			}
 			suboffset += data_size[j] & 0x0f;
@@ -2756,7 +2883,7 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 	}
 
 	debug_disasm_buffer buffer(space->device());
-	
+
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);
@@ -2798,7 +2925,7 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
 		// Insert current pc
 		if (m_cpu.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->safe_pcbase();
+			const offs_t pc = cpu->state().pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");

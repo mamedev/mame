@@ -17,27 +17,28 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class albazc_state : public driver_device
 {
 public:
-	albazc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	albazc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram3(*this, "spriteram3"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper") { }
+		m_hopper(*this, "hopper")
+	{ }
 
+	void hanaroku(machine_config &config);
+
+protected:
 	/* video-related */
-	required_shared_ptr<uint8_t> m_spriteram1;
-	required_shared_ptr<uint8_t> m_spriteram2;
-	required_shared_ptr<uint8_t> m_spriteram3;
-	uint8_t m_flip_bit;
 	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
@@ -46,6 +47,13 @@ public:
 	DECLARE_PALETTE_INIT(albazc);
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hanaroku_map(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_spriteram1;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_spriteram3;
+	uint8_t m_flip_bit;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -174,23 +182,24 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 
 /* main cpu */
 
-static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("spriteram3")
-	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP    // ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)   // ???
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // ??? always 0x40
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM         // main ram
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE(hanaroku_out_2_w)
-ADDRESS_MAP_END
+void albazc_state::hanaroku_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("spriteram1");
+	map(0x9000, 0x97ff).ram().share("spriteram2");
+	map(0xa000, 0xa1ff).ram().share("spriteram3");
+	map(0xa200, 0xa2ff).nopw();    // ??? written once during P.O.S.T.
+	map(0xa300, 0xa304).w(FUNC(albazc_state::albazc_vregs_w));   // ???
+	map(0xb000, 0xb000).nopw();    // ??? always 0x40
+	map(0xc000, 0xc3ff).ram();         // main ram
+	map(0xc400, 0xc4ff).ram().share("nvram");
+	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xe000, 0xe000).portr("IN0").w(FUNC(albazc_state::hanaroku_out_0_w));
+	map(0xe001, 0xe001).portr("IN1");
+	map(0xe002, 0xe002).portr("IN2").w(FUNC(albazc_state::hanaroku_out_1_w));
+	map(0xe004, 0xe004).portr("DSW3").w(FUNC(albazc_state::hanaroku_out_2_w));
+}
 
 
 static INPUT_PORTS_START( hanaroku )
@@ -217,7 +226,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_START("IN2")   /* 0xe002 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Data Clear")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // "Medal In"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // "Medal In"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 2")
@@ -266,16 +275,16 @@ static const gfx_layout hanaroku_charlayout =
 
 
 
-static GFXDECODE_START( hanaroku )
+static GFXDECODE_START( gfx_hanaroku )
 	GFXDECODE_ENTRY( "gfx1", 0, hanaroku_charlayout,   0, 32  )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( hanaroku )
+MACHINE_CONFIG_START(albazc_state::hanaroku)
 
-	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(hanaroku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hanaroku_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -290,15 +299,15 @@ static MACHINE_CONFIG_START( hanaroku )
 	MCFG_SCREEN_UPDATE_DRIVER(albazc_state, screen_update_hanaroku)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hanaroku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaroku)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(albazc_state, albazc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* ? MHz */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -321,4 +330,4 @@ ROM_START( hanaroku )
 ROM_END
 
 
-GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, albazc_state, 0, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanaroku, 0, hanaroku, hanaroku, albazc_state, empty_init, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

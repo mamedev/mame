@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class blmbycar_state : public driver_device
 {
 public:
@@ -58,7 +60,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	DECLARE_DRIVER_INIT(blmbycar);
+	void init_blmbycar();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(blmbycar);
 	DECLARE_MACHINE_RESET(blmbycar);
@@ -67,4 +69,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void watrball(machine_config &config);
+	void blmbycar(machine_config &config);
+	void blmbycar_map(address_map &map);
+	void blmbycar_oki_map(address_map &map);
+	void common_map(address_map &map);
+	void watrball_map(address_map &map);
 };

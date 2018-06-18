@@ -41,6 +41,7 @@ ToDo:
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -64,7 +65,7 @@ public:
 	{ }
 
 	DECLARE_PALETTE_INIT(mrgame);
-	DECLARE_DRIVER_INIT(mrgame);
+	void init_mrgame();
 	DECLARE_WRITE8_MEMBER(ack1_w);
 	DECLARE_WRITE8_MEMBER(ack2_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -85,6 +86,13 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void mrgame(machine_config &config);
+	void audio1_io(address_map &map);
+	void audio1_map(address_map &map);
+	void audio2_io(address_map &map);
+	void audio2_map(address_map &map);
+	void main_map(address_map &map);
+	void video_map(address_map &map);
 private:
 	bool m_ack1;
 	bool m_ack2;
@@ -109,55 +117,61 @@ private:
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mrgame_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x030000, 0x030001) AM_READ8(rsw_r, 0xff) //RSW ACK
-	AM_RANGE(0x030002, 0x030003) AM_WRITE8(sound_w, 0xff) //W SOUND
-	AM_RANGE(0x030004, 0x030005) AM_WRITE8(video_w, 0xff00) //W VID
-	AM_RANGE(0x030006, 0x030007) AM_WRITE8(triple_w, 0xff) //W CS
-	AM_RANGE(0x030008, 0x030009) AM_WRITENOP //W DATA - lamp/sol data
-	AM_RANGE(0x03000a, 0x03000b) AM_WRITE8(row_w, 0xff) //W ROW
-	AM_RANGE(0x03000c, 0x03000d) AM_READ8(col_r, 0xff) //R COL
-	AM_RANGE(0x03000e, 0x03000f) AM_WRITENOP //EXT ADD - lamp/sol data
-ADDRESS_MAP_END
+void mrgame_state::main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("roms", 0);
+	map(0x020000, 0x02ffff).ram().share("nvram");
+	map(0x030001, 0x030001).r(FUNC(mrgame_state::rsw_r)); //RSW ACK
+	map(0x030003, 0x030003).w(FUNC(mrgame_state::sound_w)); //W SOUND
+	map(0x030004, 0x030004).w(FUNC(mrgame_state::video_w)); //W VID
+	map(0x030007, 0x030007).w(FUNC(mrgame_state::triple_w)); //W CS
+	map(0x030008, 0x030009).nopw(); //W DATA - lamp/sol data
+	map(0x03000b, 0x03000b).w(FUNC(mrgame_state::row_w)); //W ROW
+	map(0x03000d, 0x03000d).r(FUNC(mrgame_state::col_r)); //R COL
+	map(0x03000e, 0x03000f).nopw(); //EXT ADD - lamp/sol data
+}
 
-static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, mrgame_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("video", 0)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("objectram")
-	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(video_ctrl_w)
-	AM_RANGE(0x7000, 0x77ff) AM_READNOP //AFR - looks like a watchdog
-	AM_RANGE(0x8100, 0x8103) AM_MIRROR(0x7efc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void mrgame_state::video_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("video", 0);
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().share("objectram");
+	map(0x6800, 0x6807).mirror(0x07f8).w(FUNC(mrgame_state::video_ctrl_w));
+	map(0x7000, 0x77ff).nopr(); //AFR - looks like a watchdog
+	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-static ADDRESS_MAP_START( audio1_map, AS_PROGRAM, 8, mrgame_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audio1", 0)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mrgame_state::audio1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audio1", 0);
+	map(0xfc00, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( audio1_io, AS_IO, 8, mrgame_state )
-	ADDRESS_MAP_GLOBAL_MASK(3)
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacvol", dac_byte_interface, write) //DA1
-	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN1
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack1_w) //AKL1
-	AM_RANGE(0x0003, 0x0003) AM_WRITENOP //SGS pass data to M114
-ADDRESS_MAP_END
+void mrgame_state::audio1_io(address_map &map)
+{
+	map.global_mask(3);
+	map(0x0000, 0x0000).w("dacvol", FUNC(dac_byte_interface::data_w)); //DA1
+	map(0x0001, 0x0001).r(FUNC(mrgame_state::sound_r)); //IN1
+	map(0x0002, 0x0002).w(FUNC(mrgame_state::ack1_w)); //AKL1
+	map(0x0003, 0x0003).nopw(); //SGS pass data to M114
+}
 
-static ADDRESS_MAP_START( audio2_map, AS_PROGRAM, 8, mrgame_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audio2", 0)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mrgame_state::audio2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audio2", 0);
+	map(0xfc00, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( audio2_io, AS_IO, 8, mrgame_state )
-	ADDRESS_MAP_GLOBAL_MASK(7)
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("ldac", dac_byte_interface, write) //DA2
-	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN2
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack2_w) //AKL2
-	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w) //Speech
-	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("rdac", dac_byte_interface, write) //DA3
-ADDRESS_MAP_END
+void mrgame_state::audio2_io(address_map &map)
+{
+	map.global_mask(7);
+	map(0x0000, 0x0000).w("ldac", FUNC(dac_byte_interface::data_w)); //DA2
+	map(0x0001, 0x0001).r(FUNC(mrgame_state::sound_r)); //IN2
+	map(0x0002, 0x0002).w(FUNC(mrgame_state::ack2_w)); //AKL2
+	map(0x0003, 0x0003).rw("tms", FUNC(tms5220_device::status_r), FUNC(tms5220_device::data_w)); //Speech
+	map(0x0004, 0x0004).w("rdac", FUNC(dac_byte_interface::data_w)); //DA3
+}
 
 static INPUT_PORTS_START( mrgame )
 	PORT_START("DSW0")
@@ -320,7 +334,7 @@ void mrgame_state::machine_reset()
 	m_row_data = 0;
 }
 
-DRIVER_INIT_MEMBER( mrgame_state, mrgame )
+void mrgame_state::init_mrgame()
 {
 }
 
@@ -366,7 +380,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( mrgame )
+static GFXDECODE_START( gfx_mrgame )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -460,20 +474,20 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mrgame )
+MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
-	MCFG_CPU_ADD("videocpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(video_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
-	MCFG_CPU_ADD("audiocpu1", Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(audio1_map)
-	MCFG_CPU_IO_MAP(audio1_io)
-	MCFG_CPU_ADD("audiocpu2", Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(audio2_map)
-	MCFG_CPU_IO_MAP(audio2_io)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
+	MCFG_DEVICE_ADD("videocpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(video_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("audiocpu1", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(audio1_map)
+	MCFG_DEVICE_IO_MAP(audio1_io)
+	MCFG_DEVICE_ADD("audiocpu2", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(audio2_map)
+	MCFG_DEVICE_IO_MAP(audio2_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -487,19 +501,20 @@ static MACHINE_CONFIG_START( mrgame )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(mrgame_state, mrgame)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrgame)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrgame)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
+	MCFG_DEVICE_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
 	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -507,9 +522,9 @@ static MACHINE_CONFIG_START( mrgame )
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mrgame_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mrgame_state, portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mrgame_state, portc_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mrgame_state, porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mrgame_state, portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mrgame_state, portc_r))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -665,8 +680,8 @@ ROM_START(wcup90)
 ROM_END
 
 
-GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL)

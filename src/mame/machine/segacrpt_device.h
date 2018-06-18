@@ -10,30 +10,30 @@
 
 
 #define MCFG_SEGACRPT_SET_DECRYPTED_TAG(_tag) \
-	segacrpt_z80_device::set_decrypted_tag(*device, _tag);
+	downcast<segacrpt_z80_device &>(*device).set_decrypted_tag(_tag);
 
 #define MCFG_SEGACRPT_SET_DECRYPTED_PTR(_tag) \
-	segacrpt_z80_device::set_decrypted_ptr(*device, _ptr);
+	downcast<segacrpt_z80_device &>(*device).set_decrypted_ptr(_ptr);
 
 #define MCFG_SEGACRPT_SET_SIZE(_size) \
-	segacrpt_z80_device::set_size(*device, _size);
+	downcast<segacrpt_z80_device &>(*device).set_size(_size);
 
 #define MCFG_SEGACRPT_SET_NUMBANKS(_numbanks) \
-	segacrpt_z80_device::set_numbanks(*device, _numbanks);
+	downcast<segacrpt_z80_device &>(*device).set_numbanks(_numbanks);
 
 #define MCFG_SEGACRPT_SET_BANKSIZE(_banksize) \
-	segacrpt_z80_device::set_banksize(*device, _banksize);
+	downcast<segacrpt_z80_device &>(*device).set_banksize(_banksize);
 
 
 // base class
 class segacrpt_z80_device : public z80_device
 {
 public:
-	static void set_decrypted_tag(device_t &device, const char* decrypted_tag);
-	static void set_decrypted_ptr(device_t &device, uint8_t* ptr); // toprollr
-	static void set_size(device_t &device, int size);
-	static void set_numbanks(device_t &device, int _numbanks);
-	static void set_banksize(device_t &device, int _banksize);
+	void set_decrypted_tag(const char* decrypted_tag) { m_decrypted_tag = decrypted_tag; }
+	void set_decrypted_ptr(uint8_t* ptr) { m_decrypted_ptr = ptr; } // toprollr
+	void set_size(int size) { m_decode_size = size; }
+	void set_numbanks(int numbanks) { m_numbanks = numbanks; }
+	void set_banksize(int banksize) { m_banksize = banksize; }
 
 	void set_decrypted_p(uint8_t* ptr);
 	void set_region_p(uint8_t* ptr);

@@ -27,6 +27,9 @@ public:
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 
+	void lft(machine_config &config);
+	void lft_io(address_map &map);
+	void lft_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -34,22 +37,24 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START(lft_mem, AS_PROGRAM, 16, lft_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x5ffff) AM_RAM
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void lft_state::lft_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x5ffff).ram();
+	map(0xfc000, 0xfffff).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START(lft_io, AS_IO, 16, lft_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void lft_state::lft_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// screen 1
-	AM_RANGE(0x00, 0x01) AM_READNOP
-	AM_RANGE(0x04, 0x05) AM_READWRITE(keyin_r,term_w)
+	map(0x00, 0x01).nopr();
+	map(0x04, 0x05).rw(FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
 	// screen 2
-	AM_RANGE(0x02, 0x03) AM_READNOP
-	AM_RANGE(0x06, 0x07) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x02, 0x03).nopr();
+	map(0x06, 0x07).nopw();
+}
 
 
 /* Input ports */
@@ -83,11 +88,11 @@ void lft_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( lft )
+MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 4000000) // no idea
-	MCFG_CPU_PROGRAM_MAP(lft_mem)
-	MCFG_CPU_IO_MAP(lft_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, 4000000) // no idea
+	MCFG_DEVICE_PROGRAM_MAP(lft_mem)
+	MCFG_DEVICE_IO_MAP(lft_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -113,6 +118,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT   COMPANY  FULLNAME    FLAGS
-COMP( ????, lft1510, 0,       0,      lft,     lft,   lft_state, 0,     "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
-COMP( ????, lft1230, lft1510, 0,      lft,     lft,   lft_state, 0,     "LFT",   "LFT 1230", MACHINE_IS_SKELETON)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME    FLAGS
+COMP( ????, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
+COMP( ????, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1230", MACHINE_IS_SKELETON)

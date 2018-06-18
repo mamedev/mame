@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class megazone_state : public driver_device
 {
 public:
@@ -61,5 +63,11 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(megazone);
 	uint32_t screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void megazone(machine_config &config);
+	void megazone_i8039_io_map(address_map &map);
+	void megazone_i8039_map(address_map &map);
+	void megazone_map(address_map &map);
+	void megazone_sound_io_map(address_map &map);
+	void megazone_sound_map(address_map &map);
 };

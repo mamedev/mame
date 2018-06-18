@@ -38,13 +38,19 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
+
+private:
+	//DECLARE_WRITE_LINE_MEMBER(tms_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(tms_readyq_callback);
+	uint8_t m_writelatch_data; // 74ls373 latch
+	bool m_readlatch_flag; // 74c74 1st half
+	bool m_writelatch_flag; // 74c74 2nd half
 };
 
 // device type definition
-extern const device_type A2BUS_ECHOII;
 DECLARE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device)
 
 #endif // MAME_BUS_A2BUS_A2ECHOII_H

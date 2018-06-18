@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(ABC_KEYBOARD_PORT, abc_keyboard_port_device, "abc_keyboard_po
 //-------------------------------------------------
 
 abc_keyboard_interface::abc_keyboard_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_slot_card_interface(mconfig, device)
 {
 	m_slot = dynamic_cast<abc_keyboard_port_device *>(device.owner());
 }
@@ -54,12 +54,27 @@ abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void abc_keyboard_port_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<abc_keyboard_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement abc_keyboard_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void abc_keyboard_port_device::device_start()
 {
-	m_card = dynamic_cast<abc_keyboard_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<abc_keyboard_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement abc_keyboard_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_out_rx_handler.resolve_safe();
@@ -74,8 +89,6 @@ void abc_keyboard_port_device::device_start()
 
 void abc_keyboard_port_device::device_reset()
 {
-	if (m_card != nullptr)
-		get_card_device()->reset();
 }
 
 
@@ -129,9 +142,10 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::keydown_w )
 #include "abc77.h"
 #include "abc99.h"
 
-SLOT_INTERFACE_START( abc_keyboard_devices )
-	SLOT_INTERFACE("abc800", ABC800_KEYBOARD)
-	SLOT_INTERFACE("abc55", ABC55)
-	SLOT_INTERFACE("abc77", ABC77)
-	SLOT_INTERFACE("abc99", ABC99)
-SLOT_INTERFACE_END
+void abc_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("abc800", ABC800_KEYBOARD);
+	device.option_add("abc55", ABC55);
+	device.option_add("abc77", ABC77);
+	device.option_add("abc99", ABC99);
+}

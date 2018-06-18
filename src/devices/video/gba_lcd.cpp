@@ -1560,7 +1560,7 @@ READ32_MEMBER(gba_lcd_device::video_r)
 	switch (offset)
 	{
 	case 0x0004/4:
-		retval = DISPSTAT | (machine().first_screen()->vpos() << 16);
+		retval = DISPSTAT | (screen().vpos() << 16);
 		break;
 	default:
 		if (ACCESSING_BITS_0_15)
@@ -1620,34 +1620,6 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 	}
 }
 
-static inline uint32_t combine_data_32_16(uint32_t prev, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&prev);
-
-	switch (mem_mask)
-	{
-	case 0x000000ff:
-		prev &= 0xffff00ff;
-		prev |= data << 8;
-		break;
-	case 0x0000ff00:
-		prev &= 0xffffff00;
-		prev |= data >> 8;
-		break;
-	case 0x00ff0000:
-		prev &= 0x00ffffff;
-		prev |= data << 8;
-		break;
-	case 0xff000000:
-		prev &= 0xff00ffff;
-		prev |= data >> 8;
-		break;
-	default:
-		break;
-	}
-	return prev;
-}
-
 READ32_MEMBER(gba_lcd_device::gba_pram_r)
 {
 	return m_pram[offset];
@@ -1655,7 +1627,7 @@ READ32_MEMBER(gba_lcd_device::gba_pram_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_pram_w)
 {
-	m_pram[offset] = combine_data_32_16(m_pram[offset], data, mem_mask);
+	COMBINE_DATA(&m_pram[offset]);
 }
 
 READ32_MEMBER(gba_lcd_device::gba_vram_r)
@@ -1665,7 +1637,7 @@ READ32_MEMBER(gba_lcd_device::gba_vram_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_vram_w)
 {
-	m_vram[offset] = combine_data_32_16(m_vram[offset], data, mem_mask);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 READ32_MEMBER(gba_lcd_device::gba_oam_r)
@@ -1675,12 +1647,12 @@ READ32_MEMBER(gba_lcd_device::gba_oam_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_oam_w)
 {
-	m_oam[offset] = combine_data_32_16(m_oam[offset], data, mem_mask);
+	COMBINE_DATA(&m_oam[offset]);
 }
 
 TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 {
-	int scanline = machine().first_screen()->vpos();
+	int scanline = screen().vpos();
 
 	// reload LCD controller internal registers from I/O ones at vblank
 	if (scanline == 0)
@@ -1716,7 +1688,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	clear(dispstat::hblank);
 	clear(dispstat::vcount);
 
-	int scanline = machine().first_screen()->vpos();
+	int scanline = screen().vpos();
 
 	// VBLANK is set for scanlines 160 through 226 (but not 227, which is the last line)
 	if (scanline >= 160 && scanline < 227)
@@ -1753,8 +1725,8 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		}
 	}
 
-	m_hbl_timer->adjust(machine().first_screen()->time_until_pos(scanline, 240));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos((scanline + 1) % 228, 0));
+	m_hbl_timer->adjust(screen().time_until_pos(scanline, 240));
+	m_scan_timer->adjust(screen().time_until_pos((scanline + 1) % 228, 0));
 }
 
 PALETTE_INIT_MEMBER(gba_lcd_device, gba)
@@ -1791,12 +1763,12 @@ void gba_lcd_device::device_start()
 	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
 	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);
 
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	/* create a timer to fire scanline functions */
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_scan),this));
 	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_hbl),this));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scan_timer->adjust(screen().time_until_pos(0, 0));
 
 	save_item(NAME(m_regs));
 
@@ -1828,13 +1800,13 @@ void gba_lcd_device::device_reset()
 	m_bg3x = { 0, false };
 	m_bg3y = { 0, false };
 
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scan_timer->adjust(screen().time_until_pos(0, 0));
 	m_hbl_timer->adjust(attotime::never);
 }
 
-MACHINE_CONFIG_MEMBER(gba_lcd_device::device_add_mconfig)
+MACHINE_CONFIG_START(gba_lcd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz / 4, 308, 0, 240, 228, 0, 160)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -181,7 +181,7 @@ offs_t lr35902_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	int8_t offset;
 	uint8_t op, op1;
 	uint16_t ea;
-	int pos = 0;
+	int pos = pc;
 
 	//symbol = nullptr;
 
@@ -255,5 +255,5 @@ offs_t lr35902_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
-	return pos | s_flags[d->mnemonic] | SUPPORTED;
+	return (pos - pc) | s_flags[d->mnemonic] | SUPPORTED;
 }

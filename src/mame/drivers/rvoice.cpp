@@ -84,16 +84,19 @@ public:
 	rvoicepc_t m_rvoicepc;
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
-	DECLARE_DRIVER_INIT(rvoicepc);
+	void init_rvoicepc();
 	virtual void machine_reset() override;
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
+	void rvoicepc(machine_config &config);
+	void hd63701_main_io(address_map &map);
+	void hd63701_main_mem(address_map &map);
 };
 
 
 /* Devices */
 
-DRIVER_INIT_MEMBER(rvoice_state,rvoicepc)
+void rvoice_state::init_rvoicepc()
 {
 }
 
@@ -139,7 +142,7 @@ void rvoice_state::machine_reset()
 READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 {
 	uint8_t data = 0;
-	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", space.device().safe_pc(), offset);
+	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", m_maincpu->pc(), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -221,7 +224,7 @@ READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 
 WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
 {
-	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", space.device().safe_pc(), offset);
+	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", m_maincpu->pc(), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -331,18 +334,21 @@ WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(hd63701_main_mem, AS_PROGRAM, 8, rvoice_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0027) AM_READWRITE(main_hd63701_internal_registers_r, main_hd63701_internal_registers_w) // INTERNAL REGS
-	AM_RANGE(0x0040, 0x013f) AM_RAM // INTERNAL RAM (overlaps acia)
-	AM_RANGE(0x0060, 0x007f) AM_DEVREADWRITE("acia65c51", mos6551_device, read, write) // ACIA 65C51
-	AM_RANGE(0x2000, 0x7fff) AM_RAM // EXTERNAL SRAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM // 27512 EPROM
-ADDRESS_MAP_END
+void rvoice_state::hd63701_main_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0027).rw(FUNC(rvoice_state::main_hd63701_internal_registers_r), FUNC(rvoice_state::main_hd63701_internal_registers_w)); // INTERNAL REGS
+	map(0x0040, 0x005f).ram(); // INTERNAL RAM (overlaps acia)
+	map(0x0060, 0x007f).rw("acia65c51", FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // ACIA 65C51
+	map(0x0080, 0x013f).ram(); // INTERNAL RAM (overlaps acia)
+	map(0x2000, 0x7fff).ram(); // EXTERNAL SRAM
+	map(0x8000, 0xffff).rom(); // 27512 EPROM
+}
 
-static ADDRESS_MAP_START(hd63701_main_io, AS_IO, 8, rvoice_state )
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void rvoice_state::hd63701_main_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 /******************************************************************************
@@ -358,19 +364,19 @@ void rvoice_state::null_kbd_put(u8 data)
 {
 }
 
-static MACHINE_CONFIG_START( rvoicepc )
+MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
-	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)
-	MCFG_CPU_IO_MAP(hd63701_main_io)
+	MCFG_DEVICE_ADD("maincpu", HD63701, XTAL(7'372'800))
+	MCFG_DEVICE_PROGRAM_MAP(hd63701_main_mem)
+	MCFG_DEVICE_IO_MAP(hd63701_main_io)
 
-	//MCFG_CPU_ADD("playercpu", HD63701, XTAL_7_3728MHz) // not dumped yet
-	//MCFG_CPU_PROGRAM_MAP(hd63701_slave_mem)
-	//MCFG_CPU_IO_MAP(hd63701_slave_io)
+	//MCFG_DEVICE_ADD("playercpu", HD63701, XTAL(7'372'800)) // not dumped yet
+	//MCFG_DEVICE_PROGRAM_MAP(hd63701_slave_mem)
+	//MCFG_DEVICE_IO_MAP(hd63701_slave_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("acia65c51", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
@@ -401,5 +407,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE         INIT      COMPANY                           FULLNAME        FLAGS
-COMP( 1988?, rvoicepc, 0,      0,      rvoicepc, rvoicepc, rvoice_state, rvoicepc, "Adaptive Communication Systems", "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY                           FULLNAME        FLAGS
+COMP( 1988?, rvoicepc, 0,      0,      rvoicepc, rvoicepc, rvoice_state, init_rvoicepc, "Adaptive Communication Systems", "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

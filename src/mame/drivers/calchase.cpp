@@ -15,6 +15,9 @@ Other games known to be on this hardware (if ever finished):
 - Tiger Odds (c) The Game Room
 - one other unnamed/unfinished game
 
+Notes:
+- calchase: type boot to load game
+
 TODO:
 - get Win 98 to boot (most of Windows 98 copy is damaged inside current HDD dump);
 - Various graphics bugs (title screen uses ROZ?);
@@ -97,7 +100,7 @@ Grull Osgo - Improvements
 
 -Changes about BIOS memory management so ROM Shadow now works properly.
  The changes are:
-    Rom Memory Map remmapped to 128K size AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+    Rom Memory Map remmapped to 128K size map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 
 -Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
 compatible with chipset VIA.
@@ -165,28 +168,39 @@ public:
 	DECLARE_READ16_MEMBER(calchase_iocard5_r);
 	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
 	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
-	DECLARE_DRIVER_INIT(calchase);
-	DECLARE_DRIVER_INIT(hostinv);
+	void init_calchase();
+	void init_hostinv();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void calchase(machine_config &config);
+	void hostinv(machine_config &config);
+	void calchase_io(address_map &map);
+	void calchase_map(address_map &map);
+
+	uint8_t mtxc_config_r(int function, int reg);
+	void mtxc_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint8_t piix4_config_r(int function, int reg);
+	void piix4_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // Intel 82439TX System Controller (MTXC)
 // TODO: change with a VIA82C585VPX (North Bridge - APOLLO Chipset)
 
-static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t calchase_state::mtxc_config_r(int function, int reg)
 {
-	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
 
-	return state->m_mtxc_config_reg[reg];
+	return m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 
 	/*
 	memory banking with North Bridge:
@@ -201,16 +215,16 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 	if (reg == 0x63)
 	{
 		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
-			state->membank("bios_bank")->set_base(state->m_bios_ram.get());
+			membank("bios_bank")->set_base(m_bios_ram.get());
 		else                    // disable RAM access (reads go to BIOS ROM)
-			state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
+			membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
 		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
-			state->membank("bios_ext")->set_base(state->m_bios_ext_ram.get());
+			membank("bios_ext")->set_base(m_bios_ext_ram.get());
 		else
-			state->membank("bios_ext")->set_base(state->memregion("bios")->base() + 0);
+			membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 	}
 
-	state->m_mtxc_config_reg[reg] = data;
+	m_mtxc_config_reg[reg] = data;
 }
 
 void calchase_state::intel82439tx_init()
@@ -223,7 +237,7 @@ void calchase_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t calchase_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -232,61 +246,59 @@ static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int fu
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= mtxc_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= mtxc_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= mtxc_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= mtxc_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void calchase_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 //TODO: change with VIA82C586B (South Bridge - APOLLO Chipset)
 
-static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t calchase_state::piix4_config_r(int function, int reg)
 {
-	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return state->m_piix4_config_reg[function][reg];
+	return m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void calchase_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
-	state->m_piix4_config_reg[function][reg] = data;
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+	m_piix4_config_reg[function][reg] = data;
 }
 
-static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t calchase_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -295,40 +307,40 @@ static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int fu
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= piix4_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= piix4_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= piix4_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= piix4_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void calchase_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -375,76 +387,74 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 }
 
 
-static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000c8000, 0x000cffff) AM_NOP
-	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
-	AM_RANGE(0x000d0004, 0x000d0007) AM_READ16(calchase_iocard1_r, 0x0000ffff)
-	AM_RANGE(0x000d000c, 0x000d000f) AM_READ16(calchase_iocard2_r, 0x0000ffff)
-	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard3_r, 0xffff0000)
-	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard4_r, 0x0000ffff)
-	AM_RANGE(0x000d0034, 0x000d0037) AM_READ16(calchase_iocard5_r, 0x0000ffff)
-	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
-	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("ldac", dac_word_interface, write, 0x0000ffff)
-	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("rdac", dac_word_interface, write, 0x0000ffff)
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+void calchase_state::calchase_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
+	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
+	map(0x000c8000, 0x000cffff).noprw();
+	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
+	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::calchase_iocard1_r));
+	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::calchase_iocard2_r));
+	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::calchase_iocard3_r));
+	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::calchase_iocard4_r));
+	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::calchase_iocard5_r));
+	map(0x000d0008, 0x000d000b).nopw(); // ???
+	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
+	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
+	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
+//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
 
-	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
-	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
-	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
-	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
-	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
-	//AM_RANGE(0x10000000, 0x100001ff) AM_RAM
-	//AM_RANGE(0x14000000, 0x140001ff) AM_RAM
-	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
-	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
-	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
+	map(0x00100000, 0x03ffffff).ram();  // 64MB
+	map(0x04000000, 0x28ffffff).noprw();
+	//map(0x04000000, 0x040001ff).ram();
+	//map(0x08000000, 0x080001ff).ram();
+	//map(0x0c000000, 0x0c0001ff).ram();
+	//map(0x10000000, 0x100001ff).ram();
+	//map(0x14000000, 0x140001ff).ram();
+	//map(0x18000000, 0x180001ff).ram();
+	//map(0x20000000, 0x200001ff).ram();
+	//map(0x28000000, 0x280001ff).ram();
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
-	AM_IMPORT_FROM(pcat32_io_common)
-	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
-	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
-	AM_RANGE(0x0260, 0x026f) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
-	AM_RANGE(0x0280, 0x0287) AM_NOP //To debug
-	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
-	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
-	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x02ff) AM_NOP //To debug
-	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
-	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
-	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", trident_vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03e0, 0x03ef) AM_NOP //To debug
-	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
-	// AM_RANGE(0x0300, 0x03af) AM_NOP
-	// AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
-	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
-	AM_RANGE(0x43c4, 0x43cb) AM_DEVREADWRITE8("vga", trident_vga_device, port_43c6_r, port_43c6_w, 0xffffffff)  // Trident Memory and Video Clock register
-	AM_RANGE(0x46e8, 0x46ef) AM_NOP //To debug
-	AM_RANGE(0x4ae8, 0x4aef) AM_NOP //To debug
-	AM_RANGE(0x83c4, 0x83cb) AM_DEVREADWRITE8("vga", trident_vga_device, port_83c6_r, port_83c6_w, 0xffffffff)  // Trident LUTDAC
-	AM_RANGE(0x92e8, 0x92ef) AM_NOP //To debug
-ADDRESS_MAP_END
+void calchase_state::calchase_io(address_map &map)
+{
+	pcat32_io_common(map);
+	//map(0x00e8, 0x00eb).noprw();
+	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
+	map(0x0170, 0x0177).noprw(); //To debug
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0200, 0x021f).noprw(); //To debug
+	map(0x0260, 0x026f).noprw(); //To debug
+	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
+	map(0x0280, 0x0287).noprw(); //To debug
+	map(0x02a0, 0x02a7).noprw(); //To debug
+	map(0x02c0, 0x02c7).noprw(); //To debug
+	map(0x02e0, 0x02ef).noprw(); //To debug
+	map(0x02f8, 0x02ff).noprw(); //To debug
+	map(0x0320, 0x038f).noprw(); //To debug
+	map(0x03a0, 0x03a7).noprw(); //To debug
+	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
+	map(0x03e0, 0x03ef).noprw(); //To debug
+	map(0x0378, 0x037f).noprw(); //To debug
+	// map(0x0300, 0x03af).noprw();
+	// map(0x03b0, 0x03df).noprw();
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
+	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	map(0x42e8, 0x43ef).noprw(); //To debug
+	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
+	map(0x46e8, 0x46ef).noprw(); //To debug
+	map(0x4ae8, 0x4aef).noprw(); //To debug
+	map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
+	map(0x92e8, 0x92ef).noprw(); //To debug
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -455,20 +465,47 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+//  AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+	// 0x0004, KEYCODE_0
+	// 0x0008, KEYCODE_1
+	// 0x0010, KEYCODE_2
+	// 0x0020, KEYCODE_3
+	// 0x0040, KEYCODE_4
+	// 0x0080, KEYCODE_5
+	// 0x0100, KEYCODE_6
+	// 0x0200, KEYCODE_7
+	// 0x0400, KEYCODE_8
+	// 0x0800, KEYCODE_9
+	// 0x1000, KEYCODE_MINUS
+	// 0x2000, KEYCODE_EQUAL
+	// 0x4000, KEYCODE_BACKSPACE
+	// 0x8000, KEYCODE_TAB
 
 	PORT_START("pc_keyboard_1")
+	// 0x0001, KEYCODE_Q
+	// 0x0002, KEYCODE_W
+	AT_KEYB_HELPER( 0x0004, "E",            KEYCODE_E           )
+	AT_KEYB_HELPER( 0x0008, "R",            KEYCODE_R           )
 	AT_KEYB_HELPER( 0x0010, "T",            KEYCODE_T           ) /* T                           14  94 */
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
+	// 0x0040, KEYCODE_U
+	AT_KEYB_HELPER( 0x0080, "I",            KEYCODE_I           )
 	AT_KEYB_HELPER( 0x0100, "O",            KEYCODE_O           ) /* O                           18  98 */
+	// 0x0200, KEYCODE_P
 	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
+	AT_KEYB_HELPER( 0x4000, "A",            KEYCODE_A          )
+	AT_KEYB_HELPER( 0x8000, "S",            KEYCODE_S           )
 
 	PORT_START("pc_keyboard_2")
+	AT_KEYB_HELPER( 0x0001, "D",            KEYCODE_D           )
+	AT_KEYB_HELPER( 0x0002, "F",            KEYCODE_F           )
+
 
 	PORT_START("pc_keyboard_3")
 	AT_KEYB_HELPER( 0x0001, "B",            KEYCODE_B           ) /* B                           30  B0 */
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
-	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
+	AT_KEYB_HELPER( 0x0200, "SPACE",        KEYCODE_SPACE       ) /* N                           31  B1 */
+	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_F1          ) /* F1                          3B  BB */
 //  AT_KEYB_HELPER( 0x8000, "F5",           KEYCODE_F5          )
 
 	PORT_START("pc_keyboard_4")
@@ -476,14 +513,15 @@ static INPUT_PORTS_START( calchase )
 
 	PORT_START("pc_keyboard_5")
 
+
 	PORT_START("pc_keyboard_6")
 	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
 	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
 	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",        KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
 	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
 	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",                      KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_DEL           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 
@@ -639,69 +677,71 @@ void calchase_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 }
 
-static MACHINE_CONFIG_START( calchase )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
-	MCFG_CPU_PROGRAM_MAP(calchase_map)
-	MCFG_CPU_IO_MAP(calchase_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+MACHINE_CONFIG_START(calchase_state::calchase)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
+	MCFG_DEVICE_PROGRAM_MAP(calchase_map)
+	MCFG_DEVICE_IO_MAP(calchase_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, calchase_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hostinv )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
-	MCFG_CPU_PROGRAM_MAP(calchase_map)
-	MCFG_CPU_IO_MAP(calchase_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+MACHINE_CONFIG_START(calchase_state::hostinv)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
+	MCFG_DEVICE_PROGRAM_MAP(calchase_map)
+	MCFG_DEVICE_IO_MAP(calchase_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, calchase_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
-	if(space.device().safe_pc()==0x1406f48)
+	if(m_maincpu->pc()==0x1406f48)
 		m_maincpu->spin_until_interrupt();
 
 	return m_idle_skip_ram;
@@ -712,7 +752,7 @@ WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
 	COMBINE_DATA(&m_idle_skip_ram);
 }
 
-DRIVER_INIT_MEMBER(calchase_state,calchase)
+void calchase_state::init_calchase()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
@@ -721,7 +761,7 @@ DRIVER_INIT_MEMBER(calchase_state,calchase)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
 }
 
-DRIVER_INIT_MEMBER(calchase_state, hostinv)
+void calchase_state::init_hostinv()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
@@ -773,6 +813,6 @@ ROM_START( eggsplc )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
 
-GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, eggsplc,   0,    calchase, calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )
+GAME( 1998, hostinv,  0, hostinv,  calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, calchase, 0, calchase, calchase, calchase_state, init_calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, eggsplc,  0, calchase, calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )

@@ -61,29 +61,30 @@ const tiny_rom_entry *cmd_hd_device::device_rom_region() const
 //  ADDRESS_MAP( cmd_hd_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cmd_hd_mem, AS_PROGRAM, 8, cmd_hd_device )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x1f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x1f0) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0x8800, 0x8803) AM_MIRROR(0x1fc) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x8c00, 0x8c0f) AM_MIRROR(0x1f0) AM_DEVREADWRITE(RTC72421A_TAG, rtc72421_device, read, write)
-	AM_RANGE(0x8f00, 0x8f00) AM_MIRROR(0xff) AM_WRITE(led_w)
-ADDRESS_MAP_END
+void cmd_hd_device::cmd_hd_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
+	map(0x8000, 0x800f).mirror(0x1f0).w(M6522_1_TAG, FUNC(via6522_device::write));
+	map(0x8400, 0x840f).mirror(0x1f0).w(M6522_2_TAG, FUNC(via6522_device::write));
+	map(0x8800, 0x8803).mirror(0x1fc).w(I8255A_TAG, FUNC(i8255_device::write));
+	map(0x8c00, 0x8c0f).mirror(0x1f0).w(RTC72421A_TAG, FUNC(rtc72421_device::write));
+	map(0x8f00, 0x8f00).mirror(0xff).w(FUNC(cmd_hd_device::led_w));
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cmd_hd_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6502_TAG, M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(cmd_hd_mem)
+MACHINE_CONFIG_START(cmd_hd_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(cmd_hd_mem)
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 2000000)
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 2000000)
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_DEVICE_ADD(RTC72421A_TAG, RTC72421, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RTC72421A_TAG, RTC72421, XTAL(32'768))
 
 	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)

@@ -302,13 +302,13 @@ READ16_MEMBER(midtunit_state::midwunit_control_r)
 WRITE16_MEMBER(midtunit_state::midxunit_paletteram_w)
 {
 	if (!(offset & 1))
-		m_palette->write(space, offset / 2, data, mem_mask);
+		m_palette->write16(space, offset / 2, data, mem_mask);
 }
 
 
 READ16_MEMBER(midtunit_state::midxunit_paletteram_r)
 {
-	return m_palette->read(space, offset / 2, mem_mask);
+	return m_palette->read16(space, offset / 2, mem_mask);
 }
 
 

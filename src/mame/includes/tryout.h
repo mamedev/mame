@@ -2,6 +2,7 @@
 // copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tryout_state : public driver_device
 {
@@ -58,4 +59,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void tryout(machine_config &config);
+	void main_cpu(address_map &map);
+	void sound_cpu(address_map &map);
 };

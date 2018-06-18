@@ -68,24 +68,6 @@ cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void cs8221_device::static_set_cputag(device_t &device, const char *tag)
-{
-	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
-	cs8221.m_cputag = tag;
-}
-
-void cs8221_device::static_set_isatag(device_t &device, const char *tag)
-{
-	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
-	cs8221.m_isatag = tag;
-}
-
-void cs8221_device::static_set_biostag(device_t &device, const char *tag)
-{
-	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
-	cs8221.m_biostag = tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -108,10 +90,11 @@ void cs8221_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
-DEVICE_ADDRESS_MAP_START( map, 16, cs8221_device )
-	AM_RANGE(0x0022, 0x0023) AM_DEVWRITE8("cs8221", cs8221_device, address_w, 0x00ff)
-	AM_RANGE(0x0022, 0x0023) AM_DEVREADWRITE8("cs8221", cs8221_device, data_r, data_w, 0xff00)
-ADDRESS_MAP_END
+void cs8221_device::map(address_map &map)
+{
+	map(0x0022, 0x0022).w("cs8221", FUNC(cs8221_device::address_w));
+	map(0x0023, 0x0023).rw("cs8221", FUNC(cs8221_device::data_r), FUNC(cs8221_device::data_w));
+}
 
 WRITE8_MEMBER( cs8221_device::address_w )
 {

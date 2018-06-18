@@ -212,10 +212,10 @@ static uint16_t gm(int i4)
 static uint32_t core_decrypt(uint32_t ciphertext, int i1, int i2, int i3, int i4,
 							const uint8_t *rotate, const uint8_t *x5, const uint16_t *x11, uint32_t preXor, uint32_t carryMask, uint32_t postXor)
 {
-	uint32_t v1 = BITSWAP32(yrot(ciphertext, rotate[i1]), 25,28,15,19, 6,0,3,24, 11,1,2,30, 16,7,22,17, 31,14,23,9, 27,18,4,10, 13,20,5,12, 8,29,26,21);
+	uint32_t v1 = bitswap<32>(yrot(ciphertext, rotate[i1]), 25,28,15,19, 6,0,3,24, 11,1,2,30, 16,7,22,17, 31,14,23,9, 27,18,4,10, 13,20,5,12, 8,29,26,21);
 
 	uint16_t x1Low = (x5[i2]<<11) ^ x11[i3] ^ gm(i4);
-	uint32_t x1 = x1Low | (BITSWAP16(x1Low, 0,8,1,9, 2,10,3,11, 4,12,5,13, 6,14,7,15)<<16);
+	uint32_t x1 = x1Low | (bitswap<16>(x1Low, 0,8,1,9, 2,10,3,11, 4,12,5,13, 6,14,7,15)<<16);
 
 	return partial_carry_sum32(v1, x1^preXor, carryMask) ^ postXor;
 }

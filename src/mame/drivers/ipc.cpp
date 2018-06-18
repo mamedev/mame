@@ -54,27 +54,32 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ipc(machine_config &config);
+	void ipc_io(address_map &map);
+	void ipc_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(ipc_mem, AS_PROGRAM, 8, ipc_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_RAM
-	AM_RANGE(0xe800, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void ipc_state::ipc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).ram();
+	map(0xe800, 0xffff).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ipc_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xf4, 0xf4) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0xf5, 0xf5) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void ipc_state::ipc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf0, 0xf3).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf4, 0xf4).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf5, 0xf5).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf6, 0xf6).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf7, 0xf7).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ipc )
@@ -87,40 +92,40 @@ void ipc_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ipc )
+MACHINE_CONFIG_START(ipc_state::ipc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(ipc_mem)
-	MCFG_CPU_IO_MAP(ipc_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ipc_mem)
+	MCFG_DEVICE_IO_MAP(ipc_io)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_19_6608MHz / 16)
-	MCFG_PIT8253_CLK1(XTAL_19_6608MHz / 16)
-	MCFG_PIT8253_CLK2(XTAL_19_6608MHz / 16)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart2", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
+	MCFG_PIT8253_CLK0(XTAL(19'660'800) / 16)
+	MCFG_PIT8253_CLK1(XTAL(19'660'800) / 16)
+	MCFG_PIT8253_CLK2(XTAL(19'660'800) / 16)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart2", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0) // 8 data bits, no parity, 1 stop bit, 9600 baud
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("uart2", I8251, 0) // 8 data bits, no parity, 2 stop bits, 2400 baud
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232b", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2", i8251_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -140,6 +145,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE   INPUT  STATE      INIT   COMPANY    FULLNAME  FLAGS */
-COMP( 19??, ipb,    0,      0,       ipc,      ipc,   ipc_state, 0,     "Intel",   "iPB",    MACHINE_NO_SOUND_HW )
-COMP( 19??, ipc,    ipb,    0,       ipc,      ipc,   ipc_state, 0,     "Intel",   "iPC",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 19??, ipb,  0,      0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPB",    MACHINE_NO_SOUND_HW )
+COMP( 19??, ipc,  ipb,    0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPC",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

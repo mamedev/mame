@@ -200,9 +200,9 @@ public:
 	//! set the vblank bit for the display to synch upon
 	void screen_vblank();
 
-	DECLARE_ADDRESS_MAP( ucode_map, 32 );
-	DECLARE_ADDRESS_MAP( const_map, 16 );
-	DECLARE_ADDRESS_MAP( iomem_map, 16 );
+	void ucode_map(address_map &map);
+	void const_map(address_map &map);
+	void iomem_map(address_map &map);
 
 	//! register a mouse motion in x direction
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_motion_x );
@@ -238,7 +238,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	//! device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 

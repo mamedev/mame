@@ -30,6 +30,7 @@ enum
 	MCS48_A,
 	MCS48_TC,
 	MCS48_TPRE,
+	MCS48_P0,   // 8021/8022 only
 	MCS48_P1,
 	MCS48_P2,
 	MCS48_R0,
@@ -41,9 +42,9 @@ enum
 	MCS48_R6,
 	MCS48_R7,
 	MCS48_EA,
-	MCS48_STS,  /* UPI-41 systems only */
-	MCS48_DBBO, /* UPI-41 systems only */
-	MCS48_DBBI  /* UPI-41 systems only */
+	MCS48_STS,  // UPI-41 only
+	MCS48_DBBO, // UPI-41 only
+	MCS48_DBBI  // UPI-41 only
 };
 
 
@@ -68,33 +69,33 @@ enum
 
 
 #define MCFG_MCS48_PORT_P1_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_P1_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
 
 #define MCFG_MCS48_PORT_P2_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_P2_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
 
 #define MCFG_MCS48_PORT_T0_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_test_in_cb(0, DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_T0_CLK_DEVICE(_tag) \
-	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
+	downcast<mcs48_cpu_device &>(*device).set_t0_clk_cb(clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
 #define MCFG_MCS48_PORT_T0_CLK_CUSTOM(_class, _func) \
-	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(&_class::_func, #_class "::" _func, owner));
+	downcast<mcs48_cpu_device &>(*device).set_t0_clk_cb(clock_update_delegate(&_class::_func, #_class "::" _func, owner));
 
 #define MCFG_MCS48_PORT_T1_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_test_in_cb(1, DEVCB_##_devcb);
 
 #define MCFG_MCS48_PORT_BUS_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_bus_in_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_bus_in_cb(DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_BUS_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_bus_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_bus_out_cb(DEVCB_##_devcb);
 
 // PROG line to 8243 expander
 #define MCFG_MCS48_PORT_PROG_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_prog_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_prog_out_cb(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -140,21 +141,29 @@ public:
 		EXPANDER_OP_AND = 3
 	};
 
-	// static configuration
-	template <class Object> static devcb_base &set_port_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_out_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_bus_in_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_bus_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_bus_out_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_bus_out_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_test_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_test_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	static void set_t0_clk_cb(device_t &device, clock_update_delegate &&func) { downcast<mcs48_cpu_device &>(device).m_t0_clk_func = std::move(func); }
-	template <class Object> static devcb_base &set_prog_out_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_prog_out_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	template <class Object> devcb_base &set_port_in_cb(int n, Object &&cb) { return m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port_out_cb(int n, Object &&cb) { return m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_bus_in_cb(Object &&cb) { return m_bus_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_bus_out_cb(Object &&cb) { return m_bus_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_test_in_cb(int n, Object &&cb) { return m_test_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_t0_clk_cb(Object &&cb) { m_t0_clk_func = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_prog_out_cb(Object &&cb) { return m_prog_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_READ8_MEMBER(p2_r);
 
+	void data_6bit(address_map &map);
+	void data_7bit(address_map &map);
+	void data_8bit(address_map &map);
+	void program_10bit(address_map &map);
+	void program_11bit(address_map &map);
+	void program_12bit(address_map &map);
 protected:
+	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
+
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask = 0);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_ophandler *opcode_table);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -167,7 +176,6 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 3; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector() const override { return MCS48_INPUT_IRQ; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -180,7 +188,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 protected:
 	address_space_config m_program_config;
@@ -228,7 +236,7 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -237,8 +245,11 @@ protected:
 
 	uint8_t       m_rtemp;              /* temporary for import/export */
 
-	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
-	static const mcs48_ophandler s_opcode_table[256];
+	static const mcs48_ophandler s_mcs48_opcodes[256];
+	static const mcs48_ophandler s_upi41_opcodes[256];
+	static const mcs48_ophandler s_i8021_opcodes[256];
+	static const mcs48_ophandler s_i8022_opcodes[256];
+	const mcs48_ophandler *const m_opcode_table;
 
 	/* ROM is mapped to AS_PROGRAM */
 	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
@@ -355,6 +366,7 @@ protected:
 	int en_dma();
 	int en_flags();
 	int ent0_clk();
+	int in_a_p0();
 	int in_a_p1();
 	int in_a_p2();
 	int ins_a_bus();
@@ -471,6 +483,7 @@ protected:
 	int orld_p6_a();
 	int orld_p7_a();
 	int outl_bus_a();
+	int outl_p0_a();
 	int outl_p1_a();
 	int outl_p2_a();
 	int out_dbb_a();
@@ -511,21 +524,6 @@ protected:
 	int xrl_a_xr0();
 	int xrl_a_xr1();
 	int xrl_a_n();
-	int split_02();
-	int split_08();
-	int split_22();
-	int split_75();
-	int split_80();
-	int split_81();
-	int split_86();
-	int split_88();
-	int split_90();
-	int split_91();
-	int split_98();
-	int split_d6();
-	int split_e5();
-	int split_f5();
-
 };
 
 class i8021_device : public mcs48_cpu_device
@@ -647,8 +645,6 @@ public:
 protected:
 	// construction/destruction
 	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size);
-
-	virtual util::disasm_interface *create_disassembler() override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };

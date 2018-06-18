@@ -21,27 +21,36 @@
 class tourtabl_state : public driver_device
 {
 public:
-	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void tourtabl(machine_config &config);
 
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
+	void main_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_leds;
 };
 
 
-#define MASTER_CLOCK    XTAL_3_579545MHz
+#define MASTER_CLOCK    XTAL(3'579'545)
 
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 {
-	output().set_led_value(0, data & 0x40); /* start 1 */
-	output().set_led_value(1, data & 0x20); /* start 2 */
-	output().set_led_value(2, data & 0x10); /* start 4 */
-	output().set_led_value(3, data & 0x80); /* select game */
+	m_leds[0] = BIT(data, 6); /* start 1 */
+	m_leds[1] = BIT(data, 5); /* start 2 */
+	m_leds[2] = BIT(data, 4); /* start 4 */
+	m_leds[3] = BIT(data, 7); /* select game */
 
 	machine().bookkeeping().coin_lockout_global_w(!(data & 0x80));
 }
@@ -60,15 +69,16 @@ READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
-	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
-	AM_RANGE(0x0400, 0x047f) AM_RAM
-	AM_RANGE(0x0500, 0x051f) AM_DEVREADWRITE("riot2", riot6532_device, read, write)
-	AM_RANGE(0x0800, 0x1fff) AM_ROM
-	AM_RANGE(0xe800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tourtabl_state::main_map(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x0100).rw("tia_video", FUNC(tia_video_device::read), FUNC(tia_video_device::write));
+	map(0x0080, 0x00ff).mirror(0x0100).ram();
+	map(0x0280, 0x029f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0400, 0x047f).ram();
+	map(0x0500, 0x051f).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0800, 0x1fff).rom();
+	map(0xe800, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( tourtabl )
@@ -146,27 +156,27 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tourtabl )
+MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("riot1", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT0_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT0_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("watchdog", watchdog_timer_device, reset_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
 
 	MCFG_DEVICE_ADD("riot2", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT1_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT1_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, tourtabl_led_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, tourtabl_state, tourtabl_led_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tourtabl_state, tourtabl_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tourtabl_state, tourtabl_get_databus_contents))
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
@@ -174,7 +184,7 @@ static MACHINE_CONFIG_START( tourtabl )
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -203,5 +213,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )

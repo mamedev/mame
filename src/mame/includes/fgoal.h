@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "machine/mb14241.h"
+#include "emupal.h"
 #include "screen.h"
 
 class fgoal_state : public driver_device
@@ -73,6 +74,8 @@ public:
 	int intensity(int bits);
 	unsigned video_ram_address( );
 
+	void fgoal(machine_config &config);
+	void cpu_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

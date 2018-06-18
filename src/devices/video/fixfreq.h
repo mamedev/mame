@@ -29,22 +29,22 @@
 	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
 #define MCFG_FIXFREQ_MONITOR_CLOCK(_clock) \
-	fixedfreq_device::set_minitor_clock(*device, _clock);
+	downcast<fixedfreq_device &>(*device).set_minitor_clock(_clock);
 
 #define MCFG_FIXFREQ_HORZ_PARAMS(_visible, _frontporch, _sync, _backporch) \
-	fixedfreq_device::set_horz_params(*device, _visible, _frontporch, _sync, _backporch);
+	downcast<fixedfreq_device &>(*device).set_horz_params(_visible, _frontporch, _sync, _backporch);
 
 #define MCFG_FIXFREQ_VERT_PARAMS(_visible, _frontporch, _sync, _backporch) \
-	fixedfreq_device::set_vert_params(*device, _visible, _frontporch, _sync, _backporch);
+	downcast<fixedfreq_device &>(*device).set_vert_params(_visible, _frontporch, _sync, _backporch);
 
 #define MCFG_FIXFREQ_FIELDCOUNT(_count) \
-	fixedfreq_device::set_fieldcount(*device, _count);
+	downcast<fixedfreq_device &>(*device).set_fieldcount(_count);
 
 #define MCFG_FIXFREQ_SYNC_THRESHOLD(_threshold) \
-	fixedfreq_device::set_threshold(*device, _threshold);
+	downcast<fixedfreq_device &>(*device).set_threshold(_threshold);
 
 #define MCFG_FIXFREQ_GAIN(_gain) \
-	fixedfreq_device::set_gain(*device, _gain);
+	downcast<fixedfreq_device &>(*device).set_gain(_gain);
 
 // pre-defined configurations
 
@@ -74,25 +74,23 @@ public:
 	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void set_minitor_clock(device_t &device, uint32_t clock) { downcast<fixedfreq_device &>(device).m_monitor_clock = clock; }
-	static void set_fieldcount(device_t &device, int count) { downcast<fixedfreq_device &>(device).m_fieldcount = count; }
-	static void set_threshold(device_t &device, double threshold) { downcast<fixedfreq_device &>(device).m_sync_threshold = threshold; }
-	static void set_gain(device_t &device, double gain) { downcast<fixedfreq_device &>(device).m_gain = gain; }
-	static void set_horz_params(device_t &device, int visible, int frontporch, int sync, int backporch)
+	void set_minitor_clock(uint32_t clock) { m_monitor_clock = clock; }
+	void set_fieldcount(int count) { m_fieldcount = count; }
+	void set_threshold(double threshold) { m_sync_threshold = threshold; }
+	void set_gain(double gain) { m_gain = gain; }
+	void set_horz_params(int visible, int frontporch, int sync, int backporch)
 	{
-		fixedfreq_device &dev = downcast<fixedfreq_device &>(device);
-		dev.m_hvisible = visible;
-		dev.m_hfrontporch = frontporch;
-		dev.m_hsync = sync;
-		dev.m_hbackporch = backporch;
+		m_hvisible = visible;
+		m_hfrontporch = frontporch;
+		m_hsync = sync;
+		m_hbackporch = backporch;
 	}
-	static void set_vert_params(device_t &device, int visible, int frontporch, int sync, int backporch)
+	void set_vert_params(int visible, int frontporch, int sync, int backporch)
 	{
-		fixedfreq_device &dev = downcast<fixedfreq_device &>(device);
-		dev.m_vvisible = visible;
-		dev.m_vfrontporch = frontporch;
-		dev.m_vsync = sync;
-		dev.m_vbackporch = backporch;
+		m_vvisible = visible;
+		m_vfrontporch = frontporch;
+		m_vsync = sync;
+		m_vbackporch = backporch;
 	}
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

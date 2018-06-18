@@ -387,6 +387,11 @@ newoption {
 }
 
 newoption {
+	trigger = "SANITIZE",
+	description = "Specifies the santizer(s) to use."
+}
+
+newoption {
 	trigger = "PROJECT",
 	description = "Select projects to be built. Will look into project folder for files.",
 }
@@ -407,14 +412,6 @@ end
 
 if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
-end
-
-if not _OPTIONS["NOASM"] then
-	if _OPTIONS["targetos"]=="emscripten" then
-		_OPTIONS["NOASM"] = "1"
-	else
-		_OPTIONS["NOASM"] = "0"
-	end
 end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
@@ -570,7 +567,8 @@ configuration { "Debug" }
 
 if _OPTIONS["FASTDEBUG"]=="1" then
 	defines {
-		"MAME_DEBUG_FAST"
+		"MAME_DEBUG_FAST",
+		"NDEBUG",
 	}
 end
 
@@ -666,6 +664,16 @@ if not _OPTIONS["with-system-flac"]~=nil then
 	}
 end
 
+if not _OPTIONS["with-system-pugixml"] then
+	defines {
+		"PUGIXML_HEADER_ONLY",
+	}
+else
+	links {
+		ext_lib("pugixml"),
+	}
+end
+
 if _OPTIONS["NOASM"]=="1" then
 	defines {
 		"MAME_NOASM"
@@ -758,7 +766,7 @@ if (_OPTIONS["SHADOW_CHECK"]=="1") then
 end
 
 -- only show deprecation warnings when enabled
-if _OPTIONS["DEPRECATED"]~="1" then
+if _OPTIONS["DEPRECATED"]=="0" then
 	buildoptions {
 		"-Wno-deprecated-declarations"
 	}
@@ -847,7 +855,7 @@ end
 
 configuration { "mingw-clang" }
 	buildoptions {
-		"-O1", -- without this executable crash often
+		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
 	}
 configuration {  }
 
@@ -928,6 +936,7 @@ end
 		"-Wwrite-strings",
 		"-Wno-sign-compare",
 		"-Wno-conversion",
+		"-Wno-error=deprecated-declarations",
 	}
 -- warnings only applicable to C compiles
 	buildoptions_c {
@@ -951,12 +960,37 @@ end
 		"-Woverloaded-virtual",
 	}
 
---ifdef SANITIZE
---CCOMFLAGS += -fsanitize=$(SANITIZE)
+if _OPTIONS["SANITIZE"] then
+	buildoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	linkoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	if string.find(_OPTIONS["SANITIZE"], "address") then
+		buildoptions {
+			"-fsanitize-address-use-after-scope"
+		}
+		linkoptions {
+			"-fsanitize-address-use-after-scope"
+		}
+	end
+	if string.find(_OPTIONS["SANITIZE"], "undefined") then
+		-- 'function' produces errors without delegates by design
+		-- 'alignment' produces a lot of errors which we are not interested in
+		buildoptions {
+			"-fno-sanitize=function",
+			"-fno-sanitize=alignment"
+		}
+		linkoptions {
+			"-fno-sanitize=function",
+			"-fno-sanitize=alignment"
+		}
+	end
+end
 
 --ifneq (,$(findstring thread,$(SANITIZE)))
 --CCOMFLAGS += -fPIE
---endif
 --endif
 
 
@@ -993,6 +1027,16 @@ end
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 					"-Wno-array-bounds",
 				}
+			if (version >= 80000) then
+				buildoptions {
+					"-Wno-format-overflow", -- try machine/bfm_sc45_helper.cpp in GCC 8.0.1, among others
+					"-Wno-stringop-truncation", -- ImGui again
+					"-Wno-stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
+				}
+				buildoptions_cpp {
+					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
+				}
+			end
 		end
 	end
 
@@ -1012,6 +1056,12 @@ if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
 	}
+	defines {
+		"PTR64=1",
+	}
+end
+
+if (_OPTIONS["PLATFORM"]=="riscv64") then
 	defines {
 		"PTR64=1",
 	}
@@ -1043,6 +1093,9 @@ configuration { "asmjs" }
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
+	}
+	linkoptions {
+		"-Wl,--start-group",
 	}
 	archivesplit_size "20"
 
@@ -1133,8 +1186,7 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
-		local version = str_to_version(_OPTIONS["gcc_version"])
-		if not (_OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang")) or version < 40000
+		if _OPTIONS["osd"]~="sdl"
 		then
 			linkoptions {
 				"-static",

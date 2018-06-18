@@ -8,6 +8,7 @@
 
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 class dribling_state : public driver_device
 {
@@ -52,4 +53,7 @@ public:
 	DECLARE_PALETTE_INIT(dribling);
 	uint32_t screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
+	void dribling(machine_config &config);
+	void dribling_map(address_map &map);
+	void io_map(address_map &map);
 };

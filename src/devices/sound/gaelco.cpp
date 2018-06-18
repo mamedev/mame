@@ -106,7 +106,7 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 				bank = m_banks[((m_sndregs[base_offset + 1] >> 0) & 0x03)];
 				vol_l = ((m_sndregs[base_offset + 1] >> 12) & 0x0f);
 				vol_r = ((m_sndregs[base_offset + 1] >> 8) & 0x0f);
-				end_pos = m_sndregs[base_offset + 2] << 8;
+				end_pos = (m_sndregs[base_offset + 2] << 8) - 1;
 
 				/* generates output data (range 0x00000..0xffff) */
 				if (type == 0x08){

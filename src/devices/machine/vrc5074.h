@@ -12,33 +12,36 @@
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
 
-#define MCFG_VRC5074_ADD(_tag, _cpu_tag) \
-	MCFG_PCI_HOST_ADD(_tag, VRC5074, 0x1033005a, 0x04, 0x00000000) \
-	downcast<vrc5074_device *>(device)->set_cpu_tag(_cpu_tag);
-
 #define MCFG_VRC5074_SET_SDRAM(_index, _size) \
-	downcast<vrc5074_device *>(device)->set_sdram_size(_index, _size);
+	downcast<vrc5074_device &>(*device).set_sdram_size(_index, _size);
 
 #define MCFG_VRC5074_SET_CS(_cs_num, _map) \
-	downcast<vrc5074_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), owner);
+	downcast<vrc5074_device &>(*device).set_map(_cs_num, address_map_constructor(&_map, #_map, this), this);
 
 class vrc5074_device : public pci_host_device {
 public:
+	template <typename T>
+	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: vrc5074_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	required_device<ns16550_device> m_uart;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	void postload();
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+	virtual void device_post_load() override;
 
-	void set_cpu_tag(const char *tag);
-	void set_sdram_size(const int index, const int size) { m_sdram_size[index] = size; };
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	void set_sdram_size(int index, int size) { m_sdram_size[index] = size; };
 
-	void set_map(int id, const address_map_delegate &map, device_t *device);
+	void set_map(int id, const address_map_constructor &map, device_t *device);
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 	DECLARE_READ32_MEMBER(sdram_addr_r);
 	DECLARE_WRITE32_MEMBER(sdram_addr_w);
 
@@ -63,7 +66,7 @@ public:
 	DECLARE_READ32_MEMBER (pci1_r);
 	DECLARE_WRITE32_MEMBER(pci1_w);
 
-	virtual DECLARE_ADDRESS_MAP(target1_map, 32);
+	virtual void target1_map(address_map &map);
 	DECLARE_READ32_MEMBER (target1_r);
 	DECLARE_WRITE32_MEMBER(target1_w);
 
@@ -86,14 +89,13 @@ private:
 		AS_PCI_IO = 2
 	};
 
-	mips3_device *m_cpu;
-	const char *cpu_tag;
+	required_device<mips3_device> m_cpu;
 	int m_sdram_size[2];
 
 	address_space_config m_mem_config, m_io_config;
 
-	DECLARE_ADDRESS_MAP(cpu_map, 32);
-	DECLARE_ADDRESS_MAP(serial_map, 32);
+	void cpu_map(address_map &map);
+	void serial_map(address_map &map);
 
 	void map_cpu_space();
 
@@ -109,11 +111,12 @@ private:
 
 	// Chip Select
 	device_t *m_cs_devices[7];
-	address_map_delegate m_cs_maps[7];
+	address_map_constructor m_cs_maps[7];
 
 	uint32_t m_cpu_regs[0x1ff / 4];
 	uint16_t m_nile_irq_state;
 	int m_uart_irq;
+	uint8_t m_irq_pins;
 
 	void setup_pci_space();
 	uint32_t m_pci_laddr[2], m_pci_mask[2], m_pci_type[2];

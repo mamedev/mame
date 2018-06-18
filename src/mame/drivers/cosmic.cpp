@@ -376,61 +376,66 @@ WRITE8_MEMBER(cosmic_state::flip_screen_w)
 }
 
 
-static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
-	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
-	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
-	AM_RANGE(0x6803, 0x6803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x7000, 0x700b) AM_WRITE(panic_sound_output_w)
-	AM_RANGE(0x700c, 0x700e) AM_WRITE(cosmic_color_register_w)
-	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x7800, 0x7801) AM_WRITE(panic_sound_output2_w)
-ADDRESS_MAP_END
+void cosmic_state::panic_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x601f).writeonly().share("spriteram");
+	map(0x6800, 0x6800).portr("P1");
+	map(0x6801, 0x6801).portr("P2");
+	map(0x6802, 0x6802).portr("DSW");
+	map(0x6803, 0x6803).portr("SYSTEM");
+	map(0x7000, 0x700b).w(FUNC(cosmic_state::panic_sound_output_w));
+	map(0x700c, 0x700e).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x700f, 0x700f).w(FUNC(cosmic_state::flip_screen_w));
+	map(0x7800, 0x7801).w(FUNC(cosmic_state::panic_sound_output2_w));
+}
 
 
-static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
-	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
-	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
-	AM_RANGE(0x6803, 0x6803) AM_READ(cosmica_pixel_clock_r)
-	AM_RANGE(0x7000, 0x700b) AM_WRITE(cosmica_sound_output_w)
-	AM_RANGE(0x700c, 0x700d) AM_WRITE(cosmic_color_register_w)
-	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
-ADDRESS_MAP_END
+void cosmic_state::cosmica_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x601f).writeonly().share("spriteram");
+	map(0x6800, 0x6800).portr("P1");
+	map(0x6801, 0x6801).portr("P2");
+	map(0x6802, 0x6802).portr("DSW");
+	map(0x6803, 0x6803).r(FUNC(cosmic_state::cosmica_pixel_clock_r));
+	map(0x7000, 0x700b).w(FUNC(cosmic_state::cosmica_sound_output_w));
+	map(0x700c, 0x700d).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x700f, 0x700f).w(FUNC(cosmic_state::flip_screen_w));
+}
 
 
-static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8, cosmic_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cosmic_state::cosmicg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram().share("videoram");
+}
 
-static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
-	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
-	AM_RANGE(0x16, 0x17) AM_WRITE(cosmic_color_register_w)
-ADDRESS_MAP_END
+void cosmic_state::cosmicg_io_map(address_map &map)
+{
+	map(0x00, 0x00).r(FUNC(cosmic_state::cosmicg_port_0_r));
+	map(0x01, 0x01).portr("IN1");
+	map(0x00, 0x15).w(FUNC(cosmic_state::cosmicg_output_w));
+	map(0x16, 0x17).w(FUNC(cosmic_state::cosmic_color_register_w));
+}
 
 
-static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
-	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(dac_w)
-	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
-	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
-	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
-	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
-	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cosmic_state::magspot_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3800, 0x3807).r(FUNC(cosmic_state::magspot_coinage_dip_r));
+	map(0x4000, 0x401f).writeonly().share("spriteram");
+	map(0x4800, 0x4800).w(FUNC(cosmic_state::dac_w));
+	map(0x480c, 0x480d).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x480f, 0x480f).w(FUNC(cosmic_state::flip_screen_w));
+	map(0x5000, 0x5000).portr("IN0");
+	map(0x5001, 0x5001).portr("IN1");
+	map(0x5002, 0x5002).portr("IN2");
+	map(0x5003, 0x5003).portr("IN3");
+	map(0x6000, 0x7fff).ram().share("videoram");
+}
 
 
 WRITE_LINE_MEMBER(cosmic_state::panic_coin_inserted)
@@ -560,7 +565,7 @@ INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
 
 static INPUT_PORTS_START( cosmicg )
 	PORT_START("IN0")   /* 4-7 */
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL )    /* pixel clock */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM )    /* pixel clock */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -660,7 +665,7 @@ static INPUT_PORTS_START( magspot )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )     /* always HI */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )    /* reads what was written to 4808.  Probably not used?? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    /* reads what was written to 4808.  Probably not used?? */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -809,14 +814,14 @@ static INPUT_PORTS_START( nomnlnd )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_SPECIAL )    /* diagonals */
+	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_CUSTOM )    /* diagonals */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_SPECIAL )    /* diagonals */
+	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_CUSTOM )    /* diagonals */
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
@@ -841,7 +846,7 @@ static INPUT_PORTS_START( nomnlnd )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )     /* always HI */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )    /* reads what was written to 4808.  Probably not used?? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    /* reads what was written to 4808.  Probably not used?? */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -897,12 +902,12 @@ static const gfx_layout cosmic_spritelayout32 =
 };
 
 
-static GFXDECODE_START( panic )
+static GFXDECODE_START( gfx_panic )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout16, 16, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout32, 16, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cosmica )
+static GFXDECODE_START( gfx_cosmica )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout16,  8, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout32,  8, 16 )
 GFXDECODE_END
@@ -1000,10 +1005,10 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
 	m_maincpu->set_input_line(INT_9980A_RESET, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( cosmic )
+MACHINE_CONFIG_START(cosmic_state::cosmic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
 
 	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
 	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
@@ -1028,15 +1033,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 }
 
 
-static MACHINE_CONFIG_DERIVED( panic, cosmic )
+MACHINE_CONFIG_START(cosmic_state::panic)
+	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(panic_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(panic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cosmic_state, panic_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
@@ -1045,27 +1051,28 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_panic)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(9)
 	MCFG_SAMPLES_NAMES(panic_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
+MACHINE_CONFIG_START(cosmic_state::cosmica)
+	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cosmica_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cosmica_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cosmica)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cosmica)
 	MCFG_PALETTE_ADD("palette", 8+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
@@ -1074,15 +1081,15 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmica)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(13)
 	MCFG_SAMPLES_NAMES(cosmica_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cosmicg )
+MACHINE_CONFIG_START(cosmic_state::cosmicg)
 
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map)
@@ -1106,28 +1113,29 @@ static MACHINE_CONFIG_START( cosmicg )
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(9)
 	MCFG_SAMPLES_NAMES(cosmicg_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // NE556
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // NE556
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 	// Other DACs include 3-bit binary-weighted (100K/50K/25K) DAC combined with another NE556 for attack march
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magspot, cosmic )
+MACHINE_CONFIG_START(cosmic_state::magspot)
+	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
-	MCFG_CPU_PROGRAM_MAP(magspot_map)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
+	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
@@ -1136,15 +1144,16 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_magspot)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( devzone, magspot )
+MACHINE_CONFIG_START(cosmic_state::devzone)
+	magspot(config);
 
 	/* basic machine hardware */
 
@@ -1154,14 +1163,15 @@ static MACHINE_CONFIG_DERIVED( devzone, magspot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
+MACHINE_CONFIG_START(cosmic_state::nomnlnd)
+	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magspot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)
@@ -1170,11 +1180,11 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_nomnlnd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1545,14 +1555,12 @@ ROM_START( nomnlndg )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::init_cosmicg()
 {
 	/* Program ROMs have data pins connected different from normal */
-	offs_t offs, len;
-	uint8_t *rom;
-	len = memregion("maincpu")->bytes();
-	rom = memregion("maincpu")->base();
-	for (offs = 0; offs < len; offs++)
+	offs_t len = memregion("maincpu")->bytes();
+	uint8_t *rom = memregion("maincpu")->base();
+	for (offs_t offs = 0; offs < len; offs++)
 	{
 		uint8_t scrambled = rom[offs];
 
@@ -1570,20 +1578,20 @@ DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,cosmica)
+void cosmic_state::init_cosmica()
 {
 	m_sound_enabled = 1;
 	m_dive_bomb_b_select = 0;
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,devzone)
+void cosmic_state::init_devzone()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
+void cosmic_state::init_nomnlnd()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
@@ -1591,25 +1599,25 @@ DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(cosmic_state::dac_w), this));
 }
 
-DRIVER_INIT_MEMBER(cosmic_state,panic)
+void cosmic_state::init_panic()
 {
 	m_sound_enabled = 1;
 }
 
 
-GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmic_state, cosmicg, ROT270, "Universal", "Cosmic Guerilla", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1979, cosmicgi, cosmicg, cosmicg,  cosmicg,  cosmic_state, cosmicg, ROT270, "bootleg (Inder)", "Cosmic Guerilla (Spanish bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL  /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmic_state, cosmica, ROT270, "Universal", "Cosmic Alien (version II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmic_state, cosmica, ROT270, "Universal", "Cosmic Alien (first version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmic_state, cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  cosmic_state, nomnlnd, ROT270, "Universal", "No Man's Land", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, cosmic_state, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, magspot,  0,       magspot,  magspot,  cosmic_state, 0,       ROT270, "Universal", "Magical Spot", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, magspot2, 0,       magspot,  magspot,  cosmic_state, 0,       ROT270, "Universal", "Magical Spot II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panic,    0,       panic,    panic,    cosmic_state, panic,   ROT270, "Universal", "Space Panic (version E)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panic2,   panic,   panic,    panic,    cosmic_state, panic,   ROT270, "Universal", "Space Panic (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panic3,   panic,   panic,    panic,    cosmic_state, panic,   ROT270, "Universal", "Space Panic (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panich,   panic,   panic,    panic,    cosmic_state, panic,   ROT270, "Universal", "Space Panic (harder)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panicger, panic,   panic,    panic,    cosmic_state, panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, devzone,  0,       devzone,  devzone,  cosmic_state, devzone, ROT270, "Universal", "Devil Zone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, devzone2, devzone, devzone,  devzone2, cosmic_state, devzone, ROT270, "Universal", "Devil Zone (easier)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmicg,  0,       cosmicg, cosmicg,  cosmic_state, init_cosmicg, ROT270, "Universal", "Cosmic Guerilla", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL /*| MACHINE_SUPPORTS_SAVE */)
+GAME( 1979, cosmicgi, cosmicg, cosmicg, cosmicg,  cosmic_state, init_cosmicg, ROT270, "bootleg (Inder)", "Cosmic Guerilla (Spanish bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL  /*| MACHINE_SUPPORTS_SAVE */)
+GAME( 1979, cosmica,  0,       cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (version II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica1, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (first version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica2, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nomnlnd,  0,       nomnlnd, nomnlnd,  cosmic_state, init_nomnlnd, ROT270, "Universal", "No Man's Land", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nomnlndg, nomnlnd, nomnlnd, nomnlndg, cosmic_state, init_nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, magspot,  0,       magspot, magspot,  cosmic_state, empty_init,   ROT270, "Universal", "Magical Spot", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, magspot2, 0,       magspot, magspot,  cosmic_state, empty_init,   ROT270, "Universal", "Magical Spot II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panic,    0,       panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (version E)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panic2,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panic3,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panich,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (harder)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panicger, panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, devzone,  0,       devzone, devzone,  cosmic_state, init_devzone, ROT270, "Universal", "Devil Zone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, devzone2, devzone, devzone, devzone2, cosmic_state, init_devzone, ROT270, "Universal", "Devil Zone (easier)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

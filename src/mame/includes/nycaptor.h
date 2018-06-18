@@ -5,6 +5,7 @@
 #include "machine/input_merger.h"
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class nycaptor_state : public driver_device
 {
@@ -83,10 +84,10 @@ public:
 	DECLARE_READ8_MEMBER(nycaptor_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_DRIVER_INIT(cyclshtg);
-	DECLARE_DRIVER_INIT(colt);
-	DECLARE_DRIVER_INIT(bronx);
-	DECLARE_DRIVER_INIT(nycaptor);
+	void init_cyclshtg();
+	void init_colt();
+	void init_bronx();
+	void init_nycaptor();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -94,4 +95,15 @@ public:
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void nycaptor(machine_config &config);
+	void cyclshtg(machine_config &config);
+	void bronx(machine_config &config);
+	void bronx_master_map(address_map &map);
+	void bronx_slave_io_map(address_map &map);
+	void bronx_slave_map(address_map &map);
+	void cyclshtg_master_map(address_map &map);
+	void cyclshtg_slave_map(address_map &map);
+	void nycaptor_master_map(address_map &map);
+	void nycaptor_slave_map(address_map &map);
+	void sound_map(address_map &map);
 };

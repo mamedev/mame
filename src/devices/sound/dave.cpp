@@ -28,20 +28,24 @@
 DEFINE_DEVICE_TYPE(DAVE, dave_device, "dave", "Inteligent Designs DAVE")
 
 
-DEVICE_ADDRESS_MAP_START( z80_program_map, 8, dave_device )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(program_r, program_w)
-ADDRESS_MAP_END
+void dave_device::z80_program_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(dave_device::program_r), FUNC(dave_device::program_w));
+}
 
-DEVICE_ADDRESS_MAP_START( z80_io_map, 8, dave_device )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void dave_device::z80_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(dave_device::io_r), FUNC(dave_device::io_w));
+}
 
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, dave_device )
-ADDRESS_MAP_END
+void dave_device::program_map(address_map &map)
+{
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dave_device )
-ADDRESS_MAP_END
+void dave_device::io_map(address_map &map)
+{
+}
 
 
 
@@ -57,8 +61,8 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, DAVE, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
-		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
-		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(io_map)),
+		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(dave_device::program_map), this)),
+		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
 		m_write_irq(*this),
 		m_write_lh(*this),
 		m_write_rh(*this),

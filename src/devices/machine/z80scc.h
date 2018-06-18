@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
+#include "diserial.h"
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -43,94 +44,55 @@
 
 #define Z80SCC_USE_LOCAL_BRG 0
 
-/* Variant ADD macros - use the right one to enable the right feature set! */
-#define MCFG_SCC8030_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC8030, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC80C30_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC80C30, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC80230_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC80230, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC8530_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC8530N, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC85C30_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC85C30, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC85230_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC85230, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC85233_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC85233, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_SCC8523L_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC8523L, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-/* generic ADD macro - Avoid using it directly, see above for correct variant instead */
-#define MCFG_Z80SCC_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SCC, _clock) \
-	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-/* Generic macros */
 #define MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb) \
-	z80scc_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
+	downcast<z80scc_device &>(*device).configure_channels(_rxa, _txa, _rxb, _txb);
 
 #define MCFG_Z80SCC_OUT_INT_CB(_devcb) \
-	devcb = &z80scc_device::set_out_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 // Port A callbacks
 #define MCFG_Z80SCC_OUT_TXDA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_txd_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_txd_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_DTRA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_dtr_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_dtr_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RTSA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_rts_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_rts_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_WREQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_wreq_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_wreq_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_SYNCA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_sync_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_sync_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RXDRQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_rxdrq_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_rxdrq_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_TXDRQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_txdrq_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_txdrq_callback<0>(DEVCB_##_devcb);
 
 // Port B callbacks
 #define MCFG_Z80SCC_OUT_TXDB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_txd_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_txd_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_DTRB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_dtr_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_dtr_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RTSB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_rts_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_rts_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_WREQB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_wreq_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_wreq_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_SYNCB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_sync_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_sync_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RXDRQB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_rxdrq_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_rxdrq_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_TXDRQB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_txdrq_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80scc_device &>(*device).set_out_txdrq_callback<1>(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -417,31 +379,23 @@ class z80scc_device : public device_t, public device_z80daisy_interface
 	friend class z80scc_channel;
 
 public:
-	// construction/destruction
-	z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <unsigned N, class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_wreq_callback(Object &&cb) { return m_out_wreq_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_sync_callback(Object &&cb) { return m_out_sync_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_rxdrq_callback(Object &&cb) { return m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_txdrq_callback(Object &&cb) { return m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <unsigned N, class Object> static devcb_base &set_out_txd_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_txd_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_out_dtr_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_dtr_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_out_rts_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rts_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_out_wreq_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wreq_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_out_sync_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_sync_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_out_rxdrq_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_out_txdrq_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	void set_cputag(const char *tag) { m_cputag = tag; }
 
-	static void static_set_cputag(device_t &device, const char *tag)
+	void configure_channels(int rxa, int txa, int rxb, int txb)
 	{
-		z80scc_device &dev = downcast<z80scc_device &>(device);
-		dev.m_cputag = tag;
-	}
-
-	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
-	{
-		z80scc_device &dev = downcast<z80scc_device &>(device);
-		dev.m_rxca = rxa;
-		dev.m_txca = txa;
-		dev.m_rxcb = rxb;
-		dev.m_txcb = txb;
+		m_rxca = rxa;
+		m_txca = txa;
+		m_rxcb = rxb;
+		m_txcb = txb;
 	}
 
 	DECLARE_READ8_MEMBER( cd_ab_r );
@@ -497,7 +451,7 @@ protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_z80daisy_interface overrides
@@ -517,7 +471,6 @@ protected:
 	// Variants in the SCC family
 	enum
 	{
-		TYPE_Z80SCC   = 0x001,
 		TYPE_SCC8030  = 0x002,
 		TYPE_SCC80C30 = 0x004,
 		TYPE_SCC80230 = 0x008,
@@ -618,7 +571,6 @@ public:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(Z80SCC,         z80scc_device)
 DECLARE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel)
 DECLARE_DEVICE_TYPE(SCC8030,        scc8030_device)
 DECLARE_DEVICE_TYPE(SCC80C30,       scc80c30_device)

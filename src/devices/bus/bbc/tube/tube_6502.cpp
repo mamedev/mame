@@ -25,9 +25,10 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_6502, bbc_tube_6502_device, "bbc_tube_6502", "Acorn 
 //  ADDRESS_MAP( tube_6502_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_6502_mem, AS_PROGRAM, 8, bbc_tube_6502_device)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void bbc_tube_6502_device::tube_6502_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_6502_device::read), FUNC(bbc_tube_6502_device::write));
+}
 
 //-------------------------------------------------
 //  ROM( tube_6502 )
@@ -42,9 +43,9 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_tube_6502_device::device_add_mconfig )
-	MCFG_CPU_ADD("m6502", M65C02, XTAL_12MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(tube_6502_mem)
+MACHINE_CONFIG_START(bbc_tube_6502_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("m6502", M65C02, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(tube_6502_mem)
 
 	MCFG_TUBE_ADD("ula")
 	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("m6502", M65C02_NMI_LINE))
@@ -130,7 +131,7 @@ READ8_MEMBER(bbc_tube_6502_device::read)
 
 	if (offset >= 0xfef0 && offset <= 0xfeff)
 	{
-		if (!machine().side_effect_disabled()) m_rom_enabled = false;
+		if (!machine().side_effects_disabled()) m_rom_enabled = false;
 		data = m_ula->parasite_r(space, offset);
 	}
 	else if (m_rom_enabled && (offset >= 0xf000))

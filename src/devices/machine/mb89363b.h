@@ -24,41 +24,41 @@ DECLARE_DEVICE_TYPE(MB89363B, mb89363b_device)
 
 
 #define MCFG_MB89363B_IN_PORTA_CB(_devcb) \
-	devcb = &mb89363b_device::set_in_a_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_in_a_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTB_CB(_devcb) \
-	devcb = &mb89363b_device::set_in_a_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_in_a_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTC_CB(_devcb) \
-	devcb = &mb89363b_device::set_in_a_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_in_a_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTA_CB(_devcb) \
-	devcb = &mb89363b_device::set_out_a_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_out_a_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTB_CB(_devcb) \
-	devcb = &mb89363b_device::set_out_a_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_out_a_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTC_CB(_devcb) \
-	devcb = &mb89363b_device::set_out_a_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_out_a_pc_callback(DEVCB_##_devcb);
 
 
 #define MCFG_MB89363B_IN_PORTD_CB(_devcb) \
-	devcb = &mb89363b_device::set_in_b_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_in_b_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTE_CB(_devcb) \
-	devcb = &mb89363b_device::set_in_b_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_in_b_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTF_CB(_devcb) \
-	devcb = &mb89363b_device::set_in_b_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_in_b_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTD_CB(_devcb) \
-	devcb = &mb89363b_device::set_out_b_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_out_b_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTE_CB(_devcb) \
-	devcb = &mb89363b_device::set_out_b_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_out_b_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTF_CB(_devcb) \
-	devcb = &mb89363b_device::set_out_b_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89363b_device &>(*device).set_out_b_pc_callback(DEVCB_##_devcb);
 
 
 
@@ -71,19 +71,19 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	template <class Object> static devcb_base &set_in_a_pa_callback(device_t &device, Object &&cb)  { return downcast<mb89363b_device &>(device).m_in_a_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_a_pb_callback(device_t &device, Object &&cb)  { return downcast<mb89363b_device &>(device).m_in_a_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_a_pc_callback(device_t &device, Object &&cb)  { return downcast<mb89363b_device &>(device).m_in_a_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_a_pa_callback(device_t &device, Object &&cb) { return downcast<mb89363b_device &>(device).m_out_a_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_a_pb_callback(device_t &device, Object &&cb) { return downcast<mb89363b_device &>(device).m_out_a_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_a_pc_callback(device_t &device, Object &&cb) { return downcast<mb89363b_device &>(device).m_out_a_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_a_pa_callback(Object &&cb)  { return m_in_a_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_a_pb_callback(Object &&cb)  { return m_in_a_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_a_pc_callback(Object &&cb)  { return m_in_a_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_a_pa_callback(Object &&cb) { return m_out_a_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_a_pb_callback(Object &&cb) { return m_out_a_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_a_pc_callback(Object &&cb) { return m_out_a_pc_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_in_b_pa_callback(device_t &device, Object &&cb)  { return downcast<mb89363b_device &>(device).m_in_b_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_b_pb_callback(device_t &device, Object &&cb)  { return downcast<mb89363b_device &>(device).m_in_b_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_b_pc_callback(device_t &device, Object &&cb)  { return downcast<mb89363b_device &>(device).m_in_b_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_b_pa_callback(device_t &device, Object &&cb) { return downcast<mb89363b_device &>(device).m_out_b_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_b_pb_callback(device_t &device, Object &&cb) { return downcast<mb89363b_device &>(device).m_out_b_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_b_pc_callback(device_t &device, Object &&cb) { return downcast<mb89363b_device &>(device).m_out_b_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_b_pa_callback(Object &&cb)  { return m_in_b_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_b_pb_callback(Object &&cb)  { return m_in_b_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_b_pc_callback(Object &&cb)  { return m_in_b_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_b_pa_callback(Object &&cb) { return m_out_b_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_b_pb_callback(Object &&cb) { return m_out_b_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_b_pc_callback(Object &&cb) { return m_out_b_pc_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

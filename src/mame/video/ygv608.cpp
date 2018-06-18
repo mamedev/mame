@@ -228,7 +228,7 @@ static const gfx_layout pts_16x16_8bits_layout =
 	16*16*8
 };
 
-static GFXDECODE_START( ygv608 )
+static GFXDECODE_START( gfx_ygv608 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_8x8_4bits_layout,    0,  16 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_16x16_4bits_layout,  0,  16 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_32x32_4bits_layout,  0,  16 )
@@ -248,47 +248,48 @@ GFXDECODE_END
  ***************************************/
 
  // we use decimals here to match documentation
-static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+void ygv608_device::regs_map(address_map &map)
+{
 
 	// address pointers
-	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
-	AM_RANGE( 1,  1) AM_READWRITE(pattern_name_table_x_r,pattern_name_table_x_w)
+	map(0, 0).rw(FUNC(ygv608_device::pattern_name_table_y_r), FUNC(ygv608_device::pattern_name_table_y_w));
+	map(1, 1).rw(FUNC(ygv608_device::pattern_name_table_x_r), FUNC(ygv608_device::pattern_name_table_x_w));
 
-	AM_RANGE( 2,  2) AM_READWRITE(ram_access_ctrl_r,ram_access_ctrl_w)
+	map(2, 2).rw(FUNC(ygv608_device::ram_access_ctrl_r), FUNC(ygv608_device::ram_access_ctrl_w));
 
-	AM_RANGE( 3,  3) AM_READWRITE(sprite_address_r,sprite_address_w)
-	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
-	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
-	AM_RANGE( 6,  6) AM_READWRITE(sprite_bank_r,sprite_bank_w)
+	map(3, 3).rw(FUNC(ygv608_device::sprite_address_r), FUNC(ygv608_device::sprite_address_w));
+	map(4, 4).rw(FUNC(ygv608_device::scroll_address_r), FUNC(ygv608_device::scroll_address_w));
+	map(5, 5).rw(FUNC(ygv608_device::palette_address_r), FUNC(ygv608_device::palette_address_w));
+	map(6, 6).rw(FUNC(ygv608_device::sprite_bank_r), FUNC(ygv608_device::sprite_bank_w));
 
 	// screen control
-	AM_RANGE( 7,  7) AM_READWRITE(screen_ctrl_7_r,  screen_ctrl_7_w)
-	AM_RANGE( 8,  8) AM_READWRITE(screen_ctrl_8_r,  screen_ctrl_8_w)
-	AM_RANGE( 9,  9) AM_READWRITE(screen_ctrl_9_r,  screen_ctrl_9_w)
-	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_10_r, screen_ctrl_10_w)
-	AM_RANGE(11, 11) AM_READWRITE(screen_ctrl_11_r, screen_ctrl_11_w)
-	AM_RANGE(12, 12) AM_READWRITE(screen_ctrl_12_r, screen_ctrl_12_w)
+	map(7, 7).rw(FUNC(ygv608_device::screen_ctrl_7_r), FUNC(ygv608_device::screen_ctrl_7_w));
+	map(8, 8).rw(FUNC(ygv608_device::screen_ctrl_8_r), FUNC(ygv608_device::screen_ctrl_8_w));
+	map(9, 9).rw(FUNC(ygv608_device::screen_ctrl_9_r), FUNC(ygv608_device::screen_ctrl_9_w));
+	map(10, 10).rw(FUNC(ygv608_device::screen_ctrl_10_r), FUNC(ygv608_device::screen_ctrl_10_w));
+	map(11, 11).rw(FUNC(ygv608_device::screen_ctrl_11_r), FUNC(ygv608_device::screen_ctrl_11_w));
+	map(12, 12).rw(FUNC(ygv608_device::screen_ctrl_12_r), FUNC(ygv608_device::screen_ctrl_12_w));
 
-	AM_RANGE(13, 13) AM_WRITE(border_color_w)
+	map(13, 13).w(FUNC(ygv608_device::border_color_w));
 	// interrupt section
-	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w)
-	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
+	map(14, 14).rw(FUNC(ygv608_device::irq_mask_r), FUNC(ygv608_device::irq_mask_w));
+	map(15, 16).rw(FUNC(ygv608_device::irq_ctrl_r), FUNC(ygv608_device::irq_ctrl_w));
 	// base address
-	AM_RANGE(17, 24) AM_WRITE(base_address_w)
+	map(17, 24).w(FUNC(ygv608_device::base_address_w));
 
 	// ROZ parameters
-	AM_RANGE(25, 27) AM_WRITE(roz_ax_w)
-	AM_RANGE(28, 29) AM_WRITE(roz_dx_w)
-	AM_RANGE(30, 31) AM_WRITE(roz_dxy_w)
-	AM_RANGE(32, 34) AM_WRITE(roz_ay_w)
-	AM_RANGE(35, 36) AM_WRITE(roz_dy_w)
-	AM_RANGE(37, 38) AM_WRITE(roz_dyx_w)
+	map(25, 27).w(FUNC(ygv608_device::roz_ax_w));
+	map(28, 29).w(FUNC(ygv608_device::roz_dx_w));
+	map(30, 31).w(FUNC(ygv608_device::roz_dxy_w));
+	map(32, 34).w(FUNC(ygv608_device::roz_ay_w));
+	map(35, 36).w(FUNC(ygv608_device::roz_dy_w));
+	map(37, 38).w(FUNC(ygv608_device::roz_dyx_w));
 
 	// CRTC
-	AM_RANGE(39, 46) AM_WRITE(crtc_w)
+	map(39, 46).w(FUNC(ygv608_device::crtc_w));
 //  47-48 ROM transfer control - DMA source address
 //  49 ROM transfer control - DMA size
-ADDRESS_MAP_END
+}
 
 /***************************************
  *
@@ -296,16 +297,17 @@ ADDRESS_MAP_END
  *
  ***************************************/
 
-DEVICE_ADDRESS_MAP_START( port_map, 8, ygv608_device )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pattern_name_table_r,pattern_name_table_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(sprite_data_r,sprite_data_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_data_r,palette_data_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(register_data_r,register_data_w)
-	AM_RANGE(0x05, 0x05) AM_READNOP AM_WRITE(register_select_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(status_port_r,status_port_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(system_control_r,system_control_w)
-ADDRESS_MAP_END
+void ygv608_device::port_map(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(ygv608_device::pattern_name_table_r), FUNC(ygv608_device::pattern_name_table_w));
+	map(0x01, 0x01).rw(FUNC(ygv608_device::sprite_data_r), FUNC(ygv608_device::sprite_data_w));
+	map(0x02, 0x02).rw(FUNC(ygv608_device::scroll_data_r), FUNC(ygv608_device::scroll_data_w));
+	map(0x03, 0x03).rw(FUNC(ygv608_device::palette_data_r), FUNC(ygv608_device::palette_data_w));
+	map(0x04, 0x04).rw(FUNC(ygv608_device::register_data_r), FUNC(ygv608_device::register_data_w));
+	map(0x05, 0x05).nopr().w(FUNC(ygv608_device::register_select_w));
+	map(0x06, 0x06).rw(FUNC(ygv608_device::status_port_r), FUNC(ygv608_device::status_port_w));
+	map(0x07, 0x07).rw(FUNC(ygv608_device::system_control_r), FUNC(ygv608_device::system_control_w));
+}
 
 
 //-------------------------------------------------
@@ -314,9 +316,10 @@ ADDRESS_MAP_END
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, tag, owner, clock),
-	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
+	  device_gfx_interface(mconfig, *this, gfx_ygv608),
 	  device_memory_interface(mconfig, *this),
-	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(regs_map)),
+	  device_video_interface(mconfig, *this),
+	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),
 	  m_vblank_handler(*this),
 	  m_raster_handler(*this)
 {
@@ -376,7 +379,6 @@ void ygv608_device::device_start()
 	m_iospace = &space(AS_IO);
 
 	// TODO: tagging configuration
-	m_screen = downcast<screen_device *>(machine().device("screen"));
 	m_vblank_handler.resolve();
 	m_raster_handler.resolve();
 	m_vblank_timer = timer_alloc(VBLANK_TIMER);
@@ -1030,6 +1032,26 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
 }
 
+void ygv608_device::ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
+{
+	int x, y, mask;
+
+	if (n <= 0)
+	{
+		return;
+	}
+
+	// mask to drop the lowest n-bits
+	mask = ~((1 << n) - 1);
+
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			bitmap.pix16(y, x) = bitmap.pix16(y & mask, x & mask);
+		}
+	}
+}
 
 uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1083,7 +1105,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			m_tilemap_A = m_tilemap_A_cache_16[index];
 		m_tilemap_A->mark_all_dirty();
 
-		m_tilemap_A->set_transparent_pen(0);
+		m_tilemap_A->set_transparent_pen(m_border_color);
 
 		if (m_h_div_size == 0) {
 			m_tilemap_A->set_scroll_cols(m_page_x);
@@ -1175,6 +1197,8 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	else
 	{
 		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
+		if(m_mosaic_bplane > 0)
+			ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_bplane);
 
 		if(m_planeB_trans_enable == true)
 			copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -1192,6 +1216,8 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		draw_sprites(bitmap, finalclip);
 
 	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
+	if(m_mosaic_aplane > 0)
+		ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_aplane);
 
 	if(m_planeA_trans_enable == true)
 		copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -1236,7 +1262,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 {
 	int pn = 0;
 
-	switch (p0_state_r)
+	switch (p0_state)
 	{
 		case 0:
 			/* Are we reading from plane B? */
@@ -1259,7 +1285,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 			"mode = %d, pgs = %d (%dx%d)\n"
 			"pattern_name_base_r = %d\n"
 			"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-			p0_state_r,
+			p0_state,
 			pn, m_md, m_page_size,
 			m_page_x, m_page_y,
 			pattern_name_base_r,
@@ -1268,14 +1294,14 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 		pn = 0;
 	}
 
-	p0_state_r++;
+	p0_state++;
 	if (m_md == MD_2PLANE_8BIT )
-		p0_state_r++;
+		p0_state++;
 
-	if (p0_state_r == 2)
+	if (p0_state == 2)
 	{
 		pattern_name_autoinc_check();
-		p0_state_r = 0;
+		p0_state = 0;
 		pattern_name_base_r = 0;
 	}
 
@@ -1360,7 +1386,7 @@ READ8_MEMBER(ygv608_device::register_data_r)
 READ8_MEMBER( ygv608_device::status_port_r )
 {
 	// TODO: we need to use h/vpos in case of border support instead due of how MAME framework works here.
-	return (m_screen_status & 0x1c) | (m_screen->hblank()<<1) | m_screen->vblank();
+	return (m_screen_status & 0x1c) | (screen().hblank()<<1) | screen().vblank();
 }
 
 // P#7R - system control port
@@ -1374,7 +1400,7 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 {
 	int pn = 0;
 
-	switch (p0_state_w)
+	switch (p0_state)
 	{
 		case 0:
 			/* Are we reading from plane B? */
@@ -1393,11 +1419,11 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	if (pn > 4095)
 	{
-		logerror( "attempt (%d) to read pattern name %d\n"
+		logerror( "attempt (%d) to write pattern name %d\n"
 			"mode = %d, pgs = %d (%dx%d)\n"
 			"pattern_name_base_w = %d\n"
 			"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-			p0_state_w,
+			p0_state,
 			pn, m_md, m_page_size,
 			m_page_x, m_page_y,
 			pattern_name_base_w,
@@ -1408,14 +1434,14 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	m_pattern_name_table[pn] = data;
 
-	p0_state_w++;
+	p0_state++;
 	if (m_md == MD_2PLANE_8BIT )
-		p0_state_w++;
+		p0_state++;
 
-	if (p0_state_w == 2)
+	if (p0_state == 2)
 	{
 		pattern_name_autoinc_check();
-		p0_state_w = 0;
+		p0_state = 0;
 		pattern_name_base_w = 0;
 	}
 }
@@ -1806,8 +1832,7 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_7_w )
 	m_na8_mask = ((m_flip == true) ? 0x03 : 0x0f );
 
 	// changing mode resets the pattern name table states (Mappy Arrange)
-	p0_state_w = 0;
-	p0_state_r = 0;
+	p0_state = 0;
 	pattern_mode_setup();
 // TODO: add dot clock into CRTC
 //  screen_configure();
@@ -1941,8 +1966,8 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_10_w )
 	// check mosaic
 	m_mosaic_bplane = (data & 0xc) >> 2;
 	m_mosaic_aplane = data & 3;
-	if(m_mosaic_aplane || m_mosaic_bplane)
-		popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
+//  if(m_mosaic_aplane || m_mosaic_bplane)
+//      popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
 }
 
 // R#11R - screen control 11
@@ -2060,7 +2085,7 @@ attotime ygv608_device::raster_sync_offset()
 	}
 
 	// TODO: actual sync not taken into account, needs a better test than NCV2 limited case
-	return m_screen->time_until_pos(m_raster_irq_vpos,m_raster_irq_hpos);
+	return screen().time_until_pos(m_raster_irq_vpos,m_raster_irq_hpos);
 }
 
 // R#17 / R#24 - base address
@@ -2236,14 +2261,14 @@ void ygv608_device::screen_configure()
 
 	// TODO: Dig Dug Original wants this to be 60.60 Hz (like original Namco HW), lets compensate somehow
 	//      (clock is really 6144000 x 8 = 49152000, so it must have same parameters in practice)
-	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
+	attoseconds_t period = HZ_TO_ATTOSECONDS(screen().clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
 
-	m_screen->configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
+	screen().configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
 
 	// reset vblank timer
 	m_vblank_timer->reset();
-	//m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_vstart+m_crtc.display_height,0), 0, m_screen->frame_period());
-	m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_height,0), 0, m_screen->frame_period());
+	//m_vblank_timer->adjust(screen().time_until_pos(m_crtc.display_vstart+m_crtc.display_height,0), 0, screen().frame_period());
+	m_vblank_timer->adjust(screen().time_until_pos(m_crtc.display_height,0), 0, screen().frame_period());
 }
 
 

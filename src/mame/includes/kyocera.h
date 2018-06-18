@@ -25,6 +25,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 
 
@@ -142,6 +143,11 @@ public:
 	DECLARE_PALETTE_INIT(kc85);
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
+	void kc85(machine_config &config);
+	void kc85_video(machine_config &config);
+	void kc85_io(address_map &map);
+	void kc85_mem(address_map &map);
+	void trsm100_io(address_map &map);
 };
 
 class trsm100_state : public kc85_state
@@ -151,6 +157,8 @@ public:
 		: kc85_state(mconfig, type, tag) { }
 
 	virtual void machine_start() override;
+	void trsm100(machine_config &config);
+	void tandy102(machine_config &config);
 };
 
 class pc8201_state : public kc85_state
@@ -181,6 +189,10 @@ public:
 
 	/* peripheral state */
 	int m_iosel;                /* serial interface select */
+	void pc8300(machine_config &config);
+	void pc8201(machine_config &config);
+	void pc8201_io(address_map &map);
+	void pc8201_mem(address_map &map);
 };
 
 class tandy200_state : public driver_device
@@ -252,11 +264,11 @@ public:
 
 	int m_centronics_busy;
 	int m_centronics_select;
+	void tandy200(machine_config &config);
+	void tandy200_video(machine_config &config);
+	void tandy200_io(address_map &map);
+	void tandy200_lcdc(address_map &map);
+	void tandy200_mem(address_map &map);
 };
-
-/* ---------- defined in video/kyocera.c ---------- */
-
-MACHINE_CONFIG_EXTERN( kc85_video );
-MACHINE_CONFIG_EXTERN( tandy200_video );
 
 #endif // MAME_INCLUDES_KYOCERA_H

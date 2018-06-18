@@ -44,7 +44,7 @@ static uint16_t decrypt(uint16_t data, int address, int select_xor)
 	xorval = xors[j];
 
 	// decrypt
-	return xorval ^ BITSWAP16(data,
+	return xorval ^ bitswap<16>(data,
 				bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
 				bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 }

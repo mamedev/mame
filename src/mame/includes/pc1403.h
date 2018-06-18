@@ -8,12 +8,13 @@
  *
  ****************************************************************************/
 
-#ifndef PC1403_H_
-#define PC1403_H_
+#ifndef MAME_INCLUDES_PC1403_H
+#define MAME_INCLUDES_PC1403_H
 
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define CONTRAST (ioport("DSW0")->read() & 0x07)
 
@@ -40,7 +41,7 @@ public:
 	int m_RIGHT;
 	uint8_t m_reg[0x100];
 
-	DECLARE_DRIVER_INIT(pc1403);
+	void init_pc1403();
 	uint32_t screen_update_pc1403(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ_LINE_MEMBER(pc1403_reset);
 	DECLARE_READ_LINE_MEMBER(pc1403_brk);
@@ -58,8 +59,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	void pc1403h(machine_config &config);
+	void pc1403(machine_config &config);
+	void pc1403_mem(address_map &map);
+	void pc1403h_mem(address_map &map);
+	void pc1421_readmem(address_map &map);
+	void pc1421_writemem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* PC1403_H_ */
+#endif // MAME_INCLUDES_PC1403_H

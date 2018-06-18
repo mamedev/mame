@@ -9,7 +9,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/tiki100/exp.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -19,6 +19,7 @@
 #include "machine/z80pio.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 #define Z80_TAG         "z80"
 #define Z80DART_TAG     "z80dart"
@@ -62,6 +63,7 @@ public:
 		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 1U),
 		m_rome(1),
 		m_vire(1)
 	{ }
@@ -96,6 +98,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( busrq_w );
 
+	void tiki100(machine_config &config);
+	void tiki100_io(address_map &map);
+	void tiki100_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -118,13 +123,14 @@ protected:
 	required_ioport_array<12> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
 
 	enum
 	{
 		ROM0 = 0x01,
 		ROM1 = 0x02,
 		VIR  = 0x04,
-		RAM  = 0x08
+		RAM0 = 0x08
 	};
 
 	// memory state
@@ -146,6 +152,7 @@ protected:
 
 	// serial state
 	bool m_st;
+
 };
 
 #endif // MAME_INCLUDES_TIKI100_H

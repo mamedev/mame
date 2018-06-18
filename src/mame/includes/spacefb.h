@@ -77,6 +77,11 @@ public:
 	void draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void spacefb(machine_config &config);
+	void spacefb_audio(machine_config &config);
+	void spacefb_audio_map(address_map &map);
+	void spacefb_main_io_map(address_map &map);
+	void spacefb_main_map(address_map &map);
 protected:
 
 	enum
@@ -86,6 +91,3 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-/*----------- defined in audio/spacefb.c -----------*/
-MACHINE_CONFIG_EXTERN( spacefb_audio );

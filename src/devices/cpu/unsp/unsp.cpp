@@ -14,7 +14,7 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "u'nSP")
+DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
 
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -31,9 +31,9 @@ device_memory_interface::space_config_vector unsp_device::memory_space_config() 
 	};
 }
 
-util::disasm_interface *unsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> unsp_device::create_disassembler()
 {
-	return new unsp_disassembler;
+	return std::make_unique<unsp_disassembler>();
 }
 
 
@@ -128,7 +128,7 @@ void unsp_device::WRITE16(uint32_t address, uint16_t data)
 
 void unsp_device::device_start()
 {
-	memset(m_r, 0, sizeof(uint16_t) * UNSP_GPR_COUNT);
+	memset(m_r, 0, sizeof(uint16_t) * 16);
 	m_irq = 0;
 	m_fiq = 0;
 	m_curirq = 0;
@@ -154,7 +154,7 @@ void unsp_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void unsp_device::state_export(const device_state_entry &entry)
@@ -182,7 +182,7 @@ void unsp_device::state_import(const device_state_entry &entry)
 
 void unsp_device::device_reset()
 {
-	memset(m_r, 0, sizeof(uint16_t) * UNSP_GPR_COUNT);
+	memset(m_r, 0, sizeof(uint16_t) * 16);
 
 	UNSP_REG(PC) = READ16(0xfff7);
 	m_irq = 0;
@@ -238,7 +238,7 @@ void unsp_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, UNSP_LPC);
+		debugger_instruction_hook(UNSP_LPC);
 		op = READ16(UNSP_LPC);
 
 		UNSP_REG(PC)++;

@@ -111,9 +111,9 @@ public:
 	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
 	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
 	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
-	DECLARE_DRIVER_INIT(slither);
-	DECLARE_DRIVER_INIT(zookeep);
-	DECLARE_DRIVER_INIT(kram3);
+	void init_slither();
+	void init_zookeep();
+	void init_kram3();
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
@@ -146,16 +146,24 @@ public:
 	int kram3_decrypt(int address, int value);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);
+	void mcu(machine_config &config);
+	void qix_base(machine_config &config);
+	void qix(machine_config &config);
+	void qix_video(machine_config &config);
+	void qix_audio(machine_config &config);
+	void zookeep(machine_config &config);
+	void zookeep_video(machine_config &config);
+	void kram3(machine_config &config);
+	void kram3_video(machine_config &config);
+	void slither(machine_config &config);
+	void slither_video(machine_config &config);
+	void slither_audio(machine_config &config);
+	void audio_map(address_map &map);
+	void kram3_main_map(address_map &map);
+	void kram3_video_map(address_map &map);
+	void main_map(address_map &map);
+	void qix_video_map(address_map &map);
+	void slither_video_map(address_map &map);
+	void zoo_main_map(address_map &map);
+	void zookeep_video_map(address_map &map);
 };
-
-/*----------- defined in video/qix.c -----------*/
-
-MACHINE_CONFIG_EXTERN( qix_video );
-MACHINE_CONFIG_EXTERN( kram3_video );
-MACHINE_CONFIG_EXTERN( zookeep_video );
-MACHINE_CONFIG_EXTERN( slither_video );
-
-/*----------- defined in audio/qix.c -----------*/
-
-MACHINE_CONFIG_EXTERN( qix_audio );
-MACHINE_CONFIG_EXTERN( slither_audio );

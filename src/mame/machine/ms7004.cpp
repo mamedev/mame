@@ -47,27 +47,28 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ms7004_map, AS_PROGRAM, 8, ms7004_device )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void ms7004_device::ms7004_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ms7004_device::device_add_mconfig )
-	MCFG_CPU_ADD(MS7004_CPU_TAG, I8035, XTAL_4_608MHz)
-	MCFG_CPU_PROGRAM_MAP(ms7004_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ms7004_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ms7004_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ms7004_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(MS7004_CPU_TAG, I8035, XTAL(4'608'000))
+	MCFG_DEVICE_PROGRAM_MAP(ms7004_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ms7004_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ms7004_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ms7004_device, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(ms7004_device, i8243_port_w))
+	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, ms7004_device, i8243_port_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MS7004_SPK_TAG, BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(MS7004_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

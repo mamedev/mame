@@ -28,6 +28,8 @@ protected:
 	hard_disk_file *harddisk;
 	int lba, cur_lba, blocks;
 	int bytes_per_sector;
+
+	std::vector<u8> m_inquiry_data;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_HARDDISK, nscsi_harddisk_device)

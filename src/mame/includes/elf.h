@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_ELF_H
+#define MAME_INCLUDES_ELF_H
 
-#ifndef __INCLUDES_ELF__
-#define __INCLUDES_ELF__
+#pragma once
 
 
 #include "cpu/cosmac/cosmac.h"
@@ -26,27 +26,18 @@ class elf2_state : public driver_device
 {
 public:
 	elf2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vdc(*this, CDP1861_TAG),
-			m_kb(*this, MM74C923_TAG),
-			m_led_l(*this, DM9368_L_TAG),
-			m_led_h(*this, DM9368_H_TAG),
-			m_cassette(*this, "cassette"),
-			m_ram(*this, RAM_TAG),
-			m_special(*this, "SPECIAL")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_vdc(*this, CDP1861_TAG)
+		, m_kb(*this, MM74C923_TAG)
+		, m_led_l(*this, DM9368_L_TAG)
+		, m_led_h(*this, DM9368_H_TAG)
+		, m_cassette(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+		, m_special(*this, "SPECIAL")
+		, m_7segs(*this, "digit%u", 0U)
+		, m_led(*this, "led0")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cdp1861_device> m_vdc;
-	required_device<mm74c922_device> m_kb;
-	required_device<dm9368_device> m_led_l;
-	required_device<dm9368_device> m_led_h;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
-	required_ioport m_special;
-
-	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( data_r );
@@ -60,8 +51,27 @@ public:
 	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER( input_w );
+	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
+	void elf2(machine_config &config);
+	void elf2_io(address_map &map);
+	void elf2_mem(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cdp1861_device> m_vdc;
+	required_device<mm74c922_device> m_kb;
+	required_device<dm9368_device> m_led_l;
+	required_device<dm9368_device> m_led_h;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	required_ioport m_special;
+	output_finder<2> m_7segs;
+	output_finder<> m_led;
+
 	// display state
 	uint8_t m_data;
 };

@@ -32,16 +32,18 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(joystick_r);
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	required_memory_region m_exp_rom;
 	required_ioport m_joy;
+
+	uint8_t m_romsel;
 };
 
 

@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "machine/er2055.h"
 
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -19,9 +21,10 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM")
 
-static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8, er2055_device )
-	AM_RANGE(0x0000, 0x003f) AM_RAM
-ADDRESS_MAP_END
+void er2055_device::er2055_map(address_map &map)
+{
+	map(0x0000, 0x003f).ram();
+}
 
 
 
@@ -38,7 +41,7 @@ er2055_device::er2055_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
-		m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map)),
+		m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(er2055_device::er2055_map), this)),
 		m_control_state(0),
 		m_address(0),
 		m_data(0)
@@ -138,11 +141,11 @@ void er2055_device::nvram_write(emu_file &file)
 //  reacts to various combinations
 //-------------------------------------------------
 
-void er2055_device::set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2, uint8_t ck)
+void er2055_device::set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2)
 {
 	// create a new composite control state
 	uint8_t oldstate = m_control_state;
-	m_control_state = (ck != 0) ? CK : 0;
+	m_control_state = oldstate & CK;
 	m_control_state |= (c1 != 0) ? C1 : 0;
 	m_control_state |= (c2 != 0) ? C2 : 0;
 	m_control_state |= (cs1 != 0) ? CS1 : 0;
@@ -152,29 +155,60 @@ void er2055_device::set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2
 	if ((m_control_state & (CS1 | CS2)) != (CS1 | CS2) || m_control_state == oldstate)
 		return;
 
-	// something changed, see what it is based on what mode we're in
+	update_state();
+}
+
+
+//-------------------------------------------------
+//  update_state - update internal state following
+//  a transition on clock, control or chip select
+//  lines based on what mode we're in
+//-------------------------------------------------
+
+void er2055_device::update_state()
+{
 	switch (m_control_state & (C1 | C2))
 	{
 		// write mode; erasing is required, so we perform an AND against previous
 		// data to simulate incorrect behavior if erasing was not done
 		case 0:
 			space(AS_PROGRAM).write_byte(m_address, space(AS_PROGRAM).read_byte(m_address) & m_data);
-//printf("Write %02X = %02X\n", m_address, m_data);
+			LOG("Write %02X = %02X\n", m_address, m_data);
 			break;
 
 		// erase mode
 		case C2:
 			space(AS_PROGRAM).write_byte(m_address, 0xff);
-//printf("Erase %02X\n", m_address);
+			LOG("Erase %02X\n", m_address);
 			break;
+	}
+}
 
-		// read mode
-		case C1:
-			if ((oldstate & CK) != 0 && (m_control_state & CK) == 0)
-			{
-				m_data = space(AS_PROGRAM).read_byte(m_address);
-//printf("Read %02X = %02X\n", m_address, m_data);
-			}
-			break;
+
+//-------------------------------------------------
+//  set_clk - set the CLK line, pulses on which
+//  are required for every read operation and for
+//  successive write or erase operations
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(er2055_device::set_clk)
+{
+	uint8_t oldstate = m_control_state;
+	if (state)
+		m_control_state |= CK;
+	else
+		m_control_state &= ~CK;
+
+	// updates occur on falling edge when chip is selected
+	if ((m_control_state & (CS1 | CS2)) == (CS1 | CS2) && (m_control_state != oldstate) && !state)
+	{
+		// read mode (C2 is "Don't Care")
+		if ((m_control_state & C1) == C1)
+		{
+			m_data = space(AS_PROGRAM).read_byte(m_address);
+			LOG("Read %02X = %02X\n", m_address, m_data);
+		}
+
+		update_state();
 	}
 }

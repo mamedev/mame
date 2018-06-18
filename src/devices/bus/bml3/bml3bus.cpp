@@ -70,13 +70,6 @@ bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_t
 {
 }
 
-void bml3bus_slot_device::static_set_bml3bus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	bml3bus_slot_device &bml3bus_card = dynamic_cast<bml3bus_slot_device &>(device);
-	bml3bus_card.m_bml3bus_tag = tag;
-	bml3bus_card.m_bml3bus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -85,7 +78,7 @@ void bml3bus_slot_device::device_start()
 {
 	device_bml3bus_card_interface *dev = dynamic_cast<device_bml3bus_card_interface *>(get_card_device());
 
-	if (dev) device_bml3bus_card_interface::static_set_bml3bus_tag(*dev, m_bml3bus_tag, m_bml3bus_slottag);
+	if (dev) dev->set_bml3bus_tag(m_bml3bus_tag, m_bml3bus_slottag);
 }
 
 //**************************************************************************
@@ -93,12 +86,6 @@ void bml3bus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BML3BUS, bml3bus_device, "bml3bus", "Hitachi MB-6890 Bus")
-
-void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	bml3bus_device &bml3bus = downcast<bml3bus_device &>(device);
-	bml3bus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -115,7 +102,7 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, d
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(nullptr),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_out_nmi_cb(*this),
 	m_out_irq_cb(*this),
 	m_out_firq_cb(*this),
@@ -128,8 +115,6 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, 
 
 void bml3bus_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-
 	// resolve callbacks
 	m_out_nmi_cb.resolve_safe();
 	m_out_irq_cb.resolve_safe();
@@ -212,13 +197,6 @@ device_bml3bus_card_interface::device_bml3bus_card_interface(const machine_confi
 
 device_bml3bus_card_interface::~device_bml3bus_card_interface()
 {
-}
-
-void device_bml3bus_card_interface::static_set_bml3bus_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_bml3bus_card_interface &bml3bus_card = dynamic_cast<device_bml3bus_card_interface &>(device);
-	bml3bus_card.m_bml3bus_tag = tag;
-	bml3bus_card.m_bml3bus_slottag = slottag;
 }
 
 void device_bml3bus_card_interface::set_bml3bus_device()

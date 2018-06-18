@@ -15,6 +15,7 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -28,12 +29,13 @@ class jtc_state : public driver_device
 {
 public:
 	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, UB8830D_TAG),
-			m_cassette(*this, "cassette"),
-			m_speaker(*this, "speaker"),
-			m_centronics(*this, CENTRONICS_TAG),
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, UB8830D_TAG)
+		, m_cassette(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -53,6 +55,9 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void basic(machine_config &config);
+	void jtc(machine_config &config);
+	void jtc_mem(address_map &map);
 };
 
 
@@ -62,6 +67,8 @@ public:
 	jtces88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 	{ }
+	void jtces88(machine_config &config);
+	void jtc_es1988_mem(address_map &map);
 };
 
 
@@ -74,6 +81,8 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void jtces23(machine_config &config);
+	void jtc_es23_mem(address_map &map);
 };
 
 
@@ -95,6 +104,8 @@ public:
 	std::unique_ptr<uint8_t[]> m_color_ram_r;
 	std::unique_ptr<uint8_t[]> m_color_ram_g;
 	std::unique_ptr<uint8_t[]> m_color_ram_b;
+	void jtces40(machine_config &config);
+	void jtc_es40_mem(address_map &map);
 };
 
 
@@ -201,86 +212,90 @@ WRITE8_MEMBER( jtces40_state::banksel_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8, jtc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void jtc_state::jtc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("video_ram");
+}
 
-static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8, jtces88_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0800, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_ROM
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void jtces88_state::jtc_es1988_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0800, 0x0fff).rom();
+	map(0x2000, 0x27ff).rom();
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("video_ram");
+}
 
-static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0800, 0x17ff) AM_ROM
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff0) AM_READ_PORT("Y0")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0x700d, 0x700d) AM_MIRROR(0x0ff0) AM_READ_PORT("Y13")
-	AM_RANGE(0x700e, 0x700e) AM_MIRROR(0x0ff0) AM_READ_PORT("Y14")
-	AM_RANGE(0x700f, 0x700f) AM_MIRROR(0x0ff0) AM_READ_PORT("Y15")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void jtces23_state::jtc_es23_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0800, 0x17ff).rom();
+	map(0x7000, 0x7000).mirror(0x0ff0).portr("Y0");
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0x700d, 0x700d).mirror(0x0ff0).portr("Y13");
+	map(0x700e, 0x700e).mirror(0x0ff0).portr("Y14");
+	map(0x700f, 0x700f).mirror(0x0ff0).portr("Y15");
+	map(0xe000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("video_ram");
+}
 
-static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8, jtces40_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0800, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(videoram_r, videoram_w)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(banksel_w)
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0x8000, 0xffff) AM_RAM//BANK(1)
-ADDRESS_MAP_END
+void jtces40_state::jtc_es40_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0800, 0x1fff).rom();
+	map(0x4000, 0x5fff).rw(FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
+	map(0x6000, 0x63ff).w(FUNC(jtces40_state::banksel_w));
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0x8000, 0xffff).ram();//BANK(1)
+}
 
 /* Input Ports */
 
@@ -704,40 +719,39 @@ static const gfx_layout jtces40_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( jtces23 )
+static GFXDECODE_START( gfx_jtces23 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces23_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jtces40 )
+static GFXDECODE_START( gfx_jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( basic )
+MACHINE_CONFIG_START(jtc_state::basic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
-	MCFG_CPU_PROGRAM_MAP(jtc_mem)
-	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(jtc_state, p2_w))
-	MCFG_Z8_PORT_P3_READ_CB(READ8(jtc_state, p3_r))
-	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(jtc_state, p3_w))
+	MCFG_DEVICE_ADD(UB8830D_TAG, UB8830D, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jtc_mem)
+	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(*this, jtc_state, p2_w))
+	MCFG_Z8_PORT_P3_READ_CB(READ8(*this, jtc_state, p3_r))
+	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtc, basic )
+MACHINE_CONFIG_START(jtc_state::jtc)
+	basic(config);
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -754,20 +768,22 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtces88, jtc )
+MACHINE_CONFIG_START(jtces88_state::jtces88)
+	jtc(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es1988_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtces23, basic )
+MACHINE_CONFIG_START(jtces23_state::jtces23)
+	basic(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es23_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -778,7 +794,7 @@ static MACHINE_CONFIG_DERIVED( jtces23, basic )
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
@@ -786,10 +802,11 @@ static MACHINE_CONFIG_DERIVED( jtces23, basic )
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtces40, basic )
+MACHINE_CONFIG_START(jtces40_state::jtces40)
+	basic(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es40_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -800,7 +817,7 @@ static MACHINE_CONFIG_DERIVED( jtces40, basic )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces40)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
 
@@ -840,8 +857,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT    STATE          INIT  COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc,     jtc_state,     0,    "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc,     jtces88_state, 0,    "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, jtces23_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, jtces40_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME                    FLAGS */
+COMP( 1987, jtc,     0,      0,      jtc,     jtc,     jtc_state,     empty_init, "Jugend+Technik", "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88, jtc,    0,      jtces88, jtc,     jtces88_state, empty_init, "Jugend+Technik", "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23, jtc,    0,      jtces23, jtces23, jtces23_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40, jtc,    0,      jtces40, jtces40, jtces40_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

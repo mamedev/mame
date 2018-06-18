@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 
@@ -60,21 +60,23 @@ DEFINE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device, "ldv1000", "Pioneer 
 //  LD-V1000 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8, pioneer_ldv1000_device )
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi1", i8255_device, read, write)
-ADDRESS_MAP_END
+void pioneer_ldv1000_device::ldv1000_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
+	map(0x8000, 0x87ff).mirror(0x3800).ram();
+	map(0xc000, 0xc003).mirror(0x1ff0).rw("ldvppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).mirror(0x1ff0).rw("ldvppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8, pioneer_ldv1000_device )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(z80_decoder_display_port_r, z80_decoder_display_port_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(z80_controller_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(z80_controller_w)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ldvctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void pioneer_ldv1000_device::ldv1000_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).mirror(0x38).rw(FUNC(pioneer_ldv1000_device::z80_decoder_display_port_r), FUNC(pioneer_ldv1000_device::z80_decoder_display_port_w));
+	map(0x40, 0x40).mirror(0x3f).r(FUNC(pioneer_ldv1000_device::z80_controller_r));
+	map(0x80, 0x80).mirror(0x3f).w(FUNC(pioneer_ldv1000_device::z80_controller_w));
+	map(0xc0, 0xc3).mirror(0x3c).rw("ldvctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 static const z80_daisy_config daisy_chain[] =
@@ -270,25 +272,25 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pioneer_ldv1000_device::device_add_mconfig )
-	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
+MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("ldv1000", Z80, XTAL(5'000'000)/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
-	MCFG_CPU_IO_MAP(ldv1000_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(ldv1000_map)
+	MCFG_DEVICE_IO_MAP(ldv1000_portmap)
 
-	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL_5MHz/2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
+	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL(5'000'000)/2)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, pioneer_ldv1000_device, ctc_interrupt))
 
 	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pioneer_ldv1000_device, ppi0_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pioneer_ldv1000_device, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi0_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pioneer_ldv1000_device, ppi0_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pioneer_ldv1000_device, ppi0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_portc_w))
 
 	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pioneer_ldv1000_device, ppi1_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pioneer_ldv1000_device, ppi1_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pioneer_ldv1000_device, ppi1_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pioneer_ldv1000_device, ppi1_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pioneer_ldv1000_device, ppi1_portc_w))
 MACHINE_CONFIG_END
 
 
@@ -417,7 +419,7 @@ READ8_MEMBER( pioneer_ldv1000_device::z80_controller_r )
 WRITE8_MEMBER( pioneer_ldv1000_device::z80_controller_w )
 {
 	if (LOG_STATUS_CHANGES && data != m_status)
-		logerror("%04X:CONTROLLER.W=%02X\n", space.device().safe_pc(), data);
+		logerror("%s:CONTROLLER.W=%02X\n", machine().describe_context(), data);
 	m_status = data;
 }
 

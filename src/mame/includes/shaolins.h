@@ -2,6 +2,7 @@
 // copyright-holders:Allard van der Bas
 
 #include "machine/timer.h"
+#include "emupal.h"
 
 class shaolins_state : public driver_device
 {
@@ -42,4 +43,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void shaolins(machine_config &config);
+	void shaolins_map(address_map &map);
 };

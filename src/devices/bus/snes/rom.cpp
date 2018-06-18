@@ -291,7 +291,7 @@ WRITE8_MEMBER( sns_rom_obc1_device::chip_write )
 // Address range for read/write depends on the game (check snes.xml)
 READ8_MEMBER( sns_rom_pokemon_device::chip_read )
 {
-	return BITSWAP8(m_latch,0,6,7,1,2,3,4,5);
+	return bitswap<8>(m_latch,0,6,7,1,2,3,4,5);
 }
 
 WRITE8_MEMBER( sns_rom_pokemon_device::chip_write )
@@ -488,7 +488,7 @@ WRITE8_MEMBER( sns_rom_20col_device::chip_write )
 
 READ8_MEMBER( sns_rom_banana_device::chip_read )
 {
-	return BITSWAP8(m_latch[0xf],0,6,7,1,2,3,4,5);
+	return bitswap<8>(m_latch[0xf],0,6,7,1,2,3,4,5);
 }
 
 WRITE8_MEMBER( sns_rom_banana_device::chip_write )
@@ -499,7 +499,7 @@ WRITE8_MEMBER( sns_rom_banana_device::chip_write )
 
 READ8_MEMBER( sns_rom_bugs_device::chip_read )
 {
-	return BITSWAP8(m_latch[offset & 0xff],0,6,7,1,2,3,4,5);
+	return bitswap<8>(m_latch[offset & 0xff],0,6,7,1,2,3,4,5);
 }
 
 WRITE8_MEMBER( sns_rom_bugs_device::chip_write )

@@ -347,7 +347,7 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
 */
 void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	//activedevice_adjust_icount(-4);
 
@@ -533,7 +533,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 */
 void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	//activedevice_adjust_icount(-4);
 
@@ -696,7 +696,7 @@ INPUT_PORTS_START( ti99_hsgpl)
 		PORT_DIPSETTING(    0x01, "Normal" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( snug_high_speed_gpl_device::device_add_mconfig )
+MACHINE_CONFIG_START(snug_high_speed_gpl_device::device_add_mconfig)
 	MCFG_AT29C040A_ADD( DSR_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_B_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_A_EEPROM )

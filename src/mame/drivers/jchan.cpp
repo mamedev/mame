@@ -163,6 +163,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "video/sknsspr.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -170,58 +171,50 @@ class jchan_state : public driver_device
 {
 public:
 	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"sub"),
-		m_palette(*this, "palette"),
-		m_spritegen1(*this, "spritegen1"),
-		m_spritegen2(*this, "spritegen2"),
-		m_view2_0(*this, "view2_0"),
-		m_spriteram_1(*this, "spriteram_1"),
-		m_sprregs_1(*this, "sprregs_1"),
-		m_spriteram_2(*this, "spriteram_2"),
-		m_sprregs_2(*this, "sprregs_2"),
-		m_mainsub_shared_ram(*this, "mainsub_shared"),
-		m_ctrl(*this, "ctrl")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_subcpu(*this,"sub")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen%u", 1)
+		, m_view2(*this, "view2")
+		, m_spriteram(*this, "spriteram_%u", 1)
+		, m_sprregs(*this, "sprregs_%u", 1)
+		, m_mainsub_shared_ram(*this, "mainsub_shared")
+		, m_ctrl(*this, "ctrl")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<palette_device> m_palette;
-	required_device<sknsspr_device> m_spritegen1;
-	required_device<sknsspr_device> m_spritegen2;
-	required_device<kaneko_view2_tilemap_device> m_view2_0;
+	required_device_array<sknsspr_device, 2> m_spritegen;
+	required_device<kaneko_view2_tilemap_device> m_view2;
 
-	required_shared_ptr<uint16_t> m_spriteram_1;
-	required_shared_ptr<uint16_t> m_sprregs_1;
-	required_shared_ptr<uint16_t> m_spriteram_2;
-	required_shared_ptr<uint16_t> m_sprregs_2;
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
+	required_shared_ptr_array<uint16_t, 2> m_sprregs;
 	required_shared_ptr<uint16_t> m_mainsub_shared_ram;
 	required_shared_ptr<uint16_t> m_ctrl;
 
-	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_1;
-	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_2;
-	std::unique_ptr<uint32_t[]> m_sprite_ram32_1;
-	std::unique_ptr<uint32_t[]> m_sprite_ram32_2;
-	std::unique_ptr<uint32_t[]> m_sprite_regs32_1;
-	std::unique_ptr<uint32_t[]> m_sprite_regs32_2;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap[2];
+	std::unique_ptr<uint32_t[]> m_sprite_ram32[2];
+	std::unique_ptr<uint32_t[]> m_sprite_regs32[2];
 	int m_irq_sub_enable;
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 	DECLARE_READ16_MEMBER(ctrl_r);
 	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
 	DECLARE_WRITE16_MEMBER(sub2main_cmd_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_1_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_1_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_2_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_2_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
 
-	DECLARE_DRIVER_INIT(jchan);
+	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
+	void jchan(machine_config &config);
+	void jchan_main(address_map &map);
+	void jchan_sub(address_map &map);
 };
 
 
@@ -264,34 +257,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 }
 
 
-
-
 void jchan_state::video_start()
 {
-	/* so we can use sknsspr.c */
-	m_sprite_ram32_1 = std::make_unique<uint32_t[]>(0x4000/4);
-	m_sprite_ram32_2 = std::make_unique<uint32_t[]>(0x4000/4);
+	/* so we can use sknsspr.cpp */
+	m_sprite_ram32[0] = std::make_unique<uint32_t[]>(0x4000/4);
+	m_sprite_ram32[1] = std::make_unique<uint32_t[]>(0x4000/4);
 
-	m_sprite_regs32_1 = std::make_unique<uint32_t[]>(0x40/4);
-	m_sprite_regs32_2 = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32[0] = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32[1] = std::make_unique<uint32_t[]>(0x40/4);
 
-	m_sprite_bitmap_1 = std::make_unique<bitmap_ind16>(1024,1024);
-	m_sprite_bitmap_2 = std::make_unique<bitmap_ind16>(1024,1024);
+	m_sprite_bitmap[0] = std::make_unique<bitmap_ind16>(1024,1024);
+	m_sprite_bitmap[1] = std::make_unique<bitmap_ind16>(1024,1024);
 
-	m_spritegen1->skns_sprite_kludge(0,0);
-	m_spritegen2->skns_sprite_kludge(0,0);
+	m_spritegen[0]->skns_sprite_kludge(0,0);
+	m_spritegen[1]->skns_sprite_kludge(0,0);
 
 	save_item(NAME(m_irq_sub_enable));
-	save_pointer(NAME(m_sprite_ram32_1.get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_ram32_2.get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_regs32_1.get()), 0x40/4);
-	save_pointer(NAME(m_sprite_regs32_2.get()), 0x40/4);
+	save_pointer(NAME(m_sprite_ram32[0].get()), 0x4000/4);
+	save_pointer(NAME(m_sprite_ram32[1].get()), 0x4000/4);
+	save_pointer(NAME(m_sprite_regs32[0].get()), 0x40/4);
+	save_pointer(NAME(m_sprite_regs32[1].get()), 0x40/4);
 }
-
-
-
-
-
 
 
 uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -300,46 +286,95 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	uint16_t* src1;
 	uint16_t* src2;
 	uint16_t* dst;
-	uint16_t pixdata1;
-	uint16_t pixdata2;
+	uint16_t pixdata1, pixdata2;
+	uint16_t pridata1, pridata2;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	uint8_t *tilepri;
+	uint8_t bgpridata;
+
+	bitmap.fill(0x7f00, cliprect); // verified
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	m_view2->kaneko16_prepare(bitmap, cliprect);
 
-	for ( int i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++)
 	{
-		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
-	m_sprite_bitmap_1->fill(0x0000, cliprect);
-	m_sprite_bitmap_2->fill(0x0000, cliprect);
-
-	m_spritegen1->skns_draw_sprites(*m_sprite_bitmap_1, cliprect, m_sprite_ram32_1.get(), 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_sprite_regs32_1.get() );
-	m_spritegen2->skns_draw_sprites(*m_sprite_bitmap_2, cliprect, m_sprite_ram32_2.get(), 0x4000, memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2.get() );
-
-	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
-	for (y=0;y<240;y++)
+	for (int chip = 0; chip < 2; chip++)
 	{
-		src1 = &m_sprite_bitmap_1->pix16(y);
-		src2 = &m_sprite_bitmap_2->pix16(y);
+		m_sprite_bitmap[chip]->fill(0, cliprect);
+		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_sprite_regs32[chip].get() );
+	}
+
+	bitmap_ind8 *tile_primap = &screen.priority();
+
+	// TODO : verify sprite-tile priorities from real hardware, Check what 15 bit of palette actually working
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	{
+		src1 = &m_sprite_bitmap[0]->pix16(y);
+		src2 = &m_sprite_bitmap[1]->pix16(y);
+		tilepri = &tile_primap->pix8(y);
 		dst =  &bitmap.pix16(y);
 
-		for (x=0;x<320;x++)
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			pixdata1 = src1[x];
 			pixdata2 = src2[x];
+			pridata1 = (pixdata1 >> 14) & 3;
+			pridata2 = (pixdata2 >> 14) & 3;
 
-			if (pixdata2 & 0x3fff)
+			bgpridata = tilepri[x] >> 1;
+
+			if (pridata1 >= bgpridata)
 			{
-				dst[x] = (pixdata2 & 0x3fff)|0x4000;
+				if (pridata2 >= bgpridata)
+				{
+					if (pridata2 >= pridata1)
+					{
+						if (pixdata2 & 0xff)
+						{
+							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata2 << 1);
+						}
+						else if (pixdata1 & 0xff)
+						{
+							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata1 << 1);
+						}
+					}
+					else
+					{
+						if (pixdata1 & 0xff)
+						{
+							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata1 << 1);
+						}
+						else if (pixdata2 & 0xff)
+						{
+							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata2 << 1);
+						}
+					}
+				}
+				else
+				{
+					if (pixdata1 & 0xff)
+					{
+						dst[x] = (pixdata1 & 0x3fff)|0x4000;
+						tilepri[x] = (pridata1 << 1);
+					}
+				}
 			}
-
-			if (pixdata1 & 0x3fff)
+			else if (pridata2 >= bgpridata)
 			{
-				dst[x] = (pixdata1 & 0x3fff)|0x4000;
+				if (pixdata2 & 0xff)
+				{
+					dst[x] = (pixdata2 & 0x3fff)|0x4000;
+					tilepri[x] = (pridata2 << 1);
+				}
 			}
 		}
 	}
@@ -398,78 +433,68 @@ WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_1_w)
+template<int Chip>
+WRITE16_MEMBER(jchan_state::sknsspr_sprite32_w)
 {
-	COMBINE_DATA(&m_spriteram_1[offset]);
+	COMBINE_DATA(&m_spriteram[Chip][offset]);
 	offset>>=1;
-	m_sprite_ram32_1[offset]=(m_spriteram_1[offset*2+1]<<16) | (m_spriteram_1[offset*2]);
+	m_sprite_ram32[Chip][offset]=(m_spriteram[Chip][offset*2+1]<<16) | (m_spriteram[Chip][offset*2]);
 }
 
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_1_w)
+template<int Chip>
+WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_w)
 {
-	COMBINE_DATA(&m_sprregs_1[offset]);
+	COMBINE_DATA(&m_sprregs[Chip][offset]);
 	offset>>=1;
-	m_sprite_regs32_1[offset]=(m_sprregs_1[offset*2+1]<<16) | (m_sprregs_1[offset*2]);
-}
-
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_2_w)
-{
-	COMBINE_DATA(&m_spriteram_2[offset]);
-	offset>>=1;
-	m_sprite_ram32_2[offset]=(m_spriteram_2[offset*2+1]<<16) | (m_spriteram_2[offset*2]);
-}
-
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_2_w)
-{
-	COMBINE_DATA(&m_sprregs_2[offset]);
-	offset>>=1;
-	m_sprite_regs32_2[offset]=(m_sprregs_2[offset*2+1]<<16) | (m_sprregs_2[offset*2]);
+	m_sprite_regs32[Chip][offset]=(m_sprregs[Chip][offset*2+1]<<16) | (m_sprregs[Chip][offset*2]);
 }
 
 
-static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
+void jchan_state::jchan_main(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).ram(); // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("mcuram") //    [G] MCU share
-	AM_RANGE(0x330000, 0x330001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x370000, 0x370001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
+	map(0x300000, 0x30ffff).ram().share("mcuram"); //    [G] MCU share
+	map(0x330000, 0x330001).w("toybox", FUNC(kaneko_toybox_device::mcu_com0_w));
+	map(0x340000, 0x340001).w("toybox", FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x350000, 0x350001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x360000, 0x360001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
+	map(0x370000, 0x370001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
+	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* 1st sprite layer */
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sknsspr_sprite32_1_w) AM_SHARE("spriteram_1")
-	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(sknsspr_sprite32regs_1_w) AM_SHARE("sprregs_1")
+	map(0x500000, 0x503fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
+	map(0x600000, 0x60003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette for sprites?
+	map(0x700000, 0x70ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette
 
-	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(ctrl_r, ctrl_w) AM_SHARE("ctrl")
+	map(0xf00000, 0xf00007).rw(FUNC(jchan_state::ctrl_r), FUNC(jchan_state::ctrl_w)).share("ctrl");
 
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-ADDRESS_MAP_END
+	map(0xf80000, 0xf80001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+}
 
 
-static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
+void jchan_state::jchan_sub(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram(); // Work RAM - grid tested, cleared ($612-$6dc)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
+	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	map(0x500000, 0x503fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 
 	/* background sprites */
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(sknsspr_sprite32_2_w) AM_SHARE("spriteram_2")
-	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(sknsspr_sprite32regs_2_w) AM_SHARE("sprregs_2")
+	map(0x700000, 0x703fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
+	map(0x780000, 0x78003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
 
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff) // sound
+	map(0x800000, 0x800003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff); // sound
 
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-ADDRESS_MAP_END
+	map(0xa00000, 0xa00001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+}
 
 
 static const gfx_layout tilelayout =
@@ -483,11 +508,10 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-// we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.c */
+// we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.cpp */
 
-static GFXDECODE_START( jchan )
+static GFXDECODE_START( gfx_jchan )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  ) // video/kaneko16.c is hardcoded to here for now
 GFXDECODE_END
 
 
@@ -522,7 +546,7 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME( DEF_STR( Test ) ) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( DEF_STR( Test ) ) PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -577,19 +601,18 @@ INPUT_PORTS_END
 
 /* machine driver */
 
-static MACHINE_CONFIG_START( jchan )
+MACHINE_CONFIG_START(jchan_state::jchan)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jchan_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(jchan_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jchan_state, vblank, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jchan_sub)
+	MCFG_DEVICE_ADD("sub", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(jchan_sub)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -602,25 +625,23 @@ static MACHINE_CONFIG_START( jchan )
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 25, 11, 320, 240);
+	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
+	MCFG_KANEKO_TMAP_GFX_REGION(0)
+	MCFG_KANEKO_TMAP_OFFSET(33, 11, 320, 240)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
-
-
 
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -638,7 +659,7 @@ ROM_START( jchan )
 	ROM_LOAD16_BYTE( "jsp1x3.u86", 0x000001, 0x080000, CRC(d15d2b8e) SHA1(e253f2d64fee6627f68833b441f41ea6bbb3ab07) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "jsp0x3.u87", 0x000000, 0x080000, CRC(ebec50b1) SHA1(57d7bd728349c2b9d662bcf20a3be92902cb3ffb) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x2000000, "gfx1", 0 ) /* SPA GFX */
+	ROM_REGION( 0x2000000, "spritegen1", 0 ) /* SPA GFX */
 	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
 	ROM_LOAD( "jc-101-00.180", 0x0400000, 0x0400000, CRC(7f5e1aca) SHA1(66ed3deedfd55d88e7dcd017b9c2ce523ccb421a) ) // SPA1
 	ROM_LOAD( "jc-102-00.181", 0x0800000, 0x0400000, CRC(72caaa68) SHA1(f6b98aa949768a306ac9bc5f9c05a1c1a3fb6c3f) ) // SPA2
@@ -649,7 +670,7 @@ ROM_START( jchan )
 	ROM_LOAD16_BYTE( "jcs0x3.164", 0x1600000, 0x040000, CRC(9a012cbc) SHA1(b3e7390220c90d55dccfb96397f0af73925e36f9) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "jcs1x3.165", 0x1600001, 0x040000, CRC(57ae7c8d) SHA1(4086f638c2aabcee84e838243f0fd15cec5c040d) ) // SPA-7B female portraits
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (background sprites) */
+	ROM_REGION( 0x1000000, "spritegen2", 0 ) /* SPB GFX (background sprites) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
@@ -678,7 +699,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_BYTE( "j2p1x5.u86", 0x000001, 0x080000, CRC(dc897725) SHA1(d3e94bac96497deb2f79996c2d4a349f6da5b1d6) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "j2p1x6.u87", 0x000000, 0x080000, CRC(594224f9) SHA1(bc546a98c5f3c5b08f521c54a4b0e9e2cdf83ced) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x2000000, "gfx1", 0 ) /* SPA GFX */
+	ROM_REGION( 0x2000000, "spritegen1", 0 ) /* SPA GFX */
 	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
 	ROM_LOAD( "jc-101-00.180", 0x0400000, 0x0400000, CRC(7f5e1aca) SHA1(66ed3deedfd55d88e7dcd017b9c2ce523ccb421a) ) // SPA1
 	ROM_LOAD( "jc-102-00.181", 0x0800000, 0x0400000, CRC(72caaa68) SHA1(f6b98aa949768a306ac9bc5f9c05a1c1a3fb6c3f) ) // SPA2
@@ -689,7 +710,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_BYTE( "j2g1x1.164", 0x1600000, 0x080000, CRC(66a7ea6a) SHA1(605cbc1eb50fb0decbea790f2a11e999d5fde762) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "j2g1x2.165", 0x1600001, 0x080000, CRC(660e770c) SHA1(1e385a6ee83559b269d2179e6c247238c0f3c850) ) // SPA-7B female portraits
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (background sprites) */
+	ROM_REGION( 0x1000000, "spritegen2", 0 ) /* SPB GFX (background sprites) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
@@ -706,7 +727,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT_MEMBER( jchan_state, jchan )
+void jchan_state::init_jchan()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
@@ -714,5 +735,5 @@ DRIVER_INIT_MEMBER( jchan_state, jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan,  jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,  0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2, 0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

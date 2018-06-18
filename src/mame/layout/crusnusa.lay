@@ -87,40 +87,40 @@
 	</element>
 
 	<view name="Dashboard">
-		<bounds left="0" top="0" right="4" bottom="3.472" />
+		<bounds left="0" top="0" right="4" bottom="3.525" />
 
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="4" bottom="3.125" />
 		</screen>
 
-		<bezel name="lamp0" element="start" inputtag="IN0" inputmask="0x04">
-			<bounds x="3.60" y="3.1" width="0.3" height="0.3" />
+		<bezel element="radio" inputtag="IN1" inputmask="0x02">
+			<bounds x="3.250" y="3.150" width="0.35" height="0.35" />
 		</bezel>
+		<bezel name="lamp0" element="start" inputtag="IN0" inputmask="0x04">
+			<bounds x="3.625" y="3.150" width="0.35" height="0.35" />
+		</bezel>
+
 		<bezel name="lamp1" element="view1" inputtag="IN1" inputmask="0x10">
-			<bounds x="0.1" y="3.075" width="0.5" height="0.1" />
+			<bounds x="0.025" y="3.150" width="0.5" height="0.1" />
 		</bezel>
 		<bezel name="lamp2" element="view2" inputtag="IN1" inputmask="0x20">
-			<bounds x="0.1" y="3.2" width="0.5" height="0.1" />
+			<bounds x="0.025" y="3.275" width="0.5" height="0.1" />
 		</bezel>
 		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
-			<bounds x="0.1" y="3.325" width="0.5" height="0.1" />
+			<bounds x="0.025" y="3.400" width="0.5" height="0.1" />
 		</bezel>
 
 		<bezel name="lamp4" element="lamp">
-			<bounds x="1.785" y="3.2" width="0.1" height="0.1" />
+			<bounds x="1.785" y="3.275" width="0.1" height="0.1" />
 		</bezel>
 		<bezel name="lamp5" element="lamp">
-			<bounds x="1.895" y="3.2" width="0.1" height="0.1" />
+			<bounds x="1.895" y="3.275" width="0.1" height="0.1" />
 		</bezel>
 		<bezel name="lamp6" element="lamp">
-			<bounds x="2.005" y="3.2" width="0.1" height="0.1" />
+			<bounds x="2.005" y="3.275" width="0.1" height="0.1" />
 		</bezel>
 		<bezel name="lamp7" element="lamp">
-			<bounds x="2.115" y="3.2" width="0.1" height="0.1" />
-		</bezel>
-
-		<bezel element="radio" inputtag="IN1" inputmask="0x02">
-			<bounds x="3.20" y="3.1" width="0.3" height="0.3" />
+			<bounds x="2.115" y="3.275" width="0.1" height="0.1" />
 		</bezel>
 	</view>
 </mamelayout>

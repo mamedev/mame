@@ -69,7 +69,7 @@ WRITE16_MEMBER(suna16_state::flipscreen_w)
 		flip_screen_set(data & 1 );
 		m_color_bank = ( data & 4 ) >> 2;
 	}
-	if (data & ~(1|4))  logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~(1|4))  logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
@@ -79,7 +79,7 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 		flip_screen_set(data & 0x10 );
 		//m_color_bank = ( data & 0x07 );
 	}
-	if (data & ~(0x10)) logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~(0x10)) logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 

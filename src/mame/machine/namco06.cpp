@@ -93,7 +93,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 	if (!m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
 		LOG("NMI cpu '%s'\n",m_nmicpu->tag());
-		m_nmicpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_nmicpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		LOG("NMI not generated because cpu '%s' is suspended\n",m_nmicpu->tag());
@@ -145,7 +145,7 @@ READ8_MEMBER( namco_06xx_device::ctrl_r )
 
 WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 {
-	LOG("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data);
+	LOG("%s: 06XX '%s' control %02x\n",machine().describe_context(),tag(),data);
 
 	m_control = data;
 

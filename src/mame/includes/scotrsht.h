@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, ???
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class scotrsht_state : public driver_device
 {
@@ -44,11 +45,15 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(scotrsht);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void scotrsht(machine_config &config);
+	void scotrsht_map(address_map &map);
+	void scotrsht_sound_map(address_map &map);
+	void scotrsht_sound_port(address_map &map);
 };

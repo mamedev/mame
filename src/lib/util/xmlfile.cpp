@@ -18,15 +18,23 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
+#include <locale>
+#include <sstream>
 
 
 namespace util { namespace xml {
+
+namespace {
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-#define TEMP_BUFFER_SIZE        4096
+constexpr unsigned TEMP_BUFFER_SIZE(4096U);
+std::locale const f_portable_locale("C");
+
+} // anonymous namespace
 
 
 
@@ -577,18 +585,38 @@ const char *data_node::get_attribute_string(const char *attribute, const char *d
 int data_node::get_attribute_int(const char *attribute, int defvalue) const
 {
 	char const *const string = get_attribute_string(attribute, nullptr);
-	int value;
-	unsigned int uvalue;
-
-	if (string == nullptr)
+	if (!string)
 		return defvalue;
+
+	std::istringstream stream;
+	stream.imbue(f_portable_locale);
+	int result;
 	if (string[0] == '$')
-		return (sscanf(&string[1], "%X", &uvalue) == 1) ? uvalue : defvalue;
-	if (string[0] == '0' && string[1] == 'x')
-		return (sscanf(&string[2], "%X", &uvalue) == 1) ? uvalue : defvalue;
-	if (string[0] == '#')
-		return (sscanf(&string[1], "%d", &value) == 1) ? value : defvalue;
-	return (sscanf(&string[0], "%d", &value) == 1) ? value : defvalue;
+	{
+		stream.str(&string[1]);
+		unsigned uvalue;
+		stream >> std::hex >> uvalue;
+		result = int(uvalue);
+	}
+	else if (string[0] == '0' && string[1] == 'x')
+	{
+		stream.str(&string[2]);
+		unsigned uvalue;
+		stream >> std::hex >> uvalue;
+		result = int(uvalue);
+	}
+	else if (string[0] == '#')
+	{
+		stream.str(&string[1]);
+		stream >> result;
+	}
+	else
+	{
+		stream.str(&string[0]);
+		stream >> result;
+	}
+
+	return stream ? result : defvalue;
 }
 
 
@@ -600,7 +628,6 @@ int data_node::get_attribute_int(const char *attribute, int defvalue) const
 data_node::int_format data_node::get_attribute_int_format(const char *attribute) const
 {
 	char const *const string = get_attribute_string(attribute, nullptr);
-
 	if (!string)
 		return int_format::DECIMAL;
 	else if (string[0] == '$')
@@ -623,11 +650,13 @@ data_node::int_format data_node::get_attribute_int_format(const char *attribute)
 float data_node::get_attribute_float(const char *attribute, float defvalue) const
 {
 	char const *const string = get_attribute_string(attribute, nullptr);
-	float value;
-
-	if (string == nullptr || sscanf(string, "%f", &value) != 1)
+	if (!string)
 		return defvalue;
-	return value;
+
+	std::istringstream stream(string);
+	stream.imbue(f_portable_locale);
+	float result;
+	return (stream >> result) ? result : defvalue;
 }
 
 
@@ -663,9 +692,7 @@ void data_node::set_attribute(const char *name, const char *value)
 
 void data_node::set_attribute_int(const char *name, int value)
 {
-	char buffer[100];
-	sprintf(buffer, "%d", value);
-	set_attribute(name, buffer);
+	set_attribute(name, string_format(f_portable_locale, "%d", value).c_str());
 }
 
 
@@ -676,9 +703,7 @@ void data_node::set_attribute_int(const char *name, int value)
 
 void data_node::set_attribute_float(const char *name, float value)
 {
-	char buffer[100];
-	sprintf(buffer, "%f", (double) value);
-	set_attribute(name, buffer);
+	set_attribute(name, string_format(f_portable_locale, "%f", value).c_str());
 }
 
 
@@ -888,6 +913,7 @@ void data_node::add_attribute(const char *name, const char *value)
 	}
 	catch (...)
 	{
+		osd_printf_warning("error adding attribute to XML data node\n");
 	}
 }
 

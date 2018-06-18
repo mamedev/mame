@@ -37,9 +37,15 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_COMPACT_JOYPORT_ADD( _tag, _slot_intf, _def_slot) \
+#define MCFG_BBC_JOYPORT_ADD( _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, BBC_JOYPORT_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+#define MCFG_BBC_JOYPORT_CB1_HANDLER(_devcb) \
+	devcb = &downcast<bbc_joyport_slot_device &>(*device).set_cb1_handler(DEVCB_##_devcb);
+
+#define MCFG_BBC_JOYPORT_CB2_HANDLER(_devcb) \
+	devcb = &downcast<bbc_joyport_slot_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -55,15 +61,27 @@ public:
 	// construction/destruction
 	bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t cb_r();
-	uint8_t pb_r();
+	// callbacks
+	template <class Object> devcb_base &set_cb1_handler(Object &&cb) { return m_cb1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cb2_handler(Object &&cb) { return m_cb2_handler.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
+
+	DECLARE_READ8_MEMBER(pb_r);
+	DECLARE_WRITE8_MEMBER(pb_w);
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	device_bbc_joyport_interface *m_device;
+
+private:
+	devcb_write_line m_cb1_handler;
+	devcb_write_line m_cb2_handler;
 };
 
 
@@ -75,8 +93,8 @@ public:
 	// construction/destruction
 	virtual ~device_bbc_joyport_interface();
 
-	virtual uint8_t cb_r() { return 0xff; }
-	virtual uint8_t pb_r() { return 0x1f; }
+	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
 
 protected:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
@@ -88,7 +106,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_JOYPORT_SLOT, bbc_joyport_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_joyport_devices );
+void bbc_joyport_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_JOYPORT_JOYPORT_H

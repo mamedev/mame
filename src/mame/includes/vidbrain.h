@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __VIDBRAIN__
-#define __VIDBRAIN__
+#ifndef MAME_INCLUDES_VIDBRAIN_H
+#define MAME_INCLUDES_VIDBRAIN_H
 
 #include "bus/vidbrain/exp.h"
 #include "cpu/f8/f8.h"
@@ -97,10 +97,10 @@ public:
 
 	// timers
 	emu_timer *m_timer_ne555;
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
+	void vidbrain_io(address_map &map);
+	void vidbrain_mem(address_map &map);
 };
-
-//----------- defined in video/vidbrain.c -----------
-
-MACHINE_CONFIG_EXTERN( vidbrain_video );
 
 #endif

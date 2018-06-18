@@ -32,13 +32,14 @@ msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, co
 }
 
 
-static ADDRESS_MAP_START( bm_012_memory_map, AS_PROGRAM, 8, msx_cart_bm_012_device )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void msx_cart_bm_012_device::bm_012_memory_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
 
-MACHINE_CONFIG_MEMBER( msx_cart_bm_012_device::device_add_mconfig )
+MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	// 12MHz XTAL @ X1
 	// Toshiba TMPZ84C015AF-6 (@U5) components:
 	// - Z80
@@ -47,29 +48,29 @@ MACHINE_CONFIG_MEMBER( msx_cart_bm_012_device::device_add_mconfig )
 	// - PIO
 	// - CGC
 	// - WDT
-	MCFG_CPU_ADD("tmpz84c015af", TMPZ84C015, XTAL_12MHz/2)         /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(bm_012_memory_map)
+	MCFG_DEVICE_ADD("tmpz84c015af", TMPZ84C015, XTAL(12'000'000)/2)         /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bm_012_memory_map)
 	// PIO callbacks
-	MCFG_TMPZ84C015_IN_PA_CB(DEVREAD8("bm012_pio", z80pio_device, pa_r))
-	MCFG_TMPZ84C015_OUT_PA_CB(DEVWRITE8("bm012_pio", z80pio_device, pa_w))
-	MCFG_TMPZ84C015_IN_PB_CB(DEVREAD8("bm012_pio", z80pio_device, pb_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(DEVWRITE8("bm012_pio", z80pio_device, pb_w))
-	MCFG_TMPZ84C015_OUT_BRDY_CB(DEVWRITELINE("bm012_pio", z80pio_device, strobe_b))
+	MCFG_TMPZ84C015_IN_PA_CB(READ8("bm012_pio", z80pio_device, pa_r))
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8("bm012_pio", z80pio_device, pa_w))
+	MCFG_TMPZ84C015_IN_PB_CB(READ8("bm012_pio", z80pio_device, pb_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8("bm012_pio", z80pio_device, pb_w))
+	MCFG_TMPZ84C015_OUT_BRDY_CB(WRITELINE("bm012_pio", z80pio_device, strobe_b))
 	// SIO callbacks
-	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_TMPZ84C015_OUT_TXDA_CB(WRITELINE("mdout", midi_port_device, write_txd))
 
 	// Sony CXK5864BSP-10L  (8KB ram)
 	// Sharp LH0081A Z80A-PIO-0 - For communicating between the MSX and the TMP
-	MCFG_DEVICE_ADD("bm012_pio", Z80PIO, XTAL_3_579545MHz)  // ?????
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("tmpz84c015af", tmpz84c015_device, pa_w))
-	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("tmpz84c015af", tmpz84c015_device, pa_r))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("tmpz84c015af", tmpz84c015_device, pb_w))
-	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("tmpz84c015af", tmpz84c015_device, pb_r))
-	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE("tmpz84c015af", tmpz84c015_device, strobe_b))
+	MCFG_DEVICE_ADD("bm012_pio", Z80PIO, XTAL(3'579'545))  // ?????
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("tmpz84c015af", tmpz84c015_device, pa_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8("tmpz84c015af", tmpz84c015_device, pa_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("tmpz84c015af", tmpz84c015_device, pb_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8("tmpz84c015af", tmpz84c015_device, pb_r))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE("tmpz84c015af", tmpz84c015_device, strobe_b))
 
 	// MIDI ports
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(msx_cart_bm_012_device, midi_in))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(*this, msx_cart_bm_012_device, midi_in))
 
 	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
 

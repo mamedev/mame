@@ -11,6 +11,7 @@
 #include "video/k052109.h"
 #include "video/k051960.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class thunderx_state : public driver_device
 {
@@ -66,7 +67,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(thunderx);
+	void init_thunderx();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
@@ -78,6 +79,16 @@ public:
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void scontra(machine_config &config);
+	void gbusters(machine_config &config);
+	void thunderx(machine_config &config);
+	void gbusters_map(address_map &map);
+	void scontra_bank5800_map(address_map &map);
+	void scontra_map(address_map &map);
+	void scontra_sound_map(address_map &map);
+	void thunderx_bank5800_map(address_map &map);
+	void thunderx_map(address_map &map);
+	void thunderx_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

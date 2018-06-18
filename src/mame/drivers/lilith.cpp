@@ -18,20 +18,15 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void lilith(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, lilith_state )
-//ADDRESS_MAP_END
-
-//static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, lilith_state )
-//ADDRESS_MAP_END
-
 static INPUT_PORTS_START( lilith )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilith )
+MACHINE_CONFIG_START(lilith_state::lilith)
 MACHINE_CONFIG_END
 
 ROM_START( lilith )
@@ -60,4 +55,4 @@ ROM_START( lilith )
 	ROM_LOAD( "kbd_eprom.bin", 0x000000, 0x000800, CRC(40fa5230) SHA1(473ca714959fc35aa2a0ab9310aee2aedffa2163) )
 ROM_END
 
-COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, 0, "DISER", "Lilith", MACHINE_IS_SKELETON )
+COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, empty_init, "DISER", "Lilith", MACHINE_IS_SKELETON )

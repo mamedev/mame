@@ -3,6 +3,7 @@
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 struct jungler_star
 {
@@ -53,14 +54,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t    m_main_irq_mask;
+	bool    m_main_irq_mask;
 	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(bang_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_on_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE_LINE_MEMBER(led_0_w);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
@@ -83,8 +83,8 @@ public:
 	uint32_t screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(rallyx_vblank_irq);
-	INTERRUPT_GEN_MEMBER(jungler_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(rallyx_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(jungler_vblank_irq);
 	inline void rallyx_get_tile_info( tile_data &tileinfo, int tile_index, int ram_offs);
 	inline void locomotn_get_tile_info(tile_data &tileinfo,int tile_index,int ram_offs);
 	void calculate_star_field(  );
@@ -96,4 +96,12 @@ public:
 	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
+	void commsega(machine_config &config);
+	void locomotn(machine_config &config);
+	void tactcian(machine_config &config);
+	void rallyx(machine_config &config);
+	void jungler(machine_config &config);
+	void io_map(address_map &map);
+	void jungler_map(address_map &map);
+	void rallyx_map(address_map &map);
 };

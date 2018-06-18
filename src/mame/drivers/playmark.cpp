@@ -65,11 +65,8 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
 #include "screen.h"
-#include "sound/okim6295.h"
 #include "speaker.h"
 
 
@@ -112,20 +109,20 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", m_maincpu->pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
 			if (data & 0x10) {
 				m_dispenser_latch |= ((data & 0x10) | 0x80);
-				machine().device<ticket_dispenser_device>("token")->write(space, 0, 0x80);
+				m_token->motor_w(1);
 			}
 		}
 		else {
 			m_dispenser_latch &= 0x7f;
-			machine().device<ticket_dispenser_device>("token")->write(space, 0, (m_dispenser_latch & 0x10) ? 0x80 : 0);
+			m_token->motor_w(BIT(m_dispenser_latch, 4));
 		}
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
+		m_ticket->motor_w(BIT(data, 3));
 
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
 		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
@@ -140,20 +137,20 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", m_maincpu->pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
 			if (data & 0x10) {
 				m_dispenser_latch |= ((data & 0x10) | 0x80);
-				machine().device<ticket_dispenser_device>("token")->write(space, 0, 0x80);
+				m_token->motor_w(1);
 			}
 		}
 		else {
 			m_dispenser_latch &= 0x7f;
-			machine().device<ticket_dispenser_device>("token")->write(space, 0, (m_dispenser_latch & 0x10) ? 0x80 : 0);
+			m_token->motor_w(BIT(m_dispenser_latch, 4));
 		}
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
+		m_ticket->motor_w(BIT(data, 3));
 
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
 		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
@@ -170,11 +167,11 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",space.device().safe_pcbase(), data);
+//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",m_maincpu->pcbase(), data);
 
 		m_snd_command = (data & 0xff);
 		m_snd_flag = 1;
-		space.device().execute().yield();
+		m_maincpu->yield();
 	}
 }
 
@@ -185,12 +182,12 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	if ((m_oki_control & 0x38) == 0x30)
 	{
 		data = m_snd_command;
-//      logerror("PC$%03x PortB reading %02x from the 68K\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the 68K\n", m_maincpu->pcbase(), data);
 	}
 	else if ((m_oki_control & 0x38) == 0x28)
 	{
 		data = (m_oki->read(space, 0) & 0x0f);
-//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", m_maincpu->pcbase(), data);
 	}
 
 	return data;
@@ -210,7 +207,7 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 
 WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 {
-	logerror("PC$%03x Writing %02x to PortA  (OKI bank select)\n",space.device().safe_pcbase(),data);
+	logerror("%s Writing %02x to PortA  (OKI bank select)\n",machine().describe_context(),data);
 
 	int bank = data & 7;
 
@@ -240,7 +237,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -256,7 +253,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -264,154 +261,162 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 /***************************** 68000 Memory Maps ****************************/
 
-static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x304000, 0x304001) AM_NOP             /* watchdog? irq ack? */
-	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500fff) AM_WRITE(wbeachvl_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x501000, 0x501fff) AM_WRITENOP    /* unused RAM? */
-	AM_RANGE(0x502000, 0x503fff) AM_WRITE(wbeachvl_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x504000, 0x50ffff) AM_WRITENOP    /* unused RAM? */
-	AM_RANGE(0x510000, 0x51000b) AM_WRITE(bigtwin_scroll_w)
-	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP    /* always 3? */
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
-	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
-	AM_RANGE(0x700016, 0x700017) AM_WRITE(coinctrl_w)
-	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+void playmark_state::bigtwin_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x304000, 0x304001).noprw();             /* watchdog? irq ack? */
+	map(0x440000, 0x4403ff).ram().share("spriteram");
+	map(0x500000, 0x500fff).w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x501000, 0x501fff).nopw();    /* unused RAM? */
+	map(0x502000, 0x503fff).w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x504000, 0x50ffff).nopw();    /* unused RAM? */
+	map(0x510000, 0x51000b).w(FUNC(playmark_state::bigtwin_scroll_w));
+	map(0x51000c, 0x51000d).nopw();    /* always 3? */
+	map(0x600000, 0x67ffff).ram().share("bgvideoram");
+	map(0x700010, 0x700011).portr("SYSTEM");
+	map(0x700012, 0x700013).portr("P1");
+	map(0x700014, 0x700015).portr("P2");
+	map(0x700016, 0x700017).w(FUNC(playmark_state::coinctrl_w));
+	map(0x70001a, 0x70001b).portr("DSW2");
+	map(0x70001c, 0x70001d).portr("DSW1");
+	map(0x70001e, 0x70001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x780000, 0x7807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::bigtwinb_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x201000, 0x2013ff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("SYSTEM");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("P2");
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
+	map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+	map(0xff0000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(wbeachvl_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x50f000, 0x50ffff) AM_RAM AM_SHARE("rowscroll")
-	AM_RANGE(0x510000, 0x51000b) AM_WRITE(wbeachvl_scroll_w)
-	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP    /* 2 and 3 */
+void playmark_state::wbeachvl_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x440000, 0x440fff).ram().share("spriteram");
+	map(0x500000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_bgvideoram_w)).share("videoram3");
+	map(0x504000, 0x505fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x508000, 0x509fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x50f000, 0x50ffff).ram().share("rowscroll");
+	map(0x510000, 0x51000b).w(FUNC(playmark_state::wbeachvl_scroll_w));
+	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
 //  AM_RANGE(0x700000, 0x700001) ?? written on startup
-	AM_RANGE(0x710010, 0x710011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x710012, 0x710013) AM_READ_PORT("P1")
-	AM_RANGE(0x710014, 0x710015) AM_READ_PORT("P2")
-	AM_RANGE(0x710016, 0x710017) AM_WRITE(wbeachvl_coin_eeprom_w)
-	AM_RANGE(0x710018, 0x710019) AM_READ_PORT("P3")
-	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
+	map(0x710010, 0x710011).portr("SYSTEM");
+	map(0x710012, 0x710013).portr("P1");
+	map(0x710014, 0x710015).portr("P2");
+	map(0x710016, 0x710017).w(FUNC(playmark_state::wbeachvl_coin_eeprom_w));
+	map(0x710018, 0x710019).portr("P3");
+	map(0x71001a, 0x71001b).portr("P4");
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
-	AM_RANGE(0x71001e, 0x71001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x71001e, 0x71001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP                /* watchdog? irq ack? */
-	AM_RANGE(0x440000, 0x440cff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x510000, 0x51000b) AM_WRITE(excelsr_scroll_w)
-	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP    /* 2 and 3 */
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
-	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
-	AM_RANGE(0x700016, 0x700017) AM_WRITE(coinctrl_w)
-	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::excelsr_main_map(address_map &map)
+{
+	map(0x000000, 0x2fffff).rom();
+	map(0x304000, 0x304001).nopw();                /* watchdog? irq ack? */
+	map(0x440000, 0x440cff).ram().share("spriteram");
+	map(0x500000, 0x500fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x501000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x510000, 0x51000b).w(FUNC(playmark_state::excelsr_scroll_w));
+	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
+	map(0x600000, 0x67ffff).ram().share("bgvideoram");
+	map(0x700010, 0x700011).portr("SYSTEM");
+	map(0x700012, 0x700013).portr("P1");
+	map(0x700014, 0x700015).portr("P2");
+	map(0x700016, 0x700017).w(FUNC(playmark_state::coinctrl_w));
+	map(0x70001a, 0x70001b).portr("DSW2");
+	map(0x70001c, 0x70001d).portr("DSW1");
+	map(0x70001e, 0x70001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x780000, 0x7807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0bffff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3") // 32*32?
-	AM_RANGE(0x100800, 0x103fff) AM_RAM
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2") // 128*32?
-	AM_RANGE(0x106000, 0x107fff) AM_RAM
-	AM_RANGE(0x108000, 0x109fff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1") // 64*64?
-	AM_RANGE(0x10a000, 0x10bfff) AM_RAM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM // Unused
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x280800, 0x280fff) AM_RAM // Unused
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x300016, 0x300017) AM_WRITE(hrdtimes_coin_w)
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
+void playmark_state::hrdtimes_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0bffff).ram();
+	map(0x0c0000, 0x0fffff).rom().region("maincpu", 0x0c0000);
+	map(0x100000, 0x1007ff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3"); // 32*32?
+	map(0x100800, 0x103fff).ram();
+	map(0x104000, 0x105fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2"); // 128*32?
+	map(0x106000, 0x107fff).ram();
+	map(0x108000, 0x109fff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1"); // 64*64?
+	map(0x10a000, 0x10bfff).ram();
+	map(0x10c000, 0x10ffff).ram(); // Unused
+	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x280800, 0x280fff).ram(); // Unused
+	map(0x300010, 0x300011).portr("SYSTEM");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("P2");
+	map(0x300016, 0x300017).w(FUNC(playmark_state::hrdtimes_coin_w));
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
 //  AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-ADDRESS_MAP_END
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+}
 
-static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("COINS")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("DISPENSER") AM_WRITE(hotmind_coin_eeprom_w)
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::hotmind_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("COINS");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("DISPENSER").w(FUNC(playmark_state::hotmind_coin_eeprom_w));
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
+	map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+	map(0xff0000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( luckboomh_main_map, AS_PROGRAM, 16, playmark_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("COINS")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("DISPENSER") AM_WRITE(luckboomh_dispenser_w)
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0xff0000, 0xff03ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::luckboomh_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("COINS");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("DISPENSER").w(FUNC(playmark_state::luckboomh_dispenser_w));
+	map(0x30001c, 0x30001d).portr("SERVICE");
+	map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+	map(0xff0000, 0xff03ff).ram().share("nvram");
+	map(0xff8000, 0xffffff).ram();
+}
 
-static ADDRESS_MAP_START( oki_map, 0, 8, playmark_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void playmark_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 
 #define PLAYMARK_COINS \
@@ -533,8 +538,8 @@ static INPUT_PORTS_START( wbeachvl )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_LOW)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* ?? see code at 746a. sound status? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* ?? see code at 746a. sound status? */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -732,10 +737,10 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Wired to Token dispenser connector, but doesn't seem to affect anything.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Token Dispenser Empty") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("token",  ticket_dispenser_device, line_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("token",  ticket_dispenser_device, line_r)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ticket Dispenser Empty") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -794,9 +799,9 @@ static INPUT_PORTS_START( luckboomh )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )     // Checked during port read, but no effect noticed
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("token",  ticket_dispenser_device, line_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("token",  ticket_dispenser_device, line_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -848,7 +853,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( bigtwin )
+static GFXDECODE_START( gfx_bigtwin )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 16 )   /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0x000,  8 )   /* colors 0x000-0x07f */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x080,  8 )   /* colors 0x080-0x0ff */
@@ -894,13 +899,13 @@ static const gfx_layout wspritelayout =
 	32*8
 };
 
-static GFXDECODE_START( wbeachvl )
+static GFXDECODE_START( gfx_wbeachvl )
 	GFXDECODE_ENTRY( "gfx1", 0, wspritelayout, 0x600, 16 )  /* colors 0x600-0x7ff */
 	GFXDECODE_ENTRY( "gfx1", 0, wtilelayout,   0x000, 16 )  /* colors 0x000-0x3ff */
 	GFXDECODE_ENTRY( "gfx1", 0, wcharlayout,   0x400,  8 )  /* colors 0x400-0x5ff */
 GFXDECODE_END
 
-static GFXDECODE_START( excelsr )
+static GFXDECODE_START( gfx_excelsr )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x200, 16 ) /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x000,  8 ) /* colors 0x000-0x07f */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x080,  8 ) /* colors 0x080-0x0ff */
@@ -956,28 +961,28 @@ static const gfx_layout hotmind_charlayout =
 };
 
 
-static GFXDECODE_START( hrdtimes )
+static GFXDECODE_START( gfx_hrdtimes )
 	GFXDECODE_ENTRY( "gfx2", 0,       hrdtimes_full_layout, 0x200, 32 )    /* colors 0x200-0x2ff - Sprites */
 	GFXDECODE_ENTRY( "gfx1", 0,       hrdtimes_tilelayout,  0x000, 16 )    /* colors 0x000-0x0ff - BG */
 	GFXDECODE_ENTRY( "gfx1", 0x80000, hrdtimes_tilelayout,  0x000, 16 )    /* colors 0x000-0x0ff - FG */
 	GFXDECODE_ENTRY( "gfx1", 0xfc000, hrdtimes_charlayout,  0x100,  8 )    /* colors 0x100-0x17f - Text */
 GFXDECODE_END
 
-static GFXDECODE_START( hotmind )
+static GFXDECODE_START( gfx_hotmind )
 	GFXDECODE_ENTRY( "gfx2", 0,       hrdtimes_full_layout, 0x200, 32 )    /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx1", 0,       hrdtimes_tilelayout,  0x000, 16 )    /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx1", 0x20000, hrdtimes_tilelayout,  0x000, 16 )    /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx1", 0x30000, hotmind_charlayout,   0x100,  8 )    /* colors 0x100-0x17f */
 GFXDECODE_END
 
-static GFXDECODE_START( luckboomh )
+static GFXDECODE_START( gfx_luckboomh )
 	GFXDECODE_ENTRY( "gfx2", 0,       hrdtimes_full_layout, 0x200, 32 )    /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx1", 0,       hrdtimes_full_layout, 0x000, 16 )    /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx1", 0,       hrdtimes_full_layout, 0x000, 16 )    /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx1", 0x30000, hotmind_charlayout,   0x100,  8 )    /* colors 0x100-0x17f */
 GFXDECODE_END
 
-static GFXDECODE_START( bigtwinb )
+static GFXDECODE_START( gfx_bigtwinb )
 	GFXDECODE_ENTRY( "gfx2", 0,       spritelayout,        0x300, 16 )    /* colors 0x300-0x3ff */
 	GFXDECODE_ENTRY( "gfx1", 0,       hrdtimes_tilelayout, 0x000, 16 )    /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx1", 0x40000, hrdtimes_tilelayout, 0x000, 16 )    /* colors 0x000-0x0ff */
@@ -1036,19 +1041,19 @@ MACHINE_RESET_MEMBER(playmark_state,playmark)
 	m_dispenser_latch = 0;
 }
 
-static MACHINE_CONFIG_START( bigtwin )
+MACHINE_CONFIG_START(playmark_state::bigtwin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(bigtwin_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bigtwin_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1062,33 +1067,33 @@ static MACHINE_CONFIG_START( bigtwin )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwin)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigtwin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigtwin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigtwinb )
+MACHINE_CONFIG_START(playmark_state::bigtwinb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
-	MCFG_CPU_PROGRAM_MAP(bigtwinb_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(bigtwinb_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1102,37 +1107,37 @@ static MACHINE_CONFIG_START( bigtwinb )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwinb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigtwinb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigtwinb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wbeachvl )
+MACHINE_CONFIG_START(playmark_state::wbeachvl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(wbeachvl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wbeachvl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* 12MHz with internal 4x divisor */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // wrong?
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // wrong?
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
+//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1146,33 +1151,33 @@ static MACHINE_CONFIG_START( wbeachvl )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_wbeachvl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wbeachvl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wbeachvl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( excelsr )
+MACHINE_CONFIG_START(playmark_state::excelsr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(excelsr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(excelsr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* 12MHz with internal 4x divisor */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1186,33 +1191,33 @@ static MACHINE_CONFIG_START( excelsr )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_excelsr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excelsr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excelsr)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* 1MHz resonator */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* 1MHz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hrdtimes )
+MACHINE_CONFIG_START(playmark_state::hrdtimes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hrdtimes_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hrdtimes_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
@@ -1227,36 +1232,36 @@ static MACHINE_CONFIG_START( hrdtimes )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hrdtimes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hrdtimes)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hotmind )
+MACHINE_CONFIG_START(playmark_state::hotmind)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hotmind_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hotmind_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1270,7 +1275,7 @@ static MACHINE_CONFIG_START( hotmind )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotmind)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotmind)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -1280,26 +1285,26 @@ static MACHINE_CONFIG_START( hotmind )
 	MCFG_TICKET_DISPENSER_ADD("token",  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckboomh )
+MACHINE_CONFIG_START(playmark_state::luckboomh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(luckboomh_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(luckboomh_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1315,7 +1320,7 @@ static MACHINE_CONFIG_START( luckboomh )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckboomh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckboomh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -1325,9 +1330,9 @@ static MACHINE_CONFIG_START( luckboomh )
 	MCFG_TICKET_DISPENSER_ADD("token",  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -1803,21 +1808,21 @@ void playmark_state::playmark_decode_pic_hex_dump(void)
 }
 
 
-DRIVER_INIT_MEMBER(playmark_state,pic_decode)
+void playmark_state::init_pic_decode()
 {
 	playmark_decode_pic_hex_dump();
 }
 
 
 
-GAME( 1995, bigtwin,   0,        bigtwin,   bigtwin,   playmark_state, pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,  bigtwinb,  playmark_state, pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl,  0,        wbeachvl,  wbeachvl,  playmark_state, 0,          ROT0, "Playmark", "World Beach Volley (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, 0,          ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, 0,          ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsr,   0,        excelsr,   excelsr,   playmark_state, pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsra,  excelsr,  excelsr,   excelsr,   playmark_state, pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes,  hrdtimes,  playmark_state, 0,          ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,  hrdtimes,  playmark_state, 0,          ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotmind,   0,        hotmind,   hotmind,   playmark_state, pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, luckboomh, luckboom, luckboomh, luckboomh, playmark_state, pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwin,   0,        bigtwin,   bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,  bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl,  0,        wbeachvl,  wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsr,   0,        excelsr,   excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsra,  excelsr,  excelsr,   excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimes,  0,        hrdtimes,  hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,  hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmind,   0,        hotmind,   hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, luckboomh, luckboom, luckboomh, luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

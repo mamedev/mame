@@ -1408,11 +1408,12 @@ Note:
 #include "cpu/arm7/arm7core.h"
 #include "machine/pxa255.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 class zaurus_state : public driver_device
 {
@@ -1445,6 +1446,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void zaurus(machine_config &config);
+	void zaurus_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1465,7 +1468,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-		//printf( "%s: %s", device.machine().describe_context(), buf );
+		//printf( "%s: %s", device.machine().describe_context().c_str(), buf );
 	}
 }
 
@@ -1710,13 +1713,14 @@ WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
 
 }
 
-static ADDRESS_MAP_START( zaurus_map, AS_PROGRAM, 32, zaurus_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_REGION("firmware", 0)
-	AM_RANGE(0x40900000, 0x4090000f) AM_READWRITE(pxa255_rtc_r,pxa255_rtc_w)
-	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE(pxa255_ostimer_r, pxa255_ostimer_w )
-	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE(pxa255_intc_r, pxa255_intc_w )
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void zaurus_state::zaurus_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
+	map(0x40900000, 0x4090000f).rw(FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
+	map(0x40a00000, 0x40a0001f).rw(FUNC(zaurus_state::pxa255_ostimer_r), FUNC(zaurus_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(FUNC(zaurus_state::pxa255_intc_r), FUNC(zaurus_state::pxa255_intc_w));
+	map(0xa0000000, 0xa07fffff).ram().share("ram");
+}
 
 
 static INPUT_PORTS_START( zaurus )
@@ -1748,13 +1752,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 }
 
 // TODO: main CPU differs greatly between versions!
-static MACHINE_CONFIG_START( zaurus )
+MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zaurus_map)
+	MCFG_DEVICE_ADD("maincpu",PXA255,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL_32_768kHz))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1767,8 +1771,8 @@ static MACHINE_CONFIG_START( zaurus )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -1782,22 +1786,22 @@ MACHINE_CONFIG_END
 /* was labeled SL-C500 */
 ROM_START( zsl5500 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "sl-c500 v1.20 (zimage).bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
+	ROM_LOAD( "sl-c500 v1.20,zimage.bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
 ROM_END
 
 ROM_START( zsl5600 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "zaurus sl-b500 - 5600 (zimage).bin", 0x000000, 0x11b6b0, BAD_DUMP CRC(779c70a1) SHA1(26824e3dc563b681f195029f220dfaa405613f9e) )
+	ROM_LOAD( "zaurus sl-b500 - 5600,zimage.bin", 0x000000, 0x11b6b0, BAD_DUMP CRC(779c70a1) SHA1(26824e3dc563b681f195029f220dfaa405613f9e) )
 ROM_END
 
 ROM_START( zslc750 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "zaurus sl-c750 (zimage).bin", 0x000000, 0x121544, BAD_DUMP CRC(56353f4d) SHA1(8e1fff6e93d560bd6572c5c163bbd81378693f68) )
+	ROM_LOAD( "zaurus sl-c750,zimage.bin", 0x000000, 0x121544, BAD_DUMP CRC(56353f4d) SHA1(8e1fff6e93d560bd6572c5c163bbd81378693f68) )
 ROM_END
 
 ROM_START( zslc760 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "zaurus sl-c760 (zimage).bin", 0x000000, 0x120b44, BAD_DUMP CRC(feedcba3) SHA1(1821ad0fc03a8c3832ad5fe2221c21c1ca277508) )
+	ROM_LOAD( "zaurus sl-c760,zimage.bin", 0x000000, 0x120b44, BAD_DUMP CRC(feedcba3) SHA1(1821ad0fc03a8c3832ad5fe2221c21c1ca277508) )
 ROM_END
 
 ROM_START( zslc3000 )
@@ -1810,9 +1814,9 @@ ROM_START( zslc1000 )
 	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
-COMP( 2002, zsl5500,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 2002, zsl5500,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
+COMP( 2002, zsl5600,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
+COMP( 2003, zslc750,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2004, zslc760,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
+COMP( 200?, zslc3000, 0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 200?, zslc1000, 0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )

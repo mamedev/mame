@@ -417,26 +417,13 @@ void threecom3c505_device::device_reset()
  cpu_context - return a string describing the current CPU context
  ***************************************************************************/
 
-const char *threecom3c505_device::cpu_context()
+std::string threecom3c505_device::cpu_context() const
 {
-	static char statebuf[64]; /* string buffer containing state description */
-
-	device_t *cpu = machine().firstcpu;
 	osd_ticks_t t = osd_ticks();
 	int s = (t / osd_ticks_per_second()) % 3600;
 	int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
-	/* if we have an executing CPU, output data */
-	if (cpu != nullptr)
-	{
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu->safe_pcbase(), tag());
-	}
-	else
-	{
-		sprintf(statebuf, "%d.%03d", s, ms);
-	}
-	return statebuf;
+	return string_format("%d.%03d %s", s, ms, machine().describe_context());
 }
 
 /*-------------------------------------------------
@@ -1657,7 +1644,7 @@ READ16_MEMBER(threecom3c505_device::read)
 		// omit excessive logging
 		if (data == last_data)
 		{
-			uint32_t pc = space.device().safe_pcbase();
+			uint32_t pc = space.device().state().pcbase();
 			if (pc == last_pc)
 			{
 				return data;

@@ -25,6 +25,8 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
+#include "screen.h"
 
 class orion_state : public radio86_state
 {
@@ -47,6 +49,7 @@ public:
 		, m_bank6(*this, "bank6")
 		, m_bank7(*this, "bank7")
 		, m_bank8(*this, "bank8")
+		, m_screen(*this, "screen")
 	{ }
 
 	DECLARE_READ8_MEMBER(orion128_system_r);
@@ -84,6 +87,17 @@ public:
 	DECLARE_WRITE8_MEMBER(orion_romdisk_portc_w);
 	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
 
+	void orionz80(machine_config &config);
+	void orion128ms(machine_config &config);
+	void orion128(machine_config &config);
+	void orionpro(machine_config &config);
+	void orionz80ms(machine_config &config);
+	void orion128_io(address_map &map);
+	void orion128_mem(address_map &map);
+	void orionpro_io(address_map &map);
+	void orionpro_mem(address_map &map);
+	void orionz80_io(address_map &map);
+	void orionz80_mem(address_map &map);
 protected:
 	uint8_t m_orion128_video_mode;
 	uint8_t m_orion128_video_page;
@@ -121,6 +135,7 @@ protected:
 	optional_memory_bank m_bank6;
 	optional_memory_bank m_bank7;
 	optional_memory_bank m_bank8;
+	required_device<screen_device> m_screen;
 
 	void orionz80_switch_bank();
 	void orion_set_video_mode(int width);

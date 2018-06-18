@@ -215,7 +215,7 @@ static const gfx_layout cgc7900_charlayout =
     GFXDECODE( cgc7900 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( cgc7900 )
+static GFXDECODE_START( gfx_cgc7900 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cgc7900_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -227,18 +227,18 @@ GFXDECODE_END
     MACHINE_DRIVER( cgc7900_video )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START( cgc7900_video )
+MACHINE_CONFIG_START(cgc7900_state::cgc7900_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(cgc7900_state, screen_update)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cgc7900_state, irq<0xc>))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0xc>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cgc7900)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cgc7900)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(cgc7900_state, cgc7900)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL_28_48MHz/7500000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL(28'480'000)/7500000))
 MACHINE_CONFIG_END

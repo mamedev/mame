@@ -71,7 +71,7 @@ READ16_MEMBER(lethalj_state::lethalj_gun_r)
 			result = m_guny + 4;
 			break;
 	}
-/*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", space.device().safe_pc(), offset, result); */
+/*  logerror("%s:lethalj_gun_r(%d) = %04X\n", machine().describe_context(), offset, result); */
 	return result;
 }
 
@@ -170,7 +170,7 @@ WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 		else
 			do_blit();
 
-		m_gen_ext1_int_timer->adjust(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)));
+		m_gen_ext1_int_timer->adjust(attotime::from_hz(XTAL(32'000'000)) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)));
 	}
 
 	/* clear the IRQ on offset 0 */

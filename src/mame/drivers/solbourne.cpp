@@ -18,17 +18,15 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void solbourne(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, solbourne_state )
-//ADDRESS_MAP_END
-
 static INPUT_PORTS_START( solbourne )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( solbourne )
+MACHINE_CONFIG_START(solbourne_state::solbourne)
 MACHINE_CONFIG_END
 
 ROM_START( sols5e )
@@ -51,4 +49,4 @@ ROM_START( sols5e )
 	ROM_LOAD( "10454id.bin",  0x000000, 0x000800, CRC(c94b3371) SHA1(9ef9792ffe26302965023041a969d57749d101f7) )
 ROM_END
 
-COMP( 198?, sols5e, 0, 0, solbourne, solbourne, solbourne_state, 0, "Solbourne Computer Inc", "Series 5E Computer Workstation", MACHINE_IS_SKELETON )
+COMP( 198?, sols5e, 0, 0, solbourne, solbourne, solbourne_state, empty_init, "Solbourne Computer Inc", "Series 5E Computer Workstation", MACHINE_IS_SKELETON )

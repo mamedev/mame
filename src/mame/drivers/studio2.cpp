@@ -246,6 +246,10 @@ public:
 
 	/* keyboard state */
 	uint8_t m_keylatch;
+	void studio2_cartslot(machine_config &config);
+	void studio2(machine_config &config);
+	void studio2_io_map(address_map &map);
+	void studio2_map(address_map &map);
 };
 
 class visicom_state : public studio2_state
@@ -263,6 +267,9 @@ public:
 	required_shared_ptr<uint8_t> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
+	void visicom(machine_config &config);
+	void visicom_io_map(address_map &map);
+	void visicom_map(address_map &map);
 };
 
 class mpt02_state : public studio2_state
@@ -288,6 +295,9 @@ public:
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color;
+	void mpt02(machine_config &config);
+	void mpt02_io_map(address_map &map);
+	void mpt02_map(address_map &map);
 };
 
 
@@ -324,43 +334,49 @@ WRITE8_MEMBER( studio2_state::dispon_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( studio2_map, AS_PROGRAM, 8, studio2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_MIRROR(0xf400) AM_RAM
-ADDRESS_MAP_END
+void studio2_state::studio2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x09ff).mirror(0xf400).ram();
+}
 
-static ADDRESS_MAP_START( studio2_io_map, AS_IO, 8, studio2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-ADDRESS_MAP_END
+void studio2_state::studio2_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x01, 0x01).r(FUNC(studio2_state::dispon_r));
+	map(0x02, 0x02).w(FUNC(studio2_state::keylatch_w));
+}
 
-static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color0_ram")
-	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color1_ram")
-ADDRESS_MAP_END
+void visicom_state::visicom_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x1000, 0x10ff).ram();
+	map(0x1100, 0x11ff).ram().share("color0_ram");
+	map(0x1300, 0x13ff).ram().share("color1_ram");
+}
 
-static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, visicom_state )
-	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-ADDRESS_MAP_END
+void visicom_state::visicom_io_map(address_map &map)
+{
+	map(0x01, 0x01).w(FUNC(visicom_state::dispon_w));
+	map(0x02, 0x02).w(FUNC(visicom_state::keylatch_w));
+}
 
-static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, mpt02_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_SHARE("color_ram")
-	AM_RANGE(0x0c00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void mpt02_state::mpt02_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x09ff).ram();
+	map(0x0b00, 0x0b3f).ram().share("color_ram");
+	map(0x0c00, 0x0fff).rom();
+}
 
-static ADDRESS_MAP_START( mpt02_io_map, AS_IO, 8, mpt02_state )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
-ADDRESS_MAP_END
+void mpt02_state::mpt02_io_map(address_map &map)
+{
+	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
+	map(0x02, 0x02).w(FUNC(mpt02_state::keylatch_w));
+	map(0x04, 0x04).rw(m_cti, FUNC(cdp1864_device::dispoff_r), FUNC(cdp1864_device::tone_latch_w));
+}
 
 /* Input Ports */
 
@@ -613,7 +629,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( studio2_cartslot )
+MACHINE_CONFIG_START(studio2_state::studio2_cartslot)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "studio2_cart")
 	MCFG_GENERIC_EXTENSIONS("st2,bin,rom")
 	MCFG_GENERIC_LOAD(studio2_state, studio2_cart_load)
@@ -622,17 +638,17 @@ static MACHINE_CONFIG_START( studio2_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "studio2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( studio2 )
+MACHINE_CONFIG_START(studio2_state::studio2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
-	MCFG_CPU_PROGRAM_MAP(studio2_map)
-	MCFG_CPU_IO_MAP(studio2_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
+	MCFG_DEVICE_PROGRAM_MAP(studio2_map)
+	MCFG_DEVICE_IO_MAP(studio2_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(studio2_state, clear_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(studio2_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(studio2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(studio2_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, studio2_state, clear_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, studio2_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, studio2_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, studio2_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1861_TAG, cdp1861_device, dma_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, 1760000)
@@ -642,36 +658,36 @@ static MACHINE_CONFIG_START( studio2 )
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 300)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	studio2_cartslot(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( visicom )
+MACHINE_CONFIG_START(visicom_state::visicom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
-	MCFG_CPU_PROGRAM_MAP(visicom_map)
-	MCFG_CPU_IO_MAP(visicom_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'579'545)/2)
+	MCFG_DEVICE_PROGRAM_MAP(visicom_map)
+	MCFG_DEVICE_IO_MAP(visicom_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(visicom_state, clear_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(visicom_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(visicom_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(visicom_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(visicom_state, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, visicom_state, clear_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, visicom_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, visicom_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, visicom_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, visicom_state, dma_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL_3_579545MHz/2)
+	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL(3'579'545)/2)
 	MCFG_CDP1861_IRQ_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT))
 	MCFG_CDP1861_DMA_OUT_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT))
 	MCFG_CDP1861_EFX_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
+	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'579'545)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(visicom_state, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 300)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "visicom_cart")
@@ -681,33 +697,33 @@ static MACHINE_CONFIG_START( visicom )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "visicom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpt02 )
+MACHINE_CONFIG_START(mpt02_state::mpt02)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mpt02_map)
-	MCFG_CPU_IO_MAP(mpt02_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mpt02_map)
+	MCFG_DEVICE_IO_MAP(mpt02_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(mpt02_state, clear_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(mpt02_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(mpt02_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(mpt02_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(mpt02_state, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, mpt02_state, clear_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, mpt02_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, mpt02_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, mpt02_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, mpt02_state, dma_w))
 
 	/* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 300)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, CDP1864_CLOCK, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(mpt02_state, rdata_r), READLINE(mpt02_state, bdata_r), READLINE(mpt02_state, gdata_r))
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, CDP1864_CLOCK, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, mpt02_state, rdata_r), READLINE(*this, mpt02_state, bdata_r), READLINE(*this, mpt02_state, gdata_r))
 	MCFG_CDP1864_CHROMINANCE(RES_K(4.7), RES_K(8.2), RES_K(4.7), RES_K(22))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	studio2_cartslot(config);
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -745,12 +761,12 @@ ROM_END
 
 /* Game Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY     FULLNAME                                        FLAGS
-CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, 0,    "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, visicom,    studio2,0,      visicom,    studio2, visicom_state, 0,    "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
-CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
-CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY     FULLNAME                                        FLAGS
+CONS( 1977, studio2,  0,       0,      studio2, studio2, studio2_state, empty_init, "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, visicom,  studio2, 0,      visicom, studio2, visicom_state, empty_init, "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02,    studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02h,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mtc9016,  studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
+CONS( 1978, shmc1200, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
+CONS( 1978, cm1200,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apollo80, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )

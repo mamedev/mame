@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DIMEMORY_H
 #define MAME_EMU_DIMEMORY_H
 
+#include <type_traits>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -44,10 +46,10 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 //**************************************************************************
 
 #define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
-	device_memory_interface::static_set_addrmap(*device, _space, ADDRESS_MAP_NAME(_map));
+	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor(&std::remove_pointer_t<decltype(this)>::_map, tag(), this));
 
 #define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
-	device_memory_interface::static_set_addrmap(*device, _space, nullptr);
+	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor());
 
 #define MCFG_DEVICE_PROGRAM_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
@@ -58,7 +60,7 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 #define MCFG_DEVICE_IO_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
 
-#define MCFG_DEVICE_DECRYPTED_OPCODES_MAP(_map) \
+#define MCFG_DEVICE_OPCODES_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_OPCODES, _map)
 
 
@@ -72,6 +74,11 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 class device_memory_interface : public device_interface
 {
 	friend class device_scheduler;
+	template <typename T, typename U> struct is_related_class { static constexpr bool value = std::is_convertible<std::add_pointer_t<T>, std::add_pointer_t<U> >::value; };
+	template <typename T, typename U> struct is_related_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && is_related_class<T, U>::value; };
+	template <typename T, typename U> struct is_related_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && is_related_class<T, U>::value; };
+	template <typename T, typename U> struct is_unrelated_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && !is_related_class<T, U>::value; };
+	template <typename T, typename U> struct is_unrelated_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value; };
 
 public:
 	// construction/destruction
@@ -79,17 +86,28 @@ public:
 	virtual ~device_memory_interface();
 
 	// configuration access
-	address_map_constructor address_map(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_map.size()) ? m_address_map[spacenum] : nullptr; }
+	address_map_constructor get_addrmap(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_map.size()) ? m_address_map[spacenum] : address_map_constructor(); }
 	const address_space_config *space_config(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_config.size()) ? m_address_config[spacenum] : nullptr; }
 	int max_space_count() const { return m_address_config.size(); }
 
-	// static inline configuration helpers
-	static void static_set_addrmap(device_t &device, int spacenum, address_map_constructor map);
+	// configuration helpers
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_related_device<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &downcast<U &>(obj))); }
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_related_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &downcast<U &>(obj))); }
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_unrelated_device<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &dynamic_cast<U &>(obj))); }
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_unrelated_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &dynamic_cast<U &>(obj))); }
+	template <typename T, typename Ret, typename... Params>
+	std::enable_if_t<is_related_class<device_t, T>::value> set_addrmap(int spacenum, Ret (T::*func)(Params...));
+	template <typename T, typename Ret, typename... Params>
+	std::enable_if_t<!is_related_class<device_t, T>::value> set_addrmap(int spacenum, Ret (T::*func)(Params...));
 	void set_addrmap(int spacenum, address_map_constructor map);
 
 	// basic information getters
 	bool has_space(int index = 0) const { return index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]; }
-	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && m_address_map[index]; }
+	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && !m_address_map[index].isnull(); }
 	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
 	// address translation

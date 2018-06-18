@@ -76,6 +76,7 @@ quaquiz2 - no inputs, needs NVRAM
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -109,12 +110,12 @@ public:
 	DECLARE_READ8_MEMBER(question_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
-	DECLARE_DRIVER_INIT(addr_xlh);
-	DECLARE_DRIVER_INIT(addr_lhx);
-	DECLARE_DRIVER_INIT(addr_lmh);
-	DECLARE_DRIVER_INIT(addr_lmhe);
-	DECLARE_DRIVER_INIT(addr_xhl);
-	DECLARE_DRIVER_INIT(laserdisc);
+	void init_addr_xlh();
+	void init_addr_lhx();
+	void init_addr_lmh();
+	void init_addr_lmhe();
+	void init_addr_xhl();
+	void init_laserdisc();
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
@@ -122,6 +123,11 @@ public:
 	DECLARE_VIDEO_START(vertical);
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
+	void statriv2(machine_config &config);
+	void funcsino(machine_config &config);
+	void statriv2v(machine_config &config);
+	void statriv2_io_map(address_map &map);
+	void statriv2_map(address_map &map);
 };
 
 
@@ -281,20 +287,22 @@ WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void statriv2_state::statriv2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x48ff).ram().share("nvram");
+	map(0xc800, 0xcfff).ram().w(FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
+}
 
-static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_SHARE("question_offset")
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_device, read, write)
-ADDRESS_MAP_END
+void statriv2_state::statriv2_io_map(address_map &map)
+{
+	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
+	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xb1, 0xb1).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
+}
 
 
 /*************************************
@@ -317,7 +325,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -350,7 +358,7 @@ static INPUT_PORTS_START( funcsino )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -386,7 +394,7 @@ static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -461,7 +469,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -563,7 +571,7 @@ static const gfx_layout horizontal_tiles_layout =
 	16*8
 };
 
-static GFXDECODE_START( horizontal )
+static GFXDECODE_START( gfx_horizontal )
 	GFXDECODE_ENTRY( "tiles", 0, horizontal_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -579,7 +587,7 @@ static const gfx_layout vertical_tiles_layout =
 	8*8
 };
 
-static GFXDECODE_START( vertical )
+static GFXDECODE_START( gfx_vertical )
 	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -590,13 +598,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( statriv2 )
+MACHINE_CONFIG_START(statriv2_state::statriv2)
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(statriv2_map)
-	MCFG_CPU_IO_MAP(statriv2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8085A, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(statriv2_map)
+	MCFG_DEVICE_IO_MAP(statriv2_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -607,7 +615,7 @@ static MACHINE_CONFIG_START( statriv2 )
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(statriv2_state, ppi_portc_hi_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, statriv2_state, ppi_portc_hi_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -615,21 +623,22 @@ static MACHINE_CONFIG_START( statriv2 )
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
+MACHINE_CONFIG_START(statriv2_state::statriv2v)
+	statriv2(config);
 
 	/* basic machine hardware */
 
@@ -637,15 +646,16 @@ static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( funcsino, statriv2 )
+MACHINE_CONFIG_START(statriv2_state::funcsino)
+	statriv2(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(MASTER_CLOCK/2)  /* 3 MHz?? seems accurate */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(MASTER_CLOCK/2)  /* 3 MHz?? seems accurate */
 MACHINE_CONFIG_END
 
 
@@ -1476,7 +1486,7 @@ ROM_END
  *************************************/
 
 /* question address is stored as L/H/X (low/high/don't care) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_lhx)
+void statriv2_state::init_addr_lhx()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
@@ -1484,7 +1494,7 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_lhx)
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_xlh)
+void statriv2_state::init_addr_xlh()
 {
 	m_question_offset_low = 1;
 	m_question_offset_mid = 2;
@@ -1492,7 +1502,7 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_xlh)
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_xhl)
+void statriv2_state::init_addr_xhl()
 {
 	m_question_offset_low = 2;
 	m_question_offset_mid = 1;
@@ -1500,14 +1510,14 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_xhl)
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_lmh)
+void statriv2_state::init_addr_lmh()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 2;
 }
 
-DRIVER_INIT_MEMBER(statriv2_state, addr_lmhe)
+void statriv2_state::init_addr_lmhe()
 {
 	/***************************************************\
 	*                                                   *
@@ -1576,12 +1586,12 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_lmhe)
 	uint32_t address;
 
 	for (address = 0; address < length; address++)
-		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
+		qrom[address] ^= bitswap<8>(address, 4,3,3,2,2,1,1,0);
 
-	DRIVER_INIT_CALL(addr_lmh);
+	init_addr_lmh();
 }
 
-DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
+void statriv2_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b,
@@ -1608,41 +1618,41 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj,   0,        statriv2,  statusbj, statriv2_state, 0,         ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw,   0,        statriv2,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, bigcsino,   0,        statriv2,  bigcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv4,   0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games",       "Triv Four",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games",       "Triv Five Special Edition",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1986, bbchall,    0,        statriv2,  supertr2, statriv2_state, 0,         ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs?
-GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0,  "Status Games",       "Super Triv II",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
+GAME( 1981, statusbj,   0,        statriv2,  statusbj, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw,   0,        statriv2,  funcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, bigcsino,   0,        statriv2,  bigcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, init_addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, init_addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv4,   0,        statriv2,  statriv4, statriv2_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv Four",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv Five Special Edition",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1986, bbchall,    0,        statriv2,  supertr2, statriv2_state, empty_init,     ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs?
+GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmhe, ROT0,  "Status Games",       "Super Triv II",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
 // The following Casino Strip sets don't show the version on screen (at least without the laserdisc video). It was taken from the rom labels / from the Dragon's Lair Project archive.
-GAME( 1984, cs1_spp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, cs1_spp2,  cs1_spp,   statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs2_sps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, cs3_qps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs5_spp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs5_ssp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs6_sps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs6_ssp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1986, cs8_ssp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs8_spp,    0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs8_sps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, cs9_qps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs9_spp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs10_sps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_ssp,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_sps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_sps2, cs11_sps,  statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs12_sps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1996, cspe_qps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, csv1_qps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, cs1_spp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, cs1_spp2,  cs1_spp,   statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs2_sps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs3_qps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_spp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_ssp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs6_sps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs6_ssp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, cs8_ssp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs8_spp,    0,        statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs8_sps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs9_qps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs9_spp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs10_sps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_ssp,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps2, cs11_sps,  statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs12_sps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1996, cspe_qps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, csv1_qps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

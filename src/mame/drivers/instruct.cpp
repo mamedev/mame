@@ -63,6 +63,7 @@ public:
 		, m_p_smiram(*this, "smiram")
 		, m_p_extram(*this, "extram")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(port_r);
@@ -77,8 +78,13 @@ public:
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
+	void instruct(machine_config &config);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
 	uint8_t m_digit;
 	bool m_valid_digit;
@@ -89,6 +95,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_smiram;
 	required_shared_ptr<uint8_t> m_p_extram;
 	required_device<cassette_image_device> m_cass;
+	output_finder<129> m_digits;
 };
 
 // flag led
@@ -123,7 +130,7 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 WRITE8_MEMBER( instruct_state::portf9_w )
 {
 	if (m_valid_digit)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 	m_valid_digit = false;
 }
 
@@ -214,30 +221,33 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	}
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, instruct_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0ffe) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x0fff, 0x0fff) AM_READWRITE(port_r,port_w)
-	AM_RANGE(0x1780, 0x17ff) AM_RAM AM_SHARE("smiram")
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("roms",0)
-	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_SHARE("extram")
-ADDRESS_MAP_END
+void instruct_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0ffe).ram().share("mainram");
+	map(0x0fff, 0x0fff).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(0x1780, 0x17ff).ram().share("smiram");
+	map(0x1800, 0x1fff).rom().region("roms", 0);
+	map(0x2000, 0x7fff).ram().share("extram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, instruct_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x07, 0x07) AM_READWRITE(port_r,port_w)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(portf8_w)
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(portf9_w)
-	AM_RANGE(0xfa, 0xfa) AM_WRITE(portfa_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
-	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
-	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
-ADDRESS_MAP_END
+void instruct_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x07, 0x07).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(0xf8, 0xf8).w(FUNC(instruct_state::portf8_w));
+	map(0xf9, 0xf9).w(FUNC(instruct_state::portf9_w));
+	map(0xfa, 0xfa).w(FUNC(instruct_state::portfa_w));
+	map(0xfc, 0xfc).r(FUNC(instruct_state::portfc_r));
+	map(0xfd, 0xfd).r(FUNC(instruct_state::portfd_r));
+	map(0xfe, 0xfe).r(FUNC(instruct_state::portfe_r));
+}
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 8, instruct_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
-ADDRESS_MAP_END
+void instruct_state::data_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( instruct )
@@ -408,15 +418,15 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	return result;
 }
 
-static MACHINE_CONFIG_START( instruct )
+MACHINE_CONFIG_START(instruct_state::instruct)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
-	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(3'579'545) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, instruct_state, sense_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, instruct_state, flag_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
@@ -426,9 +436,8 @@ static MACHINE_CONFIG_START( instruct )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -443,5 +452,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )

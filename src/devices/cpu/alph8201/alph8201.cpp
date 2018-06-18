@@ -394,7 +394,7 @@ const alpha8201_cpu_device::s_opcode alpha8201_cpu_device::opcode_8301[256]=
 void alpha8201_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).callimport().mask(0x3ff).formatstr("%03X");
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
@@ -440,7 +440,7 @@ void alpha8201_cpu_device::device_start()
 	save_item(NAME(m_savec));
 	save_item(NAME(m_savez));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -665,7 +665,7 @@ osd_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 
 		/* run */
 		m_PREVPC = m_pc.w.l;
-		debugger_instruction_hook(this, m_pc.w.l);
+		debugger_instruction_hook(m_pc.w.l);
 		opcode =M_RDOP(m_pc.w.l);
 #if TRACE_PC
 osd_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);
@@ -690,7 +690,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-util::disasm_interface *alpha8201_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> alpha8201_cpu_device::create_disassembler()
 {
-	return new alpha8201_disassembler;
+	return std::make_unique<alpha8201_disassembler>();
 }

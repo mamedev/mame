@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ETI660__
-#define __ETI660__
+#ifndef MAME_INCLUDES_ETI660_H
+#define MAME_INCLUDES_ETI660_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -36,6 +36,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_special(*this, "SPECIAL")
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER( pia_r );
@@ -54,6 +55,9 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
 	required_shared_ptr<uint8_t> m_p_videoram;
 
+	void eti660(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
@@ -61,6 +65,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<4> m_io_keyboard;
 	required_ioport m_special;
+	output_finder<2> m_leds;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

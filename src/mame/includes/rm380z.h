@@ -129,10 +129,10 @@ public:
 
 	void keyboard_put(u8 data);
 
-	DECLARE_DRIVER_INIT(rm380z);
-	DECLARE_DRIVER_INIT(rm380z34d);
-	DECLARE_DRIVER_INIT(rm380z34e);
-	DECLARE_DRIVER_INIT(rm480z);
+	void init_rm380z();
+	void init_rm380z34d();
+	void init_rm380z34e();
+	void init_rm480z();
 	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
@@ -140,6 +140,12 @@ public:
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
+	void rm480z(machine_config &config);
+	void rm380z(machine_config &config);
+	void rm380z_io(address_map &map);
+	void rm380z_mem(address_map &map);
+	void rm480z_io(address_map &map);
+	void rm480z_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_RM380Z_H

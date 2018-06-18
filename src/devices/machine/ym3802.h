@@ -14,19 +14,20 @@
  *       reg6 : IER  DSR  AMR  RDR  ---  TDR  CCR  SPR(L)  MTR(L)  EOR/EIR
  *       reg7 : ---  DNR  ADR  ---  ---  ---  CDR  SPR(H)  MTR(H)  ---
  */
-
-#ifndef DEVICES_MACHINE_YM3802_H
-#define DEVICES_MACHINE_YM3802_H
+#ifndef MAME_MACHINE_YM3802_H
+#define MAME_MACHINE_YM3802_H
 
 #pragma once
+
+#include "diserial.h"
 
 #include <queue>
 
 #define MCFG_YM3802_IRQ_HANDLER(_devcb) \
-	devcb = &ym3802_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym3802_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_YM3802_TXD_HANDLER(_devcb) \
-	devcb = &ym3802_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym3802_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 class ym3802_device : public device_t, public device_serial_interface
 {
@@ -34,9 +35,9 @@ public:
 		// construction/destruction
 	ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym3802_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<ym3802_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -168,4 +169,4 @@ private:
 
 DECLARE_DEVICE_TYPE(YM3802, ym3802_device)
 
-#endif // DEVICES_MACHINE_YM3802_H
+#endif // MAME_MACHINE_YM3802_H

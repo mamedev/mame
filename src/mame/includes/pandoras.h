@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class pandoras_state : public driver_device
 {
 public:
@@ -65,7 +67,12 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pandoras);
 	uint32_t screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pandoras_master_interrupt);
-	INTERRUPT_GEN_MEMBER(pandoras_slave_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr );
+	void pandoras(machine_config &config);
+	void pandoras_i8039_io_map(address_map &map);
+	void pandoras_i8039_map(address_map &map);
+	void pandoras_master_map(address_map &map);
+	void pandoras_slave_map(address_map &map);
+	void pandoras_sound_map(address_map &map);
 };

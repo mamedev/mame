@@ -8,12 +8,11 @@
 
 #include "emu.h"
 #include "tms0970.h"
-#include "debugger.h"
 
 // TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
 // - RAM, ROM, microinstructions is the same as TMS1000
 // - 10-term inverted output PLA and segment PLA on the top-left
-DEFINE_DEVICE_TYPE(TMS0950, tms0950_cpu_device, "tms0950", "TMS0950") // 28-pin DIP, 8 O pins, 11? R pins
+DEFINE_DEVICE_TYPE(TMS0950, tms0950_cpu_device, "tms0950", "Texas Instruments TMS0950") // 28-pin DIP, 8 O pins, 11? R pins
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - RAM and ROM is the same as TMS1000
@@ -22,23 +21,13 @@ DEFINE_DEVICE_TYPE(TMS0950, tms0950_cpu_device, "tms0950", "TMS0950") // 28-pin 
 //     RETN, SETR, RBIT, SBIT, LDX, COMX, TDO, ..., redir(----0-00), LDP
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-DEFINE_DEVICE_TYPE(TMS0970, tms0970_cpu_device, "tms0970", "TMS0970") // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
-DEFINE_DEVICE_TYPE(TMS1990, tms1990_cpu_device, "tms1990", "TMS1990") // 28-pin DIP, ? R pins..
-
-
-// internal memory maps
-static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8, tms1k_base_device)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1k_base_device)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+DEFINE_DEVICE_TYPE(TMS0970, tms0970_cpu_device, "tms0970", "Texas Instruments TMS0970") // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
+DEFINE_DEVICE_TYPE(TMS1990, tms1990_cpu_device, "tms1990", "Texas Instruments TMS1990") // 28-pin DIP, ? R pins..
 
 
 // device definitions
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0970_cpu_device(mconfig, TMS0970, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4))
+	: tms0970_cpu_device(mconfig, TMS0970, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, address_map_constructor(FUNC(tms0970_cpu_device::program_10bit_8), this), 6 /* data width */, address_map_constructor(FUNC(tms0970_cpu_device::data_64x4), this))
 {
 }
 
@@ -48,18 +37,18 @@ tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_typ
 }
 
 tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0970_cpu_device(mconfig, TMS0950, tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+	: tms0970_cpu_device(mconfig, TMS0950, tag, owner, clock, 8, 11, 6, 8, 2, 10, address_map_constructor(FUNC(tms0950_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(tms0950_cpu_device::data_64x4), this))
 {
 }
 
 tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0970_cpu_device(mconfig, TMS1990, tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+	: tms0970_cpu_device(mconfig, TMS1990, tag, owner, clock, 8, 11, 6, 8, 2, 10, address_map_constructor(FUNC(tms1990_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(tms1990_cpu_device::data_64x4), this))
 {
 }
 
 
 // machine configs
-MACHINE_CONFIG_MEMBER(tms0950_cpu_device::device_add_mconfig)
+MACHINE_CONFIG_START(tms0950_cpu_device::device_add_mconfig)
 
 	// microinstructions PLA, output PLA, segment PLA
 	MCFG_PLA_ADD("mpla", 8, 16, 30)
@@ -70,7 +59,7 @@ MACHINE_CONFIG_MEMBER(tms0950_cpu_device::device_add_mconfig)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER(tms0970_cpu_device::device_add_mconfig)
+MACHINE_CONFIG_START(tms0970_cpu_device::device_add_mconfig)
 
 	// main opcodes PLA, microinstructions PLA, output PLA, segment PLA
 	MCFG_PLA_ADD("ipla", 8, 15, 18)
@@ -110,7 +99,7 @@ void tms0970_cpu_device::device_reset()
 		if (imask & 0x40 && (imask & 0x20) == 0)
 			msel = (op & 0xf) | (op >> 1 & 0x10);
 
-		msel = BITSWAP8(msel,7,6,5,0,1,2,3,4); // lines are reversed
+		msel = bitswap<8>(msel,7,6,5,0,1,2,3,4); // lines are reversed
 		u32 mmask = m_mpla->read(msel);
 		mmask ^= 0x09fe; // invert active-negative
 

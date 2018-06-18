@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define XTAL_CR1        XTAL_9_8304MHz
-#define XTAL_CR2        XTAL_32_768kHz
+#define XTAL_CR1        XTAL(9'830'400)
+#define XTAL_CR2        XTAL(32'768)
 
 /* interrupt sources */
 #define INT0_7508       0x01
@@ -511,67 +511,56 @@ WRITE8_MEMBER( px8_state::ksc_w )
     ADDRESS_MAP( px8_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_mem, AS_PROGRAM, 8, px8_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank0")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void px8_state::px8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("bank0");
+	map(0x8000, 0xffff).bankrw("bank1");
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( px8_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_io, AS_IO, 8, px8_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(gah40m_r, gah40m_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
+void px8_state::px8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x0f);
+	map(0x00, 0x07).rw(FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
+	map(0x0c, 0x0c).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0d, 0x0d).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 //  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
 //  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, data_r, command_w)
-ADDRESS_MAP_END
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( px8_slave_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_slave_mem, AS_PROGRAM, 8, px8_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
+void px8_state::px8_slave_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0020, 0x0023).rw(FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
-	AM_RANGE(0x0028, 0x0028) AM_WRITE(gah40s_ier_w)
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x9800, 0xefff) AM_NOP
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6303_TAG, 0) /* internal mask rom */
-ADDRESS_MAP_END
+	map(0x0028, 0x0028).w(FUNC(px8_state::gah40s_ier_w));
+	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x9800, 0xefff).noprw();
+	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( px8_slave_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_slave_io, AS_IO, 8, px8_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(M6801_PORT1, M6801_PORT1)
-	AM_RANGE(M6801_PORT2, M6801_PORT2)
-	AM_RANGE(M6801_PORT3, M6801_PORT3)
-	AM_RANGE(M6801_PORT4, M6801_PORT4)
-ADDRESS_MAP_END
+void px8_state::px8_slave_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(M6801_PORT1, M6801_PORT1);
+	map(M6801_PORT2, M6801_PORT2);
+	map(M6801_PORT3, M6801_PORT3);
+	map(M6801_PORT4, M6801_PORT4);
+}
 
-/*-------------------------------------------------
-    ADDRESS_MAP( px8_sub_io )
--------------------------------------------------*/
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( px8_sub_io, AS_IO, 8, px8_state )
-//  AM_RANGE(0x00, 0x00) AM_READWRITE()
-	AM_RANGE(0x01, 0x01) AM_READ(krtn_0_3_r)
-//  AM_RANGE(0x02, 0x02) AM_WRITE()
-	AM_RANGE(0x03, 0x03) AM_WRITE(ksc_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE()
-	AM_RANGE(0x05, 0x05) AM_READ(krtn_4_7_r)
-//  AM_RANGE(0x06, 0x06) AM_READ()
-//  AM_RANGE(0x07, 0x07) AM_WRITE()
-ADDRESS_MAP_END
-#endif
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -723,7 +712,7 @@ static const gfx_layout px8_charlayout =
     GFXDECODE( px8 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( px8 )
+static GFXDECODE_START( gfx_px8 )
 	GFXDECODE_ENTRY( SED1320_TAG, 0x0000, px8_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -758,21 +747,21 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( px8 )
+MACHINE_CONFIG_START(px8_state::px8)
 	/* main cpu (uPD70008) */
-	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
-	MCFG_CPU_PROGRAM_MAP(px8_mem)
-	MCFG_CPU_IO_MAP(px8_io)
+	MCFG_DEVICE_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(px8_mem)
+	MCFG_DEVICE_IO_MAP(px8_io)
 
 	/* slave cpu (HD6303) */
-	MCFG_CPU_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
-	MCFG_CPU_PROGRAM_MAP(px8_slave_mem)
-	MCFG_CPU_IO_MAP(px8_slave_io)
+	MCFG_DEVICE_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(px8_slave_mem)
+	MCFG_DEVICE_IO_MAP(px8_slave_io)
 	MCFG_DEVICE_DISABLE()
 
 	/* sub CPU (uPD7508) */
-//  MCFG_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
-//  MCFG_CPU_IO_MAP(px8_sub_io)
+//  MCFG_DEVICE_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
+//  MCFG_DEVICE_IO_MAP(px8_sub_io)
 //  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -785,14 +774,13 @@ static MACHINE_CONFIG_START( px8 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", px8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_px8)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
@@ -824,9 +812,9 @@ ROM_START( px8 )
 	ROM_REGION( 0x10000, UPD70008_TAG, 0 )
 	ROM_DEFAULT_BIOS("052884")
 	ROM_SYSTEM_BIOS( 0, "091383", "9/13/83" )
-	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(1) )
+	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "052884", "5/28/84" )
-	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(2) )
+	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(1) )
 
 	ROM_REGION( 0x0800, SED1320_TAG, 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )
@@ -846,5 +834,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING )

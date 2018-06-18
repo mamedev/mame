@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Stephane Humbert
+#ifndef MAME_INCLUDES_ARKANOID_H
+#define MAME_INCLUDES_ARKANOID_H
+
+#pragma once
+
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
@@ -76,17 +82,17 @@ public:
 	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
-	DECLARE_DRIVER_INIT(block2);
-	DECLARE_DRIVER_INIT(arkblock);
-	DECLARE_DRIVER_INIT(hexa);
-	DECLARE_DRIVER_INIT(hexaa);
-	DECLARE_DRIVER_INIT(paddle2);
-	DECLARE_DRIVER_INIT(tetrsark);
-	DECLARE_DRIVER_INIT(arkgcbl);
-	DECLARE_DRIVER_INIT(arkangc2);
-	DECLARE_DRIVER_INIT(arkbloc2);
-	DECLARE_DRIVER_INIT(arkangc);
-	DECLARE_DRIVER_INIT(brixian);
+	void init_block2();
+	void init_arkblock();
+	void init_hexa();
+	void init_hexaa();
+	void init_paddle2();
+	void init_tetrsark();
+	void init_arkgcbl();
+	void init_arkangc2();
+	void init_arkbloc2();
+	void init_arkangc();
+	void init_brixian();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -96,4 +102,21 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
 
+	void bootleg(machine_config &config);
+	void p3mcuay(machine_config &config);
+	void aysnd(machine_config &config);
+	void hexa(machine_config &config);
+	void brixian(machine_config &config);
+	void hexaa(machine_config &config);
+	void p3mcu(machine_config &config);
+	void arkanoid(machine_config &config);
+	void arkanoid_map(address_map &map);
+	void bootleg_map(address_map &map);
+	void brixian_map(address_map &map);
+	void hexa_map(address_map &map);
+	void hexaa_map(address_map &map);
+	void hexaa_sub_iomap(address_map &map);
+	void hexaa_sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ARKANOID_H

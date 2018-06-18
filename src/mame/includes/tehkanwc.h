@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class tehkanwc_state : public driver_device
 {
@@ -25,7 +26,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_digits(*this, "digit%u", 0U)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -40,6 +43,8 @@ public:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_spriteram;
+
+	output_finder<2> m_digits;
 
 	int m_track0[2];
 	int m_track1[2];
@@ -78,7 +83,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_DRIVER_INIT(teedoff);
+	void init_teedoff();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -86,6 +91,12 @@ public:
 	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void tehkanwcb(machine_config &config);
+	void tehkanwc(machine_config &config);
+	void main_mem(address_map &map);
+	void sound_mem(address_map &map);
+	void sound_port(address_map &map);
+	void sub_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

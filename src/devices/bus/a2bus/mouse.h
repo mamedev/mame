@@ -22,8 +22,8 @@
 //**************************************************************************
 
 class a2bus_mouse_device:
-	public device_t,
-	public device_a2bus_card_interface
+		public device_t,
+		public device_a2bus_card_interface
 {
 public:
 	// construction/destruction
@@ -41,9 +41,9 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
 
 	DECLARE_WRITE8_MEMBER(pia_out_a);
 	DECLARE_WRITE8_MEMBER(pia_out_b);
@@ -71,6 +71,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_MOUSE;
+DECLARE_DEVICE_TYPE(A2BUS_MOUSE, a2bus_mouse_device)
 
 #endif // MAME_DEVICES_A2BUS_MOUSE_H

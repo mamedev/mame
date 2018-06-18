@@ -147,7 +147,7 @@ void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 
 READ8Z_MEMBER(ti_fdc_device::readz)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -161,7 +161,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 		if (m_WDsel && ((m_address & 9)==0))
 		{
-			if (!machine().side_effect_disabled()) reply = m_fd1771->gen_r((offset >> 1)&0x03);
+			if (!machine().side_effects_disabled()) reply = m_fd1771->gen_r((offset >> 1)&0x03);
 			if (TRACE_DATA)
 			{
 				if ((m_address & 0xffff)==0x5ff6)
@@ -188,7 +188,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 WRITE8_MEMBER(ti_fdc_device::write)
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	if (m_inDsrArea && m_selected)
 	{
@@ -206,7 +206,7 @@ WRITE8_MEMBER(ti_fdc_device::write)
 		{
 			// As this is a memory-mapped access we must prevent the debugger
 			// from messing with the operation
-			if (!machine().side_effect_disabled()) m_fd1771->gen_w((offset >> 1)&0x03, data);
+			if (!machine().side_effects_disabled()) m_fd1771->gen_w((offset >> 1)&0x03, data);
 		}
 	}
 }
@@ -439,9 +439,10 @@ FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
 	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tifdc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void tifdc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 ROM_START( ti_fdc )
 	ROM_REGION(0x2000, TI99_DSRROM, 0)
@@ -449,10 +450,10 @@ ROM_START( ti_fdc )
 	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ti_fdc_device::device_add_mconfig )
-	MCFG_FD1771_ADD(FDC_TAG, XTAL_1MHz)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_drq_w))
+MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(FDC_TAG, FD1771, 1_MHz_XTAL)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, ti_fdc_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, ti_fdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
@@ -461,14 +462,14 @@ MACHINE_CONFIG_MEMBER( ti_fdc_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U23
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ti_fdc_device, dskpgena_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(ti_fdc_device, kaclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(ti_fdc_device, waiten_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ti_fdc_device, hlt_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ti_fdc_device, dsel_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ti_fdc_device, dsel_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ti_fdc_device, dsel_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ti_fdc_device, sidsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ti_fdc_device, dskpgena_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ti_fdc_device, kaclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ti_fdc_device, waiten_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ti_fdc_device, hlt_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ti_fdc_device, dsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ti_fdc_device, dsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ti_fdc_device, dsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ti_fdc_device, sidsel_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_fdc_device::device_rom_region() const

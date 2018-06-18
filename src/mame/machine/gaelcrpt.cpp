@@ -20,10 +20,10 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 
 	switch (swap)
 	{
-		case 0: res = BITSWAP16(enc_word,  1, 2, 0,14,12,15, 4, 8,13, 7, 3, 6,11, 5,10, 9); break;
-		case 1: res = BITSWAP16(enc_word, 14,10, 4,15, 1, 6,12,11, 8, 0, 9,13, 7, 3, 5, 2); break;
-		case 2: res = BITSWAP16(enc_word,  2,13,15, 1,12, 8,14, 4, 6, 0, 9, 5,10, 7, 3,11); break;
-		case 3: res = BITSWAP16(enc_word,  3, 8, 1,13,14, 4,15, 0,10, 2, 7,12, 6,11, 9, 5); break;
+		case 0: res = bitswap<16>(enc_word,  1, 2, 0,14,12,15, 4, 8,13, 7, 3, 6,11, 5,10, 9); break;
+		case 1: res = bitswap<16>(enc_word, 14,10, 4,15, 1, 6,12,11, 8, 0, 9,13, 7, 3, 5, 2); break;
+		case 2: res = bitswap<16>(enc_word,  2,13,15, 1,12, 8,14, 4, 6, 0, 9, 5,10, 7, 3,11); break;
+		case 3: res = bitswap<16>(enc_word,  3, 8, 1,13,14, 4,15, 0,10, 2, 7,12, 6,11, 9, 5); break;
 	}
 
 	res ^= param2;
@@ -117,7 +117,7 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 
 	res ^= (param1 << 6) | (param1 << 11);
 
-	return BITSWAP16(res, 2,6,0,11,14,12,7,10,5,4,8,3,9,1,13,15);
+	return bitswap<16>(res, 2,6,0,11,14,12,7,10,5,4,8,3,9,1,13,15);
 }
 
 
@@ -126,7 +126,7 @@ uint16_t gaelco_decrypt(address_space &space, int offset, int data, int param1, 
 {
 	static int lastpc, lastoffset, lastencword, lastdecword;
 
-	int thispc = space.device().safe_pc();
+	int thispc = space.device().state().pc();
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */
@@ -148,7 +148,7 @@ uint16_t gaelco_decrypt(address_space &space, int offset, int data, int param1, 
 
 		lastdecword = data;
 
-//      logerror("%s : data1 = %4x > %4x @ %8x\n",space.machine().describe_context(),savedata,data,lastoffset);
+//      logerror("%s : data1 = %4x > %4x @ %8x\n",machine().describe_context(),savedata,data,lastoffset);
 	}
 	return data;
 }

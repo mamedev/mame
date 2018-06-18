@@ -114,22 +114,24 @@ WRITE8_MEMBER( abc_fd2_device::status_w )
 //  ADDRESS_MAP( abc_fd2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc_fd2_mem, AS_PROGRAM, 8, abc_fd2_device )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM
-ADDRESS_MAP_END
+void abc_fd2_device::abc_fd2_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region(Z80_TAG, 0);
+	map(0x0800, 0x0bff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc_fd2_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc_fd2_io, AS_IO, 8, abc_fd2_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x73)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(FD1771_TAG, fd1771_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(status_w)
-ADDRESS_MAP_END
+void abc_fd2_device::abc_fd2_io(address_map &map)
+{
+	map.global_mask(0x73);
+	map(0x30, 0x33).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x50, 0x53).rw(FD1771_TAG, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0x60, 0x60).w(FUNC(abc_fd2_device::status_w));
+}
 
 
 //-------------------------------------------------
@@ -221,9 +223,10 @@ static const z80_daisy_config daisy_chain[] =
 //  SLOT_INTERFACE( abc_fd2_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc_fd2_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-SLOT_INTERFACE_END
+static void abc_fd2_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
 	FLOPPY_ABC_FD2_FORMAT
@@ -234,23 +237,23 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abc_fd2_device::device_add_mconfig )
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
-	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
-	MCFG_CPU_IO_MAP(abc_fd2_io)
+MACHINE_CONFIG_START(abc_fd2_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(abc_fd2_mem)
+	MCFG_DEVICE_IO_MAP(abc_fd2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_4MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 4_MHz_XTAL / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(abc_fd2_device, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(abc_fd2_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(abc_fd2_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc_fd2_device, pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, abc_fd2_device, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, abc_fd2_device, pio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, abc_fd2_device, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, abc_fd2_device, pio_pb_w))
 
-	MCFG_FD1771_ADD(FD1771_TAG, XTAL_4MHz/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
-	MCFG_WD_FDC_HLD_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
+	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 4_MHz_XTAL / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)

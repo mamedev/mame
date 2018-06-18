@@ -44,7 +44,7 @@ private:
 	u16 oplist[0x10000];
 
 	void get_op(const data_buffer &opcodes, int i, offs_t &new_pc, u16 *w, u8 *b, u8 *n);
-	
+
 };
 
 #endif

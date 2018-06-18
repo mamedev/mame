@@ -125,7 +125,7 @@ public:
 protected:
 	virtual void indirect(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) override;
 	virtual void register_register(std::ostream &stream, uint8_t pb) override;
-	
+
 private:
 	static const opcodeinfo m6x09_opcodes[];
 	const std::array<std::array<char, 4>, 16> &m_teregs;

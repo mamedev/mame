@@ -101,6 +101,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rev2_write_o);
 	DECLARE_WRITE16_MEMBER(rev2_write_r);
 
+	void rev1(machine_config &config);
+	void rev2(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -150,7 +153,7 @@ void tispellb_state::prepare_display()
 WRITE16_MEMBER(tispellb_state::main_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
-	m_plate = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
+	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	prepare_display();
 }
 
@@ -199,7 +202,7 @@ WRITE16_MEMBER(tispellb_state::sub_write_o)
 READ8_MEMBER(tispellb_state::rev1_ctl_r)
 {
 	// main CTL3210 <- sub O6043
-	return BITSWAP8(m_sub_o,7,5,2,1,6,0,4,3) & 0xf;
+	return bitswap<4>(m_sub_o,6,0,4,3);
 }
 
 WRITE16_MEMBER(tispellb_state::sub_write_r)
@@ -341,20 +344,20 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( rev1 )
+MACHINE_CONFIG_START(tispellb_state::rev1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, main_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, main_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, main_write_r))
-	MCFG_TMS0270_READ_CTL_CB(READ8(tispellb_state, rev1_ctl_r))
-	MCFG_TMS0270_WRITE_CTL_CB(WRITE8(tispellb_state, rev1_ctl_w))
+	MCFG_DEVICE_ADD("maincpu", TMS0270, 350000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, main_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, main_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, main_write_r))
+	MCFG_TMS0270_READ_CTL_CB(READ8(*this, tispellb_state, rev1_ctl_r))
+	MCFG_TMS0270_WRITE_CTL_CB(WRITE8(*this, tispellb_state, rev1_ctl_w))
 
-	MCFG_CPU_ADD("subcpu", TMS1980, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, sub_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, sub_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, sub_write_r))
+	MCFG_DEVICE_ADD("subcpu", TMS1980, 350000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, sub_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, sub_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, sub_write_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -365,15 +368,15 @@ static MACHINE_CONFIG_START( rev1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rev2 )
+MACHINE_CONFIG_START(tispellb_state::rev2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, main_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, rev2_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, rev2_write_r))
-	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms6100", tms6100_device, data_r))
-	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
+	MCFG_DEVICE_ADD("maincpu", TMS0270, 350000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, main_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, rev2_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, rev2_write_r))
+	MCFG_TMS0270_READ_CTL_CB(READ8("tms6100", tms6100_device, data_r))
+	MCFG_TMS0270_WRITE_CTL_CB(WRITE8("tms6100", tms6100_device, add_w))
 
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 350000)
 	MCFG_TMS6100_4BIT_MODE()
@@ -382,8 +385,8 @@ static MACHINE_CONFIG_START( rev2 )
 	MCFG_DEFAULT_LAYOUT(layout_spellb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -450,8 +453,8 @@ ROM_END
 
 
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
-COMP( 1978, spellb,   0,      0, rev1,    spellb,   tispellb_state, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, spellb79, spellb, 0, rev2,    spellb,   tispellb_state, 0, "Texas Instruments", "Spelling B (1979 version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT CMP MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME                     FLAGS
+COMP( 1978, spellb,   0,      0, rev1,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, spellb79, spellb, 0, rev2,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1979 version)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1979, mrchalgr, 0,      0, rev2,    mrchalgr, tispellb_state, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, mrchalgr, 0,      0, rev2,    mrchalgr, tispellb_state, empty_init, "Texas Instruments", "Mr. Challenger",            MACHINE_SUPPORTS_SAVE )

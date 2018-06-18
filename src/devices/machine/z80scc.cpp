@@ -357,7 +357,6 @@ enum : uint8_t
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-DEFINE_DEVICE_TYPE(Z80SCC,         z80scc_device,   "z80scc",         "Z80 SCC")
 DEFINE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel,  "z80scc_channel", "Z80 SCC Channel")
 DEFINE_DEVICE_TYPE(SCC8030,        scc8030_device,  "scc8030",        "Zilog Z8030 SCC")
 DEFINE_DEVICE_TYPE(SCC80C30,       scc80c30_device, "scc80c30",       "Zilog Z80C30 SCC")
@@ -371,7 +370,7 @@ DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z85
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( z80scc_device::device_add_mconfig )
+MACHINE_CONFIG_START(z80scc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(CHANA_TAG, Z80SCC_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, Z80SCC_CHANNEL, 0)
 MACHINE_CONFIG_END
@@ -422,11 +421,6 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
-}
-
-z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, Z80SCC, tag, owner, clock, TYPE_Z80SCC)
-{
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -513,13 +507,9 @@ void z80scc_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
-void z80scc_device::device_reset()
+void z80scc_device::device_reset_after_children()
 {
 	LOG("%s %s \n",tag(), FUNCNAME);
-
-	// Do channel reset on both channels
-	m_chanA->reset();
-	m_chanB->reset();
 
 	// Hardware reset values for registers where it differs from channel reset values
 	m_wr9  &= 0x3c;
@@ -639,7 +629,7 @@ int z80scc_device::z80daisy_irq_ack()
 	if (ret == -1 && m_cputag != nullptr)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
-		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
 		LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
 		logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
 	}
@@ -2160,14 +2150,14 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 		if (m_uart->m_variant & z80scc_device::SET_Z80X30)
 		{
 			uint8_t tmp_wr0 = m_wr0; // Save the Shift Left/Shift Right bits
-			m_uart->device_reset();
+			m_uart->reset();
 			// Restore the Shift Left/Shift Right bits
 			m_wr0 &= 0xfc;
 			m_wr0 |= (tmp_wr0 & 0x03);
 		}
 		else
 		{
-			m_uart->device_reset();
+			m_uart->reset();
 		}
 		// Set the MIE, Status High/Status Low and DLC bits as given in this command
 		m_uart->m_wr9 &=        ~(WR9_BIT_MIE | WR9_BIT_SHSL | WR9_BIT_DLC );
@@ -2530,6 +2520,7 @@ uint8_t z80scc_channel::data_read()
 				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
 				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
 				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+				m_uart->check_interrupts();
 			}
 		}
 	}

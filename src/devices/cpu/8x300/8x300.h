@@ -63,7 +63,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -72,7 +72,7 @@ protected:
 	bool m_increment_pc;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_io;
 
 	uint16_t m_PC;  // Program Counter

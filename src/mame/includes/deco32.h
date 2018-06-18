@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#include "cpu/h6280/h6280.h"
 #include "audio/decobsmt.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "video/deco_ace.h"
 #include "machine/deco_irq.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -13,39 +15,30 @@
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "video/deco_zoomspr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class deco32_state : public driver_device
 {
 public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_ioprot(*this, "ioprot"),
-		m_deco_irq(*this, "irq"),
-		m_decobsmt(*this, "decobsmt"),
-		m_spriteram(*this, "spriteram"),
-		m_sprgen(*this, "spritegen"),
-		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2"),
-		m_sprgenzoom(*this, "spritegen_zoom"),
-		m_eeprom(*this, "eeprom"),
-		m_ym2151(*this, "ymsnd"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco_tilegen2(*this, "tilegen2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_ram(*this, "ram"),
-		m_pf1_rowscroll32(*this, "pf1_rowscroll32"),
-		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
-		m_pf3_rowscroll32(*this, "pf3_rowscroll32"),
-		m_pf4_rowscroll32(*this, "pf4_rowscroll32"),
-		m_generic_paletteram_32(*this, "paletteram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ioprot(*this, "ioprot")
+		, m_deco_irq(*this, "irq")
+		, m_decobsmt(*this, "decobsmt")
+		, m_sprgen(*this, "spritegen%u", 1)
+		, m_eeprom(*this, "eeprom")
+		, m_ym2151(*this, "ymsnd")
+		, m_oki(*this, "oki%u", 1)
+		, m_deco_tilegen(*this, "tilegen%u", 1)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1)
+		, m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -53,38 +46,25 @@ public:
 	required_device<deco_146_base_device> m_ioprot;
 	optional_device<deco_irq_device> m_deco_irq;
 	optional_device<decobsmt_device> m_decobsmt;
-	optional_device<buffered_spriteram32_device> m_spriteram;
-	optional_device<decospr_device> m_sprgen;
-	optional_device<decospr_device> m_sprgen1;
-	optional_device<decospr_device> m_sprgen2;
-	optional_device<deco_zoomspr_device> m_sprgenzoom;
+	optional_device_array<decospr_device, 2> m_sprgen;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<ym2151_device> m_ym2151;
-	optional_device<okim6295_device> m_oki1;
-	optional_device<okim6295_device> m_oki2;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<deco16ic_device> m_deco_tilegen2;
+	optional_device_array<okim6295_device, 3> m_oki;
+	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint32_t> m_ram;
 	// we use the pointers below to store a 32-bit copy..
-	required_shared_ptr<uint32_t> m_pf1_rowscroll32;
-	required_shared_ptr<uint32_t> m_pf2_rowscroll32;
-	required_shared_ptr<uint32_t> m_pf3_rowscroll32;
-	required_shared_ptr<uint32_t> m_pf4_rowscroll32;
+	required_shared_ptr_array<uint32_t, 4> m_pf_rowscroll32;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	std::unique_ptr<uint8_t[]> m_dirty_palette; // all but captaven
-	int m_pri; // captaven, fghthist, nslasher and tattass
-	uint16_t m_spriteram16[0x1000]; // captaven, fghthist, nslasher and tattass
-	uint16_t m_spriteram16_buffered[0x1000]; // captaven, fghthist, nslasher and tattass
-	uint16_t    m_pf1_rowscroll[0x1000]; // common
-	uint16_t    m_pf2_rowscroll[0x1000]; // common
-	uint16_t    m_pf3_rowscroll[0x1000]; // common
-	uint16_t    m_pf4_rowscroll[0x1000]; // common
+	int m_pri; // all but dragngun
+	std::unique_ptr<uint16_t[]> m_spriteram16[2]; // all but dragngun
+	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // all but dragngun
+	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
 
 	// common
 	DECLARE_READ16_MEMBER(ioprot_r);
@@ -94,24 +74,29 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_w);
 	DECLARE_WRITE32_MEMBER(vblank_ack_w);
 
-	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf3_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf4_rowscroll_w);
+	template<int Chip> DECLARE_WRITE32_MEMBER(pf_rowscroll_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 
 	// captaven, fghthist, nslasher and tattass
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
-	DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
+	template<int Chip> DECLARE_READ32_MEMBER(spriteram_r);
+	template<int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
+	template<int Chip> DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
 	DECLARE_WRITE32_MEMBER(pri_w);
 
 	// all but captaven
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
 	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
+	void h6280_sound_custom_latch_map(address_map &map);
+	void h6280_sound_map(address_map &map);
+	void z80_sound_io(address_map &map);
+	void z80_sound_map(address_map &map);
 protected:
 	virtual void video_start() override;
+
+	void allocate_spriteram(int chip);
+	void allocate_buffered_palette();
+	void allocate_rowscroll(int size1, int size2, int size3, int size4);
 
 };
 
@@ -129,13 +114,15 @@ public:
 	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
 
 	DECLARE_VIDEO_START(captaven);
-	DECLARE_DRIVER_INIT(captaven);
+	void init_captaven();
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
+	void captaven(machine_config &config);
+	void captaven_map(address_map &map);
 private:
 };
 
@@ -151,13 +138,18 @@ public:
 	DECLARE_READ16_MEMBER(fghthist_in1_r);
 	DECLARE_READ32_MEMBER(unk_status_r);
 
-	DECLARE_DRIVER_INIT(fghthist);
+	void init_fghthist();
 	DECLARE_VIDEO_START(fghthist);
 
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 
+	void fghthist(machine_config &config);
+	void fghthistu(machine_config &config);
+	void fghthsta(machine_config &config);
+	void fghthist_map(address_map &map);
+	void fghthsta_memmap(address_map &map);
 private:
 };
 
@@ -166,21 +158,17 @@ class nslasher_state : public deco32_state
 {
 public:
 	nslasher_state(const machine_config &mconfig, device_type type, const char *tag)
-		: deco32_state(mconfig, type, tag),
-		m_ace_ram(*this, "ace_ram")
+		: deco32_state(mconfig, type, tag)
+		, m_deco_ace(*this, "deco_ace")
 	{ }
+	required_device<deco_ace_device> m_deco_ace;
 
 	DECLARE_WRITE32_MEMBER(tattass_control_w);
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
 	DECLARE_READ16_MEMBER(nslasher_debug_r);
-	DECLARE_READ32_MEMBER(spriteram2_r);
-	DECLARE_WRITE32_MEMBER(spriteram2_w);
-	DECLARE_WRITE32_MEMBER(buffer_spriteram2_w);
-	DECLARE_WRITE32_MEMBER(ace_ram_w);
-	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
+	void init_tattass();
+	void init_nslasher();
 	DECLARE_VIDEO_START(nslasher);
 
 	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -188,16 +176,15 @@ public:
 	DECLARE_READ16_MEMBER(port_b_tattass);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
 
+	void nslasheru(machine_config &config);
+	void tattass(machine_config &config);
+	void nslasher(machine_config &config);
+	void nslasher_map(address_map &map);
+	void tattass_map(address_map &map);
 private:
-	void updateAceRam();
 	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
-	required_shared_ptr<uint32_t> m_ace_ram;
-
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
-
-	uint16_t m_spriteram16_2[0x1000];
-	uint16_t m_spriteram16_2_buffered[0x1000];
 
 	int m_tattass_eprom_bit;
 	int m_lastClock;
@@ -206,34 +193,33 @@ private:
 	int m_pendingCommand;
 	int m_readBitCount;
 	int m_byteAddr;
-	int m_ace_ram_dirty;
 };
 
 class dragngun_state : public deco32_state
 {
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: deco32_state(mconfig, type, tag),
-		m_sprite_layout_0_ram(*this, "lay0"),
-		m_sprite_layout_1_ram(*this, "lay1"),
-		m_sprite_lookup_0_ram(*this, "look0"),
-		m_sprite_lookup_1_ram(*this, "look1"),
-		m_oki3(*this, "oki3"),
-		m_vol_main(*this, "vol_main"),
-		m_vol_gun(*this, "vol_gun"),
-		m_gun_speaker_disabled(true)
+		: deco32_state(mconfig, type, tag)
+		, m_sprgenzoom(*this, "spritegen_zoom")
+		, m_spriteram(*this, "spriteram")
+		, m_sprite_layout_ram(*this, "lay%u", 0)
+		, m_sprite_lookup_ram(*this, "look%u", 0)
+		, m_vol_main(*this, "vol_main")
+		, m_vol_gun(*this, "vol_gun")
+		, m_gun_speaker_disabled(true)
 	{ }
 
-	required_shared_ptr<uint32_t> m_sprite_layout_0_ram;
-	required_shared_ptr<uint32_t> m_sprite_layout_1_ram;
-	required_shared_ptr<uint32_t> m_sprite_lookup_0_ram;
-	required_shared_ptr<uint32_t> m_sprite_lookup_1_ram;
-	optional_device<okim6295_device> m_oki3;
+	required_device<deco_zoomspr_device> m_sprgenzoom;
+	required_device<buffered_spriteram32_device> m_spriteram;
+
+	required_shared_ptr_array<uint32_t, 2> m_sprite_layout_ram;
+	required_shared_ptr_array<uint32_t, 2> m_sprite_lookup_ram;
 	required_device<lc7535_device> m_vol_main;
-	required_device<lc7535_device> m_vol_gun;
+	optional_device<lc7535_device> m_vol_gun;
 
 	uint32_t m_sprite_ctrl;
 	int m_lightgun_port;
+	int m_oki2_bank; // lockload
 	bitmap_rgb32 m_temp_render_bitmap;
 
 	DECLARE_READ32_MEMBER(lightgun_r);
@@ -250,12 +236,13 @@ public:
 	LC7535_VOLUME_CHANGED(volume_main_changed);
 	LC7535_VOLUME_CHANGED(volume_gun_changed);
 
-	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(dragngun);
-	DECLARE_DRIVER_INIT(dragngunj);
-	DECLARE_DRIVER_INIT(lockload);
+	DECLARE_WRITE8_MEMBER(lockload_okibank_lo_w);
+	DECLARE_WRITE8_MEMBER(lockload_okibank_hi_w); // lockload
+
+	void init_dragngun();
+	void init_dragngunj();
+	void init_lockload();
 	DECLARE_VIDEO_START(dragngun);
-	DECLARE_VIDEO_START(lockload);
 	void dragngun_init_common();
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 
@@ -264,6 +251,14 @@ public:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void dragngun(machine_config &config);
+	void lockload(machine_config &config);
+	void lockloadu(machine_config &config);
+	void dragngun_map(address_map &map);
+	void lockload_map(address_map &map);
+	void lockloadu_map(address_map &map);
+	void lockload_sound_map(address_map &map);
+	void lockloadu_sound_map(address_map &map);
 private:
 	bool m_gun_speaker_disabled;
 };

@@ -120,14 +120,14 @@ WRITE_LINE_MEMBER(sams_memory_expansion_device::map_mode_w)
 	m_map_mode = state;
 }
 
-MACHINE_CONFIG_MEMBER( sams_memory_expansion_device::device_add_mconfig )
+MACHINE_CONFIG_START(sams_memory_expansion_device::device_add_mconfig)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sams_memory_expansion_device, access_mapper_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sams_memory_expansion_device, map_mode_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sams_memory_expansion_device, access_mapper_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sams_memory_expansion_device, map_mode_w))
 MACHINE_CONFIG_END
 
 void sams_memory_expansion_device::device_start()

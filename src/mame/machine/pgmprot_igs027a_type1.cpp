@@ -122,7 +122,7 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, space.device().safe_pc());
+		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) %s\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, machine().describe_context());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
@@ -131,7 +131,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, space.device().safe_pc());
+		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) %s\n", BYTE_XOR_LE(offset), data, mem_mask, machine().describe_context());
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
 }
 
@@ -151,53 +151,57 @@ READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_exrom_r )
 READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_r )
 {
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, m_arm7_shareram[offset], mem_mask, space.device().safe_pc());
+		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) %s\n", offset << 2, m_arm7_shareram[offset], mem_mask, machine().describe_context());
 	return m_arm7_shareram[offset];
 }
 
 WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_w )
 {
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, space.device().safe_pc());
+		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) %s\n", offset << 2, data, mem_mask, machine().describe_context());
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 
 /* 55857E? */
 /* Knights of Valor, Photo Y2k */
 /*  no execute only space? */
-static ADDRESS_MAP_START( kov_map, AS_PROGRAM, 16, pgm_arm_type1_state )
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(pgm_arm7_type1_ram_r, pgm_arm7_type1_ram_w) /* ARM7 Shared RAM */
-	AM_RANGE(0x500000, 0x500005) AM_READWRITE(pgm_arm7_type1_68k_protlatch_r, pgm_arm7_type1_68k_protlatch_w) /* ARM7 Latch */
-ADDRESS_MAP_END
+void pgm_arm_type1_state::kov_map(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
+	map(0x4f0000, 0x4f003f).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_w)); /* ARM7 Shared RAM */
+	map(0x500000, 0x500005).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
+}
 
-static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32, pgm_arm_type1_state )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08100000, 0x083fffff) AM_READ(pgm_arm7_type1_exrom_r) // unpopulated, returns 0 to keep checksum happy
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
-	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(pgm_arm7_type1_protlatch_r, pgm_arm7_type1_protlatch_w)
-	AM_RANGE(0x40000008, 0x4000000b) AM_WRITENOP // ?
-	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(pgm_arm7_type1_unk_r)
-	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(pgm_arm7_type1_shareram_r, pgm_arm7_type1_shareram_w) AM_SHARE("arm7_shareram")
-	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
-ADDRESS_MAP_END
+void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
+{
+	map(0x00000000, 0x00003fff).rom();
+	map(0x08100000, 0x083fffff).r(FUNC(pgm_arm_type1_state::pgm_arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
+	map(0x10000000, 0x100003ff).ram(); // internal ram for asic
+	map(0x40000000, 0x40000003).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w));
+	map(0x40000008, 0x4000000b).nopw(); // ?
+	map(0x4000000c, 0x4000000f).r(FUNC(pgm_arm_type1_state::pgm_arm7_type1_unk_r));
+	map(0x50800000, 0x5080003f).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_w)).share("arm7_shareram");
+	map(0x50000000, 0x500003ff).ram(); // uploads xor table to decrypt 68k rom here
+}
 
 
 
 
 /**************************** SIMULATIONS *****************************/
 
-static ADDRESS_MAP_START( kov_sim_map, AS_PROGRAM, 16, pgm_arm_type1_state )
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
-ADDRESS_MAP_END
+void pgm_arm_type1_state::kov_sim_map(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
+}
 
-static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16, pgm_arm_type1_state )
-	AM_IMPORT_FROM(pgm_base_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+void pgm_arm_type1_state::cavepgm_mem(address_map &map)
+{
+	pgm_base_mem(map);
+	map(0x000000, 0x3fffff).rom();
 	/* protection devices installed (simulated) later */
-ADDRESS_MAP_END
+}
 
 
 MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
@@ -211,11 +215,11 @@ MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 	save_item(NAME(m_slots));
 }
 
-MACHINE_CONFIG_START( pgm_arm_type1_cave )
-	MCFG_FRAGMENT_ADD(pgmbase)
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
+	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
 
@@ -223,23 +227,25 @@ MACHINE_CONFIG_START( pgm_arm_type1_cave )
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( pgm_arm_type1_sim, pgm_arm_type1_cave )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_sim_map)
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
+	pgm_arm_type1_cave(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_sim_map)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000 )   // 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000 )   // 55857E?
+	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( pgm_arm_type1, pgm_arm_type1_cave )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_map)
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1)
+	pgm_arm_type1_cave(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_map)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)    // 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857E?
+	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
 MACHINE_CONFIG_END
 
 void pgm_arm_type1_state::pgm_arm7_type1_latch_init()
@@ -267,7 +273,7 @@ READ16_MEMBER(pgm_arm_type1_state::kovsh_fake_region_r )
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,photoy2k)
+void pgm_arm_type1_state::init_photoy2k()
 {
 	pgm_basic_init();
 	pgm_photoy2k_decrypt(machine());
@@ -276,7 +282,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,photoy2k)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovsh)
+void pgm_arm_type1_state::init_kovsh()
 {
 	pgm_basic_init();
 	pgm_kovsh_decrypt(machine());
@@ -345,7 +351,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovshp)
+void pgm_arm_type1_state::init_kovshp()
 {
 	pgm_basic_init();
 	pgm_kovshp_decrypt(machine());
@@ -358,7 +364,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovshp)
 
 /* bootleg inits */
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovshxas)
+void pgm_arm_type1_state::init_kovshxas()
 {
 	pgm_basic_init();
 //  pgm_kovshp_decrypt(machine());
@@ -375,9 +381,9 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 
 	for (i = 0; i < 0x800000 / 2; i++)
 	{
-		j = BITSWAP24(i, 23, 22, 9, 8, 21, 18, 0, 1, 2, 3, 16, 15, 14, 13, 12, 11, 10, 19, 20, 17, 7, 6, 5, 4);
+		j = bitswap<24>(i, 23, 22, 9, 8, 21, 18, 0, 1, 2, 3, 16, 15, 14, 13, 12, 11, 10, 19, 20, 17, 7, 6, 5, 4);
 
-		dst[j] = BITSWAP16(src[i], 1, 14, 8, 7, 0, 15, 6, 9, 13, 2, 5, 10, 12, 3, 4, 11);
+		dst[j] = bitswap<16>(src[i], 1, 14, 8, 7, 0, 15, 6, 9, 13, 2, 5, 10, 12, 3, 4, 11);
 	}
 
 	memcpy( src, &dst[0], 0x800000 );
@@ -390,7 +396,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( uint8_t *src )
 
 	for (i = 0; i < 0x800000; i++)
 	{
-		j = BITSWAP24(i, 23, 10, 9, 22, 19, 18, 20, 21, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+		j = bitswap<24>(i, 23, 10, 9, 22, 19, 18, 20, 21, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
 		dst[j] = src[i];
 	}
@@ -418,9 +424,9 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 
 	for (i = 0; i < 0x400000 / 2; i++)
 	{
-		int j = BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0);
+		int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0);
 
-		dst[j] = BITSWAP16(src[i], 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+		dst[j] = bitswap<16>(src[i], 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 	}
 
 	memcpy( src, &dst[0], 0x400000 );
@@ -434,7 +440,7 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 
 	for (i = 0; i < 0x400000 / 2; i++)
 	{
-		int j = BITSWAP24(i, 23, 22, 21, 20, 19, 16, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 18, 17, 7);
+		int j = bitswap<24>(i, 23, 22, 21, 20, 19, 16, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 18, 17, 7);
 
 		dst[j] = src[i];
 	}
@@ -443,7 +449,7 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovlsqh2)
+void pgm_arm_type1_state::init_kovlsqh2()
 {
 	pgm_decode_kovqhsgs2_program();
 	pgm_decode_kovlsqh2_tiles();
@@ -464,7 +470,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovlsqh2)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovqhsgs)
+void pgm_arm_type1_state::init_kovqhsgs()
 {
 	pgm_decode_kovqhsgs_program();
 	pgm_decode_kovlsqh2_tiles();
@@ -536,21 +542,21 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 			break;
 
 		case 0x67: // set high bits
-	//      printf("%06x command %02x | %04x\n", space.device().safe_pc(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_curslots = (m_value0 & 0xff00)>>8;
 			m_slots[m_curslots] = (m_value0 & 0x00ff) << 16;
 			break;
 
 		case 0xe5: // set low bits for operation?
-		//  printf("%06x command %02x | %04x\n", space.device().safe_pc(), m_ddp3lastcommand, m_value0);
+		//  printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_slots[m_curslots] |= (m_value0 & 0xffff);
 			break;
 
 
 		case 0x8e: // read back result of operations
-	//      printf("%06x command %02x | %04x\n", space.device().safe_pc(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = m_slots[m_value0&0xff];
 			break;
 
@@ -1737,7 +1743,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 
 WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (offset == 0)
 	{
@@ -1791,7 +1797,7 @@ READ16_MEMBER(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,ddp3)
+void pgm_arm_type1_state::init_ddp3()
 {
 	pgm_basic_init(false);
 	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
@@ -1799,7 +1805,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,ddp3)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,ket)
+void pgm_arm_type1_state::init_ket()
 {
 	pgm_basic_init(false);
 	pgm_ket_decrypt(machine());
@@ -1807,7 +1813,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,ket)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,espgal)
+void pgm_arm_type1_state::init_espgal()
 {
 	pgm_basic_init(false);
 	pgm_espgal_decrypt(machine());
@@ -2100,7 +2106,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
+void pgm_arm_type1_state::init_puzzli2()
 {
 	pgm_basic_init();
 
@@ -2232,7 +2238,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 #endif
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,py2k2)
+void pgm_arm_type1_state::init_py2k2()
 {
 	pgm_basic_init();
 	pgm_py2k2_decrypt(machine());
@@ -2241,7 +2247,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,py2k2)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,pgm3in1)
+void pgm_arm_type1_state::init_pgm3in1()
 {
 	pgm_basic_init();
 	pgm_decrypt_pgm3in1(machine());
@@ -2251,7 +2257,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,pgm3in1)
 	m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,pstar)
+void pgm_arm_type1_state::init_pstar()
 {
 	pgm_basic_init();
 	pgm_pstar_decrypt(machine());
@@ -2275,7 +2281,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,pstar)
 	save_item(NAME(m_extra_ram));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kov)
+void pgm_arm_type1_state::init_kov()
 {
 	pgm_basic_init();
 	pgm_kov_decrypt(machine());
@@ -2289,7 +2295,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,kov)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovboot)
+void pgm_arm_type1_state::init_kovboot()
 {
 	pgm_basic_init();
 //  pgm_kov_decrypt(machine());
@@ -2304,7 +2310,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovboot)
 
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type1_state,oldsplus)
+void pgm_arm_type1_state::init_oldsplus()
 {
 	pgm_basic_init();
 	pgm_oldsplus_decrypt(machine());
@@ -2414,6 +2420,17 @@ INPUT_PORTS_START( py2k2 )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0006, "Singapore, Malaysia" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( pgm3in1 )
+	PORT_INCLUDE ( pgm )
+
+	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0003, DEF_STR( World ) )
 INPUT_PORTS_END
 
 

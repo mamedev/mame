@@ -18,10 +18,10 @@ Acorn Archimedes KART interface
 //**************************************************************************
 
 #define MCFG_AAKART_OUT_TX_CB(_devcb) \
-	devcb = &aakart_device::set_out_tx_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<aakart_device &>(*device).set_out_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_AAKART_OUT_RX_CB(_devcb) \
-	devcb = &aakart_device::set_out_rx_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<aakart_device &>(*device).set_out_rx_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -36,8 +36,8 @@ public:
 	// construction/destruction
 	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_tx_callback(device_t &device, Object &&cb) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rx_callback(device_t &device, Object &&cb) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tx_callback(Object &&cb) { return m_out_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_rx_callback(Object &&cb) { return m_out_rx_cb.set_callback(std::forward<Object>(cb)); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

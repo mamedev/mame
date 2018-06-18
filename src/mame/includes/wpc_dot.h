@@ -7,8 +7,8 @@
  *      Author: bsr
  */
 
-#ifndef WPC_DOT_H_
-#define WPC_DOT_H_
+#ifndef MAME_INCLUDES_WPC_DOT_H
+#define MAME_INCLUDES_WPC_DOT_H
 
 #include "cpu/m6809/m6809.h"
 #include "audio/wpcsnd.h"
@@ -34,6 +34,8 @@ public:
 			m_dmdbank6(*this, "dmdbank6")
 	{ }
 
+	void wpc_dot(machine_config &config);
+	void wpc_dot_map(address_map &map);
 protected:
 
 	// devices
@@ -55,7 +57,7 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
-	DECLARE_DRIVER_INIT(wpc_dot);
+	void init_wpc_dot();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
@@ -80,4 +82,4 @@ private:
 	emu_timer* m_irq_timer;
 };
 
-#endif /* WPC_DOT_H_ */
+#endif // MAME_INCLUDES_WPC_DOT_H

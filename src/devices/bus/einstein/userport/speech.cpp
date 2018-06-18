@@ -37,9 +37,9 @@ const tiny_rom_entry *einstein_speech_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( einstein_speech_device::device_add_mconfig )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sp0256", SP0256, 3120000) // ???
+MACHINE_CONFIG_START(einstein_speech_device::device_add_mconfig)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sp0256", SP0256, 3120000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

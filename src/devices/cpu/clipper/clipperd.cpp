@@ -2,6 +2,7 @@
 // copyright-holders:Patrick Mackinlay
 
 #include "emu.h"
+#include "cpu/clipper/common.h"
 #include "clipperd.h"
 
 /*
@@ -297,6 +298,10 @@ offs_t clipper_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x3e: util::stream_format(stream, "trapfn"); break;
 		case 0x3f: util::stream_format(stream, "loadfs  r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
 
+#if C400_INSTRUCTIONS
+		case 0x44: util::stream_format(stream, "cnvxsw  f%d,f%d", (opcodes.r16(pc + 2) & 0xf0) >> 4, opcodes.r16(pc + 2) & 0xf); break;
+		case 0x46: util::stream_format(stream, "cnvxdw  f%d,f%d", (opcodes.r16(pc + 2) & 0xf0) >> 4, opcodes.r16(pc + 2) & 0xf); break;
+#endif
 		default:
 			util::stream_format(stream, "macro   0x%04x 0x%04x", opcodes.r16(pc), opcodes.r16(pc+2));
 			break;

@@ -40,6 +40,8 @@ public:
 
 	void kbd_put(u8 data);
 
+	void ms9540(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -49,13 +51,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, ms9540_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x010000, 0x013fff) AM_ROM AM_REGION("9540", 0)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM
-ADDRESS_MAP_END
+void ms9540_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x00ffff).ram().share("rambase");
+	map(0x010000, 0x013fff).rom().region("9540", 0);
+	map(0x018000, 0x018fff).ram();
+}
 
 
 /* Input ports */
@@ -75,10 +78,10 @@ void ms9540_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ms9540 )
+MACHINE_CONFIG_START(ms9540_state::ms9540)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -100,5 +103,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY               FULLNAME  FLAGS
-COMP( 198?, ms9540, 0,      0,      ms9540,  ms9540, ms9540_state, 0,    "Millennium Systems", "ms9540", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY               FULLNAME  FLAGS
+COMP( 198?, ms9540, 0,      0,      ms9540,  ms9540, ms9540_state, empty_init, "Millennium Systems", "ms9540", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

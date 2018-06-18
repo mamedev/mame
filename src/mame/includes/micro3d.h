@@ -15,6 +15,7 @@
 #include "sound/upd7759.h"
 #include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "emupal.h"
 
 
 #define HOST_MONITOR_DISPLAY        0
@@ -154,10 +155,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
-	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
-	DECLARE_DRIVER_INIT(micro3d);
-	DECLARE_DRIVER_INIT(botss);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
+	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
+	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
+	void init_micro3d();
+	void init_botss();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
@@ -183,6 +186,14 @@ public:
 	void draw_triangles(uint32_t attr);
 
 
+	void micro3d(machine_config &config);
+	void botss11(machine_config &config);
+	void drmath_data(address_map &map);
+	void drmath_prg(address_map &map);
+	void hostmem(address_map &map);
+	void soundmem_io(address_map &map);
+	void soundmem_prg(address_map &map);
+	void vgbmem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

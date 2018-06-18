@@ -54,7 +54,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	// helpers
@@ -108,7 +108,7 @@ private:
 
 	address_space_config m_program_config;
 	address_space *     m_program;
-	direct_read_data<0> *  m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// internal state
 	int                 m_icount;

@@ -26,6 +26,7 @@
 
 #include "debug/debugcon.h"
 #include "debugger.h"
+#include "emupal.h"
 
 #include "formats/pc_dsk.h"
 
@@ -148,7 +149,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
 	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
-	DECLARE_DRIVER_INIT(mbc55x);
+	void init_mbc55x();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(mbc55x);
@@ -159,6 +160,9 @@ public:
 
 	uint32_t      m_debug_machine;
 
+	void mbc55x(machine_config &config);
+	void mbc55x_io(address_map &map);
+	void mbc55x_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

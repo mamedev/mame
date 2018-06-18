@@ -145,183 +145,197 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "formats/dmk_dsk.h"
 
 
-static ADDRESS_MAP_START( trs80_map, AS_PROGRAM, 8, trs80_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void trs80_state::trs80_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x3800, 0x38ff).r(FUNC(trs80_state::trs80_keyboard_r));
+	map(0x3c00, 0x3fff).rw(FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).ram();
+}
 
-static ADDRESS_MAP_START( trs80_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
-ADDRESS_MAP_END
+void trs80_state::trs80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+}
 
-static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8, trs80_state )
-	AM_RANGE(0x0000, 0x377f) AM_ROM // sys80,ht1080 needs up to 375F
-	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
-	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
-	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
-	AM_RANGE(0x37e4, 0x37e7) AM_WRITE(trs80_cassunit_w)
-	AM_RANGE(0x37e8, 0x37eb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0x37ec, 0x37ec) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0x37ec, 0x37ec) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
-	AM_RANGE(0x37ed, 0x37ed) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
-	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
-	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void trs80_state::model1_map(address_map &map)
+{
+	map(0x0000, 0x377f).rom(); // sys80,ht1080 needs up to 375F
+	map(0x37de, 0x37de).rw(FUNC(trs80_state::sys80_f9_r), FUNC(trs80_state::sys80_f8_w));
+	map(0x37df, 0x37df).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::trs80_irq_status_r), FUNC(trs80_state::trs80_motor_w));
+	map(0x37e4, 0x37e7).w(FUNC(trs80_state::trs80_cassunit_w));
+	map(0x37e8, 0x37eb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0x37ec, 0x37ec).r(FUNC(trs80_state::trs80_wd179x_r));
+	map(0x37ec, 0x37ec).w(m_fdc, FUNC(fd1793_device::cmd_w));
+	map(0x37ed, 0x37ed).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0x37ee, 0x37ee).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0x37ef, 0x37ef).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0x3800, 0x38ff).mirror(0x300).r(FUNC(trs80_state::trs80_keyboard_r));
+	map(0x3c00, 0x3fff).rw(FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
+	map(0x4000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( model1_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
-ADDRESS_MAP_END
+void trs80_state::model1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+}
 
-static ADDRESS_MAP_START( sys80_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m4_eb_r, sys80_f8_w)
-	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m4_eb_w)
-	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sys80_fe_w)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
-ADDRESS_MAP_END
+void trs80_state::sys80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xf8, 0xf8).r("uart", FUNC(ay31015_device::receive)).w(FUNC(trs80_state::sys80_f8_w));
+	map(0xf9, 0xf9).r(FUNC(trs80_state::sys80_f9_r)).w("uart", FUNC(ay31015_device::transmit));
+	map(0xfd, 0xfd).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfe, 0xfe).w(FUNC(trs80_state::sys80_fe_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+}
 
-static ADDRESS_MAP_START( lnw80_map, AS_PROGRAM, 8, trs80_state )
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void trs80_state::lnw80_map(address_map &map)
+{
+	map(0x4000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( lnw80_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9")
-	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(lnw80_fe_r, lnw80_fe_w)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
-ADDRESS_MAP_END
+void trs80_state::lnw80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9");
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xfe, 0xfe).rw(FUNC(trs80_state::lnw80_fe_r), FUNC(trs80_state::lnw80_fe_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+}
 
-static ADDRESS_MAP_START( model3_map, AS_PROGRAM, 8, trs80_state )
-ADDRESS_MAP_END
+void trs80_state::model3_map(address_map &map)
+{
+}
 
-static ADDRESS_MAP_START( model3_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
-	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
-	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
-	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
-	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
-	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
-ADDRESS_MAP_END
+void trs80_state::model3_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
+	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
+	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+}
 
-static ADDRESS_MAP_START( model4_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
-	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
-	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
-	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
-	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
-	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
-	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
-	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
-	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
-ADDRESS_MAP_END
+void trs80_state::model4_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x84, 0x87).w(FUNC(trs80_state::trs80m4_84_w));
+	map(0x88, 0x89).w(FUNC(trs80_state::trs80m4_88_w));
+	map(0x90, 0x93).w(FUNC(trs80_state::trs80m4_90_w));
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
+	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
+	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+}
 
-static ADDRESS_MAP_START( model4p_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
-	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
-	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
-	AM_RANGE(0x9c, 0x9f) AM_WRITE(trs80m4p_9c_w)
-	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
-	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
-	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
-	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
-	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
-	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
-ADDRESS_MAP_END
+void trs80_state::model4p_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x84, 0x87).w(FUNC(trs80_state::trs80m4_84_w));
+	map(0x88, 0x89).w(FUNC(trs80_state::trs80m4_88_w));
+	map(0x90, 0x93).w(FUNC(trs80_state::trs80m4_90_w));
+	map(0x9c, 0x9f).w(FUNC(trs80_state::trs80m4p_9c_w));
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
+	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
+	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+}
 
-static ADDRESS_MAP_START( meritum_map, AS_PROGRAM, 8, trs80_state )
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void trs80_state::meritum_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0x3800, 0x38ff).mirror(0x300).r(FUNC(trs80_state::trs80_keyboard_r));
+	map(0x3c00, 0x3fff).rw(FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
+	map(0x4000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void trs80_state::meritum_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 	// There are specific writes to ports 03, F3, F7, F8, FA, FB, FD
 	// so perhaps this system uses devices at these locations.
 	// The disk input expects values that are different to the usual,
 	// eg. port F0 should be 5, port F2 should have bit 3 set.
 	//AM_RANGE(0x03, 0x03) unknown
-	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
-	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
+	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
+	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
 	//AM_RANGE(0xfc, 0xfd) unknown
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
-ADDRESS_MAP_END
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+}
 
-static ADDRESS_MAP_START( cp500_io, AS_IO, 8, trs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
-	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
-	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
-	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
-	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
-	AM_RANGE(0xf4, 0xf7) AM_READ(cp500_a11_flipflop_toggle)
-	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
-ADDRESS_MAP_END
+void trs80_state::cp500_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
+	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
+	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf4, 0xf7).r(FUNC(trs80_state::cp500_a11_flipflop_toggle));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+}
 
 /**************************************************************************
    w/o SHIFT                             with SHIFT
@@ -556,27 +570,27 @@ static const gfx_layout meritum_charlayout =
 	8*16           /* every char takes 16 bytes (unused scanlines are blank) */
 };
 
-static GFXDECODE_START(trs80)
+static GFXDECODE_START(gfx_trs80)
 	GFXDECODE_ENTRY( "chargen", 0, trs80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(ht1080z)
+static GFXDECODE_START(gfx_ht1080z)
 	GFXDECODE_ENTRY( "chargen", 0, ht1080z_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(trs80m4)
+static GFXDECODE_START(gfx_trs80m4)
 	GFXDECODE_ENTRY( "chargen", 0, trs80m4_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(lnw80)
+static GFXDECODE_START(gfx_lnw80)
 	GFXDECODE_ENTRY( "chargen", 0, lnw80_charlayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START(radionic)
+static GFXDECODE_START(gfx_radionic)
 	GFXDECODE_ENTRY( "chargen", 0, radionic_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(meritum)
+static GFXDECODE_START(gfx_meritum)
 	GFXDECODE_ENTRY( "chargen", 0, meritum_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -586,56 +600,53 @@ FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( trs80_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void trs80_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_QD);
+}
 
 
-static MACHINE_CONFIG_START( trs80 )       // the original model I, level I, with no extras
+MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
-	MCFG_CPU_PROGRAM_MAP(trs80_map)
-	MCFG_CPU_IO_MAP(trs80_io)
-
+	MCFG_DEVICE_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6) // "a little over 1.774 MHz"
+	// MAME driver previously configured CPU at "1.796 MHz"; where did this number come from?
+	MCFG_DEVICE_PROGRAM_MAP(trs80_map)
+	MCFG_DEVICE_IO_MAP(trs80_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*6, 16*12)
-	MCFG_SCREEN_VISIBLE_AREA(0,64*6-1,0,16*12-1)
+	MCFG_SCREEN_RAW_PARAMS(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trs80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trs80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( model1_map)
-	MCFG_CPU_IO_MAP( model1_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
+MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
+	trs80(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model1_map)
+	MCFG_DEVICE_IO_MAP(model1_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
 
 	/* devices */
-	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_MODIFY("cassette")
 	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
-	MCFG_FD1793_ADD("fdc", XTAL_1MHz) // todo: should be fd1771
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
+	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4) // todo: should be fd1771
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80_state,trs80_fdc_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -644,97 +655,114 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD( "tr1602", AY31015, 0 )
+	MCFG_DEVICE_ADD("uart", AY31015, 0)
 	MCFG_AY31015_RX_CLOCK(0.0)
 	MCFG_AY31015_TX_CLOCK(0.0)
+	MCFG_AY31015_AUTO_RDAV(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model3, model1 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( model3_map)
-	MCFG_CPU_IO_MAP( model3_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  30)
+MACHINE_CONFIG_START(trs80_state::model3)
+	model1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(20.2752_MHz_XTAL / 10)
+	MCFG_DEVICE_PROGRAM_MAP(model3_map)
+	MCFG_DEVICE_IO_MAP(model3_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
 
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4 )
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode",trs80m4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_trs80m4)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80m4)
-	MCFG_SCREEN_SIZE(80*8, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
+	MCFG_SCREEN_RAW_PARAMS(12.672_MHz_XTAL, 800, 0, 640, 264, 0, 240)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model4, model3 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( model4_io)
+MACHINE_CONFIG_START(trs80_state::model4)
+	model3(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(model4_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model4p, model3 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( model4p_io)
+MACHINE_CONFIG_START(trs80_state::model4p)
+	model3(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(model4p_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys80, model1 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( sys80_io)
+MACHINE_CONFIG_START(trs80_state::sys80)
+	model1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(sys80_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ht1080z, sys80 )
+MACHINE_CONFIG_START(trs80_state::ht1080z)
+	sys80(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ht1080z)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lnw80, model1 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( lnw80_map)
-	MCFG_CPU_IO_MAP( lnw80_io)
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80 )
+MACHINE_CONFIG_START(trs80_state::lnw80)
+	model1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 4) // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
+	MCFG_DEVICE_PROGRAM_MAP(lnw80_map)
+	MCFG_DEVICE_IO_MAP(lnw80_io)
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnw80)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(trs80_state,lnw80)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(80*6, 16*12)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*6-1,0,16*12-1)
+	MCFG_SCREEN_RAW_PARAMS(3.579545_MHz_XTAL * 3, 682, 0, 480, 264, 0, 192) // 10.738MHz generated by tank circuit (top left of page 2 of schematics)
+	// LNW80 Theory of Operations gives H and V periods as 15.750kHz and 59.66Hz, probably due to rounding the calculated ~15.7468kHz to 4 figures
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_lnw80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( radionic, model1 )
+MACHINE_CONFIG_START(trs80_state::radionic)
+	model1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(12_MHz_XTAL / 6) // or 3.579MHz / 2 (selectable?)
+	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." This likely refers to an alternate NTSC version
+	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
+	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
+
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(64*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
+	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", radionic)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritum, sys80 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( meritum_map)
-	MCFG_CPU_IO_MAP( meritum_io)
+MACHINE_CONFIG_START(trs80_state::meritum)
+	sys80(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritum_map)
+	MCFG_DEVICE_IO_MAP(meritum_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_meritum)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_meritum)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cp500, model3 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( cp500_io)
+MACHINE_CONFIG_START(trs80_state::cp500)
+	model3(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(cp500_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500 )
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -754,13 +782,13 @@ ROM_END
 ROM_START(trs80l2)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "level2", "Radio Shack Level II Basic")
-	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(1))
-	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(1))
-	ROMX_LOAD("trs80.zl2",   0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(1))
+	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0))
+	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0))
+	ROMX_LOAD("trs80.zl2",   0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rsl2", "R/S L2 Basic")
-	ROMX_LOAD("trs80alt.z33",0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(2))
-	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(2))
-	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(2))
+	ROMX_LOAD("trs80alt.z33",0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1))
+	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1))
+	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1))
 
 	ROM_REGION(0x00400, "chargen",0)
 	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
@@ -826,19 +854,19 @@ Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, b
 */
 	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m3_revc", "Level 2 bios, RomC Rev C")
+	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(0)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
+	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(0)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
+	ROMX_LOAD("8040316c.u106", 0x3000, 0x0800, CRC(c8f79433) SHA1(6f395bba822d39d3cd2b73c8ea25aab4c4c26da7), ROM_BIOS(0)) // Label: "SCM91692P // Tandy (c) 81 // 8040316-C // QQ8220" (Level 2 bios ROM C REV C '2f84')
+	ROM_SYSTEM_BIOS(1, "trs80m3_revb", "Level 2 bios, RomC Rev B")
 	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(1)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
 	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(1)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
-	ROMX_LOAD("8040316c.u106", 0x3000, 0x0800, CRC(c8f79433) SHA1(6f395bba822d39d3cd2b73c8ea25aab4c4c26da7), ROM_BIOS(1)) // Label: "SCM91692P // Tandy (c) 81 // 8040316-C // QQ8220" (Level 2 bios ROM C REV C '2f84')
-	ROM_SYSTEM_BIOS(1, "trs80m3_revb", "Level 2 bios, RomC Rev B")
-	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(2)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
-	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(2)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
-	ROMX_LOAD("8040316b.u106", 0x3000, 0x0800, CRC(84a5702d) SHA1(297dca756a9d3c6fd13e0fa6f93d172ff795b520), ROM_BIOS(2)) // Label: "SCM91692P // Tandy (c) 80 // 8040316B // QQ8040" (Level 2 bios ROM C REV B '2ef8')
+	ROMX_LOAD("8040316b.u106", 0x3000, 0x0800, CRC(84a5702d) SHA1(297dca756a9d3c6fd13e0fa6f93d172ff795b520), ROM_BIOS(1)) // Label: "SCM91692P // Tandy (c) 80 // 8040316B // QQ8040" (Level 2 bios ROM C REV B '2ef8')
 	ROM_SYSTEM_BIOS(2, "trs80m3_n3v2", "Level 2 bios, Network III v2 (student)")
-	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(3)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
-	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(3)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117" (Level 2 bios ROM B '407c')
-	ROMX_LOAD("276a.u106", 0x3000, 0x0800, CRC(7d38720a) SHA1(bef621e5ae2a8c1f9e7f6325b7841f5ab8ab7e6a), ROM_BIOS(3)) // 2716 EPROM Label: "MOD.III // ROM C // (276A)" (Network III v2 ROM C '276a')
+	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(2)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
+	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(2)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117" (Level 2 bios ROM B '407c')
+	ROMX_LOAD("276a.u106", 0x3000, 0x0800, CRC(7d38720a) SHA1(bef621e5ae2a8c1f9e7f6325b7841f5ab8ab7e6a), ROM_BIOS(2)) // 2716 EPROM Label: "MOD.III // ROM C // (276A)" (Network III v2 ROM C '276a')
 	ROM_SYSTEM_BIOS(3, "trs80m3_l1", "Level 1 bios")
-	ROMX_LOAD("8040032.u104", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(4) ) // Label: "8040032 // (M) QQ8028 // SCM91616P"; Silkscreen: "TANDY // (C) '80"; (Level 1 bios)
+	ROMX_LOAD("8040032.u104", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(3) ) // Label: "8040032 // (M) QQ8028 // SCM91616P"; Silkscreen: "TANDY // (C) '80"; (Level 1 bios)
 
 	ROM_REGION(0x00800, "chargen",0)    /* correct for later systems; the trs80m3_l1 bios uses the non-a version of this rom, dump is pending */
 	ROM_LOAD("8044316.u36", 0x0000, 0x0800, NO_DUMP) // Label: "(M) // SCM91665P // 8044316 // QQ8029" ('no-letter' revision)
@@ -857,9 +885,9 @@ ROM_END
 ROM_START(trs80m4p) // uses a completely different memory map scheme to the others; the trs-80 model 3 roms are loaded from a boot disk, the only rom on the machine is a bootloader; bootloader can be banked out of 0x0000-0x1000 space which is replaced with ram; see the tech ref pdf, pdf page 62
 	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m4p", "Level 2 bios, gate array machine")
-	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(1)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
+	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(0)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
 	ROM_SYSTEM_BIOS(1, "trs80m4p_hack", "Disk loader hack")
-	ROMX_LOAD("trs80m4p_loader_hack.rom", 0x0000, 0x01f8, CRC(7ff336f4) SHA1(41184f5240b4b54f3804f5a22b4d78bbba52ed1d), ROM_BIOS(2))
+	ROMX_LOAD("trs80m4p_loader_hack.rom", 0x0000, 0x01f8, CRC(7ff336f4) SHA1(41184f5240b4b54f3804f5a22b4d78bbba52ed1d), ROM_BIOS(1))
 
 	ROM_REGION(0x00800, "chargen",0)
 	ROM_LOAD("8049007.u103", 0x0000, 0x0800, CRC(1ac44bea) SHA1(c9426ab2b2aa5380dc97a7b9c048ccd1bbde92ca)) // Label: "SCM95987P // 8049007 // TANDY (C) 1983 // 8447" at location U103 (may be located at U43 on some pcb revisions)
@@ -929,33 +957,33 @@ ROM_START( cp500 )
 	ROM_LOAD( "100.105.ci36", 0x0000, 0x800, CRC(1765931e) SHA1(49176ceea6cc003efa04fad2f31829b9432fe10f))
 ROM_END
 
-DRIVER_INIT_MEMBER(trs80_state,trs80)
+void trs80_state::init_trs80()
 {
 	m_mode = 0;
 	m_model4 = 0;
 }
 
-DRIVER_INIT_MEMBER(trs80_state,trs80l2)
+void trs80_state::init_trs80l2()
 {
 	m_mode = 2;
 	m_model4 = 0;
 }
 
-DRIVER_INIT_MEMBER(trs80_state,trs80m4)
+void trs80_state::init_trs80m4()
 {
 	m_mode = 0;
 	m_model4 = 2;
 	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-DRIVER_INIT_MEMBER(trs80_state,trs80m4p)
+void trs80_state::init_trs80m4p()
 {
 	m_mode = 0;
 	m_model4 = 4;
 	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-DRIVER_INIT_MEMBER(trs80_state,lnw80)
+void trs80_state::init_lnw80()
 {
 	m_mode = 0;
 	m_model4 = 0;
@@ -963,18 +991,18 @@ DRIVER_INIT_MEMBER(trs80_state,lnw80)
 	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-//    YEAR  NAME         PARENT  COMPAT  MACHINE   INPUT    STATE        INIT      COMPANY                        FULLNAME                           FLAGS
-COMP( 1977, trs80,       0,      0,      trs80,    trs80,   trs80_state, trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  0 )
-COMP( 1978, trs80l2,     trs80,  0,      model1,   trs80,   trs80_state, trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", 0 )
-COMP( 1983, radionic,    trs80,  0,      radionic, trs80,   trs80_state, trs80,    "Komtek",                      "Radionic",                        0 )
-COMP( 1980, sys80,       trs80,  0,      sys80,    trs80,   trs80_state, trs80l2,  "EACA Computers Ltd",          "System-80",                       0 )
-COMP( 1981, lnw80,       trs80,  0,      lnw80,    trs80m3, trs80_state, lnw80,    "LNW Research",                "LNW-80",                          0 )
-COMP( 1980, trs80m3,     trs80,  0,      model3,   trs80m3, trs80_state, trs80m4,  "Tandy Radio Shack",           "TRS-80 Model III",                0 )
-COMP( 1980, trs80m4,     trs80,  0,      model4,   trs80m3, trs80_state, trs80m4,  "Tandy Radio Shack",           "TRS-80 Model 4",                  0 )
-COMP( 1983, trs80m4p,    trs80,  0,      model4p,  trs80m3, trs80_state, trs80m4p, "Tandy Radio Shack",           "TRS-80 Model 4P",                 0 )
-COMP( 1983, ht1080z,     trs80,  0,      ht1080z,  trs80,   trs80_state, trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               0 )
-COMP( 1984, ht1080z2,    trs80,  0,      ht1080z,  trs80,   trs80_state, trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              0 )
-COMP( 1985, ht108064,    trs80,  0,      ht1080z,  trs80,   trs80_state, trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     0 )
-COMP( 1985, meritum,     trs80,  0,      meritum,  trs80,   trs80_state, trs80l2,  "Mera-Elzab",                  "Meritum I (Model 2)",             0 )
-COMP( 1985, meritum_net, trs80,  0,      meritum,  trs80,   trs80_state, trs80l2,  "Mera-Elzab",                  "Meritum I (Model 2) (network)",   0 )
-COMP( 1982, cp500,       trs80,  0,      cp500,    trs80m3, trs80_state, trs80m4,  "Prológica",                   "CP-500 (PVIII REV.3)",            0 )
+//    YEAR  NAME         PARENT  COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
+COMP( 1977, trs80,       0,      0,      trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  0 )
+COMP( 1978, trs80l2,     trs80,  0,      model1,   trs80,   trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", 0 )
+COMP( 1983, radionic,    trs80,  0,      radionic, trs80,   trs80_state, init_trs80,    "Komtek",                      "Radionic",                        0 )
+COMP( 1980, sys80,       trs80,  0,      sys80,    trs80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80",                       0 )
+COMP( 1981, lnw80,       trs80,  0,      lnw80,    trs80m3, trs80_state, init_lnw80,    "LNW Research",                "LNW-80",                          0 )
+COMP( 1980, trs80m3,     trs80,  0,      model3,   trs80m3, trs80_state, init_trs80m4,  "Tandy Radio Shack",           "TRS-80 Model III",                0 )
+COMP( 1980, trs80m4,     trs80,  0,      model4,   trs80m3, trs80_state, init_trs80m4,  "Tandy Radio Shack",           "TRS-80 Model 4",                  0 )
+COMP( 1983, trs80m4p,    trs80,  0,      model4p,  trs80m3, trs80_state, init_trs80m4p, "Tandy Radio Shack",           "TRS-80 Model 4P",                 0 )
+COMP( 1983, ht1080z,     trs80,  0,      ht1080z,  trs80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               0 )
+COMP( 1984, ht1080z2,    trs80,  0,      ht1080z,  trs80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              0 )
+COMP( 1985, ht108064,    trs80,  0,      ht1080z,  trs80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     0 )
+COMP( 1985, meritum,     trs80,  0,      meritum,  trs80,   trs80_state, init_trs80l2,  "Mera-Elzab",                  "Meritum I (Model 2)",             0 )
+COMP( 1985, meritum_net, trs80,  0,      meritum,  trs80,   trs80_state, init_trs80l2,  "Mera-Elzab",                  "Meritum I (Model 2) (network)",   0 )
+COMP( 1982, cp500,       trs80,  0,      cp500,    trs80m3, trs80_state, init_trs80m4,  "Prológica",                  "CP-500 (PVIII REV.3)",            0 )

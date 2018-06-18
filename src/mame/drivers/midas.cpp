@@ -58,6 +58,7 @@
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -72,6 +73,8 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
+		m_prize(*this, "prize%u", 1),
+		m_ticket(*this, "ticket"),
 		m_zoomram(*this, "zoomtable")
 	{ }
 
@@ -83,7 +86,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
-	DECLARE_DRIVER_INIT(livequiz);
+	void init_livequiz();
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -96,10 +99,16 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<neosprite_midas_device> m_sprgen;
 	required_device<screen_device> m_screen;
+	optional_device_array<ticket_dispenser_device, 2> m_prize;
+	optional_device<ticket_dispenser_device> m_ticket;
 	required_shared_ptr<uint16_t> m_zoomram;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
+	void hammer(machine_config &config);
+	void livequiz(machine_config &config);
+	void hammer_map(address_map &map);
+	void livequiz_map(address_map &map);
 };
 
 
@@ -188,38 +197,39 @@ WRITE16_MEMBER(midas_state::livequiz_coin_w)
 #endif
 }
 
-static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void midas_state::livequiz_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW_PLAYER1")
-	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("PLAYER2")
-	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("START")
+	map(0x900000, 0x900001).portr("DSW_PLAYER1");
+	map(0x920000, 0x920001).portr("SERVICE");
+	map(0x940000, 0x940001).portr("PLAYER2");
+	map(0x980000, 0x980001).portr("START");
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE(livequiz_coin_w )
+	map(0x980000, 0x980001).w(FUNC(midas_state::livequiz_coin_w));
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
+	map(0x9a0000, 0x9a0001).w(FUNC(midas_state::midas_eeprom_w));
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
-	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack, temporary
+	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
+	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa40000, 0xa7ffff).ram();
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
+	map(0xb00000, 0xb00001).r(FUNC(midas_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(FUNC(midas_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(FUNC(midas_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(FUNC(midas_state::ret_ffff));
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff )
+	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
-	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
+	map(0xba0000, 0xba0001).portr("START3");
+	map(0xbc0000, 0xbc0001).portr("PLAYER3");
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM_WRITE(midas_zoomtable_w) AM_SHARE("zoomtable") // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
 
-	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe00000, 0xe3ffff).ram();
+}
 
 /***************************************************************************************
                                           Hammer
@@ -237,8 +247,8 @@ WRITE16_MEMBER(midas_state::hammer_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -249,9 +259,9 @@ WRITE16_MEMBER(midas_state::hammer_motor_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().device<ticket_dispenser_device>("prize1")->write(space, 0, (data & 0x0001) << 7);
-		machine().device<ticket_dispenser_device>("prize2")->write(space, 0, (data & 0x0002) << 6);
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x0010) << 3);
+		m_prize[0]->motor_w(BIT(data, 0));
+		m_prize[1]->motor_w(BIT(data, 1));
+		m_ticket->motor_w(BIT(data, 4));
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG
@@ -259,42 +269,43 @@ WRITE16_MEMBER(midas_state::hammer_motor_w)
 #endif
 }
 
-static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void midas_state::hammer_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW")
-	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
-	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("TILT")
+	map(0x900000, 0x900001).portr("DSW");
+	map(0x920000, 0x920001).portr("SERVICE");
+	map(0x940000, 0x940001).portr("IN0");
+	map(0x980000, 0x980001).portr("TILT");
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE(hammer_coin_w )
+	map(0x980000, 0x980001).w(FUNC(midas_state::hammer_coin_w));
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
+	map(0x9a0000, 0x9a0001).w(FUNC(midas_state::midas_eeprom_w));
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
-	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack, temporary
+	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
+	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa40000, 0xa7ffff).ram();
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
+	map(0xb00000, 0xb00001).r(FUNC(midas_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(FUNC(midas_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(FUNC(midas_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(FUNC(midas_state::ret_ffff));
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff )
+	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN1")
-	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("HAMMER")
+	map(0xba0000, 0xba0001).portr("IN1");
+	map(0xbc0000, 0xbc0001).portr("HAMMER");
 
-	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE(hammer_motor_w )
+	map(0xbc0002, 0xbc0003).w(FUNC(midas_state::hammer_motor_w));
 
-	AM_RANGE(0xbc0004, 0xbc0005) AM_READ(hammer_sensor_r )
+	map(0xbc0004, 0xbc0005).r(FUNC(midas_state::hammer_sensor_r));
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM_WRITE(midas_zoomtable_w) AM_SHARE("zoomtable") // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
 
-	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe00000, 0xe3ffff).ram();
+}
 
 
 static const gfx_layout layout16x16x8 =
@@ -319,7 +330,7 @@ static const gfx_layout layout8x8x8_2 =
 	32*8*2
 };
 
-static GFXDECODE_START( midas )
+static GFXDECODE_START( gfx_midas )
 	GFXDECODE_ENTRY( "sprites", 0, layout16x16x8, 0, 0x100 )
 	GFXDECODE_ENTRY( "tiles",   0, layout8x8x8_2, 0,  0x80 )
 GFXDECODE_END
@@ -366,7 +377,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -499,7 +510,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2     )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SERVICE1  )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -572,11 +583,11 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("HAMMER")    // bc0000
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize1", ticket_dispenser_device, line_r) // prize 1 sensor ("tejisw 1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize2", ticket_dispenser_device, line_r) // prize 2 sensor ("tejisw 2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize1", ticket_dispenser_device, line_r) // prize 1 sensor ("tejisw 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize2", ticket_dispenser_device, line_r) // prize 2 sensor ("tejisw 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_IMPULSE(5) PORT_NAME( "Hammer" )
@@ -618,42 +629,43 @@ WRITE_LINE_MEMBER(midas_state::screen_vblank_midas)
 
 
 
-static MACHINE_CONFIG_START( livequiz )
+MACHINE_CONFIG_START(midas_state::livequiz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(livequiz_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(livequiz_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(midas_state, screen_vblank_midas))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, midas_state, screen_vblank_midas))
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hammer )
+MACHINE_CONFIG_START(midas_state::hammer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(hammer_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(hammer_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
@@ -663,18 +675,19 @@ static MACHINE_CONFIG_START( hammer )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(midas_state, screen_vblank_midas))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, midas_state, screen_vblank_midas))
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -792,7 +805,7 @@ ROM_START( livequiz )
 	/* uploaded */
 ROM_END
 
-DRIVER_INIT_MEMBER(midas_state,livequiz)
+void midas_state::init_livequiz()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -887,5 +900,5 @@ ROM_START( hammer )
 	/* uploaded */
 ROM_END
 
-GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, 0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, init_livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, empty_init,    ROT0, "Andamiro", "Hammer",         0 )

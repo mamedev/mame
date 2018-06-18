@@ -69,7 +69,6 @@
 #include "includes/vtech2.h"
 
 #include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
 #include "sound/wave.h"
 
 #include "screen.h"
@@ -78,21 +77,23 @@
 #include "formats/vt_cas.h"
 
 
-static ADDRESS_MAP_START(vtech2_mem, AS_PROGRAM, 8, vtech2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void vtech2_state::vtech2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-static ADDRESS_MAP_START(vtech2_io, AS_IO, 8, vtech2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x1f) AM_READWRITE(laser_fdc_r, laser_fdc_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(laser_bank_select_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(laser_bg_mode_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(laser_two_color_w)
-ADDRESS_MAP_END
+void vtech2_state::vtech2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
+	map(0x40, 0x43).w(FUNC(vtech2_state::laser_bank_select_w));
+	map(0x44, 0x44).w(FUNC(vtech2_state::laser_bg_mode_w));
+	map(0x45, 0x45).w(FUNC(vtech2_state::laser_two_color_w));
+}
 
 /* 2008-05 FP:
 Small note about natural keyboard: currently,
@@ -351,7 +352,7 @@ static const gfx_layout gfxlayout_4bpp_dh =
 	2*4                     /* one byte per code */
 };
 
-static GFXDECODE_START( vtech2 )
+static GFXDECODE_START( gfx_vtech2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_80, 0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_40, 0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_1bpp, 0, 256 )
@@ -413,12 +414,12 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
-	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
-	MCFG_CPU_IO_MAP(vtech2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(vtech2_mem)
+	MCFG_DEVICE_IO_MAP(vtech2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -430,17 +431,15 @@ static MACHINE_CONFIG_START( laser350 )
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vtech2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vtech2)
 	MCFG_PALETTE_ADD("palette", 512+16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)
@@ -455,12 +454,14 @@ static MACHINE_CONFIG_START( laser350 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser500, laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser500)
+	laser350(config);
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser700, laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser700)
+	laser350(config);
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */
@@ -504,7 +505,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     STATE         INIT   COMPANY             FULLNAME      FLAGS
-COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, laser, "Video Technology", "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, laser, "Video Technology", "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, laser, "Video Technology", "Laser 700" , 0)
+//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY             FULLNAME      FLAGS
+COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)

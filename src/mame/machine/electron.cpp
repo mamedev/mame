@@ -18,9 +18,9 @@ void electron_state::waitforramsync()
 {
 	int cycles = 0;
 
-	if (!(m_ula.screen_mode & 4) && machine().first_screen()->hpos()<640)
+	if (!(m_ula.screen_mode & 4) && (m_screen->vpos() > m_screen->visible_area().min_y) && (m_screen->vpos() < m_screen->visible_area().max_y) && !m_screen->hblank())
 	{
-		cycles += (640 - machine().first_screen()->hpos()) / 8;
+		cycles += (m_screen->visible_area().max_x - m_screen->hpos()) / 16;
 	}
 	if (cycles & 1) cycles++;
 
@@ -142,60 +142,180 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	}
 }
 
-READ8_MEMBER(electron_state::electron_read_keyboard)
+READ8_MEMBER(electron_state::electron64_fetch_r)
 {
-	uint8_t data = 0;
+	m_vdu_drivers = (offset & 0xe000) == 0xc000 ? true : false;
 
-	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
-	for (int i = 0; i < 14; i++)
-	{
-		if (!(offset & 1))
-			data |= m_keybd[i]->read() & 0x0f;
-
-		offset = offset >> 1;
-	}
-	//logerror( ", data: %02x\n", data );
-	return data;
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 READ8_MEMBER(electron_state::electron_mem_r)
 {
-	//waitforramsync();
+	switch (m_mrb.read_safe(0))
+	{
+	case 0x00: /* Normal */
+		/* The processor will run at 1MHz during an access cycle to the RAM */
+		m_maincpu->set_clock_scale(0.5f);
+		waitforramsync();
+		break;
+
+	case 0x01: /* Turbo */
+		if (m_mrb_mapped && offset < 0x3000) offset += 0x8000;
+		break;
+
+	case 0x02: /* Shadow */
+		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
+		break;
+	}
 	return m_ram->read(offset);
 }
 
 WRITE8_MEMBER(electron_state::electron_mem_w)
 {
-	//waitforramsync();
+	switch (m_mrb.read_safe(0))
+	{
+	case 0x00: /* Normal */
+		/* The processor will run at 1MHz during an access cycle to the RAM */
+		m_maincpu->set_clock_scale(0.5f);
+		waitforramsync();
+		break;
+
+	case 0x01: /* Turbo */
+		if (m_mrb_mapped && offset < 0x3000) offset += 0x8000;
+		break;
+
+	case 0x02: /* Shadow */
+		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
+		break;
+	}
 	m_ram->write(offset, data);
+}
+
+READ8_MEMBER(electron_state::electron_paged_r)
+{
+	/*  0 Second external socket on the expansion module (SK2) */
+	/*  1 Second external socket on the expansion module (SK2) */
+	/*  2 First external socket on the expansion module (SK1)  */
+	/*  3 First external socket on the expansion module (SK1)  */
+	/*  4 Disc                                                 */
+	/*  5 USER applications                                    */
+	/*  6 USER applications                                    */
+	/*  7 Modem interface ROM                                  */
+	/*  8 Keyboard                                             */
+	/*  9 Keyboard mirror                                      */
+	/* 10 BASIC rom                                            */
+	/* 11 BASIC rom mirror                                     */
+	/* 12 Expansion module operating system                    */
+	/* 13 High priority slot in expansion module               */
+	/* 14 ECONET                                               */
+	/* 15 Reserved                                             */
+
+	uint8_t data = 0;
+
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	switch (m_ula.rompage)
+	{
+	case 8:
+	case 9:
+		/* Keyboard */
+		for (int i = 0; i < 14; i++)
+		{
+			if (!(offset & 1))
+				data |= m_keybd[i]->read() & 0x0f;
+
+			offset = offset >> 1;
+		}
+		break;
+
+	case 10:
+	case 11:
+		/* BASIC */
+		data = m_region_basic->base()[offset & 0x3fff];
+		break;
+
+	default:
+		/* ROM in extension devices */
+		data = m_exp->expbus_r(space, 0x8000 + offset, 0xff);
+		break;
+	}
+	return data;
+}
+
+WRITE8_MEMBER(electron_state::electron_paged_w)
+{
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	m_exp->expbus_w(space, 0x8000 + offset, data);
+}
+
+READ8_MEMBER(electron_state::electron_mos_r)
+{
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	return m_region_mos->base()[offset & 0x3fff];
+}
+
+WRITE8_MEMBER(electron_state::electron_mos_w)
+{
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	logerror("MOS: write %04x %02x\n", offset + 0xc000, data);
+	m_exp->expbus_w(space, 0xc000 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_fred_r)
 {
-	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfc */
-	logerror("FRED: read fc%02x\n", offset);
-	return 0xfc;
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
+	//logerror("FRED: read fc%02x\n", offset);
+	return m_exp->expbus_r(space, 0xfc00 + offset, 0xff);
 }
 
 WRITE8_MEMBER(electron_state::electron_fred_w)
 {
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	/* Master RAM Board */
+	if (offset == 0x7f) m_mrb_mapped = !(data & 0x80);
+
+	//logerror("FRED: write fc%02x\n", offset);
+	m_exp->expbus_w(space, 0xfc00 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_jim_r)
 {
-	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfd */
-	logerror("JIM: read fd%02x\n", offset);
-	return 0xfd;
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
+	//logerror("JIM: read fd%02x\n", offset);
+	return m_exp->expbus_r(space, 0xfd00 + offset, 0xff);
 }
 
 WRITE8_MEMBER(electron_state::electron_jim_w)
 {
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	//logerror("JIM: write fd%02x\n", offset);
+	m_exp->expbus_w(space, 0xfd00 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_sheila_r)
 {
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfe */
-	uint8_t data = 0xfe;
+	uint8_t data = 0xff;
 
 	switch ( offset & 0x0f )
 	{
@@ -210,17 +330,23 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 		data = m_ula.tape_byte;
 		break;
 	}
-	logerror( "ULA: read offset %02x: %02x\n", offset, data );
+	//logerror( "ULA: read fe%02x: %02x\n", offset, data );
 	return data;
 }
 
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
-static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
+static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x6000 };
+static const int electron_mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249 };
 
 WRITE8_MEMBER(electron_state::electron_sheila_w)
 {
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	m_exp->expbus_w(space, 0xfe00 + offset, data);
+
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
-	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
+	//logerror( "ULA: write fe%02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt control */
@@ -233,7 +359,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x03:  /* Screen start address #2 */
-		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
+		m_ula.screen_start = ( m_ula.screen_start & 0x1ff ) | ( ( data & 0x3f ) << 9 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x04:  /* Cassette data shift register */
@@ -251,13 +377,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 			if ( m_ula.rompage == 8 || m_ula.rompage == 9 )
 			{
 				m_ula.rompage = 8;
-				space.install_read_handler( 0x8000, 0xbfff, read8_delegate(FUNC(electron_state::electron_read_keyboard),this));
 			}
-			else
-			{
-				space.install_read_bank( 0x8000, 0xbfff, "bank2");
-			}
-			membank("bank2")->set_entry(m_ula.rompage);
 		}
 		if ( data & 0x10 )
 		{
@@ -310,22 +430,22 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = electron_screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
+		m_ula.screen_dispend = electron_mode_end[ m_ula.screen_mode ];
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
 		output().set_value("capslock_led", m_ula.capslock_mode);
 		break;
-	case 0x08: case 0x0A: case 0x0C: case 0x0E:
-		// video_update
-		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+	case 0x08: case 0x0a: case 0x0c: case 0x0e:
+		/* colour palette */
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 2));
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
 		m_ula.current_pal[i] = (m_ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
 		break;
-	case 0x09: case 0x0B: case 0x0D: case 0x0F:
-		// video_update
+	case 0x09: case 0x0b: case 0x0d: case 0x0f:
+		/* colour palette */
 		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
@@ -368,8 +488,6 @@ TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 
 void electron_state::machine_reset()
 {
-	membank("bank2")->set_entry(0);
-
 	m_ula.communication_mode = 0x04;
 	m_ula.screen_mode = 0;
 	m_ula.cassette_motor_mode = 0;
@@ -377,16 +495,15 @@ void electron_state::machine_reset()
 	m_ula.screen_start = 0x3000;
 	m_ula.screen_base = 0x3000;
 	m_ula.screen_size = 0x8000 - 0x3000;
-	m_ula.screen_addr = 0;
+	m_ula.screen_addr = 0x3000;
 	m_ula.tape_running = 0;
-	m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
+
+	m_mrb_mapped = true;
+	m_vdu_drivers = false;
 }
 
 void electron_state::machine_start()
 {
-	for (int page = 0; page < 16; page++)
-		membank("bank2")->configure_entries(page, 1, memregion("user1")->base() + page * 0x4000, 0x4000);
-
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);

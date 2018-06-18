@@ -21,26 +21,30 @@ TODO:
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "TMP95C061")
-DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "TMP95C063")
+DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "Toshiba TMP95C061")
+DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063")
 
 
-static ADDRESS_MAP_START( tmp95c061_mem8, AS_PROGRAM, 8, tmp95c061_device )
-	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE( internal_r, internal_w )
-ADDRESS_MAP_END
+void tmp95c061_device::tmp95c061_mem8(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+}
 
-static ADDRESS_MAP_START( tmp95c061_mem16, AS_PROGRAM, 16, tmp95c061_device )
-	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
-ADDRESS_MAP_END
+void tmp95c061_device::tmp95c061_mem16(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+}
 
 
-static ADDRESS_MAP_START(tmp95c063_mem8, AS_PROGRAM, 8, tmp95c063_device )
-	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE( internal_r, internal_w )
-ADDRESS_MAP_END
+void tmp95c063_device::tmp95c063_mem8(address_map &map)
+{
+	map(0x000000, 0x00009f).rw(FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+}
 
-static ADDRESS_MAP_START(tmp95c063_mem16, AS_PROGRAM, 16, tmp95c063_device )
-	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
-ADDRESS_MAP_END
+void tmp95c063_device::tmp95c063_mem16(address_map &map)
+{
+	map(0x000000, 0x00009f).rw(FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+}
 
 
 tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -87,11 +91,11 @@ void tmp95c061_device::device_config_complete()
 {
 	if (m_am8_16 == 0)
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(tmp95c061_mem16));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor(FUNC(tmp95c061_device::tmp95c061_mem16), this));
 	}
 	else
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, ADDRESS_MAP_NAME(tmp95c061_mem8));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor(FUNC(tmp95c061_device::tmp95c061_mem8), this));
 	}
 }
 
@@ -140,18 +144,18 @@ void tmp95c063_device::device_config_complete()
 {
 	if (m_am8_16 == 0)
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(tmp95c063_mem16));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor(FUNC(tmp95c063_device::tmp95c063_mem16), this));
 	}
 	else
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, ADDRESS_MAP_NAME(tmp95c063_mem8));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor(FUNC(tmp95c063_device::tmp95c063_mem8), this));
 	}
 }
 
 
-util::disasm_interface *tlcs900h_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs900h_device::create_disassembler()
 {
-	return new tlcs900_disassembler;
+	return std::make_unique<tlcs900_disassembler>();
 }
 
 
@@ -388,7 +392,7 @@ void tlcs900h_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc.d ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr.w.l ).formatstr("%12s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1052,7 +1056,7 @@ void tlcs900h_device::execute_run()
 			m_check_irqs = 0;
 		}
 
-		debugger_instruction_hook( this, m_pc.d );
+		debugger_instruction_hook( m_pc.d );
 
 		if ( m_halted )
 		{

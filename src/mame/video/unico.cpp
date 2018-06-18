@@ -65,7 +65,7 @@ WRITE16_MEMBER(unico_state::unico_palette_w)
 			(data2 >> 8) & 0xFC );
 }
 
-WRITE32_MEMBER(unico_state::unico_palette32_w)
+WRITE32_MEMBER(zeropnt2_state::unico_palette32_w)
 {
 	uint32_t rgb0 = COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_palette->set_pen_color( offset,
@@ -125,7 +125,7 @@ WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offs
 ***************************************************************************/
 
 
-VIDEO_START_MEMBER(unico_state,unico)
+void unico_state::video_start()
 {
 	m_vram   = make_unique_clear<uint16_t[]>(0xc000 / 2);
 	m_scroll = make_unique_clear<uint16_t[]>(0x18 / 2);

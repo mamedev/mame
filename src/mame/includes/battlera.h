@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/msm5205.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
@@ -22,8 +23,8 @@ public:
 		m_soundlatch(*this, "soundlatch")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_maincpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 	required_device<huc6260_device> m_huc6260;
@@ -43,4 +44,8 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void battlera(machine_config &config);
+	void battlera_map(address_map &map);
+	void battlera_portmap(address_map &map);
+	void sound_map(address_map &map);
 };

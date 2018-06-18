@@ -64,11 +64,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 
-	DECLARE_DRIVER_INIT(ti990_4);
-	DECLARE_DRIVER_INIT(ti990_4v);
+	void init_ti990_4();
+	void init_ti990_4v();
 
 	DECLARE_MACHINE_RESET(ti990_4);
 
+	void ti990_4v(machine_config &config);
+	void ti990_4(machine_config &config);
+	void cru_map(address_map &map);
+	void cru_map_v(address_map &map);
+	void memmap(address_map &map);
 private:
 	void        hold_load();
 	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -208,12 +213,13 @@ READ8_MEMBER( ti990_4_state::interrupt_level )
     Memory map - see description above
 */
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti990_4_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM /* dynamic RAM */
-	AM_RANGE(0x8000, 0xf7ff) AM_NOP /* reserved for expansion */
-	AM_RANGE(0xf800, 0xfbff) AM_RAM /* static RAM? */
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* LOAD ROM */
-ADDRESS_MAP_END
+void ti990_4_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).ram(); /* dynamic RAM */
+	map(0x8000, 0xf7ff).noprw(); /* reserved for expansion */
+	map(0xf800, 0xfbff).ram(); /* static RAM? */
+	map(0xfc00, 0xffff).rom(); /* LOAD ROM */
+}
 
 
 /*
@@ -238,27 +244,29 @@ ADDRESS_MAP_END
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
-	AM_RANGE(0x00, 0x01) AM_DEVREAD("asr733", asr733_device, cru_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("asr733", asr733_device, cru_w)
+void ti990_4_state::cru_map(address_map &map)
+{
+	map(0x00, 0x01).r("asr733", FUNC(asr733_device::cru_r));
+	map(0x00, 0x0f).w("asr733", FUNC(asr733_device::cru_w));
 
-	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
-	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
+	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
+	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
-	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
-ADDRESS_MAP_END
+	map(0x1fe, 0x1ff).r(FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
+}
 
-static ADDRESS_MAP_START(cru_map_v, AS_IO, 8, ti990_4_state )
-	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_device, cru_r)
-	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_device, cru_w)
+void ti990_4_state::cru_map_v(address_map &map)
+{
+	map(0x10, 0x11).r("vdt911", FUNC(vdt911_device::cru_r));
+	map(0x80, 0x8f).w("vdt911", FUNC(vdt911_device::cru_w));
 
-	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
-	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
+	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
+	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
-	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
-ADDRESS_MAP_END
+	map(0x1fe, 0x1ff).r(FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
+}
 
 
 /* static const floppy_interface ti990_4_floppy_interface =
@@ -276,48 +284,48 @@ MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 	m_maincpu->set_ready(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
+void ti990_4_state::init_ti990_4()
 {
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }
 
-static MACHINE_CONFIG_START( ti990_4 )
+MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti990_4_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti990_4_state, interrupt_level) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	MCFG_DEVICE_ADD("asr733", ASR733, 0)
-	MCFG_ASR733_KEYINT_HANDLER(WRITELINE(ti990_4_state, asrkey_interrupt))
-	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
+	MCFG_ASR733_KEYINT_HANDLER(WRITELINE(*this, ti990_4_state, asrkey_interrupt))
+	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(*this, ti990_4_state, line_interrupt))
 
 	// Floppy controller
 	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
-	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_FD800_INT_HANDLER(WRITELINE(*this, ti990_4_state, fd_interrupt))
 
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti990_4v )
+MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti990_4_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti990_4_state, interrupt_level) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_4_state, vdtkey_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
+	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(*this, ti990_4_state, vdtkey_interrupt))
+	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(*this, ti990_4_state, line_interrupt))
 
 	// Floppy controller
 	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
-	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_FD800_INT_HANDLER(WRITELINE(*this, ti990_4_state, fd_interrupt))
 
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
@@ -362,6 +370,6 @@ ROM_START(ti990_4v)
 	ROM_REGION(vdt911_device::chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE          INIT     COMPANY              FULLNAME                                                           FLAGS
-COMP( 1976, ti990_4,  0,       0,      ti990_4,  0,     ti990_4_state, ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1976, ti990_4v, ti990_4, 0,      ti990_4v, 0,     ti990_4_state, ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System with Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS          INIT          COMPANY              FULLNAME                                                           FLAGS
+COMP( 1976, ti990_4,  0,       0,      ti990_4,  0,     ti990_4_state, init_ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4, 0,      ti990_4v, 0,     ti990_4_state, init_ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System with Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

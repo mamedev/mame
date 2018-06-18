@@ -15,7 +15,7 @@
 	MCFG_DEVICE_ADD(_tag, DSBZ80, 0)
 
 #define MCFG_DSBZ80_RXD_HANDLER(_devcb) \
-	devcb = &dsbz80_device::set_rxd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<dsbz80_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object &&object) { return downcast<dsbz80_device &>(device).m_rxd_handler.set_callback(std::forward<_Object>(object)); }
+	// configuration
+	template<class Object> devcb_base &set_rxd_handler(device_t &device, Object &&object) { return m_rxd_handler.set_callback(std::forward<Object>(object)); }
 
 	required_device<cpu_device> m_ourcpu;
 	required_device<i8251_device> m_uart;
@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mpeg_stereo_w);
 	DECLARE_READ8_MEMBER(mpeg_pos_r);
 
+	void dsbz80_map(address_map &map);
+	void dsbz80io_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,7 +64,6 @@ private:
 
 
 // device type definition
-extern const device_type DSBZ80;
 DECLARE_DEVICE_TYPE(DSBZ80, dsbz80_device)
 
 #endif // MAME_AUDIO_DSBZ80_H

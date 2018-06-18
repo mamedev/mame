@@ -35,7 +35,7 @@ WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_c_w)
 
 READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
 {
-	logerror("%s: tc_r\n", space.machine().describe_context());
+	logerror("%s: tc_r\n", machine().describe_context());
 
 	// toggle tc on read
 	m_fdc->tc_w(true);
@@ -46,7 +46,7 @@ READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
 
 WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
 {
-	logerror("%s: control_w(%02x)\n", space.machine().describe_context(), data);
+	logerror("%s: control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
 	if (m_fd0)
@@ -55,41 +55,44 @@ WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
 		m_fd1->mon_w(!BIT(data, 0));
 }
 
-static ADDRESS_MAP_START( sd725_mem, AS_PROGRAM, 8, spc1000_fdd_exp_device )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void spc1000_fdd_exp_device::sd725_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( sd725_io, AS_IO, 8, spc1000_fdd_exp_device )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(tc_r, control_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
-ADDRESS_MAP_END
+void spc1000_fdd_exp_device::sd725_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).rw(FUNC(spc1000_fdd_exp_device::tc_r), FUNC(spc1000_fdd_exp_device::control_w)); // (R) Terminal Count Port (W) Motor Control Port
+	map(0xfa, 0xfb).m("upd765", FUNC(upd765a_device::map));
+	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-static SLOT_INTERFACE_START( sd725_floppies )
-	SLOT_INTERFACE("sd320", EPSON_SD_320)
-SLOT_INTERFACE_END
+static void sd725_floppies(device_slot_interface &device)
+{
+	device.option_add("sd320", EPSON_SD_320);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( spc1000_fdd_exp_device::device_add_mconfig )
+MACHINE_CONFIG_START(spc1000_fdd_exp_device::device_add_mconfig)
 
 	// sub CPU (5 inch floppy drive)
-	MCFG_CPU_ADD("fdccpu", Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(sd725_mem)
-	MCFG_CPU_IO_MAP(sd725_io)
+	MCFG_DEVICE_ADD("fdccpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sd725_mem)
+	MCFG_DEVICE_IO_MAP(sd725_io)
 
 	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1000_fdd_exp_device, i8255_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(spc1000_fdd_exp_device, i8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1000_fdd_exp_device, i8255_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("d8255_master", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(READ8("d8255_master", i8255_device, pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spc1000_fdd_exp_device, i8255_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, spc1000_fdd_exp_device, i8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spc1000_fdd_exp_device, i8255_c_w))
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("upd765", true, true)

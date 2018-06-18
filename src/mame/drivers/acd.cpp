@@ -18,17 +18,15 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void acd(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, acd_state )
-//ADDRESS_MAP_END
-
 static INPUT_PORTS_START( acd )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( acd )
+MACHINE_CONFIG_START(acd_state::acd)
 MACHINE_CONFIG_END
 
 ROM_START( acd )
@@ -44,4 +42,4 @@ ROM_START( acd )
 	ROM_LOAD( "d9_cpu_b14_rev_1.2.bin", 0x000000, 0x000200, CRC(5572ff8b) SHA1(9e8158c338b2798f7fb1d9c4fa6dd99592d2fae3) )
 ROM_END
 
-COMP( 198?, acd, 0, 0, acd, acd, acd_state, 0, "Advanced Computer Design", "unknown ACD computer", MACHINE_IS_SKELETON )
+COMP( 198?, acd, 0, 0, acd, acd, acd_state, empty_init, "Advanced Computer Design", "unknown ACD computer", MACHINE_IS_SKELETON )

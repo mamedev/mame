@@ -13,6 +13,7 @@ Floppies were 8 inch IBM format.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -30,6 +31,8 @@ public:
 	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void terak(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_unit;
 	uint8_t m_cmd;
@@ -67,15 +70,16 @@ WRITE16_MEMBER( terak_state::terak_fdc_data_w )
 	logerror("terak_fdc_data_w %04x\n",data);
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, terak_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000,  0xf5ff ) AM_RAM // RAM
+void terak_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf5ff).ram(); // RAM
 
 	// octal
-	AM_RANGE( 0173000, 0173177 ) AM_ROM // ROM
-	AM_RANGE( 0177000, 0177001 ) AM_READWRITE(terak_fdc_status_r,terak_fdc_command_w)
-	AM_RANGE( 0177002, 0177003 ) AM_READWRITE(terak_fdc_data_r,terak_fdc_data_w)
-ADDRESS_MAP_END
+	map(0173000, 0173177).rom(); // ROM
+	map(0177000, 0177001).rw(FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
+	map(0177002, 0177003).rw(FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( terak )
@@ -96,11 +100,11 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( terak )
+MACHINE_CONFIG_START(terak_state::terak)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000))
 	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -128,5 +132,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1977, terak,  0,      0,       terak,     terak, terak_state, 0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1977, terak, 0,      0,      terak,   terak, terak_state, empty_init, "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

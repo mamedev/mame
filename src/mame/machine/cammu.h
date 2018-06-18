@@ -6,52 +6,24 @@
 
 #pragma once
 
-#define MCFG_CAMMU_SSW_CB(_sswcb) \
-	devcb = &cammu_device::static_set_ssw_callback(*device, DEVCB_##_sswcb);
+#include "cpu/clipper/common.h"
+
+#define MCFG_CAMMU_ID(_id) \
+	downcast<cammu_c4_device &>(*device).set_cammu_id(_id);
 
 #define MCFG_CAMMU_EXCEPTION_CB(_exceptioncb) \
-	devcb = &cammu_device::static_set_exception_callback(*device, DEVCB_##_exceptioncb);
+	devcb = &downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
 
 #define MCFG_CAMMU_LINK(_tag) \
-	cammu_c3_device::static_add_linked(*device, _tag);
+	downcast<cammu_c3_device &>(*device).add_linked(_tag);
 
-class cammu_device : public device_t, public device_memory_interface
+class cammu_device : public device_t
 {
 public:
-	template <class Object> static devcb_base &static_set_ssw_callback(device_t &device, Object &&cb) { return downcast<cammu_device &>(device).m_ssw_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_exception_callback(device_t &device, Object &&cb) { return downcast<cammu_device &>(device).m_exception_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_exception_callback(Object &&cb) { return m_exception_func.set_callback(std::forward<Object>(cb)); }
 
 	static const u32 CAMMU_PAGE_SIZE = 0x1000;
 	static const u32 CAMMU_PAGE_MASK = (CAMMU_PAGE_SIZE - 1);
-
-	enum ssw_mask : u32
-	{
-		SSW_M  = 0x04000000, // mapped mode
-		SSW_KU = 0x08000000, // user protect key
-		SSW_UU = 0x10000000, // user data mode
-		SSW_K  = 0x20000000, // protect key
-		SSW_U  = 0x40000000, // user mode
-
-		SSW_PL = 0x78000000  // protection level relevant bits
-	};
-
-	enum exception_vectors : u16
-	{
-		// data memory trap group
-		EXCEPTION_D_CORRECTED_MEMORY_ERROR     = 0x108,
-		EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR = 0x110,
-		EXCEPTION_D_ALIGNMENT_FAULT            = 0x120,
-		EXCEPTION_D_PAGE_FAULT                 = 0x128,
-		EXCEPTION_D_READ_PROTECT_FAULT         = 0x130,
-		EXCEPTION_D_WRITE_PROTECT_FAULT        = 0x138,
-
-		// instruction memory trap group
-		EXCEPTION_I_CORRECTED_MEMORY_ERROR     = 0x288,
-		EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR = 0x290,
-		EXCEPTION_I_ALIGNMENT_FAULT            = 0x2a0,
-		EXCEPTION_I_PAGE_FAULT                 = 0x2a8,
-		EXCEPTION_I_EXECUTE_PROTECT_FAULT      = 0x2b0,
-	};
 
 	enum pdo_mask : u32
 	{
@@ -79,17 +51,7 @@ public:
 		PTE_LOCK  = 0x00000100  // page lock (software)
 	};
 
-	enum pte_st_mask : u32
-	{
-		ST_0 = 0x00000000, // private, write-through, main memory space
-		ST_1 = 0x00000200, // shared, write-through, main memory space
-		ST_2 = 0x00000400, // private, copy-back, main memory space
-		ST_3 = 0x00000600, // noncacheable, main memory space
-		ST_4 = 0x00000800, // noncacheable, i/o space
-		ST_5 = 0x00000a00, // noncacheable, boot space
-		ST_6 = 0x00000c00, // cache purge
-		ST_7 = 0x00000e00  // slave i/o
-	};
+	static const int PTE_ST_SHIFT = 9;
 
 	enum va_mask : u32
 	{
@@ -98,10 +60,103 @@ public:
 		VA_PTDI = 0xffc00000  // page table directory index
 	};
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
+	enum system_tag_t : u8
+	{
+		ST0 = 0, // private, write-through, main memory space
+		ST1 = 1, // shared, write-through, main memory space
+		ST2 = 2, // private, copy-back, main memory space
+		ST3 = 3, // noncacheable, main memory space
+		ST4 = 4, // noncacheable, i/o space
+		ST5 = 5, // noncacheable, boot space
+		ST6 = 6, // cache purge
+		ST7 = 7  // slave i/o
+	};
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	virtual void map(address_map &map) = 0;
+
+	void set_spaces(std::vector<address_space *> spaces);
+
+	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(const u32 ssw, const u32 address, U &&apply)
+	{
+		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), READ);
+
+		if (t.space != nullptr)
+		{
+			switch (sizeof(T))
+			{
+			case 1: apply(T(t.space->read_byte(t.address))); break;
+			case 2: apply(T(t.space->read_word(t.address))); break;
+			case 4: apply(T(t.space->read_dword(t.address))); break;
+			case 8: apply(T(t.space->read_qword(t.address))); break;
+			default: fatalerror("unhandled load size %d\n", access_size(sizeof(T)));
+			}
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(const u32 ssw, const u32 address, U data)
+	{
+		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), WRITE);
+
+		if (t.space != nullptr)
+		{
+			switch (sizeof(T))
+			{
+			case 1: t.space->write_byte(t.address, T(data)); break;
+			case 2: t.space->write_word(t.address, T(data)); break;
+			case 4: t.space->write_dword(t.address, T(data)); break;
+			case 8: t.space->write_qword(t.address, T(data)); break;
+			default: fatalerror("unhandled store size %d\n", access_size(sizeof(T)));
+			}
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<T(T)>>::value, bool> modify(const u32 ssw, const u32 address, U &&apply)
+	{
+		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), RMW);
+
+		if (t.space != nullptr)
+		{
+			switch (sizeof(T))
+			{
+			case 4: t.space->write_dword(t.address, apply(T(t.space->read_dword(t.address)))); break;
+			default: fatalerror("unhandled modify size %d\n", access_size(sizeof(T)));
+			}
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> fetch(const u32 ssw, const u32 address, U &&apply)
+	{
+		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), EXECUTE);
+
+		if (t.space != nullptr)
+		{
+			switch (sizeof(T))
+			{
+			case 2: apply(T(t.space->read_word(t.address))); break;
+			case 4: apply(T(t.space->read_dword_unaligned(t.address))); break;
+			default: fatalerror("unhandled fetch size %d\n", access_size(sizeof(T)));
+			}
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	// address translation for debugger
+	bool memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address);
 
 protected:
 	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -110,81 +165,84 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
-
-	enum access_t
+	enum access_size : u8
 	{
-		ACCESS_R = 1,
-		ACCESS_W = 2,
-		ACCESS_X = 3
+		BYTE  = 1,
+		WORD  = 2,
+		DWORD = 4,
+		QWORD = 8
 	};
 
-	address_space *translate_address(const offs_t virtual_address, const access_t mode, offs_t *physical_address);
+	enum access_type : u8
+	{
+		READ    = 1,
+		WRITE   = 2,
+		RMW     = 3,
+		EXECUTE = 4
+	};
 
-	u32 get_pte(const u32 va, const bool user);
+private:
+	// address translation
+	struct translated_t
+	{
+		address_space *const space;
+		const u32 address;
+	};
+	translated_t translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode);
 
-	virtual bool get_access(const access_t mode, const u32 pte, const u32 ssw) const = 0;
+	struct pte_t
+	{
+		const u32 entry;
+		const u32 address;
+	};
+	pte_t get_pte(const u32 va, const bool user);
+
+	// helpers
+	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const = 0;
 	virtual bool get_alignment() const = 0;
 	virtual u32 get_pdo(const bool user) const = 0;
-	virtual address_space *get_ust_space() const = 0;
+	virtual system_tag_t get_ust_space() const = 0;
 
 	virtual void set_fault_address(const u32 va) = 0;
 
-	address_space_config m_main_space_config;
-	address_space_config m_io_space_config;
-	address_space_config m_boot_space_config;
-
-	address_space *m_main_space;
-	address_space *m_io_space;
-	address_space *m_boot_space;
-
-	devcb_read32 m_ssw_func;
 	devcb_write16 m_exception_func;
-
-	struct
-	{
-		u32 va;
-		u32 pte;
-	}
-	m_tlb[2];
-
-private:
+	address_space *m_space[8];
 };
 
 class cammu_c4_device : public cammu_device
 {
 public:
-	DECLARE_READ32_MEMBER(s_pdo_r) const { return m_s_pdo; }
+	void set_cammu_id(const u32 cammu_id) { m_control = cammu_id; }
+
+	DECLARE_READ32_MEMBER(s_pdo_r) { return m_s_pdo; }
 	DECLARE_WRITE32_MEMBER(s_pdo_w) { m_s_pdo = ((m_s_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
-	DECLARE_READ32_MEMBER(u_pdo_r) const { return m_u_pdo; }
+	DECLARE_READ32_MEMBER(u_pdo_r) { return m_u_pdo; }
 	DECLARE_WRITE32_MEMBER(u_pdo_w) { m_u_pdo = ((m_u_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
 
-	virtual DECLARE_READ32_MEMBER(control_r) const = 0;
+	virtual DECLARE_READ32_MEMBER(control_r) = 0;
 	virtual DECLARE_WRITE32_MEMBER(control_w) = 0;
 
-	DECLARE_READ32_MEMBER(i_fault_r) const { return m_i_fault; }
+	DECLARE_READ32_MEMBER(i_fault_r) { return m_i_fault; }
 	DECLARE_WRITE32_MEMBER(i_fault_w) { m_i_fault = data; }
-	DECLARE_READ32_MEMBER(fault_address_1_r) const { return m_fault_address_1; }
+	DECLARE_READ32_MEMBER(fault_address_1_r) { return m_fault_address_1; }
 	DECLARE_WRITE32_MEMBER(fault_address_1_w) { m_fault_address_1 = data; }
-	DECLARE_READ32_MEMBER(fault_address_2_r) const { return m_fault_address_2; }
+	DECLARE_READ32_MEMBER(fault_address_2_r) { return m_fault_address_2; }
 	DECLARE_WRITE32_MEMBER(fault_address_2_w) { m_fault_address_2 = data; }
-	DECLARE_READ32_MEMBER(fault_data_1_lo_r) const { return m_fault_data_1_lo; }
+	DECLARE_READ32_MEMBER(fault_data_1_lo_r) { return m_fault_data_1_lo; }
 	DECLARE_WRITE32_MEMBER(fault_data_1_lo_w) { m_fault_data_1_lo = data; }
-	DECLARE_READ32_MEMBER(fault_data_1_hi_r) const { return m_fault_data_1_hi; }
+	DECLARE_READ32_MEMBER(fault_data_1_hi_r) { return m_fault_data_1_hi; }
 	DECLARE_WRITE32_MEMBER(fault_data_1_hi_w) { m_fault_data_1_hi = data; }
-	DECLARE_READ32_MEMBER(fault_data_2_lo_r) const { return m_fault_data_2_lo; }
+	DECLARE_READ32_MEMBER(fault_data_2_lo_r) { return m_fault_data_2_lo; }
 	DECLARE_WRITE32_MEMBER(fault_data_2_lo_w) { m_fault_data_2_lo = data; }
-	DECLARE_READ32_MEMBER(fault_data_2_hi_r) const { return m_fault_data_2_hi; }
+	DECLARE_READ32_MEMBER(fault_data_2_hi_r) { return m_fault_data_2_hi; }
 	DECLARE_WRITE32_MEMBER(fault_data_2_hi_w) { m_fault_data_2_hi = data; }
 
 protected:
-	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 cammu_id);
+	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 
-	virtual bool get_access(const access_t mode, const u32 pte, const u32 ssw) const override;
+	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const override;
 	virtual u32 get_pdo(const bool user) const override { return user ? m_u_pdo : m_s_pdo; }
 
 	virtual void set_fault_address(const u32 va) override { m_fault_address_1 = va; }
@@ -207,15 +265,15 @@ class cammu_c4t_device : public cammu_c4_device
 public:
 	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
-	DECLARE_READ32_MEMBER(ram_line_r) const { return m_ram_line; }
+	DECLARE_READ32_MEMBER(ram_line_r) { return m_ram_line; }
 	DECLARE_WRITE32_MEMBER(ram_line_w) { m_ram_line = data; }
 
-	DECLARE_READ32_MEMBER(htlb_offset_r) const { return m_htlb_offset; }
+	DECLARE_READ32_MEMBER(htlb_offset_r) { return m_htlb_offset; }
 	DECLARE_WRITE32_MEMBER(htlb_offset_w) { m_htlb_offset = data; }
 
-	DECLARE_READ32_MEMBER(c4_bus_poll_r) const { return m_c4_bus_poll; }
+	DECLARE_READ32_MEMBER(c4_bus_poll_r) { return m_c4_bus_poll; }
 	DECLARE_WRITE32_MEMBER(c4_bus_poll_w) { m_c4_bus_poll = data; }
 
 	enum control_mask : u32
@@ -248,33 +306,33 @@ public:
 		CID_C4T = 0x00000000 // unknown
 	};
 
-	virtual DECLARE_READ32_MEMBER(control_r) const override { return m_control; }
+	virtual DECLARE_READ32_MEMBER(control_r) override { return m_control; }
 	virtual DECLARE_WRITE32_MEMBER(control_w) override { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
-	DECLARE_READ32_MEMBER(bio_control_r) const { return m_bio_control; }
+	DECLARE_READ32_MEMBER(bio_control_r) { return m_bio_control; }
 	DECLARE_WRITE32_MEMBER(bio_control_w) { m_bio_control = data; }
-	DECLARE_READ32_MEMBER(bio_address_tag_r) const { return m_bio_address_tag; }
+	DECLARE_READ32_MEMBER(bio_address_tag_r) { return m_bio_address_tag; }
 	DECLARE_WRITE32_MEMBER(bio_address_tag_w) { m_bio_address_tag = data; }
 
-	DECLARE_READ32_MEMBER(cache_data_lo_r) const { return m_cache_data_lo; }
+	DECLARE_READ32_MEMBER(cache_data_lo_r) { return m_cache_data_lo; }
 	DECLARE_WRITE32_MEMBER(cache_data_lo_w) { m_cache_data_lo = data; }
-	DECLARE_READ32_MEMBER(cache_data_hi_r) const { return m_cache_data_hi; }
+	DECLARE_READ32_MEMBER(cache_data_hi_r) { return m_cache_data_hi; }
 	DECLARE_WRITE32_MEMBER(cache_data_hi_w) { m_cache_data_hi = data; }
-	DECLARE_READ32_MEMBER(cache_cpu_tag_r) const { return m_cache_cpu_tag; }
+	DECLARE_READ32_MEMBER(cache_cpu_tag_r) { return m_cache_cpu_tag; }
 	DECLARE_WRITE32_MEMBER(cache_cpu_tag_w) { m_cache_cpu_tag = data; }
-	DECLARE_READ32_MEMBER(cache_system_tag_valid_r) const { return m_cache_system_tag_valid; }
+	DECLARE_READ32_MEMBER(cache_system_tag_valid_r) { return m_cache_system_tag_valid; }
 	DECLARE_WRITE32_MEMBER(cache_system_tag_valid_w) { m_cache_system_tag_valid = data; }
-	DECLARE_READ32_MEMBER(cache_system_tag_r) const { return m_cache_system_tag; }
+	DECLARE_READ32_MEMBER(cache_system_tag_r) { return m_cache_system_tag; }
 	DECLARE_WRITE32_MEMBER(cache_system_tag_w) { m_cache_system_tag = data; }
-	DECLARE_READ32_MEMBER(tlb_va_line_r) const { return m_tlb_va_line; }
+	DECLARE_READ32_MEMBER(tlb_va_line_r) { return m_tlb_va_line; }
 	DECLARE_WRITE32_MEMBER(tlb_va_line_w) { m_tlb_va_line = data; }
-	DECLARE_READ32_MEMBER(tlb_ra_line_r) const { return m_tlb_ra_line; }
+	DECLARE_READ32_MEMBER(tlb_ra_line_r) { return m_tlb_ra_line; }
 	DECLARE_WRITE32_MEMBER(tlb_ra_line_w) { m_tlb_ra_line = data; }
 
 protected:
 	virtual void device_start() override;
 
 	virtual bool get_alignment() const override { return (m_control & CNTL_ATD) == 0; }
-	virtual address_space *get_ust_space() const override { return (m_control & CNTL_IOTS) ? m_io_space : m_main_space; }
+	virtual system_tag_t get_ust_space() const override { return system_tag_t((m_control & (CNTL_IOTS | CNTL_UST)) >> 4); }
 
 private:
 	u32 m_ram_line;
@@ -297,7 +355,7 @@ class cammu_c4i_device : public cammu_c4_device
 public:
 	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
 	enum control_mask : u32
 	{
@@ -333,12 +391,14 @@ public:
 		CRR_OFF    = 0x00700000, // refresh off
 	};
 
+	// c4i cammu identification (rev 2 and rev 3 known to have existed)
 	enum control_cid_mask : u32
 	{
-		CID_C4I = 0x02000000 // c4i cammu identification
+		CID_C4IR0 = 0x00000000,
+		CID_C4IR2 = 0x02000000
 	};
 
-	virtual DECLARE_READ32_MEMBER(control_r) const override { return m_control; }
+	virtual DECLARE_READ32_MEMBER(control_r) override { return m_control; }
 	virtual DECLARE_WRITE32_MEMBER(control_w) override { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
 
 	enum reset_mask : u32
@@ -352,29 +412,30 @@ public:
 		RESET_FLUSH = 0x40000000, // flush out burst io buffer
 		RESET_CFR   = 0x80000000  // clear fault registers
 	};
-	DECLARE_READ32_MEMBER(reset_r) const { return m_reset; }
+	DECLARE_READ32_MEMBER(reset_r) { return m_reset; }
 	DECLARE_WRITE32_MEMBER(reset_w) { m_reset = data; }
 
-	DECLARE_READ32_MEMBER(clr_s_data_tlb_r) const { return m_clr_s_data_tlb; }
+	DECLARE_READ32_MEMBER(clr_s_data_tlb_r) { return m_clr_s_data_tlb; }
 	DECLARE_WRITE32_MEMBER(clr_s_data_tlb_w) { m_clr_s_data_tlb = data; }
-	DECLARE_READ32_MEMBER(clr_u_data_tlb_r) const { return m_clr_u_data_tlb; }
+	DECLARE_READ32_MEMBER(clr_u_data_tlb_r) { return m_clr_u_data_tlb; }
 	DECLARE_WRITE32_MEMBER(clr_u_data_tlb_w) { m_clr_u_data_tlb = data; }
-	DECLARE_READ32_MEMBER(clr_s_insn_tlb_r) const { return m_clr_s_insn_tlb; }
+	DECLARE_READ32_MEMBER(clr_s_insn_tlb_r) { return m_clr_s_insn_tlb; }
 	DECLARE_WRITE32_MEMBER(clr_s_insn_tlb_w) { m_clr_s_insn_tlb = data; }
-	DECLARE_READ32_MEMBER(clr_u_insn_tlb_r) const { return m_clr_u_insn_tlb; }
+	DECLARE_READ32_MEMBER(clr_u_insn_tlb_r) { return m_clr_u_insn_tlb; }
 	DECLARE_WRITE32_MEMBER(clr_u_insn_tlb_w) { m_clr_u_insn_tlb = data; }
 
-	DECLARE_READ32_MEMBER(test_data_r) const { return m_test_data; }
+	DECLARE_READ32_MEMBER(test_data_r) { return m_test_data; }
 	DECLARE_WRITE32_MEMBER(test_data_w) { m_test_data = data; }
 
-	DECLARE_READ32_MEMBER(test_address_r) const { return m_test_address; }
+	DECLARE_READ32_MEMBER(test_address_r) { return m_test_address; }
 	DECLARE_WRITE32_MEMBER(test_address_w) { m_test_address = data; }
 
 protected:
 	virtual void device_start() override;
 
 	virtual bool get_alignment() const override { return (m_control & CNTL_ATD) == 0; }
-	virtual address_space *get_ust_space() const override;
+	// FIXME: don't really know how unmapped mode works on c4i
+	virtual system_tag_t get_ust_space() const override { return (m_control & UMM_IO) ? ST4 : ST3; }
 
 private:
 	u32 m_reset;
@@ -391,10 +452,10 @@ class cammu_c3_device : public cammu_device
 public:
 	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_add_linked(device_t &device, const char *const tag);
+	virtual void map(address_map &map) override;
+	virtual void map_global(address_map &map);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
-	virtual DECLARE_ADDRESS_MAP(map_global, 32);
+	void add_linked(const char *const tag) { m_linked.push_back(downcast<cammu_c3_device *>(siblingdevice(tag))); }
 
 	enum control_mask : u32
 	{
@@ -421,15 +482,15 @@ public:
 		CID_C3 = 0x00000000 // unknown
 	};
 
-	DECLARE_READ32_MEMBER(s_pdo_r) const { return m_s_pdo; }
+	DECLARE_READ32_MEMBER(s_pdo_r) { return m_s_pdo; }
 	DECLARE_WRITE32_MEMBER(s_pdo_w) { m_s_pdo = ((m_s_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
-	DECLARE_READ32_MEMBER(u_pdo_r) const { return m_u_pdo; }
+	DECLARE_READ32_MEMBER(u_pdo_r) { return m_u_pdo; }
 	DECLARE_WRITE32_MEMBER(u_pdo_w) { m_u_pdo = ((m_u_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
-	DECLARE_READ32_MEMBER(fault_r) const { return m_fault; }
+	DECLARE_READ32_MEMBER(fault_r) { return m_fault; }
 	DECLARE_WRITE32_MEMBER(fault_w) { m_fault = data; }
-	DECLARE_READ32_MEMBER(control_r) const { return m_control; }
+	DECLARE_READ32_MEMBER(control_r) { return m_control; }
 	DECLARE_WRITE32_MEMBER(control_w) { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
-	DECLARE_READ32_MEMBER(reset_r) const { return m_reset; }
+	DECLARE_READ32_MEMBER(reset_r) { return m_reset; }
 	DECLARE_WRITE32_MEMBER(reset_w) { m_reset = data; }
 
 	// global methods - relay to each linked device
@@ -443,10 +504,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_start() override;
 
-	virtual bool get_access(const access_t mode, const u32 pte, const u32 ssw) const override;
+	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const override;
 	virtual bool get_alignment() const override { return m_control & CNTL_ATE; }
 	virtual u32 get_pdo(const bool user) const override { return user ? m_u_pdo : m_s_pdo; }
-	virtual address_space *get_ust_space() const override { return m_main_space; }
+	virtual system_tag_t get_ust_space() const override { return system_tag_t((m_control & CNTL_UST) >> 4); }
 
 	virtual void set_fault_address(const u32 va) override { m_fault = va; }
 

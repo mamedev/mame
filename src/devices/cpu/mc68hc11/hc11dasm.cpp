@@ -1160,7 +1160,7 @@ offs_t hc11_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 
 		case EA_IMM16:
-			imm16 = opcodes.r16(cpc++);
+			imm16 = opcodes.r16(cpc);
 			cpc += 2;
 			util::stream_format(stream, "%s 0x%04X", op_table->mnemonic, imm16);
 			break;
@@ -1171,7 +1171,7 @@ offs_t hc11_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 
 		case EA_EXT:
-			imm16 = opcodes.r16(cpc++);
+			imm16 = opcodes.r16(cpc);
 			cpc += 2;
 			util::stream_format(stream, "%s (0x%04X)", op_table->mnemonic, imm16);
 			break;

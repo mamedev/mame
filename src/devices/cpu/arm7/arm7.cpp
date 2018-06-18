@@ -148,14 +148,16 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 }
 
 
-arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
+
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: arm9_cpu_device(mconfig, type, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
 	cp15_control(0x78)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-			   | ARM9_COPRO_ID_ARCH_V5TE
-			   | ARM9_COPRO_ID_PART_ARM946
-			   | ARM9_COPRO_ID_STEP_ARM946_A0;
+		| ARM9_COPRO_ID_ARCH_V5TE
+		| ARM9_COPRO_ID_PART_ARM946
+		| ARM9_COPRO_ID_STEP_ARM946_A0;
 
 	memset(ITCM, 0, 0x8000);
 	memset(DTCM, 0, 0x4000);
@@ -167,6 +169,17 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const ch
 	cp15_dtcm_size = 0;
 	cp15_dtcm_end = 0;
 	cp15_itcm_reg = cp15_dtcm_reg = 0;
+}
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm946es_cpu_device(mconfig, ARM946ES, tag, owner, clock)
+{
+}
+
+// unknown configuration, but uses MPU not MMU, so closer to ARM946ES
+igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock)
+{
 }
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -188,13 +201,6 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_PART_SA1110
 			   | ARM9_COPRO_ID_STEP_SA1110_A0;
 }
-
-// unknown configuration
-igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, IGS036, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
-{
-}
-
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
 {
@@ -552,11 +558,30 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
  * CPU SPECIFIC IMPLEMENTATIONS
  **************************************************************************/
 
+void arm7_cpu_device::postload()
+{
+	update_reg_ptr();
+}
+
 void arm7_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
 
+	if(m_program->endianness() == ENDIANNESS_LITTLE) {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	} else {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+
+	save_item(NAME(m_insn_prefetch_depth));
+	save_item(NAME(m_insn_prefetch_count));
+	save_item(NAME(m_insn_prefetch_index));
+	save_item(NAME(m_insn_prefetch_buffer));
+	save_item(NAME(m_insn_prefetch_address));
 	save_item(NAME(m_r));
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
@@ -565,10 +590,18 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pendingUnd));
 	save_item(NAME(m_pendingSwi));
 	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_control));
+	save_item(NAME(m_tlbBase));
+	save_item(NAME(m_tlb_base_mask));
+	save_item(NAME(m_faultStatus));
+	save_item(NAME(m_faultAddress));
 	save_item(NAME(m_fcsePID));
 	save_item(NAME(m_pid_offset));
+	save_item(NAME(m_domainAccessControl));
+	save_item(NAME(m_decoded_access_control));
+	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().noshow();
@@ -617,6 +650,24 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_USPSR, "UR16", m_r[eSPSR_UND]).formatstr("%08X");
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
+}
+
+
+void arm946es_cpu_device::device_start()
+{
+	arm9_cpu_device::device_start();
+
+	save_item(NAME(cp15_control));
+	save_item(NAME(cp15_itcm_base));
+	save_item(NAME(cp15_dtcm_base));
+	save_item(NAME(cp15_itcm_size));
+	save_item(NAME(cp15_dtcm_size));
+	save_item(NAME(cp15_itcm_end));
+	save_item(NAME(cp15_dtcm_end));
+	save_item(NAME(cp15_itcm_reg));
+	save_item(NAME(cp15_dtcm_reg));
+	save_item(NAME(ITCM));
+	save_item(NAME(DTCM));
 }
 
 
@@ -709,7 +760,7 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 		{
 			break;
 		}
-		uint32_t op = m_direct->read_dword(pc);
+		uint32_t op = m_pr32(pc);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
 		m_insn_prefetch_address[index] = pc;
@@ -762,7 +813,7 @@ void arm7_cpu_device::execute_run()
 
 		update_insn_prefetch(pc);
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 
 		/* handle Thumb instructions if active */
 		if (T_IS_SET(m_r[eCPSR]))
@@ -929,9 +980,9 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-util::disasm_interface *arm7_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arm7_cpu_device::create_disassembler()
 {
-	return new arm7_disassembler(this);
+	return std::make_unique<arm7_disassembler>(this);
 }
 
 bool arm7_cpu_device::get_t_flag() const
@@ -1419,29 +1470,20 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 
 uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
 {
-	uint32_t result;
+	addr &= ~1;
 
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
 	{
-		uint16_t *wp = (uint16_t *)&ITCM[(addr & ~1)&0x7fff];
-		result = *wp;
+		uint16_t *wp = (uint16_t *)&ITCM[addr & 0x7fff];
+		return *wp;
 	}
 	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
 	{
-		uint16_t *wp = (uint16_t *)&DTCM[(addr & ~1)&0x3fff];
-		result = *wp;
-	}
-	else
-	{
-		result = m_program->read_word(addr & ~1);
+		uint16_t *wp = (uint16_t *)&DTCM[addr &0x3fff];
+		return *wp;
 	}
 
-	if (addr & 1)
-	{
-		result = ((result >> 8) & 0xff) | ((result & 0xff) << 24);
-	}
-
-	return result;
+	return m_program->read_word(addr);
 }
 
 uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
@@ -1457,14 +1499,6 @@ uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
 
 	// Handle through normal 8 bit handler (for 32 bit cpu)
 	return m_program->read_byte(addr);
-}
-
-WRITE32_MEMBER(igs036_cpu_device::arm7_rt_w_callback)
-{
-	arm7_cpu_device::arm7_rt_w_callback(space, offset, data, mem_mask);
-	/* disable the MMU for now, it doesn't seem to set up valid mappings
-	   so could be entirely different here */
-	COPRO_CTRL &= ~COPRO_CTRL_MMU_EN;
 }
 
 void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)

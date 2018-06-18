@@ -212,17 +212,6 @@ svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  set_bus - set owner bus tag
-//-------------------------------------------------
-
-void svi_slot_device::set_bus(device_t &device, device_t *owner, const char *bus_tag)
-{
-	svi_slot_device &card = dynamic_cast<svi_slot_device &>(device);
-	card.m_owner = owner;
-	card.m_bus_tag = bus_tag;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

@@ -58,7 +58,7 @@ static const char *const mwa_bank_hard[4] =
 	"bank4"   /* mapped in c000-ffff */
 };
 
-DRIVER_INIT_MEMBER(vtech2_state,laser)
+void vtech2_state::init_laser()
 {
 	uint8_t *gfx = memregion("gfx2")->base();
 	int i;
@@ -308,24 +308,18 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 }
 
 
-device_t *vtech2_state::laser_file()
-{
-	return machine().device(m_laser_drive ? FLOPPY_1 : FLOPPY_0);
-}
-
 void vtech2_state::laser_get_track()
 {
 	sprintf(m_laser_frame_message, "#%d get track %02d", m_laser_drive, m_laser_track_x2[m_laser_drive]/2);
 	m_laser_frame_time = 30;
 	/* drive selected or and image file ok? */
-	if( m_laser_drive >= 0 && laser_file() != nullptr )
+	if( m_laser_drive >= 0 && m_laser_file[m_laser_drive].found() )
 	{
-		int size, offs;
-		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file());
-		size = TRKSIZE_VZ;
-		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
-		image->fseek(offs, SEEK_SET);
-		size = image->fread(m_laser_fdc_data, size);
+		device_image_interface &image = *m_laser_file[m_laser_drive];
+		int size = TRKSIZE_VZ;
+		int offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
+		image.fseek(offs, SEEK_SET);
+		size = image.fread(m_laser_fdc_data, size);
 		logerror("get track @$%05x $%04x bytes\n", offs, size);
 	}
 	m_laser_fdc_offs = 0;
@@ -334,14 +328,13 @@ void vtech2_state::laser_get_track()
 
 void vtech2_state::laser_put_track()
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file());
 	/* drive selected and image file ok? */
-	if( m_laser_drive >= 0 && laser_file() != nullptr )
+	if( m_laser_drive >= 0 && m_laser_file[m_laser_drive].found() )
 	{
-		int size, offs;
-		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
-		image->fseek(offs + m_laser_fdc_start, SEEK_SET);
-		size = image->fwrite(&m_laser_fdc_data[m_laser_fdc_start], m_laser_fdc_write);
+		device_image_interface &image = *m_laser_file[m_laser_drive];
+		int offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
+		image.fseek(offs + m_laser_fdc_start, SEEK_SET);
+		int size = image.fwrite(&m_laser_fdc_data[m_laser_fdc_start], m_laser_fdc_write);
 		logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, m_laser_fdc_start, size, m_laser_fdc_write);
 	}
 }

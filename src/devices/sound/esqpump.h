@@ -16,9 +16,10 @@
 class esq_5505_5510_pump_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_otis(es5505_device *otis) { m_otis = otis; }
 	void set_esp(es5510_device *esp) { m_esp = esp; }
 	void set_esp_halted(bool esp_halted) {
 		m_esp_halted = esp_halted;
@@ -86,9 +87,6 @@ private:
 	// per-sample timer
 	emu_timer *m_timer;
 
-	// OTIS sound generator
-	es5505_device *m_otis;
-
 	// ESP signal processor
 	es5510_device *m_esp;
 
@@ -112,7 +110,7 @@ private:
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	int16_t e[0x4000];
+	std::unique_ptr<int16_t[]> e;
 	int ei;
 #endif
 };

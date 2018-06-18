@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class hanaawas_state : public driver_device
 {
 public:
@@ -42,4 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hanaawas_portB_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void hanaawas(machine_config &config);
+	void hanaawas_map(address_map &map);
+	void io_map(address_map &map);
 };

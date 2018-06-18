@@ -62,46 +62,50 @@
 #define M37710_DEBUG    (0) // enables verbose logging for peripherals, etc.
 
 
-DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "M37702M2")
-DEFINE_DEVICE_TYPE(M37702S1, m37702s1_device, "m37702s1", "M37702S1")
-DEFINE_DEVICE_TYPE(M37710S4, m37710s4_device, "m37710s4", "M37710S4")
-DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "M37720S1")
+DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "Mitsubishi M37702M2")
+DEFINE_DEVICE_TYPE(M37702S1, m37702s1_device, "m37702s1", "Mitsubishi M37702S1")
+DEFINE_DEVICE_TYPE(M37710S4, m37710s4_device, "m37710s4", "Mitsubishi M37710S4")
+DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "Mitsubishi M37720S1")
 
 
 // On-board RAM, ROM, and peripherals
 
 // M37702M2: 512 bytes internal RAM, 16K internal mask ROM
 // (M37702E2: same with EPROM instead of mask ROM)
-DEVICE_ADDRESS_MAP_START( map, 16, m37702m2_device )
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(M37710_INTERNAL_ROM_REGION, 0)
-ADDRESS_MAP_END
+void m37702m2_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37702m2_device::m37710_internal_r), FUNC(m37702m2_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+	map(0x00c000, 0x00ffff).rom().region(M37710_INTERNAL_ROM_REGION, 0);
+}
 
 
 // M37702S1: 512 bytes internal RAM, no internal ROM
-DEVICE_ADDRESS_MAP_START( map, 16, m37702s1_device )
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
+void m37702s1_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37702s1_device::m37710_internal_r), FUNC(m37702s1_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+}
 
 
 // M37710S4: 2048 bytes internal RAM, no internal ROM
-DEVICE_ADDRESS_MAP_START( map, 16, m37710s4_device )
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00087f) AM_RAM
-ADDRESS_MAP_END
+void m37710s4_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37710s4_device::m37710_internal_r), FUNC(m37710s4_device::m37710_internal_w));
+	map(0x000080, 0x00087f).ram();
+}
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
-DEVICE_ADDRESS_MAP_START( map, 16, m37720s1_device )
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
+void m37720s1_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37720s1_device::m37710_internal_r), FUNC(m37720s1_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+}
 
 // many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -116,24 +120,24 @@ m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag,
 
 
 m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(m37702m2_device::map), this))
+	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m37702m2_device::map), this))
 {
 }
 
 
 m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_delegate(FUNC(m37702s1_device::map), this))
+	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_constructor(FUNC(m37702s1_device::map), this))
 {
 }
 
 
 m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_delegate(FUNC(m37710s4_device::map), this))
+	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_constructor(FUNC(m37710s4_device::map), this))
 {
 }
 
 m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_delegate(FUNC(m37720s1_device::map), this))
+	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_constructor(FUNC(m37720s1_device::map), this))
 {
 }
 
@@ -949,9 +953,9 @@ bool m37710_cpu_device::get_x_flag() const
 	return FLAG_X;
 }
 
-util::disasm_interface *m37710_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m37710_cpu_device::create_disassembler()
 {
-	return new m7700_disassembler(this);
+	return std::make_unique<m7700_disassembler>(this);
 }
 
 void m37710_cpu_device::m37710_restore_state()
@@ -998,7 +1002,7 @@ void m37710_cpu_device::device_start()
 	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	m_ICount = 0;
@@ -1074,7 +1078,7 @@ void m37710_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_p ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 

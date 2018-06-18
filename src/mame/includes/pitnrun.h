@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
+
+#include "emupal.h"
+
 class pitnrun_state : public driver_device
 {
 public:
@@ -78,4 +81,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spotlights();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void pitnrun_mcu(machine_config &config);
+	void pitnrun(machine_config &config);
+	void pitnrun_map(address_map &map);
+	void pitnrun_map_mcu(address_map &map);
+	void pitnrun_sound_io_map(address_map &map);
+	void pitnrun_sound_map(address_map &map);
 };

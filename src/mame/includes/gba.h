@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Ryan Holtz
-#ifndef _GBA_H_
-#define _GBA_H_
+
+#ifndef MAME_INCLUDES_GBA_H
+#define MAME_INCLUDES_GBA_H
 
 #include "sound/gb.h"
 #include "machine/intelfsh.h"
@@ -66,7 +67,7 @@ public:
 	DECLARE_WRITE32_MEMBER(gba_io_w);
 	DECLARE_READ32_MEMBER(gba_bios_r);
 	DECLARE_READ32_MEMBER(gba_10000000_r);
-	DECLARE_DRIVER_INIT(gbadv);
+	void init_gbadv();
 	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
@@ -78,6 +79,8 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
+	void gbadv(machine_config &config);
+	void gba_map(address_map &map);
 protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_ioport m_io_inputs;

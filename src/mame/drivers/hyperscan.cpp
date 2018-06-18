@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "cpu/score/score.h"
 #include "screen.h"
-
+#include "softlist_dev.h"
 
 #define LOG_SPG290_REGISTER_ACCESS  (1)
 
@@ -88,6 +88,8 @@ public:
 	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
+	void hyperscan(machine_config &config);
+	void spg290_mem(address_map &map);
 private:
 	static const device_timer_id TIMER_SPG290 = 0;
 	static const device_timer_id TIMER_I2C = 1;
@@ -224,7 +226,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
 	}
 #endif
@@ -342,7 +344,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	}
 	else if (addr == 0x2100e4)                  // Timer Source Clock Selection
 	{
-		uint32_t timers_clk = XTAL_27MHz / ((data & 0xff) + 1);
+		const auto timers_clk = XTAL(27'000'000) / ((data & 0xff) + 1);
 		m_update_timer->adjust(attotime::from_hz(timers_clk), 0, attotime::from_hz(timers_clk));
 	}
 	else if(addr == 0x130020)                   // I2C configuration
@@ -359,7 +361,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	else if(addr == 0x130028)                   // I2C clock setting
 	{
 		COMBINE_DATA(&m_i2c.clock);
-		uint32_t i2c_clk = XTAL_27MHz / ((m_i2c.clock & 0x3ff) + 1);
+		const auto i2c_clk = XTAL(27'000'000) / ((m_i2c.clock & 0x3ff) + 1);
 		m_i2c_timer->adjust(attotime::from_hz(i2c_clk), 0, attotime::from_hz(i2c_clk));
 	}
 	else if(addr == 0x13002c)                   // I2C ID
@@ -387,7 +389,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
 	}
 #endif
@@ -583,15 +585,16 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-static ADDRESS_MAP_START(spg290_mem, AS_PROGRAM, 32, hyperscan_state)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffffff)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_MIRROR(0x07000000)
-	AM_RANGE(0x08000000, 0x09ffffff) AM_READWRITE(spg290_regs_r, spg290_regs_w)
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_RAM                         // internal SRAM
-	AM_RANGE(0x0b000000, 0x0b007fff) AM_ROM AM_REGION("spg290", 0)  // internal ROM
-	AM_RANGE(0x10000000, 0x100fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-	AM_RANGE(0x11000000, 0x110fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-ADDRESS_MAP_END
+void hyperscan_state::spg290_mem(address_map &map)
+{
+	map.global_mask(0x1fffffff);
+	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
+	map(0x08000000, 0x09ffffff).rw(FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
+	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
+	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
+	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);
+	map(0x11000000, 0x110fffff).rom().region("bios", 0).mirror(0x0e000000);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hyperscan )
@@ -616,10 +619,12 @@ void hyperscan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( hyperscan )
+MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCORE7, XTAL_27MHz * 4)   // 108MHz S+core 7
-	MCFG_CPU_PROGRAM_MAP(spg290_mem)
+	MCFG_DEVICE_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
+	MCFG_DEVICE_PROGRAM_MAP(spg290_mem)
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -628,7 +633,7 @@ static MACHINE_CONFIG_START( hyperscan )
 	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperscan_state, spg290_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperscan_state, spg290_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -644,5 +649,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      STATE            INIT  COMPANY   FULLNAME     FLAGS
-COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, 0,    "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
+COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -79,12 +79,12 @@ WRITE8_MEMBER(docastle_state::docastle_shared1_w)
 
 	/* freeze execution of the master CPU until the slave has used the shared memory */
 	if (offset == 8)
-		space.device().execute().spin_until_trigger(500);
+		m_maincpu->spin_until_trigger(500);
 }
 
 
 
 WRITE8_MEMBER(docastle_state::docastle_nmitrigger_w)
 {
-	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }

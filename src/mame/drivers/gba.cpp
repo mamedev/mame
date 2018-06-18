@@ -132,7 +132,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-static const uint32_t timer_clks[4] = { XTAL_16_777216MHz, XTAL_16_777216MHz / 64, XTAL_16_777216MHz / 256, XTAL_16_777216MHz / 1024 };
+static const XTAL timer_clks[4] = { XTAL(16'777'216), XTAL(16'777'216) / 64, XTAL(16'777'216) / 256, XTAL(16'777'216) / 1024 };
 
 
 void gba_state::request_irq(uint32_t int_type)
@@ -238,8 +238,8 @@ void gba_state::dma_exec(int ch)
 	{
 		if ((ctrl>>10) & 1)
 		{
-			src &= 0xfffffffc;
-			dst &= 0xfffffffc;
+			src &= 0xfffffffe;
+			dst &= 0xfffffffe;
 
 			// 32-bit
 			space.write_dword(dst, space.read_dword(src));
@@ -408,7 +408,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 		m_timer_recalc[tmr] = 0;
 		m_timer_regs[tmr] = (m_timer_regs[tmr] & 0xFFFF0000) | (m_timer_reload[tmr] & 0x0000FFFF);
 		rate = 0x10000 - (m_timer_regs[tmr] & 0xffff);
-		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3];
+		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3].dvalue();
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
@@ -531,7 +531,7 @@ TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 	m_irq_timer->adjust(attotime::never);
 }
 
-static const char *reg_names[] = {
+static const char *const reg_names[] = {
 	/* Sound Registers */
 	"SOUND1CNT_L", "SOUND1CNT_H", "SOUND1CNT_X", "Unused",
 	"SOUND2CNT_L", "Unused",      "SOUND2CNT_H", "Unused",
@@ -669,7 +669,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 				double time, ticks;
 				int timer = offset + 0x60/4 - 0x100/4;
 
-//              printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+//              printf("Read timer reg %x (PC=%x)\n", timer, m_maincpu->pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -1059,7 +1059,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-//              printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+//              printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_maincpu->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -1079,7 +1079,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3].dvalue();
 
 					final = clocksel / rate;
 
@@ -1179,6 +1179,7 @@ READ32_MEMBER(gba_state::gba_bios_r)
 
 READ32_MEMBER(gba_state::gba_10000000_r)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
 	if (pc >= 0x10000000)
@@ -1188,11 +1189,11 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
-		data = space.read_dword(pc + 8);
+		data = mspace.read_dword(pc + 8);
 	}
 	else
 	{
-		uint16_t insn = space.read_word(pc + 4);
+		uint16_t insn = mspace.read_word(pc + 4);
 		data = (insn << 16) | (insn << 0);
 	}
 	logerror("%s: unmapped program memory read from %08X = %08X & %08X\n", machine().describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);
@@ -1236,21 +1237,22 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 	}
 }
 
-static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
-	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
-	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
-	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
-	AM_RANGE(0x04000000, 0x0400005f) AM_DEVREADWRITE("lcd", gba_lcd_device, video_r, video_w)
-	AM_RANGE(0x04000060, 0x040003ff) AM_READWRITE(gba_io_r, gba_io_w)
-	AM_RANGE(0x04000400, 0x04ffffff) AM_NOP                                         // Not used
-	AM_RANGE(0x05000000, 0x050003ff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_pram_r, gba_pram_w)  // Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_oam_r, gba_oam_w)    // OAM
-	AM_RANGE(0x07000400, 0x07ffffff) AM_NOP                                         // Not used
+void gba_state::gba_map(address_map &map)
+{
+	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
+	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_state::gba_bios_r));
+	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000);
+	map(0x03000000, 0x03007fff).ram().mirror(0xff8000);
+	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
+	map(0x04000060, 0x040003ff).rw(FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
+	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
+	map(0x05000000, 0x050003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_pram_r), FUNC(gba_lcd_device::gba_pram_w));  // Palette RAM
+	map(0x06000000, 0x06017fff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
+	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
+	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
 	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
-	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
-ADDRESS_MAP_END
+	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+}
 
 static INPUT_PORTS_START( gbadv )
 	PORT_START("INPUTS")
@@ -1353,6 +1355,8 @@ void gba_state::machine_start()
 		{
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe010000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe010000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
 		if (m_cart->get_type() == GBA_EEPROM || m_cart->get_type() == GBA_EEPROM4 || m_cart->get_type() == GBA_EEPROM64 || m_cart->get_type() == GBA_BOKTAI)
 		{
@@ -1406,51 +1410,53 @@ void gba_state::machine_start()
 }
 
 
-static SLOT_INTERFACE_START(gba_cart)
-	SLOT_INTERFACE_INTERNAL("gba_rom",          GBA_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("gba_sram",         GBA_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("gba_drilldoz",     GBA_ROM_DRILLDOZ)   // Rumble output unemulated
-	SLOT_INTERFACE_INTERNAL("gba_wariotws",     GBA_ROM_WARIOTWS)   // Rumble output unemulated
-	SLOT_INTERFACE_INTERNAL("gba_eeprom",       GBA_ROM_EEPROM)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom_4k",    GBA_ROM_EEPROM)
-	SLOT_INTERFACE_INTERNAL("gba_yoshiug",      GBA_ROM_YOSHIUG)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom_64k",   GBA_ROM_EEPROM64)
-	SLOT_INTERFACE_INTERNAL("gba_boktai",       GBA_ROM_BOKTAI)
-	SLOT_INTERFACE_INTERNAL("gba_flash",        GBA_ROM_FLASH)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_rtc",    GBA_ROM_FLASH_RTC)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_512",    GBA_ROM_FLASH)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_1m",     GBA_ROM_FLASH1M) // Sanyo
-	SLOT_INTERFACE_INTERNAL("gba_flash_1m_rtc", GBA_ROM_FLASH1M_RTC) // Sanyo
-	SLOT_INTERFACE_INTERNAL("gba_3dmatrix",     GBA_ROM_3DMATRIX)
-SLOT_INTERFACE_END
+static void gba_cart(device_slot_interface &device)
+{
+	device.option_add_internal("gba_rom",          GBA_ROM_STD);
+	device.option_add_internal("gba_sram",         GBA_ROM_SRAM);
+	device.option_add_internal("gba_drilldoz",     GBA_ROM_DRILLDOZ);       // Rumble output unemulated
+	device.option_add_internal("gba_wariotws",     GBA_ROM_WARIOTWS);       // Rumble output unemulated
+	device.option_add_internal("gba_eeprom",       GBA_ROM_EEPROM);
+	device.option_add_internal("gba_eeprom_4k",    GBA_ROM_EEPROM);
+	device.option_add_internal("gba_yoshiug",      GBA_ROM_YOSHIUG);
+	device.option_add_internal("gba_eeprom_64k",   GBA_ROM_EEPROM64);
+	device.option_add_internal("gba_boktai",       GBA_ROM_BOKTAI);
+	device.option_add_internal("gba_flash",        GBA_ROM_FLASH);          // Panasonic
+	device.option_add_internal("gba_flash_rtc",    GBA_ROM_FLASH_RTC);      // Panasonic
+	device.option_add_internal("gba_flash_512",    GBA_ROM_FLASH);          // Panasonic
+	device.option_add_internal("gba_flash_1m",     GBA_ROM_FLASH1M);        // Sanyo
+	device.option_add_internal("gba_flash_1m_rtc", GBA_ROM_FLASH1M_RTC);    // Sanyo
+	device.option_add_internal("gba_3dmatrix",     GBA_ROM_3DMATRIX);
+}
 
 
-static MACHINE_CONFIG_START( gbadv )
+MACHINE_CONFIG_START(gba_state::gbadv)
 
-	MCFG_CPU_ADD("maincpu", ARM7, XTAL_16_777216MHz)
-	MCFG_CPU_PROGRAM_MAP(gba_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, XTAL(16'777'216))
+	MCFG_DEVICE_PROGRAM_MAP(gba_map)
 
 	MCFG_GBA_LCD_ADD("lcd")
-	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(gba_state, int_hblank_callback))
-	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(gba_state, int_vblank_callback))
-	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(gba_state, int_vcount_callback))
-	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(gba_state, dma_hblank_callback))
-	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
+	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(*this, gba_state, int_hblank_callback))
+	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(*this, gba_state, int_vblank_callback))
+	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(*this, gba_state, int_vcount_callback))
+	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(*this, gba_state, dma_hblank_callback))
+	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(*this, gba_state, dma_vblank_callback))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL_16_777216MHz/4)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("custom", CGB04_APU, XTAL(16'777'216)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_SOUND_ADD("ldaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("ldaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
@@ -1463,5 +1469,5 @@ ROM_START( gba )
 ROM_END
 
 
-//   YEAR  NAME PARENT COMPAT MACHINE INPUT  STATE      INIT  COMPANY     FULLNAME            FLAGS
-CONS(2001, gba, 0,     0,     gbadv,  gbadv, gba_state, 0,    "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME            FLAGS
+CONS(2001, gba,  0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

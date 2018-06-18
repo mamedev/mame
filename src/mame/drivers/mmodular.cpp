@@ -51,7 +51,17 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(gen32);
+	void init_gen32();
+	void alm32(machine_config &config);
+	void van32(machine_config &config);
+	void van16(machine_config &config);
+	void alm16(machine_config &config);
+	void gen32(machine_config &config);
+	void alm16_mem(address_map &map);
+	void alm32_mem(address_map &map);
+	void gen32_mem(address_map &map);
+	void van16_mem(address_map &map);
+	void van32_mem(address_map &map);
 };
 
 
@@ -66,85 +76,92 @@ public:
 
 	DECLARE_READ8_MEMBER(berlinp_input_r);
 
+	void berlinp(machine_config &config);
+	void berlinp_mem(address_map &map);
 private:
 	required_device<mephisto_board_device> m_board;
 	required_ioport m_keys;
 };
 
 
-static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, mmodular_state)
-	AM_RANGE( 0x000000, 0x01ffff )  AM_ROM
+void mmodular_state::alm16_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff00)
-	AM_RANGE( 0xc80000, 0xc80001 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff00)
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff00)
-	AM_RANGE( 0xf00000, 0xf00003 ) AM_READ_PORT("KEY1")
-	AM_RANGE( 0xf00004, 0xf00007 ) AM_READ_PORT("KEY2")
-	AM_RANGE( 0xf00008, 0xf0000b ) AM_READ_PORT("KEY3")
-	AM_RANGE( 0xd80000, 0xd80001 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff00)
-	AM_RANGE( 0xd80008, 0xd80009 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff00)
+	map(0xc00000, 0xc00000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0xc80000, 0xc80000).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0xd00000, 0xd00000).w("board", FUNC(mephisto_board_device::led_w));
+	map(0xf00000, 0xf00003).portr("KEY1");
+	map(0xf00004, 0xf00007).portr("KEY2");
+	map(0xf00008, 0xf0000b).portr("KEY3");
+	map(0xd80000, 0xd80000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xd80008, 0xd80008).w("display", FUNC(mephisto_display_modul_device::io_w));
 
-	AM_RANGE( 0x400000, 0x47ffff ) AM_RAM
-	AM_RANGE( 0x800000, 0x803fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x400000, 0x47ffff).ram();
+	map(0x800000, 0x803fff).ram().share("nvram");
+}
 
-static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, mmodular_state)
-	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
+void mmodular_state::van16_mem(address_map &map)
+{
+	alm16_mem(map);
+
+	map(0x000000, 0x03ffff).rom();
 
 //  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
 //  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
+}
 
-	AM_IMPORT_FROM(alm16_mem)
-ADDRESS_MAP_END
+void mmodular_state::alm32_mem(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
 
-static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, mmodular_state)
-	AM_RANGE( 0x00000000, 0x0001ffff )  AM_ROM
+	map(0x800000fc, 0x800000fc).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x88000000, 0x88000007).w("board", FUNC(mephisto_board_device::mux_w)).umask32(0xff000000);
+	map(0x90000000, 0x90000007).w("board", FUNC(mephisto_board_device::led_w)).umask32(0xff000000);
+	map(0x800000ec, 0x800000ef).portr("KEY1");
+	map(0x800000f4, 0x800000f7).portr("KEY2");
+	map(0x800000f8, 0x800000fb).portr("KEY3");
+	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 
-	AM_RANGE( 0x800000fc, 0x800000ff ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff000000)
-	AM_RANGE( 0x88000000, 0x88000007 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
-	AM_RANGE( 0x90000000, 0x90000007 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff000000)
-	AM_RANGE( 0x800000ec, 0x800000ef ) AM_READ_PORT("KEY1")
-	AM_RANGE( 0x800000f4, 0x800000f7 ) AM_READ_PORT("KEY2")
-	AM_RANGE( 0x800000f8, 0x800000fb ) AM_READ_PORT("KEY3")
-	AM_RANGE( 0xa0000000, 0xa0000003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
-	AM_RANGE( 0xa0000010, 0xa0000013 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
-
-	AM_RANGE( 0x40000000, 0x400fffff ) AM_RAM
-	AM_RANGE( 0xa8000000, 0xa8007fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x40000000, 0x400fffff).ram();
+	map(0xa8000000, 0xa8007fff).ram().share("nvram");
+}
 
 
-static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, mmodular_state)
-	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
+void mmodular_state::van32_mem(address_map &map)
+{
+	alm32_mem(map);
+
+	map(0x00000000, 0x0003ffff).rom();
 
 //  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
+}
 
-	AM_IMPORT_FROM(alm32_mem)
-ADDRESS_MAP_END
+void mmodular_state::gen32_mem(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).rom();
 
-static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, mmodular_state)
-	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
-
-	AM_RANGE( 0xc8000004, 0xc8000007 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
-	AM_RANGE( 0xd0000004, 0xd0000007 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff000000)
-	AM_RANGE( 0xc0000000, 0xc0000003 ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff000000)
-	AM_RANGE( 0xf0000004, 0xf0000007 ) AM_READ_PORT("KEY1")
-	AM_RANGE( 0xf0000008, 0xf000000b ) AM_READ_PORT("KEY2")
-	AM_RANGE( 0xf0000010, 0xf0000013 ) AM_READ_PORT("KEY3")
-	AM_RANGE( 0xe0000000, 0xe0000003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
-	AM_RANGE( 0xe0000010, 0xe0000013 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
+	map(0xc8000004, 0xc8000004).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0xd0000004, 0xd0000004).w("board", FUNC(mephisto_board_device::led_w));
+	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0xf0000004, 0xf0000007).portr("KEY1");
+	map(0xf0000008, 0xf000000b).portr("KEY2");
+	map(0xf0000010, 0xf0000013).portr("KEY3");
+	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 
 //  AM_RANGE( 0xd8000008, 0xd800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xd8000004, 0xd8000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0xd800000c, 0xd800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
 
-	AM_RANGE( 0x40000000, 0x4007ffff ) AM_RAM
-	AM_RANGE( 0x80000000, 0x8003ffff ) AM_RAM
-	AM_RANGE( 0xe8000000, 0xe8007fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x40000000, 0x4007ffff).ram();
+	map(0x80000000, 0x8003ffff).ram();
+	map(0xe8000000, 0xe8007fff).ram().share("nvram");
+}
 
 
 READ8_MEMBER(berlinp_state::berlinp_input_r)
@@ -155,18 +172,19 @@ READ8_MEMBER(berlinp_state::berlinp_input_r)
 		return m_board->input_r(space, offset) ^ 0xff;
 }
 
-static ADDRESS_MAP_START(berlinp_mem, AS_PROGRAM, 32, berlinp_state)
-	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
+void berlinp_state::berlinp_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE( 0x800000, 0x800003 ) AM_READ8(berlinp_input_r, 0xff000000)
-	AM_RANGE( 0x900000, 0x900003 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
-	AM_RANGE( 0xa00000, 0xa00003 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff000000)
-	AM_RANGE( 0xb00000, 0xb00003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
-	AM_RANGE( 0xc00000, 0xc00003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
+	map(0x800000, 0x800000).r(FUNC(berlinp_state::berlinp_input_r));
+	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
+	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
+	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 
-	AM_RANGE( 0x400000, 0x4fffff ) AM_RAM
-	AM_RANGE( 0xd00000, 0xd07fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x400000, 0x4fffff).ram();
+	map(0xd00000, 0xd07fff).ram().share("nvram");
+}
 
 
 static INPUT_PORTS_START( alm16 )
@@ -224,7 +242,7 @@ static INPUT_PORTS_START( berlinp )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(mmodular_state, gen32)
+void mmodular_state::init_gen32()
 {
 	// patch LCD delay loop
 	uint8_t *rom = memregion("maincpu")->base();
@@ -232,10 +250,10 @@ DRIVER_INIT_MEMBER(mmodular_state, gen32)
 		rom[0x870] = 0x38;
 }
 
-static MACHINE_CONFIG_START( alm16 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(alm16_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
+MACHINE_CONFIG_START(mmodular_state::alm16)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alm16_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
@@ -243,16 +261,17 @@ static MACHINE_CONFIG_START( alm16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( van16, alm16 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(van16_mem)
+MACHINE_CONFIG_START(mmodular_state::van16)
+	alm16(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(van16_mem)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( alm32 )
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(alm32_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
+MACHINE_CONFIG_START(mmodular_state::alm32)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alm32_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -262,16 +281,17 @@ static MACHINE_CONFIG_START( alm32 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( van32, alm32 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(van32_mem)
+MACHINE_CONFIG_START(mmodular_state::van32)
+	alm32(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(van32_mem)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gen32 )
-	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
-	MCFG_CPU_PROGRAM_MAP(gen32_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
+MACHINE_CONFIG_START(mmodular_state::gen32)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(33'333'000))
+	MCFG_DEVICE_PROGRAM_MAP(gen32_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -281,10 +301,10 @@ static MACHINE_CONFIG_START( gen32 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( berlinp )
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
-	MCFG_CPU_PROGRAM_MAP(berlinp_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
+MACHINE_CONFIG_START(berlinp_state::berlinp)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(24'576'000))
+	MCFG_DEVICE_PROGRAM_MAP(berlinp_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -319,9 +339,9 @@ ROM_END
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v41", "V4.1" )
-	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(1))
+	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v40", "V4.0" )
-	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(2))
+	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(1))
 ROM_END
 
 ROM_START( van16 )
@@ -371,19 +391,19 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS                   INIT   COMPANY             FULLNAME                                FLAGS */
-CONS( 1988, alm16,    0,           0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm32,    0,           0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,   alm16,       0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32,   alm32,       0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,   alm16,       0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32,   alm32,       0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,    alm16,       0,      van16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van32,    alm32,       0,      van32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, gen32,    0,           0,      gen32,     gen32,    mmodular_state,     gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond020,  alm32,       0,      van32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond030,  gen32,       0,      gen32,     gen32,    mmodular_state,     gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY             FULLNAME                                FLAGS */
+CONS( 1988, alm16,   0,       0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm32,   0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   alm16,   0,      van16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, gen32,   0,       0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond020, alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond030, gen32,   0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
 // not modular boards
-CONS( 1994, berlinp,  0,           0,      berlinp,   berlinp,  berlinp_state,      0,     "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, bpl32,    berlinp,     0,      berlinp,   berlinp,  berlinp_state,      0,     "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

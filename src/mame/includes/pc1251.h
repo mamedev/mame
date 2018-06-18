@@ -8,12 +8,13 @@
  *
  ****************************************************************************/
 
-#ifndef PC1251_H_
-#define PC1251_H_
+#ifndef MAME_INCLUDES_PC1251_H
+#define MAME_INCLUDES_PC1251_H
 
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define PC1251_CONTRAST (ioport("DSW0")->read() & 0x07)
 
@@ -30,14 +31,16 @@ public:
 		: pocketc_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_cpu_nvram(*this, "cpu_nvram"),
+		m_ram_nvram(*this, "ram_nvram") { }
 
 	uint8_t m_outa;
 	uint8_t m_outb;
 	int m_power;
 	uint8_t m_reg[0x100];
 
-	DECLARE_DRIVER_INIT(pc1251);
+	void init_pc1251();
 	uint32_t screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(pc1251_outa);
 	DECLARE_WRITE8_MEMBER(pc1251_outb);
@@ -55,8 +58,22 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	void pc1261(machine_config &config);
+	void pc1260(machine_config &config);
+	void pc1255(machine_config &config);
+	void pc1251(machine_config &config);
+	void pc1250(machine_config &config);
+	void pc1250_mem(address_map &map);
+	void pc1251_mem(address_map &map);
+	void pc1255_mem(address_map &map);
+	void pc1260_mem(address_map &map);
+	void pc1261_mem(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_device<nvram_device> m_cpu_nvram;
+	required_device<nvram_device> m_ram_nvram;
 };
 
-#endif /* PC1251_H_ */
+#endif // MAME_INCLUDES_PC1251_H

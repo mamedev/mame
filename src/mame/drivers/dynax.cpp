@@ -33,10 +33,11 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Dial Q2              D5212298L-1               Z80                 YM2413             PROM
 91 Mj Yarunara             D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001
 91 Hana wo Yaraneba!       D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
+91 Warai no Hana Tenshi    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
-91 Mj Ougon No Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
+91 Mj Ougon no Hai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
 94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
@@ -74,9 +75,6 @@ TODO:
 
 - neruton / majxtal7: girls are behind the background in demo mode.
 
-- tenkai: Interrupts are not quite right; "RAM ERROR" at startup and music slows
-  down while dealing tiles in attract mode.
-
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -85,7 +83,6 @@ TODO:
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/tmpz84c015.h"
-#include "machine/74259.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -113,37 +110,28 @@ TODO:
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void dynax_state::sprtmtch_update_irq()
 {
-	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x10 : 0) | ((m_blitter_irq && m_blitter_irq_mask) ? 0x20 : 0) ;
-	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	m_mainirq->rst4_w(m_blitter_irq && m_blitter_irq_mask);
 }
 
 WRITE8_MEMBER(dynax_state::dynax_vblank_ack_w)
 {
-	m_vblank_irq = 0;
-	sprtmtch_update_irq();
+	m_mainirq->rst2_w(0);
 }
 
 WRITE_LINE_MEMBER(dynax_state::blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
-
-	// this must be acknowledged somewhere else
 	if (!m_blitter_irq_mask)
+	{
 		m_blitter_irq = 0;
-
-	sprtmtch_update_irq();
+		m_mainirq->rst4_w(0);
+	}
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::sprtmtch_vblank_interrupt)
+WRITE_LINE_MEMBER(dynax_state::sprtmtch_vblank_w)
 {
-	m_vblank_irq = 1;
-	sprtmtch_update_irq();
-}
-
-WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
-{
-	m_sound_irq = state;
-	sprtmtch_update_irq();
+	if (state)
+		m_mainirq->rst2_w(1);
 }
 
 
@@ -154,42 +142,42 @@ WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void dynax_state::jantouki_update_irq()
 {
-	int irq = ((m_blitter_irq && m_blitter_irq_mask) ? 0x08 : 0) | ((m_blitter2_irq && m_blitter2_irq_mask) ? 0x10 : 0) | ((m_vblank_irq) ? 0x20 : 0) ;
-	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	m_mainirq->rst1_w(m_blitter_irq && m_blitter_irq_mask);
+	m_mainirq->rst2_w(m_blitter2_irq && m_blitter2_irq_mask);
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_vblank_ack_w)
 {
-	m_vblank_irq = 0;
-	jantouki_update_irq();
+	m_mainirq->rst4_w(0);
 }
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
-
-	// this must be acknowledged somewhere else
 	if (!m_blitter_irq_mask)
+	{
 		m_blitter_irq = 0;
-
-	jantouki_update_irq();
+		m_mainirq->rst1_w(0);
+	}
 }
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_blitter2_ack_w)
 {
 	m_blitter2_irq_mask = state;
-
-	// this must be acknowledged somewhere else
 	if (!m_blitter2_irq_mask)
+	{
 		m_blitter2_irq = 0;
-
-	jantouki_update_irq();
+		m_mainirq->rst2_w(0);
+	}
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
+WRITE_LINE_MEMBER(dynax_state::jantouki_vblank_w)
 {
-	m_vblank_irq = 1;
-	jantouki_update_irq();
+	if (state)
+	{
+		m_mainirq->rst4_w(1);
+		m_soundirq->rst4_w(1);
+	}
 }
 
 
@@ -197,28 +185,9 @@ INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-void dynax_state::jantouki_sound_update_irq()
-{
-	int irq = ((m_sound_irq) ? 0x08 : 0) | ((m_soundlatch_irq) ? 0x10 : 0) | ((m_sound_vblank_irq) ? 0x20 : 0) ;
-	m_soundcpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
-}
-
-INTERRUPT_GEN_MEMBER(dynax_state::jantouki_sound_vblank_interrupt)
-{
-	m_sound_vblank_irq = 1;
-	jantouki_sound_update_irq();
-}
-
 WRITE8_MEMBER(dynax_state::jantouki_sound_vblank_ack_w)
 {
-	m_sound_vblank_irq = 0;
-	jantouki_sound_update_irq();
-}
-
-WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
-{
-	m_sound_irq = state;
-	jantouki_sound_update_irq();
+	m_soundirq->rst4_w(0);
 }
 
 
@@ -317,9 +286,9 @@ void dynax_state::hnoridur_palette_update(offs_t offset)
 {
 	int x = (m_palette_ram[256 * m_palbank + offset] << 8) + m_palette_ram[256 * m_palbank + offset + 16 * 256];
 	/* The bits are in reverse order! */
-	int r = BITSWAP8((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-	int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-	int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+	int r = bitswap<5>((x >>  0) & 0x1f, 0, 1, 2, 3, 4);
+	int g = bitswap<5>((x >>  5) & 0x1f, 0, 1, 2, 3, 4);
+	int b = bitswap<5>((x >> 10) & 0x1f, 0, 1, 2, 3, 4);
 	m_palette->set_pen_color(256 * m_palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
@@ -348,7 +317,7 @@ void dynax_state::nanajign_palette_update(offs_t offset)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 {
-	m_msm->data_w(m_msm5205next >> 4);
+	m_msm->write_data(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -356,20 +325,20 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 	if (m_toggle)
 	{
 		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 {
-	m_msm->data_w(m_msm5205next >> 4);
+	m_msm->write_data(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle_cpu1 = 1 - m_toggle_cpu1;
 	if (m_toggle_cpu1)
 	{
 		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);  // cpu1
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // cpu1
 	}
 }
 
@@ -397,183 +366,195 @@ MACHINE_RESET_MEMBER(dynax_state,adpcm)
 	m_msm->reset_w(1);
 }
 
-static ADDRESS_MAP_START( cdracula_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
-	AM_RANGE( 0xc000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void dynax_state::cdracula_mem_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void dynax_state::sprtmtch_mem_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-static ADDRESS_MAP_START( hnoridur_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::hnoridur_mem_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( mcnpshnt_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::mcnpshnt_mem_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( nanajign_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::nanajign_mem_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( mjdialq2_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0800, 0x0fff ) AM_RAM
-	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void dynax_state::mjdialq2_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x0800, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::yarunara_mem_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
 //identical to yarunara, but nvram is in the 0x6000 - 0x6fff range
-static ADDRESS_MAP_START( quiztvqq_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::quiztvqq_mem_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram().share("nvram");
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( jantouki_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void dynax_state::jantouki_mem_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-static ADDRESS_MAP_START( jantouki_sound_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x77ff ) AM_ROM
-	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank2")
-ADDRESS_MAP_END
-
-
-
-static ADDRESS_MAP_START( hnoridur_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x80000, 0x800ff) AM_WRITE(hnoridur_palette_lo_w)
-	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(hnoridur_palette_hi_w)
-	AM_RANGE(0xc0000, 0xc7fff) AM_RAM // hnoridur: R/W RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjelctrn_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x80000, 0x800ff) AM_WRITE(nanajign_palette_lo_w)
-	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(nanajign_palette_hi_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nanajign_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x80000, 0x800ff) AM_WRITE(nanajign_palette_lo_w)
-	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(nanajign_palette_hi_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( yarunara_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x80000, 0x801ff) AM_WRITE(tenkai_palette_w)
-	AM_RANGE(0xe0000, 0xe000f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjangels_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x010000)
-	AM_RANGE(0x080000, 0x0801ff) AM_WRITE(tenkai_palette_w)
-	AM_RANGE(0x0a0000, 0x0bffff) AM_ROM AM_REGION("maincpu", 0x0b0000)
-	AM_RANGE(0x0e0000, 0x0e000f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("maincpu", 0x110000)
-ADDRESS_MAP_END
+void dynax_state::jantouki_sound_mem_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank2");
+}
 
 
 
-static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-	AM_RANGE( 0x41, 0x47 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_rombank_w)        // BANK ROM Select  hnkochou only
-	AM_RANGE( 0x60, 0x60 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x61, 0x61 ) AM_READ(hanamai_keyboard_1_r)        // P2
-	AM_RANGE( 0x62, 0x62 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x63, 0x63 ) AM_READ(ret_ff)              // ?
-	AM_RANGE( 0x64, 0x64 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x65, 0x65 ) AM_WRITE(dynax_rombank_w)        // BANK ROM Select  hanamai only
-	AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x67, 0x67 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x68, 0x68 ) AM_WRITE(dynax_layer_enable_w)       // Layers Enable
-	AM_RANGE( 0x69, 0x69 ) AM_WRITE(hanamai_priority_w)     // layer priority
-	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x6b, 0x6b ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
-	AM_RANGE( 0x6d, 0x6d ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x6e, 0x6e ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x70, 0x77 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE("ym2203", ym2203_device, read, write) // 2 x DSW
-	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE("aysnd", ay8912_device, address_data_w)   // AY8912
-//  AM_RANGE( 0x7c, 0x7c ) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x7d, 0x7d ) AM_WRITENOP   //
-	AM_RANGE( 0x7e, 0x7e ) AM_WRITE(dynax_blit_romregion_w) // Blitter ROM bank
-ADDRESS_MAP_END
+void dynax_state::hnoridur_banked_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom().region("maincpu", 0x10000);
+	map(0x80000, 0x800ff).w(FUNC(dynax_state::hnoridur_palette_lo_w));
+	map(0xa0000, 0xa00ff).w(FUNC(dynax_state::hnoridur_palette_hi_w));
+	map(0xc0000, 0xc7fff).ram(); // hnoridur: R/W RAM
+}
+
+void dynax_state::mjelctrn_banked_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("maincpu", 0x10000);
+	map(0x80000, 0x800ff).w(FUNC(dynax_state::nanajign_palette_lo_w));
+	map(0xa0000, 0xa00ff).w(FUNC(dynax_state::nanajign_palette_hi_w));
+}
+
+void dynax_state::nanajign_banked_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom().region("maincpu", 0x10000);
+	map(0x80000, 0x800ff).w(FUNC(dynax_state::nanajign_palette_lo_w));
+	map(0xa0000, 0xa00ff).w(FUNC(dynax_state::nanajign_palette_hi_w));
+}
+
+void dynax_state::yarunara_banked_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("maincpu", 0x10000);
+	map(0x80000, 0x801ff).w(FUNC(dynax_state::tenkai_palette_w));
+	map(0xe0000, 0xe000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+}
+
+void dynax_state::mjangels_banked_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0x010000);
+	map(0x080000, 0x0801ff).w(FUNC(dynax_state::tenkai_palette_w));
+	map(0x0a0000, 0x0bffff).rom().region("maincpu", 0x0b0000);
+	map(0x0e0000, 0x0e000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x100000, 0x13ffff).rom().region("maincpu", 0x110000);
+}
 
 
-static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-//  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x22, 0x22 ) AM_READ(hanamai_keyboard_1_r)        // P2
-	AM_RANGE( 0x23, 0x23 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW1")         // DSW2
-	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT("DSW3")         // DSW4
-	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT("DSW2")         // DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8912_device, data_r)     // AY8912, DSW0
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x46, 0x46 ) AM_WRITE(dynax_blit_romregion_w) // Blitter ROM bank
-	AM_RANGE( 0x47, 0x47 ) AM_WRITE(hnoridur_palbank_w)
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x55, 0x55 ) AM_WRITENOP                  // ? VBlank IRQ Ack
-	AM_RANGE( 0x56, 0x56 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)              // ?
-	AM_RANGE( 0x60, 0x67 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x70, 0x77 ) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+
+void dynax_state::hanamai_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(dynax_state::dynax_extra_scrollx_w));	// screen scroll X
+	map(0x20, 0x20).w(FUNC(dynax_state::dynax_extra_scrolly_w));    // screen scroll Y
+	map(0x41, 0x47).w(FUNC(dynax_state::dynax_blitter_rev2_w));     // Blitter
+	map(0x50, 0x50).w(FUNC(dynax_state::dynax_rombank_w));          // BANK ROM Select  hnkochou only
+	map(0x60, 0x60).r(FUNC(dynax_state::hanamai_keyboard_0_r));     // P1
+	map(0x61, 0x61).r(FUNC(dynax_state::hanamai_keyboard_1_r));     // P2
+	map(0x62, 0x62).portr("COINS");                                 // Coins
+	map(0x63, 0x63).r(FUNC(dynax_state::ret_ff));                   // ?
+	map(0x64, 0x64).w(FUNC(dynax_state::hanamai_keyboard_w));       // keyboard row select
+	map(0x65, 0x65).w(FUNC(dynax_state::dynax_rombank_w));          // BANK ROM Select  hanamai only
+	map(0x66, 0x66).w(FUNC(dynax_state::dynax_vblank_ack_w));       // VBlank IRQ Ack
+	map(0x67, 0x67).w(FUNC(dynax_state::adpcm_data_w));             // MSM5205 data
+	map(0x68, 0x68).w(FUNC(dynax_state::dynax_layer_enable_w));     // Layers Enable
+	map(0x69, 0x69).w(FUNC(dynax_state::hanamai_priority_w));       // layer priority
+	map(0x6a, 0x6a).w(FUNC(dynax_state::dynax_blit_dest_w));        // Destination Layer
+	map(0x6b, 0x6b).w(FUNC(dynax_state::dynax_blit_pen_w));         // Destination Pen
+	map(0x6c, 0x6c).w(FUNC(dynax_state::dynax_blit_palette01_w));   // Layers Palettes (Low Bits)
+	map(0x6d, 0x6d).w(FUNC(dynax_state::dynax_blit_palette23_w));   //
+	map(0x6e, 0x6e).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
+	map(0x70, 0x77).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x78, 0x79).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write)); // 2 x DSW
+	map(0x7a, 0x7b).w("aysnd", FUNC(ay8912_device::address_data_w));   // AY8912
+//  AM_RANGE( 0x7c, 0x7c ) AM_WRITENOP                              // CRT Controller
+//  AM_RANGE( 0x7d, 0x7d ) AM_WRITENOP                              //
+	map(0x7e, 0x7e).w(FUNC(dynax_state::dynax_blit_romregion_w));   // Blitter ROM bank
+}
+
+
+void dynax_state::hnoridur_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x07).w(FUNC(dynax_state::dynax_blitter_rev2_w));     // Blitter
+//  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP                              // CRT Controller
+//  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP                              // CRT Controller
+	map(0x20, 0x20).w(FUNC(dynax_state::hanamai_keyboard_w));       // keyboard row select
+	map(0x21, 0x21).portr("COINS");                                 // Coins
+	map(0x22, 0x22).r(FUNC(dynax_state::hanamai_keyboard_1_r));     // P2
+	map(0x23, 0x23).r(FUNC(dynax_state::hanamai_keyboard_0_r));     // P1
+	map(0x24, 0x24).portr("DSW1");                                  // DSW2
+	map(0x25, 0x25).portr("DSW3");                                  // DSW4
+	map(0x26, 0x26).portr("DSW2");                                  // DSW3
+	map(0x30, 0x30).w(FUNC(dynax_state::adpcm_reset_w));            // MSM5205 reset
+	map(0x32, 0x32).w(FUNC(dynax_state::adpcm_data_w));             // MSM5205 data
+	map(0x34, 0x35).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x36, 0x36).r("aysnd", FUNC(ay8912_device::data_r));        // AY8912, DSW0
+	map(0x38, 0x38).w("aysnd", FUNC(ay8912_device::data_w));        // AY8912
+	map(0x3a, 0x3a).w("aysnd", FUNC(ay8912_device::address_w));     //
+	map(0x40, 0x40).w(FUNC(dynax_state::dynax_blit_pen_w));         // Destination Pen
+	map(0x41, 0x41).w(FUNC(dynax_state::dynax_blit_dest_w));        // Destination Layer
+	map(0x42, 0x42).w(FUNC(dynax_state::dynax_blit_palette01_w));   // Layers Palettes
+	map(0x43, 0x43).w(FUNC(dynax_state::dynax_blit_palette23_w));   //
+	map(0x44, 0x44).w(FUNC(dynax_state::hanamai_priority_w));       // layer priority and enable
+	map(0x45, 0x45).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
+	map(0x46, 0x46).w(FUNC(dynax_state::dynax_blit_romregion_w));   // Blitter ROM bank
+	map(0x47, 0x47).w(FUNC(dynax_state::hnoridur_palbank_w));
+	map(0x50, 0x50).w(FUNC(dynax_state::dynax_extra_scrollx_w));    // screen scroll X
+	map(0x51, 0x51).w(FUNC(dynax_state::dynax_extra_scrolly_w));    // screen scroll Y
+	map(0x54, 0x54).w(FUNC(dynax_state::hnoridur_rombank_w));       // BANK ROM Select
+	map(0x55, 0x55).nopw();                                         // ? VBlank IRQ Ack
+	map(0x56, 0x56).w(FUNC(dynax_state::dynax_vblank_ack_w));       // VBlank IRQ Ack
+	map(0x57, 0x57).r(FUNC(dynax_state::ret_ff));                   // ?
+	map(0x60, 0x67).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x70, 0x77).w("outlatch", FUNC(ls259_device::write_d0));
+}
 
 /***************************************************************************
                                 Hana Jingi
 ***************************************************************************/
-
-WRITE8_MEMBER(dynax_state::hjingi_bank_w)
-{
-	m_bankdev->set_bank(data);
-}
 
 WRITE_LINE_MEMBER(dynax_state::hjingi_lockout_w)
 {
@@ -600,65 +581,68 @@ READ8_MEMBER(dynax_state::hjingi_keyboard_1_r)
 	return hanamai_keyboard_1_r(space, 0) | ioport("BET")->read();
 }
 
-static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
-	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::hjingi_mem_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rom();
+	map(0x0200, 0x1fff).ram().share("nvram");
+	map(0x2000, 0x7fff).rom();
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-static ADDRESS_MAP_START( hjingi_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x80000, 0x800ff) AM_WRITE(hnoridur_palette_lo_w)
-	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(hnoridur_palette_hi_w)
-ADDRESS_MAP_END
+void dynax_state::hjingi_banked_map(address_map &map)
+{
+	map(0x80000, 0x800ff).w(FUNC(dynax_state::hnoridur_palette_lo_w));
+	map(0xa0000, 0xa00ff).w(FUNC(dynax_state::hnoridur_palette_hi_w));
+}
 
-static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+void dynax_state::hjingi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x07).w(FUNC(dynax_state::dynax_blitter_rev2_w));     // Blitter
 
-//  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP                              // CRT Controller
+//  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP                              // CRT Controller
 
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x22, 0x22 ) AM_READ(hjingi_keyboard_1_r)     // P2 + Hopper
-	AM_RANGE( 0x23, 0x23 ) AM_READ(hjingi_keyboard_0_r)     // P1 + Hopper
-	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW1")         // DSW1
-	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT("DSW3")         // DSW3
-	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT("DSW2")         // DSW2
+	map(0x20, 0x20).w(FUNC(dynax_state::hanamai_keyboard_w));       // keyboard row select
+	map(0x21, 0x21).portr("COINS");                                 // Coins
+	map(0x22, 0x22).r(FUNC(dynax_state::hjingi_keyboard_1_r));      // P2 + Hopper
+	map(0x23, 0x23).r(FUNC(dynax_state::hjingi_keyboard_0_r));      // P1 + Hopper
+	map(0x24, 0x24).portr("DSW1");                                  // DSW1
+	map(0x25, 0x25).portr("DSW3");                                  // DSW3
+	map(0x26, 0x26).portr("DSW2");                                  // DSW2
 
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
+	map(0x30, 0x30).w(FUNC(dynax_state::adpcm_reset_w));            // MSM5205 reset
+	map(0x32, 0x32).w(FUNC(dynax_state::adpcm_data_w));             // MSM5205 data
+	map(0x34, 0x35).w("ym2413", FUNC(ym2413_device::write));        //
 
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8912_device, data_r)     // AY8912, DSW0
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
+	map(0x36, 0x36).r("aysnd", FUNC(ay8912_device::data_r));        // AY8912, DSW0
+	map(0x38, 0x38).w("aysnd", FUNC(ay8912_device::data_w));        // AY8912
+	map(0x3a, 0x3a).w("aysnd", FUNC(ay8912_device::address_w));     //
 
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x46, 0x46 ) AM_WRITE(dynax_blit_romregion_w) // Blitter ROM bank
-	AM_RANGE( 0x47, 0x47 ) AM_WRITE(hnoridur_palbank_w)
+	map(0x40, 0x40).w(FUNC(dynax_state::dynax_blit_pen_w));         // Destination Pen
+	map(0x41, 0x41).w(FUNC(dynax_state::dynax_blit_dest_w));        // Destination Layer
+	map(0x42, 0x42).w(FUNC(dynax_state::dynax_blit_palette01_w));   // Layers Palettes
+	map(0x43, 0x43).w(FUNC(dynax_state::dynax_blit_palette23_w));   //
+	map(0x44, 0x44).w(FUNC(dynax_state::hanamai_priority_w));       // layer priority and enable
+	map(0x45, 0x45).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
+	map(0x46, 0x46).w(FUNC(dynax_state::dynax_blit_romregion_w));   // Blitter ROM bank
+	map(0x47, 0x47).w(FUNC(dynax_state::hnoridur_palbank_w));
 
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
+	map(0x50, 0x50).w(FUNC(dynax_state::dynax_extra_scrollx_w));    // screen scroll X
+	map(0x51, 0x51).w(FUNC(dynax_state::dynax_extra_scrolly_w));    // screen scroll Y
 
-	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hjingi_bank_w)          // BANK ROM Select
+	map(0x54, 0x54).w(FUNC(dynax_state::hnoridur_rombank_w));       // palette bank select
 
-	AM_RANGE( 0x56, 0x56 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)              // Blitter Busy
+	map(0x56, 0x56).w(FUNC(dynax_state::dynax_vblank_ack_w));       // VBlank IRQ Ack
+	map(0x57, 0x57).r(FUNC(dynax_state::ret_ff));                   // Blitter Busy
 
-	AM_RANGE( 0x60, 0x67 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0) // Flip screen, layer half select, etc.
+	map(0x60, 0x67).w(m_mainlatch, FUNC(ls259_device::write_d0));   // Flip screen, layer half select, etc.
 
-	AM_RANGE( 0x70, 0x77 ) AM_DEVWRITE("outlatch", ls259_device, write_d0) // Coin Counters, Hopper, Coin Lockout
+	map(0x70, 0x77).w("outlatch", FUNC(ls259_device::write_d0));    // Coin Counters, Hopper, Coin Lockout
 
-	AM_RANGE( 0x80, 0x80 ) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
-ADDRESS_MAP_END
+	map(0x80, 0x80).w(FUNC(dynax_state::dynax_rombank_w));          // BANK ROM Select
+}
 
 
 /***************************************************************************
@@ -737,146 +721,151 @@ WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 		case 0x81:  dynax_blit_romregion_w(space, 0, 3);    return;
 		case 0x82:  dynax_blit_romregion_w(space, 0, 4);    return; // mjcomv1
 	}
-	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
+	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x01 ) AM_WRITE(yarunara_input_w)       // Controls
-	AM_RANGE( 0x02, 0x03 ) AM_READ(yarunara_input_r)        //
-	AM_RANGE( 0x11, 0x17 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x22, 0x22 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x48, 0x48 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x49, 0x49 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-	AM_RANGE( 0x4a, 0x4a ) AM_WRITE(yarunara_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x4b, 0x4b ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x4c, 0x4c ) AM_READ_PORT("DSW0")         // DSW 1
-	AM_RANGE( 0x4f, 0x4f ) AM_READ_PORT("DSW1")         // DSW 2
-	AM_RANGE( 0x50, 0x57 ) AM_DEVWRITE("mainlatch", ls259_device, write_d1)
-	AM_RANGE( 0x68, 0x68 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x69, 0x69 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0x6b, 0x6b ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0x6d, 0x6d ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x6e, 0x6e ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-ADDRESS_MAP_END
+void dynax_state::yarunara_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(FUNC(dynax_state::yarunara_input_w));       // Controls
+	map(0x02, 0x03).r(FUNC(dynax_state::yarunara_input_r));        //
+	map(0x11, 0x17).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
+	map(0x20, 0x20).w(FUNC(dynax_state::adpcm_reset_w));  // MSM5205 reset
+	map(0x22, 0x22).w(FUNC(dynax_state::adpcm_data_w));           // MSM5205 data
+	map(0x24, 0x25).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x28, 0x28).w("aysnd", FUNC(ay8912_device::data_w));   // AY8912
+	map(0x2a, 0x2a).w("aysnd", FUNC(ay8912_device::address_w));    //
+	map(0x48, 0x48).w(FUNC(dynax_state::dynax_extra_scrollx_w));  // screen scroll X
+	map(0x49, 0x49).w(FUNC(dynax_state::dynax_extra_scrolly_w));  // screen scroll Y
+	map(0x4a, 0x4a).w(FUNC(dynax_state::yarunara_rombank_w));     // BANK ROM Select
+	map(0x4b, 0x4b).w(FUNC(dynax_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
+	map(0x4c, 0x4c).portr("DSW0");         // DSW 1
+	map(0x4f, 0x4f).portr("DSW1");         // DSW 2
+	map(0x50, 0x57).w(m_mainlatch, FUNC(ls259_device::write_d1));
+	map(0x68, 0x68).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0x69, 0x69).w(FUNC(dynax_state::dynax_blit_dest_w));      // Destination Layer
+	map(0x6a, 0x6a).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes
+	map(0x6b, 0x6b).w(FUNC(dynax_state::dynax_blit_palette23_w)); //
+	map(0x6c, 0x6c).w(FUNC(dynax_state::hanamai_priority_w));     // layer priority and enable
+	map(0x6d, 0x6d).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x6e, 0x6e).w(FUNC(dynax_state::yarunara_blit_romregion_w));  // Blitter ROM bank
+}
 
 
 // Almost identical to hnoridur
-static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+void dynax_state::mcnpshnt_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x07).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x22, 0x22 ) AM_READ(hanamai_keyboard_1_r)        // P2
-	AM_RANGE( 0x23, 0x23 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW0")         // DSW2
-	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT("DSW1")         // DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x46, 0x46 ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0x47, 0x47 ) AM_WRITE(hnoridur_palbank_w)
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x56, 0x56 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)              // ?
-	AM_RANGE( 0x60, 0x67 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x70, 0x77 ) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+	map(0x20, 0x20).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
+	map(0x21, 0x21).portr("COINS");            // Coins
+	map(0x22, 0x22).r(FUNC(dynax_state::hanamai_keyboard_1_r));        // P2
+	map(0x23, 0x23).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
+	map(0x24, 0x24).portr("DSW0");         // DSW2
+	map(0x26, 0x26).portr("DSW1");         // DSW3
+	map(0x30, 0x30).w(FUNC(dynax_state::adpcm_reset_w));  // MSM5205 reset
+	map(0x32, 0x32).w(FUNC(dynax_state::adpcm_data_w));           // MSM5205 data
+	map(0x34, 0x35).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x38, 0x38).w("aysnd", FUNC(ay8912_device::data_w));   // AY8912
+	map(0x3a, 0x3a).w("aysnd", FUNC(ay8912_device::address_w));    //
+	map(0x40, 0x40).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0x41, 0x41).w(FUNC(dynax_state::dynax_blit_dest_w));      // Destination Layer
+	map(0x42, 0x42).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes
+	map(0x43, 0x43).w(FUNC(dynax_state::dynax_blit_palette23_w)); //
+	map(0x44, 0x44).w(FUNC(dynax_state::hanamai_priority_w));     // layer priority and enable
+	map(0x45, 0x45).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x46, 0x46).w(FUNC(dynax_state::yarunara_blit_romregion_w));  // Blitter ROM bank
+	map(0x47, 0x47).w(FUNC(dynax_state::hnoridur_palbank_w));
+	map(0x50, 0x50).w(FUNC(dynax_state::dynax_extra_scrollx_w));  // screen scroll X
+	map(0x51, 0x51).w(FUNC(dynax_state::dynax_extra_scrolly_w));  // screen scroll Y
+	map(0x54, 0x54).w(FUNC(dynax_state::hnoridur_rombank_w));     // BANK ROM Select
+	map(0x56, 0x56).w(FUNC(dynax_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
+	map(0x57, 0x57).r(FUNC(dynax_state::ret_ff));              // ?
+	map(0x60, 0x67).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x70, 0x77).w("outlatch", FUNC(ls259_device::write_d0));
+}
 
 
-static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)  // 2 x DSW
+void dynax_state::sprtmtch_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x07).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
+	map(0x10, 0x11).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));  // 2 x DSW
 //  AM_RANGE( 0x12, 0x12 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x13, 0x13 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT("P1")               // P1
-	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("P2")               // P2
-	AM_RANGE( 0x22, 0x22 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x23, 0x23 ) AM_READ(ret_ff)              // ?
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE(dynax_layer_enable_w)       // Layers Enable
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE(dynax_rombank_w)        // BANK ROM Select
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x33, 0x33 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x34, 0x34 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
-	AM_RANGE( 0x35, 0x35 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x36, 0x36 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x37, 0x37 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x40, 0x47 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+	map(0x20, 0x20).portr("P1");               // P1
+	map(0x21, 0x21).portr("P2");               // P2
+	map(0x22, 0x22).portr("COINS");            // Coins
+	map(0x23, 0x23).r(FUNC(dynax_state::ret_ff));              // ?
+	map(0x30, 0x30).w(FUNC(dynax_state::dynax_layer_enable_w));       // Layers Enable
+	map(0x31, 0x31).w(FUNC(dynax_state::dynax_rombank_w));        // BANK ROM Select
+	map(0x32, 0x32).w(FUNC(dynax_state::dynax_blit_dest_w));      // Destination Layer
+	map(0x33, 0x33).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0x34, 0x34).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes (Low Bits)
+	map(0x35, 0x35).w(FUNC(dynax_state::dynax_blit_palette23_w)); //
+	map(0x36, 0x36).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x37, 0x37).w(FUNC(dynax_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
+	map(0x40, 0x47).w(m_mainlatch, FUNC(ls259_device::write_d0));
+}
 
 
 
-static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(dynax_rombank_w)        // BANK ROM Select
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x10, 0x17 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x41, 0x47 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+void dynax_state::mjfriday_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0x01, 0x01).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes (Low Bits)
+	map(0x02, 0x02).w(FUNC(dynax_state::dynax_rombank_w));        // BANK ROM Select
+	map(0x03, 0x03).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x10, 0x17).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x41, 0x47).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
 //  AM_RANGE( 0x50, 0x50 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x51, 0x51 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x61, 0x61 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x62, 0x62 ) AM_READ(hanamai_keyboard_1_r)        // P2
-	AM_RANGE( 0x63, 0x63 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x64, 0x64 ) AM_READ_PORT("DSW0")         // DSW
-	AM_RANGE( 0x67, 0x67 ) AM_READ_PORT("DSW1")         // DSW
-	AM_RANGE( 0x70, 0x71 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
+	map(0x60, 0x60).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
+	map(0x61, 0x61).portr("COINS");            // Coins
+	map(0x62, 0x62).r(FUNC(dynax_state::hanamai_keyboard_1_r));        // P2
+	map(0x63, 0x63).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
+	map(0x64, 0x64).portr("DSW0");         // DSW
+	map(0x67, 0x67).portr("DSW1");         // DSW
+	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));        //
 //  AM_RANGE( 0x80, 0x80 ) AM_WRITENOP   // IRQ ack?
-ADDRESS_MAP_END
+}
 
 
-static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x10, 0x10 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x12, 0x12 ) AM_READ(hanamai_keyboard_1_r)        // P2
-	AM_RANGE( 0x13, 0x13 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x14, 0x14 ) AM_READ_PORT("DSW0")         // DSW1
-	AM_RANGE( 0x15, 0x15 ) AM_READ_PORT("DSW1")         // DSW2
-	AM_RANGE( 0x16, 0x16 ) AM_READ_PORT("DSW2")         // DSW3
+void dynax_state::nanajign_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(dynax_state::adpcm_reset_w));  // MSM5205 reset
+	map(0x02, 0x02).w(FUNC(dynax_state::adpcm_data_w));           // MSM5205 data
+	map(0x04, 0x05).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x08, 0x08).w("aysnd", FUNC(ay8912_device::data_w));   // AY8912
+	map(0x0a, 0x0a).w("aysnd", FUNC(ay8912_device::address_w));    //
+	map(0x10, 0x10).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
+	map(0x11, 0x11).portr("COINS");            // Coins
+	map(0x12, 0x12).r(FUNC(dynax_state::hanamai_keyboard_1_r));        // P2
+	map(0x13, 0x13).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
+	map(0x14, 0x14).portr("DSW0");         // DSW1
+	map(0x15, 0x15).portr("DSW1");         // DSW2
+	map(0x16, 0x16).portr("DSW2");         // DSW3
 //  AM_RANGE( 0x20, 0x21 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x31, 0x37 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x40, 0x47 ) AM_DEVWRITE("outlatch", ls259_device, write_d0)  // Coin Counter
-	AM_RANGE( 0x50, 0x57 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0x70, 0x70 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x72, 0x72 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0x73, 0x73 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x74, 0x74 ) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0x75, 0x75 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x76, 0x76 ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0x77, 0x77 ) AM_WRITE(hnoridur_palbank_w)
-ADDRESS_MAP_END
+	map(0x31, 0x37).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
+	map(0x40, 0x47).w("outlatch", FUNC(ls259_device::write_d0));  // Coin Counter
+	map(0x50, 0x57).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x60, 0x60).w(FUNC(dynax_state::dynax_extra_scrollx_w));  // screen scroll X
+	map(0x62, 0x62).w(FUNC(dynax_state::dynax_extra_scrolly_w));  // screen scroll Y
+	map(0x6a, 0x6a).w(FUNC(dynax_state::hnoridur_rombank_w));     // BANK ROM Select
+	map(0x6c, 0x6c).w(FUNC(dynax_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
+	map(0x70, 0x70).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0x71, 0x71).w(FUNC(dynax_state::dynax_blit_dest_w));      // Destination Layer
+	map(0x72, 0x72).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes
+	map(0x73, 0x73).w(FUNC(dynax_state::dynax_blit_palette23_w)); //
+	map(0x74, 0x74).w(FUNC(dynax_state::hanamai_priority_w));     // layer priority and enable
+	map(0x75, 0x75).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x76, 0x76).w(FUNC(dynax_state::yarunara_blit_romregion_w));  // Blitter ROM bank
+	map(0x77, 0x77).w(FUNC(dynax_state::hnoridur_palbank_w));
+}
 
 
 /***************************************************************************
@@ -885,16 +874,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(dynax_state::jantouki_soundlatch_ack_r)
 {
-	return (m_soundlatch_ack) ? 0x80 : 0;
-}
-
-WRITE8_MEMBER(dynax_state::jantouki_soundlatch_w)
-{
-	m_soundlatch_ack = 1;
-	m_soundlatch_full = 1;
-	m_soundlatch_irq = 1;
-	m_latch = data;
-	jantouki_sound_update_irq();
+	machine().scheduler().synchronize();
+	return m_soundlatch->pending_r() ? 0x80 : 0;
 }
 
 READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
@@ -905,73 +886,62 @@ READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
 WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
-	output().set_led_value(0, data & 0x10);  // maybe
+	m_led = BIT(data, 4);  // maybe
 }
 
-static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void dynax_state::jantouki_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE( 0x40, 0x41 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x48, 0x48 ) AM_WRITE(jantouki_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x49, 0x49 ) AM_WRITE(jantouki_soundlatch_w)  // To Sound CPU
-	AM_RANGE( 0x4a, 0x4a ) AM_READ(jantouki_soundlatch_ack_r)   // Soundlatch status
-	AM_RANGE( 0x4b, 0x4b ) AM_WRITE(dynax_blit2_dest_w)     // Destination Layer 2
-	AM_RANGE( 0x4d, 0x4d ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0x4f, 0x4f ) AM_WRITE(dynax_blit2_romregion_w)    // Blitter 2 ROM bank
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(jantouki_vblank_ack_w)  // VBlank IRQ Ack
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x52, 0x52 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x54, 0x54 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x55, 0x55 ) AM_READ_PORT("DSW0")         // DSW1
-	AM_RANGE( 0x56, 0x56 ) AM_READ_PORT("DSW1")         // DSW2
-	AM_RANGE( 0x58, 0x5f ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_blit_palette67_w) // Layers Palettes (Low Bits)
-	AM_RANGE( 0x61, 0x61 ) AM_WRITE(dynax_blit_palette45_w) //
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0x63, 0x63 ) AM_WRITE(dynax_blit_palette01_w) //
-	AM_RANGE( 0x64, 0x64 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x65, 0x65 ) AM_WRITE(dynax_blit2_pen_w)      // Destination Pen 2
-	AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0x67, 0x67 ) AM_READ(jantouki_blitter_busy_r) //
-	AM_RANGE( 0x69, 0x6f ) AM_WRITE(jantouki_blitter2_rev2_w)   // Blitter 2
-	AM_RANGE( 0x71, 0x77 ) AM_WRITE(jantouki_blitter_rev2_w)    // Blitter
-	AM_RANGE( 0x78, 0x7e ) AM_WRITE(jantouki_layer_enable_w)    // Layers Enable
-ADDRESS_MAP_END
+	map(0x48, 0x48).w(FUNC(dynax_state::jantouki_rombank_w));     // BANK ROM Select
+	map(0x49, 0x49).w(m_soundlatch, FUNC(generic_latch_8_device::write));  // To Sound CPU
+	map(0x4a, 0x4a).r(FUNC(dynax_state::jantouki_soundlatch_ack_r));   // Soundlatch status
+	map(0x4b, 0x4b).w(FUNC(dynax_state::dynax_blit2_dest_w));     // Destination Layer 2
+	map(0x4d, 0x4d).w(FUNC(dynax_state::dynax_blit_dest_w));      // Destination Layer
+	map(0x4f, 0x4f).w(FUNC(dynax_state::dynax_blit2_romregion_w));    // Blitter 2 ROM bank
+	map(0x50, 0x50).w(FUNC(dynax_state::jantouki_vblank_ack_w));  // VBlank IRQ Ack
+	map(0x51, 0x51).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
+	map(0x52, 0x52).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
+	map(0x54, 0x54).portr("COINS");            // Coins
+	map(0x55, 0x55).portr("DSW0");         // DSW1
+	map(0x56, 0x56).portr("DSW1");         // DSW2
+	map(0x58, 0x5f).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x60, 0x60).w(FUNC(dynax_state::dynax_blit_palette67_w)); // Layers Palettes (Low Bits)
+	map(0x61, 0x61).w(FUNC(dynax_state::dynax_blit_palette45_w)); //
+	map(0x62, 0x62).w(FUNC(dynax_state::dynax_blit_palette23_w)); //
+	map(0x63, 0x63).w(FUNC(dynax_state::dynax_blit_palette01_w)); //
+	map(0x64, 0x64).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x65, 0x65).w(FUNC(dynax_state::dynax_blit2_pen_w));      // Destination Pen 2
+	map(0x66, 0x66).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0x67, 0x67).r(FUNC(dynax_state::jantouki_blitter_busy_r)); //
+	map(0x69, 0x6f).w(FUNC(dynax_state::jantouki_blitter2_rev2_w));   // Blitter 2
+	map(0x71, 0x77).w(FUNC(dynax_state::jantouki_blitter_rev2_w));    // Blitter
+	map(0x78, 0x7e).w(FUNC(dynax_state::jantouki_layer_enable_w));    // Layers Enable
+}
 
 /***************************************************************************
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::jantouki_soundlatch_ack_w)
-{
-	m_soundlatch_ack = data;
-	m_soundlatch_irq = 0;
-	jantouki_sound_update_irq();
-}
-
-READ8_MEMBER(dynax_state::jantouki_soundlatch_r)
-{
-	m_soundlatch_full = 0;
-	return m_latch;
-}
-
 READ8_MEMBER(dynax_state::jantouki_soundlatch_status_r)
 {
-	return (m_soundlatch_full) ? 0 : 0x80;
+	return m_soundlatch->pending_r() ? 0 : 0x80;
 }
 
-static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(jantouki_sound_rombank_w)       // BANK ROM Select
-	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)    // VBlank IRQ Ack
-	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD("aysnd", ay8912_device, data_r)         // AY8912
-	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE("aysnd", ay8912_device, data_address_w)   //
-	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE("ym2203", ym2203_device, read, write) //
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)      // MSM5205 reset
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_data_w)               // MSM5205 data
-	AM_RANGE( 0x50, 0x50 ) AM_READ(jantouki_soundlatch_status_r)    // Soundlatch status
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(jantouki_soundlatch_ack_w)      // Soundlatch status
-	AM_RANGE( 0x70, 0x70 ) AM_READ(jantouki_soundlatch_r)           // From Main CPU
-ADDRESS_MAP_END
+void dynax_state::jantouki_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(dynax_state::jantouki_sound_rombank_w));       // BANK ROM Select
+	map(0x10, 0x10).w(FUNC(dynax_state::jantouki_sound_vblank_ack_w));    // VBlank IRQ Ack
+	map(0x21, 0x21).r("aysnd", FUNC(ay8912_device::data_r));         // AY8912
+	map(0x22, 0x23).w("aysnd", FUNC(ay8912_device::data_address_w));   //
+	map(0x28, 0x29).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write)); //
+	map(0x30, 0x30).w(FUNC(dynax_state::adpcm_reset_w));      // MSM5205 reset
+	map(0x40, 0x40).w(FUNC(dynax_state::adpcm_data_w));               // MSM5205 data
+	map(0x50, 0x50).r(FUNC(dynax_state::jantouki_soundlatch_status_r));    // Soundlatch status
+	map(0x60, 0x60).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x70, 0x70).r(m_soundlatch, FUNC(generic_latch_8_device::read)); // From Main CPU
+}
 
 
 
@@ -992,64 +962,66 @@ READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
 	return ioport(dswnames[dsw])->read();
 }
 
-static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x02, 0x02 ) AM_MIRROR(0xff00) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x04, 0x05 ) AM_MIRROR(0xff00) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x08, 0x08 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x0a, 0x0a ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-//  AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x21, 0x21 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0xff00) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE( 0x60, 0x60 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x62, 0x62 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-//  AM_RANGE( 0x64, 0x64 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrollx_w)      // screen scroll X
-//  AM_RANGE( 0x66, 0x66 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrolly_w)      // screen scroll Y
-	AM_RANGE( 0x6a, 0x6a ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x80, 0x80 ) AM_MIRROR(0xff00) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x81, 0x81 ) AM_MIRROR(0xff00) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x82, 0x82 ) AM_MIRROR(0xff00) AM_READ(mjelctrn_keyboard_1_r)       // P2
-	AM_RANGE( 0x83, 0x83 ) AM_MIRROR(0xff00) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x84, 0x84 ) AM_MIRROR(0xff00) AM_READ(mjelctrn_dsw_r)          // DSW8 x 4
-	AM_RANGE( 0x85, 0x85 ) AM_MIRROR(0xff00) AM_READ_PORT("SW1")              // DSW2
-	AM_RANGE( 0xa1, 0xa7 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0xc0, 0xc7 ) AM_MIRROR(0xff00) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0xe0, 0xe0 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0xe1, 0xe1 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0xe2, 0xe2 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0xe3, 0xe3 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0xe4, 0xe4 ) AM_MIRROR(0xff00) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0xe5, 0xe5 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0xe6, 0xe6 ) AM_MIRROR(0xff00) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0xe7, 0xe7 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_palbank_w)
-ADDRESS_MAP_END
+void dynax_state::mjelctrn_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(dynax_state::adpcm_reset_w));  // MSM5205 reset
+	map(0x02, 0x02).w(FUNC(dynax_state::adpcm_data_w));           // MSM5205 data
+	map(0x04, 0x05).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x08, 0x08).w("aysnd", FUNC(ay8912_device::data_w));   // AY8912
+	map(0x0a, 0x0a).w("aysnd", FUNC(ay8912_device::address_w));    //
+//  AM_RANGE( 0x20, 0x20 ) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x21, 0x21 ) AM_WRITENOP   // CRT Controller
+	map(0x40, 0x47).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0x60, 0x60).w(FUNC(dynax_state::dynax_extra_scrollx_w));  // screen scroll X
+	map(0x62, 0x62).w(FUNC(dynax_state::dynax_extra_scrolly_w));  // screen scroll Y
+//  AM_RANGE( 0x64, 0x64 ) AM_WRITE(dynax_extra_scrollx_w)      // screen scroll X
+//  AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_extra_scrolly_w)      // screen scroll Y
+	map(0x6a, 0x6a).w(FUNC(dynax_state::hnoridur_rombank_w));     // BANK ROM Select
+	map(0x80, 0x80).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
+	map(0x81, 0x81).portr("COINS");            // Coins
+	map(0x82, 0x82).r(FUNC(dynax_state::mjelctrn_keyboard_1_r));       // P2
+	map(0x83, 0x83).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
+	map(0x84, 0x84).r(FUNC(dynax_state::mjelctrn_dsw_r));          // DSW8 x 4
+	map(0x85, 0x85).portr("SW1");              // DSW2
+	map(0xa1, 0xa7).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
+	map(0xc0, 0xc7).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe0, 0xe0).w(FUNC(dynax_state::dynax_blit_pen_w));       // Destination Pen
+	map(0xe1, 0xe1).w(FUNC(dynax_state::dynax_blit_dest_w));      // Destination Layer
+	map(0xe2, 0xe2).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes
+	map(0xe3, 0xe3).w(FUNC(dynax_state::dynax_blit_palette23_w)); //
+	map(0xe4, 0xe4).w(FUNC(dynax_state::hanamai_priority_w));     // layer priority and enable
+	map(0xe5, 0xe5).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0xe6, 0xe6).w(FUNC(dynax_state::yarunara_blit_romregion_w));  // Blitter ROM bank
+	map(0xe7, 0xe7).w(FUNC(dynax_state::hnoridur_palbank_w));
+}
 
-static ADDRESS_MAP_START( mjembase_io_map, AS_IO, 8, dynax_state )
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x04, 0x05 ) AM_MIRROR(0xff00) AM_DEVWRITE("ym2413", ym2413_device, write)       //
-	AM_RANGE( 0x06, 0x06 ) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8912_device, data_r)        // AY8912, dsw0
-	AM_RANGE( 0x08, 0x08 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, data_w)       //
-	AM_RANGE( 0x0a, 0x0a ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_WRITE(hanamai_keyboard_w)         // keyboard row select
-	AM_RANGE( 0x21, 0x21 ) AM_MIRROR(0xff00) AM_READ_PORT("COINS")                // Coins
-	AM_RANGE( 0x22, 0x22 ) AM_MIRROR(0xff00) AM_READ(mjelctrn_keyboard_1_r)       // P2
-	AM_RANGE( 0x23, 0x23 ) AM_MIRROR(0xff00) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x24, 0x24 ) AM_MIRROR(0xff00) AM_READ_PORT("DSW3")
-//  AM_RANGE( 0x40, 0x40 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x41, 0x41 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x61, 0x67 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x80, 0x87 ) AM_MIRROR(0xff00) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0xa0, 0xa0 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_rombank_w)         // BANK ROM Select
-	AM_RANGE( 0xc0, 0xc0 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_pen_w)           // Destination Pen
-	AM_RANGE( 0xc1, 0xc1 ) AM_MIRROR(0xff00) AM_WRITE(mjembase_blit_dest_w)       // Destination Layer
-	AM_RANGE( 0xc2, 0xc2 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_palette01_w)     // Layers Palettes
-	AM_RANGE( 0xc3, 0xc3 ) AM_MIRROR(0xff00) AM_WRITE(mjembase_blit_palette23_w)  //
-	AM_RANGE( 0xc4, 0xc4 ) AM_MIRROR(0xff00) AM_WRITE(mjembase_priority_w)        // layer priority and enable
-	AM_RANGE( 0xc5, 0xc5 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0xc6, 0xc6 ) AM_MIRROR(0xff00) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0xc7, 0xc7 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_palbank_w)
-ADDRESS_MAP_END
+void dynax_state::mjembase_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x05).w("ym2413", FUNC(ym2413_device::write));       //
+	map(0x06, 0x06).r("aysnd", FUNC(ay8912_device::data_r));        // AY8912, dsw0
+	map(0x08, 0x08).w("aysnd", FUNC(ay8912_device::data_w));       //
+	map(0x0a, 0x0a).w("aysnd", FUNC(ay8912_device::address_w));    //
+	map(0x20, 0x20).w(FUNC(dynax_state::hanamai_keyboard_w));         // keyboard row select
+	map(0x21, 0x21).portr("COINS");                // Coins
+	map(0x22, 0x22).r(FUNC(dynax_state::mjelctrn_keyboard_1_r));       // P2
+	map(0x23, 0x23).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
+	map(0x24, 0x24).portr("DSW3");
+//  AM_RANGE( 0x40, 0x40 ) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x41, 0x41 ) AM_WRITENOP   // CRT Controller
+	map(0x61, 0x67).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
+	map(0x80, 0x87).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xa0, 0xa0).w(FUNC(dynax_state::hnoridur_rombank_w));         // BANK ROM Select
+	map(0xc0, 0xc0).w(FUNC(dynax_state::dynax_blit_pen_w));           // Destination Pen
+	map(0xc1, 0xc1).w(FUNC(dynax_state::mjembase_blit_dest_w));       // Destination Layer
+	map(0xc2, 0xc2).w(FUNC(dynax_state::dynax_blit_palette01_w));     // Layers Palettes
+	map(0xc3, 0xc3).w(FUNC(dynax_state::mjembase_blit_palette23_w));  //
+	map(0xc4, 0xc4).w(FUNC(dynax_state::mjembase_priority_w));        // layer priority and enable
+	map(0xc5, 0xc5).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0xc6, 0xc6).w(FUNC(dynax_state::yarunara_blit_romregion_w));  // Blitter ROM bank
+	map(0xc7, 0xc7).w(FUNC(dynax_state::hnoridur_palbank_w));
+}
 
 
 /***************************************************************************
@@ -1086,7 +1058,7 @@ WRITE8_MEMBER(dynax_state::tenkai_ip_w)
 			break;
 		return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", space.device().safe_pc(), m_input_sel, data);
+	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", m_maincpu->pc(), m_input_sel, data);
 }
 
 READ8_MEMBER(dynax_state::tenkai_ip_r)
@@ -1104,7 +1076,7 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 					return ioport("COINS")->read(); // coins
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", space.device().safe_pc(), m_input_sel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1119,17 +1091,17 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 				// player 2
 				case 0x81:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", space.device().safe_pc(), m_keyb);
+						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
 					return 0xff;//ioport(keynames1[m_keyb++])->read();
 
 				// player 1
 				case 0x82:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", space.device().safe_pc(), m_keyb);
+						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
 					return ioport(keynames0[m_keyb++])->read();
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", space.device().safe_pc(), m_input_sel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1254,36 +1226,41 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 		case 0x83:  dynax_blit_romregion_w(space, 0, 1);    return;
 		case 0x80:  dynax_blit_romregion_w(space, 0, 2);    return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
+	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
 }
 
-static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
-	AM_RANGE(  0x6000,  0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD("aysnd", ay8910_device, data_r)       // AY8910
-	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE("aysnd", ay8910_device, data_w) //
-	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE("aysnd", ay8910_device, address_w)  //
-	AM_RANGE( 0x10020, 0x10021 ) AM_DEVWRITE("ym2413", ym2413_device, write)      //
-	AM_RANGE( 0x10040, 0x10040 ) AM_WRITE(dynax_blit_pen_w)     // Destination Pen
-	AM_RANGE( 0x10044, 0x10044 ) AM_WRITE(tenkai_blit_dest_w)       // Destination Layer
-	AM_RANGE( 0x10048, 0x10048 ) AM_WRITE(tenkai_blit_palette23_w)  // Layers Palettes
-	AM_RANGE( 0x1004c, 0x1004c ) AM_WRITE(tenkai_blit_palette01_w)  //
-	AM_RANGE( 0x10050, 0x10050 ) AM_WRITE(tenkai_priority_w)        // layer priority and enable
-	AM_RANGE( 0x10054, 0x10054 ) AM_WRITE(dynax_blit_backpen_w)     // Background Color
-	AM_RANGE( 0x10058, 0x10058 ) AM_WRITE(tenkai_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0x10060, 0x1007f ) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d1, rshift<2>)
-	AM_RANGE( 0x100c0, 0x100c0 ) AM_WRITE(tenkai_ipsel_w)
-	AM_RANGE( 0x100c1, 0x100c1 ) AM_WRITE(tenkai_ip_w)
-	AM_RANGE( 0x100c2, 0x100c3 ) AM_READ(tenkai_ip_r)
-	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)    // Blitter (inverted scroll values)
-ADDRESS_MAP_END
+void dynax_state::tenkai_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x10000, 0x10000).r("aysnd", FUNC(ay8910_device::data_r));       // AY8910
+	map(0x10008, 0x10008).w("aysnd", FUNC(ay8910_device::data_w)); //
+	map(0x10010, 0x10010).w("aysnd", FUNC(ay8910_device::address_w));  //
+	map(0x10020, 0x10021).w("ym2413", FUNC(ym2413_device::write));      //
+	map(0x10040, 0x10040).w(FUNC(dynax_state::dynax_blit_pen_w));     // Destination Pen
+	map(0x10044, 0x10044).w(FUNC(dynax_state::tenkai_blit_dest_w));       // Destination Layer
+	map(0x10048, 0x10048).w(FUNC(dynax_state::tenkai_blit_palette23_w));  // Layers Palettes
+	map(0x1004c, 0x1004c).w(FUNC(dynax_state::tenkai_blit_palette01_w));  //
+	map(0x10050, 0x10050).w(FUNC(dynax_state::tenkai_priority_w));        // layer priority and enable
+	map(0x10054, 0x10054).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
+	map(0x10058, 0x10058).w(FUNC(dynax_state::tenkai_blit_romregion_w));  // Blitter ROM bank
+	map(0x10060, 0x1007f).lw8("mainlatch_w",
+							  [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								  m_mainlatch->write_d1(space, offset >> 2, data, mem_mask);
+							  });
+	map(0x100c0, 0x100c0).w(FUNC(dynax_state::tenkai_ipsel_w));
+	map(0x100c1, 0x100c1).w(FUNC(dynax_state::tenkai_ip_w));
+	map(0x100c2, 0x100c3).r(FUNC(dynax_state::tenkai_ip_r));
+	map(0x100e1, 0x100e7).w(FUNC(dynax_state::tenkai_blitter_rev2_w));    // Blitter (inverted scroll values)
+}
 
-static ADDRESS_MAP_START( tenkai_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE( 0x80000, 0x8000f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x90000, 0x97fff ) AM_READWRITE(tenkai_palette_r, tenkai_palette_w)
-ADDRESS_MAP_END
+void dynax_state::tenkai_banked_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("maincpu", 0x10000);
+	map(0x80000, 0x8000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x90000, 0x97fff).rw(FUNC(dynax_state::tenkai_palette_r), FUNC(dynax_state::tenkai_palette_w));
+}
 
 /***************************************************************************
                                 Mahjong Gekisha
@@ -1331,34 +1308,36 @@ WRITE8_MEMBER(dynax_state::gekisha_p4_w)
 }
 
 
-static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
-	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void dynax_state::gekisha_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( gekisha_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x00000, 0x0ffff ) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE( 0x10000, 0x10000 ) AM_WRITENOP   // ? 0
-	AM_RANGE( 0x10001, 0x10001 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
-	AM_RANGE( 0x10002, 0x10002 ) AM_WRITENOP   // ? 1
-	AM_RANGE( 0x10003, 0x10003 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0x10010, 0x10017 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x10020, 0x10021 ) AM_WRITE(gekisha_hopper_w)
-	AM_RANGE( 0x10041, 0x10047 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+void dynax_state::gekisha_banked_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0x8000);
+	map(0x10000, 0x10000).nopw();   // ? 0
+	map(0x10001, 0x10001).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes (Low Bits)
+	map(0x10002, 0x10002).nopw();   // ? 1
+	map(0x10003, 0x10003).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x10010, 0x10017).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x10020, 0x10021).w(FUNC(dynax_state::gekisha_hopper_w));
+	map(0x10041, 0x10047).w(FUNC(dynax_state::dynax_blitter_rev2_w));       // Blitter
 //  AM_RANGE( 0x10050, 0x10050 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x10051, 0x10051 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x10060, 0x10060 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x10061, 0x10061 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x10062, 0x10062 ) AM_READ(gekisha_keyboard_1_r)        // P2
-	AM_RANGE( 0x10063, 0x10063 ) AM_READ(gekisha_keyboard_0_r)        // P1
-	AM_RANGE( 0x10064, 0x10064 ) AM_READ_PORT("DSW1")         // DSW
-	AM_RANGE( 0x10065, 0x10065 ) AM_READ_PORT("DSW3")         // DSW
-	AM_RANGE( 0x10066, 0x10066 ) AM_READ_PORT("DSW4")         // DSW
-	AM_RANGE( 0x10067, 0x10067 ) AM_READ_PORT("DSW2")         // DSW
-	AM_RANGE( 0x10070, 0x10071 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x10080, 0x10080 ) AM_WRITENOP   // ? 0,1,6 (bit 0 = screen disable?)
-ADDRESS_MAP_END
+	map(0x10060, 0x10060).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
+	map(0x10061, 0x10061).portr("COINS");            // Coins
+	map(0x10062, 0x10062).r(FUNC(dynax_state::gekisha_keyboard_1_r));        // P2
+	map(0x10063, 0x10063).r(FUNC(dynax_state::gekisha_keyboard_0_r));        // P1
+	map(0x10064, 0x10064).portr("DSW1");         // DSW
+	map(0x10065, 0x10065).portr("DSW3");         // DSW
+	map(0x10066, 0x10066).portr("DSW4");         // DSW
+	map(0x10067, 0x10067).portr("DSW2");         // DSW
+	map(0x10070, 0x10071).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x10080, 0x10080).nopw();   // ? 0,1,6 (bit 0 = screen disable?)
+}
 
 
 /***************************************************************************
@@ -1376,29 +1355,30 @@ WRITE8_MEMBER(dynax_state::cdracula_sound_rombank_w)
 		logerror("%s: warning, invalid sound bank = %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( cdracula_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE(cdracula_blitter_rev2_w)       // Blitter + Destination Layers
-	AM_RANGE( 0x10, 0x10 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE( 0x11, 0x11 ) AM_NOP   // unpopulated oki
+void dynax_state::cdracula_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x07).w(FUNC(dynax_state::cdracula_blitter_rev2_w));       // Blitter + Destination Layers
+	map(0x10, 0x10).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x11, 0x11).noprw();   // unpopulated oki
 //  AM_RANGE( 0x12, 0x12 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x13, 0x13 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT("P1")                 // P1
-	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("P2")                 // P2
-	AM_RANGE( 0x22, 0x22 ) AM_READ_PORT("COINS")              // Coins
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE(dynax_layer_enable_w)     // Layers Enable
+	map(0x20, 0x20).portr("P1");                 // P1
+	map(0x21, 0x21).portr("P2");                 // P2
+	map(0x22, 0x22).portr("COINS");              // Coins
+	map(0x30, 0x30).w(FUNC(dynax_state::dynax_layer_enable_w));     // Layers Enable
 //  AM_RANGE( 0x31, 0x31 ) AM_WRITE(dynax_rombank_w)          // BANK ROM Select
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(dynax_blit_pen_w)         // Destination Pen
-	AM_RANGE( 0x33, 0x33 ) AM_WRITE(dynax_blit_flags_w)       // Flags + Do Blit
-	AM_RANGE( 0x34, 0x34 ) AM_WRITE(dynax_blit_palette01_w)   // Layers Palettes (Low Bits)
-	AM_RANGE( 0x35, 0x35 ) AM_WRITE(dynax_blit_palette23_w)   //
-	AM_RANGE( 0x36, 0x36 ) AM_WRITE(dynax_blit_backpen_w)     // Background Color
-	AM_RANGE( 0x37, 0x37 ) AM_WRITE(dynax_vblank_ack_w)       // VBlank IRQ Ack
-	AM_RANGE( 0x40, 0x47 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0x60, 0x60 ) AM_READ_PORT("DSW2")
-	AM_RANGE( 0x61, 0x61 ) AM_READ_PORT("DSW1")
-	AM_RANGE( 0x6b, 0x6b ) AM_WRITE(cdracula_sound_rombank_w) // OKI Bank
-ADDRESS_MAP_END
+	map(0x32, 0x32).w(FUNC(dynax_state::dynax_blit_pen_w));         // Destination Pen
+	map(0x33, 0x33).w(FUNC(dynax_state::dynax_blit_flags_w));       // Flags + Do Blit
+	map(0x34, 0x34).w(FUNC(dynax_state::dynax_blit_palette01_w));   // Layers Palettes (Low Bits)
+	map(0x35, 0x35).w(FUNC(dynax_state::dynax_blit_palette23_w));   //
+	map(0x36, 0x36).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
+	map(0x37, 0x37).w(FUNC(dynax_state::dynax_vblank_ack_w));       // VBlank IRQ Ack
+	map(0x40, 0x47).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x60, 0x60).portr("DSW2");
+	map(0x61, 0x61).portr("DSW1");
+	map(0x6b, 0x6b).w(FUNC(dynax_state::cdracula_sound_rombank_w)); // OKI Bank
+}
 
 
 /***************************************************************************
@@ -2542,6 +2522,52 @@ static INPUT_PORTS_START( yarunara )
 	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_INCLUDE( MAHJONG_KEYS )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( warahana )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Panel Type" )
+	PORT_DIPSETTING(    0x00, "Mahjong" )
+	PORT_DIPSETTING(    0x40, "Hanafuda" )
+	PORT_DIPNAME( 0x80, 0x80, "Set Date" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Start with Quiz" )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4097,17 +4123,15 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,dynax)
 {
+	m_led.resolve();
+
 	m_blitter_irq_mask = 1;
 	m_blitter2_irq_mask = 1;
 
-	save_item(NAME(m_sound_irq));
-	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_blitter_irq));
 	save_item(NAME(m_blitter_irq_mask));
 	save_item(NAME(m_blitter2_irq));
 	save_item(NAME(m_blitter2_irq_mask));
-	save_item(NAME(m_soundlatch_irq));
-	save_item(NAME(m_sound_vblank_irq));
 
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
@@ -4119,10 +4143,6 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_resetkludge));
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_toggle_cpu1));
-	save_item(NAME(m_yarunara_clk_toggle));
-	save_item(NAME(m_soundlatch_ack));
-	save_item(NAME(m_soundlatch_full));
-	save_item(NAME(m_latch));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_tenkai_p5_val));
 	save_item(NAME(m_tenkai_6c));
@@ -4136,12 +4156,8 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	if (m_msm != nullptr)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
 
-	m_sound_irq = 0;
-	m_vblank_irq = 0;
 	m_blitter_irq = 0;
 	m_blitter2_irq = 0;
-	m_soundlatch_irq = 0;
-	m_sound_vblank_irq = 0;
 
 	m_input_sel = 0;
 	m_dsw_sel = 0;
@@ -4153,10 +4169,6 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_resetkludge = 0;
 	m_toggle = 0;
 	m_toggle_cpu1 = 0;
-	m_yarunara_clk_toggle = 0;
-	m_soundlatch_ack = 0;
-	m_soundlatch_full = 0;
-	m_latch = 0;
 	m_rombank = 0;
 	m_tenkai_p5_val = 0;
 	m_tenkai_6c = 0;
@@ -4165,6 +4177,14 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_gekisha_val[1] = 0;
 
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
+}
+
+MACHINE_START_MEMBER(dynax_state,hjingi)
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
+
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 MACHINE_START_MEMBER(dynax_state,hanamai)
@@ -4179,23 +4199,26 @@ MACHINE_START_MEMBER(dynax_state,hanamai)
                                 Castle Of Dracula
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( cdracula )
+MACHINE_CONFIG_START(dynax_state::cdracula)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/4) /* 5.3693175MHz measured */
-	MCFG_CPU_PROGRAM_MAP(cdracula_mem_map)
-	MCFG_CPU_IO_MAP(cdracula_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/4) /* 5.3693175MHz measured */
+	MCFG_DEVICE_PROGRAM_MAP(cdracula_mem_map)
+	MCFG_DEVICE_IO_MAP(cdracula_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, flipscreen_w))       // Flip Screen
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, jantouki_blitter_ack_w))   // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))     // Layers Palettes (High Bit)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))       // Flip Screen
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))      // Blitter IRQ Ack
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))     // Layers Palettes (High Bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4205,6 +4228,7 @@ static MACHINE_CONFIG_START( cdracula )
 	MCFG_SCREEN_VISIBLE_AREA(16, 512-16-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_cdracula)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4212,9 +4236,9 @@ static MACHINE_CONFIG_START( cdracula )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, PIN7_HIGH) /* 1MHz measured */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH) /* 1MHz measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -4223,28 +4247,31 @@ MACHINE_CONFIG_END
                                 Hana no Mai
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hanamai )
+MACHINE_CONFIG_START(dynax_state::hanamai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
-	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
-	MCFG_CPU_IO_MAP(hanamai_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_DEVICE_IO_MAP(hanamai_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT  // MSM5205 reset
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(dynax_state, adpcm_reset_kludge_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, flipscreen_w))     // Flip Screen
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))  // Coin Counters
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))  //
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, blitter_ack_w))        // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))       // Layers Palettes (High Bit)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, layer_half_w))       // half of the interleaved layer to write to
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT  // MSM5205 reset
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dynax_state, adpcm_reset_kludge_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))     // Flip Screen
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))  // Coin Counters
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))  //
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))        // Blitter IRQ Ack
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))       // Layers Palettes (High Bit)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))       // half of the interleaved layer to write to
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4254,6 +4281,7 @@ static MACHINE_CONFIG_START( hanamai )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hanamai)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4261,13 +4289,13 @@ static MACHINE_CONFIG_START( hanamai )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 22000000 / 8)
+	MCFG_DEVICE_ADD("aysnd", AY8912, 22000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
+	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -4275,8 +4303,8 @@ static MACHINE_CONFIG_START( hanamai )
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -4287,13 +4315,13 @@ MACHINE_CONFIG_END
                                 Hana Oriduru
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hnoridur )
+MACHINE_CONFIG_START(dynax_state::hnoridur)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_22MHz / 4)    /* 5.5MHz */
-	MCFG_CPU_PROGRAM_MAP(hnoridur_mem_map)
-	MCFG_CPU_IO_MAP(hnoridur_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(22'000'000) / 4)    /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hnoridur_mem_map)
+	MCFG_DEVICE_IO_MAP(hnoridur_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4306,15 +4334,18 @@ static MACHINE_CONFIG_START( hnoridur )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC25
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, blitter_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC61
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4324,23 +4355,24 @@ static MACHINE_CONFIG_START( hnoridur )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_22MHz / 16)
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(22'000'000) / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -4350,15 +4382,15 @@ MACHINE_CONFIG_END
                                 Hana Jingi
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hjingi )
+MACHINE_CONFIG_START(dynax_state::hjingi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_22MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(hjingi_mem_map)
-	MCFG_CPU_IO_MAP(hjingi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(22'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(hjingi_mem_map)
+	MCFG_DEVICE_IO_MAP(hjingi_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
-	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
@@ -4369,17 +4401,20 @@ static MACHINE_CONFIG_START( hjingi )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, blitter_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, hjingi_hopper_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, hjingi_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, hjingi_hopper_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, hjingi_lockout_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4389,23 +4424,24 @@ static MACHINE_CONFIG_START( hjingi )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_22MHz / 16)
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(22'000'000) / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz )
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -4415,25 +4451,28 @@ MACHINE_CONFIG_END
                                 Sports Match
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sprtmtch )
+MACHINE_CONFIG_START(dynax_state::sprtmtch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,22000000 / 4)   /* 5.5MHz */
-	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
-	MCFG_CPU_IO_MAP(sprtmtch_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("maincpu", Z80,22000000 / 4)   /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_DEVICE_IO_MAP(sprtmtch_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // UF12 on Intergirl
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, blitter_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4443,6 +4482,7 @@ static MACHINE_CONFIG_START( sprtmtch )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_sprtmtch)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4450,10 +4490,10 @@ static MACHINE_CONFIG_START( sprtmtch )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,sprtmtch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
+	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -4467,13 +4507,18 @@ MACHINE_CONFIG_END
                             Mahjong Friday
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mjfriday )
+WRITE_LINE_MEMBER(dynax_state::mjfriday_vblank_w)
+{
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+MACHINE_CONFIG_START(dynax_state::mjfriday)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,24000000/4)  /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
-	MCFG_CPU_IO_MAP(mjfriday_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80,24000000/4)  /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_DEVICE_IO_MAP(mjfriday_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4481,14 +4526,14 @@ static MACHINE_CONFIG_START( mjfriday )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, mjdialq2_blit_dest1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, mjdialq2_blit_dest0_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(dynax_state, mjdialq2_layer1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, mjdialq2_layer0_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest0_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer0_enable_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4498,6 +4543,7 @@ static MACHINE_CONFIG_START( mjfriday )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, mjfriday_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4505,9 +4551,9 @@ static MACHINE_CONFIG_START( mjfriday )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym2413", YM2413, 24000000/6)
+	MCFG_DEVICE_ADD("ym2413", YM2413, 24000000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4516,11 +4562,12 @@ MACHINE_CONFIG_END
                             Mahjong Dial Q2
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( mjdialq2, mjfriday )
+MACHINE_CONFIG_START(dynax_state::mjdialq2)
+	mjfriday(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjdialq2_mem_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjdialq2_mem_map)
 MACHINE_CONFIG_END
 
 
@@ -4528,29 +4575,13 @@ MACHINE_CONFIG_END
                     Yarunara / Quiz TV Q&Q / Mahjong Angels
 ***************************************************************************/
 
-/* the old code here didn't work..
-  what was it trying to do?
-  set an irq and clear it before its even taken? */
-
-INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
-{
-	m_yarunara_clk_toggle ^= 1;
-
-	if (m_yarunara_clk_toggle == 1)
-		m_sound_irq = 0;
-	else
-		m_sound_irq = 1;
-
-	sprtmtch_update_irq();
-}
-
-static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
+MACHINE_CONFIG_START(dynax_state::yarunara)
+	hnoridur(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
-	MCFG_CPU_IO_MAP(yarunara_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dynax_state, yarunara_clock_interrupt,  60)    // RTC
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yarunara_mem_map)
+	MCFG_DEVICE_IO_MAP(yarunara_io_map)
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(yarunara_banked_map)
@@ -4563,20 +4594,23 @@ static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjangels, yarunara )
+MACHINE_CONFIG_START(dynax_state::mjangels)
+	yarunara(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjangels_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quiztvqq, mjangels )
+MACHINE_CONFIG_START(dynax_state::quiztvqq)
+	mjangels(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(quiztvqq_mem_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(quiztvqq_mem_map)
 MACHINE_CONFIG_END
 
 
@@ -4584,10 +4618,11 @@ MACHINE_CONFIG_END
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( mcnpshnt, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
-	MCFG_CPU_IO_MAP(mcnpshnt_io_map)
+MACHINE_CONFIG_START(dynax_state::mcnpshnt)
+	hnoridur(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mcnpshnt_mem_map)
+	MCFG_DEVICE_IO_MAP(mcnpshnt_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mcnpshnt) // different priorities
 MACHINE_CONFIG_END
@@ -4597,10 +4632,11 @@ MACHINE_CONFIG_END
                             7jigen
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( nanajign, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
-	MCFG_CPU_IO_MAP(nanajign_io_map)
+MACHINE_CONFIG_START(dynax_state::nanajign)
+	hnoridur(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nanajign_mem_map)
+	MCFG_DEVICE_IO_MAP(nanajign_io_map)
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(nanajign_banked_map)
@@ -4625,30 +4661,40 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 }
 
 
-static MACHINE_CONFIG_START( jantouki )
+MACHINE_CONFIG_START(dynax_state::jantouki)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
-	MCFG_CPU_PROGRAM_MAP(jantouki_mem_map)
-	MCFG_CPU_IO_MAP(jantouki_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", dynax_state,  jantouki_vblank_interrupt)  /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jantouki_mem_map)
+	MCFG_DEVICE_IO_MAP(jantouki_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
 
-	MCFG_CPU_ADD("soundcpu",Z80,22000000 / 4)   /* 5.5MHz */
-	MCFG_CPU_PROGRAM_MAP(jantouki_sound_mem_map)
-	MCFG_CPU_IO_MAP(jantouki_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", dynax_state,  jantouki_sound_vblank_interrupt)    /* IM 0 needs an opcode on the data bus */
+	MCFG_DEVICE_ADD("soundcpu",Z80,22000000 / 4)   /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jantouki_sound_mem_map)
+	MCFG_DEVICE_IO_MAP(jantouki_sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_pos_buffer_device, inta_cb)    // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("soundirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))  // Coin Counter
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, blit2_palbank_w))  // Layers Palettes (High Bit)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(dynax_state, jantouki_blitter_ack_w)) // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, jantouki_blitter2_ack_w))    // Blitter 2 IRQ Ack
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))  // Coin Counter
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, blit2_palbank_w))  // Layers Palettes (High Bit)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, jantouki_blitter_ack_w)) // Blitter IRQ Ack
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, jantouki_blitter2_ack_w))    // Blitter 2 IRQ Ack
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_pos_buffer_device, rst2_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 512)
@@ -4662,6 +4708,7 @@ static MACHINE_CONFIG_START( jantouki )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_top)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, jantouki_vblank_w))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4674,28 +4721,29 @@ static MACHINE_CONFIG_START( jantouki )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 22000000 / 8)
+	MCFG_DEVICE_ADD("aysnd", AY8912, 22000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, jantouki_sound_callback))
+	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", rst_pos_buffer_device, rst1_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int_cpu1))         /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int_cpu1))         /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( janyuki, jantouki )
+MACHINE_CONFIG_START(dynax_state::janyuki)
+	jantouki(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
 MACHINE_CONFIG_END
@@ -4718,35 +4766,39 @@ void dynax_state::mjelctrn_update_irq()
 	cpu.trg2(1);
 }
 
-static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
-	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, XTAL_22MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
-	MCFG_CPU_IO_MAP(mjelctrn_io_map)
+MACHINE_CONFIG_START(dynax_state::mjelctrn)
+	hnoridur(config);
+	MCFG_DEVICE_REPLACE("maincpu", TMPZ84C015, XTAL(22'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(nanajign_mem_map)
+	MCFG_DEVICE_IO_MAP(mjelctrn_io_map)
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjelctrn_banked_map)
 
 	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
 	// Q3, Q4 seem to be related to wrap around enable
 
+	MCFG_DEVICE_REMOVE("mainirq")
+
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjembase, mjelctrn )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mjembase_io_map)
+MACHINE_CONFIG_START(dynax_state::mjembase)
+	mjelctrn(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mjembase_io_map)
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
 	MCFG_TMPZ84C015_IN_PB_CB(IOPORT("DSW2"))
 
 	MCFG_DEVICE_MODIFY("mainlatch") // 13C
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
 
 	MCFG_DEVICE_REMOVE("outlatch")
 
@@ -4762,7 +4814,8 @@ MACHINE_CONFIG_END
     0x40 is vblank
     0x46 is a periodic irq? */
 
-static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
+MACHINE_CONFIG_START(dynax_state::neruton)
+	mjelctrn(config);
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
 
@@ -4774,34 +4827,37 @@ MACHINE_CONFIG_END
 
 void dynax_state::tenkai_update_irq()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
+	if (m_blitter_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
 }
 
 WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
 
-	// this must be acknowledged somewhere else
 	if (!m_blitter_irq_mask)
+	{
 		m_blitter_irq = 0;
-
-	tenkai_update_irq();
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+	else
+		tenkai_update_irq();
 }
 
 
-static MACHINE_CONFIG_START( tenkai )
+MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
-	MCFG_CPU_PROGRAM_MAP(tenkai_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(dynax_state, tenkai_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(dynax_state, tenkai_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, tenkai_p4_w))
-	MCFG_TLCS90_PORT_P5_READ_CB(READ8(dynax_state, tenkai_p5_r))
-	MCFG_TLCS90_PORT_P6_WRITE_CB(WRITE8(dynax_state, tenkai_p6_w))
-	MCFG_TLCS90_PORT_P7_WRITE_CB(WRITE8(dynax_state, tenkai_p7_w))
-	MCFG_TLCS90_PORT_P8_READ_CB(READ8(dynax_state, tenkai_p8_r))
-	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(dynax_state, tenkai_p8_w))
+	MCFG_DEVICE_ADD("maincpu",TMP91640, 21472700 / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tenkai_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, dynax_state, tenkai_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(*this, dynax_state, tenkai_p5_r))
+	MCFG_TLCS90_PORT_P6_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p6_w))
+	MCFG_TLCS90_PORT_P7_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p7_w))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, dynax_state, tenkai_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p8_w))
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(tenkai_banked_map)
@@ -4814,13 +4870,13 @@ static MACHINE_CONFIG_START( tenkai )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 10C on Ougon no Pai
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, tenkai_6c_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, tenkai_70_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, tenkai_blitter_ack_w))
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 10C on Ougon no Hai
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, tenkai_6c_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, tenkai_70_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, tenkai_blitter_ack_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4837,43 +4893,44 @@ static MACHINE_CONFIG_START( tenkai )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,tenkai)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dynax_state, tenkai_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(dynax_state, tenkai_dswsel_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 22000000 / 16)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dynax_state, tenkai_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, dynax_state, tenkai_dswsel_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
+MACHINE_CONFIG_START(dynax_state::majrjhdx)
+	tenkai(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjreach, tenkai )
+MACHINE_CONFIG_START(dynax_state::mjreach)
+	tenkai(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w)) // not inverted
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w)) // not inverted
 MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Mahjong Gekisha
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( gekisha )
+MACHINE_CONFIG_START(dynax_state::gekisha)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )   // ?
-	MCFG_CPU_PROGRAM_MAP(gekisha_map)
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, gekisha_p4_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",TMP90841, XTAL(10'000'000) )   // ?
+	MCFG_DEVICE_PROGRAM_MAP(gekisha_map)
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, dynax_state, gekisha_p4_w))
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(gekisha_banked_map)
@@ -4887,14 +4944,14 @@ static MACHINE_CONFIG_START( gekisha )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, mjdialq2_blit_dest1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, mjdialq2_blit_dest0_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(dynax_state, mjdialq2_layer1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, mjdialq2_layer0_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest0_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer0_enable_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4904,20 +4961,21 @@ static MACHINE_CONFIG_START( gekisha )
 	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz / 16)    // ?
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dynax_state, tenkai_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(dynax_state, tenkai_dswsel_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000) / 16)    // ?
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dynax_state, tenkai_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, dynax_state, tenkai_dswsel_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_24MHz / 8) // ?
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(24'000'000) / 8) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -5337,32 +5395,29 @@ ROM_START( blktouch )
 	ROM_LOAD( "u13",  0x000, 0x200, CRC(6984aaa9) SHA1(91645cd944cb21266edd13e55a8dc846f6edc419) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynax_state,blktouch)
+void dynax_state::init_blktouch()
 {
 	// fearsome encryption ;-)
-	uint8_t   *src = (uint8_t *)memregion("maincpu")->base();
-	int i;
-
-	for (i = 0; i < 0x90000; i++)
+	uint8_t *src = (uint8_t *)memregion("maincpu")->base();
+	for (int i = 0; i < 0x90000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 
 	}
 
 	src = (uint8_t *)memregion("gfx1")->base();
-
-	for (i = 0; i < 0xc0000; i++)
+	for (int i = 0; i < 0xc0000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 
 	}
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state, maya_common)
+void dynax_state::init_maya_common()
 {
 	/* Address lines scrambling on 1 z80 rom */
-	uint8_t   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
+	uint8_t *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
 		uint8_t temp[8];
@@ -5375,37 +5430,29 @@ DRIVER_INIT_MEMBER(dynax_state, maya_common)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+void dynax_state::init_maya()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
-	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
-	int i;
-
+	uint8_t *gfx = (uint8_t *)memregion("gfx1")->base();
 	/* Address lines scrambling on the blitter data roms */
-	{
-		std::vector<uint8_t> rom(0xc0000);
-		memcpy(&rom[0], gfx, 0xc0000);
-		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
-	}
+	std::vector<uint8_t> rom(0xc0000);
+	memcpy(&rom[0], gfx, 0xc0000);
+	for (int i = 0; i < 0xc0000; i++)
+		gfx[i] = rom[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,mayac)
+void dynax_state::init_mayac()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
-	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
-	int i;
-
+	uint8_t *gfx = (uint8_t *)memregion("gfx1")->base();
 	/* Address lines scrambling on the blitter data roms */
-	{
-		std::vector<uint8_t> rom(0xc0000);
-		memcpy(&rom[0], gfx, 0xc0000);
-		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
-	}
+	std::vector<uint8_t> rom(0xc0000);
+	memcpy(&rom[0], gfx, 0xc0000);
+	for (int i = 0; i < 0xc0000; i++)
+		gfx[i] = rom[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 
@@ -5609,7 +5656,6 @@ ROM_START( hanayara )
 	ROM_LOAD( "5510h.2a",  0x80000, 0x20000, CRC(bb9c71e1) SHA1(21f2977196aaa27b76ee6547a08aba8da7aba76c) )
 ROM_END
 
-
 /***************************************************************************
 
 Quiz TV Gassyuukoku Q&Q (JPN ver.)
@@ -5723,6 +5769,69 @@ ROM_START( mjangels )
 	ROM_LOAD( "612-10.s5c",   0x60000, 0x20000, CRC(bf1edb0e) SHA1(932ca328c5968529d52b2c629b6bb866cfa1e784) )
 	ROM_LOAD( "612-09.s4c",   0x80000, 0x20000, CRC(8345999e) SHA1(c70c731ababcb28752dd4961d6dc54d43cb6bcba) )
 	ROM_LOAD( "612-08.s3c",   0xa0000, 0x20000, CRC(aad88516) SHA1(e6c7ef3325a17b2945530847998d314685c39f5d) )
+ROM_END
+
+
+/***************************************************************************
+
+Warai no Hana Tenshi
+(c)1991 Dynax
+
+D5512068L1-1 (DX-BASE)
+D6107068L-1 (sub board)
+
+CPU  : Z80B
+Sound: AY-3-8912A YM2413 M5205
+OSC  : 22.000MHz (near main CPU), 14.31818MHz (Sound section)
+       YC-38 (X1), 384KHz (X2, M5205)
+
+
+ROMs:
+613-01.2D (M5M27C101K-15 - 128kB)
+613-02.4D (M5M27C101K-15 - 128kB)
+613-03.5D (Fujitsu Mask ROM 831000-15 - 128kB)
+
+on Subboard
+613-04.1A (AM27C040 - 512kB)
+613-05.2A (AM27C020 - 256kB)
+613-06.1B (M5M27C101K-15 - 128kB)
+613-07.2B (M5M27C101K-15 - 128kB)
+613-08.4C (M5M27C101K-15 - 128kB)
+613-09.5C (M5M27C101K-15 - 128kB)
+613-10.6C (M5M27C101K-15 - 128kB)
+
+PALs (not dumped):
+D613A.4E
+
+on Subboard
+D613B.7B
+
+***************************************************************************/
+
+ROM_START( warahana )
+	ROM_REGION( 0x150000, "maincpu", 0 )   // Z80 Code
+	ROM_LOAD( "613-01.2d", 0x00000, 0x20000, CRC(1e067bfb) SHA1(9cdd261a87f5930dddc60d9224e0daf2ac6b28c9) )
+	ROM_RELOAD(            0x10000, 0x20000 )
+	ROM_RELOAD(            0x70000, 0x20000 )
+	ROM_LOAD( "613-02.4d", 0x30000, 0x20000, CRC(d267a707) SHA1(c38cb06dc09f9062ad4cdd659333410bd2decd01) )
+	ROM_LOAD( "613-03.5d", 0x50000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+
+//  ROM_REGION( 0x00000, "gfx1", 0 )    // blitter data
+//  unused
+
+//  ROM_REGION( 0x00000, "gfx2", 0 )    // blitter data
+//  unused
+
+	ROM_REGION( 0xc0000, "gfx3", 0 )    // blitter data
+	ROM_LOAD( "613-04.1a",  0x00000, 0x80000, CRC(5c90cbb3) SHA1(7bb6fa95bde76382d4e86c3934d1820716f94eac) )
+	ROM_LOAD( "613-05.2a",  0x80000, 0x40000, CRC(f6d03514) SHA1(de80bbc66055e4f67b66360e63aac703c5c436a3) )
+
+	ROM_REGION( 0xa0000, "gfx4", 0 )    // blitter data
+	ROM_LOAD( "613-06.1b",  0x00000, 0x20000, CRC(34c502e1) SHA1(730bf01bfa5af0cff1420bb64e7c08d3fe42f97c) )
+	ROM_LOAD( "613-07.2b",  0x20000, 0x20000, CRC(988c04da) SHA1(74e690d23182b06171f7445fee70ef5261d7eef7) )
+	ROM_LOAD( "613-10.6c",  0x40000, 0x20000, CRC(a9e7fc66) SHA1(9f97946ab089d09c85cc0fae3695355cd1b3a8b3) )
+	ROM_LOAD( "613-09.5c",  0x60000, 0x20000, CRC(c2c0c47b) SHA1(72bdc654841bf7ba90a4a2a8160dcc8f2a0bac8d) )
+	ROM_LOAD( "613-08.4c",  0x80000, 0x20000, CRC(7cc529c3) SHA1(0ccef8adee8ca02b2dba2addbe888fb0ee6904a5) )
 ROM_END
 
 
@@ -6315,30 +6424,28 @@ ROM_START( intrgirl )
 ROM_END
 
 // Decrypted by yong
-DRIVER_INIT_MEMBER(dynax_state,mjelct3)
+void dynax_state::init_mjelct3()
 {
-	int i;
-	uint8_t   *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
 	std::vector<uint8_t> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
-	for (i = 0; i < size; i++)
-		rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
+	for (int i = 0; i < size; i++)
+		rom[i] = bitswap<8>(rom1[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
 }
 
-DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
+void dynax_state::init_mjelct3a()
 {
-	int i, j;
-	uint8_t   *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
 	std::vector<uint8_t> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		j = i & ~0x7e00;
-		switch(i & 0x7000)
+		int j = i & ~0x7e00;
+		switch (i & 0x7000)
 		{
 			case 0x0000:    j |= 0x0400;    break;
 			case 0x1000:    j |= 0x4400;    break;
@@ -6349,7 +6456,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 //              case 0x6000:    j |= 0x0000;    break;
 			case 0x7000:    j |= 0x0600;    break;
 		}
-		switch(i & 0x0e00)
+		switch (i & 0x0e00)
 		{
 			case 0x0000:    j |= 0x2000;    break;
 			case 0x0200:    j |= 0x3800;    break;
@@ -6363,7 +6470,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 		rom[j] = rom1[i];
 	}
 
-	DRIVER_INIT_CALL(mjelct3);
+	init_mjelct3();
 }
 
 
@@ -6778,7 +6885,7 @@ ROM_START( tenkai )
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
 	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonpaib
+	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonhaib
 	ROM_LOAD( "taicom01.15b", 0x080000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
@@ -6971,7 +7078,7 @@ ROM_START( tenkaicb )
 	// it doesn't need the internal rom from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonpaib
+	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonhaib
 	ROM_LOAD( "rom.u12",    0x80000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
@@ -7009,7 +7116,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon No Pai
+Mahjong Ougon no Hai
 DYNAX D6209038L1-0
 
 AY-3-8910A, rest of the chips are scratched
@@ -7017,25 +7124,25 @@ AY-3-8910A, rest of the chips are scratched
 
 ***************************************************************************/
 
-ROM_START( ougonpai )
+ROM_START( ougonhai )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "dynax_6201b.2c", 0x00000, 0x40000, CRC(18ef8eda) SHA1(48a3e4566b0a86db907602fd235c01d96eddec23) )
 	ROM_RELOAD(                 0x10000, 0x40000 )
 	ROM_RELOAD(                 0x50000, 0x40000 )
-	ROM_LOAD( "ougonpai_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "dynax_6202.11b", 0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonpaib)
-	ROM_LOAD( "dynax_6203.13b", 0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )  // = tydg003.u6 (ougonpaib)
+	ROM_LOAD( "dynax_6202.11b", 0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonhaib)
+	ROM_LOAD( "dynax_6203.13b", 0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )  // = tydg003.u6 (ougonhaib)
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
-	ROM_LOAD( "dynax_6204.14b", 0x00000, 0x80000, CRC(4142f94b) SHA1(9982f12333973b307c210e39310eafc88b8620e1) )  // ~= tydg004.u21 (ougonpaib)
-	ROM_LOAD( "dynax_6205.15b", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )  // = tydg005.u19 (ougonpaib)
+	ROM_LOAD( "dynax_6204.14b", 0x00000, 0x80000, CRC(4142f94b) SHA1(9982f12333973b307c210e39310eafc88b8620e1) )  // ~= tydg004.u21 (ougonhaib)
+	ROM_LOAD( "dynax_6205.15b", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )  // = tydg005.u19 (ougonhaib)
 ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon No Pai (bootleg, PCB is not working)
+Mahjong Ougon no Hai (bootleg, PCB is not working)
 
 PCB Layout
 ----------
@@ -7064,13 +7171,13 @@ PCB Layout
 
 ***************************************************************************/
 
-ROM_START( ougonpaib )
+ROM_START( ougonhaib )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_RELOAD(                   0x50000, 0x40000 )
 	// tenkai internal rom is incompatible with the code of this set
-	ROM_LOAD( "ougonpaib_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ougonhaib_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "tydg002.u8",  0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // = lzc-01.u6 [1/2]
@@ -7220,9 +7327,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hjingi )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "h10b.4a", 0x00000, 0x20000, CRC(e1152b17) SHA1(ced822eafa96c89dda82fd8ea002e86c2eb4438a) )
-	ROM_RELOAD(          0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "h02.21", 0x00000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
@@ -7240,9 +7346,8 @@ ROM_END
 
 // dump of the program roms only?
 ROM_START( hjingia )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "h10b.4a", 0x00000, 0x20000, CRC(a77a062a) SHA1(cae76effd573c20e20172829220587a5d200eb9e) )
-	ROM_RELOAD(          0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "h02.21", 0x00000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
@@ -7337,51 +7442,52 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, janyuki,  0,        janyuki,  janyuki,  dynax_state, 0,        ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, dynax_state, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  dynax_state, 0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hjingi,   0,        hjingi,   hjingi,   dynax_state, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   dynax_state, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, dynax_state, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, dynax_state, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, janyuki,  0,        janyuki,  janyuki,  dynax_state, empty_init,    ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  dynax_state, empty_init,    ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hjingi,   0,        hjingi,   hjingi,   dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, dynax_state, empty_init,    ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
 /* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
-GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
-GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, init_mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
+GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, init_blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gekisha,  0,        gekisha,  gekisha,  dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 7jigen,   0,        nanajign, nanajign, dynax_state, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, jantouki, 0,        jantouki, jantouki, dynax_state, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, yarunara, 0,        yarunara, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjangels, 0,        mjangels, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, dynax_state, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majxtal7, 0,        neruton,  majxtal7, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanayara, 0,        yarunara, hanayara, dynax_state, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjcomv1,  0,        mjangels, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkai,   0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonpai, 0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Pai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Pai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, 0,        ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
-GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
-GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
-GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gekisha,  0,        gekisha,  gekisha,  dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Gekisha",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 7jigen,   0,        nanajign, nanajign, dynax_state, empty_init,    ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, jantouki, 0,        jantouki, jantouki, dynax_state, empty_init,    ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yarunara, 0,        yarunara, yarunara, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjangels, 0,        mjangels, yarunara, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, warahana, 0,        mjangels, warahana, dynax_state, empty_init,    ROT180, "Dynax",                    "Warai no Hana Tenshi (Japan)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, dynax_state, empty_init,    ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state, init_mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state, init_mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majxtal7, 0,        neruton,  majxtal7, dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanayara, 0,        yarunara, hanayara, dynax_state, empty_init,    ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjcomv1,  0,        mjangels, yarunara, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkai,   0,        tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai, 0,        tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon No Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib,ougonhai, tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon No Hai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, empty_init,    ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, empty_init,    ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
+GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
+GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -987,7 +987,7 @@ void tap_990_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tap_990_device::device_add_mconfig )
+MACHINE_CONFIG_START(tap_990_device::device_add_mconfig)
 	MCFG_TI990_TAPE_ADD("tape0")
 	MCFG_TI990_TAPE_ADD("tape1")
 	MCFG_TI990_TAPE_ADD("tape2")

@@ -20,8 +20,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// device type definition
+// device type definitions
 DECLARE_DEVICE_TYPE(HD6309, hd6309_device)
+DECLARE_DEVICE_TYPE(HD6309E, hd6309e_device)
 
 // ======================> hd6309_device
 
@@ -32,6 +33,9 @@ public:
 	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	// delegating constructor
+	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -42,7 +46,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual bool is_6809() override { return false; };
 
@@ -136,6 +140,15 @@ enum
 	HD6309_MD,
 	HD6309_ZERO_BYTE,
 	HD6309_ZERO_WORD
+};
+
+// ======================> hd6309e_device
+
+class hd6309e_device : public hd6309_device
+{
+public:
+	// construction/destruction
+	hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #define HD6309_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */

@@ -24,9 +24,9 @@
 	MCFG_I8243_READHANDLER(_read) \
 	MCFG_I8243_WRITEHANDLER(_write)
 #define MCFG_I8243_READHANDLER(_devcb) \
-	devcb = &i8243_device::set_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8243_device &>(*device).set_read_handler(DEVCB_##_devcb);
 #define MCFG_I8243_WRITEHANDLER(_devcb) \
-	devcb = &i8243_device::set_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8243_device &>(*device).set_write_handler(DEVCB_##_devcb);
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -40,9 +40,9 @@ public:
 	// construction/destruction
 	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_handler(device_t &device, Object &&cb) { return downcast<i8243_device &>(device).m_readhandler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_handler(device_t &device, Object &&cb) { return downcast<i8243_device &>(device).m_writehandler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_read_handler(Object &&cb) { return m_readhandler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_handler(Object &&cb) { return m_writehandler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);

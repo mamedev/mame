@@ -9,6 +9,7 @@
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "video/k051316.h"
+#include "emupal.h"
 
 class tail2nos_state : public driver_device
 {
@@ -61,4 +62,8 @@ public:
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
+	void tail2nos(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port_map(address_map &map);
 };

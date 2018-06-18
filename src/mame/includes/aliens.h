@@ -48,4 +48,8 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
+	void aliens(machine_config &config);
+	void aliens_map(address_map &map);
+	void aliens_sound_map(address_map &map);
+	void bank0000_map(address_map &map);
 };

@@ -9,6 +9,7 @@
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class firetrap_state : public driver_device
 {
@@ -92,4 +93,10 @@ public:
 	inline void get_bg_tile_info(tile_data &tileinfo, int tile_index, uint8_t *bgvideoram, int gfx_region);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(firetrap_adpcm_int);
+	void firetrapbl(machine_config &config);
+	void firetrap(machine_config &config);
+	void firetrap_base_map(address_map &map);
+	void firetrap_bootleg_map(address_map &map);
+	void firetrap_map(address_map &map);
+	void sound_map(address_map &map);
 };

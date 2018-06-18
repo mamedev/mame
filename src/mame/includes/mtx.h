@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef __MTX__
-#define __MTX__
+#ifndef MAME_INCLUDES_MTX_H
+#define MAME_INCLUDES_MTX_H
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -105,6 +105,12 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rompak_load);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(mtx);
+	void rs128(machine_config &config);
+	void mtx500(machine_config &config);
+	void mtx512(machine_config &config);
+	void mtx_io(address_map &map);
+	void mtx_mem(address_map &map);
+	void rs128_io(address_map &map);
 };
 
-#endif /* __MTX_H__ */
+#endif // MAME_INCLUDES_MTX_H

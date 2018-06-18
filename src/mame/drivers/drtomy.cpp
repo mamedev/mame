@@ -12,6 +12,7 @@ similar hardware.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -53,6 +54,8 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void drtomy(machine_config &config);
+	void drtomy_map(address_map &map);
 };
 
 
@@ -172,20 +175,21 @@ WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
 	/* unknown bit 2 -> (data & 4) */
 }
 
-static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM /* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")   /* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_SHARE("videorabg") /* Video RAM BG */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(drtomy_okibank_w) /* OKI banking */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) /* OKI 6295*/
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* Work RAM */
-ADDRESS_MAP_END
+void drtomy_state::drtomy_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom(); /* ROM */
+	map(0x100000, 0x100fff).ram().w(FUNC(drtomy_state::drtomy_vram_fg_w)).share("videorafg");   /* Video RAM FG */
+	map(0x101000, 0x101fff).ram().w(FUNC(drtomy_state::drtomy_vram_bg_w)).share("videorabg"); /* Video RAM BG */
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x440000, 0x440fff).ram().share("spriteram"); /* Sprite RAM */
+	map(0x700000, 0x700001).portr("DSW1");
+	map(0x700002, 0x700003).portr("DSW2");
+	map(0x700004, 0x700005).portr("P1");
+	map(0x700006, 0x700007).portr("P2");
+	map(0x70000c, 0x70000d).w(FUNC(drtomy_state::drtomy_okibank_w)); /* OKI banking */
+	map(0x70000f, 0x70000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)); /* OKI 6295*/
+	map(0xffc000, 0xffffff).ram(); /* Work RAM */
+}
 
 static const gfx_layout tilelayout8=
 {
@@ -209,7 +213,7 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( drtomy )
+static GFXDECODE_START( gfx_drtomy )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout8,  0x100, 16 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0x000, 16 ) /* BG */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0x200, 16 ) /* FG */
@@ -299,12 +303,12 @@ void drtomy_state::machine_reset()
 	m_oki_bank = 0;
 }
 
-static MACHINE_CONFIG_START( drtomy )
+MACHINE_CONFIG_START(drtomy_state::drtomy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(drtomy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drtomy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
 
 
 	/* video hardware */
@@ -316,15 +320,15 @@ static MACHINE_CONFIG_START( drtomy )
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drtomy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drtomy)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 26000000/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 26000000/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -355,4 +359,4 @@ ROM_START( drtomy )
 ROM_END
 
 
-GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, 0, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, empty_init, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )

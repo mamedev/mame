@@ -8,7 +8,7 @@
 #include "machine/cedar_magnet_board.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/bankdev.h"
 
@@ -36,6 +36,9 @@ public:
 
 	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
 
+	void cedar_magnet_sprite_io(address_map &map);
+	void cedar_magnet_sprite_map(address_map &map);
+	void cedar_magnet_sprite_sub_ram_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

@@ -138,6 +138,15 @@ public:
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void funkball(machine_config &config);
+	void flashbank_map(address_map &map);
+	void funkball_io(address_map &map);
+	void funkball_map(address_map &map);
+
+	uint32_t voodoo_0_pci_r(int function, int reg, uint32_t mem_mask);
+	void voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask);
+	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 void funkball_state::video_start()
@@ -149,9 +158,8 @@ uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bit
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	funkball_state* state = device->machine().driver_data<funkball_state>();
 	uint32_t val = 0;
 
 	printf("Voodoo PCI R: %x\n", reg);
@@ -162,58 +170,52 @@ static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int functi
 			val = 0x0001121a;
 			break;
 		case 0x10:
-			val = state->m_voodoo_pci_regs.base_addr;
+			val = m_voodoo_pci_regs.base_addr;
 			break;
 		case 0x40:
-			val = state->m_voodoo_pci_regs.init_enable;
+			val = m_voodoo_pci_regs.init_enable;
 			break;
 	}
 	return val;
 }
 
-static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void funkball_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	funkball_state* state = device->machine().driver_data<funkball_state>();
-
 	printf("Voodoo [%x]: %x\n", reg, data);
 
 	switch (reg)
 	{
 		case 0x04:
-			state->m_voodoo_pci_regs.command = data & 0x3;
+			m_voodoo_pci_regs.command = data & 0x3;
 			break;
 		case 0x10:
 			if (data == 0xffffffff)
-				state->m_voodoo_pci_regs.base_addr = 0xff000000;
+				m_voodoo_pci_regs.base_addr = 0xff000000;
 			else
-				state->m_voodoo_pci_regs.base_addr = data;
+				m_voodoo_pci_regs.base_addr = data;
 			break;
 		case 0x40:
-			state->m_voodoo_pci_regs.init_enable = data;
-			state->m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo_pci_regs.init_enable = data;
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 	}
 }
 
-static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t funkball_state::cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
-
 	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
 		case 0:     return 0x00001078;
 	}
 
-	return state->m_cx5510_regs[reg/4];
+	return m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void funkball_state::cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
-
 	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
+	COMBINE_DATA(&m_cx5510_regs[reg/4]);
 }
 
 READ8_MEMBER( funkball_state::serial_r )
@@ -324,52 +326,55 @@ READ8_MEMBER( funkball_state::in_r )
 	return m_inputs[offset]->read();
 }
 
-static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000bffff) AM_DEVICE("flashbank", address_map_bank_device, amap32)
-	AM_RANGE(0x000c0000, 0x000cffff) AM_RAM
-	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM
-	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1")
-	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_ext2")
-	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_ext3")
-	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4")
-	AM_RANGE(0x000f0000, 0x000f3fff) AM_ROMBANK("bios_bank1")
-	AM_RANGE(0x000f4000, 0x000f7fff) AM_ROMBANK("bios_bank2")
-	AM_RANGE(0x000f8000, 0x000fbfff) AM_ROMBANK("bios_bank3")
-	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8(bios_ram_w,0xffffffff)
-	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
+void funkball_state::funkball_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000affff).ram();
+	map(0x000b0000, 0x000bffff).m(m_flashbank, FUNC(address_map_bank_device::amap32));
+	map(0x000c0000, 0x000cffff).ram();
+	map(0x000d0000, 0x000dffff).ram();
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1");
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2");
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3");
+	map(0x000ec000, 0x000effff).bankr("bios_ext4");
+	map(0x000f0000, 0x000f3fff).bankr("bios_bank1");
+	map(0x000f4000, 0x000f7fff).bankr("bios_bank2");
+	map(0x000f8000, 0x000fbfff).bankr("bios_bank3");
+	map(0x000fc000, 0x000fffff).bankr("bios_bank4");
+	map(0x000e0000, 0x000fffff).w(FUNC(funkball_state::bios_ram_w));
+	map(0x00100000, 0x07ffffff).ram();
 //  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
-	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_SHARE("unk_ram")
-	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+	map(0x40008000, 0x400080ff).rw(FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
+	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
+	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 32, funkball_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE16("u29", intel_28f320j5_device, read, write, 0xffffffff ) // needed to boot
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE16("u30", intel_28f320j5_device, read, write, 0xffffffff ) // i assume it maps directly after
+void funkball_state::flashbank_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rw("u29", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // needed to boot
+	map(0x00400000, 0x007fffff).rw("u30", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // i assume it maps directly after
 //  AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE16("u3", intel_28f320j5_device, read, write, 0xffffffff ) // sound program, don't think it matters where we map it, might not even be visible in this space
 	/* it checks for 64MBit chips at 0x80000000 the way things are set up, they must return an intel Flash ID of 0x15 */
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+void funkball_state::funkball_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0022, 0x0023).rw(FUNC(funkball_state::io20_r), FUNC(funkball_state::io20_w));
+	map(0x00e8, 0x00ef).noprw();
 
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(serial_r,serial_w,0xffffffff)
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
+	map(0x03f8, 0x03ff).rw(FUNC(funkball_state::serial_r), FUNC(funkball_state::serial_w));
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-	AM_RANGE(0x0360, 0x0363) AM_WRITE(flash_w)
+	map(0x0360, 0x0363).w(FUNC(funkball_state::flash_w));
 
 //  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-	AM_RANGE(0x0360, 0x036f) AM_READ8(in_r,0xffffffff) // inputs
-ADDRESS_MAP_END
+	map(0x0360, 0x036f).r(FUNC(funkball_state::in_r)); // inputs
+}
 
 static INPUT_PORTS_START( funkball )
 	PORT_START("IN.0")
@@ -764,20 +769,20 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
-static MACHINE_CONFIG_START( funkball )
-	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
-	MCFG_CPU_PROGRAM_MAP(funkball_map)
-	MCFG_CPU_IO_MAP(funkball_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+MACHINE_CONFIG_START(funkball_state::funkball)
+	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
+	MCFG_DEVICE_PROGRAM_MAP(funkball_map)
+	MCFG_DEVICE_IO_MAP(funkball_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
@@ -822,4 +827,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, funkball_state, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

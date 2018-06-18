@@ -204,13 +204,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
 2008-08
 Dip locations verified with US conversion kit manual.
 
+TODO:
+    Blend function aren't fully emulated.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/dassault.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/mb8421.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
@@ -219,6 +221,11 @@ Dip locations verified with US conversion kit manual.
 
 
 /**********************************************************************************/
+
+WRITE16_MEMBER(dassault_state::priority_w)
+{
+	COMBINE_DATA(&m_priority);
+}
 
 WRITE16_MEMBER(dassault_state::main_irq_ack_w)
 {
@@ -267,62 +274,65 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void dassault_state::dassault_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
+	map(0x100000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x140006, 0x140007) AM_WRITENOP /* ? */
+	map(0x140004, 0x140005).w(FUNC(dassault_state::main_irq_ack_w));
+	map(0x140006, 0x140007).nopw(); /* ? */
 
-	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
-	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
-	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
+	map(0x1c0000, 0x1c000f).r(FUNC(dassault_state::dassault_control_r));
+	map(0x1c000a, 0x1c000b).w(FUNC(dassault_state::priority_w));
+	map(0x1c000c, 0x1c000d).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
+	map(0x1c000e, 0x1c000f).w(FUNC(dassault_state::dassault_control_w));
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
+	map(0x200000, 0x201fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x212000, 0x212fff).writeonly().share("pf2_rowscroll");
+	map(0x220000, 0x22000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
 
-	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_SHARE("pf4_rowscroll")
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
+	map(0x240000, 0x240fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x242000, 0x242fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x252000, 0x252fff).writeonly().share("pf4_rowscroll");
+	map(0x260000, 0x26000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram") /* Main ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
-	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, left_r, left_w)
-ADDRESS_MAP_END
+	map(0x3f8000, 0x3fbfff).ram(); /* Main ram */
+	map(0x3fc000, 0x3fcfff).ram().share("spriteram2"); /* Spriteram (2nd) */
+	map(0x3fe000, 0x3fefff).rw("sharedram", FUNC(mb8421_mb8431_16_device::left_r), FUNC(mb8421_mb8431_16_device::left_w));
+}
 
-static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void dassault_state::dassault_sub_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(sub_irq_ack_w)
-	AM_RANGE(0x100004, 0x100007) AM_WRITENOP /* ? */
-	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
+	map(0x100000, 0x100001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write));
+	map(0x100002, 0x100003).w(FUNC(dassault_state::sub_irq_ack_w));
+	map(0x100004, 0x100007).nopw(); /* ? */
+	map(0x100004, 0x100005).r(FUNC(dassault_state::dassault_sub_control_r));
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
-	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, right_r, right_w)
-ADDRESS_MAP_END
+	map(0x3f8000, 0x3fbfff).ram(); /* Sub cpu ram */
+	map(0x3fc000, 0x3fcfff).ram().share("spriteram1"); /* Sprite ram */
+	map(0x3fe000, 0x3fefff).rw("sharedram", FUNC(mb8421_mb8431_16_device::right_r), FUNC(mb8421_mb8431_16_device::right_w));
+}
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dassault_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void dassault_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
+}
 
 /**********************************************************************************/
 
@@ -469,8 +479,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
@@ -480,14 +490,12 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
-static GFXDECODE_START( dassault )
+static GFXDECODE_START( gfx_dassault )
 	/* "gfx1" is copied to "gfx2" at runtime */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )    /* Tiles 16x16 */
@@ -511,19 +519,24 @@ DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 	return ((bank >> 4) & 0xf) << 12;
 }
 
-static MACHINE_CONFIG_START( dassault )
+void dassault_state::machine_reset()
+{
+	m_priority = 0;
+}
+
+MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/8)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
@@ -534,25 +547,20 @@ static MACHINE_CONFIG_START( dassault )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
-
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0)
@@ -568,7 +576,8 @@ static MACHINE_CONFIG_START( dassault )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0)
@@ -592,26 +601,27 @@ static MACHINE_CONFIG_START( dassault )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9)
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dassault_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dassault_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH) // verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) // verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1029,22 +1039,7 @@ ROM_END
 /**********************************************************************************/
 
 
-DRIVER_INIT_MEMBER(dassault_state,dassault)
-{
-	const uint8_t *src = memregion("gfx1")->base();
-	uint8_t *dst = memregion("gfx2")->base();
-	std::vector<uint8_t> tmp(0x80000);
-
-	/* Playfield 4 also has access to the char graphics, make things easier
-	by just copying the chars to both banks (if I just used a different gfx
-	bank then the colours would be wrong). */
-	memcpy(&tmp[0x000000], dst + 0x80000, 0x80000);
-	memcpy(dst + 0x090000, &tmp[0x00000], 0x80000);
-	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
-	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
-}
-
-DRIVER_INIT_MEMBER(dassault_state,thndzone)
+void dassault_state::init_dassault()
 {
 	const uint8_t *src = memregion("gfx1")->base();
 	uint8_t *dst = memregion("gfx2")->base();
@@ -1061,9 +1056,9 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 
 /**********************************************************************************/
 
-GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzonea, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzone4, thndzone, dassault, thndzone4, dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (World, Rev 1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzonea, thndzone, dassault, thndzone,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzone4, thndzone, dassault, thndzone4, dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (World 4 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Desert Assault (US)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, init_dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

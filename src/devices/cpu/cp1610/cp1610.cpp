@@ -2122,7 +2122,7 @@ void cp1610_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_r[7]);
+		debugger_instruction_hook(m_r[7]);
 
 		m_mask_interrupts = 0;
 
@@ -3363,13 +3363,13 @@ void cp1610_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_r[7]).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void cp1610_cpu_device::device_reset()
 {
 	/* This is how we set the reset vector */
-	set_input_line(CP1610_RESET, PULSE_LINE);
+	pulse_input_line(CP1610_RESET, attotime::zero);
 }
 
 void cp1610_cpu_device::execute_set_input(int irqline, int state)
@@ -3422,7 +3422,7 @@ void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-util::disasm_interface *cp1610_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cp1610_cpu_device::create_disassembler()
 {
-	return new cp1610_disassembler;
+	return std::make_unique<cp1610_disassembler>();
 }

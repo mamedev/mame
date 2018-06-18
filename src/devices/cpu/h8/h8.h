@@ -87,7 +87,7 @@ protected:
 		EXR_I  = 0x07
 	};
 
-	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_delegate map_delegate);
+	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -97,6 +97,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override;
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -108,11 +109,11 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;
-	direct_read_data<0> *direct;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *cache;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
 	h8_dma_state *current_dma;

@@ -31,6 +31,12 @@ public:
 	DECLARE_PALETTE_INIT(astrowar);
 	uint32_t screen_update_galaxia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_astrowar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galaxia_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void init_common();
+	void astrowar(machine_config &config);
+	void galaxia(machine_config &config);
+	void astrowar_mem_map(address_map &map);
+	void galaxia_data_map(address_map &map);
+	void galaxia_io_map(address_map &map);
+	void galaxia_mem_map(address_map &map);
 };

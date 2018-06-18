@@ -9,6 +9,7 @@
 #include "video/bufsprite.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
+#include "emupal.h"
 
 class hcastle_state : public driver_device
 {
@@ -71,4 +72,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void hcastle(machine_config &config);
+	void hcastle_map(address_map &map);
+	void sound_map(address_map &map);
 };

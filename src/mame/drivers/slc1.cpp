@@ -63,17 +63,28 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_display(*this, "digit%u", 0U)
 	{ }
 
+	void slc1(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
-private:
-	uint8_t m_digit;
-	bool m_kbd_type;
-	virtual void machine_reset() override;
+
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+
+private:
+	uint8_t m_digit = 0;
+	bool m_kbd_type = false;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	output_finder<8> m_display;
 };
 
 
@@ -87,37 +98,35 @@ private:
 
 WRITE8_MEMBER( slc1_state::io_w )
 {
-	bool segonoff = BIT(data, 7);
-	bool busyled = BIT(data, 4);
+	bool const segonoff = BIT(data, 7);
+	bool const busyled = BIT(data, 4);
 	data &= 15;
 
 	if (data < 8)
 		m_digit = data;
-	else
-	if (data < 12)
+	else if (data < 12)
 	{
 		m_speaker->level_w(BIT(data, 1));
 		return;
 	}
-	else
-	if (offset == 0x2f07)
+	else if (offset == 0x2f07)
 		return;
 
-	uint8_t segdata = output().get_digit_value(m_digit);
-	uint8_t segnum  = offset & 7;
-	uint8_t segmask = 1 << segnum;
+	uint8_t segdata = m_display[m_digit];
+	uint8_t const segnum  = offset & 7;
+	uint8_t const segmask = 1 << segnum;
 
 	if (segonoff)
 		segdata |= segmask;
 	else
 		segdata &= ~segmask;
 
-	output().set_digit_value(m_digit, segdata);
+	m_display[m_digit] = segdata;
 
 	output().set_value("busyled", busyled);
 
 	if (m_digit == 3)
-		m_kbd_type = (segdata);
+		m_kbd_type = segdata;
 }
 
 
@@ -167,6 +176,10 @@ READ8_MEMBER( slc1_state::io_r )
 
 void slc1_state::machine_start()
 {
+	m_display.resolve();
+
+	save_item(NAME(m_digit));
+	save_item(NAME(m_kbd_type));
 }
 
 void slc1_state::machine_reset()
@@ -181,17 +194,19 @@ void slc1_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, slc1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x4fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0xc00)
-ADDRESS_MAP_END
+void slc1_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x4fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).ram().mirror(0xc00);
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, slc1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r,io_w)
-ADDRESS_MAP_END
+void slc1_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+}
 
 
 /**************************************************************************
@@ -253,18 +268,18 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( slc1 )
+MACHINE_CONFIG_START(slc1_state::slc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_slc1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -278,11 +293,11 @@ MACHINE_CONFIG_END
 ROM_START(slc1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "bios0", "SLC-1")
-	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(1) )
+	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "bios1", "SC-1 v2")
-	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(2) )
+	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(1))
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  STATE          INIT  COMPANY                   FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1,  slc1_state,    0,    "Dr. Dieter Scheuschner", "SLC-1" , 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME */
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "SLC-1" , 0 )

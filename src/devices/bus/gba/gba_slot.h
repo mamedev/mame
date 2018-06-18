@@ -98,8 +98,6 @@ public:
 	int get_type() { return m_type; }
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
-	void internal_header_logging(uint8_t *ROM, uint32_t len);
-
 	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 	uint32_t get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 

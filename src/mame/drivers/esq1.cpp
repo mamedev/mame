@@ -57,6 +57,7 @@ TODO:
     - Keyboard
     - Analog filters and VCA on the back end of the 5503
     - SQ-80 support (additional banking, FDC)
+      SQ-80 is totally broken now, jumping into unmapped memory
 
 NOTES:
     Commands from KPC are all 2 bytes
@@ -424,6 +425,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(uint8_t data);
+	void esq1(machine_config &config);
+	void sq80(machine_config &config);
+	void esq1_map(address_map &map);
+	void sq80_map(address_map &map);
 };
 
 
@@ -498,28 +503,30 @@ WRITE8_MEMBER(esq1_state::seqdosram_w)
 	}
 }
 
-static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
-ADDRESS_MAP_END
+void esq1_state::esq1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();                 // OSRAM
+	map(0x4000, 0x5fff).ram();                 // SEQRAM
+	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
+	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
+	map(0x7000, 0x7fff).bankr("osbank");
+	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
+}
 
-static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
+void esq1_state::sq80_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();                 // OSRAM
+	map(0x4000, 0x5fff).ram();                 // SEQRAM
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
-	AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
-	AM_RANGE(0x6e00, 0x6fff) AM_READWRITE(wd1772_r, wd1772_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
-ADDRESS_MAP_END
+	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
+	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
+	map(0x6c00, 0x6dff).w(FUNC(esq1_state::mapper_w));
+	map(0x6e00, 0x6fff).rw(FUNC(esq1_state::wd1772_r), FUNC(esq1_state::wd1772_w));
+	map(0x7000, 0x7fff).bankr("osbank");
+	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
+}
 
 // from the schematics:
 //
@@ -540,7 +547,7 @@ WRITE8_MEMBER(esq1_state::duart_output)
 {
 	int bank = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-//  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, m_maincpu->safe_pc());
+//  printf("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
 
 	m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;
@@ -578,51 +585,53 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-static MACHINE_CONFIG_START( esq1 )
-	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
-	MCFG_CPU_PROGRAM_MAP(esq1_map)
+MACHINE_CONFIG_START(esq1_state::esq1)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000)) // XTAL not directly attached to CPU
+	MCFG_DEVICE_PROGRAM_MAP(esq1_map)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_8MHz / 2)
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL_8MHz / 16, XTAL_8MHz / 16, XTAL_8MHz / 8, XTAL_8MHz / 8)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(8'000'000) / 2)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(8'000'000) / 16, XTAL(8'000'000) / 16, XTAL(8'000'000) / 8, XTAL(8'000'000) / 8)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, esq1_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, esq1_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, esq1_state, duart_output))
 
 	MCFG_ESQPANEL2X40_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", scn2681_device, rx_b_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("filters", ESQ1_FILTERS, 0)
+	MCFG_DEVICE_ADD("filters", ESQ1_FILTERS, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ES5503_ADD("es5503", XTAL_8MHz)
+	MCFG_ES5503_ADD("es5503", XTAL(8'000'000))
 	MCFG_ES5503_OUTPUT_CHANNELS(8)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(esq1_state, esq1_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(esq1_state, esq1_adc_read))
+	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, esq1_state, esq1_doc_irq))
+	MCFG_ES5503_ADC_FUNC(READ8(*this, esq1_state, esq1_adc_read))
 
-	MCFG_SOUND_ROUTE_EX(0, "filters", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "filters", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "filters", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "filters", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "filters", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "filters", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "filters", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "filters", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "filters", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "filters", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "filters", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "filters", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "filters", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "filters", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "filters", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "filters", 1.0, 7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq80, esq1)
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sq80_map)
+MACHINE_CONFIG_START(esq1_state::sq80)
+	esq1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sq80_map)
 
-	MCFG_WD1772_ADD(WD1772_TAG, 4000000)
+	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 4000000)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( esq1 )
@@ -690,6 +699,6 @@ ROM_START( esqm )
 ROM_END
 
 
-CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-1 Digital Wave Synthesizer", MACHINE_NOT_WORKING )
-CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-M Digital Wave Synthesizer Module", MACHINE_NOT_WORKING )
-CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, 0, "Ensoniq", "SQ-80 Cross Wave Synthesizer", MACHINE_NOT_WORKING )
+CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, empty_init, "Ensoniq", "ESQ-1 Digital Wave Synthesizer", MACHINE_NOT_WORKING )
+CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, empty_init, "Ensoniq", "ESQ-M Digital Wave Synthesizer Module", MACHINE_NOT_WORKING )
+CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, empty_init, "Ensoniq", "SQ-80 Cross Wave Synthesizer", MACHINE_NOT_WORKING )

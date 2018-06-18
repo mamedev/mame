@@ -655,7 +655,7 @@ void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 
 /* panel with 1x22 VFD display used in the EPS-16 and EPS-16 Plus */
 
-MACHINE_CONFIG_MEMBER(esqpanel1x22_device::device_add_mconfig)
+MACHINE_CONFIG_START(esqpanel1x22_device::device_add_mconfig)
 	MCFG_ESQ1X22_ADD("vfd")
 MACHINE_CONFIG_END
 
@@ -669,7 +669,7 @@ esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const ch
 
 /* panel with 2x40 VFD display used in the ESQ-1, SQ-80 */
 
-MACHINE_CONFIG_MEMBER(esqpanel2x40_device::device_add_mconfig)
+MACHINE_CONFIG_START(esqpanel2x40_device::device_add_mconfig)
 	MCFG_ESQ2X40_ADD("vfd")
 MACHINE_CONFIG_END
 
@@ -683,7 +683,7 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 
 /* panel with 2x40 VFD display used in the VFX, VFX-SD, SD-1 series */
 
-MACHINE_CONFIG_MEMBER(esqpanel2x40_vfx_device::device_add_mconfig)
+MACHINE_CONFIG_START(esqpanel2x40_vfx_device::device_add_mconfig)
 	MCFG_ESQ2X40_ADD("vfd")
 MACHINE_CONFIG_END
 
@@ -708,7 +708,7 @@ bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
 
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
-MACHINE_CONFIG_MEMBER(esqpanel2x16_sq1_device::device_add_mconfig)
+MACHINE_CONFIG_START(esqpanel2x16_sq1_device::device_add_mconfig)
 	MCFG_ESQ2X16_SQ1_ADD("vfd")
 MACHINE_CONFIG_END
 

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+
+#include "emupal.h"
+
 class marineb_state : public driver_device
 {
 public:
@@ -31,8 +34,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t     m_irq_mask;
+	bool     m_irq_mask;
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(marineb_videoram_w);
 	DECLARE_WRITE8_MEMBER(marineb_colorram_w);
 	DECLARE_WRITE8_MEMBER(marineb_column_scroll_w);
@@ -50,7 +54,17 @@ public:
 	uint32_t screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hoccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hopprobo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(marineb_vblank_irq);
-	INTERRUPT_GEN_MEMBER(wanted_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(marineb_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(wanted_vblank_irq);
 	void set_tilemap_scrolly( int cols );
+	void springer(machine_config &config);
+	void wanted(machine_config &config);
+	void hopprobo(machine_config &config);
+	void marineb(machine_config &config);
+	void bcruzm12(machine_config &config);
+	void hoccer(machine_config &config);
+	void changes(machine_config &config);
+	void marineb_io_map(address_map &map);
+	void marineb_map(address_map &map);
+	void wanted_io_map(address_map &map);
 };

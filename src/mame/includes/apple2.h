@@ -28,6 +28,9 @@
 #include "bus/a2bus/a2eauxslot.h"
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
+#include "screen.h"
+
 
 #define AUXSLOT_TAG "auxbus"
 
@@ -133,6 +136,7 @@ public:
 	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, "ay3600"),
 		m_a2bus(*this, "a2bus"),
@@ -155,6 +159,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
@@ -369,7 +374,7 @@ public:
 	void apple2_iwm_setdiskreg(uint8_t data);
 	void apple2_init_common();
 	void apple2eplus_init_common(void *apple2cp_ce00_ram);
-	int8_t apple2_slotram_r(address_space &space, int slotnum, int offset);
+	int8_t apple2_slotram_r(int slotnum, int offset);
 	int a2_no_ctrl_reset();
 
 private:

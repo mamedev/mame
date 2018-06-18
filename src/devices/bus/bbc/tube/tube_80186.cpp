@@ -25,17 +25,19 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_80186, bbc_tube_80186_device, "bbc_tube_80186", "Aco
 //  ADDRESS_MAP( tube_80186_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_80186_mem, AS_PROGRAM, 16, bbc_tube_80186_device)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void bbc_tube_80186_device::tube_80186_mem(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_80186_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_80186_io, AS_IO, 16, bbc_tube_80186_device)
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE8("ula", tube_device, parasite_r, parasite_w, 0x00ff)
-ADDRESS_MAP_END
+void bbc_tube_80186_device::tube_80186_io(address_map &map)
+{
+	map(0x80, 0x8f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask16(0x00ff);
+}
 
 //-------------------------------------------------
 //  ROM( tube_80186 )
@@ -43,25 +45,25 @@ ADDRESS_MAP_END
 
 ROM_START( tube_80186 )
 	ROM_REGION(0x4000, "bootstrap", 0)
-	ROM_LOAD16_BYTE("M512_LO_IC31.rom", 0x0000, 0x2000, CRC(c0df8707) SHA1(7f6d843d5aea6bdb36cbd4623ae942b16b96069d)) // 2201,287-02
-	ROM_LOAD16_BYTE("M512_HI_IC32.rom", 0x0001, 0x2000, CRC(e47f10b2) SHA1(45dc8d7e7936afbec6de423569d9005a1c350316)) // 2201,288-02
+	ROM_LOAD16_BYTE("m512_lo_ic31.rom", 0x0000, 0x2000, CRC(c0df8707) SHA1(7f6d843d5aea6bdb36cbd4623ae942b16b96069d)) // 2201,287-02
+	ROM_LOAD16_BYTE("m512_hi_ic32.rom", 0x0001, 0x2000, CRC(e47f10b2) SHA1(45dc8d7e7936afbec6de423569d9005a1c350316)) // 2201,288-02
 ROM_END
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(bbc_tube_80186_device::device_add_mconfig )
-	MCFG_CPU_ADD("i80186", I80186, XTAL_20MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(tube_80186_mem)
-	MCFG_CPU_IO_MAP(tube_80186_io)
-	//MCFG_80186_CHIP_SELECT_CB(WRITE16(bbc_tube_80186_device, chip_select_cb))
+MACHINE_CONFIG_START(bbc_tube_80186_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("i80186", I80186, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tube_80186_mem)
+	MCFG_DEVICE_IO_MAP(tube_80186_io)
+	//MCFG_80186_CHIP_SELECT_CB(WRITE16(*this, bbc_tube_80186_device, chip_select_cb))
 	MCFG_80186_TMROUT0_HANDLER(INPUTLINE("i80186", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT
 	MCFG_80186_TMROUT1_HANDLER(INPUTLINE("i80186", INPUT_LINE_NMI)) MCFG_DEVCB_INVERT
 
 	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_PIRQ_HANDLER(DEVWRITELINE("i80186", i80186_cpu_device, int0_w))
-	MCFG_TUBE_DRQ_HANDLER(DEVWRITELINE("i80186", i80186_cpu_device, drq0_w))
+	MCFG_TUBE_PIRQ_HANDLER(WRITELINE("i80186", i80186_cpu_device, int0_w))
+	MCFG_TUBE_DRQ_HANDLER(WRITELINE("i80186", i80186_cpu_device, drq0_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

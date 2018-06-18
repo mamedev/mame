@@ -5,6 +5,12 @@
     Atari Cloak & Dagger hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CLOAK_H
+#define MAME_INCLUDES_CLOAK_H
+
+#pragma once
+
+#include "emupal.h"
 #include "screen.h"
 
 class cloak_state : public driver_device
@@ -18,22 +24,12 @@ public:
 		m_slave(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	int m_nvram_enabled;
-	uint8_t m_bitmap_videoram_selected;
-	uint8_t m_bitmap_videoram_address_x;
-	uint8_t m_bitmap_videoram_address_y;
-	std::unique_ptr<uint8_t[]> m_bitmap_videoram1;
-	std::unique_ptr<uint8_t[]> m_bitmap_videoram2;
-	uint8_t *m_current_bitmap_videoram_accessed;
-	uint8_t *m_current_bitmap_videoram_displayed;
-	std::unique_ptr<uint16_t[]>  m_palette_ram;
-	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE_LINE_MEMBER(start_led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(start_led_2_w);
+	void cloak(machine_config &config);
+
+protected:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_l_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_r_w);
 	DECLARE_WRITE8_MEMBER(cloak_custom_w);
@@ -54,9 +50,28 @@ public:
 	void set_pen(int i);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	int m_nvram_enabled;
+	uint8_t m_bitmap_videoram_selected;
+	uint8_t m_bitmap_videoram_address_x;
+	uint8_t m_bitmap_videoram_address_y;
+	std::unique_ptr<uint8_t[]> m_bitmap_videoram1;
+	std::unique_ptr<uint8_t[]> m_bitmap_videoram2;
+	uint8_t *m_current_bitmap_videoram_accessed;
+	uint8_t *m_current_bitmap_videoram_displayed;
+	std::unique_ptr<uint16_t[]>  m_palette_ram;
+	tilemap_t *m_bg_tilemap;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
+
+#endif // MAME_INCLUDES_CLOAK_H

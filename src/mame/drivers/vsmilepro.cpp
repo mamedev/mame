@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    Skeleton driver for V-Tech VSmile Pro CD System
+    Skeleton driver for VTech V.Smile Pro CD System
 
     30/05/2016
 
@@ -34,23 +34,26 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void vsmilpro(machine_config &config);
+	void vsmilpro_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(vsmilpro_map, AS_PROGRAM, 32, vsmilpro_state)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-ADDRESS_MAP_END
+void vsmilpro_state::vsmilpro_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+}
 
 
 /* Input ports */
 static INPUT_PORTS_START( vsmilpro )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vsmilpro )
+MACHINE_CONFIG_START(vsmilpro_state::vsmilpro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 150000000)
-	MCFG_CPU_PROGRAM_MAP(vsmilpro_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 150000000)
+	MCFG_DEVICE_PROGRAM_MAP(vsmilpro_map)
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("vsmile_vdisk")
@@ -66,5 +69,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, 0,    "V-Tech", "V-Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

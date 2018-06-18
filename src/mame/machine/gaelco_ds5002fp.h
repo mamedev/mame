@@ -18,6 +18,8 @@ public:
 	DECLARE_READ8_MEMBER(hostmem_r);
 	DECLARE_WRITE8_MEMBER(hostmem_w);
 
+	void dallas_ram(address_map &map);
+	void dallas_rom(address_map &map);
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;

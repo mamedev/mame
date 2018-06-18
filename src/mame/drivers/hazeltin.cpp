@@ -29,11 +29,13 @@ References:
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
+#include "machine/input_merger.h"
 #include "machine/kb3600.h"
 #include "machine/netlist.h"
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -58,8 +60,8 @@ References:
 #define VBLANK_OUT_TAG  "videobrd:vblank"
 #define TVINTERQ_OUT_TAG "videobrd:tvinterq"
 
-#define VIDEO_CLOCK     (XTAL_33_264MHz/2)
-#define VIDEOBRD_CLOCK  (XTAL_33_264MHz*30)
+#define VIDEO_CLOCK     (XTAL(33'264'000)/2)
+#define VIDEOBRD_CLOCK  (XTAL(33'264'000)*30)
 
 #define SR2_FULL_DUPLEX (0x01)
 #define SR2_UPPER_ONLY  (0x08)
@@ -121,6 +123,7 @@ public:
 		, m_misc_dips(*this, MISCPORT_TAG)
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
 		, m_screen(*this, SCREEN_TAG)
+		, m_mainint(*this, "mainint")
 		, m_iowq_timer(nullptr)
 		, m_status_reg_3(0)
 		, m_kbd_status_latch(0)
@@ -140,8 +143,6 @@ public:
 	static const device_timer_id TIMER_IOWQ = 0;
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -165,6 +166,9 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
+	void hazl1500(machine_config &config);
+	void hazl1500_io(address_map &map);
+	void hazl1500_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
@@ -206,6 +210,8 @@ private:
 
 	required_device<screen_device> m_screen;
 
+	required_device<input_merger_device> m_mainint;
+
 	emu_timer* m_iowq_timer;
 
 	uint8_t m_status_reg_3;
@@ -228,6 +234,8 @@ void hazl1500_state::machine_start()
 	m_iowq_timer = timer_alloc(TIMER_IOWQ);
 	m_iowq_timer->adjust(attotime::never);
 
+	m_uart->write_swe(0);
+
 	save_item(NAME(m_status_reg_3));
 	save_item(NAME(m_kbd_status_latch));
 	save_item(NAME(m_refresh_address));
@@ -247,12 +255,6 @@ void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	m_cpu_iowq->write(1);
 	m_cpu_ba4->write(1);
-}
-
-WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
-{
-	m_uart->rx_process();
-	m_uart->tx_process();
 }
 
 uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -337,16 +339,17 @@ READ8_MEMBER( hazl1500_state::status_reg_2_r )
 WRITE8_MEMBER( hazl1500_state::status_reg_3_w )
 {
 	m_status_reg_3 = data;
+	m_uart->write_rdav(BIT(data, 2));
 }
 
 READ8_MEMBER( hazl1500_state::uart_r )
 {
-	return m_uart->get_received_data();
+	return (m_uart->get_received_data() & 0x7f) | (m_uart->pe_r() << 7);
 }
 
 WRITE8_MEMBER( hazl1500_state::uart_w )
 {
-	m_uart->set_transmit_data(data);
+	m_uart->set_transmit_data((data & 0x7f) | (BIT(m_misc_dips->read(), 3) ? 0x00 : 0x80));
 }
 
 READ8_MEMBER( hazl1500_state::kbd_status_latch_r )
@@ -407,12 +410,12 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 	if (int(data) > 1)
 	{
 		m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_mainint->in_w<1>(0);
 	}
 	else
 	{
 		m_kbd_status_latch |= KBD_STATUS_TV_INT;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_mainint->in_w<1>(1);
 	}
 }
 
@@ -459,7 +462,7 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 {
 	synchronize();
 	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
-	m_iowq_timer->adjust(attotime::from_hz(XTAL_18MHz/9));
+	m_iowq_timer->adjust(attotime::from_hz(XTAL(18'000'000)/9));
 	m_cpu_iowq->write(0);
 	m_cpu_ba4->write(0);
 	m_cpu_db0->write((data >> 0) & 1);
@@ -472,21 +475,23 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 	m_cpu_db7->write((data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START(hazl1500_mem, AS_PROGRAM, 8, hazl1500_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x3000, 0x377f) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x3780, 0x37ff) AM_RAM
-ADDRESS_MAP_END
+void hazl1500_state::hazl1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x3000, 0x377f).rw(FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
+	map(0x3780, 0x37ff).ram();
+}
 
-static ADDRESS_MAP_START(hazl1500_io, AS_IO, 8, hazl1500_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_READWRITE(status_reg_2_r, status_reg_3_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0xdf, 0xdf) AM_READ(kbd_encoder_r)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(system_test_r, refresh_address_w)
-	AM_RANGE(0xf7, 0xf7) AM_READ(kbd_status_latch_r)
-ADDRESS_MAP_END
+void hazl1500_state::hazl1500_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).rw(FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
+	map(0xbf, 0xbf).rw(FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
+	map(0xdf, 0xdf).r(FUNC(hazl1500_state::kbd_encoder_r));
+	map(0xef, 0xef).rw(FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
+	map(0xf7, 0xf7).r(FUNC(hazl1500_state::kbd_status_latch_r));
+}
 
 	/*
 	  Hazeltine 1500 key matrix (from ref[1])
@@ -682,34 +687,39 @@ static const gfx_layout hazl1500_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( hazl1500 )
+static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( hazl1500 )
+MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
-	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
-	MCFG_CPU_IO_MAP(hazl1500_io)
+	MCFG_DEVICE_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
+	MCFG_DEVICE_PROGRAM_MAP(hazl1500_mem)
+	MCFG_DEVICE_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
 	//    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
 	//    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
-	MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
 		SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
-	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(hazl1500_state, com5016_fr_w))
+	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay51013_device, write_tcp))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", ay51013_device, write_rcp))
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
+	MCFG_AY51013_WRITE_DAV_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
@@ -760,9 +770,9 @@ static MACHINE_CONFIG_START( hazl1500 )
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(hazl1500_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(hazl1500_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(hazl1500_state, ay3600_data_ready_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, hazl1500_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, hazl1500_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, hazl1500_state, ay3600_data_ready_w))
 MACHINE_CONFIG_END
 
 
@@ -770,7 +780,7 @@ ROM_START( hazl1500 )
 	ROM_REGION( 0x10000, NETLIST_TAG, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x10000, CPU_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "h15s-00I-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
+	ROM_LOAD( "h15s-00i-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
 
 	ROM_REGION( 0x800, CHAR_EPROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u83_chr.bin", 0x0000, 0x0800, CRC(e0c6b734) SHA1(7c42947235c66c41059fd4384e09f4f3a17c9857))
@@ -784,5 +794,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME          FLAGS
+COMP( 1977, hazl1500, 0,      0,      hazl1500, hazl1500, hazl1500_state, empty_init, "Hazeltine Corporation", "Hazeltine 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

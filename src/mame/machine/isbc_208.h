@@ -14,12 +14,12 @@ class isbc_208_device : public device_t
 public:
 	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 	DECLARE_READ8_MEMBER(stat_r);
 	DECLARE_WRITE8_MEMBER(aux_w);
 
-	template <class Object> static devcb_base &static_set_irq_callback(device_t &device, Object &&cb) { return downcast<isbc_208_device &>(device).m_out_irq_func.set_callback(std::forward<Object>(cb)); }
-	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_208_device &>(device).m_maincpu_tag = maincpu_tag; }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	void set_maincpu_tag(const char *maincpu_tag) { m_maincpu_tag = maincpu_tag; }
 
 protected:
 	virtual void device_start() override;
@@ -44,10 +44,10 @@ private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 #define MCFG_ISBC_208_MAINCPU(_maincpu_tag) \
-	isbc_208_device::static_set_maincpu_tag(*device, _maincpu_tag);
+	downcast<isbc_208_device &>(*device).set_maincpu_tag(_maincpu_tag);
 
 #define MCFG_ISBC_208_IRQ(_irq_line) \
-	devcb = &isbc_208_device::static_set_irq_callback(*device, DEVCB_##_irq_line);
+	devcb = &downcast<isbc_208_device &>(*device).set_irq_callback(DEVCB_##_irq_line);
 
 DECLARE_DEVICE_TYPE(ISBC_208, isbc_208_device)
 

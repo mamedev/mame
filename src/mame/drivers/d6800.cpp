@@ -46,6 +46,7 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,6 +82,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 
+	void d6800(machine_config &config);
+	void d6800_map(address_map &map);
 private:
 	uint8_t m_rtc;
 	bool m_cb2;
@@ -108,13 +111,14 @@ private:
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( d6800_map, AS_PROGRAM, 8, d6800_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0200, 0x0fff) AM_RAM
-	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_ROM
-ADDRESS_MAP_END
+void d6800_state::d6800_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("videoram");
+	map(0x0200, 0x0fff).ram();
+	map(0x8010, 0x8013).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc000, 0xc7ff).mirror(0x3800).rom();
+}
 
 /* Input Ports */
 
@@ -381,10 +385,10 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( d6800 )
+MACHINE_CONFIG_START(d6800_state::d6800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
-	MCFG_CPU_PROGRAM_MAP(d6800_map)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(d6800_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -398,19 +402,17 @@ static MACHINE_CONFIG_START( d6800 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(d6800_state, d6800_keyboard_r))
-	MCFG_PIA_READPB_HANDLER(READ8(d6800_state, d6800_cassette_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(d6800_state, d6800_keyboard_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(d6800_state, d6800_cassette_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(d6800_state, d6800_screen_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, d6800_state, d6800_keyboard_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, d6800_state, d6800_cassette_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, d6800_state, d6800_keyboard_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, d6800_state, d6800_cassette_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, d6800_state, d6800_screen_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
@@ -429,11 +431,11 @@ MACHINE_CONFIG_END
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "0", "Original")
-	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(1) )
-	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(1) )
+	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
+	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "1", "Dreamsoft")
-	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(2) )
+	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY          FULLNAME      FLAGS
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, d6800_state, 0,    "Michael Bauer", "Dream 6800", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
+COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", 0 )

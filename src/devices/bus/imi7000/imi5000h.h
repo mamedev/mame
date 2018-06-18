@@ -15,7 +15,7 @@
 
 #include "imi7000.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 
@@ -64,6 +64,9 @@ private:
 	DECLARE_READ8_MEMBER( pio3_pb_r );
 	DECLARE_WRITE8_MEMBER( pio3_pb_w );
 
+	void imi5000h_io(address_map &map);
+	void imi5000h_mem(address_map &map);
+
 	enum
 	{
 		LED_FAULT,
@@ -81,7 +84,6 @@ private:
 
 
 // device type definition
-extern const device_type IMI5000H;
 DECLARE_DEVICE_TYPE(IMI5000H, imi5000h_device)
 
 #endif // MAME_BUS_IMI7000_IMI5000H_H

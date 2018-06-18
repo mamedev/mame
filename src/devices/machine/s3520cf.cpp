@@ -91,7 +91,7 @@ void s3520cf_device::device_start()
 {
 	/* let's call the timer callback every second for now */
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3520cf_device::timer_callback), this));
-	m_timer->adjust(attotime::from_hz(clock() / XTAL_32_768kHz), 0, attotime::from_hz(clock() / XTAL_32_768kHz));
+	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
 	system_time systime;
 	machine().base_datetime(systime);

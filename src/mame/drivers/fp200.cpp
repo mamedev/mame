@@ -22,10 +22,11 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_6_144MHz
+static constexpr XTAL MAIN_CLOCK = 6.144_MHz_XTAL;
 
 class fp200_state : public driver_device
 {
@@ -68,6 +69,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
 	DECLARE_PALETTE_INIT(fp200);
+	void fp200(machine_config &config);
+	void fp200_io(address_map &map);
+	void fp200_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -409,18 +413,20 @@ WRITE8_MEMBER(fp200_state::fp200_io_w)
 	}
 }
 
-static ADDRESS_MAP_START( fp200_map, AS_PROGRAM, 8, fp200_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
+void fp200_state::fp200_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
 //  0xa000, 0xffff exp RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( fp200_io, AS_IO, 8, fp200_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(fp200_io_r,fp200_io_w)
-ADDRESS_MAP_END
+void fp200_state::fp200_io(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+}
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
 {
@@ -542,7 +548,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( fp200 )
+static GFXDECODE_START( gfx_fp200 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -554,7 +560,7 @@ void fp200_state::machine_start()
 
 	for(int i=0;i<0x800;i++)
 	{
-		m_chargen[i] = raw_gfx[BITSWAP16(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
+		m_chargen[i] = raw_gfx[bitswap<16>(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
 	}
 }
 
@@ -579,14 +585,14 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-static MACHINE_CONFIG_START( fp200 )
+MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(fp200_map)
-	MCFG_CPU_IO_MAP(fp200_io)
-	MCFG_I8085A_SID(READLINE(fp200_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(fp200_state, sod_w))
+	MCFG_DEVICE_ADD("maincpu",I8085A,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(fp200_map)
+	MCFG_DEVICE_IO_MAP(fp200_io)
+	MCFG_I8085A_SID(READLINE(*this, fp200_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, fp200_state, sod_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -597,14 +603,14 @@ static MACHINE_CONFIG_START( fp200 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 8*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp200)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp200)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -625,4 +631,4 @@ ROM_START( fp200 )
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
 
-COMP( 1982, fp200,  0,   0,   fp200,  fp200, fp200_state,  0,  "Casio",      "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, fp200, 0, 0, fp200, fp200, fp200_state, empty_init, "Casio", "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

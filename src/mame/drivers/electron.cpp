@@ -88,15 +88,20 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
 
-static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(electron_mem_r, electron_mem_w)           /* 32KB of RAM */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")                                    /* Banked ROM pages */
-	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("user1", 0x40000)                     /* OS ROM */
-	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE(electron_fred_r, electron_fred_w )        /* FRED */
-	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(electron_jim_r, electron_jim_w )          /* JIM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(electron_sheila_r, electron_sheila_w )    /* SHEILA */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                     /* OS ROM continued */
-ADDRESS_MAP_END
+void electron_state::electron_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(FUNC(electron_state::electron_mem_r), FUNC(electron_state::electron_mem_w));          /* 32KB of RAM */
+	map(0x8000, 0xbfff).rw(FUNC(electron_state::electron_paged_r), FUNC(electron_state::electron_paged_w));      /* Banked ROM pages */
+	map(0xc000, 0xffff).rw(FUNC(electron_state::electron_mos_r), FUNC(electron_state::electron_mos_w));          /* OS ROM */
+	map(0xfc00, 0xfcff).rw(FUNC(electron_state::electron_fred_r), FUNC(electron_state::electron_fred_w));        /* FRED */
+	map(0xfd00, 0xfdff).rw(FUNC(electron_state::electron_jim_r), FUNC(electron_state::electron_jim_w));          /* JIM */
+	map(0xfe00, 0xfeff).rw(FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
+}
+
+void electron_state::electron64_opcodes(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(electron_state::electron64_fetch_r));
+}
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
@@ -197,14 +202,23 @@ static INPUT_PORTS_START( electron )
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_state, trigger_reset, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( electron )
-	MCFG_CPU_ADD( "maincpu", M6502, XTAL_16MHz/8 )
-	MCFG_CPU_PROGRAM_MAP( electron_mem )
+static INPUT_PORTS_START( electron64 )
+	PORT_INCLUDE(electron)
+
+	PORT_START("MRB")
+	PORT_CONFNAME(0x03, 0x02, "MRB Mode")
+	PORT_CONFSETTING(0x00, "Normal")
+	PORT_CONFSETTING(0x01, "Turbo")
+	PORT_CONFSETTING(0x02, "64K")
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(electron_state::electron)
+	MCFG_DEVICE_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
+	MCFG_DEVICE_PROGRAM_MAP( electron_mem )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 50.08 )
-	MCFG_SCREEN_SIZE( 640, 312 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-1 )
+	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
+	//MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 264, 264 + 640, 312, 31, 31 + 256)
 	MCFG_SCREEN_UPDATE_DRIVER(electron_state, screen_update_electron)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
@@ -212,8 +226,8 @@ static MACHINE_CONFIG_START( electron )
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 300 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -221,7 +235,7 @@ static MACHINE_CONFIG_START( electron )
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("electron_cass")
 
 	/* expansion port */
@@ -233,10 +247,12 @@ static MACHINE_CONFIG_START( electron )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "electron_cass")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "electron_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "electron_flop")
+	MCFG_SOFTWARE_LIST_ADD("rom_list",  "electron_rom")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( btm2105, electron )
+MACHINE_CONFIG_START(electron_state::btm2105)
+	electron(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_COLOR(rgb_t::amber())
 
@@ -249,34 +265,37 @@ static MACHINE_CONFIG_DERIVED( btm2105, electron )
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(electron_state::electron64)
+	electron(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(electron_mem)
+	MCFG_DEVICE_OPCODES_MAP(electron64_opcodes)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
+
 /* Electron Rom Load */
 ROM_START(electron)
-	ROM_REGION( 0x44000, "user1", 0 ) /* OS Rom */
-	ROM_LOAD( "b02_acornos-1.rom", 0x40000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) ) /* OS rom */
-	/* 00000  0 Second external socket on the expansion module (SK2) */
-	/* 04000  1 Second external socket on the expansion module (SK2) */
-	/* 08000  2 First external socket on the expansion module (SK1)  */
-	/* 0c000  3 First external socket on the expansion module (SK1)  */
-	/* 10000  4 Disc                                                 */
-	/* 14000  5 USER applications                                    */
-	/* 18000  6 USER applications                                    */
-	/* 1c000  7 Modem interface ROM                                  */
-	/* 20000  8 Keyboard                                             */
-	/* 24000  9 Keyboard mirror                                      */
-	/* 28000 10 BASIC rom                                            */
-	/* 2c000 11 BASIC rom mirror                                     */
-	/* 30000 12 Expansion module operating system                    */
-	/* 34000 13 High priority slot in expansion module               */
-	/* 38000 14 ECONET                                               */
-	/* 3c000 15 Reserved                                             */
-		ROM_LOAD("basic.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
-		ROM_COPY("user1", 0x28000, 0x2c000, 0x4000)
+	ROM_REGION( 0x4000, "mos", 0 )
+	ROM_LOAD( "b02_acornos-1.rom", 0x0000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 ROM_END
 
+ROM_START(electron64)
+	ROM_REGION( 0x4000, "mos", 0 )
+	ROM_LOAD( "os_300.rom", 0x0000, 0x4000, CRC(f80a0cea) SHA1(165e42ff4164a842e56f08ebd420d5027af99fdd) )
+	ROM_REGION(0x4000, "basic", 0)
+	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+ROM_END
 
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                             FULLNAME           FLAGS */
-COMP ( 1983, electron,  0,        0,      electron, electron, electron_state, 0,    "Acorn",                            "Acorn Electron",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,   electron, 0,      btm2105,  electron, electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105", MACHINE_NOT_WORKING )
+/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                             FULLNAME                                 FLAGS */
+COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, empty_init, "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
+COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, empty_init, "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -17,7 +17,7 @@ class at_mb_device : public device_t
 public:
 	at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(page8_r);
 	DECLARE_WRITE8_MEMBER(page8_w);
@@ -29,6 +29,7 @@ public:
 
 	uint32_t a20_286(bool state);
 
+	void at_softlists(machine_config &config);
 protected:
 	void device_start() override;
 	void device_reset() override;
@@ -49,7 +50,7 @@ private:
 	uint8_t m_at_spkrdata;
 	uint8_t m_pit_out2;
 	int m_dma_channel;
-	bool m_cur_eop;
+	bool m_cur_eop, m_cur_eop2;
 	uint8_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	uint16_t m_dma_high_byte;
@@ -60,6 +61,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 
 	DECLARE_WRITE_LINE_MEMBER(dma8237_out_eop);
+	DECLARE_WRITE_LINE_MEMBER(dma8237_2_out_eop);
 	DECLARE_READ8_MEMBER(dma8237_0_dack_r);
 	DECLARE_READ8_MEMBER(dma8237_1_dack_r);
 	DECLARE_READ8_MEMBER(dma8237_2_dack_r);
@@ -93,6 +95,5 @@ private:
 
 DECLARE_DEVICE_TYPE(AT_MB, at_mb_device)
 
-MACHINE_CONFIG_EXTERN(at_softlists);
 
 #endif // MAME_MACHINE_AT_H

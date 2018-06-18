@@ -22,7 +22,7 @@
  *
  *************************************/
 
-#define MAC_CLK             XTAL_10MHz
+#define MAC_CLK             XTAL(10'000'000)
 #define VTXROM_FMT(x)       (((x) << 14) | ((x) & (1 << 15) ? 0xc0000000 : 0))
 
 
@@ -473,35 +473,30 @@ WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
 	/* TODO: This controls upd7759 volume */
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
+WRITE8_MEMBER(micro3d_state::micro3d_sound_p1_w)
 {
-	m_sound_port_latch[offset] = data;
+	m_sound_port_latch[1] = data;
 
-	switch (offset)
-	{
-		case 0x01:
-		{
-			micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
-			noise->noise_sh_w(data);
-			break;
-		}
-		case 0x03:
-		{
-			m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
-			m_upd7759->reset_w((data & 0x10) ? 0 : 1);
-			break;
-		}
-	}
+	micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
+	noise->noise_sh_w(data);
 }
 
-READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
+WRITE8_MEMBER(micro3d_state::micro3d_sound_p3_w)
 {
-	switch (offset)
-	{
-		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | m_sound_sw->read();
-		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
-		default:    return 0;
-	}
+	m_sound_port_latch[3] = data;
+
+	m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
+	m_upd7759->reset_w((data & 0x10) ? 0 : 1);
+}
+
+READ8_MEMBER(micro3d_state::micro3d_sound_p1_r)
+{
+	return (m_sound_port_latch[1] & 0x7f) | m_sound_sw->read();
+}
+
+READ8_MEMBER(micro3d_state::micro3d_sound_p3_r)
+{
+	return (m_sound_port_latch[3] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 }
 
 WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
@@ -518,7 +513,7 @@ WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(micro3d_state,micro3d)
+void micro3d_state::init_micro3d()
 {
 	address_space &space = m_drmath->space(AS_DATA);
 
@@ -532,7 +527,7 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 	m_maincpu->set_clock_scale(0.945f);
 }
 
-DRIVER_INIT_MEMBER(micro3d_state,botss)
+void micro3d_state::init_botss()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -540,7 +535,7 @@ DRIVER_INIT_MEMBER(micro3d_state,botss)
 	space.install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));
 	space.install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),this));
 
-	DRIVER_INIT_CALL(micro3d);
+	init_micro3d();
 }
 
 void micro3d_state::machine_reset()

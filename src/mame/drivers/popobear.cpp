@@ -82,6 +82,7 @@ Component Side   A   B   Solder Side
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -131,6 +132,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void postload();
+	void popobear(machine_config &config);
+	void popobear_mem(address_map &map);
 };
 
 
@@ -139,7 +142,7 @@ WRITE16_MEMBER(popobear_state::vram_w)
 	COMBINE_DATA(&m_vram[offset]);
 
 	// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
-	int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
+	int swapped_offset = bitswap<32>(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
 
 	18,17,16,15,14,13,12,
 
@@ -172,7 +175,7 @@ static const gfx_layout char_layout =
 	8*64
 };
 
-GFXDECODE_START(popobear)
+GFXDECODE_START(gfx_popobear)
 	GFXDECODE_RAM( "vram", 0, char_layout, 0, 1 )
 GFXDECODE_END
 
@@ -471,36 +474,38 @@ WRITE8_MEMBER(popobear_state::irq_ack_w)
 	}
 }
 
-static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM_WRITE( vram_w ) AM_SHARE("vram") // tile definitions + tilemaps
+void popobear_state::popobear_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram();
+	map(0x280000, 0x2fffff).ram().share("spr"); // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
+	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
 
 
 	/* Most if not all of these are vregs */
-	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x480020, 0x480023) AM_RAM
-	AM_RANGE(0x480028, 0x48002d) AM_RAM
+	map(0x480000, 0x48001f).ram().share("vregs");
+	map(0x480020, 0x480023).ram();
+	map(0x480028, 0x48002d).ram();
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(480020_r) AM_WRITE(480020_w)
 //  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(480028_w)
 //  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(48002c_w)
-	AM_RANGE(0x480030, 0x480031) AM_WRITE8(irq_ack_w, 0x00ff)
-	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
-	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(48003a_r) AM_WRITE(48003a_w)
+	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
+	map(0x480034, 0x480035).ram(); // coin counter or coin lockout
+	map(0x48003a, 0x48003b).ram(); //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
-	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	map(0x480400, 0x4807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
-	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")
-	AM_RANGE(0x540000, 0x540001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	map(0x500000, 0x500001).portr("IN0");
+	map(0x520000, 0x520001).portr("IN1");
+	map(0x540001, 0x540001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x550000, 0x550003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
-	AM_RANGE(0x620000, 0x620001) AM_READ8(_620000_r,0xff00) AM_WRITENOP
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x600000, 0x600001).nopw();
+	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r));
+	map(0x620000, 0x620001).nopw();
+	map(0x800000, 0xbfffff).rom();
+}
 
 static INPUT_PORTS_START( popobear )
 
@@ -635,12 +640,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( popobear )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_CPU_PROGRAM_MAP(popobear_mem)
+MACHINE_CONFIG_START(popobear_state::popobear)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000)/4)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_DEVICE_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, irq, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,14 +660,14 @@ static MACHINE_CONFIG_START( popobear )
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popobear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popobear)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000)/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/32, PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000)/32, okim6295_device::PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -680,4 +685,4 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear, popobear_state,    0, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, popobear,    0, popobear,    popobear, popobear_state, empty_init, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

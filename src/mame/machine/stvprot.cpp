@@ -30,7 +30,7 @@
 
 READ32_MEMBER( stv_state::common_prot_r )
 {
-	uint32_t *ROM = (uint32_t *)space.machine().root_device().memregion("abus")->base();
+	uint32_t *ROM = (uint32_t *)machine().root_device().memregion("abus")->base();
 
 	if(m_abus_protenable & 0x00010000)//protection calculation is activated
 	{

@@ -66,11 +66,11 @@ ROM_START( qubide )
 	ROM_REGION( 0x4000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v156")
 	ROM_SYSTEM_BIOS( 0, "v141", "v1.41" )
-	ROMX_LOAD( "qide141.bin", 0x0000, 0x4000, CRC(28955132) SHA1(37e47043260977c1fa5bae4a50b65d5575cd8e5f), ROM_BIOS(1) )
+	ROMX_LOAD( "qide141.bin", 0x0000, 0x4000, CRC(28955132) SHA1(37e47043260977c1fa5bae4a50b65d5575cd8e5f), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v156", "v1.56" )
-	ROMX_LOAD( "qub156a.rom", 0x0000, 0x4000, CRC(95e8dd34) SHA1(74ea670ece5f579e61ddf4dbbc32645c21a80c03), ROM_BIOS(2) )
+	ROMX_LOAD( "qub156a.rom", 0x0000, 0x4000, CRC(95e8dd34) SHA1(74ea670ece5f579e61ddf4dbbc32645c21a80c03), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v201", "v2.01" )
-	ROMX_LOAD( "qb201_16k.rom", 0x0000, 0x4000, CRC(6f1d62a6) SHA1(1708d85397422e2024daa1a3406cac685f46730d), ROM_BIOS(3) )
+	ROMX_LOAD( "qb201_16k.rom", 0x0000, 0x4000, CRC(6f1d62a6) SHA1(1708d85397422e2024daa1a3406cac685f46730d), ROM_BIOS(2) )
 
 	ROM_REGION( 0x22e, "plds", 0 )
 	ROM_LOAD( "gal 1a", 0x000, 0x117, CRC(cfb889ba) SHA1(657a2c61e4d372b84eaff78055ddeac6d2ee4d68) ) // old GAL (< v2.0)
@@ -92,7 +92,7 @@ const tiny_rom_entry *qubide_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( qubide_device::device_add_mconfig )
+MACHINE_CONFIG_START(qubide_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
@@ -210,15 +210,15 @@ uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 			switch (offset & 0x0f)
 			{
 			case 0:
-				data = m_ata->read_cs1(space, 0x07, 0xff);
+				data = m_ata->read_cs1(0x07, 0xff);
 				break;
 
 			default:
-				data = m_ata->read_cs0(space, offset & 0x07, 0xff);
+				data = m_ata->read_cs0(offset & 0x07, 0xff);
 				break;
 
 			case 0x08: case 0x0a: case 0x0c:
-				m_ata_data = m_ata->read_cs0(space, 0x00, 0xffff);
+				m_ata_data = m_ata->read_cs0(0);
 
 				data = m_ata_data >> 8;
 				break;
@@ -228,7 +228,7 @@ uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 				break;
 
 			case 0x0e: case 0x0f:
-				data = m_ata->read_cs1(space, 0x05, 0xff);
+				data = m_ata->read_cs1(0x05, 0xff);
 				break;
 			}
 		}
@@ -255,7 +255,7 @@ void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
 			switch (offset & 0x0f)
 			{
 			case 0: case 0x0e: case 0x0f:
-				m_ata->write_cs1(space, 0x05, data, 0xff);
+				m_ata->write_cs1(0x05, data, 0xff);
 				break;
 
 			case 0x08: case 0x0a: case 0x0c:
@@ -265,11 +265,11 @@ void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
 			case 0x09: case 0x0b: case 0x0d:
 				m_ata_data = (m_ata_data & 0xff00) | data;
 
-				m_ata->write_cs0(space, 0x00, m_ata_data, 0xffff);
+				m_ata->write_cs0(0, m_ata_data);
 				break;
 
 			default:
-				m_ata->write_cs0(space, offset & 0x07, data, 0xff);
+				m_ata->write_cs0(offset & 0x07, data, 0xff);
 				break;
 			}
 		}

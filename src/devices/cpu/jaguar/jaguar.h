@@ -65,7 +65,7 @@ enum
 ***************************************************************************/
 
 #define MCFG_JAGUAR_IRQ_HANDLER(_devcb) \
-	devcb = &jaguar_cpu_device::set_int_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<jaguar_cpu_device &>(*device).set_int_func(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -95,8 +95,8 @@ public:
 	// construction/destruction
 	~jaguar_cpu_device();
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_int_func(device_t &device, Object &&cb) { return downcast<jaguar_cpu_device &>(device).m_cpu_interrupt.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_int_func(Object &&cb) { return m_cpu_interrupt.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_WRITE32_MEMBER(ctrl_w) = 0;
 	virtual DECLARE_READ32_MEMBER(ctrl_r) = 0;
@@ -139,7 +139,7 @@ protected:
 	int         m_bankswitch_icount;
 	devcb_write_line m_cpu_interrupt;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
 
 	uint32_t      m_internal_ram_start;
 	uint32_t      m_internal_ram_end;
@@ -245,7 +245,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -262,7 +262,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

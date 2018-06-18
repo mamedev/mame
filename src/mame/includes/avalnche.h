@@ -36,10 +36,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(catch_aud1_w);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud2_w);
 	required_device<cpu_device> m_maincpu;
+	void avalnche_base(machine_config &config);
+	void acatch(machine_config &config);
+	void acatch_sound(machine_config &config);
+	void avalnche(machine_config &config);
+	void avalnche_sound(machine_config &config);
+	void catch_map(address_map &map);
+	void main_map(address_map &map);
 };
-
-
-/*----------- defined in audio/avalnche.cpp -----------*/
-
-MACHINE_CONFIG_EXTERN(avalnche_sound);
-MACHINE_CONFIG_EXTERN(catch_sound);

@@ -125,17 +125,28 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HD6309, hd6309_device, "hd6309", "HD6309")
+DEFINE_DEVICE_TYPE(HD6309, hd6309_device, "hd6309", "Hitachi HD6309")
+DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "Hitachi HD6309E")
 
 
 //-------------------------------------------------
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6809_base_device(mconfig, tag, owner, clock, HD6309, 4),
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider) :
+	m6809_base_device(mconfig, tag, owner, clock, type, divider),
 	m_md(0),
 	m_temp_im(0)
+{
+}
+
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6309_device(mconfig, tag, owner, clock, HD6309, 4)
+{
+}
+
+hd6309e_device::hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6309_device(mconfig, tag, owner, clock, HD6309E, 1)
 {
 }
 
@@ -290,9 +301,9 @@ void hd6309_device::device_post_load()
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *hd6309_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hd6309_device::create_disassembler()
 {
-	return new hd6309_disassembler;
+	return std::make_unique<hd6309_disassembler>();
 }
 
 

@@ -67,7 +67,7 @@ READ8_MEMBER(msx_s1985_device::switched_read)
 			// Pattern and foreground/background color read
 			uint8_t data = (m_pattern & 0x80) ? m_color2 : m_color1;
 
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_pattern = (m_pattern << 1) | (m_pattern >> 7);
 
 			return data;

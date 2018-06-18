@@ -29,17 +29,6 @@ public:
 	// construction/destruction
 	epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// floppy disk controller
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_WRITE8_MEMBER( fdc_tc_w );
-
-	// hd6303 i/o
-	DECLARE_READ8_MEMBER( port1_r );
-	DECLARE_WRITE8_MEMBER( port1_w );
-	DECLARE_READ8_MEMBER( port2_r );
-	DECLARE_WRITE8_MEMBER( port2_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,6 +51,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( pinc_w );
 
+	// floppy disk controller
+	DECLARE_READ8_MEMBER( fdc_r );
+	DECLARE_WRITE8_MEMBER( fdc_w );
+	DECLARE_WRITE8_MEMBER( fdc_tc_w );
+
+	// hd6303 i/o
+	DECLARE_READ8_MEMBER( port1_r );
+	DECLARE_WRITE8_MEMBER( port1_w );
+	DECLARE_READ8_MEMBER( port2_r );
+	DECLARE_WRITE8_MEMBER( port2_w );
+
+	void cpu_io(address_map &map);
+	void cpu_mem(address_map &map);
 
 	required_device<hd6303y_cpu_device> m_cpu;
 	required_device<upd765a_device> m_fdc;

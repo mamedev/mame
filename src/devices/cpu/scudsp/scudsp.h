@@ -37,13 +37,13 @@ enum
 
 
 #define MCFG_SCUDSP_OUT_IRQ_CB(_devcb) \
-	devcb = &scudsp_cpu_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<scudsp_cpu_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCUDSP_IN_DMA_CB(_devcb) \
-	devcb = &scudsp_cpu_device::set_in_dma_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<scudsp_cpu_device &>(*device).set_in_dma_callback(DEVCB_##_devcb);
 
 #define MCFG_SCUDSP_OUT_DMA_CB(_devcb) \
-	devcb = &scudsp_cpu_device::set_out_dma_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<scudsp_cpu_device &>(*device).set_out_dma_callback(DEVCB_##_devcb);
 
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
@@ -54,9 +54,9 @@ public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_dma_callback(device_t &device, Object &&cb) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_dma_callback(device_t &device, Object &&cb) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_dma_callback(Object &&cb) { return m_in_dma_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_dma_callback(Object &&cb) { return m_out_dma_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* port 0 */
 	DECLARE_READ32_MEMBER( program_control_r );
@@ -69,6 +69,8 @@ public:
 	DECLARE_READ32_MEMBER( ram_address_r );
 	DECLARE_WRITE32_MEMBER( ram_address_w );
 
+	void data_map(address_map &map);
+	void program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,7 +90,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	devcb_write_line     m_out_irq_cb;
 	devcb_read16         m_in_dma_cb;

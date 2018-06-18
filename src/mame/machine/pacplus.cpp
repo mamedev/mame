@@ -37,7 +37,7 @@ uint8_t pacman_state::pacplus_decrypt(int addr, uint8_t e)
 		method ^= 1;
 
 	tbl = swap_xor_table[method];
-	return BITSWAP8(e,tbl[0],tbl[1],tbl[2],tbl[3],tbl[4],tbl[5],tbl[6],tbl[7]) ^ tbl[8];
+	return bitswap<8>(e,tbl[0],tbl[1],tbl[2],tbl[3],tbl[4],tbl[5],tbl[6],tbl[7]) ^ tbl[8];
 }
 
 

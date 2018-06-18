@@ -383,6 +383,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -397,6 +398,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void hikaru(machine_config &config);
+	void hikaru_map(address_map &map);
+	void hikaru_map_slave(address_map &map);
 };
 
 void hikaru_state::video_start()
@@ -442,48 +446,50 @@ INPUT_PORTS_END
 
 */
 
-static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64, hikaru_state )
+void hikaru_state::hikaru_map(address_map &map)
+{
 //  Area 0
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1")  // boot ROM
-	AM_RANGE(0x00400000, 0x00400007) AM_NOP // unknown
-	AM_RANGE(0x00800000, 0x0083ffff) AM_NOP // MIE + Service/Test switches and more
-	AM_RANGE(0x00c00000, 0x00c0ffff) AM_RAM // backup RAM
-	AM_RANGE(0x01000000, 0x01000007) AM_NOP // unknown
-	AM_RANGE(0x01000100, 0x01000107) AM_NOP // unknown
-	AM_RANGE(0x02000000, 0x02ffffff) AM_NOP // banked area (ROMBD + AICA + COMM + other devices)
-	AM_RANGE(0x03000000, 0x03ffffff) AM_NOP // banked area (ROMBD + EEPROM + COMM + other devices)
+	map(0x00000000, 0x001fffff).rom().share("share1");  // boot ROM
+	map(0x00400000, 0x00400007).noprw(); // unknown
+	map(0x00800000, 0x0083ffff).noprw(); // MIE + Service/Test switches and more
+	map(0x00c00000, 0x00c0ffff).ram(); // backup RAM
+	map(0x01000000, 0x01000007).noprw(); // unknown
+	map(0x01000100, 0x01000107).noprw(); // unknown
+	map(0x02000000, 0x02ffffff).noprw(); // banked area (ROMBD + AICA + COMM + other devices)
+	map(0x03000000, 0x03ffffff).noprw(); // banked area (ROMBD + EEPROM + COMM + other devices)
 //  Area 1
-	AM_RANGE(0x04000000, 0x0400003f) AM_NOP // memory controller (Master)
+	map(0x04000000, 0x0400003f).noprw(); // memory controller (Master)
 //  Area 3
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM // main Work RAM
+	map(0x0c000000, 0x0dffffff).ram(); // main Work RAM
 //  Area 5
-	AM_RANGE(0x14000000, 0x140000ff) AM_NOP // Master/Slave COMM
-	AM_RANGE(0x14000100, 0x143fffff) AM_RAM // GPU command RAM
-	AM_RANGE(0x15000000, 0x150000ff) AM_NOP // GPU Regs
-	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
-	AM_RANGE(0x16010000, 0x17ffffff) AM_RAM // Slave Work RAM
+	map(0x14000000, 0x140000ff).noprw(); // Master/Slave COMM
+	map(0x14000100, 0x143fffff).ram(); // GPU command RAM
+	map(0x15000000, 0x150000ff).noprw(); // GPU Regs
+	map(0x16010000, 0x17ffffff).ram(); // Slave Work RAM
+	map(0x16001000, 0x163fffff).ram(); // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
 //  Area 6
-	AM_RANGE(0x18001000, 0x1800101f) AM_NOP // unknown
-	AM_RANGE(0x1a000000, 0x1a000107) AM_NOP // GPU Regs
-	AM_RANGE(0x1a000180, 0x1a0001bf) AM_NOP // GPU Texture Regs A
-	AM_RANGE(0x1a000200, 0x1a00023f) AM_NOP // GPU Texture Regs B
-	AM_RANGE(0x1a040000, 0x1a04000f) AM_NOP // GPU Texture FIFO (?)
-	AM_RANGE(0x1b000000, 0x1b7fffff) AM_NOP // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
-ADDRESS_MAP_END
+	map(0x18001000, 0x1800101f).noprw(); // unknown
+	map(0x1a000000, 0x1a000107).noprw(); // GPU Regs
+	map(0x1a000180, 0x1a0001bf).noprw(); // GPU Texture Regs A
+	map(0x1a000200, 0x1a00023f).noprw(); // GPU Texture Regs B
+	map(0x1a040000, 0x1a04000f).noprw(); // GPU Texture FIFO (?)
+	map(0x1b000000, 0x1b7fffff).noprw(); // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
+}
 
-static ADDRESS_MAP_START( hikaru_map_slave, AS_PROGRAM, 64, hikaru_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_ROM AM_SHARE("share1")
-	AM_RANGE(0x0C000000, 0x0DFFFFFF) AM_RAM
-	AM_RANGE(0x10000000, 0x100000FF) AM_RAM
-	AM_RANGE(0x1A800000, 0x1A8000FF) AM_RAM
-	AM_RANGE(0x1B000000, 0x1B0001FF) AM_RAM
-ADDRESS_MAP_END
+void hikaru_state::hikaru_map_slave(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x001FFFFF).rom().share("share1");
+	map(0x0C000000, 0x0DFFFFFF).ram();
+	map(0x10000000, 0x100000FF).ram();
+	map(0x1A800000, 0x1A8000FF).ram();
+	map(0x1B000000, 0x1B0001FF).ram();
+}
 
 
-static MACHINE_CONFIG_START( hikaru )
+MACHINE_CONFIG_START(hikaru_state::hikaru)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK)
 //  MCFG_SH4_MD0(1)
 //  MCFG_SH4_MD1(0)
 //  MCFG_SH4_MD2(1)
@@ -494,13 +500,13 @@ static MACHINE_CONFIG_START( hikaru )
 //  MCFG_SH4_MD7(1)
 //  MCFG_SH4_MD8(0)
 //  MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(hikaru_map)
-//  MCFG_CPU_IO_MAP(hikaru_port)
+	MCFG_DEVICE_PROGRAM_MAP(hikaru_map)
+//  MCFG_DEVICE_IO_MAP(hikaru_port)
 	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
 
-	MCFG_CPU_ADD("slave", SH4LE, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
+	MCFG_DEVICE_ADD("slave", SH4LE, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(hikaru_map_slave)
 	MCFG_CPU_FORCE_NO_DRC()
 
 
@@ -520,15 +526,16 @@ static MACHINE_CONFIG_START( hikaru )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
-//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_SOUND_ADD("aica", AICA, 0)
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
+//  MCFG_DEVICE_ADD("aica", AICA, 0)
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 
 #define HIKARU_BIOS \
@@ -810,11 +817,11 @@ ROM_START( sgnascaro )
 	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
 
-GAME( 2000, hikaru,   0,        hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
-GAME( 1999, braveff,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrix,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrixo, airtrix,  hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascar, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascaro,sgnascar, hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, pharrier, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, swracer,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Racing (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Racing (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, pharrier,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, swracer,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

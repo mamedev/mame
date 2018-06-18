@@ -28,6 +28,7 @@
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 #include "sound/dmadac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -35,12 +36,19 @@ class _39in1_state : public driver_device
 {
 public:
 	_39in1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_ram(*this, "ram"),
-		m_eeprom(*this, "eeprom"),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_ram(*this, "ram")
+		, m_dmadac(*this, "dac%u", 1U)
+		, m_eeprom(*this, "eeprom")
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+	{ }
 
+	void _60in1(machine_config &config);
+	void _39in1(machine_config &config);
+
+	void init_39in1();
+private:
 	uint32_t m_seed;
 	uint32_t m_magic;
 	uint32_t m_state;
@@ -54,7 +62,7 @@ public:
 	PXA255_GPIO_Regs m_gpio_regs;
 	PXA255_LCD_Regs m_lcd_regs;
 
-	dmadac_sound_device *m_dmadac[2];
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	uint32_t m_pxa255_lcd_palette[0x100];
 	uint8_t m_pxa255_lcd_framebuffer[0x100000];
@@ -78,7 +86,6 @@ public:
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
-	DECLARE_DRIVER_INIT(39in1);
 	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
 	uint32_t screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -98,6 +105,7 @@ public:
 	void pxa255_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void _39in1_map(address_map &map);
 };
 
 
@@ -113,7 +121,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-		//printf( "%s: %s", device.machine().describe_context(), buf );
+		//printf( "%s: %s", device.machine().describe_context().c_str(), buf );
 	}
 }
 
@@ -210,8 +218,11 @@ WRITE32_MEMBER(_39in1_state::pxa255_i2s_w)
 		case PXA255_SADIV:
 			verboselog(*this, 3, "pxa255_i2s_w: Serial Audio Clock Divider Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->sadiv = data & 0x0000007f;
-			dmadac_set_frequency(&m_dmadac[0], 2, ((double)147600000 / (double)i2s_regs->sadiv) / 256.0);
-			dmadac_enable(&m_dmadac[0], 2, 1);
+			for (auto &dac : m_dmadac)
+			{
+				dac->set_frequency(((double)147600000 / (double)i2s_regs->sadiv) / 256.0);
+				dac->enable(1);
+			}
 			break;
 		case PXA255_SADR:
 			verboselog(*this, 4, "pxa255_i2s_w: Serial Audio Data Register: %08x & %08x\n", data, mem_mask );
@@ -323,7 +334,10 @@ TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
 				m_samples[(index >> 1) + 1] = (int16_t)(m_words[index >> 2] & 0xffff);
 				sadr += 4;
 			}
-			dmadac_transfer(&m_dmadac[0], 2, 2, 2, count/4, m_samples);
+			for (auto &dac : m_dmadac)
+				dac->flush();
+			m_dmadac[0]->transfer(0, 2, 2, count/4, m_samples);
+			m_dmadac[1]->transfer(1, 2, 2, count/4, m_samples);
 			break;
 		default:
 			for(index = 0; index < count;)
@@ -1355,13 +1369,13 @@ READ32_MEMBER(_39in1_state::unknown_r)
 
 READ32_MEMBER(_39in1_state::cpld_r)
 {
-	//if (space.device().safe_pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, space.device().safe_pc(), state);
+	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
 
-	if (space.device().safe_pc() == 0x3f04)
+	if (m_maincpu->pc() == 0x3f04)
 	{
 		return 0xf0;      // any non-zero value works here
 	}
-	else if (space.device().safe_pc() == 0xe3af4)
+	else if (m_maincpu->pc() == 0xe3af4)
 	{
 		return ioport("MCUIPT")->read();
 	}
@@ -1415,11 +1429,11 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 		m_seed = data<<16;
 	}
 
-	if (space.device().safe_pc() == 0x280c)
+	if (m_maincpu->pc() == 0x280c)
 	{
 		m_state = 1;
 	}
-	if (space.device().safe_pc() == 0x2874)
+	if (m_maincpu->pc() == 0x2874)
 	{
 		m_state = 2;
 		m_magic = space.read_byte(0xa02d4ff0);
@@ -1430,7 +1444,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #if 0
 	else
 	{
-		printf("%08x: CPLD_W: %08x = %08x & %08x\n", space.device().safe_pc(), offset, data, mem_mask);
+		printf("%08x: CPLD_W: %08x = %08x & %08x\n", m_maincpu->pc(), offset, data, mem_mask);
 	}
 #endif
 }
@@ -1440,29 +1454,27 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 	return 0x37;
 }
 
-DRIVER_INIT_MEMBER(_39in1_state,39in1)
+void _39in1_state::init_39in1()
 {
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
-
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
 }
 
 
 
-static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32, _39in1_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x04000000, 0x047fffff) AM_READWRITE(cpld_r, cpld_w )
-	AM_RANGE(0x40000000, 0x400002ff) AM_READWRITE(pxa255_dma_r, pxa255_dma_w )
-	AM_RANGE(0x40400000, 0x40400083) AM_READWRITE(pxa255_i2s_r, pxa255_i2s_w )
-	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE(pxa255_ostimer_r, pxa255_ostimer_w )
-	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE(pxa255_intc_r, pxa255_intc_w )
-	AM_RANGE(0x40e00000, 0x40e0006b) AM_READWRITE(pxa255_gpio_r, pxa255_gpio_w )
-	AM_RANGE(0x44000000, 0x4400021f) AM_READWRITE(pxa255_lcd_r,  pxa255_lcd_w )
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void _39in1_state::_39in1_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+	map(0x00400000, 0x005fffff).rom().region("data", 0);
+	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
+	map(0x40000000, 0x400002ff).rw(FUNC(_39in1_state::pxa255_dma_r), FUNC(_39in1_state::pxa255_dma_w));
+	map(0x40400000, 0x40400083).rw(FUNC(_39in1_state::pxa255_i2s_r), FUNC(_39in1_state::pxa255_i2s_w));
+	map(0x40a00000, 0x40a0001f).rw(FUNC(_39in1_state::pxa255_ostimer_r), FUNC(_39in1_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(FUNC(_39in1_state::pxa255_intc_r), FUNC(_39in1_state::pxa255_intc_w));
+	map(0x40e00000, 0x40e0006b).rw(FUNC(_39in1_state::pxa255_gpio_r), FUNC(_39in1_state::pxa255_gpio_w));
+	map(0x44000000, 0x4400021f).rw(FUNC(_39in1_state::pxa255_lcd_r), FUNC(_39in1_state::pxa255_lcd_w));
+	map(0xa0000000, 0xa07fffff).ram().share("ram");
+}
 
 static INPUT_PORTS_START( 39in1 )
 	PORT_START("MCUIPT")
@@ -1550,7 +1562,7 @@ void _39in1_state::machine_start()
 
 	for (i = 0; i < 0x80000; i += 2)
 	{
-		ROM[i] = BITSWAP8(ROM[i],7,2,5,6,0,3,1,4) ^ BITSWAP8((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
+		ROM[i] = bitswap<8>(ROM[i],7,2,5,6,0,3,1,4) ^ bitswap<8>((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
 	}
 
 	pxa255_start();
@@ -1565,18 +1577,18 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 	{
 		if ((i%2)==0)
 		{
-			ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
+			ROM[i] = bitswap<8>(ROM[i],5,1,4,2,0,7,6,3)^bitswap<8>(i, 6,0,4,13,0,5,3,11);
 		}
 	}
 
 	pxa255_start();
 }
 
-static MACHINE_CONFIG_START( 39in1 )
+MACHINE_CONFIG_START(_39in1_state::_39in1)
 
-	MCFG_CPU_ADD("maincpu", PXA255, 200000000)
-	MCFG_CPU_PROGRAM_MAP(39in1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _39in1_state,  pxa255_vblank_start)
+	MCFG_DEVICE_ADD("maincpu", PXA255, 200000000)
+	MCFG_DEVICE_PROGRAM_MAP(_39in1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _39in1_state,  pxa255_vblank_start)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1587,17 +1599,19 @@ static MACHINE_CONFIG_START( 39in1 )
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 60in1, 39in1 )
+MACHINE_CONFIG_START(_39in1_state::_60in1)
+	_39in1(config);
 	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
 MACHINE_CONFIG_END
 
@@ -1718,11 +1732,11 @@ ROM_START( 19in1 )
 	ROM_LOAD16_WORD_SWAP( "19in1_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
-GAME(2004, 4in1a,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,  0,     39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,  39in1, 60in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,  39in1, _60in1, 39in1, _39in1_state, init_39in1, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

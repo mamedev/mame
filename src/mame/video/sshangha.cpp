@@ -32,16 +32,18 @@ void sshangha_state::video_start()
 
 uint32_t sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram, 0x800, true);
-
-	// I'm pretty sure only the original has the 2nd spriteram, used for the Japanese text on the 2nd scene (non-scrolling text) in the intro of the quest (3rd in JPN) mode
-	if (m_spriteram2 != nullptr)
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2, 0x800, true);
-
-	// flip screen
+	// sprites are flipped relative to tilemaps
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(!BIT(flip, 7));
+	m_sprgen2->set_flip_screen(!BIT(flip, 7));
+
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
+
+	// I'm pretty sure only the original has the 2nd spriteram, used for the Japanese text on the 2nd scene (non-scrolling text) in the intro of the quest (3rd in JPN) mode
+	if (m_spriteram2 != nullptr)
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2, 0x800);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

@@ -28,9 +28,9 @@
 
 #define MCFG_CS8221_ADD(_tag, _cputag, _isatag, _biostag) \
 	MCFG_DEVICE_ADD(_tag, CS8221, 0) \
-	cs8221_device::static_set_cputag(*device, _cputag); \
-	cs8221_device::static_set_isatag(*device, _isatag); \
-	cs8221_device::static_set_biostag(*device, _biostag);
+	downcast<cs8221_device &>(*device).set_cputag(_cputag); \
+	downcast<cs8221_device &>(*device).set_isatag(_isatag); \
+	downcast<cs8221_device &>(*device).set_biostag(_biostag);
 
 
 //**************************************************************************
@@ -45,15 +45,12 @@ public:
 	// construction/destruction
 	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_ADDRESS_MAP(map, 16);
-
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_isatag(device_t &device, const char *tag);
-	static void static_set_biostag(device_t &device, const char *tag);
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	void set_isatag(const char *tag) { m_isatag = tag; }
+	void set_biostag(const char *tag) { m_biostag = tag; }
+
+	void map(address_map &map);
 
 protected:
 	// device-level overrides
@@ -76,8 +73,11 @@ private:
 	const char *m_isatag;
 	const char *m_biostag;
 
-
 	uint8_t m_registers[0x10];
+
+	DECLARE_WRITE8_MEMBER( address_w );
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( data_w );
 };
 
 

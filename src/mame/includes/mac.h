@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAC_H_
-#define MAC_H_
+#ifndef MAME_INCLUDES_MAC_H
+#define MAME_INCLUDES_MAC_H
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
@@ -27,6 +27,7 @@
 #include "sound/awacs.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAC_SCREEN_NAME "screen"
@@ -47,96 +48,6 @@
 #define ADB_IS_PM_VIA1_CLASS    (m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100)
 #define ADB_IS_PM_VIA2_CLASS    (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)
 #define ADB_IS_PM_CLASS ((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
-
-/* for Egret and CUDA streaming MCU commands, command types */
-enum mac_streaming_t
-{
-	MCU_STREAMING_NONE = 0,
-	MCU_STREAMING_PRAMRD,
-	MCU_STREAMING_PRAMWR,
-	MCU_STREAMING_WRAMRD,
-	MCU_STREAMING_WRAMWR
-};
-
-enum
-{
-	RBV_TYPE_RBV = 0,
-	RBV_TYPE_V8,
-	RBV_TYPE_SONORA,
-	RBV_TYPE_DAFB
-};
-
-/* tells which model is being emulated (set by macxxx_init) */
-enum model_t
-{
-	MODEL_MAC_128K512K, // 68000 machines
-	MODEL_MAC_512KE,
-	MODEL_MAC_PLUS,
-	MODEL_MAC_SE,
-	MODEL_MAC_CLASSIC,
-
-	MODEL_MAC_PORTABLE, // Portable/PB100 are sort of hybrid classic and Mac IIs
-	MODEL_MAC_PB100,
-
-	MODEL_MAC_II,       // Mac II class 68020/030 machines
-	MODEL_MAC_II_FDHD,
-	MODEL_MAC_IIX,
-	MODEL_MAC_IICX,
-	MODEL_MAC_IICI,
-	MODEL_MAC_IISI,
-	MODEL_MAC_IIVX,
-	MODEL_MAC_IIVI,
-	MODEL_MAC_IIFX,
-	MODEL_MAC_SE30,
-
-	MODEL_MAC_LC,       // LC class 68030 machines, generally using a V8 or compatible gate array
-	MODEL_MAC_LC_II,
-	MODEL_MAC_LC_III,
-	MODEL_MAC_LC_III_PLUS,
-	MODEL_MAC_CLASSIC_II,
-	MODEL_MAC_COLOR_CLASSIC,
-
-	MODEL_MAC_LC_475,   // LC III clones with Cuda instead of Egret and 68LC040 on most models
-	MODEL_MAC_LC_520,
-	MODEL_MAC_LC_550,
-	MODEL_MAC_TV,
-	MODEL_MAC_LC_575,
-	MODEL_MAC_LC_580,
-
-	MODEL_MAC_PB140,    // 68030 PowerBooks.  140/145/145B/170 all have the same machine ID
-	MODEL_MAC_PB160,    // 160/180/165 all have the same machine ID too
-	MODEL_MAC_PB165c,
-	MODEL_MAC_PB180c,
-	MODEL_MAC_PB150,    // 150 is fairly radically different from the other 1x0s
-
-	MODEL_MAC_PBDUO_210,    // 68030 PowerBook Duos
-	MODEL_MAC_PBDUO_230,
-	MODEL_MAC_PBDUO_250,
-	MODEL_MAC_PBDUO_270c,
-
-	MODEL_MAC_QUADRA_700,   // 68(LC)040 desktops
-	MODEL_MAC_QUADRA_610,
-	MODEL_MAC_QUADRA_650,
-	MODEL_MAC_QUADRA_800,
-	MODEL_MAC_QUADRA_900,
-	MODEL_MAC_QUADRA_950,
-	MODEL_MAC_QUADRA_660AV,
-	MODEL_MAC_QUADRA_840AV,
-	MODEL_MAC_QUADRA_605,
-	MODEL_MAC_QUADRA_630,
-
-	MODEL_MAC_PB550c,   // 68(LC)040 PowerBooks
-	MODEL_MAC_PB520,
-	MODEL_MAC_PB520c,
-	MODEL_MAC_PB540,
-	MODEL_MAC_PB540c,
-	MODEL_MAC_PB190,
-	MODEL_MAC_PB190cs,
-
-	MODEL_MAC_POWERMAC_6100,    // NuBus PowerMacs
-	MODEL_MAC_POWERMAC_7100,
-	MODEL_MAC_POWERMAC_8100
-};
 
 // video parameters for classic Macs
 #define MAC_H_VIS   (512)
@@ -206,6 +117,96 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	/* for Egret and CUDA streaming MCU commands, command types */
+	enum mac_streaming_t
+	{
+		MCU_STREAMING_NONE = 0,
+		MCU_STREAMING_PRAMRD,
+		MCU_STREAMING_PRAMWR,
+		MCU_STREAMING_WRAMRD,
+		MCU_STREAMING_WRAMWR
+	};
+
+	enum
+	{
+		RBV_TYPE_RBV = 0,
+		RBV_TYPE_V8,
+		RBV_TYPE_SONORA,
+		RBV_TYPE_DAFB
+	};
+
+	/* tells which model is being emulated (set by macxxx_init) */
+	enum model_t
+	{
+		MODEL_MAC_128K512K, // 68000 machines
+		MODEL_MAC_512KE,
+		MODEL_MAC_PLUS,
+		MODEL_MAC_SE,
+		MODEL_MAC_CLASSIC,
+
+		MODEL_MAC_PORTABLE, // Portable/PB100 are sort of hybrid classic and Mac IIs
+		MODEL_MAC_PB100,
+
+		MODEL_MAC_II,       // Mac II class 68020/030 machines
+		MODEL_MAC_II_FDHD,
+		MODEL_MAC_IIX,
+		MODEL_MAC_IICX,
+		MODEL_MAC_IICI,
+		MODEL_MAC_IISI,
+		MODEL_MAC_IIVX,
+		MODEL_MAC_IIVI,
+		MODEL_MAC_IIFX,
+		MODEL_MAC_SE30,
+
+		MODEL_MAC_LC,       // LC class 68030 machines, generally using a V8 or compatible gate array
+		MODEL_MAC_LC_II,
+		MODEL_MAC_LC_III,
+		MODEL_MAC_LC_III_PLUS,
+		MODEL_MAC_CLASSIC_II,
+		MODEL_MAC_COLOR_CLASSIC,
+
+		MODEL_MAC_LC_475,   // LC III clones with Cuda instead of Egret and 68LC040 on most models
+		MODEL_MAC_LC_520,
+		MODEL_MAC_LC_550,
+		MODEL_MAC_TV,
+		MODEL_MAC_LC_575,
+		MODEL_MAC_LC_580,
+
+		MODEL_MAC_PB140,    // 68030 PowerBooks.  140/145/145B/170 all have the same machine ID
+		MODEL_MAC_PB160,    // 160/180/165 all have the same machine ID too
+		MODEL_MAC_PB165c,
+		MODEL_MAC_PB180c,
+		MODEL_MAC_PB150,    // 150 is fairly radically different from the other 1x0s
+
+		MODEL_MAC_PBDUO_210,    // 68030 PowerBook Duos
+		MODEL_MAC_PBDUO_230,
+		MODEL_MAC_PBDUO_250,
+		MODEL_MAC_PBDUO_270c,
+
+		MODEL_MAC_QUADRA_700,   // 68(LC)040 desktops
+		MODEL_MAC_QUADRA_610,
+		MODEL_MAC_QUADRA_650,
+		MODEL_MAC_QUADRA_800,
+		MODEL_MAC_QUADRA_900,
+		MODEL_MAC_QUADRA_950,
+		MODEL_MAC_QUADRA_660AV,
+		MODEL_MAC_QUADRA_840AV,
+		MODEL_MAC_QUADRA_605,
+		MODEL_MAC_QUADRA_630,
+
+		MODEL_MAC_PB550c,   // 68(LC)040 PowerBooks
+		MODEL_MAC_PB520,
+		MODEL_MAC_PB520c,
+		MODEL_MAC_PB540,
+		MODEL_MAC_PB540c,
+		MODEL_MAC_PB190,
+		MODEL_MAC_PB190cs,
+
+		MODEL_MAC_POWERMAC_6100,    // NuBus PowerMacs
+		MODEL_MAC_POWERMAC_7100,
+		MODEL_MAC_POWERMAC_8100
+	};
+
 	model_t m_model;
 
 	uint32_t m_overlay;
@@ -274,6 +275,9 @@ public:
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
 	emu_timer *m_6015_timer;
+
+	// ADB refresh timer, independent of anything else going on
+	emu_timer *m_adbupdate_timer;
 
 	// RBV and friends (V8, etc)
 	uint8_t m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
@@ -387,6 +391,52 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
+	void mac512ke(machine_config &config);
+	void macplus(machine_config &config);
+	void maclc(machine_config &config);
+	void macpb170(machine_config &config);
+	void macclasc(machine_config &config);
+	void maciisi(machine_config &config);
+	void maclc2(machine_config &config);
+	void macse(machine_config &config);
+	void maclc3(machine_config &config);
+	void macpd210(machine_config &config);
+	void maciici(machine_config &config);
+	void macprtb(machine_config &config);
+	void maciix(machine_config &config);
+	void maclc520(machine_config &config);
+	void pwrmac(machine_config &config);
+	void maciivx(machine_config &config);
+	void maccclas(machine_config &config);
+	void maciivi(machine_config &config);
+	void macpb160(machine_config &config);
+	void maciicx(machine_config &config);
+	void macqd700(machine_config &config);
+	void macse30(machine_config &config);
+	void macpb180(machine_config &config);
+	void macpb145(machine_config &config);
+	void macpb180c(machine_config &config);
+	void maciifx(machine_config &config);
+	void macpb140(machine_config &config);
+	void macclas2(machine_config &config);
+	void macii(machine_config &config);
+	void maciihmu(machine_config &config);
+	void mac512ke_map(address_map &map);
+	void macii_map(address_map &map);
+	void maciici_map(address_map &map);
+	void maciifx_map(address_map &map);
+	void maclc3_map(address_map &map);
+	void maclc_map(address_map &map);
+	void macpb140_map(address_map &map);
+	void macpb160_map(address_map &map);
+	void macpb165c_map(address_map &map);
+	void macpd210_map(address_map &map);
+	void macplus_map(address_map &map);
+	void macprtb_map(address_map &map);
+	void macse30_map(address_map &map);
+	void macse_map(address_map &map);
+	void pwrmac_map(address_map &map);
+	void quadra700_map(address_map &map);
 private:
 	int has_adb();
 	void adb_reset();
@@ -427,33 +477,33 @@ private:
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
-	DECLARE_DRIVER_INIT(maclc2);
-	DECLARE_DRIVER_INIT(maciifdhd);
-	DECLARE_DRIVER_INIT(macse30);
-	DECLARE_DRIVER_INIT(macprtb);
-	DECLARE_DRIVER_INIT(maciivx);
-	DECLARE_DRIVER_INIT(macpd210);
-	DECLARE_DRIVER_INIT(macii);
-	DECLARE_DRIVER_INIT(macclassic);
-	DECLARE_DRIVER_INIT(macquadra700);
-	DECLARE_DRIVER_INIT(macclassic2);
-	DECLARE_DRIVER_INIT(maciifx);
-	DECLARE_DRIVER_INIT(maclc);
-	DECLARE_DRIVER_INIT(macpb160);
-	DECLARE_DRIVER_INIT(macse);
-	DECLARE_DRIVER_INIT(macpb140);
-	DECLARE_DRIVER_INIT(macpm6100);
-	DECLARE_DRIVER_INIT(maclc520);
-	DECLARE_DRIVER_INIT(maciici);
-	DECLARE_DRIVER_INIT(maciix);
-	DECLARE_DRIVER_INIT(maclrcclassic);
-	DECLARE_DRIVER_INIT(maciisi);
-	DECLARE_DRIVER_INIT(maciicx);
-	DECLARE_DRIVER_INIT(maclc3);
-	DECLARE_DRIVER_INIT(maclc3plus);
-	DECLARE_DRIVER_INIT(macpm7100);
-	DECLARE_DRIVER_INIT(macpm8100);
-	DECLARE_DRIVER_INIT(macpb100);
+	void init_maclc2();
+	void init_maciifdhd();
+	void init_macse30();
+	void init_macprtb();
+	void init_maciivx();
+	void init_macpd210();
+	void init_macii();
+	void init_macclassic();
+	void init_macquadra700();
+	void init_macclassic2();
+	void init_maciifx();
+	void init_maclc();
+	void init_macpb160();
+	void init_macse();
+	void init_macpb140();
+	void init_macpm6100();
+	void init_maclc520();
+	void init_maciici();
+	void init_maciix();
+	void init_maclrcclassic();
+	void init_maciisi();
+	void init_maciicx();
+	void init_maclc3();
+	void init_maclc3plus();
+	void init_macpm7100();
+	void init_macpm8100();
+	void init_macpb100();
 	DECLARE_VIDEO_START(mac);
 	DECLARE_PALETTE_INIT(mac);
 	DECLARE_VIDEO_START(macprtb);
@@ -477,12 +527,13 @@ public:
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mac_rbv_vbl);
+	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
 	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
 #endif
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
+	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
@@ -492,6 +543,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
 	DECLARE_READ8_MEMBER(mac_via_in_b);
+	DECLARE_READ8_MEMBER(mac_via_in_b_ii);
 	DECLARE_WRITE8_MEMBER(mac_via_out_a);
 	DECLARE_WRITE8_MEMBER(mac_via_out_b);
 	DECLARE_READ8_MEMBER(mac_via_in_a_pmu);
@@ -526,4 +578,4 @@ public:
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
-#endif /* MAC_H_ */
+#endif // MAME_INCLUDES_MAC_H

@@ -49,6 +49,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void a1supply(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -89,7 +90,7 @@ void a1supply_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( a1supply )
+MACHINE_CONFIG_START(a1supply_state::a1supply)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -164,6 +165,6 @@ ROM_START( tvpoker )
 ROM_END
 
 
-GAME( 197?, tv21,     0, a1supply, 0, a1supply_state,  0, ROT0, "A-1 Supply", "T.V. 21",     MACHINE_IS_SKELETON )
-GAME( 197?, tv21_3,   0, a1supply, 0, a1supply_state,  0, ROT0, "A-1 Supply", "T.V. 21 III", MACHINE_IS_SKELETON )
-GAME( 197?, tvpoker,  0, a1supply, 0, a1supply_state,  0, ROT0, "A-1 Supply", "T.V. Poker",  MACHINE_IS_SKELETON )
+GAME( 197?, tv21,    0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. 21",     MACHINE_IS_SKELETON )
+GAME( 197?, tv21_3,  0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. 21 III", MACHINE_IS_SKELETON )
+GAME( 197?, tvpoker, 0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. Poker",  MACHINE_IS_SKELETON )

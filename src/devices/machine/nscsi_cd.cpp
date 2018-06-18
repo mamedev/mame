@@ -31,7 +31,7 @@ void nscsi_cdrom_device::device_reset()
 	cur_lba = -1;
 }
 
-MACHINE_CONFIG_MEMBER(nscsi_cdrom_device::device_add_mconfig)
+MACHINE_CONFIG_START(nscsi_cdrom_device::device_add_mconfig)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 MACHINE_CONFIG_END

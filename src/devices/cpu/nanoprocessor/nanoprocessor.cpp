@@ -42,7 +42,7 @@ enum {
 #define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
 #define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
 
-DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "HP-Nanoprocessor")
+DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "Hewlett Packard HP-Nanoprocessor")
 
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, HP_NANOPROCESSOR, tag, owner, clock),
@@ -80,7 +80,7 @@ void hp_nanoprocessor_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%10s");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_reg_A));
@@ -90,7 +90,7 @@ void hp_nanoprocessor_device::device_start()
 	save_item(NAME(m_reg_ISR));
 	save_item(NAME(m_flags));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_dc_changed_func.resolve_safe();
 	m_read_dc_func.resolve_safe(0xff);
@@ -132,7 +132,7 @@ void hp_nanoprocessor_device::execute_run()
 			// Need this to propagate the clearing of DC7 to the clearing of int. line
 			yield();
 		} else {
-			debugger_instruction_hook(this, m_reg_PA);
+			debugger_instruction_hook(m_reg_PA);
 
 			uint8_t opcode = fetch();
 			execute_one(opcode);
@@ -170,9 +170,9 @@ void hp_nanoprocessor_device::state_string_export(const device_state_entry &entr
 
 }
 
-util::disasm_interface *hp_nanoprocessor_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_nanoprocessor_device::create_disassembler()
 {
-	return new hp_nanoprocessor_disassembler;
+	return std::make_unique<hp_nanoprocessor_disassembler>();
 }
 
 void hp_nanoprocessor_device::execute_one(uint8_t opcode)
@@ -507,7 +507,7 @@ uint16_t hp_nanoprocessor_device::pa_offset(unsigned off) const
 
 uint8_t hp_nanoprocessor_device::fetch(void)
 {
-	uint8_t res = m_direct->read_byte(m_reg_PA);
+	uint8_t res = m_cache->read_byte(m_reg_PA);
 	m_reg_PA = pa_offset(1);
 	return res;
 }

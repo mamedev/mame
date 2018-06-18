@@ -103,25 +103,27 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 		m_d7756->port_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb000, 0xb03f) AM_RAM_WRITE(homerun_color_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void homerun_state::homerun_memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x9fff).ram().w(FUNC(homerun_state::homerun_videoram_w)).share("videoram");
+	map(0xa000, 0xa0ff).ram().share("spriteram");
+	map(0xb000, 0xb03f).ram().w(FUNC(homerun_state::homerun_color_w)).share("colorram");
+	map(0xc000, 0xdfff).ram();
+}
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(homerun_d7756_sample_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_control_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void homerun_state::homerun_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w(FUNC(homerun_state::homerun_d7756_sample_w));
+	map(0x20, 0x20).w(FUNC(homerun_state::homerun_control_w));
+	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x40).portr("IN0");
+	map(0x50, 0x50).portr("IN2");
+	map(0x60, 0x60).portr("IN1");
+	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
@@ -150,8 +152,8 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -187,7 +189,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // doesn't have d7756
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -225,8 +227,8 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
 	PORT_BIT( 0x36, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -234,7 +236,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_NAME("P1 Down / Paper")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right / Scissors")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) // unused?
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, nullptr)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -244,6 +246,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
+	// starts game with coin in if 1c_1c?
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -314,7 +317,7 @@ static const gfx_layout spritelayout =
 	8*8*2*4
 };
 
-static GFXDECODE_START( homerun )
+static GFXDECODE_START( gfx_homerun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
@@ -347,59 +350,62 @@ void homerun_state::machine_reset()
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( dynashot )
+MACHINE_CONFIG_START(homerun_state::dynashot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
-	MCFG_CPU_PROGRAM_MAP(homerun_memmap)
-	MCFG_CPU_IO_MAP(homerun_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(homerun_memmap)
+	MCFG_DEVICE_IO_MAP(homerun_iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(homerun_state, homerun_scrollhi_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(homerun_state, homerun_scrolly_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(homerun_state, homerun_scrollx_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, homerun_state, homerun_scrollhi_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, homerun_state, homerun_scrolly_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, homerun_state, homerun_scrollx_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_SIZE(256, 256)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4,328,0,256,253,0,240)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homerun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homerun)
 	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_20MHz/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(homerun_state, homerun_banking_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, homerun_state, homerun_banking_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( homerun, dynashot )
+MACHINE_CONFIG_START(homerun_state::homerun)
+	dynashot(config);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("d7756", UPD7756)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(homerun_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ganjaja, dynashot )
+MACHINE_CONFIG_START(homerun_state::ganjaja)
+	dynashot(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(homerun_state, irq0_line_hold,  4*60) // ?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(homerun_state, irq0_line_hold,  4*60) // ?
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("d7756", UPD7756)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -422,6 +428,20 @@ ROM_START( homerun )
 	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom - very likely the same rom as [Moero!! Pro Yakyuu (Black/Red)] on Famicom, and [Moero!! Nettou Yakyuu '88] on MSX2 */
 ROM_END
 
+ROM_START( nhomerun )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",   0x00000, 0x04000, CRC(aed96d6d) SHA1(5cb3932f4cfa3f6c0134ac20a1747c562db31a65) )
+	ROM_CONTINUE(         0x10000, 0x1c000)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2.ic120",  0x00000, 0x20000, CRC(57e9b757) SHA1(8190d690721005407a5b06d13d64e70301d1e925) )
+
+	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
+	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP )
+ROM_END
 
 ROM_START( dynashot )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -452,6 +472,8 @@ ROM_START( ganjaja )
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun,  homerun,  homerun_state, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, dynashot, dynashot, homerun_state, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  homerun_state, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT    COMPANY   FULLNAME                                                            FLAGS
+GAME( 1988, nhomerun, 0,        homerun,  homerun,  homerun_state, empty_init, ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
+GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, empty_init, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0,        dynashot, dynashot, homerun_state, empty_init, ROT0, "Jaleco", "Dynamic Shoot Kyousou",                                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0,        ganjaja,  ganjaja,  homerun_state, empty_init, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

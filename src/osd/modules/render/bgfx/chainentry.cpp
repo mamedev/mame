@@ -259,7 +259,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::setViewRect(view, 0, 0, width, height);
 
 	const bgfx::Caps* caps = bgfx::getCaps();
-	
+
 	float projMat[16];
 	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 	bgfx::setViewTransform(view, nullptr, projMat);

@@ -5,15 +5,16 @@
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
   part of a series is (or will be) in its own driver, see:
-  - hh_tms1k: here
   - eva: Chrysler EVA-11 (and EVA-24)
   - microvsn: Milton Bradley MicroVision
+
+  (contd.) hh_tms1k child drivers:
   - ticalc1x: TI TMS1K-based calculators
   - tispellb: TI Spelling B series gen. 1
   - tispeak: TI Speak & Spell series gen. 1
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products.
+  excluding most of TI's own products(they normally didn't use "MP" codes).
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -36,7 +37,9 @@
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  @MP0920   TMS1000   1979, Entex Space Battle (6004)
  @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
+ *MP1022   TMS1100   1979, Texas Instruments unknown thermostat
  @MP1030   TMS1100   1980, APF Mathemagician
+ *MP1072   TMS1100   198?, unknown device, Germany (have decap)
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
  @MP1181   TMS1100   1979, Conic Football 2
@@ -52,11 +55,11 @@
  *MP1296   TMS1100?  1982, Entex Black Knight
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
- @MP1525   TMS1170   1980, Coleco Head to Head Baseball
- *MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
+ @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
+ @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
- @MP2139   TMS1370   1982, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
+ @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
@@ -66,7 +69,8 @@
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
- *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
+ *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
+ @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -80,7 +84,7 @@
   MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
   MP3455   TMS1100   1980, MicroVision cartridge: Pinball
   MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster
- @MP3460   TMS1100   1980, Coleco Head to Head Football
+ @MP3460   TMS1100   1979, Coleco Head to Head: Electronic Football
   MP3474   TMS1100   1979, MicroVision cartridge: Vegas Slots
   MP3475   TMS1100   1979, MicroVision cartridge: Bowling
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
@@ -95,11 +99,12 @@
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
- @M34018   TMS1100   1981, Coleco Head to Head Boxing
+ @M34018   TMS1100   1981, Coleco Head to Head: Electronic Boxing
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
  @MP4486A  TMS1000C  1983, Vulcan XL 25
+ *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -137,6 +142,8 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
+  - is alphie(patent) the same as the final version?
+  - h2hhockey R9 timing is wrong: passing seems too slow, and in-game clock too fast
 
 ***************************************************************************/
 
@@ -144,7 +151,6 @@
 #include "includes/hh_tms1k.h"
 
 #include "machine/tms1024.h"
-#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
@@ -158,6 +164,7 @@
 
 // internal artwork
 #include "7in1ss.lh"
+#include "alphie.lh"
 #include "amaztron.lh" // clickable
 #include "arcmania.lh" // clickable
 #include "arrball.lh"
@@ -188,12 +195,14 @@
 #include "esbattle.lh"
 #include "esoccer.lh"
 #include "f2pbball.lh"
+#include "f3in1.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
 #include "h2hboxing.lh"
 #include "h2hfootb.lh"
+#include "h2hhockey.lh"
 #include "horseran.lh"
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
@@ -217,6 +226,8 @@
 #include "tc4.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
+#include "timaze.lh"
+#include "xl25.lh" // clickable
 #include "zodiac.lh"
 
 #include "hh_tms1k_test.lh" // common test-layout - use external artwork
@@ -438,6 +449,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void matchnum(machine_config &config);
 };
 
 // handlers
@@ -474,7 +486,6 @@ READ8_MEMBER(matchnum_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -519,20 +530,20 @@ INPUT_PORTS_END
 
 static const s16 matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( matchnum )
+MACHINE_CONFIG_START(matchnum_state::matchnum)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(matchnum_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(matchnum_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(matchnum_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, matchnum_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, matchnum_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, matchnum_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_matchnum)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, matchnum_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -567,6 +578,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void arrball(machine_config &config);
 };
 
 // handlers
@@ -604,7 +616,6 @@ READ8_MEMBER(arrball_state::read_k)
 	return read_inputs(1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( arrball )
@@ -619,20 +630,20 @@ INPUT_PORTS_END
 
 static const s16 arrball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( arrball )
+MACHINE_CONFIG_START(arrball_state::arrball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(arrball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(arrball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(arrball_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, arrball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, arrball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arrball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_arrball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, arrball_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -675,6 +686,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void mathmagi(machine_config &config);
 };
 
 // handlers
@@ -711,7 +723,6 @@ READ8_MEMBER(mathmagi_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -799,14 +810,14 @@ static const u16 mathmagi_output_pla[0x20] =
 	lA+lF+lE+lD+lC          // G
 };
 
-static MACHINE_CONFIG_START( mathmagi )
+MACHINE_CONFIG_START(mathmagi_state::mathmagi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 175000) // approximation - RC osc. R=68K, C=82pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 175000) // approximation - RC osc. R=68K, C=82pF
 	MCFG_TMS1XXX_OUTPUT_PLA(mathmagi_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(mathmagi_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mathmagi_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mathmagi_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mathmagi_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mathmagi_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mathmagi_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mathmagi)
@@ -846,6 +857,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void bcheetah(machine_config &config);
 };
 
 // handlers
@@ -873,7 +885,6 @@ READ8_MEMBER(bcheetah_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -905,13 +916,13 @@ static INPUT_PORTS_START( bcheetah )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bcheetah )
+MACHINE_CONFIG_START(bcheetah_state::bcheetah)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 100000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(bcheetah_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bcheetah_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bcheetah_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 100000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bcheetah_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bcheetah_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bcheetah_state, write_o))
 
 	MCFG_DEFAULT_LAYOUT(layout_bcheetah)
 
@@ -945,6 +956,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void amaztron(machine_config &config);
 };
 
 // handlers
@@ -986,7 +998,6 @@ READ8_MEMBER(amaztron_state::read_k)
 	if (k & 0x10) k |= 0xc;
 	return k & 0xf;
 }
-
 
 // config
 
@@ -1032,20 +1043,20 @@ static INPUT_PORTS_START( amaztron )
 	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( amaztron )
+MACHINE_CONFIG_START(amaztron_state::amaztron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=33K?, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(amaztron_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(amaztron_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(amaztron_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=33K?, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, amaztron_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, amaztron_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, amaztron_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_amaztron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1055,7 +1066,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Zodiac - The Astrology Computer
+  Coleco Zodiac - The Astrology Computer (model 2110)
   * TMS1100 MP3435 (no decap)
   * 8-digit 7seg display, 12 other LEDs, 1-bit sound
 
@@ -1075,6 +1086,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void zodiac(machine_config &config);
 };
 
 // handlers
@@ -1111,7 +1123,6 @@ READ8_MEMBER(zodiac_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -1209,21 +1220,21 @@ static const u16 zodiac_output_pla[0x20] =
 	lB+lC+lD+lE+lF          // U
 };
 
-static MACHINE_CONFIG_START( zodiac )
+MACHINE_CONFIG_START(zodiac_state::zodiac)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=18K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=18K, C=100pF
 	MCFG_TMS1XXX_OUTPUT_PLA(zodiac_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(zodiac_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(zodiac_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(zodiac_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, zodiac_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, zodiac_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, zodiac_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_zodiac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1233,7 +1244,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Electronic Quarterback
+  Coleco Electronic Quarterback (model 2120)
   * TMS1100NLL MP3415 (die label same)
   * 9-digit LED grid, 1-bit sound
 
@@ -1254,6 +1265,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void cqback(machine_config &config);
 };
 
 // handlers
@@ -1295,12 +1307,11 @@ READ8_MEMBER(cqback_state::read_k)
 	return read_rotated_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cqback )
 	PORT_START("IN.0") // K1
-	PORT_BIT( 0x01, 0x01, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Kick/Pass")
@@ -1308,7 +1319,7 @@ static INPUT_PORTS_START( cqback )
 
 	PORT_START("IN.1") // K2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_TOGGLE PORT_NAME("Play Selector") // pass
-	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
 	PORT_CONFNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -1325,20 +1336,20 @@ static INPUT_PORTS_START( cqback )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cqback )
+MACHINE_CONFIG_START(cqback_state::cqback)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(cqback_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cqback_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cqback_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cqback_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cqback_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cqback_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cqback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1348,7 +1359,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Football
+  Coleco Head to Head: Electronic Football (model 2140)
   * TMS1100NLLE (rev. E!) MP3460 (die label same)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
@@ -1356,7 +1367,7 @@ MACHINE_CONFIG_END
   offense blips (should) appear brighter. The hardware is similar to cqback.
 
   known releases:
-  - USA(1): Head to Head Football
+  - USA(1): Head to Head: Electronic Football
   - USA(2): Team Play Football, published by Sears
 
 ***************************************************************************/
@@ -1372,6 +1383,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void h2hfootb(machine_config &config);
 };
 
 // handlers
@@ -1409,7 +1421,6 @@ READ8_MEMBER(h2hfootb_state::read_k)
 	return read_rotated_inputs(9);
 }
 
-
 // config
 
 static INPUT_PORTS_START( h2hfootb )
@@ -1420,7 +1431,7 @@ static INPUT_PORTS_START( h2hfootb )
 
 	PORT_START("IN.1") // K2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_TOGGLE PORT_NAME("P1 Play Selector") // pass
-	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
 	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
@@ -1428,7 +1439,7 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_CONFSETTING(    0x02, "2" )
 
 	PORT_START("IN.3") // K8
-	PORT_BIT( 0x001, 0x001, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x001, 0x001, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Kick/Pass")
@@ -1443,20 +1454,20 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( h2hfootb )
+MACHINE_CONFIG_START(h2hfootb_state::h2hfootb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=39K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(h2hfootb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hfootb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hfootb_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=39K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hfootb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hfootb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hfootb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_h2hfootb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1466,13 +1477,156 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Baseball
+  Coleco Head to Head: Electronic Hockey (model 2160)
+  * TMS1000NLL E MP3321A (die label 1000E MP3321A)
+  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+
+  Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
+
+***************************************************************************/
+
+class h2hhockey_state : public hh_tms1k_state
+{
+public:
+	h2hhockey_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_cap_empty_timer(*this, "cap_empty")
+	{ }
+
+	required_device<timer_device> m_cap_empty_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
+	bool m_cap;
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void h2hhockey(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+};
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(h2hhockey_state::cap_empty_callback)
+{
+	if (~m_r & 0x200)
+		m_cap = false;
+}
+
+void h2hhockey_state::prepare_display()
+{
+	// R6,R7 are commons for R0-R5
+	u16 sel = 0;
+	if (m_r & 0x40) sel |= (m_r & 0x3f);
+	if (m_r & 0x80) sel |= (m_r & 0x3f) << 6;
+
+	set_display_segmask(0xc0, 0x7f);
+	display_matrix(7, 6+6, m_o, sel);
+}
+
+WRITE16_MEMBER(h2hhockey_state::write_r)
+{
+	// R0-R3: input mux
+	m_inp_mux = (data & 0xf);
+
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// R9: K8 and 15uF cap to V- (used as timer)
+	if (data & 0x200)
+		m_cap = true;
+	else if (m_r & 0x200) // falling edge
+		m_cap_empty_timer->adjust(attotime::from_msec(28)); // not accurate
+
+	// R0-R7: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(h2hhockey_state::write_o)
+{
+	// O1-O7: led data
+	m_o = data >> 1 & 0x7f;
+	prepare_display();
+}
+
+READ8_MEMBER(h2hhockey_state::read_k)
+{
+	// K1-K4: multiplexed inputs, K8: R9 and capacitor
+	return (read_inputs(4) & 7) | (m_cap ? 8 : 0);
+}
+
+// config
+
+static INPUT_PORTS_START( h2hhockey )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Pass CW") // clockwise
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Pass CCW") // counter-clockwise
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start/Display")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Left")
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void h2hhockey_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	m_cap = false;
+	save_item(NAME(m_cap));
+}
+
+MACHINE_CONFIG_START(h2hhockey_state::h2hhockey)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hhockey_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hhockey_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hhockey_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD("cap_empty", h2hhockey_state, cap_empty_callback)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
-  - USA: Head to Head Baseball
+  - USA: Head to Head: Electronic Baseball
   - Japan: Computer Baseball, published by Tsukuda
 
 ***************************************************************************/
@@ -1491,6 +1645,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void h2hbaseb(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -1531,7 +1686,6 @@ READ8_MEMBER(h2hbaseb_state::read_k)
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
 	return m_inp_matrix[4]->read() | read_inputs(4);
 }
-
 
 // config
 
@@ -1582,20 +1736,20 @@ void h2hbaseb_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( h2hbaseb )
+MACHINE_CONFIG_START(h2hbaseb_state::h2hbaseb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1170, 350000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(h2hbaseb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hbaseb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hbaseb_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1170, 350000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hbaseb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hbaseb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hbaseb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_h2hbaseb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1605,7 +1759,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Boxing
+  Coleco Head to Head: Electronic Boxing (model 2190)
   * TMS1100NLL M34018-N2 (die label M34018)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
@@ -1624,6 +1778,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void h2hboxing(machine_config &config);
 };
 
 // handlers
@@ -1661,7 +1816,6 @@ READ8_MEMBER(h2hboxing_state::read_k)
 	return read_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( h2hboxing )
@@ -1694,20 +1848,20 @@ static INPUT_PORTS_START( h2hboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Block")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( h2hboxing )
+MACHINE_CONFIG_START(h2hboxing_state::h2hboxing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=39K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(h2hboxing_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hboxing_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hboxing_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=39K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hboxing_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hboxing_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hboxing_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_h2hboxing)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1755,6 +1909,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void quizwizc(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -1773,7 +1928,7 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
 	// get cartridge pinout K1 to R connections
 	std::string pinout(image.get_feature("pinout"));
 	m_pinout = std::stoul(pinout, nullptr, 2) & 0xe7;
-	m_pinout = BITSWAP8(m_pinout,4,3,7,5,2,1,6,0) << 4;
+	m_pinout = bitswap<8>(m_pinout,4,3,7,5,2,1,6,0) << 4;
 
 	return image_init_result::PASS;
 }
@@ -1805,7 +1960,7 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 WRITE16_MEMBER(quizwizc_state::write_o)
 {
 	// O0-O7: led/digit segment data
-	m_o = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	m_o = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	prepare_display();
 }
 
@@ -1815,7 +1970,6 @@ READ8_MEMBER(quizwizc_state::read_k)
 	// K1: cartridge pin 4 (pin 5 N/C)
 	return read_inputs(6) | ((m_r & m_pinout) ? 1 : 0);
 }
-
 
 // config
 
@@ -1851,7 +2005,7 @@ static INPUT_PORTS_START( quizwizc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Slow Forward")
 
 	PORT_START("IN.5") // R5
-	PORT_CONFNAME( 0x02, 0x00, "Game Select")
+	PORT_CONFNAME( 0x02, 0x00, "Game Select" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1865,20 +2019,20 @@ void quizwizc_state::machine_start()
 	save_item(NAME(m_pinout));
 }
 
-static MACHINE_CONFIG_START( quizwizc )
+MACHINE_CONFIG_START(quizwizc_state::quizwizc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(quizwizc_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(quizwizc_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(quizwizc_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, quizwizc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, quizwizc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, quizwizc_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_quizwizc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
@@ -1932,6 +2086,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void tc4(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -1992,7 +2147,6 @@ READ8_MEMBER(tc4_state::read_k)
 	return read_inputs(6) | ((m_r & 0x200) ? m_pinout : 0);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tc4 )
@@ -2041,20 +2195,20 @@ void tc4_state::machine_start()
 	save_item(NAME(m_pinout));
 }
 
-static MACHINE_CONFIG_START( tc4 )
+MACHINE_CONFIG_START(tc4_state::tc4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(tc4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tc4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tc4_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tc4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tc4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tc4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tc4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
@@ -2095,6 +2249,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void cnbaskb(machine_config &config);
 };
 
 // handlers
@@ -2134,7 +2289,6 @@ READ8_MEMBER(cnbaskb_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cnbaskb )
@@ -2152,24 +2306,24 @@ static INPUT_PORTS_START( cnbaskb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 
 	PORT_START("IN.2") // R10
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cnbaskb )
+MACHINE_CONFIG_START(cnbaskb_state::cnbaskb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(cnbaskb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnbaskb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnbaskb_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnbaskb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnbaskb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnbaskb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cnbaskb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2206,6 +2360,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void cmsport(machine_config &config);
 };
 
 // handlers
@@ -2243,7 +2398,6 @@ READ8_MEMBER(cmsport_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cmsport )
@@ -2269,20 +2423,20 @@ static INPUT_PORTS_START( cmsport )
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmsport )
+MACHINE_CONFIG_START(cmsport_state::cmsport)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(cmsport_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cmsport_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cmsport_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cmsport_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cmsport_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cmsport_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cmsport)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2321,6 +2475,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void cnfball(machine_config &config);
 };
 
 // handlers
@@ -2370,14 +2525,13 @@ READ8_MEMBER(cnfball_state::read_k)
 	return read_inputs(2) | (m_r << 3 & 8);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cnfball )
 	PORT_START("IN.0") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R10
@@ -2395,20 +2549,20 @@ INPUT_PORTS_END
 
 static const s16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( cnfball )
+MACHINE_CONFIG_START(cnfball_state::cnfball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(cnfball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnfball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnfball_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnfball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnfball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cnfball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, cnfball_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2442,6 +2596,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void cnfball2(machine_config &config);
 };
 
 // handlers
@@ -2483,7 +2638,6 @@ READ8_MEMBER(cnfball2_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cnfball2 )
@@ -2521,21 +2675,21 @@ static const u16 cnfball2_output_pla[0x20] =
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static MACHINE_CONFIG_START( cnfball2 )
+MACHINE_CONFIG_START(cnfball2_state::cnfball2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
 	MCFG_TMS1XXX_OUTPUT_PLA(cnfball2_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(cnfball2_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnfball2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnfball2_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnfball2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnfball2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cnfball2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2572,6 +2726,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void eleciq(machine_config &config);
 };
 
 // handlers
@@ -2609,7 +2764,6 @@ READ8_MEMBER(eleciq_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(7);
 }
-
 
 // config
 
@@ -2654,7 +2808,7 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
@@ -2663,20 +2817,20 @@ INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( eleciq )
+MACHINE_CONFIG_START(eleciq_state::eleciq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=50pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(eleciq_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(eleciq_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eleciq_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=50pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, eleciq_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, eleciq_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, eleciq_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_eleciq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2707,6 +2861,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void esoccer(machine_config &config);
 };
 
 // handlers
@@ -2744,7 +2899,6 @@ READ8_MEMBER(esoccer_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( esoccer )
@@ -2768,20 +2922,20 @@ static INPUT_PORTS_START( esoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( esoccer )
+MACHINE_CONFIG_START(esoccer_state::esoccer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=33pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(esoccer_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(esoccer_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(esoccer_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=33pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, esoccer_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, esoccer_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esoccer_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_esoccer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2831,6 +2985,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void ebball(machine_config &config);
 };
 
 // handlers
@@ -2869,7 +3024,6 @@ READ8_MEMBER(ebball_state::read_k)
 	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ebball )
@@ -2902,20 +3056,20 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ebball )
+MACHINE_CONFIG_START(ebball_state::ebball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(ebball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2961,6 +3115,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void ebball2(machine_config &config);
 };
 
 // handlers
@@ -2998,7 +3153,6 @@ READ8_MEMBER(ebball2_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ebball2 )
@@ -3025,20 +3179,20 @@ static INPUT_PORTS_START( ebball2 )
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ebball2 )
+MACHINE_CONFIG_START(ebball2_state::ebball2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(ebball2_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball2_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3092,6 +3246,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void ebball3(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -3143,7 +3298,6 @@ READ8_MEMBER(ebball3_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -3205,20 +3359,20 @@ void ebball3_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( ebball3 )
+MACHINE_CONFIG_START(ebball3_state::ebball3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 340000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(ebball3_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball3_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball3_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 340000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball3_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball3_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball3_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3260,6 +3414,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void esbattle(machine_config &config);
 };
 
 // handlers
@@ -3297,7 +3452,6 @@ READ8_MEMBER(esbattle_state::read_k)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( esbattle )
@@ -3316,20 +3470,20 @@ static INPUT_PORTS_START( esbattle )
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( esbattle )
+MACHINE_CONFIG_START(esbattle_state::esbattle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 425000) // approximation - RC osc. R=47K, C=33pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(esbattle_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(esbattle_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(esbattle_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 425000) // approximation - RC osc. R=47K, C=33pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, esbattle_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, esbattle_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esbattle_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_esbattle)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3362,6 +3516,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void einvader(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -3392,7 +3547,6 @@ WRITE16_MEMBER(einvader_state::write_o)
 	m_o = data;
 	prepare_display();
 }
-
 
 // config
 
@@ -3425,13 +3579,13 @@ void einvader_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( einvader )
+MACHINE_CONFIG_START(einvader_state::einvader)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 320000) // see set_clock
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 320000) // see set_clock
 	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(einvader_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(einvader_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, einvader_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, einvader_state, write_o))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3442,8 +3596,8 @@ static MACHINE_CONFIG_START( einvader )
 	MCFG_DEFAULT_LAYOUT(layout_einvader)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3470,6 +3624,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void efootb4(machine_config &config);
 };
 
 // handlers
@@ -3505,7 +3660,6 @@ READ8_MEMBER(efootb4_state::read_k)
 {
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -3545,20 +3699,20 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( efootb4 )
+MACHINE_CONFIG_START(efootb4_state::efootb4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(efootb4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(efootb4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(efootb4_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, efootb4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, efootb4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, efootb4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_efootb4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3597,6 +3751,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void ebaskb2(machine_config &config);
 };
 
 // handlers
@@ -3634,7 +3789,6 @@ READ8_MEMBER(ebaskb2_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ebaskb2 )
@@ -3666,20 +3820,20 @@ static INPUT_PORTS_START( ebaskb2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ebaskb2 )
+MACHINE_CONFIG_START(ebaskb2_state::ebaskb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 360000) // approximation - RC osc. R=33K, C=82pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(ebaskb2_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebaskb2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebaskb2_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 360000) // approximation - RC osc. R=33K, C=82pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebaskb2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebaskb2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebaskb2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3724,6 +3878,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void raisedvl(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -3765,7 +3920,6 @@ READ8_MEMBER(raisedvl_state::read_k)
 	return read_inputs(2) & 0xf;
 }
 
-
 // config
 
 static INPUT_PORTS_START( raisedvl )
@@ -3805,20 +3959,20 @@ void raisedvl_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( raisedvl )
+MACHINE_CONFIG_START(raisedvl_state::raisedvl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(raisedvl_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(raisedvl_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(raisedvl_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, raisedvl_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, raisedvl_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, raisedvl_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_raisedvl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3865,6 +4019,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void f2pbball(machine_config &config);
 };
 
 // handlers
@@ -3892,7 +4047,7 @@ WRITE16_MEMBER(f2pbball_state::write_r)
 WRITE16_MEMBER(f2pbball_state::write_o)
 {
 	// O0-O7: led state
-	m_o = BITSWAP8(data,0,7,6,5,4,3,2,1);
+	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	prepare_display();
 }
 
@@ -3901,7 +4056,6 @@ READ8_MEMBER(f2pbball_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -3927,7 +4081,7 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
@@ -3936,20 +4090,20 @@ INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( f2pbball )
+MACHINE_CONFIG_START(f2pbball_state::f2pbball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=51K, C=39pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(f2pbball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(f2pbball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(f2pbball_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=51K, C=39pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, f2pbball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, f2pbball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f2pbball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_f2pbball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3980,6 +4134,13 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void f3in1(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -4017,14 +4178,13 @@ READ8_MEMBER(f3in1_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( f3in1 )
 	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // P
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // K
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // D
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("K Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("D Button")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R1
@@ -4043,23 +4203,44 @@ static INPUT_PORTS_START( f3in1 )
 	PORT_CONFSETTING(    0x02, "Football" )
 	PORT_CONFSETTING(    0x04, "Basketball" )
 	PORT_CONFSETTING(    0x08, "Soccer" )
+
+	PORT_START("IN.4") // fake
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, f3in1_state, skill_switch, nullptr)
+	PORT_CONFSETTING(    0x00, "Regular" ) // REG
+	PORT_CONFSETTING(    0x01, "Professional" ) // PROF
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( f3in1 )
+INPUT_CHANGED_MEMBER(f3in1_state::skill_switch)
+{
+	set_clock();
+}
+
+void f3in1_state::set_clock()
+{
+	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
+	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 400000 : 300000);
+}
+
+void f3in1_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
+MACHINE_CONFIG_START(f3in1_state::f3in1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // see set_clock ---TODO
-	MCFG_TMS1XXX_READ_K_CB(READ8(f3in1_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(f3in1_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(f3in1_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, f3in1_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, f3in1_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f3in1_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_f3in1)
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_f3in1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4094,6 +4275,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void gpoker(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -4104,7 +4286,7 @@ protected:
 void gpoker_state::prepare_display()
 {
 	set_display_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
-	u16 segs = BITSWAP16(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
+	u16 segs = bitswap<16>(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
 	display_matrix(14, 11, segs | (m_r >> 3 & 0xf00), m_r & 0x7ff);
 }
 
@@ -4134,7 +4316,6 @@ READ8_MEMBER(gpoker_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(7);
 }
-
 
 // config
 
@@ -4191,20 +4372,20 @@ void gpoker_state::machine_reset()
 	m_beeper->set_state(0);
 }
 
-static MACHINE_CONFIG_START( gpoker )
+MACHINE_CONFIG_START(gpoker_state::gpoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1370, 350000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gpoker_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1370, 350000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, gpoker_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, gpoker_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gpoker)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2405) // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2405) // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4233,6 +4414,7 @@ public:
 	{ }
 
 	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+	void gjackpot(machine_config &config);
 };
 
 // handlers
@@ -4243,7 +4425,6 @@ WRITE16_MEMBER(gjackpot_state::write_r)
 	gpoker_state::write_r(space, offset, data);
 	m_inp_mux = (data & 0x3f) | (data >> 4 & 0x40);
 }
-
 
 // config
 
@@ -4304,20 +4485,20 @@ static INPUT_PORTS_START( gjackpot )
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gjackpot )
+MACHINE_CONFIG_START(gjackpot_state::gjackpot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gjackpot_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, gpoker_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, gjackpot_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gjackpot)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2405) // see gpoker
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2405) // see gpoker
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4350,14 +4531,15 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void ginv1000(machine_config &config);
 };
 
 // handlers
 
 void ginv1000_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
-	u16 plate = BITSWAP16(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
+	u16 plate = bitswap<16>(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
 	display_matrix(12, 10, plate, grid);
 }
 
@@ -4369,8 +4551,8 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 	// R8,R15: input mux
 	m_inp_mux = (data >> 8 & 1) | (data >> 14 & 2);
 
-	// R1-R10: VFD matrix grid
-	// R11-R14: VFD matrix plate
+	// R1-R10: VFD grid
+	// R11-R14: VFD plate
 	m_grid = data >> 1 & 0x3ff;
 	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
 	prepare_display();
@@ -4378,17 +4560,16 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 
 WRITE16_MEMBER(ginv1000_state::write_o)
 {
-	// O0-O7: VFD matrix plate
+	// O0-O7: VFD plate
 	m_plate = (m_plate & ~0xff) | data;
 	prepare_display();
 }
 
 READ8_MEMBER(ginv1000_state::read_k)
 {
-	// K: multiplexed inputs (K8 is fire button)
+	// K1,K2: multiplexed inputs (K8 is fire button)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -4409,13 +4590,13 @@ static INPUT_PORTS_START( ginv1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ginv1000 )
+MACHINE_CONFIG_START(ginv1000_state::ginv1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1370, 340000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(ginv1000_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ginv1000_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ginv1000_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1370, 340000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ginv1000_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv1000_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv1000_state, write_o))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -4426,8 +4607,144 @@ static MACHINE_CONFIG_START( ginv1000 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Invader 2000
+  * TMS1370(28 pins) MP1604 (die label 1370A MP1604)
+  * TMS1024 I/O expander
+  * cyan/red/green VFD display, 1-bit sound
+
+  known releases:
+  - World: Invader 2000
+  - USA(1): Galaxy Invader 10000, published by CGL
+  - USA(2): Cosmic 3000 Fire Away, published by Tandy
+
+***************************************************************************/
+
+class ginv2000_state : public hh_tms1k_state
+{
+public:
+	ginv2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_expander(*this, "expander")
+	{ }
+
+	required_device<tms1024_device> m_expander;
+	DECLARE_WRITE8_MEMBER(expander_w);
+
+	void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+	void ginv2000(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+};
+
+// handlers
+
+void ginv2000_state::prepare_display()
+{
+	display_matrix(16, 10, m_plate, m_grid);
+}
+
+WRITE8_MEMBER(ginv2000_state::expander_w)
+{
+	// TMS1024 port 4-7: VFD plate
+	int shift = (offset - tms1024_device::PORT4) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv2000_state::write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R11,R12: input mux
+	m_inp_mux = data >> 11 & 3;
+
+	// R11,R12: TMS1024 S1,S0 (S2 forced high)
+	// R13: TMS1024 STD
+	m_expander->write_s(space, 0, (data >> 12 & 1) | (data >> 10 & 2) | 4);
+	m_expander->write_std(data >> 13 & 1);
+
+	// R1-R10: VFD grid
+	m_grid = data >> 1 & 0x3ff;
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv2000_state::write_o)
+{
+	// O4-O7: TMS1024 H1-H4
+	m_expander->write_h(space, 0, data >> 4 & 0xf);
+}
+
+READ8_MEMBER(ginv2000_state::read_k)
+{
+	// K1,K2: multiplexed inputs (K8 is fire button)
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+// config
+
+static INPUT_PORTS_START( ginv2000 )
+	PORT_START("IN.0") // R11
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R12
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+void ginv2000_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	m_expander->write_ms(1); // Vss
+}
+
+MACHINE_CONFIG_START(ginv2000_state::ginv2000)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1370, 425000) // approximation - RC osc. R=36K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ginv2000_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv2000_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv2000_state, write_o))
+
+	MCFG_DEVICE_ADD("expander", TMS1024, 0)
+	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, ginv2000_state, expander_w))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(364, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 364-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4464,6 +4781,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void fxmcr165(machine_config &config);
 };
 
 // handlers
@@ -4472,7 +4790,7 @@ void fxmcr165_state::prepare_display()
 {
 	// 7seg digit from O0-O6
 	m_display_segmask[0] = 0x7f;
-	m_display_state[0] = BITSWAP8(m_o,7,2,6,5,4,3,1,0) & 0x7f;
+	m_display_state[0] = bitswap<8>(m_o,7,2,6,5,4,3,1,0) & 0x7f;
 
 	// leds from R4-R10
 	m_display_state[1] = m_r >> 4 & 0x7f;
@@ -4508,7 +4826,6 @@ READ8_MEMBER(fxmcr165_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -4552,20 +4869,20 @@ static INPUT_PORTS_START( fxmcr165 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Address Set")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( fxmcr165 )
+MACHINE_CONFIG_START(fxmcr165_state::fxmcr165)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, XTAL_400kHz)
-	MCFG_TMS1XXX_READ_K_CB(READ8(fxmcr165_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(fxmcr165_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(fxmcr165_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 400_kHz_XTAL)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, fxmcr165_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, fxmcr165_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, fxmcr165_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fxmcr165)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4598,6 +4915,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void elecdet(machine_config &config);
 };
 
 // handlers
@@ -4609,7 +4927,7 @@ WRITE16_MEMBER(elecdet_state::write_r)
 
 	// R0-R6: select digit
 	set_display_segmask(0x7f, 0x7f);
-	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
+	display_matrix(7, 7, bitswap<8>(m_o,7,5,2,1,4,0,6,3), data);
 }
 
 WRITE16_MEMBER(elecdet_state::write_o)
@@ -4627,7 +4945,6 @@ READ8_MEMBER(elecdet_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[4]->read() | read_inputs(4);
 }
-
 
 // config
 
@@ -4680,21 +4997,21 @@ INPUT_PORTS_END
 
 static const s16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
 
-static MACHINE_CONFIG_START( elecdet )
+MACHINE_CONFIG_START(elecdet_state::elecdet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0980, 425000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(elecdet_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(elecdet_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(elecdet_state, write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+	MCFG_DEVICE_ADD("maincpu", TMS0980, 425000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, elecdet_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, elecdet_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecdet_state, write_o))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_elecdet)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, elecdet_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4726,6 +5043,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void starwbc(machine_config &config);
 };
 
 // handlers
@@ -4762,7 +5080,6 @@ READ8_MEMBER(starwbc_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -4808,20 +5125,20 @@ static INPUT_PORTS_START( starwbc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( starwbc )
+MACHINE_CONFIG_START(starwbc_state::starwbc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // approximation - RC osc. R=51K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(starwbc_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(starwbc_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(starwbc_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 325000) // approximation - RC osc. R=51K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, starwbc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, starwbc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, starwbc_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_starwbc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4851,6 +5168,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void astro(machine_config &config);
 };
 
 // handlers
@@ -4883,7 +5201,6 @@ READ8_MEMBER(astro_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(8);
 }
-
 
 // config
 
@@ -4935,13 +5252,13 @@ static INPUT_PORTS_START( astro )
 	PORT_CONFSETTING(    0x08, "Astro" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( astro )
+MACHINE_CONFIG_START(astro_state::astro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(astro_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(astro_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(astro_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, astro_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, astro_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, astro_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_astro)
@@ -4990,6 +5307,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void elecbowl(machine_config &config);
 };
 
 // handlers
@@ -5052,7 +5370,6 @@ READ8_MEMBER(elecbowl_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( elecbowl )
@@ -5100,21 +5417,21 @@ static const u16 elecbowl_output_pla[0x20] =
 	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
 };
 
-static MACHINE_CONFIG_START( elecbowl )
+MACHINE_CONFIG_START(elecbowl_state::elecbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
 	MCFG_TMS1XXX_OUTPUT_PLA(elecbowl_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(elecbowl_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(elecbowl_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(elecbowl_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, elecbowl_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, elecbowl_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecbowl_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_elecbowl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -5152,6 +5469,7 @@ public:
 	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void horseran(machine_config &config);
 };
 
 // handlers
@@ -5167,7 +5485,7 @@ WRITE32_MEMBER(horseran_state::lcd_output_w)
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
-		m_display_state[3 + (offset << 1 | i)] = BITSWAP8(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
+		m_display_state[3 + (offset << 1 | i)] = bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
 
 	set_display_segmask(0x3f<<3, 0x7f);
 	set_display_size(24, 3+6);
@@ -5192,7 +5510,6 @@ READ8_MEMBER(horseran_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(8);
 }
-
 
 // config
 
@@ -5257,16 +5574,16 @@ static INPUT_PORTS_START( horseran )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( horseran )
+MACHINE_CONFIG_START(horseran_state::horseran)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=56K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(horseran_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(horseran_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=56K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, horseran_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, horseran_state, write_r))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uF
-	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(horseran_state, lcd_output_w))
+	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(*this, horseran_state, lcd_output_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_horseran)
 
@@ -5298,6 +5615,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void mdndclab(machine_config &config);
 };
 
 // handlers
@@ -5322,7 +5640,6 @@ READ8_MEMBER(mdndclab_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(18);
 }
-
 
 // config
 
@@ -5436,20 +5753,20 @@ static INPUT_PORTS_START( mdndclab )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Dragon Attacks / Dragon Wakes")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mdndclab )
+MACHINE_CONFIG_START(mdndclab_state::mdndclab)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 475000) // approximation - RC osc. R=27K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(mdndclab_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mdndclab_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mdndclab_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 475000) // approximation - RC osc. R=27K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mdndclab_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mdndclab_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mdndclab_state, write_o))
 
 	/* no visual feedback! */
 	MCFG_DEFAULT_LAYOUT(layout_mdndclab) // playing board
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -5485,6 +5802,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void comp4(machine_config &config);
 };
 
 // handlers
@@ -5517,7 +5835,6 @@ READ8_MEMBER(comp4_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( comp4 )
@@ -5540,13 +5857,13 @@ static INPUT_PORTS_START( comp4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( comp4 )
+MACHINE_CONFIG_START(comp4_state::comp4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(comp4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(comp4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(comp4_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, comp4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, comp4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, comp4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_comp4)
@@ -5589,6 +5906,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void bship(machine_config &config);
 };
 
 // handlers
@@ -5612,7 +5930,6 @@ READ8_MEMBER(bship_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[11]->read() | read_inputs(11);
 }
-
 
 // config
 
@@ -5690,13 +6007,13 @@ static INPUT_PORTS_START( bship )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bship )
+MACHINE_CONFIG_START(bship_state::bship)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(bship_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bship_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bship_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bship_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bship_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bship_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bship)
@@ -5734,6 +6051,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void bshipb(machine_config &config);
 };
 
 // handlers
@@ -5788,25 +6106,24 @@ READ8_MEMBER(bshipb_state::read_k)
 	return m_inp_matrix[11]->read() | read_inputs(11);
 }
 
-
 // config
 
 // buttons are same as bship set
 
-static MACHINE_CONFIG_START( bshipb )
+MACHINE_CONFIG_START(bshipb_state::bshipb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(bshipb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bshipb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bshipb_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bshipb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bshipb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bshipb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bship)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn76477", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(100), CAP_P(47)) // R18, R17, C8
 	MCFG_SN76477_DECAY_RES(RES_M(3.3))                          // R16
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.47), RES_K(15))          // C7, R20
@@ -5852,6 +6169,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void simon(machine_config &config);
 };
 
 // handlers
@@ -5879,7 +6197,6 @@ READ8_MEMBER(simon_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -5911,19 +6228,19 @@ static INPUT_PORTS_START( simon )
 	PORT_CONFSETTING(    0x01, "4" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( simon )
+MACHINE_CONFIG_START(simon_state::simon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(simon_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(simon_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, simon_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, simon_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_simon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -5954,6 +6271,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
+	void ssimon(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -5981,7 +6299,6 @@ READ8_MEMBER(ssimon_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -6021,7 +6338,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_CONFSETTING(    0x01, "4" )
 
 	PORT_START("IN.5") // R10
-	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // fake
@@ -6052,19 +6369,19 @@ void ssimon_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( ssimon )
+MACHINE_CONFIG_START(ssimon_state::ssimon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 275000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(ssimon_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ssimon_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 275000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ssimon_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssimon_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ssimon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -6103,6 +6420,7 @@ public:
 	int m_gearbox_pos;
 	bool sensor_state() { return m_gearbox_pos < 0 && m_display_decay[0][0] != 0; }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
+	void bigtrak(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -6163,7 +6481,6 @@ READ8_MEMBER(bigtrak_state::read_k)
 	return read_inputs(7) | (sensor_state() ? 8 : 0);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -6217,7 +6534,7 @@ static INPUT_PORTS_START( bigtrak )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 
 	PORT_START("IN.6") // R8
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_F1) PORT_NAME("Input Port")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Input Port")
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -6232,21 +6549,21 @@ void bigtrak_state::machine_start()
 
 static const s16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-static MACHINE_CONFIG_START( bigtrak )
+MACHINE_CONFIG_START(bigtrak_state::bigtrak)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(bigtrak_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bigtrak_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bigtrak_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bigtrak_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bigtrak_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bigtrak_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gearbox", bigtrak_state, gearbox_sim_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bigtrak)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(8, bigtrak_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -6295,6 +6612,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void mbdtower(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -6354,7 +6672,7 @@ void mbdtower_state::prepare_display()
 	// update current state
 	if (~m_r & 0x10)
 	{
-		u8 o = BITSWAP8(m_o,7,0,4,3,2,1,6,5) & 0x7f;
+		u8 o = bitswap<8>(m_o,7,0,4,3,2,1,6,5) & 0x7f;
 		m_display_state[2] = (m_o & 0x80) ? o : 0;
 		m_display_state[1] = (m_o & 0x80) ? 0 : o;
 		m_display_state[0] = (m_r >> 8 & 1) | (m_r >> 4 & 0xe);
@@ -6404,7 +6722,6 @@ READ8_MEMBER(mbdtower_state::read_k)
 	// K8: rotation sensor
 	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
 }
-
 
 // config
 
@@ -6465,21 +6782,21 @@ void mbdtower_state::machine_start()
 	save_item(NAME(m_sensor_blind));
 }
 
-static MACHINE_CONFIG_START( mbdtower )
+MACHINE_CONFIG_START(mbdtower_state::mbdtower)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(mbdtower_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mbdtower_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mbdtower_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mbdtower_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mbdtower_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mbdtower_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -6508,6 +6825,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void arcmania(machine_config &config);
 };
 
 // handlers
@@ -6536,7 +6854,6 @@ READ8_MEMBER(arcmania_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -6576,20 +6893,20 @@ INPUT_PORTS_END
 
 static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-static MACHINE_CONFIG_START( arcmania )
+MACHINE_CONFIG_START(arcmania_state::arcmania)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 250000) // approximation - RC osc. R=56K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(arcmania_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(arcmania_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(arcmania_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 250000) // approximation - RC osc. R=56K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, arcmania_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, arcmania_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arcmania_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_arcmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(8, arcmania_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -6620,6 +6937,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void cnsector(machine_config &config);
 };
 
 // handlers
@@ -6646,7 +6964,6 @@ READ8_MEMBER(cnsector_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -6695,13 +7012,13 @@ static INPUT_PORTS_START( cnsector )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Teach Mode")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cnsector )
+MACHINE_CONFIG_START(cnsector_state::cnsector)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(cnsector_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnsector_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnsector_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnsector_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnsector_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnsector_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cnsector)
@@ -6745,6 +7062,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void merlin(machine_config &config);
 };
 
 // handlers
@@ -6778,7 +7096,6 @@ READ8_MEMBER(merlin_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( merlin )
@@ -6809,20 +7126,20 @@ INPUT_PORTS_END
 
 static const s16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-static MACHINE_CONFIG_START( merlin )
+MACHINE_CONFIG_START(merlin_state::merlin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(merlin_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(merlin_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(merlin_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, merlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, merlin_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, merlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_merlin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -6859,10 +7176,11 @@ public:
 	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: merlin_state(mconfig, type, tag)
 	{ }
+
+	void mmerlin(machine_config &config);
 };
 
 // handlers: uses the ones in merlin_state
-
 
 // config
 
@@ -6873,20 +7191,20 @@ static INPUT_PORTS_START( mmerlin )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Score") // instead of Hit Me
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mmerlin )
+MACHINE_CONFIG_START(mmerlin_state::mmerlin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(mmerlin_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mmerlin_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mmerlin_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mmerlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mmerlin_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mmerlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mmerlin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -6917,6 +7235,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void stopthief(machine_config &config);
 };
 
 // handlers
@@ -6925,7 +7244,7 @@ WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
 	set_display_segmask(7, 0x7f);
-	display_matrix(7, 3, BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
+	display_matrix(7, 3, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
 
 	// R3-R8(tied together): speaker out
 	int level = 0;
@@ -6949,7 +7268,6 @@ READ8_MEMBER(stopthief_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -6988,21 +7306,21 @@ INPUT_PORTS_END
 
 static const s16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
 
-static MACHINE_CONFIG_START( stopthief )
+MACHINE_CONFIG_START(stopthief_state::stopthief)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0980, 425000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(stopthief_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(stopthief_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(stopthief_state, write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+	MCFG_DEVICE_ADD("maincpu", TMS0980, 425000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, stopthief_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, stopthief_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, stopthief_state, write_o))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_stopthief)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(7, stopthief_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -7038,13 +7356,14 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void bankshot(machine_config &config);
 };
 
 // handlers
 
 void bankshot_state::prepare_display()
 {
-	display_matrix(7, 11, m_o, m_r & ~3);
+	display_matrix(8, 11, m_o, m_r & ~3);
 }
 
 WRITE16_MEMBER(bankshot_state::write_r)
@@ -7062,9 +7381,8 @@ WRITE16_MEMBER(bankshot_state::write_r)
 
 WRITE16_MEMBER(bankshot_state::write_o)
 {
-	// O0-O6: led state
-	// O7: N/C
-	m_o = data & 0x7f;
+	// O0-O7: led state
+	m_o = data;
 	prepare_display();
 }
 
@@ -7073,7 +7391,6 @@ READ8_MEMBER(bankshot_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(2);
 }
-
 
 // config
 
@@ -7103,20 +7420,20 @@ static INPUT_PORTS_START( bankshot )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bankshot )
+MACHINE_CONFIG_START(bankshot_state::bankshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(bankshot_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bankshot_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bankshot_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bankshot_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bankshot_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bankshot_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bankshot)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7167,6 +7484,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void splitsec(machine_config &config);
 };
 
 // handlers
@@ -7203,7 +7521,6 @@ READ8_MEMBER(splitsec_state::read_k)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( splitsec )
@@ -7220,20 +7537,20 @@ static INPUT_PORTS_START( splitsec )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( splitsec )
+MACHINE_CONFIG_START(splitsec_state::splitsec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(splitsec_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(splitsec_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(splitsec_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, splitsec_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, splitsec_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, splitsec_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_splitsec)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7262,6 +7579,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void lostreas(machine_config &config);
 };
 
 // handlers
@@ -7290,7 +7608,6 @@ READ8_MEMBER(lostreas_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -7318,7 +7635,7 @@ static INPUT_PORTS_START( lostreas )
 	PORT_START("IN.2") // O2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
-	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // air/up
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // air/up
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("$ Value")
 
 	PORT_START("IN.3") // O3
@@ -7338,21 +7655,143 @@ static const s16 lostreas_speaker_levels[16] =
 	0x7fff/8, 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1
 };
 
-static MACHINE_CONFIG_START( lostreas )
+MACHINE_CONFIG_START(lostreas_state::lostreas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 425000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(lostreas_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(lostreas_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lostreas_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 425000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, lostreas_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, lostreas_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, lostreas_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_lostreas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(16, lostreas_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Playskool Alphie
+  * TMS1000 (label not known yet)
+  * 5 LEDs, 1-bit sound
+
+  This is an educational toy robot for young kids. It has 2 sliding arms:
+  the left arm(Alphie's right arm) is for questions, the other for answers.
+  Cardboard inlays are used for arm position labels.
+
+  There are 4 play modes:
+  - S symbol: Alphie answers questions. The answers are always the same,
+    no matter the inlay: Q1=A3, Q2=A5, Q3=A4, Q4=A1, Q5=A2.
+  - * symbol: used with Lunar Landing board game
+  - X symbol: used with Robot Land board game
+  - music note: play a selection of 5 tunes
+
+***************************************************************************/
+
+class alphie_state : public hh_tms1k_state
+{
+public:
+	alphie_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	TIMER_DEVICE_CALLBACK_MEMBER(show_arm_position);
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void alphie(machine_config &config);
+};
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(alphie_state::show_arm_position)
+{
+	// arm position 1(up) to 5(down)
+	output().set_value("q_pos", 32 - count_leading_zeros(m_inp_matrix[1]->read()));
+	output().set_value("a_pos", 32 - count_leading_zeros(m_inp_matrix[2]->read()));
+}
+
+WRITE16_MEMBER(alphie_state::write_r)
+{
+	// R1-R5, input mux (using d5 for Vss)
+	m_inp_mux = (data >> 1 & 0x1f) | 0x20;
+
+	// R6-R10: leds
+	display_matrix(5, 1, data >> 6, 1);
+
+	// R0: power off on falling edge (turn back on with button)
+	if (~data & m_r & 1)
+		power_off();
+
+	m_r = data;
+}
+
+WRITE16_MEMBER(alphie_state::write_o)
+{
+	// O?: speaker out
+	m_speaker->level_w(data & 1);
+}
+
+READ8_MEMBER(alphie_state::read_k)
+{
+	// K: multiplexed inputs, rotated matrix
+	return read_rotated_inputs(6);
+}
+
+// config
+
+static const ioport_value alphie_armpos_table[5] = { 0x01, 0x02, 0x04, 0x08, 0x10 };
+
+static INPUT_PORTS_START( alphie )
+	PORT_START("IN.0") // K1
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+
+	PORT_START("IN.1") // K2
+	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_PLAYER(2) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Question Arm")
+
+	PORT_START("IN.2") // K4
+	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Answer Arm")
+
+	PORT_START("IN.3") // K8
+	PORT_CONFNAME( 0x0f, 0x01, "Activity" )
+	PORT_CONFSETTING(    0x01, "Questions" )
+	PORT_CONFSETTING(    0x02, "Lunar Landing" )
+	PORT_CONFSETTING(    0x04, "Robot Land" )
+	PORT_CONFSETTING(    0x08, "Tunes" )
+INPUT_PORTS_END
+
+// output PLA is guessed
+static const u16 alphie_output_pla[0x20] =
+{
+	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
+};
+
+MACHINE_CONFIG_START(alphie_state::alphie)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation
+	MCFG_TMS1XXX_OUTPUT_PLA(alphie_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, alphie_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, alphie_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, alphie_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("arm_position", alphie_state, show_arm_position, attotime::from_msec(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_alphie)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7383,6 +7822,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void tcfball(machine_config &config);
 };
 
 // handlers
@@ -7425,7 +7865,6 @@ READ8_MEMBER(tcfball_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tcfball )
@@ -7448,20 +7887,20 @@ static INPUT_PORTS_START( tcfball )
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tcfball )
+MACHINE_CONFIG_START(tcfball_state::tcfball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=56K, C=24pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(tcfball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tcfball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tcfball_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=56K, C=24pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tcfball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tcfball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tcfball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7490,10 +7929,11 @@ public:
 	tcfballa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tcfball_state(mconfig, type, tag)
 	{ }
+
+	void tcfballa(machine_config &config);
 };
 
 // handlers: uses the ones in tcfball_state
-
 
 // config
 
@@ -7512,21 +7952,21 @@ static const u16 tcfballa_output_pla[0x20] =
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( tcfballa )
+MACHINE_CONFIG_START(tcfballa_state::tcfballa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=50pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=50pF
 	MCFG_TMS1XXX_OUTPUT_PLA(tcfballa_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tcfballa_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tcfballa_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tcfballa_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tcfballa_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tcfballa_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfballa_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tcfballa)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7572,6 +8012,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void tandy12(machine_config &config);
 };
 
 // handlers
@@ -7606,7 +8047,6 @@ READ8_MEMBER(tandy12_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -7676,21 +8116,21 @@ static const u16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( tandy12 )
+MACHINE_CONFIG_START(tandy12_state::tandy12)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pF
 	MCFG_TMS1XXX_OUTPUT_PLA(tandy12_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tandy12_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tandy12_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tandy12_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tandy12_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tandy12_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tandy12_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tandy12)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7724,6 +8164,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void monkeysee(machine_config &config);
 };
 
 // handlers
@@ -7749,7 +8190,6 @@ READ8_MEMBER(monkeysee_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -7785,20 +8225,20 @@ static INPUT_PORTS_START( monkeysee )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( monkeysee )
+MACHINE_CONFIG_START(monkeysee_state::monkeysee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // approximation - RC osc. R=68K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(monkeysee_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(monkeysee_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(monkeysee_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 250000) // approximation - RC osc. R=68K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, monkeysee_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, monkeysee_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, monkeysee_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_monkeysee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -7833,6 +8273,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void speechp(machine_config &config);
 };
 
 // handlers
@@ -7871,7 +8312,6 @@ READ8_MEMBER(speechp_state::read_k)
 	// K: multiplexed inputs
 	return m_inp_matrix[10]->read() | (read_inputs(10) & 7);
 }
-
 
 // config
 
@@ -7934,21 +8374,100 @@ static INPUT_PORTS_START( speechp )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( speechp )
+MACHINE_CONFIG_START(speechp_state::speechp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(speechp_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(speechp_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(speechp_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, speechp_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, speechp_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, speechp_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_speechp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // approximation
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // approximation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Texas Instruments maze game (unreleased, from patent GB2040172A)
+  * TMS1000 (development version)
+  * 1 7seg LED digit, no sound
+
+  The title of this game is unknown, the patent describes it simply as a maze game.
+  Several electronic maze game concepts are listed in the patent. The PCB schematic
+  and program source code is included for one of them: A predefined 12*8 maze,
+  walls close to the player are displayed on a 7seg digit.
+
+  In the end Texas Instruments didn't release any electronic maze game. This version
+  is too simple and obviously unfinished, start and goal positions are always the same
+  and there is a lot of ROM space left for more levels.
+
+***************************************************************************/
+
+class timaze_state : public hh_tms1k_state
+{
+public:
+	timaze_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void timaze(machine_config &config);
+};
+
+// handlers
+
+WRITE16_MEMBER(timaze_state::write_r)
+{
+	// R0: input mux
+	m_inp_mux = data & 1;
+}
+
+WRITE16_MEMBER(timaze_state::write_o)
+{
+	// O3210: 7seg EGCD?
+	set_display_segmask(1, 0x5c);
+	display_matrix(8, 1, bitswap<8>(data, 7,1,6,0,3,2,5,4), 1);
+}
+
+READ8_MEMBER(timaze_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+// config
+
+static INPUT_PORTS_START( timaze )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(timaze_state::timaze)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=80K, C=27pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, timaze_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, timaze_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, timaze_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_timaze)
+
+	/* no sound! */
 MACHINE_CONFIG_END
 
 
@@ -7979,6 +8498,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void copycat(machine_config &config);
 };
 
 // handlers
@@ -8005,7 +8525,6 @@ READ8_MEMBER(copycat_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -8039,20 +8558,20 @@ INPUT_PORTS_END
 
 static const s16 copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( copycat )
+MACHINE_CONFIG_START(copycat_state::copycat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 320000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(copycat_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(copycat_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(copycat_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 320000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, copycat_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, copycat_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycat_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_copycat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -8088,6 +8607,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
+	void copycatm2(machine_config &config);
 };
 
 // handlers
@@ -8104,7 +8624,6 @@ WRITE16_MEMBER(copycatm2_state::write_o)
 	m_speaker->level_w((data & 1) | (data >> 5 & 2));
 }
 
-
 // config
 
 static INPUT_PORTS_START( copycatm2 )
@@ -8115,20 +8634,20 @@ static INPUT_PORTS_START( copycatm2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( copycatm2 )
+MACHINE_CONFIG_START(copycatm2_state::copycatm2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_DEVICE_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
 	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(copycatm2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(copycatm2_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, copycatm2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycatm2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_copycatm2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -8159,6 +8678,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
+	void ditto(machine_config &config);
 };
 
 // handlers
@@ -8175,7 +8695,6 @@ WRITE16_MEMBER(ditto_state::write_o)
 	m_speaker->level_w(data >> 5 & 3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ditto )
@@ -8186,20 +8705,20 @@ static INPUT_PORTS_START( ditto )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ditto )
+MACHINE_CONFIG_START(ditto_state::ditto)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_DEVICE_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
 	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ditto_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ditto_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ditto_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ditto_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ditto)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -8235,6 +8754,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void ss7in1(machine_config &config);
 };
 
 // handlers
@@ -8268,9 +8788,9 @@ WRITE16_MEMBER(ss7in1_state::write_o)
 
 READ8_MEMBER(ss7in1_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -8301,20 +8821,20 @@ static INPUT_PORTS_START( ss7in1 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ss7in1 )
+MACHINE_CONFIG_START(ss7in1_state::ss7in1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(ss7in1_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ss7in1_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ss7in1_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ss7in1_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ss7in1_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ss7in1_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_7in1ss)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -8376,6 +8896,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void tbreakup(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -8446,7 +8967,6 @@ READ8_MEMBER(tbreakup_state::read_k)
 	return (m_inp_matrix[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tbreakup )
@@ -8494,29 +9014,29 @@ void tbreakup_state::machine_start()
 	save_item(NAME(m_exp_port));
 }
 
-static MACHINE_CONFIG_START( tbreakup )
+MACHINE_CONFIG_START(tbreakup_state::tbreakup)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1040, 325000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(tbreakup_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tbreakup_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1040, 325000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tbreakup_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tbreakup_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tbreakup_state, write_o))
 
 	MCFG_DEVICE_ADD("expander", TMS1025, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT1, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT2, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT3, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT1, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT2, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT3, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, tbreakup_state, expander_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -8566,6 +9086,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	DECLARE_INPUT_CHANGED_MEMBER(flipper_button);
+	void phpball(machine_config &config);
 };
 
 // handlers
@@ -8608,7 +9129,6 @@ READ8_MEMBER(phpball_state::read_k)
 	return m_inp_matrix[1]->read() | read_inputs(1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( phpball )
@@ -8627,20 +9147,20 @@ INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 	prepare_display();
 }
 
-static MACHINE_CONFIG_START( phpball )
+MACHINE_CONFIG_START(phpball_state::phpball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(phpball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(phpball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(phpball_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, phpball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, phpball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, phpball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -8672,6 +9192,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void ssports4(machine_config &config);
 };
 
 // handlers
@@ -8708,7 +9229,6 @@ READ8_MEMBER(ssports4_state::read_k)
 	m_inp_mux = (m_r & 3) | (m_r >> 3 & 4) | (m_r >> 5 & 0x18) | (m_o >> 2 & 0x20);
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -8762,21 +9282,21 @@ static const u16 ssports4_output_pla[0x20] =
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40
 };
 
-static MACHINE_CONFIG_START( ssports4 )
+MACHINE_CONFIG_START(ssports4_state::ssports4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
 	MCFG_TMS1XXX_OUTPUT_PLA(ssports4_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(ssports4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ssports4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ssports4_state, write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ssports4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssports4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ssports4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ssports4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -8789,6 +9309,9 @@ MACHINE_CONFIG_END
   Vulcan XL 25
   * TMS1000SLC MP4486A (die label 1000C/, MP4486A)
   * 28 LEDs, 1-bit sound
+
+  This game is the same logic puzzle as Tiger's Lights Out, except that
+  all 25 lights need to be turned on instead of off.
 
 ***************************************************************************/
 
@@ -8806,6 +9329,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void xl25(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -8853,68 +9377,67 @@ READ8_MEMBER(xl25_state::read_k)
 	return read_inputs(10);
 }
 
-
 // config
 
 static INPUT_PORTS_START( xl25 )
 	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 11") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 12") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 13") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 14") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 10")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 15") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 16")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 21")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Store / Recall") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 22")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Cross / Knight / Score") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 18")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 23")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Clear") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.8") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 19")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 24")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Random") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.9") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 20")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 25")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Sound") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -8929,21 +9452,20 @@ void xl25_state::machine_reset()
 	update_halt();
 }
 
-static MACHINE_CONFIG_START( xl25 )
+MACHINE_CONFIG_START(xl25_state::xl25)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000C, 300000) // approximation - RC osc. R=5.6K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(xl25_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(xl25_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(xl25_state, write_o))
+	MCFG_DEVICE_ADD("maincpu", TMS1000C, 300000) // approximation - RC osc. R=5.6K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, xl25_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, xl25_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, xl25_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_xl25)
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_xl25)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -9042,6 +9564,17 @@ ROM_START( h2hfootb )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_h2hfootb_output.pla", 0, 365, CRC(c8d85873) SHA1(16bd6fc8e3cd16d5f8fd32d0c74e67de77f5487e) )
+ROM_END
+
+
+ROM_START( h2hhockey )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3321a", 0x0000, 0x0400, CRC(e974e604) SHA1(ed740c98ce96ad70ee5237eccae1f54a75ad8100) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_h2hhockey_output.pla", 0, 365, CRC(9d1a91e1) SHA1(96303eb22375129b0dfbfcd823c8ca5b919511bc) )
 ROM_END
 
 
@@ -9301,6 +9834,20 @@ ROM_START( ginv1000 )
 
 	ROM_REGION( 226185, "svg", 0)
 	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
+ROM_END
+
+
+ROM_START( ginv2000 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1604", 0x0000, 0x0800, CRC(f1646d0b) SHA1(65601931d81e3eef7bf22a08de5a146910ce8137) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
+
+	ROM_REGION( 374443, "svg", 0)
+	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
 ROM_END
 
 
@@ -9595,6 +10142,17 @@ ROM_START( lostreas )
 ROM_END
 
 
+ROM_START( alphie )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "us4280809", 0x0000, 0x0400, CRC(f8f14013) SHA1(bf31b929fcbcb189bbe4623104e1da0a639b5954) ) // from patent US4280809, should be good
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent description
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_alphie_output.pla", 0, 365, NO_DUMP ) // "
+ROM_END
+
+
 ROM_START( tcfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1193", 0x0000, 0x0800, CRC(7d9f446f) SHA1(bb6af47b42d989494f21475a73f072cddf58c99f) )
@@ -9649,6 +10207,17 @@ ROM_START( speechp )
 
 	ROM_REGION( 0x0800, "speech", 0 )
 	ROM_LOAD("s14007-a", 0x0000, 0x0800, CRC(543b46d4) SHA1(99daf7fe3354c378b4bd883840c9bbd22b22ebe7) )
+ROM_END
+
+
+ROM_START( timaze )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "gb2040172a", 0x0000, 0x0400, CRC(0bab4dc6) SHA1(c9d40649fbb27a8b7cf7460d66c7e217b63376f0) ) // from patent GB2040172A, verified with source code
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent, use default one
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_timaze_output.pla", 0, 365, BAD_DUMP CRC(f0f36970) SHA1(a6ad1f5e804ac98e5e1a1d07466b3db3a8d6c256) ) // described in patent, but unsure about pin order
 ROM_END
 
 
@@ -9732,104 +10301,110 @@ ROM_START( xl25 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp4486a", 0x0000, 0x0400, CRC(bd84b515) SHA1(377fcc68a517260acd51eb9746cd62914a75d739) )
 
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // placeholder
+	ROM_REGION( 922, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000c_xl25_micro.pla", 0, 922, CRC(8823e7f2) SHA1(676b0eace9d8730f2caa9087e8c51e540c7fabf8) )
 	ROM_REGION( 558, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000c_xl25_output.pla", 0, 558, CRC(06ecc6e0) SHA1(e0fa1b9388948197b4de2edd3cd02fbde1dbabbb) )
 ROM_END
 
 
 
-//    YEAR  NAME        PARENT    CMP MACHINE    INPUT      STATE         INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, matchnum,   0,         0, matchnum,  matchnum,  matchnum_state,  0, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   0, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, matchnum,   0,         0, matchnum,  matchnum,  matchnum_state,  empty_init, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   empty_init, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  0, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 
-CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  0, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
-COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hhockey_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  empty_init, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, empty_init, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, cnbaskb,    0,         0, cnbaskb,   cnbaskb,   cnbaskb_state,   0, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, cmsport,    0,         0, cmsport,   cmsport,   cmsport_state,   0, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1979, cnfball,    0,         0, cnfball,   cnfball,   cnfball_state,   0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, cnfball2,   0,         0, cnfball2,  cnfball2,  cnfball2_state,  0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, eleciq,     0,         0, eleciq,    eleciq,    eleciq_state,    0, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cnbaskb,    0,         0, cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, cmsport,    0,         0, cmsport,   cmsport,   cmsport_state,   empty_init, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, cnfball,    0,         0, cnfball,   cnfball,   cnfball_state,   empty_init, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, cnfball2,   0,         0, cnfball2,  cnfball2,  cnfball2_state,  empty_init, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, eleciq,     0,         0, eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, esoccer,    0,         0, esoccer,   esoccer,   esoccer_state,   0, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ebball2,    0,         0, ebball2,   ebball2,   ebball2_state,   0, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, ebball3,    0,         0, ebball3,   ebball3,   ebball3_state,   0, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  0, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  0, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   0, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   0, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  0, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, esoccer,    0,         0, esoccer,   esoccer,   esoccer_state,   empty_init, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    empty_init, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ebball2,    0,         0, ebball2,   ebball2,   ebball2_state,   empty_init, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ebball3,    0,         0, ebball3,   ebball3,   ebball3_state,   empty_init, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  empty_init, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  0, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     0, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, gpoker,     0,         0, gpoker,    gpoker,    gpoker_state,    0, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  0, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  0, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  0, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, gpoker,     0,         0, gpoker,    gpoker,    gpoker_state,    empty_init, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  empty_init, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   0, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   0, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   0, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1979, astro,      0,         0, astro,     astro,     astro_state,     0, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, astro,      0,         0, astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1978, elecbowl,   0,         0, elecbowl,  elecbowl,  elecbowl_state,  0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
+CONS( 1978, elecbowl,   0,         0, elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
-COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  0, "Mattel", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  empty_init, "Mattel", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 
-CONS( 1977, comp4,      0,         0, comp4,     comp4,     comp4_state,     0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1977, bshipb,     bship,     0, bshipb,    bship,     bshipb_state,    0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1978, simon,      0,         0, simon,     simon,     simon_state,     0, "Milton Bradley", "Simon (Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, simonf,     simon,     0, simon,     simon,     simon_state,     0, "Milton Bradley", "Simon (Rev F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, ssimon,     0,         0, ssimon,    ssimon,    ssimon_state,    0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, bigtrak,    0,         0, bigtrak,   bigtrak,   bigtrak_state,   0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
-CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
-CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  0, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
+CONS( 1977, comp4,      0,         0, comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
+CONS( 1977, bshipb,     bship,     0, bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (1977 version, model 4750B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
+CONS( 1978, simon,      0,         0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, simonf,     simon,     0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, ssimon,     0,         0, ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, bigtrak,    0,         0, bigtrak,   bigtrak,   bigtrak_state,   empty_init, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
+CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
+CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
-CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  0, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    0, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
-CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  0, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splitsec,   0,         0, splitsec,  splitsec,  splitsec_state,  0, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, mmerlin,    0,         0, mmerlin,   mmerlin,   mmerlin_state,   0, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, lostreas,   0,         0, lostreas,  lostreas,  lostreas_state,  0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
+CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splitsec,   0,         0, splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, mmerlin,    0,         0, mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, lostreas,   0,         0, lostreas,  lostreas,  lostreas_state,  empty_init, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   0, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  0, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
-CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, 0, "Tandy Radio Shack", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, alphie,     0,         0, alphie,    alphie,    alphie_state,    empty_init, "Playskool", "Alphie - The Electronic Robot (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 
-COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   0, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Radio Shack", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     0, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, 7in1ss,     0,         0, ss7in1,    ss7in1,    ss7in1_state,    0, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  0, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, 7in1ss,     0,         0, ss7in1,    ss7in1,    ss7in1_state,    empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      0, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

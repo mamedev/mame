@@ -42,6 +42,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -69,21 +70,7 @@ public:
 		m_nmi_enable(0), m_back_color(0), m_vram_page(0)
 	{ }
 
-	DECLARE_PALETTE_INIT(popper);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(layer0_tile_info);
-	TILE_GET_INFO_MEMBER(layer1_tile_info);
-
-	DECLARE_WRITE8_MEMBER(nmi_control_w);
-	DECLARE_WRITE8_MEMBER(crt_direction_w);
-	DECLARE_WRITE8_MEMBER(back_color_select_w);
-	DECLARE_WRITE8_MEMBER(vram_page_select_w);
-	DECLARE_WRITE8_MEMBER(intcycle_w);
-	DECLARE_READ8_MEMBER(subcpu_nmi_r);
-	DECLARE_READ8_MEMBER(subcpu_reset_r);
-	DECLARE_WRITE8_MEMBER(ay1_w);
-	DECLARE_READ8_MEMBER(watchdog_clear_r);
-	DECLARE_READ8_MEMBER(inputs_r);
+	void popper(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -108,6 +95,25 @@ private:
 	int m_nmi_enable;
 	int m_back_color;
 	int m_vram_page;
+
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
+
+	DECLARE_PALETTE_INIT(popper);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(layer0_tile_info);
+	TILE_GET_INFO_MEMBER(layer1_tile_info);
+
+	DECLARE_WRITE8_MEMBER(nmi_control_w);
+	DECLARE_WRITE8_MEMBER(crt_direction_w);
+	DECLARE_WRITE8_MEMBER(back_color_select_w);
+	DECLARE_WRITE8_MEMBER(vram_page_select_w);
+	DECLARE_WRITE8_MEMBER(intcycle_w);
+	DECLARE_READ8_MEMBER(subcpu_nmi_r);
+	DECLARE_READ8_MEMBER(subcpu_reset_r);
+	DECLARE_WRITE8_MEMBER(ay1_w);
+	DECLARE_READ8_MEMBER(watchdog_clear_r);
+	DECLARE_READ8_MEMBER(inputs_r);
 };
 
 
@@ -115,36 +121,38 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, popper_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM
-	AM_RANGE(0xc100, 0xc6ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc700, 0xc8ff) AM_RAM
-	AM_RANGE(0xc900, 0xceff) AM_RAM AM_SHARE("attribute_ram")
-	AM_RANGE(0xcf00, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("shared")
-	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0x03fc) AM_READ(inputs_r)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_WRITE(nmi_control_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_WRITE(crt_direction_w)
-	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_WRITE(back_color_select_w)
-	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITE(vram_page_select_w)
-	AM_RANGE(0xe004, 0xe007) AM_MIRROR(0x1ff8) AM_WRITE(intcycle_w)
-	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ(subcpu_nmi_r)
-	AM_RANGE(0xe800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03ff) AM_READ(subcpu_reset_r)
-	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x03ff) AM_READ(watchdog_clear_r)
-ADDRESS_MAP_END
+void popper_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).noprw();
+	map(0xc000, 0xc0ff).ram();
+	map(0xc100, 0xc6ff).ram().share("video_ram");
+	map(0xc700, 0xc8ff).ram();
+	map(0xc900, 0xceff).ram().share("attribute_ram");
+	map(0xcf00, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().share("sprite_ram");
+	map(0xd800, 0xdfff).ram().share("shared");
+	map(0xe000, 0xe003).mirror(0x03fc).r(FUNC(popper_state::inputs_r));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(FUNC(popper_state::nmi_control_w));
+	map(0xe001, 0xe001).mirror(0x1ff8).w(FUNC(popper_state::crt_direction_w));
+	map(0xe002, 0xe002).mirror(0x1ff8).w(FUNC(popper_state::back_color_select_w));
+	map(0xe003, 0xe003).mirror(0x1ff8).w(FUNC(popper_state::vram_page_select_w));
+	map(0xe004, 0xe007).mirror(0x1ff8).w(FUNC(popper_state::intcycle_w));
+	map(0xe400, 0xe400).mirror(0x03ff).r(FUNC(popper_state::subcpu_nmi_r));
+	map(0xe800, 0xf7ff).noprw();
+	map(0xf800, 0xf800).mirror(0x03ff).r(FUNC(popper_state::subcpu_reset_r));
+	map(0xfc00, 0xfc00).mirror(0x03ff).r(FUNC(popper_state::watchdog_clear_r));
+}
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, popper_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay1_w)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay2", ay8910_device, write_bc1_bc2)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("shared")
-	AM_RANGE(0xe000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void popper_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).noprw();
+	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(popper_state::ay1_w));
+	map(0xa000, 0xa003).mirror(0x1ffc).w("ay2", FUNC(ay8910_device::write_bc1_bc2));
+	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("shared");
+	map(0xe000, 0xffff).noprw();
+}
 
 
 //**************************************************************************
@@ -325,13 +333,13 @@ uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// draw the sprites
 	for (int offs = 0; offs < 0x800; offs += 4)
 	{
-		// 0  76653210  Y coordinate
+		// 0  76543210  Y coordinate
 		// 1  76543210  Code
 		// 2  7-------  Flip Y
 		// 2  -6------  Flip X
 		// 2  --54----  Not used
 		// 2  ----3210  Color
-		// 3  76653210  X coordinate
+		// 3  76543210  X coordinate
 
 		int sx = m_sprite_ram[offs + 3];
 		int sy = m_sprite_ram[offs + 0];
@@ -407,7 +415,7 @@ static const gfx_layout spritelayout =
 	16*2*8
 };
 
-static GFXDECODE_START( popper )
+static GFXDECODE_START( gfx_popper )
 	GFXDECODE_ENTRY("tiles",   0, layer0_charlayout, 0, 32)
 	GFXDECODE_ENTRY("tiles",   0, layer1_charlayout, 0, 16)
 	GFXDECODE_ENTRY("sprites", 0, spritelayout,      0, 16)
@@ -506,7 +514,7 @@ void popper_state::machine_start()
 
 	// allocate and start scanline timer
 	m_scanline_timer = timer_alloc(0);
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	// register for save states
 	save_item(NAME(m_nmi_enable));
@@ -526,33 +534,33 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( popper )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+MACHINE_CONFIG_START(popper_state::popper)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_18_432MHz/3/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 384, 48, 328, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popper)
 
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
 
 	// audio hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/3/2/2)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/3/2/2)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -587,5 +595,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

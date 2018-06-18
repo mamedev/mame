@@ -14,6 +14,7 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -91,6 +92,9 @@ public:
 	void plot0( int offset, uint8_t data );
 	void plot1( int offset, uint8_t data );
 
+	void mjsister(machine_config &config);
+	void mjsister_io_map(address_map &map);
+	void mjsister_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -313,27 +317,29 @@ READ8_MEMBER(mjsister_state::keys_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mjsister_map, AS_PROGRAM, 8, mjsister_state )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(videoram_w)
-ADDRESS_MAP_END
+void mjsister_state::mjsister_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1").w(FUNC(mjsister_state::videoram_w));
+}
 
-static ADDRESS_MAP_START( mjsister_io_map, AS_IO, 8, mjsister_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITENOP /* HD46505? */
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x20, 0x20) AM_READ(keys_r)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("mainlatch1", ls259_device, write_nibble_d0)
-	AM_RANGE(0x31, 0x31) AM_DEVWRITE("mainlatch2", ls259_device, write_nibble_d0)
-	AM_RANGE(0x32, 0x32) AM_WRITE(input_sel1_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(input_sel2_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE(dac_adr_s_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(dac_adr_e_w)
-ADDRESS_MAP_END
+void mjsister_state::mjsister_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).nopw(); /* HD46505? */
+	map(0x10, 0x10).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x11, 0x11).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x20, 0x20).r(FUNC(mjsister_state::keys_r));
+	map(0x21, 0x21).portr("IN0");
+	map(0x30, 0x30).w("mainlatch1", FUNC(ls259_device::write_nibble_d0));
+	map(0x31, 0x31).w("mainlatch2", FUNC(ls259_device::write_nibble_d0));
+	map(0x32, 0x32).w(FUNC(mjsister_state::input_sel1_w));
+	map(0x33, 0x33).w(FUNC(mjsister_state::input_sel2_w));
+	map(0x34, 0x34).w(FUNC(mjsister_state::dac_adr_s_w));
+	map(0x35, 0x35).w(FUNC(mjsister_state::dac_adr_e_w));
+}
 
 
 /*************************************
@@ -484,28 +490,28 @@ INTERRUPT_GEN_MEMBER(mjsister_state::interrupt)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mjsister )
+MACHINE_CONFIG_START(mjsister_state::mjsister)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(mjsister_map)
-	MCFG_CPU_IO_MAP(mjsister_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mjsister_state, interrupt, 2*60)
+	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mjsister_map)
+	MCFG_DEVICE_IO_MAP(mjsister_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mjsister_state, interrupt, 2*60)
 
 	MCFG_DEVICE_ADD("mainlatch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mjsister_state, rombank_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mjsister_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mjsister_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mjsister_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mjsister_state, vrambank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mjsister_state, rombank_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mjsister_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mjsister_state, video_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mjsister_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mjsister_state, vrambank_w))
 
 	MCFG_DEVICE_ADD("mainlatch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mjsister_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mjsister_state, dac_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mjsister_state, rombank_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mjsister_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mjsister_state, dac_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mjsister_state, rombank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -520,16 +526,16 @@ static MACHINE_CONFIG_START( mjsister )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MCLK/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MCLK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -562,4 +568,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, empty_init, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )

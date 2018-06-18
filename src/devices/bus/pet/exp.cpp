@@ -74,12 +74,27 @@ device_pet_expansion_card_interface::~device_pet_expansion_card_interface()
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void pet_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_pet_expansion_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_pet_expansion_card_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void pet_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_pet_expansion_card_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_pet_expansion_card_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_pet_expansion_card_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_read_dma.resolve_safe(0);
@@ -93,10 +108,6 @@ void pet_expansion_slot_device::device_start()
 
 void pet_expansion_slot_device::device_reset()
 {
-	if (m_card != nullptr)
-	{
-		get_card_device()->reset();
-	}
 }
 
 
@@ -197,9 +208,10 @@ int pet_expansion_slot_device::phi2()
 #include "hsg.h"
 #include "superpet.h"
 
-SLOT_INTERFACE_START( pet_expansion_cards )
-	SLOT_INTERFACE("64k", PET_64K)
-	SLOT_INTERFACE("hsga", CBM8000_HSG_A)
-	SLOT_INTERFACE("hsgb", CBM8000_HSG_B)
-	SLOT_INTERFACE("superpet", SUPERPET)
-SLOT_INTERFACE_END
+void pet_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("64k", PET_64K);
+	device.option_add("hsga", CBM8000_HSG_A);
+	device.option_add("hsgb", CBM8000_HSG_B);
+	device.option_add("superpet", SUPERPET);
+}

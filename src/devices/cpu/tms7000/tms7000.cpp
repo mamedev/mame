@@ -23,88 +23,96 @@
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
-DEFINE_DEVICE_TYPE(TMS7000, tms7000_device, "tms7000", "TMS7000")
-DEFINE_DEVICE_TYPE(TMS7020, tms7020_device, "tms7020", "TMS7020")
-DEFINE_DEVICE_TYPE(TMS7040, tms7040_device, "tms7040", "TMS7040")
+DEFINE_DEVICE_TYPE(TMS7000, tms7000_device, "tms7000", "Texas Instruments TMS7000")
+DEFINE_DEVICE_TYPE(TMS7020, tms7020_device, "tms7020", "Texas Instruments TMS7020")
+DEFINE_DEVICE_TYPE(TMS7040, tms7040_device, "tms7040", "Texas Instruments TMS7040")
 
 // Exelvision (spinoff of TI) TMS7020 added one custom opcode.
-DEFINE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device, "tms7020_exl", "TMS7020 (Exelvision)")
+DEFINE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device, "tms7020_exl", "Texas Instruments TMS7020 (Exelvision)")
 
 // CMOS devices biggest difference in a 'real world' setting is that the power
 // requirements are much lower. This obviously has no use in software emulation.
-DEFINE_DEVICE_TYPE(TMS70C00, tms70c00_device, "tms70c00", "TMS70C00")
-DEFINE_DEVICE_TYPE(TMS70C20, tms70c20_device, "tms70c20", "TMS70C20")
-DEFINE_DEVICE_TYPE(TMS70C40, tms70c40_device, "tms70c40", "TMS70C40")
+DEFINE_DEVICE_TYPE(TMS70C00, tms70c00_device, "tms70c00", "Texas Instruments TMS70C00")
+DEFINE_DEVICE_TYPE(TMS70C20, tms70c20_device, "tms70c20", "Texas Instruments TMS70C20")
+DEFINE_DEVICE_TYPE(TMS70C40, tms70c40_device, "tms70c40", "Texas Instruments TMS70C40")
 
 // TMS70x1 features more peripheral I/O, the main addition being a serial port.
 // TMS70x2 is the same, just with twice more RAM (256 bytes)
-DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "TMS7001")
-DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "TMS7041")
-DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "TMS7002")
-DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "TMS7042")
+DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "Texas Instruments TMS7001")
+DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "Texas Instruments TMS7041")
+DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "Texas Instruments TMS7002")
+DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "Texas Instruments TMS7042")
 
 // TMS70C46 is literally a shell around a TMS70C40, with support for external
 // memory bus, auto external clock divider on slow memory, and wake-up on keypress.
-DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "TMC70C46")
+DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "Texas Instruments TMS70C46")
 
 // TMS70Cx2 is an update to TMS70x2 with some extra features. Due to some changes
 // in peripheral file I/O, it is not backward compatible to TMS70x2.
 
 
 // internal memory maps
-static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
-	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(tms7000_unmapped_rf_r, tms7000_unmapped_rf_w)
-	AM_RANGE(0x0104, 0x0105) AM_WRITENOP // no port A write or ddr
-	AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms7000_pf_r, tms7000_pf_w)
-ADDRESS_MAP_END
+void tms7000_device::tms7000_mem(address_map &map)
+{
+	map(0x0000, 0x007f).ram(); // 128 bytes internal RAM
+	map(0x0080, 0x00ff).rw(FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
+	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0104, 0x0105).nopw(); // no port A write or ddr
+}
 
-static ADDRESS_MAP_START(tms7001_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
-	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(tms7000_unmapped_rf_r, tms7000_unmapped_rf_w)
-	AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms7000_pf_r, tms7000_pf_w)
-	AM_RANGE(0x0110, 0x0117) AM_READWRITE(tms7002_pf_r, tms7002_pf_w)
-ADDRESS_MAP_END
+void tms7000_device::tms7001_mem(address_map &map)
+{
+	map(0x0000, 0x007f).ram(); // 128 bytes internal RAM
+	map(0x0080, 0x00ff).rw(FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
+	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
+}
 
-static ADDRESS_MAP_START(tms7002_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // 256 bytes internal RAM
-	AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms7000_pf_r, tms7000_pf_w)
-	AM_RANGE(0x0110, 0x0117) AM_READWRITE(tms7002_pf_r, tms7002_pf_w)
-ADDRESS_MAP_END
+void tms7000_device::tms7002_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram(); // 256 bytes internal RAM
+	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
+}
 
-static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 2kB internal ROM
-	AM_IMPORT_FROM( tms7000_mem )
-ADDRESS_MAP_END
+void tms7000_device::tms7020_mem(address_map &map)
+{
+	tms7000_mem(map);
+	map(0xf800, 0xffff).rom().region(DEVICE_SELF, 0); // 2kB internal ROM
+}
 
-static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 4kB internal ROM
-	AM_IMPORT_FROM( tms7000_mem )
-ADDRESS_MAP_END
+void tms7000_device::tms7040_mem(address_map &map)
+{
+	tms7000_mem(map);
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0); // 4kB internal ROM
+}
 
-static ADDRESS_MAP_START(tms7041_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
-	AM_IMPORT_FROM( tms7001_mem )
-ADDRESS_MAP_END
+void tms7000_device::tms7041_mem(address_map &map)
+{
+	tms7001_mem(map);
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0);
+}
 
-static ADDRESS_MAP_START(tms7042_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
-	AM_IMPORT_FROM( tms7002_mem )
-ADDRESS_MAP_END
+void tms7000_device::tms7042_mem(address_map &map)
+{
+	tms7002_mem(map);
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0);
+}
 
-static ADDRESS_MAP_START(tms70c46_mem, AS_PROGRAM, 8, tms70c46_device )
-	AM_RANGE(0x010c, 0x010c) AM_READWRITE(e_bus_data_r, e_bus_data_w)
-	AM_RANGE(0x010d, 0x010d) AM_NOP // ? always writes $FF before checking keyboard... maybe INT3 ack?
-	AM_RANGE(0x010e, 0x010e) AM_READWRITE(dockbus_data_r, dockbus_data_w)
-	AM_RANGE(0x010f, 0x010f) AM_READWRITE(dockbus_status_r, dockbus_status_w)
-	AM_RANGE(0x0118, 0x0118) AM_READWRITE(control_r, control_w)
-	AM_IMPORT_FROM( tms7040_mem )
-ADDRESS_MAP_END
+void tms70c46_device::tms70c46_mem(address_map &map)
+{
+	tms7040_mem(map);
+	map(0x010c, 0x010c).rw(FUNC(tms70c46_device::e_bus_data_r), FUNC(tms70c46_device::e_bus_data_w));
+	map(0x010d, 0x010d).noprw(); // ? always writes $FF before checking keyboard... maybe INT3 ack?
+	map(0x010e, 0x010e).rw(FUNC(tms70c46_device::dockbus_data_r), FUNC(tms70c46_device::dockbus_data_w));
+	map(0x010f, 0x010f).rw(FUNC(tms70c46_device::dockbus_status_r), FUNC(tms70c46_device::dockbus_status_w));
+	map(0x0118, 0x0118).rw(FUNC(tms70c46_device::control_r), FUNC(tms70c46_device::control_w));
+}
 
 
 // device definitions
 tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7000, tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), 0)
+	: tms7000_device(mconfig, TMS7000, tag, owner, clock, address_map_constructor(FUNC(tms7000_device::tms7000_mem), this), 0)
 {
 }
 
@@ -118,57 +126,57 @@ tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, 
 }
 
 tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0)
+	: tms7000_device(mconfig, TMS7020, tag, owner, clock, address_map_constructor(FUNC(tms7020_device::tms7020_mem), this), 0)
 {
 }
 
 tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020_EXL, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0)
+	: tms7000_device(mconfig, TMS7020_EXL, tag, owner, clock, address_map_constructor(FUNC(tms7020_exl_device::tms7020_mem), this), 0)
 {
 }
 
 tms7040_device::tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7040, tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), 0)
+	: tms7000_device(mconfig, TMS7040, tag, owner, clock, address_map_constructor(FUNC(tms7040_device::tms7040_mem), this), 0)
 {
 }
 
 tms70c00_device::tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C00, tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), CHIP_IS_CMOS)
+	: tms7000_device(mconfig, TMS70C00, tag, owner, clock, address_map_constructor(FUNC(tms70c00_device::tms7000_mem), this), CHIP_IS_CMOS)
 {
 }
 
 tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C20, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), CHIP_IS_CMOS)
+	: tms7000_device(mconfig, TMS70C20, tag, owner, clock, address_map_constructor(FUNC(tms70c20_device::tms7020_mem), this), CHIP_IS_CMOS)
 {
 }
 
 tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C40, tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), CHIP_IS_CMOS)
+	: tms7000_device(mconfig, TMS70C40, tag, owner, clock, address_map_constructor(FUNC(tms70c40_device::tms7040_mem), this), CHIP_IS_CMOS)
 {
 }
 
 tms7001_device::tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7001, tag, owner, clock, ADDRESS_MAP_NAME(tms7001_mem), CHIP_FAMILY_70X2)
+	: tms7000_device(mconfig, TMS7001, tag, owner, clock, address_map_constructor(FUNC(tms7001_device::tms7001_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
 tms7041_device::tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7041, tag, owner, clock, ADDRESS_MAP_NAME(tms7041_mem), CHIP_FAMILY_70X2)
+	: tms7000_device(mconfig, TMS7041, tag, owner, clock, address_map_constructor(FUNC(tms7041_device::tms7041_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
 tms7002_device::tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7002, tag, owner, clock, ADDRESS_MAP_NAME(tms7002_mem), CHIP_FAMILY_70X2)
+	: tms7000_device(mconfig, TMS7002, tag, owner, clock, address_map_constructor(FUNC(tms7002_device::tms7002_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
 tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7042, tag, owner, clock, ADDRESS_MAP_NAME(tms7042_mem), CHIP_FAMILY_70X2)
+	: tms7000_device(mconfig, TMS7042, tag, owner, clock, address_map_constructor(FUNC(tms7042_device::tms7042_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
 tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C46, tag, owner, clock, ADDRESS_MAP_NAME(tms70c46_mem), CHIP_IS_CMOS)
+	: tms7000_device(mconfig, TMS70C46, tag, owner, clock, address_map_constructor(FUNC(tms70c46_device::tms70c46_mem), this), CHIP_IS_CMOS)
 {
 }
 
@@ -188,9 +196,9 @@ void tms7000_device::device_start()
 {
 	// init/zerofill
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_irq_state[TMS7000_INT1_LINE] = false;
 	m_irq_state[TMS7000_INT3_LINE] = false;
@@ -274,9 +282,9 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-util::disasm_interface *tms7000_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms7000_device::create_disassembler()
 {
-	return new tms7000_disassembler;
+	return std::make_unique<tms7000_disassembler>();
 }
 
 
@@ -511,7 +519,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 		{
 			// note: port B is write-only, reading it returns the output value as if ddr is 0xff
 			int port = offset / 2 - 2;
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				return (m_port_in_cb[port]() & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
 			break;
 		}
@@ -521,7 +529,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 			return m_port_ddr[offset / 2 - 2];
 
 		default:
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				logerror("'%s' (%04X): tms7000_pf_r @ $%04x\n", tag(), m_pc, offset);
 			break;
 	}
@@ -622,9 +630,9 @@ void tms7000_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
-		m_op = m_direct->read_byte(m_pc++);
+		m_op = m_cache->read_byte(m_pc++);
 		execute_one(m_op);
 	} while (m_icount > 0);
 }

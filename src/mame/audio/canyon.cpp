@@ -62,7 +62,7 @@ static const discrete_lfsr_desc canyon_lfsr =
 #define CANYON_WHISTLESND2      NODE_14
 #define CANYON_NOISE            NODE_15
 
-DISCRETE_SOUND_START(canyon)
+DISCRETE_SOUND_START(canyon_discrete)
 	/************************************************/
 	/* Canyon sound system: 5 Sound Sources         */
 	/*                     Relative Volume          */

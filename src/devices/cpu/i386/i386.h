@@ -26,7 +26,10 @@
 
 
 #define MCFG_I386_SMIACT(_devcb) \
-	devcb = &i386_device::set_smiact(*device, DEVCB_##_devcb);
+	devcb = &downcast<i386_device &>(*device).set_smiact(DEVCB_##_devcb);
+
+#define MCFG_I486_FERR_HANDLER(_devcb) \
+	devcb = &downcast<i386_device &>(*device).set_ferr(DEVCB_##_devcb);
 
 #define X86_NUM_CPUS        4
 
@@ -36,8 +39,9 @@ public:
 	// construction/destruction
 	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_smiact(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_smiact.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_smiact(Object &&cb) { return m_smiact.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ferr(Object &&cb) { return m_ferr_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
@@ -56,6 +60,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 40; }
 	virtual uint32_t execute_input_lines() const override { return 32; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -69,7 +74,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override;
 
 	address_space_config m_program_config;
@@ -212,7 +217,9 @@ protected:
 
 	uint8_t m_irq_state;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u8 (offs_t)> m_pr8;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<u32 (offs_t)> m_pr32;
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
@@ -283,6 +290,7 @@ protected:
 	bool m_nmi_latched;
 	uint32_t m_smbase;
 	devcb_write_line m_smiact;
+	devcb_write_line m_ferr_handler;
 	bool m_lock;
 
 	// bytes in current opcode, debug only
@@ -1386,6 +1394,8 @@ protected:
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
+	void x87_fdisi(uint8_t modrm);
+	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);
@@ -1466,6 +1476,7 @@ public:
 protected:
 	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;

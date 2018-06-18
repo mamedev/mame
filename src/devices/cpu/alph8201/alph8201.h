@@ -83,12 +83,12 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	u8 M_RDMEM(u16 A) { return m_program->read_byte(A); }
 	void M_WRMEM(u16 A, u8 V) { m_program->write_byte(A, V); }
-	u8 M_RDOP(u16 A) { return m_direct->read_byte(A); }
-	u8 M_RDOP_ARG(u16 A) { return m_direct->read_byte(A); }
+	u8 M_RDOP(u16 A) { return m_cache->read_byte(A); }
+	u8 M_RDOP_ARG(u16 A) { return m_cache->read_byte(A); }
 	u8 RD_REG(u8 x) { return m_RAM[(m_regPtr<<3)+(x)]; }
 	void WR_REG(u8 x, u8 d) { m_RAM[(m_regPtr<<3)+(x)]=(d); }
 
@@ -388,7 +388,7 @@ protected:
 	u8    m_halt;     /* halt input line                        */
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 	int m_inst_cycles;
 

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class sidearms_state : public driver_device
 {
@@ -62,10 +63,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(dyger);
-	DECLARE_DRIVER_INIT(sidearms);
-	DECLARE_DRIVER_INIT(whizz);
-	DECLARE_DRIVER_INIT(turtship);
+	void init_dyger();
+	void init_sidearms();
+	void init_whizz();
+	void init_turtship();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -78,4 +79,13 @@ public:
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );
 	void draw_starfield( bitmap_ind16 &bitmap );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sidearms(machine_config &config);
+	void turtship(machine_config &config);
+	void whizz(machine_config &config);
+	void sidearms_map(address_map &map);
+	void sidearms_sound_map(address_map &map);
+	void turtship_map(address_map &map);
+	void whizz_io_map(address_map &map);
+	void whizz_map(address_map &map);
+	void whizz_sound_map(address_map &map);
 };

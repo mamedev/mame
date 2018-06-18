@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class compgolf_state : public driver_device
 {
 public:
@@ -38,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(compgolf_back_w);
 	DECLARE_WRITE8_MEMBER(compgolf_scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(compgolf_scrolly_lo_w);
-	DECLARE_DRIVER_INIT(compgolf);
+	void init_compgolf();
 	TILE_GET_INFO_MEMBER(get_text_info);
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILE_GET_INFO_MEMBER(get_back_info);
@@ -52,4 +54,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void compgolf(machine_config &config);
+	void compgolf_map(address_map &map);
 };

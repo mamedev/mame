@@ -4,6 +4,7 @@
 #include "video/bufsprite.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class lwings_state : public driver_device
 {
@@ -69,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(avengersb);
+	void init_avengersb();
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
 	DECLARE_VIDEO_START(avengersb);
@@ -86,4 +87,19 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void lwings(machine_config &config);
+	void trojan(machine_config &config);
+	void fball(machine_config &config);
+	void avengers(machine_config &config);
+	void avengersb(machine_config &config);
+	void avengers_adpcm_io_map(address_map &map);
+	void avengers_map(address_map &map);
+	void fball_map(address_map &map);
+	void fball_oki_map(address_map &map);
+	void fball_sound_map(address_map &map);
+	void lwings_map(address_map &map);
+	void lwings_sound_map(address_map &map);
+	void trojan_adpcm_io_map(address_map &map);
+	void trojan_adpcm_map(address_map &map);
+	void trojan_map(address_map &map);
 };

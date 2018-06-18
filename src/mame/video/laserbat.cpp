@@ -164,8 +164,8 @@ void laserbat_state_base::video_start()
 	m_gfx2 = memregion("gfx2")->base();
 
 	// start rendering scanlines
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_scanline_timer->adjust(m_screen->time_until_pos(1, 0));
 }
 
 
@@ -226,7 +226,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	uint16_t *const row = &m_bitmap.pix16(y);
 
 	// wait for next scanline
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
 
 	// update the PVIs
 	if (!y)

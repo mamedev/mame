@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class battlane_state : public driver_device
 {
 public:
@@ -51,4 +53,6 @@ public:
 	INTERRUPT_GEN_MEMBER(battlane_cpu1_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg_bitmap( bitmap_ind16 &bitmap );
+	void battlane(machine_config &config);
+	void battlane_map(address_map &map);
 };

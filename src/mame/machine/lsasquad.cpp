@@ -41,7 +41,7 @@ READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",space.device().safe_pc());
+	//logerror("%04x: mcu_status_r\n",m_maincpu->pc());
 	if (m_bmcu)
 	{
 		if (CLEAR_LINE == m_bmcu->host_semaphore_r())
@@ -59,7 +59,7 @@ READ8_MEMBER(lsasquad_state::daikaiju_mcu_status_r)
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",space.device().safe_pc());
+	//logerror("%04x: mcu_status_r\n",m_maincpu->pc());
 	if (m_bmcu)
 	{
 		if (CLEAR_LINE == m_bmcu->host_semaphore_r())

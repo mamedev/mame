@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/pckeybrd.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VERBOSE 2
@@ -146,6 +147,9 @@ kron180_state(const machine_config &mconfig, device_type type, const char *tag) 
 	DECLARE_WRITE8_MEMBER( txen_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	DECLARE_WRITE8_MEMBER( kbd_reset_w ){   LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	DECLARE_WRITE8_MEMBER( dreq_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	void kron180(machine_config &config);
+	void kron180_iomap(address_map &map);
+	void kron180_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -155,12 +159,14 @@ private:
 	virtual void machine_start () override;
 };
 
-static ADDRESS_MAP_START (kron180_mem, AS_PROGRAM, 8, kron180_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x0000, 0x7fff) AM_ROM AM_REGION("roms", 0x8000)
-	AM_RANGE (0x8000, 0x9fff) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE (0x8600, 0x95ff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void kron180_state::kron180_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().region("roms", 0x8000);
+	map(0x8000, 0x85ff).ram().mirror(0x6000);
+	map(0x8600, 0x95ff).ram().share("videoram").mirror(0x6000);
+	map(0x9600, 0x9fff).ram().mirror(0x6000);
+}
 
 /*   IO decoding
  *
@@ -192,17 +198,18 @@ ADDRESS_MAP_END
  *
  * At the moment we emulate the screen at a high level so I just disregard the special functions on A16 - A18 by mirroring the mapping below
  */
-static ADDRESS_MAP_START( kron180_iomap, AS_IO, 8, kron180_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x0000, 0x000f ) AM_WRITE(sn74259_w)
-	AM_RANGE( 0x0010, 0x001f ) AM_READWRITE(ap5_r, ap5_w)
-	AM_RANGE( 0x0020, 0x002f ) AM_WRITE(wkb_w)
-	AM_RANGE( 0x0030, 0x003f ) AM_READ(sn74299_r)
-	AM_RANGE( 0x0040, 0x004f ) AM_WRITE(sn74299_w)
-	AM_RANGE( 0x0050, 0x005f ) AM_WRITE(txen_w)
-	AM_RANGE( 0x0060, 0x006f ) AM_WRITE(kbd_reset_w)
-	AM_RANGE( 0x0070, 0x007f ) AM_WRITE(dreq_w)
-ADDRESS_MAP_END
+void kron180_state::kron180_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x000f).w(FUNC(kron180_state::sn74259_w));
+	map(0x0010, 0x001f).rw(FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
+	map(0x0020, 0x002f).w(FUNC(kron180_state::wkb_w));
+	map(0x0030, 0x003f).r(FUNC(kron180_state::sn74299_r));
+	map(0x0040, 0x004f).w(FUNC(kron180_state::sn74299_w));
+	map(0x0050, 0x005f).w(FUNC(kron180_state::txen_w));
+	map(0x0060, 0x006f).w(FUNC(kron180_state::kbd_reset_w));
+	map(0x0070, 0x007f).w(FUNC(kron180_state::dreq_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START (kron180)
@@ -290,11 +297,11 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (kron180)
+MACHINE_CONFIG_START(kron180_state::kron180)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", Z180, XTAL_12_288MHz)
-	MCFG_CPU_PROGRAM_MAP (kron180_mem)
-	MCFG_CPU_IO_MAP(kron180_iomap)
+	MCFG_DEVICE_ADD ("maincpu", Z180, XTAL(12'288'000))
+	MCFG_DEVICE_PROGRAM_MAP (kron180_mem)
+	MCFG_DEVICE_IO_MAP(kron180_iomap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,18 +315,18 @@ static MACHINE_CONFIG_START (kron180)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard TODO: fix it, doesn't work yet */
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(kron180_state, keyb_interrupt))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, kron180_state, keyb_interrupt))
 MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (kron180)
 	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD ("k180DD4-2.8M.bin", 0x000000, 0x10000, CRC (ae0642ad) SHA1 (2c53a714de6af4b64e46fcd34bca6d4438511765))
+	ROM_LOAD ("k180dd4-2.8m.bin", 0x000000, 0x10000, CRC (ae0642ad) SHA1 (2c53a714de6af4b64e46fcd34bca6d4438511765))
 
 	ROM_REGION(0x1000, "chargen",0) /* TODO: This character rom is taken from ibmjr rom set and will be replaced */
 	ROM_LOAD( "cga.chr", 0x0000, 0x1000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd) )
 ROM_END
 
 /* Driver */
-//     YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS         INIT  COMPANY        FULLNAME      FLAGS
-COMP ( 1995, kron180,      0,      0,       kron180,        kron180, kron180_state, 0,    "Kron Ltd",    "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS
+COMP ( 1995, kron180, 0,      0,      kron180, kron180, kron180_state, empty_init, "Kron Ltd", "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

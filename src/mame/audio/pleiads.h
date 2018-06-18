@@ -10,7 +10,7 @@
 class pleiads_sound_device : public device_t, public device_sound_interface
 {
 public:
-	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER( control_a_w );
 	DECLARE_WRITE8_MEMBER( control_b_w );
@@ -65,7 +65,7 @@ protected:
 	inline int noise(int samplerate);
 
 	// internal state
-	tms36xx_device *m_tms;
+	required_device<tms36xx_device> m_tms;
 	sound_stream *m_channel;
 
 	int m_sound_latch_a;
@@ -94,12 +94,11 @@ protected:
 	int m_opamp_resistor;
 };
 
-DECLARE_DEVICE_TYPE(PLEIADS, pleiads_sound_device)
 
 class naughtyb_sound_device : public pleiads_sound_device
 {
 public:
-	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// device-level overrides
@@ -109,12 +108,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-DECLARE_DEVICE_TYPE(NAUGHTYB, naughtyb_sound_device)
 
 class popflame_sound_device : public pleiads_sound_device
 {
 public:
-	popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -123,6 +122,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-DECLARE_DEVICE_TYPE(POPFLAME, popflame_sound_device)
+
+DECLARE_DEVICE_TYPE(PLEIADS_SOUND, pleiads_sound_device)
+DECLARE_DEVICE_TYPE(NAUGHTYB_SOUND, naughtyb_sound_device)
+DECLARE_DEVICE_TYPE(POPFLAME_SOUND, popflame_sound_device)
 
 #endif // MAME_AUDIO_PLEIADS_H

@@ -8,6 +8,7 @@
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 #define BW_DEBUG 0
 
@@ -79,7 +80,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_charinfo);
 	TILEMAP_MAPPER_MEMBER(scan_cols);
 
-	DECLARE_DRIVER_INIT(bwing);
+	void init_bwing();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -89,4 +90,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
+	void bwing(machine_config &config);
+	void bank_map(address_map &map);
+	void bwp1_map(address_map &map);
+	void bwp2_map(address_map &map);
+	void bwp3_io_map(address_map &map);
+	void bwp3_map(address_map &map);
 };

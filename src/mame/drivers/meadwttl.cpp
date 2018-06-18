@@ -52,6 +52,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void meadows(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -92,7 +93,7 @@ void meadwttl_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( meadows )
+MACHINE_CONFIG_START(meadwttl_state::meadows)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -165,7 +166,7 @@ ROM_END
 
 
 
-GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state,  0, ROT0, "Meadows",  "Bombs Away [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state,  0, ROT0, "Meadows",  "Ckidzo [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state,  0, ROT0, "Meadows",  "Cobra Gunship [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state,  0, ROT0, "Meadows",  "Meadows 4 in 1 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1 [TTL]", MACHINE_IS_SKELETON )

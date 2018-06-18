@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+// 20MB HDD image CHS 512,5,17
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -31,6 +32,10 @@ public:
 		m_hdd(*this, "hdd"),
 		m_bios(*this, "bios")
 	{}
+
+	void altos8600(machine_config &config);
+
+protected:
 	DECLARE_READ16_MEMBER(cpuram_r);
 	DECLARE_WRITE16_MEMBER(cpuram_w);
 	DECLARE_READ16_MEMBER(stkram_r);
@@ -66,9 +71,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sintr1_w);
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
 	IRQ_CALLBACK_MEMBER(inta);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void code_mem(address_map &map);
+	void cpu_io(address_map &map);
+	void cpu_mem(address_map &map);
+	void dmac_io(address_map &map);
+	void dmac_mem(address_map &map);
+	void extra_mem(address_map &map);
+	void stack_mem(address_map &map);
 
 private:
 	u16 xlate_r(address_space &space, offs_t offset, u16 mem_mask, int permbit);
@@ -104,11 +116,39 @@ private:
 void altos8600_state::machine_start()
 {
 	m_mode = 0;
+	save_item(NAME(m_mmuaddr));
+	save_item(NAME(m_romport));
+	save_item(NAME(m_dmamplex));
+	save_item(NAME(m_mmuflags));
+	save_item(NAME(m_mmuerr));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_mmueaddr));
+	save_item(NAME(m_cpuif));
+	save_item(NAME(m_user));
+	save_item(NAME(m_nmiinh));
+	save_item(NAME(m_nmistat));
+	save_item(NAME(m_lba));
+	save_item(NAME(m_head));
+	save_item(NAME(m_sect));
+	save_item(NAME(m_cyl));
+	save_item(NAME(m_curcyl));
+	save_item(NAME(m_secoff));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_stat));
+	save_item(NAME(m_cylhi));
+	save_item(NAME(m_sechi));
+	save_item(NAME(m_sector));
+
+	if(m_hdd->get_hard_disk_file())
+		m_geom = hard_disk_get_info(m_hdd->get_hard_disk_file());
+	else
+		m_geom = nullptr;
 }
 
 void altos8600_state::machine_reset()
 {
 	m_mode = (m_mode & 0x10) | 2;
+	m_romport[0] = 0x80;
 	m_cpuif = false;
 	m_user = false;
 	m_nmiinh = true;
@@ -398,7 +438,7 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 	switch(offset)
 	{
 		case 1:
-			m_romport[0] = data;
+			//m_romport[0] = data;
 			break;
 		case 3:
 			m_romport[1] = data;
@@ -471,7 +511,7 @@ READ8_MEMBER(altos8600_state::get_slave_ack)
 
 void altos8600_state::seterr(offs_t offset, u16 mem_mask, u16 err_mask)
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return;
 	logerror("Fault at %05x type %04x\n", offset << 1, err_mask);
 	if(!m_nmiinh)
@@ -564,7 +604,7 @@ WRITE16_MEMBER(altos8600_state::xtraram_w)
 
 READ16_MEMBER(altos8600_state::cpuio_r)
 {
-	if(m_user && !machine().side_effect_disabled())
+	if(m_user && !machine().side_effects_disabled())
 	{
 		m_pic1->ir0_w(ASSERT_LINE);
 		return 0;
@@ -574,7 +614,7 @@ READ16_MEMBER(altos8600_state::cpuio_r)
 
 WRITE16_MEMBER(altos8600_state::cpuio_w)
 {
-	if(m_user && !machine().side_effect_disabled())
+	if(m_user && !machine().side_effects_disabled())
 	{
 		m_pic1->ir0_w(ASSERT_LINE);
 		return;
@@ -625,126 +665,134 @@ IRQ_CALLBACK_MEMBER(altos8600_state::inta)
 	return m_pic1->acknowledge();
 }
 
-static ADDRESS_MAP_START(cpu_mem, AS_PROGRAM, 16, altos8600_state)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(cpuram_r, cpuram_w)
-ADDRESS_MAP_END
+void altos8600_state::cpu_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::cpuram_r), FUNC(altos8600_state::cpuram_w));
+}
 
-static ADDRESS_MAP_START(stack_mem, i8086_cpu_device::AS_STACK, 16, altos8600_state)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(stkram_r, stkram_w)
-ADDRESS_MAP_END
+void altos8600_state::stack_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::stkram_r), FUNC(altos8600_state::stkram_w));
+}
 
-static ADDRESS_MAP_START(code_mem, i8086_cpu_device::AS_CODE, 16, altos8600_state)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(coderam_r, coderam_w)
-ADDRESS_MAP_END
+void altos8600_state::code_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::coderam_r), FUNC(altos8600_state::coderam_w));
+}
 
-static ADDRESS_MAP_START(extra_mem, i8086_cpu_device::AS_EXTRA, 16, altos8600_state)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(xtraram_r, xtraram_w)
-ADDRESS_MAP_END
+void altos8600_state::extra_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::xtraram_r), FUNC(altos8600_state::xtraram_w));
+}
 
-static ADDRESS_MAP_START(cpu_io, AS_IO, 16, altos8600_state)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(cpuio_r, cpuio_w)
-ADDRESS_MAP_END
+void altos8600_state::cpu_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(altos8600_state::cpuio_r), FUNC(altos8600_state::cpuio_w));
+}
 
-static ADDRESS_MAP_START(dmac_mem, AS_PROGRAM, 16, altos8600_state)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(dmacram_r, dmacram_w)
-ADDRESS_MAP_END
+void altos8600_state::dmac_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::dmacram_r), FUNC(altos8600_state::dmacram_w));
+}
 
-static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
-	AM_RANGE(0x0000, 0x0007) AM_READ(fault_r)
-	AM_RANGE(0x0008, 0x000f) AM_WRITE(clear_w)
-	AM_RANGE(0x0010, 0x0017) AM_READ(errlo_r)
-	AM_RANGE(0x0018, 0x001f) AM_READ(errhi_r)
-	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(hd_r, hd_w, 0x00ff)
-	AM_RANGE(0x0030, 0x0037) AM_WRITE(mode_w)
-	AM_RANGE(0x0038, 0x003f) AM_WRITE8(cattn_w, 0xffff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0xff00)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("uart8274", i8274_new_device, cd_ba_r, cd_ba_w, 0x00ff)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0xff00)
-	AM_RANGE(0x0050, 0x0057) AM_READWRITE8(romport_r, romport_w, 0xffff)
-	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0058, 0x005f) AM_WRITE8(clrsys_w, 0xff00)
-	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0068, 0x006f) AM_DEVREADWRITE8("pic8259_3", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0070, 0x0077) AM_NOP
-	AM_RANGE(0x0078, 0x0079) AM_WRITE8(ics_attn_w, 0xffff)
-	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(mmuflags_r, mmuflags_w)
-	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(mmuaddr_r, mmuaddr_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
-ADDRESS_MAP_END
+void altos8600_state::dmac_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(altos8600_state::nmi_r), FUNC(altos8600_state::nmi_w));
+	map(0x0000, 0x0007).r(FUNC(altos8600_state::fault_r));
+	map(0x0008, 0x000f).w(FUNC(altos8600_state::clear_w));
+	map(0x0010, 0x0017).r(FUNC(altos8600_state::errlo_r));
+	map(0x0018, 0x001f).r(FUNC(altos8600_state::errhi_r));
+	map(0x0020, 0x0027).rw(FUNC(altos8600_state::hd_r), FUNC(altos8600_state::hd_w)).umask16(0x00ff);
+	map(0x0030, 0x0037).w(FUNC(altos8600_state::mode_w));
+	map(0x0038, 0x003f).w(FUNC(altos8600_state::cattn_w));
+	map(0x0040, 0x0047).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0xff00);
+	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0048, 0x004f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0x0050, 0x0057).rw(FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
+	map(0x0058, 0x005f).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0058, 0x005f).w(FUNC(altos8600_state::clrsys_w)).umask16(0xff00);
+	map(0x0060, 0x0067).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0068, 0x006f).rw(m_pic3, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0070, 0x0077).noprw();
+	map(0x0078, 0x0079).w(FUNC(altos8600_state::ics_attn_w));
+	map(0x0200, 0x03ff).rw(FUNC(altos8600_state::mmuflags_r), FUNC(altos8600_state::mmuflags_w));
+	map(0x0400, 0x05ff).rw(FUNC(altos8600_state::mmuaddr_r), FUNC(altos8600_state::mmuaddr_w));
+}
 
-static SLOT_INTERFACE_START(altos8600_floppies)
-	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void altos8600_floppies(device_slot_interface &device)
+{
+	device.option_add("8dd", FLOPPY_8_DSDD);
+}
 
-static MACHINE_CONFIG_START(altos8600)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
-	MCFG_CPU_PROGRAM_MAP(cpu_mem)
-	MCFG_CPU_IO_MAP(cpu_io)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(code_mem)
+MACHINE_CONFIG_START(altos8600_state::altos8600)
+	MCFG_DEVICE_ADD("maincpu", I8086, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
+	MCFG_DEVICE_IO_MAP(cpu_io)
+	MCFG_DEVICE_OPCODES_MAP(code_mem)
 	MCFG_I8086_STACK_MAP(stack_mem)
 	MCFG_I8086_CODE_MAP(code_mem)
 	MCFG_I8086_EXTRA_MAP(extra_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
-	MCFG_I8086_IF_HANDLER(WRITELINE(altos8600_state, cpuif_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
+	MCFG_I8086_IF_HANDLER(WRITELINE(*this, altos8600_state, cpuif_w))
 
-	MCFG_CPU_ADD("dmac", I8089, XTAL_5MHz)
-	MCFG_CPU_PROGRAM_MAP(dmac_mem)
-	MCFG_CPU_IO_MAP(dmac_io)
+	MCFG_DEVICE_ADD("dmac", I8089, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(dmac_mem)
+	MCFG_DEVICE_IO_MAP(dmac_io)
 	MCFG_I8089_DATA_WIDTH(16)
-	MCFG_I8089_SINTR1(WRITELINE(altos8600_state, sintr1_w))
-	MCFG_I8089_SINTR2(DEVWRITELINE("pic8259_2", pic8259_device, ir4_w))
+	MCFG_I8089_SINTR1(WRITELINE(*this, altos8600_state, sintr1_w))
+	MCFG_I8089_SINTR2(WRITELINE("pic8259_2", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(altos8600_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, altos8600_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir2_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir2_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("pic8259_3", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	//MCFG_RAM_EXTRA_OPTIONS("512K")
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL_16MHz/4)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
+	MCFG_DEVICE_ADD("uart8274", I8274_NEW, 16_MHz_XTAL/4)
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", i8274_new_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", i8274_new_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", i8274_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", i8274_new_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1228800)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart8274", i8274_new_device, txca_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart8274", i8274_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart8274", i8274_new_device, txca_w))
 	MCFG_PIT8253_CLK1(1228800)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", i8274_new_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(1228800)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_1", pic8259_device, ir1_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259_1", pic8259_device, ir1_w))
 
-	MCFG_FD1797_ADD("fd1797", 2000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic8259_2", pic8259_device, ir1_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(altos8600_state, fddrq_w))
+	MCFG_DEVICE_ADD("fd1797", FD1797, 2000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259_2", pic8259_device, ir1_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, altos8600_state, fddrq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
@@ -752,8 +800,8 @@ static MACHINE_CONFIG_START(altos8600)
 
 	MCFG_DEVICE_ADD("ics", ACS8600_ICS, 0)
 	MCFG_ACS8600_ICS_MAINCPU(":dmac") // TODO: fixme
-	MCFG_ACS8600_ICS_IRQ1(DEVWRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ACS8600_ICS_IRQ2(DEVWRITELINE("pic8259_1", pic8259_device, ir6_w))
+	MCFG_ACS8600_ICS_IRQ1(WRITELINE("pic8259_1", pic8259_device, ir5_w))
+	MCFG_ACS8600_ICS_IRQ2(WRITELINE("pic8259_1", pic8259_device, ir6_w))
 
 	MCFG_HARDDISK_ADD("hdd")
 MACHINE_CONFIG_END
@@ -761,8 +809,8 @@ MACHINE_CONFIG_END
 ROM_START(altos8600)
 	ROM_REGION(0x2000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "bios", "bios")
-	ROMX_LOAD("11753_1.5_lo.bin", 0x0000, 0x1000, CRC(dfa7bf0e) SHA1(6628fd7c579423b51d2642aeaa7fc0405a989252), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("11753_1.5_lo.bin", 0x0000, 0x1000, CRC(dfa7bf0e) SHA1(6628fd7c579423b51d2642aeaa7fc0405a989252), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
-COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos Computer Systems", "ACS8600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, altos8600, 0, 0, altos8600, 0, altos8600_state, empty_init, "Altos Computer Systems", "ACS8600", MACHINE_NO_SOUND_HW)

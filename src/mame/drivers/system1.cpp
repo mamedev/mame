@@ -15,6 +15,8 @@ DIP locations verified from manual for:
 
 TODO: - remove patch in nobb if possible and fully understand the
         ports involved in the protection
+      - different XTAL/divider configurations for some Star Jacker
+        cabinets? See you.tube/-a7srHVPb_U
 
 *******************************************************************************
 
@@ -228,8 +230,8 @@ seem to have access to.
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_20MHz
-#define SOUND_CLOCK     XTAL_8MHz
+#define MASTER_CLOCK    XTAL(20'000'000)
+#define SOUND_CLOCK     XTAL(8'000'000)
 
 
 /*************************************
@@ -393,6 +395,8 @@ void system1_state::machine_start()
 	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
+	save_item(NAME(m_nob_mcu_latch));
+	save_item(NAME(m_nob_mcu_status));
 }
 
 
@@ -579,6 +583,11 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 	    Bit 1 -> n/c
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
+
+	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
+	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+
 	m_mcu_control = data;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -599,7 +608,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-						space.device().safe_pc(), m_mcu_control, offset, data);
+						m_mcu->pc(), m_mcu_control, offset, data);
 			break;
 	}
 }
@@ -620,20 +629,9 @@ READ8_MEMBER(system1_state::mcu_io_r)
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-						space.device().safe_pc(), m_mcu_control, offset);
+						m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 	}
-}
-
-
-INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
-{
-	/* toggle the INT0 line on the MCU */
-	device.execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	device.execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-
-	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -657,19 +655,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
  *
  *************************************/
 
+READ8_MEMBER(system1_state::nob_mcu_latch_r)
+{
+	return m_nob_mcu_latch;
+}
+
+WRITE8_MEMBER(system1_state::nob_mcu_latch_w)
+{
+	m_nob_mcu_latch = data;
+}
+
+WRITE8_MEMBER(system1_state::nob_mcu_status_w)
+{
+	m_nob_mcu_status = data;
+}
+
 WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 {
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x01) && !(data & 0x01))
-		*m_nob_mcu_latch = m_nob_maincpu_latch;
+		m_nob_mcu_latch = m_nob_maincpu_latch;
 
 	/* bit 1 triggers a write from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x02) && !(data & 0x02))
-		m_nob_maincpu_latch = *m_nob_mcu_latch;
+		m_nob_maincpu_latch = m_nob_mcu_latch;
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((m_mcu_control ^ data) & 0x04) && !(data & 0x04))
-		space.device().execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((m_mcu_control ^ data) & 0x08) && !(data & 0x08))
@@ -697,7 +710,7 @@ WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 
 READ8_MEMBER(system1_state::nob_mcu_status_r)
 {
-	return *m_nob_mcu_status;
+	return m_nob_mcu_status;
 }
 
 
@@ -710,25 +723,25 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
 
 READ8_MEMBER(system1_state::nobb_inport1c_r)
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",space.device().safe_pc());
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",m_maincpu->pc());
 	return(0x80);   // infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 READ8_MEMBER(system1_state::nobb_inport22_r)
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",space.device().safe_pc(),nobb_inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",m_maincpu->pc(),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
 READ8_MEMBER(system1_state::nobb_inport23_r)
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",space.device().safe_pc(),m_nobb_inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",m_maincpu->pc(),m_nobb_inport23_step);
 	return(m_nobb_inport23_step);
 }
 
 WRITE8_MEMBER(system1_state::nobb_outport24_w)
 {
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",space.device().safe_pc(),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",m_maincpu->pc(),data);
 	m_nobb_inport23_step = data;
 }
 
@@ -741,72 +754,78 @@ WRITE8_MEMBER(system1_state::nobb_outport24_w)
  *************************************/
 
 /* main memory map */
-static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(system1_mixer_collision_reset_w)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(system1_sprite_collision_reset_w)
-ADDRESS_MAP_END
+void system1_state::system1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("ram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xf000, 0xf3ff).rw(FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xf400, 0xf7ff).w(FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xf800, 0xfbff).rw(FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xfc00, 0xffff).w(FUNC(system1_state::system1_sprite_collision_reset_w));
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, system1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-ADDRESS_MAP_END
+void system1_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("ram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+}
 
-static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_OPCODES, 8, system1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-ADDRESS_MAP_END
+void system1_state::banked_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+	map(0xc000, 0xcfff).ram().share("ram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+}
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
-static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(system1_mixer_collision_reset_w)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(system1_sprite_collision_reset_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void system1_state::nobo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc3ff).rw(FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xc400, 0xc7ff).w(FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xc800, 0xcbff).rw(FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xcc00, 0xcfff).w(FUNC(system1_state::system1_sprite_collision_reset_w));
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xf000, 0xffff).ram().share("ram");
+}
 
 /* I/O map for systems with an 8255 PPI */
-static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8, system1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")    /* DIP2 */
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")    /* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")    /* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void system1_state::system1_ppi_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x00).mirror(0x03).portr("P1");
+	map(0x04, 0x04).mirror(0x03).portr("P2");
+	map(0x08, 0x08).mirror(0x03).portr("SYSTEM");
+	map(0x0c, 0x0c).mirror(0x02).portr("SWA");    /* DIP2 */
+	map(0x0d, 0x0d).mirror(0x02).portr("SWB");    /* DIP1 some games read it from here... */
+	map(0x10, 0x10).mirror(0x03).portr("SWB");    /* DIP1 ... and some others from here but there are games which check BOTH! */
+	map(0x14, 0x17).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* I/O map for systems with a Z80 PIO chip */
-static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8, system1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")    /* DIP2 */
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")    /* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")    /* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-ADDRESS_MAP_END
+void system1_state::system1_pio_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x00).mirror(0x03).portr("P1");
+	map(0x04, 0x04).mirror(0x03).portr("P2");
+	map(0x08, 0x08).mirror(0x03).portr("SYSTEM");
+	map(0x0c, 0x0c).mirror(0x02).portr("SWA");    /* DIP2 */
+	map(0x0d, 0x0d).mirror(0x02).portr("SWB");    /* DIP1 some games read it from here... */
+	map(0x10, 0x10).mirror(0x03).portr("SWB");    /* DIP1 ... and some others from here but there are games which check BOTH! */
+	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 
 
@@ -816,13 +835,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, system1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void system1_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).mirror(0x1800).ram();
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(system1_state::sound_data_r));
+}
 
 
 
@@ -832,19 +852,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, system1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8, system1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_SHARE("nob_mcu_latch")
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_SHARE("nob_mcu_status")
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(nob_mcu_control_p2_w)
-ADDRESS_MAP_END
+void system1_state::mcu_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
+}
 
 
 
@@ -1996,10 +2007,10 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_data_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_data_r, nullptr)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_status_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_status_r, nullptr)
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )     /* start 1 & 2 not connected. */
@@ -2132,7 +2143,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( system1 )
+static GFXDECODE_START( gfx_system1 )
 	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -2144,24 +2155,24 @@ GFXDECODE_END
  *************************************/
 
 /* original board with 64kbit ROMs and an 8255 PPI for outputs */
-static MACHINE_CONFIG_START( sys1ppi )
+MACHINE_CONFIG_START(system1_state::sys1ppi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* not really, see notes above */
-	MCFG_CPU_PROGRAM_MAP(system1_map)
-	MCFG_CPU_IO_MAP(system1_ppi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)  /* not really, see notes above */
+	MCFG_DEVICE_PROGRAM_MAP(system1_map)
+	MCFG_DEVICE_IO_MAP(system1_ppi_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("soundirq", system1_state, soundirq_gen, "screen", 32, 64)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(system1_state, soundport_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(system1_state, videomode_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(system1_state, sound_control_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, system1_state, soundport_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, system1_state, videomode_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, system1_state, sound_control_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2170,19 +2181,19 @@ static MACHINE_CONFIG_START( sys1ppi )
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", system1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_system1)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("sn1", SN76489A, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/2)  /* selectable via jumper */
+	MCFG_DEVICE_ADD("sn2", SN76489A, SOUND_CLOCK/2)  /* selectable via jumper */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2190,7 +2201,8 @@ MACHINE_CONFIG_END
 
 
 /* reduced visible area for scrolling games */
-static MACHINE_CONFIG_DERIVED( sys1ppis, sys1ppi )
+MACHINE_CONFIG_START(system1_state::sys1ppis)
+	sys1ppi(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2203,194 +2215,221 @@ MACHINE_CONFIG_END
 
 
 /* revised board with 128kbit ROMs and a Z80 PIO for outputs */
-static MACHINE_CONFIG_DERIVED( sys1pio, sys1ppi )
+MACHINE_CONFIG_START(system1_state::sys1pio)
+	sys1ppi(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(system1_pio_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(system1_pio_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("pio", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(system1_state, soundport_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, system1_state, soundport_w))
 	MCFG_Z80PIO_OUT_ARDY_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(system1_state, videomode_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, system1_state, videomode_w))
 MACHINE_CONFIG_END
 
 #define ENCRYPTED_SYS1PPI_MAPS \
-	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
-	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(system1_map) \
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map) \
+	MCFG_DEVICE_IO_MAP(system1_ppi_io_map) \
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 #define ENCRYPTED_SYS1PIO_MAPS \
-	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
-	MCFG_CPU_IO_MAP(system1_pio_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(system1_map) \
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map) \
+	MCFG_DEVICE_IO_MAP(system1_pio_io_map) \
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 #define ENCRYPTED_SYS2_MC8123_MAPS \
-	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map) \
-	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(system1_map) \
+	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map) \
+	MCFG_DEVICE_IO_MAP(system1_ppi_io_map) \
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 
-static MACHINE_CONFIG_DERIVED( sys1pioxb, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1pioxb)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", MC8123, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5178, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5178, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5178)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5178, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5179, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5179)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5051, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5051)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5048, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5048, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5048)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5048, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5033, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5033)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5033, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5065, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5065)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys1ppix_315_5098, sys1ppi )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5098)
+	sys1ppi(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5177, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5177)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5162, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5162, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5162)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5162, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_317_0006, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_317_0006)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5135, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5135, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5135)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5135, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5132, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5132, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5132)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5132, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5155, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5155, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5155)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5155, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5110, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5110, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5110)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5110, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5051, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5051)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5098, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5098)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5102, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5102, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5133, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5133, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5102)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5102, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5093, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5093, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5133)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5133, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox_315_5065, sys1pio )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
+
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5093)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5093, MASTER_CLOCK)
+	ENCRYPTED_SYS1PIO_MAPS
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5065)
+	sys1pio(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 /* reduced visible area for scrolling games */
-static MACHINE_CONFIG_DERIVED( sys1pios, sys1pio )
+MACHINE_CONFIG_START(system1_state::sys1pios)
+	sys1pio(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piosx_315_5099, sys1pios )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piosx_315_5099)
+	sys1pios(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piosx_315_spat, sys1pios )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1piosx_315_spat)
+	sys1pios(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_SPAT, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys1ppisx_315_5064, sys1ppis )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5064, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5064)
+	sys1ppis(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5064, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1ppisx_315_5041, sys1ppis )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5041, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5041)
+	sys1ppis(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5041, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
@@ -2401,15 +2440,20 @@ MACHINE_CONFIG_END
 
 
 /* this describes the additional 8751 MCU when present */
-static MACHINE_CONFIG_START( mcu )
+MACHINE_CONFIG_START(system1_state::mcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
-	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, mcu_irq_assert)
+	MCFG_DEVICE_ADD("mcu", I8751, SOUND_CLOCK)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, system1_state, mcu_control_w))
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", MCS51_INT0_LINE))
+	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
+	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
 MACHINE_CONFIG_END
@@ -2417,24 +2461,30 @@ MACHINE_CONFIG_END
 
 
 /* alternate program map with RAM/collision swapped */
-static MACHINE_CONFIG_DERIVED( nob, sys1ppi )
+MACHINE_CONFIG_START(system1_state::nob)
+	sys1ppi(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nobo_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nobo_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nobm, nob )
+MACHINE_CONFIG_START(system1_state::nobm)
+	nob(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_CPU_IO_MAP(nob_mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, SOUND_CLOCK)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, system1_state, nob_mcu_latch_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, system1_state, nob_mcu_latch_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, system1_state, nob_mcu_status_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, system1_state, nob_mcu_control_p2_w))
 MACHINE_CONFIG_END
 
 
 
 /* system2 video */
-static MACHINE_CONFIG_DERIVED( sys2, sys1ppi )
+MACHINE_CONFIG_START(system1_state::sys2)
+	sys1ppi(config);
 
 	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
 
@@ -2444,70 +2494,82 @@ static MACHINE_CONFIG_DERIVED( sys2, sys1ppi )
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2x, sys2 )
+MACHINE_CONFIG_START(system1_state::sys2x)
+	sys2(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2_315_5177, sys2 )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys2_315_5177)
+	sys2(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2_315_5176, sys2 )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5176, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys2_315_5176)
+	sys2(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5176, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2_317_0006, sys2 )
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys2_317_0006)
+	sys2(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2_317_0007, sys2 )
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0007, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys2_317_0007)
+	sys2(config);
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0007, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys2xb, sys2 )
-	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys2xb)
+	sys2(config);
+	MCFG_DEVICE_REPLACE("maincpu", MC8123, MASTER_CLOCK)
 	ENCRYPTED_SYS2_MC8123_MAPS
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2xboot, sys2 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
+MACHINE_CONFIG_START(system1_state::sys2xboot)
+	sys2(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2m, sys2 )
-	MCFG_FRAGMENT_ADD( mcu )
+MACHINE_CONFIG_START(system1_state::sys2m)
+	sys2(config);
+	mcu(config);
 MACHINE_CONFIG_END
 
 /* system2 with rowscroll */
-static MACHINE_CONFIG_DERIVED( sys2row, sys2 )
+MACHINE_CONFIG_START(system1_state::sys2row)
+	sys2(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2_rowscroll)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2rowxb, sys2row )
-	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
+MACHINE_CONFIG_START(system1_state::sys2rowxb)
+	sys2row(config);
+	MCFG_DEVICE_REPLACE("maincpu", MC8123, MASTER_CLOCK)
 	ENCRYPTED_SYS2_MC8123_MAPS
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2rowxboot, sys2row )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
+MACHINE_CONFIG_START(system1_state::sys2rowxboot)
+	sys2row(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys2rowm, sys2row )
-	MCFG_FRAGMENT_ADD( mcu )
+MACHINE_CONFIG_START(system1_state::sys2rowm)
+	sys2row(config);
+	mcu(config);
 MACHINE_CONFIG_END
 
 
@@ -2522,9 +2584,9 @@ MACHINE_CONFIG_END
 /* ROM is #5318, is probably the first or second System 1 game produced */
 ROM_START( starjack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr5320b.129",   0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
-	ROM_LOAD( "epr5321a.130",   0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
-	ROM_LOAD( "epr5322a.131",   0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
+	ROM_LOAD( "epr-5320b.129",  0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
+	ROM_LOAD( "epr-5321a.130",  0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
+	ROM_LOAD( "epr-5322a.131",  0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
 	ROM_LOAD( "epr-5323.132",   0x6000, 0x2000, CRC(46af0d58) SHA1(6cfa288e28e3b415db5ef3cef8e8849259234af9) )
 	ROM_LOAD( "epr-5324.133",   0x8000, 0x2000, CRC(1e89efe2) SHA1(d36ef8f176d5e44884d3d0b9af81be6f7fbd0cde) )
 	ROM_LOAD( "epr-5325.134",   0xa000, 0x2000, CRC(d6e379a1) SHA1(27362b3e10d9d4235647eadb9cd1404700a8fb49) )
@@ -2550,27 +2612,27 @@ ROM_END
 
 ROM_START( starjacks )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a1_ic29.129",    0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
-	ROM_LOAD( "a1_ic30.130",    0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
-	ROM_LOAD( "a1_ic31.131",    0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
-	ROM_LOAD( "a1_ic32.132",    0x6000, 0x2000, CRC(1c48a3fa) SHA1(4a2e7798600bc4a5fd68533083547212d148d347) )
-	ROM_LOAD( "a1_ic33.133",    0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
-	ROM_LOAD( "a1_ic34.134",    0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
+	ROM_LOAD( "star_jacker_a1_ic29.129", 0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
+	ROM_LOAD( "star_jacker_a1_ic30.130", 0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
+	ROM_LOAD( "star_jacker_a1_ic31.131", 0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
+	ROM_LOAD( "star_jacker_a1_ic32.132", 0x6000, 0x2000, CRC(1c48a3fa) SHA1(4a2e7798600bc4a5fd68533083547212d148d347) )
+	ROM_LOAD( "star_jacker_a1_ic33.133", 0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
+	ROM_LOAD( "star_jacker_a1_ic34.134", 0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr-5332.3",     0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) )
+	ROM_LOAD( "star_jacker_a1_ic3.3",    0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) ) /* same as EPR-5332 */
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr-5331.82",    0x0000, 0x2000, CRC(251d898f) SHA1(353067a75d583d5f53ce2f473b52a35dd912639f) )
-	ROM_LOAD( "a1_ic65.65",     0x2000, 0x2000, CRC(0ab1893c) SHA1(97877f5d8be7a7b80bbf9fe8dae2acd47c411d64) )
-	ROM_LOAD( "epr-5329.81",    0x4000, 0x2000, CRC(3e8bcaed) SHA1(6d19543427b9c4d8d8f5ea0872cdf8cc4fe5018c) )
-	ROM_LOAD( "a1_ic64.64",     0x6000, 0x2000, CRC(7f628ae6) SHA1(f859a505b543382b42a478c8ae5cd90f3ea2bc2c) )
-	ROM_LOAD( "epr-5327.80",    0x8000, 0x2000, CRC(79e92cb1) SHA1(03124ce123684b8469cf42be6ed5f0fffa64c480) )
-	ROM_LOAD( "a1_ic63.63",     0xa000, 0x2000, CRC(5bcb253e) SHA1(8c34a8377344940bcfb2495bfda3ffc6794f261b) )
+	ROM_LOAD( "star_jacker_a1_ic82.82",  0x0000, 0x2000, CRC(251d898f) SHA1(353067a75d583d5f53ce2f473b52a35dd912639f) )
+	ROM_LOAD( "star_jacker_a1_ic65.65",  0x2000, 0x2000, CRC(0ab1893c) SHA1(97877f5d8be7a7b80bbf9fe8dae2acd47c411d64) )
+	ROM_LOAD( "epr-5456.81",             0x4000, 0x2000, CRC(3e8bcaed) SHA1(6d19543427b9c4d8d8f5ea0872cdf8cc4fe5018c) )
+	ROM_LOAD( "epr-5455.64",             0x6000, 0x2000, CRC(7f628ae6) SHA1(f859a505b543382b42a478c8ae5cd90f3ea2bc2c) ) /* Also found labeled as STAR JACKER A1 IC64 */
+	ROM_LOAD( "epr-5454.80",             0x8000, 0x2000, CRC(79e92cb1) SHA1(03124ce123684b8469cf42be6ed5f0fffa64c480) )
+	ROM_LOAD( "epr-5453.63",             0xa000, 0x2000, CRC(5bcb253e) SHA1(8c34a8377344940bcfb2495bfda3ffc6794f261b) ) /* Also found labeled as STAR JACKER A1 IC63 */
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "a1_ic86.86",   0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
-	ROM_LOAD( "a1_ic93.93",   0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) )
+	ROM_LOAD( "star_jacker_a1_ic86.86",  0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
+	ROM_LOAD( "epr-5446.93",             0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) ) /* Also found labeled as STAR JACKER A1 IC93 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.106",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
@@ -3628,24 +3690,24 @@ ROM_START( myherobl )
 	ROM_LOAD( "3.h2",   0x8000, 0x4000, CRC(3cbbaf64) SHA1(fdb5f2ca38010729afa4ed24c087119cf398f27d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "6.E10",   0x0000, 0x2000, CRC(af467223) SHA1(d79a67e761fe483407cad645dd3b93d86e8790e3) )
+	ROM_LOAD( "6.e10",   0x0000, 0x2000, CRC(af467223) SHA1(d79a67e761fe483407cad645dd3b93d86e8790e3) )
 
 	ROM_REGION( 0xc000, "tiles", 0 ) // identical to original except for first half of B13.R10 ( has Coreland / Sega copyright tiles like the Japan set, not closer otherwise to the parent set )
-	ROM_LOAD( "B13.R10",   0x0000, 0x4000, CRC(9a4861b1) SHA1(0b09556101a8d06f5dacb40970681113d493cbf5) ) // epr-6966.62             B13.R10      [1/2]      98.498535%
-	ROM_LOAD( "B11.R7",    0x4000, 0x4000, CRC(0d6f248a) SHA1(18229745adc552c58a865a181ddad44dfd62bfad) )
-	ROM_LOAD( "x.R8",      0x8000, 0x4000, CRC(24537709) SHA1(2afbefb41b6541d7e27ebef7339f7a26aa2c00c6) )
+	ROM_LOAD( "b13.r10",   0x0000, 0x4000, CRC(9a4861b1) SHA1(0b09556101a8d06f5dacb40970681113d493cbf5) ) // epr-6966.62             B13.R10      [1/2]      98.498535%
+	ROM_LOAD( "b11.r7",    0x4000, 0x4000, CRC(0d6f248a) SHA1(18229745adc552c58a865a181ddad44dfd62bfad) )
+	ROM_LOAD( "x.r8",      0x8000, 0x4000, CRC(24537709) SHA1(2afbefb41b6541d7e27ebef7339f7a26aa2c00c6) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "4.f4",   0x0000, 0x4000, CRC(f19e05a1) SHA1(98288ba2e96c03a4ab9c8235faa7e01bb376d021) )
-	ROM_LOAD( "x.H4",   0x4000, 0x4000, CRC(7988adc3) SHA1(4ee9e964c24234366660af4981566e8c45f46db9) )
-	ROM_LOAD( "x.G4",   0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
-	ROM_LOAD( "B7.K4",  0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
+	ROM_LOAD( "x.h4",   0x4000, 0x4000, CRC(7988adc3) SHA1(4ee9e964c24234366660af4981566e8c45f46db9) )
+	ROM_LOAD( "x.g4",   0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
+	ROM_LOAD( "b7.k4",  0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // wasn't dumped here, but needed for priority
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
 	ROM_REGION( 0x0100, "promsbl", 0 ) // this is related to the bootleg reproduction of the encryption scheme
-	ROM_LOAD( "PROM.A2",     0x0000, 0x0100, CRC(4fcaf000) SHA1(c68592377373b157713b5e129b020feb6c866f91) )
+	ROM_LOAD( "prom.a2",     0x0000, 0x0100, CRC(4fcaf000) SHA1(c68592377373b157713b5e129b020feb6c866f91) )
 	ROM_IGNORE(0x100)
 ROM_END
 
@@ -5213,16 +5275,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(system1_state,bank00)
+void system1_state::init_bank00()
 {
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank44)
+void system1_state::init_bank44()
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank0c)
+void system1_state::init_bank0c()
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
 }
@@ -5230,7 +5292,7 @@ DRIVER_INIT_MEMBER(system1_state,bank0c)
 
 
 
-DRIVER_INIT_MEMBER(system1_state,myherok)
+void system1_state::init_myherok()
 {
 	// extra layer of encryption applied BEFORE the usual CPU decryption
 	// probably bootleg?
@@ -5274,43 +5336,34 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 		}
 	}
 
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 }
 
 
 
-
-
-
-
-DRIVER_INIT_MEMBER(system1_state,blockgal)
+void system1_state::init_blockgal()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
 
 
 
-
-
-
-DRIVER_INIT_MEMBER(system1_state,wbml)
+void system1_state::init_wbml()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-DRIVER_INIT_MEMBER(system1_state,ufosensi)
+void system1_state::init_ufosensi()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-
-
-DRIVER_INIT_MEMBER(system1_state,dakkochn)
+void system1_state::init_dakkochn()
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
@@ -5322,15 +5375,15 @@ DRIVER_INIT_MEMBER(system1_state,dakkochn)
 READ8_MEMBER(system1_state::nob_start_r)
 {
 	/* in reality, it's likely some M1-dependent behavior */
-	return (space.device().safe_pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
+	return (m_maincpu->pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
 }
 
-DRIVER_INIT_MEMBER(system1_state,nob)
+void system1_state::init_nob()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
@@ -5342,7 +5395,7 @@ DRIVER_INIT_MEMBER(system1_state,nob)
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
 }
 
-DRIVER_INIT_MEMBER(system1_state,nobb)
+void system1_state::init_nobb()
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
@@ -5364,7 +5417,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
 	iospace.install_read_handler(0x02, 0x02, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
@@ -5373,29 +5426,29 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootleg)
+void system1_state::init_bootleg()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	memcpy(m_decrypted_opcodes, m_maincpu_region->base() + 0x10000, 0x8000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2)
+void system1_state::init_bootsys2()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base() + 0x20000);
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x30000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2d)
+void system1_state::init_bootsys2d()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base());
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,choplift)
+void system1_state::init_choplift()
 {
 	uint8_t *mcurom = memregion("mcu")->base();
 
@@ -5404,17 +5457,17 @@ DRIVER_INIT_MEMBER(system1_state,choplift)
 	mcurom[0x27b] = 0xfb;       /* F2 in current dump */
 	mcurom[0x2ff] = 0xff - 9;   /* fix up checksum; means there's still something incorrect */
 
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
-DRIVER_INIT_MEMBER(system1_state,shtngmst)
+void system1_state::init_shtngmst()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x03, "18");
 	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
 	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
 
@@ -5426,93 +5479,93 @@ DRIVER_INIT_MEMBER(system1_state,shtngmst)
  *************************************/
 
 /* PPI-based System 1 */
-GAME( 1983, starjack,   0,        sys1ppis,          starjack,  system1_state, bank00,       ROT270, "Sega", "Star Jacker (Sega)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, starjacks,  starjack, sys1ppis,          starjacks, system1_state, bank00,       ROT270, "Sega (Stern Electronics license)", "Star Jacker (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, upndown,    0,        sys1ppix_315_5098, upndown,   system1_state, bank00,       ROT270, "Sega", "Up'n Down (315-5030)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, upndownu,   upndown,  sys1ppi,           upndown,   system1_state, bank00,       ROT270, "Sega", "Up'n Down (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, regulus,    0,        sys1ppix_315_5033, regulus,   system1_state, bank00,       ROT270, "Sega", "Regulus (315-5033, Rev A.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, reguluso,   regulus,  sys1ppix_315_5033, reguluso,  system1_state, bank00,       ROT270, "Sega", "Regulus (315-5033)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, bank00,       ROT270, "Sega", "Regulus (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, bank00,       ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, bank00,       ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, bank00,       ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nob,        0,        nobm,              nob,       system1_state, nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, starjack,   0,        sys1ppis,          starjack,  system1_state, init_bank00,       ROT270, "Sega", "Star Jacker (Sega)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, starjacks,  starjack, sys1ppis,          starjacks, system1_state, init_bank00,       ROT270, "Sega (Stern Electronics license)", "Star Jacker (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, upndown,    0,        sys1ppix_315_5098, upndown,   system1_state, init_bank00,       ROT270, "Sega", "Up'n Down (315-5030)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, upndownu,   upndown,  sys1ppi,           upndown,   system1_state, init_bank00,       ROT270, "Sega", "Up'n Down (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, regulus,    0,        sys1ppix_315_5033, regulus,   system1_state, init_bank00,       ROT270, "Sega", "Regulus (315-5033, Rev A.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, reguluso,   regulus,  sys1ppix_315_5033, reguluso,  system1_state, init_bank00,       ROT270, "Sega", "Regulus (315-5033)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, init_bank00,       ROT270, "Sega", "Regulus (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, init_bank00,       ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, init_bank00,       ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, init_bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, init_bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nob,        0,        nobm,              nob,       system1_state, init_nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, init_nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
-GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, bank00,       ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, bank00,       ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, bank00,       ROT0,   "Sega", "Spatter (315-xxxx)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, bank00,       ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-xxxx)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, bank00,       ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, bank00,       ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, bank00,       ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinj,   0,        sys1piox_315_5102, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Sega Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinju,  seganinj, sys1pio,           seganinj,  system1_state, bank00,       ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinja,  seganinj, sys1piox_315_5133, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ninja,      seganinj, sys1piox_315_5102, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinceso,  seganinj, sys1piox_315_5098, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesb,  seganinj, sys1piox_315_5051, seganinj,  system1_state, bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, bank00,       ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, bank00,       ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, bank00,       ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, bank00,       ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, bank00,       ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, bank00,       ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
-GAME( 1985, myherok,    myhero,   sys1piox_315_5132, myhero,    system1_state, myherok,      ROT0,   "Coreland / Sega", "My Hero (Korea)", MACHINE_SUPPORTS_SAVE ) // possible bootleg, has extra encryption
-GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, bank00,       ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, bank00,       ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy,       0,        sys1piox_315_5177, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyo,      wboy,     sys1piox_315_5135, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
-GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
-GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, bank00,       ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, bank00,       ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgal,   0,        sys1pioxb,         blockgal,  system1_state, blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-xxxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-xxxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinj,   0,        sys1piox_315_5102, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinju,  seganinj, sys1pio,           seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinja,  seganinj, sys1piox_315_5133, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ninja,      seganinj, sys1piox_315_5102, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinceso,  seganinj, sys1piox_315_5098, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesb,  seganinj, sys1piox_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, init_bank00,       ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, init_bank00,       ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
+GAME( 1985, myherok,    myhero,   sys1piox_315_5132, myhero,    system1_state, init_myherok,      ROT0,   "Coreland / Sega", "My Hero (Korea)", MACHINE_SUPPORTS_SAVE ) // possible bootleg, has extra encryption
+GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, init_bank00,       ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, init_bank00,       ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy,       0,        sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyo,      wboy,     sys1piox_315_5135, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
+GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
+GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blockgal,   0,        sys1pioxb,         blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
-GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, bank44,       ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, bank44,       ROT270, "Coreland / Sega", "Gardia (317-0006)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
-GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, init_bank44,       ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (317-0006)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
+GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, init_bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, choplift,     ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, shtngmste,  shtngmst, sys2m,             shtngmst,  system1_state, shtngmst,     ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tokisens,   0,        sys2,              tokisens,  system1_state, bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmlb,      wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmlbge,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg (Gecas)", "Wonder Boy in Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 2009, wbmlvc,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "Sega", "Wonder Boy in Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )
-GAME( 2009, wbmlvcd,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of English, Virtual Console release)", MACHINE_SUPPORTS_SAVE ) // fully decrypted version
-GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, dakkochn,     ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, ufosensi,     ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, bootsys2,     ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_choplift,     ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, shtngmste,  shtngmst, sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, init_bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tokisens,   0,        sys2,              tokisens,  system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmlb,      wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmlbge,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg (Gecas)", "Wonder Boy in Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, wbmlvc,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "Sega", "Wonder Boy in Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, wbmlvcd,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of English, Virtual Console release)", MACHINE_SUPPORTS_SAVE ) // fully decrypted version
+GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, init_dakkochn,     ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, init_bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, init_ufosensi,     ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, init_bootsys2,     ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )

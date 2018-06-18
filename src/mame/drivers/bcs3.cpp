@@ -50,9 +50,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -75,13 +76,19 @@ public:
 	DECLARE_READ8_MEMBER(zx_r);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_DRIVER_INIT(bcs3a);
-	DECLARE_DRIVER_INIT(bcs3b);
-	DECLARE_DRIVER_INIT(bcs3c);
-	DECLARE_DRIVER_INIT(bcs3d);
+	void init_bcs3a();
+	void init_bcs3b();
+	void init_bcs3c();
+	void init_bcs3d();
 	u32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void bcs3a(machine_config &config);
+	void bcs3(machine_config &config);
+	void bcs3b(machine_config &config);
+	void bcs3_io(address_map &map);
+	void bcs3_mem(address_map &map);
+	void bcs3a_mem(address_map &map);
 private:
 	bool m_cass_bit;
 	u8 s_curs;
@@ -127,31 +134,34 @@ READ8_MEMBER( bcs3_state::zx_r )
 	return 0xf7;
 }
 
-static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8, bcs3_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_MIRROR(0x2000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x1000, 0x13ff ) AM_MIRROR(0x2000) AM_READ(keyboard_r)
-	AM_RANGE( 0x1400, 0x17ff ) AM_MIRROR(0x2000) AM_NOP //  /WAIT circuit
-	AM_RANGE( 0x1800, 0x1bff ) AM_MIRROR(0x2000) AM_READ(video_r)
-	AM_RANGE( 0x1c00, 0x1fff ) AM_MIRROR(0x2000) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void bcs3_state::bcs3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
+	map(0x1000, 0x13ff).mirror(0x2000).r(FUNC(bcs3_state::keyboard_r));
+	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
+	map(0x1800, 0x1bff).mirror(0x2000).r(FUNC(bcs3_state::video_r));
+	map(0x1c00, 0x1fff).mirror(0x2000).ram().share("videoram");
+}
 
-static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_MIRROR(0x2000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x1000, 0x13ff ) AM_MIRROR(0x2000) AM_READ(keyboard_r)
-	AM_RANGE( 0x1400, 0x17ff ) AM_MIRROR(0x2000) AM_NOP //  /WAIT circuit
-	AM_RANGE( 0x1800, 0x1bff ) AM_MIRROR(0x2000) AM_READ(zx_r)
-	AM_RANGE( 0x3c00, 0x7fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM AM_REGION("roms", 0x1000)
-ADDRESS_MAP_END
+void bcs3_state::bcs3a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
+	map(0x1000, 0x13ff).mirror(0x2000).r(FUNC(bcs3_state::keyboard_r));
+	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
+	map(0x1800, 0x1bff).mirror(0x2000).r(FUNC(bcs3_state::zx_r));
+	map(0x3c00, 0x7fff).ram().share("videoram");
+	map(0xf000, 0xf3ff).rom().region("roms", 0x1000);
+}
 
-static ADDRESS_MAP_START( bcs3_io, AS_IO, 8, bcs3_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(3)
+void bcs3_state::bcs3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(3);
 	// coded in the rom as F8 to FB
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bcs3 )
@@ -317,7 +327,7 @@ static const gfx_layout bcs3_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( bcs3 )
+static GFXDECODE_START( gfx_bcs3 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bcs3_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -342,7 +352,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3a )
+void bcs3_state::init_bcs3a()
 {
 	s_curs = 0x7a;
 	s_init = 0x80;
@@ -350,7 +360,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3a )
 	s_cols = 29;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3b )
+void bcs3_state::init_bcs3b()
 {
 	s_curs = 0x7a;
 	s_init = 0x80;
@@ -358,7 +368,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3b )
 	s_cols = 40;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3c )
+void bcs3_state::init_bcs3c()
 {
 	s_curs = 0x08;
 	s_init = 0xa0;
@@ -366,7 +376,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3c )
 	s_cols = 29;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3d )
+void bcs3_state::init_bcs3d()
 {
 	s_curs = 0x08;
 	s_init = 0xb4;
@@ -374,12 +384,12 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3d )
 	s_cols = 29;
 }
 
-static MACHINE_CONFIG_START( bcs3 )
+MACHINE_CONFIG_START(bcs3_state::bcs3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz /2)
-	MCFG_CPU_PROGRAM_MAP(bcs3_mem)
-	MCFG_CPU_IO_MAP(bcs3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) /2)
+	MCFG_DEVICE_PROGRAM_MAP(bcs3_mem)
+	MCFG_DEVICE_IO_MAP(bcs3_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* video hardware */
@@ -390,23 +400,23 @@ static MACHINE_CONFIG_START( bcs3 )
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_5MHz / 2)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(5'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(bcs3_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bcs3a )
+MACHINE_CONFIG_START(bcs3_state::bcs3a)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7MHz /2)
-	MCFG_CPU_PROGRAM_MAP(bcs3a_mem)
-	MCFG_CPU_IO_MAP(bcs3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'000'000) /2)
+	MCFG_DEVICE_PROGRAM_MAP(bcs3a_mem)
+	MCFG_DEVICE_IO_MAP(bcs3_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* video hardware */
@@ -417,18 +427,19 @@ static MACHINE_CONFIG_START( bcs3a )
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3a)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_7MHz / 2)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(7'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(bcs3_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bcs3b, bcs3a )
+MACHINE_CONFIG_START(bcs3_state::bcs3b)
+	bcs3a(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(40*8, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,40*8-1,0,24*10-1)
@@ -486,9 +497,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT       COMPANY             FULLNAME                   FLAGS */
-COMP( 1984, bcs3,   0,       0,      bcs3,      bcs3,  bcs3_state,  0,         "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3a,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3a,     "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3b,  bcs3,    0,      bcs3b,     bcs3,  bcs3_state,  bcs3b,     "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3c,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3c,     "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3d,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3d,     "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                   FLAGS */
+COMP( 1984, bcs3,  0,      0,      bcs3,    bcs3,  bcs3_state, empty_init, "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3a, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3a, "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3b, bcs3,   0,      bcs3b,   bcs3,  bcs3_state, init_bcs3b, "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3c, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3c, "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3d, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3d, "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

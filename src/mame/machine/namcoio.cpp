@@ -177,7 +177,10 @@ void namcoio_device::device_reset()
 		elem = 0;
 
 	if (m_reset != ASSERT_LINE)
-		set_reset_line(PULSE_LINE);
+	{
+		set_reset_line(ASSERT_LINE);
+		set_reset_line(CLEAR_LINE);
+	}
 }
 
 /*****************************************************************************
@@ -476,7 +479,7 @@ READ8_MEMBER( namcoio_device::read )
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
 	offset &= 0x3f;
 
-//  LOG("%04x: I/O read: mode %d, offset %d = %02x\n", space.device().safe_pc(), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f);
+//  LOG("%s: I/O read: mode %d, offset %d = %02x\n", machine().describe_context(), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f);
 
 	return 0xf0 | m_ram[offset];
 }
@@ -486,7 +489,7 @@ WRITE8_MEMBER( namcoio_device::write )
 	offset &= 0x3f;
 	data &= 0x0f;   // RAM is 4-bit wide
 
-//  LOG("%04x: I/O write %d: offset %d = %02x\n", space.device().safe_pc(), offset / 16, offset & 0x0f, data);
+//  LOG("%s: I/O write %d: offset %d = %02x\n", machine().describe_context(), offset / 16, offset & 0x0f, data);
 
 	m_ram[offset] = data;
 }

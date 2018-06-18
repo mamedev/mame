@@ -270,7 +270,7 @@ WRITE32_MEMBER(k057714_device::write)
 			break;
 
 		default:
-			//printf("%s_w: %02X, %08X, %08X at %08X\n", basetag(), reg, data, mem_mask, space.device().safe_pc());
+			//printf("%s_w: %02X, %08X, %08X at %s\n", basetag(), reg, data, mem_mask, m_maincpu->pc());
 			break;
 	}
 }

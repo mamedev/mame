@@ -7,11 +7,13 @@
 
 #include "pci.h"
 
-#define MCFG_SATA_ADD(_tag, _main_id, _revision, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, SATA, _main_id, _revision, 0x01018a, _subdevice_id)
-
 class sata_device : public pci_device {
 public:
+	sata_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+		: sata_device(mconfig, tag, owner, clock)
+	{
+		set_ids(main_id, revision, 0x01018a, subdevice_id);
+	}
 	sata_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -19,12 +21,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(primary_command_map, 32);
-	DECLARE_ADDRESS_MAP(primary_control_map, 32);
-	DECLARE_ADDRESS_MAP(secondary_command_map, 32);
-	DECLARE_ADDRESS_MAP(secondary_control_map, 32);
-	DECLARE_ADDRESS_MAP(bus_master_map, 32);
-	DECLARE_ADDRESS_MAP(ide_command_posting_map, 32);
+	void primary_command_map(address_map &map);
+	void primary_control_map(address_map &map);
+	void secondary_command_map(address_map &map);
+	void secondary_control_map(address_map &map);
+	void bus_master_map(address_map &map);
+	void ide_command_posting_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(SATA, sata_device)

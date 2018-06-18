@@ -39,6 +39,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -54,6 +55,9 @@ public:
 	DECLARE_PALETTE_INIT(ibm3153);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ibm3153(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -61,16 +65,18 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, ibm3153_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x0ffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void ibm3153_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x0ffff).rom().region("user1", 0);
+}
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, ibm3153_state)
-	AM_RANGE(0x0000,0xffff) AM_RAM
+void ibm3153_state::io_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
 	//ADDRESS_MAP_UNMAP_HIGH
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 
 /* Input ports */
@@ -93,11 +99,11 @@ void ibm3153_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ibm3153 )
+MACHINE_CONFIG_START(ibm3153_state::ibm3153)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_16MHz) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(16'000'000)) // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -123,5 +129,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR   NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1999?, ibm3153, 0,      0,       ibm3153,  ibm3153, ibm3153_state, 0,    "IBM",   "IBM 3153 Terminal", MACHINE_IS_SKELETON)
+//    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1999?, ibm3153, 0,      0,      ibm3153, ibm3153, ibm3153_state, empty_init, "IBM",   "IBM 3153 Terminal", MACHINE_IS_SKELETON)

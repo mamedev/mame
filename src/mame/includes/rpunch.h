@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "video/vsystem_gga.h"
+#include "emupal.h"
 #include "screen.h"
 
 class rpunch_state : public driver_device
@@ -55,8 +56,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
 	DECLARE_WRITE8_MEMBER(upd_control_w);
 	DECLARE_WRITE8_MEMBER(upd_data_w);
-	DECLARE_DRIVER_INIT(rabiolep);
-	DECLARE_DRIVER_INIT(svolley);
+	void init_rabiolep();
+	void init_svolley();
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	virtual void machine_start() override;
@@ -70,4 +71,9 @@ public:
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void svolley(machine_config &config);
+	void rpunch(machine_config &config);
+	void svolleybl(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

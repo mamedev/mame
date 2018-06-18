@@ -37,17 +37,17 @@ DEFINE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device, "c64_turbo232", 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_turbo232_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_turbo232_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_3_6864MHz)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(c64_turbo232_cartridge_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MOS6551_XTAL(XTAL(3'686'400))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, c64_turbo232_cartridge_device, acia_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 
@@ -183,9 +183,9 @@ void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 
 					switch (m_es & ES_S_MASK)
 					{
-					case ES_S_230400: m_acia->set_xtal(XTAL_3_6864MHz); break;
-					case ES_S_115200: m_acia->set_xtal(XTAL_3_6864MHz/2); break;
-					case ES_S_57600: m_acia->set_xtal(XTAL_3_6864MHz/4); break;
+					case ES_S_230400: m_acia->set_xtal(XTAL(3'686'400)); break;
+					case ES_S_115200: m_acia->set_xtal(XTAL(3'686'400)/2); break;
+					case ES_S_57600: m_acia->set_xtal(XTAL(3'686'400)/4); break;
 					case ES_S_UNDEFINED: m_acia->set_xtal(0); break;
 					}
 				}

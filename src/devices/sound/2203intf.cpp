@@ -15,8 +15,7 @@ const ssg_callbacks ym2203_device::psgintf =
 /* IRQ Handler */
 void ym2203_device::irq_handler(int irq)
 {
-	if (!m_irq_handler.isnull())
-		m_irq_handler(irq);
+	m_timer[2]->adjust(attotime::zero, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -24,12 +23,17 @@ void ym2203_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id)
 	{
-	case 0:
+	case TIMER_A:
 		ym2203_timer_over(m_chip,0);
 		break;
 
-	case 1:
+	case TIMER_B:
 		ym2203_timer_over(m_chip,1);
+		break;
+
+	case TIMER_IRQ_SYNC:
+		if (!m_irq_handler.isnull())
+			m_irq_handler(param);
 		break;
 	}
 }
@@ -77,8 +81,9 @@ void ym2203_device::device_start()
 	m_irq_handler.resolve();
 
 	/* Timer Handler set */
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
+	m_timer[0] = timer_alloc(TIMER_A);
+	m_timer[1] = timer_alloc(TIMER_B);
+	m_timer[2] = timer_alloc(TIMER_IRQ_SYNC);
 
 	/* stream system initialize */
 	calculate_rates();

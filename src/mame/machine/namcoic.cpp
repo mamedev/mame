@@ -820,6 +820,7 @@ void namcos2_shared_state::c355_obj_draw(screen_device &screen, bitmap_ind16 &bi
 		screen.priority().fill(0, cliprect);
 
 //  if (offs == 0)  // boot
+	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
 		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
 //  else
 		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);

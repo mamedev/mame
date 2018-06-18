@@ -128,6 +128,19 @@ class SchemaQueries(object):
             '    slotoption      INTEGER NOT NULL,\n' \
             '    FOREIGN KEY (id) REFERENCES slot (id),\n' \
             '    FOREIGN KEY (slotoption) REFERENCES slotoption (id))'
+    CREATE_RAMOPTION = \
+            'CREATE TABLE ramoption (\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    size            INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    PRIMARY KEY (machine ASC, size ASC),\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id))'
+    CREATE_RAMDEFAULT = \
+            'CREATE TABLE ramdefault (\n' \
+            '    machine         INTEGER PRIMARY KEY,\n' \
+            '    size            INTEGER NOT NULL,\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
+            '    FOREIGN KEY (machine, size) REFERENCES ramoption (machine, size))'
 
     CREATE_TEMPORARY_DEVICEREFERENCE = 'CREATE TEMPORARY TABLE temp_devicereference (id INTEGER PRIMARY KEY, machine INTEGER NOT NULL, device TEXT NOT NULL, UNIQUE (machine, device))'
     CREATE_TEMPORARY_SLOTOPTION = 'CREATE TEMPORARY TABLE temp_slotoption (id INTEGER PRIMARY KEY, slot INTEGER NOT NULL, device TEXT NOT NULL, name TEXT NOT NULL)'
@@ -181,7 +194,9 @@ class SchemaQueries(object):
             CREATE_FEATURE,
             CREATE_SLOT,
             CREATE_SLOTOPTION,
-            CREATE_SLOTDEFAULT)
+            CREATE_SLOTDEFAULT,
+            CREATE_RAMOPTION,
+            CREATE_RAMDEFAULT)
 
     CREATE_TEMPORARY_TABLES = (
             CREATE_TEMPORARY_DEVICEREFERENCE,
@@ -225,6 +240,8 @@ class UpdateQueries(object):
     ADD_DIPVALUE = 'INSERT INTO dipvalue (dipswitch, name, value, isdefault) VALUES (?, ?, ?, ?)'
     ADD_FEATURE = 'INSERT INTO feature (machine, featuretype, status, overall) SELECT ?, id, ?, ? FROM featuretype WHERE name = ?'
     ADD_SLOT = 'INSERT INTO slot (machine, name) VALUES (?, ?)'
+    ADD_RAMOPTION = 'INSERT INTO ramoption (machine, size, name) VALUES (?, ?, ?)'
+    ADD_RAMDEFAULT = 'INSERT INTO ramdefault (machine, size) VALUES (?, ?)'
 
     ADD_TEMPORARY_DEVICEREFERENCE = 'INSERT OR IGNORE INTO temp_devicereference (machine, device) VALUES (?, ?)'
     ADD_TEMPORARY_SLOTOPTION = 'INSERT INTO temp_slotoption (slot, device, name) VALUES (?, ?, ?)'
@@ -433,6 +450,14 @@ class QueryCursor(object):
                 'WHERE slot.machine = ?',
                 (machine, ))
 
+    def get_ram_options(self, machine):
+        return self.dbcurs.execute(
+                'SELECT ramoption.name AS name, ramoption.size AS size, COUNT(ramdefault.machine) AS isdefault ' \
+                'FROM ramoption LEFT JOIN ramdefault USING (machine, size) WHERE ramoption.machine = ? ' \
+                'GROUP BY ramoption.machine, ramoption.size ' \
+                'ORDER BY ramoption.size',
+                (machine, ))
+
 
 class UpdateCursor(object):
     def __init__(self, dbconn, **kwargs):
@@ -501,6 +526,14 @@ class UpdateCursor(object):
 
     def add_slotdefault(self, slot, slotoption):
         self.dbcurs.execute(UpdateQueries.ADD_TEMPORARY_SLOTDEFAULT, (slot, slotoption))
+        return self.dbcurs.lastrowid
+
+    def add_ramoption(self, machine, name, size):
+        self.dbcurs.execute(UpdateQueries.ADD_RAMOPTION, (machine, size, name))
+        return self.dbcurs.lastrowid
+
+    def add_ramdefault(self, machine, size):
+        self.dbcurs.execute(UpdateQueries.ADD_RAMDEFAULT, (machine, size))
         return self.dbcurs.lastrowid
 
 

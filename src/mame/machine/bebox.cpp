@@ -153,8 +153,8 @@ WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 	{
 		if (LOG_CPUIMASK)
 		{
-			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device().safe_pc( ), m_cpu_imask[0]);
+			logerror("%s BeBox CPU #0 imask=0x%08x\n",
+				machine().describe_context(), m_cpu_imask[0]);
 		}
 		bebox_update_interrupts();
 	}
@@ -170,8 +170,8 @@ WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
 	{
 		if (LOG_CPUIMASK)
 		{
-			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device() .safe_pc( ), m_cpu_imask[1]);
+			logerror("%s BeBox CPU #1 imask=0x%08x\n",
+				machine().describe_context(), m_cpu_imask[1]);
 		}
 		bebox_update_interrupts();
 	}
@@ -598,17 +598,17 @@ WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
  *
  *************************************/
 
-READ8_MEMBER(bebox_state::bebox_flash_r )
+READ8_MEMBER(bebox_state::bebox_flash_r)
 {
 	offset = (offset & ~7) | (7 - (offset & 7));
-	return m_flash->read(offset);
+	return m_flash->read(space, offset);
 }
 
 
-WRITE8_MEMBER(bebox_state::bebox_flash_w )
+WRITE8_MEMBER(bebox_state::bebox_flash_w)
 {
 	offset = (offset & ~7) | (7 - (offset & 7));
-	m_flash->write(offset, data);
+	m_flash->write(space, offset, data);
 }
 
 /*************************************
@@ -681,9 +681,9 @@ WRITE64_MEMBER(bebox_state::scsi53c810_w )
 }
 
 
-uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, uint32_t mem_mask)
+#ifdef UNUSED_LEGACY_CODE
+uint32_t bebox_state::scsi53c810_pci_read(int function, int offset, uint32_t mem_mask)
 {
-	bebox_state *state = device->machine().driver_data<bebox_state>();
 	uint32_t result = 0;
 
 	if (function == 0)
@@ -699,7 +699,7 @@ uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function
 				break;
 
 			default:
-				result = state->m_scsi53c810_data[offset / 4];
+				result = m_scsi53c810_data[offset / 4];
 				break;
 		}
 	}
@@ -707,14 +707,13 @@ uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function
 }
 
 
-void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, uint32_t data, uint32_t mem_mask)
+void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask)
 {
-	bebox_state *state = device->machine().driver_data<bebox_state>();
 	offs_t addr;
 
 	if (function == 0)
 	{
-		state->m_scsi53c810_data[offset / 4] = data;
+		m_scsi53c810_data[offset / 4] = data;
 
 		switch(offset)
 		{
@@ -731,18 +730,19 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 				if (data & 0x02)
 				{
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
-					if (state->m_scsi53c810_data[5] != 0xFFFFFFF0)
+					if (m_scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						address_space &space = state->m_ppc1->space(AS_PROGRAM);
+						address_space &space = m_ppc1->space(AS_PROGRAM);
 
-						addr = (state->m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
-						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),state), write64_delegate(FUNC(bebox_state::scsi53c810_w),state));
+						addr = (m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
+						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),this), write64_delegate(FUNC(bebox_state::scsi53c810_w),this));
 					}
 				}
 				break;
 		}
 	}
 }
+#endif
 
 
 void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -778,7 +778,7 @@ void bebox_state::machine_start()
 {
 }
 
-DRIVER_INIT_MEMBER(bebox_state,bebox)
+void bebox_state::init_bebox()
 {
 	address_space &space_0 = m_ppc1->space(AS_PROGRAM);
 	address_space &space_1 = m_ppc2->space(AS_PROGRAM);

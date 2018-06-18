@@ -6,8 +6,8 @@
 
 *****************************************************************************/
 
-#ifndef __MICRONIC__
-#define __MICRONIC__
+#ifndef MAME_INCLUDES_MICRONIC_H
+#define MAME_INCLUDES_MICRONIC_H
 
 #include "cpu/z80/z80.h"
 #include "video/hd61830.h"
@@ -16,6 +16,7 @@
 #include "machine/nvram.h"
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"
@@ -82,6 +83,9 @@ public:
 	uint8_t m_status_flag;
 	DECLARE_PALETTE_INIT(micronic);
 
+	void micronic(machine_config &config);
+	void micronic_io(address_map &map);
+	void micronic_mem(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_ioport m_bit0;

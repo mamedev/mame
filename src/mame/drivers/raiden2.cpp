@@ -224,10 +224,10 @@ int cnt=0, ccol = -1;
 
 WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 {
-	//AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	//AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	//AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	//AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	//  map(0x0d000, 0x0d7ff).ram().w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	//  map(0x0d800, 0x0dfff).ram().w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	//  map(0x0e000, 0x0e7ff).ram().w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	//  map(0x0e800, 0x0f7ff).ram().w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
 
 	if (offset < 0x800 / 2)
 	{
@@ -377,25 +377,25 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 WRITE16_MEMBER(raiden2_state::raiden2_background_w)
 {
-	COMBINE_DATA(&back_data[offset]);
+	COMBINE_DATA(&m_back_data[offset]);
 	background_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
 {
-	COMBINE_DATA(&mid_data[offset]);
+	COMBINE_DATA(&m_mid_data[offset]);
 	midground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
 {
-	COMBINE_DATA(&fore_data[offset]);
+	COMBINE_DATA(&m_fore_data[offset]);
 	foreground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_text_w)
 {
-	COMBINE_DATA(&text_data[offset]);
+	COMBINE_DATA(&m_text_data[offset]);
 	text_layer->mark_tile_dirty(offset);
 }
 
@@ -481,7 +481,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 {
-	int tile = back_data[tile_index];
+	int tile = m_back_data[tile_index];
 	int color = (tile >> 12) | (0 << 4);
 
 	tile = (tile & 0xfff) | (bg_bank << 12);
@@ -491,7 +491,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 {
-	int tile = mid_data[tile_index];
+	int tile = m_mid_data[tile_index];
 	int color = (tile >> 12) | (2 << 4);
 
 	tile = (tile & 0xfff) | (mid_bank << 12);
@@ -501,7 +501,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 {
-	int tile = fore_data[tile_index];
+	int tile = m_fore_data[tile_index];
 	int color = (tile >> 12) | (1 << 4);
 
 	tile = (tile & 0xfff) | (fg_bank << 12);
@@ -511,7 +511,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 {
-	int tile = text_data[tile_index];
+	int tile = m_text_data[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -524,15 +524,18 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	text_data =  make_unique_clear<uint16_t[]>(0x1000/2);
+	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_mid_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_text_data = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_palette_data = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
 
-	save_pointer(NAME(back_data.get()), 0x800/2);
-	save_pointer(NAME(fore_data.get()), 0x800/2);
-	save_pointer(NAME(mid_data.get()), 0x800/2);
-	save_pointer(NAME(text_data.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data.get()), 0x800/2);
+	save_pointer(NAME(m_fore_data.get()), 0x800/2);
+	save_pointer(NAME(m_mid_data.get()), 0x800/2);
+	save_pointer(NAME(m_text_data.get()), 0x1000/2);
+	save_pointer(NAME(m_palette_data.get()), 0x1000/2);
 
 	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
@@ -889,214 +892,238 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
 }
 
 /* MEMORY MAPS */
-static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
-	AM_RANGE(0x0041c, 0x0041d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_target_w) // angle target (for 0x6200 COP macro)
-	AM_RANGE(0x0041e, 0x0041f) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
-	AM_RANGE(0x00420, 0x00421) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_low_w)
-	AM_RANGE(0x00422, 0x00423) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_high_w)
-	AM_RANGE(0x00424, 0x00425) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_mode_w)
-	AM_RANGE(0x00428, 0x00429) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v1_w)
-	AM_RANGE(0x0042a, 0x0042b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v2_w)
-	AM_RANGE(0x0042c, 0x0042d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_prng_maxvalue_w)
-	AM_RANGE(0x00432, 0x00433) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_data_w)
-	AM_RANGE(0x00434, 0x00435) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_addr_w)
-	AM_RANGE(0x00436, 0x00437) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_hitbox_baseadr_w)
-	AM_RANGE(0x00438, 0x00439) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_value_w)
-	AM_RANGE(0x0043a, 0x0043b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_mask_w)
-	AM_RANGE(0x0043c, 0x0043d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_trigger_w)
-	AM_RANGE(0x00444, 0x00445) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_scale_w)
-	AM_RANGE(0x00450, 0x00451) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_hi_w)
-	AM_RANGE(0x00452, 0x00453) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_lo_w)
-	AM_RANGE(0x00454, 0x00455) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_hi_w)
-	AM_RANGE(0x00456, 0x00457) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_lo_w)
-	AM_RANGE(0x00458, 0x00459) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_param_w)
-	AM_RANGE(0x0045a, 0x0045b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_val_w) //palette DMA brightness val, used by X Se Dae / Zero Team
-	AM_RANGE(0x0045c, 0x0045d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_mode_w)  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
-	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w) // implementaton of this varies between games, external hookup?
+void raiden2_state::raiden2_cop_mem(address_map &map)
+{
+	map(0x0041c, 0x0041d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_target_w)); // angle target (for 0x6200 COP macro)
+	map(0x0041e, 0x0041f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_step_w));   // angle step   (for 0x6200 COP macro)
+	map(0x00420, 0x00421).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_low_w));
+	map(0x00422, 0x00423).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_high_w));
+	map(0x00424, 0x00425).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_mode_w));
+	map(0x00428, 0x00429).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_v1_w));
+	map(0x0042a, 0x0042b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_v2_w));
+	map(0x0042c, 0x0042d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_prng_maxvalue_w));
+	map(0x00432, 0x00433).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_data_w));
+	map(0x00434, 0x00435).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_addr_w));
+	map(0x00436, 0x00437).w(m_raiden2cop, FUNC(raiden2cop_device::cop_hitbox_baseadr_w));
+	map(0x00438, 0x00439).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_value_w));
+	map(0x0043a, 0x0043b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_mask_w));
+	map(0x0043c, 0x0043d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_trigger_w));
+	map(0x00444, 0x00445).w(m_raiden2cop, FUNC(raiden2cop_device::cop_scale_w));
+	map(0x00450, 0x00451).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_ram_addr_hi_w));
+	map(0x00452, 0x00453).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_ram_addr_lo_w));
+	map(0x00454, 0x00455).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_lookup_hi_w));
+	map(0x00456, 0x00457).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_lookup_lo_w));
+	map(0x00458, 0x00459).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_param_w));
+	map(0x0045a, 0x0045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
+	map(0x0045c, 0x0045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
+	map(0x00470, 0x00471).rw(FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::cop_tile_bank_2_w)); // implementaton of this varies between games, external hookup?
 
-	AM_RANGE(0x00476, 0x00477) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_adr_rel_w)
-	AM_RANGE(0x00478, 0x00479) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_src_w)
-	AM_RANGE(0x0047a, 0x0047b) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_size_w)
-	AM_RANGE(0x0047c, 0x0047d) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_dst_w)
-	AM_RANGE(0x0047e, 0x0047f) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_dma_mode_r, cop_dma_mode_w)
-	AM_RANGE(0x004a0, 0x004ad) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_high_r, cop_reg_high_w)
-	AM_RANGE(0x004c0, 0x004cd) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_low_r, cop_reg_low_w)
-	AM_RANGE(0x00500, 0x00505) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_cmd_w)
-	AM_RANGE(0x00580, 0x00581) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_r)
-	AM_RANGE(0x00582, 0x00587) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_val_r)
-	AM_RANGE(0x00588, 0x00589) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_stat_r)
-	AM_RANGE(0x00590, 0x00599) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_itoa_digits_r)
-	AM_RANGE(0x005a0, 0x005a7) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_prng_r) // zeroteam reads from 5a4
-	AM_RANGE(0x005b0, 0x005b1) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_status_r)
-	AM_RANGE(0x005b2, 0x005b3) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_dist_r)
-	AM_RANGE(0x005b4, 0x005b5) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_angle_r)
+	map(0x00476, 0x00477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
+	map(0x00478, 0x00479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
+	map(0x0047a, 0x0047b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_size_w));
+	map(0x0047c, 0x0047d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_dst_w));
+	map(0x0047e, 0x0047f).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_mode_r), FUNC(raiden2cop_device::cop_dma_mode_w));
+	map(0x004a0, 0x004ad).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_high_r), FUNC(raiden2cop_device::cop_reg_high_w));
+	map(0x004c0, 0x004cd).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_low_r), FUNC(raiden2cop_device::cop_reg_low_w));
+	map(0x00500, 0x00505).w(m_raiden2cop, FUNC(raiden2cop_device::cop_cmd_w));
+	map(0x00580, 0x00581).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_r));
+	map(0x00582, 0x00587).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_val_r));
+	map(0x00588, 0x00589).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_stat_r));
+	map(0x00590, 0x00599).r(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_digits_r));
+	map(0x005a0, 0x005a7).r(m_raiden2cop, FUNC(raiden2cop_device::cop_prng_r)); // zeroteam reads from 5a4
+	map(0x005b0, 0x005b1).r(m_raiden2cop, FUNC(raiden2cop_device::cop_status_r));
+	map(0x005b2, 0x005b3).r(m_raiden2cop, FUNC(raiden2cop_device::cop_dist_r));
+	map(0x005b4, 0x005b5).r(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_r));
 
-	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
-	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
-	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
-	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
-	AM_RANGE(0x006ac, 0x006af) AM_WRITE(sprcpt_flags_1_w)
-	AM_RANGE(0x006b0, 0x006b3) AM_WRITE(sprcpt_data_1_w)
-	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
-	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
-	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
-	AM_RANGE(0x006c2, 0x006c3) AM_READWRITE(sprite_prot_src_seg_r, sprite_prot_src_seg_w)
-	AM_RANGE(0x006c4, 0x006c5) AM_WRITENOP // constant value written along with 0x6c0
-	AM_RANGE(0x006c6, 0x006c7) AM_WRITE(sprite_prot_dst1_w)
-	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
-	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
-	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
-	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(sprite_prot_x_w)
-	AM_RANGE(0x006da, 0x006db) AM_WRITE(sprite_prot_y_w)
-	AM_RANGE(0x006dc, 0x006dd) AM_READWRITE(sprite_prot_maxx_r, sprite_prot_maxx_w)
-	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
+	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
+	map(0x006a0, 0x006a3).w(FUNC(raiden2_state::sprcpt_val_1_w));
+	map(0x006a4, 0x006a7).w(FUNC(raiden2_state::sprcpt_data_3_w));
+	map(0x006a8, 0x006ab).w(FUNC(raiden2_state::sprcpt_data_4_w));
+	map(0x006ac, 0x006af).w(FUNC(raiden2_state::sprcpt_flags_1_w));
+	map(0x006b0, 0x006b3).w(FUNC(raiden2_state::sprcpt_data_1_w));
+	map(0x006b4, 0x006b7).w(FUNC(raiden2_state::sprcpt_data_2_w));
+	map(0x006b8, 0x006bb).w(FUNC(raiden2_state::sprcpt_val_2_w));
+	map(0x006bc, 0x006bf).w(FUNC(raiden2_state::sprcpt_adr_w));
+	map(0x006c0, 0x006c1).rw(FUNC(raiden2_state::sprite_prot_off_r), FUNC(raiden2_state::sprite_prot_off_w));
+	map(0x006c2, 0x006c3).rw(FUNC(raiden2_state::sprite_prot_src_seg_r), FUNC(raiden2_state::sprite_prot_src_seg_w));
+	map(0x006c4, 0x006c5).nopw(); // constant value written along with 0x6c0
+	map(0x006c6, 0x006c7).w(FUNC(raiden2_state::sprite_prot_dst1_w));
+	map(0x006ca, 0x006cb).w(FUNC(raiden2_state::raiden2_bank_w));
+	map(0x006cc, 0x006cd).w(FUNC(raiden2_state::tile_bank_01_w));
+	map(0x006ce, 0x006cf).w(FUNC(raiden2_state::sprcpt_flags_2_w));
+	map(0x006d8, 0x006d9).w(FUNC(raiden2_state::sprite_prot_x_w));
+	map(0x006da, 0x006db).w(FUNC(raiden2_state::sprite_prot_y_w));
+	map(0x006dc, 0x006dd).rw(FUNC(raiden2_state::sprite_prot_maxx_r), FUNC(raiden2_state::sprite_prot_maxx_w));
+	map(0x006de, 0x006df).w(FUNC(raiden2_state::sprite_prot_src_w));
 	/* end video block */
 
-	AM_RANGE(0x006fc, 0x006fd) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_trigger_w)
-	AM_RANGE(0x006fe, 0x006ff) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_dma_trig_w) // sort-DMA trigger
+	map(0x006fc, 0x006fd).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_trigger_w));
+	map(0x006fe, 0x006ff).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_dma_trig_w)); // sort-DMA trigger
 
-	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
-ADDRESS_MAP_END
+	map(0x00762, 0x00763).r(FUNC(raiden2_state::sprite_prot_dst1_r));
+}
 
-static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
+void raiden2_state::raiden2_mem(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
+	raiden2_cop_mem(map);
 
-	AM_IMPORT_FROM( raiden2_cop_mem )
+	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	map(0x00740, 0x00741).portr("DSW");
+	map(0x00744, 0x00745).portr("P1_P2");
+	map(0x0074c, 0x0074d).portr("SYSTEM");
 
-	AM_RANGE(0x00800, 0x0bfff) AM_RAM
+	map(0x00800, 0x0bfff).ram();
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM // _WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
+	map(0x0c000, 0x0cfff).ram().share("sprites");
+	map(0x0d000, 0x0d7ff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	map(0x10000, 0x1efff).ram();
+	map(0x1f000, 0x1ffff).ram(); //.w("palette", palette_device, write).share("palette");
 
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank1")
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("mainbank2")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x40000)
-ADDRESS_MAP_END
+	map(0x20000, 0x2ffff).bankr("mainbank1");
+	map(0x30000, 0x3ffff).bankr("mainbank2");
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
+}
 
-static ADDRESS_MAP_START( raidendx_mem, AS_PROGRAM, 16, raiden2_state )
-	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
-	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
-	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
-//  AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
-	AM_IMPORT_FROM( raiden2_mem )
-ADDRESS_MAP_END
+void raiden2_state::raidendx_mem(address_map &map)
+{
+	raiden2_mem(map);
+	map(0x00470, 0x00471).rw(FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::raidendx_cop_bank_2_w));
+	map(0x004d0, 0x004d7).ram(); //???
+	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
+//  map(0x006ca, 0x006cb).nopw();
+}
 
-static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
+void raiden2_state::zeroteam_mem(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
 
-	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
-	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+	raiden2_cop_mem(map);
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // irq ack / sprite buffering?
+	map(0x00470, 0x00471).nopw();
+	map(0x006cc, 0x006cd).nopw();
 
-	AM_IMPORT_FROM( raiden2_cop_mem )
+	map(0x0068e, 0x0068f).nopw(); // irq ack / sprite buffering?
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x00748, 0x00749) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	map(0x00740, 0x00741).portr("DSW");
+	map(0x00744, 0x00745).portr("P1_P2");
+	map(0x00748, 0x00749).portr("P3_P4");
+	map(0x0074c, 0x0074d).portr("SYSTEM");
 
-	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM // _WRITE(raiden2_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	map(0x00800, 0x0b7ff).ram();
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
+	map(0x0f000, 0x0ffff).ram().share("sprites");
+	map(0x10000, 0x1ffff).ram();
 
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank1")
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("mainbank2")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x40000)
-ADDRESS_MAP_END
+	map(0x20000, 0x2ffff).bankr("mainbank1");
+	map(0x30000, 0x3ffff).bankr("mainbank2");
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
+}
 
-static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
+void raiden2_state::xsedae_mem(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
 
-	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
-	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+	raiden2_cop_mem(map);
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
+	map(0x00470, 0x00471).nopw();
+	map(0x006cc, 0x006cd).nopw();
 
-	AM_IMPORT_FROM( raiden2_cop_mem )
+	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x00748, 0x00749) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	map(0x00740, 0x00741).portr("DSW");
+	map(0x00744, 0x00745).portr("P1_P2");
+	map(0x00748, 0x00749).portr("P3_P4");
+	map(0x0074c, 0x0074d).portr("SYSTEM");
 
-	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM // _WRITE(raiden2_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
+	map(0x00800, 0x0b7ff).ram();
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
+	map(0x0f000, 0x0ffff).ram().share("sprites");
 
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	map(0x10000, 0x1ffff).ram();
 
-	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000)
-ADDRESS_MAP_END
+	map(0x20000, 0xfffff).rom().region("maincpu", 0x20000);
+}
 
-ADDRESS_MAP_START( raiden2_sound_map, AS_PROGRAM, 8, raiden2_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-	AM_RANGE(0x4004, 0x4004) AM_NOP
-	AM_RANGE(0x401a, 0x401a) AM_NOP
-ADDRESS_MAP_END
+void raiden2_state::raiden2_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4004, 0x4004).noprw();
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6000, 0x6000).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x6002, 0x6002).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
-ADDRESS_MAP_START( zeroteam_sound_map, AS_PROGRAM, 8, raiden2_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void raiden2_state::zeroteam_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6000, 0x6000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
 
 /* INPUT PORTS */
@@ -1397,7 +1424,7 @@ static const gfx_layout raiden2_spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( raiden2 )
+static GFXDECODE_START( gfx_raiden2 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, raiden2_charlayout,   0x700, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, raiden2_tilelayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 4096 ) // really 128, but using the top bits for priority
@@ -1406,61 +1433,64 @@ GFXDECODE_END
 
 /* MACHINE DRIVERS */
 
-static MACHINE_CONFIG_START( raiden2 )
+MACHINE_CONFIG_START(raiden2_state::raiden2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(raiden2_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", V30,XTAL(32'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(raiden2_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/8)
-	MCFG_CPU_PROGRAM_MAP(raiden2_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
+	MCFG_DEVICE_PROGRAM_MAP(raiden2_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
+	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_28_63636MHz/8)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'636'363)/8)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/28, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/28, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
+MACHINE_CONFIG_START(raiden2_state::xsedae)
+	raiden2(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xsedae_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
 
@@ -1469,61 +1499,64 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raidendx, raiden2 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
+MACHINE_CONFIG_START(raiden2_state::raidendx)
+	raiden2(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(raidendx_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raidendx)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zeroteam )
+MACHINE_CONFIG_START(raiden2_state::zeroteam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(zeroteam_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", V30,XTAL(32'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(zeroteam_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/8)
-	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
+	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
+	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
+	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
+	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28_63636MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'636'363)/8)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000/* ? */, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000/* ? */, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 /* ROM LOADING */
@@ -3163,7 +3196,7 @@ void raiden2_state::init_blending(const uint16_t *table)
 		blend_active[*table++] = true;
 }
 
-DRIVER_INIT_MEMBER(raiden2_state,raiden2)
+void raiden2_state::init_raiden2()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -3173,7 +3206,7 @@ DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 	raiden2_decrypt_sprites(machine());
 }
 
-DRIVER_INIT_MEMBER(raiden2_state,raidendx)
+void raiden2_state::init_raidendx()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -3187,7 +3220,7 @@ const uint16_t raiden2_state::xsedae_blended_colors[] = {
 	0xffff,
 };
 
-DRIVER_INIT_MEMBER(raiden2_state,xsedae)
+void raiden2_state::init_xsedae()
 {
 	init_blending(xsedae_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -3209,7 +3242,7 @@ const uint16_t raiden2_state::zeroteam_blended_colors[] = {
 };
 
 
-DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
+void raiden2_state::init_zeroteam()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -3222,41 +3255,41 @@ DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 /* GAME DRIVERS */
 
 // rev numbers at end of the line just indicate which sets are the same code revisions (just a region byte change), they don't reflect the actual order of release
-GAME( 1993, raiden2,    0,        raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 1)", MACHINE_SUPPORTS_SAVE ) // rev 1
-GAME( 1993, raiden2u,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 2)", MACHINE_SUPPORTS_SAVE ) // ?
-GAME( 1993, raiden2g,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (Germany)", MACHINE_SUPPORTS_SAVE ) // rev 1
-GAME( 1993, raiden2hk,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (Hong Kong)", MACHINE_SUPPORTS_SAVE ) //  rev 1
-GAME( 1993, raiden2j,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Japan)", MACHINE_SUPPORTS_SAVE ) //  rev 1
-GAME( 1993, raiden2sw,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Switzerland)", MACHINE_SUPPORTS_SAVE ) // rev 1
-GAME( 1993, raiden2f,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (France)", MACHINE_SUPPORTS_SAVE ) // raiden2f & raiden2nl share same code base
-GAME( 1993, raiden2nl,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Holland)", MACHINE_SUPPORTS_SAVE ) // raiden2f & raiden2nl share same code base
-GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Italy)", MACHINE_SUPPORTS_SAVE ) // rev 2
+GAME( 1993, raiden2,    0,        raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 1)", MACHINE_SUPPORTS_SAVE ) // rev 1
+GAME( 1993, raiden2u,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 2)", MACHINE_SUPPORTS_SAVE ) // ?
+GAME( 1993, raiden2g,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (Germany)", MACHINE_SUPPORTS_SAVE ) // rev 1
+GAME( 1993, raiden2hk,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (Hong Kong)", MACHINE_SUPPORTS_SAVE ) //  rev 1
+GAME( 1993, raiden2j,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Japan)", MACHINE_SUPPORTS_SAVE ) //  rev 1
+GAME( 1993, raiden2sw,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Switzerland)", MACHINE_SUPPORTS_SAVE ) // rev 1
+GAME( 1993, raiden2f,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (France)", MACHINE_SUPPORTS_SAVE ) // raiden2f & raiden2nl share same code base
+GAME( 1993, raiden2nl,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Holland)", MACHINE_SUPPORTS_SAVE ) // raiden2f & raiden2nl share same code base
+GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Italy)", MACHINE_SUPPORTS_SAVE ) // rev 2
 
-GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Korea?)", MACHINE_SUPPORTS_SAVE ) // rev 3 (Region 0x04) - Korea?, if regions are the same as RDX, no license or region message tho
-GAME( 1993, raiden2ea,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Japan?)", MACHINE_SUPPORTS_SAVE ) // rev 4 (Region 0x00) - Should be Japan, but the easy sets have no 'FOR USE IN JAPAN ONLY' display even when region is 00
-GAME( 1993, raiden2eu,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easy version, US set 2)", MACHINE_SUPPORTS_SAVE ) //  ^
-GAME( 1993, raiden2eua, raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easy version, US set 1)", MACHINE_SUPPORTS_SAVE ) // rev 3 and 4 mix?
-GAME( 1993, raiden2eg,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (easy version, Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Korea?)", MACHINE_SUPPORTS_SAVE ) // rev 3 (Region 0x04) - Korea?, if regions are the same as RDX, no license or region message tho
+GAME( 1993, raiden2ea,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Japan?)", MACHINE_SUPPORTS_SAVE ) // rev 4 (Region 0x00) - Should be Japan, but the easy sets have no 'FOR USE IN JAPAN ONLY' display even when region is 00
+GAME( 1993, raiden2eu,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easy version, US set 2)", MACHINE_SUPPORTS_SAVE ) //  ^
+GAME( 1993, raiden2eua, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easy version, US set 1)", MACHINE_SUPPORTS_SAVE ) // rev 3 and 4 mix?
+GAME( 1993, raiden2eg,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (easy version, Germany)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, raiden2dx,  raiden2,  raidendx, raiden2,  raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden II (harder, Raiden DX hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2dx,  raiden2,  raidendx, raiden2,  raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden II (harder, Raiden DX hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, raidendx,   0,        raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (UK)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxa1, raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxa2, raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxk,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxu,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden DX (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxg,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden DX (Germany)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxnl, raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Holland)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxj,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxja, raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxch, raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Ideal International Development Corp license)", "Raiden DX (China)", MACHINE_SUPPORTS_SAVE ) // Region byte is 0x16, defined as "MAIN LAND CHINA" for this set only
+GAME( 1994, raidendx,   0,        raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (UK)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxa1, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxa2, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxk,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxu,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden DX (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxg,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden DX (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxnl, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Holland)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxj,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxja, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, raidendxch, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Ideal International Development Corp license)", "Raiden DX (China)", MACHINE_SUPPORTS_SAVE ) // Region byte is 0x16, defined as "MAIN LAND CHINA" for this set only
 
-GAME( 1993, zeroteam,   0,        zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Zero Team USA (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, zeroteama,  zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, zeroteamb,  zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, later batteryless)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 on every boot, like raiden2 does. hack?
-GAME( 1993, zeroteamc,  zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu (Liang Hwa license)", "Zero Team (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, zeroteamd,  zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu (Dream Soft license)", "Zero Team (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, zeroteams,  zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Selection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, zeroteamsr, zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Suicide Revival Kit", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 only, no game code
+GAME( 1993, zeroteam,   0,        zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Zero Team USA (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteama,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteamb,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, later batteryless)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 on every boot, like raiden2 does. hack?
+GAME( 1993, zeroteamc,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Liang Hwa license)", "Zero Team (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteamd,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Dream Soft license)", "Zero Team (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteams,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Selection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteamsr, zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Suicide Revival Kit", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 only, no game code
 
-GAME( 1995, xsedae,     0,        xsedae,   xsedae,   raiden2_state, xsedae,   ROT0,   "Dream Island", "X Se Dae Quiz (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, xsedae,     0,        xsedae,   xsedae,   raiden2_state, init_xsedae,   ROT0,   "Dream Island", "X Se Dae Quiz (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class tumbleb_state : public driver_device
 {
@@ -63,8 +64,9 @@ public:
 	DECLARE_WRITE16_MEMBER(semicom_soundcmd_w);
 	DECLARE_WRITE8_MEMBER(oki_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(jumpkids_oki_bank_w);
-	DECLARE_READ8_MEMBER(prot_io_r);
-	DECLARE_WRITE8_MEMBER(prot_io_w);
+	DECLARE_WRITE8_MEMBER(prot_p0_w);
+	DECLARE_WRITE8_MEMBER(prot_p1_w);
+	DECLARE_WRITE8_MEMBER(prot_p2_w);
 	DECLARE_READ16_MEMBER(bcstory_1a0_read);
 	DECLARE_WRITE16_MEMBER(bcstory_tilebank_w);
 	DECLARE_WRITE16_MEMBER(chokchok_tilebank_w);
@@ -78,19 +80,19 @@ public:
 	DECLARE_WRITE16_MEMBER(pangpang_pf1_data_w);
 	DECLARE_WRITE16_MEMBER(pangpang_pf2_data_w);
 	DECLARE_WRITE16_MEMBER(tumbleb2_soundmcu_w);
-	DECLARE_DRIVER_INIT(dquizgo);
-	DECLARE_DRIVER_INIT(jumpkids);
-	DECLARE_DRIVER_INIT(htchctch);
-	DECLARE_DRIVER_INIT(wlstar);
-	DECLARE_DRIVER_INIT(suprtrio);
-	DECLARE_DRIVER_INIT(tumblepb);
-	DECLARE_DRIVER_INIT(tumblepba);
-	DECLARE_DRIVER_INIT(bcstory);
-	DECLARE_DRIVER_INIT(wondl96);
-	DECLARE_DRIVER_INIT(tumbleb2);
-	DECLARE_DRIVER_INIT(chokchok);
-	DECLARE_DRIVER_INIT(fncywld);
-	DECLARE_DRIVER_INIT(carket);
+	void init_dquizgo();
+	void init_jumpkids();
+	void init_htchctch();
+	void init_wlstar();
+	void init_suprtrio();
+	void init_tumblepb();
+	void init_tumblepba();
+	void init_bcstory();
+	void init_wondl96();
+	void init_tumbleb2();
+	void init_chokchok();
+	void init_fncywld();
+	void init_carket();
 	TILEMAP_MAPPER_MEMBER(tumblep_scan);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -133,4 +135,27 @@ public:
 	void tumblepb_gfx_rearrange(int rgn);
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();
+	void tumblepb(machine_config &config);
+	void bcstory(machine_config &config);
+	void pangpang(machine_config &config);
+	void semibase(machine_config &config);
+	void tumbleb2(machine_config &config);
+	void cookbib(machine_config &config);
+	void metlsavr(machine_config &config);
+	void fncywld(machine_config &config);
+	void suprtrio(machine_config &config);
+	void htchctch(machine_config &config);
+	void sdfight(machine_config &config);
+	void chokchok(machine_config &config);
+	void cookbib_mcu(machine_config &config);
+	void jumpkids(machine_config &config);
+	void fncywld_main_map(address_map &map);
+	void htchctch_main_map(address_map &map);
+	void jumpkids_main_map(address_map &map);
+	void jumpkids_sound_map(address_map &map);
+	void pangpang_main_map(address_map &map);
+	void semicom_sound_map(address_map &map);
+	void suprtrio_main_map(address_map &map);
+	void suprtrio_sound_map(address_map &map);
+	void tumblepopb_main_map(address_map &map);
 };

@@ -7,7 +7,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
@@ -19,6 +19,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 /* Bits in m_portf0 variable:
@@ -40,7 +41,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
+		, m_wave(*this, "wave")
 		, m_samples(*this, "samples")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
@@ -53,7 +54,10 @@ public:
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
+		, m_cass_led(*this, "cass_led")
 	{ }
+
+	void machine_start() override;
 
 	DECLARE_READ8_MEMBER(super80v_low_r);
 	DECLARE_READ8_MEMBER(super80v_high_r);
@@ -76,7 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
-	DECLARE_DRIVER_INIT(super80);
+	void init_super80();
 	DECLARE_MACHINE_RESET(super80);
 	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
@@ -93,6 +97,19 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void super80m(machine_config &config);
+	void super80(machine_config &config);
+	void super80r(machine_config &config);
+	void super80e(machine_config &config);
+	void super80d(machine_config &config);
+	void super80v(machine_config &config);
+	void super80_io(address_map &map);
+	void super80_map(address_map &map);
+	void super80e_io(address_map &map);
+	void super80m_map(address_map &map);
+	void super80r_io(address_map &map);
+	void super80v_io(address_map &map);
+	void super80v_map(address_map &map);
 private:
 	uint8_t m_s_options;
 	uint8_t m_portf0;
@@ -130,6 +147,7 @@ private:
 	optional_device<wd2793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
+	output_finder<> m_cass_led;
 };
 
 #endif // MAME_INCLUDES_SUPER80_H

@@ -51,7 +51,10 @@ function cheatfind.startplugin()
 
 	-- save data block
 	function cheat.save(space, start, size)
-		local data = { block = "", start = start, size = size, space = space }
+		local data = { block = "", start = start, size = size, space = space, shift = 0 }
+		if getmetatable(space).__name:match("addr_space") then
+			data.shift = space.shift
+		end
 		if getmetatable(space).__name:match("device_t") then
 			if space:shortname() == "ram" then
 				data.block = emu.item(space.items["0/m_pointer"]):read_block(start, size)
@@ -63,14 +66,30 @@ function cheatfind.startplugin()
 			local block = ""
 			local temp = {}
 			local j = 1
-			for i = start, start + size do
-				if j < 65536 then
-					temp[j] = string.pack("B", space:read_u8(i, true))
-					j = j + 1
-				else
-					block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i, true))
-					temp = {}
-					j = 1
+			if data.shift >= 0 then -- region or byte wide space
+				for i = start, start + (size << data.shift), 1 << data.shift do
+					if j < 65536 then
+						temp[j] = string.pack("B", space:read_u8(i))
+						j = j + 1
+					else
+						block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i))
+						temp = {}
+						j = 1
+					end
+				end
+			elseif data.shift < 0 then
+				local s = -data.shift
+				local read = (s == 1) and space.read_u16 or (s == 2) and space.read_u32 or (s == 3) and space.read_u64 or space.read_u8
+				local pack = (s == 1) and "<I2" or (s == 2) and "<I4" or (s == 3) and "<I8" or "B"
+				for i = start, start + (size >> s) do
+					if j < 65536 then
+						temp[j] = string.pack(pack, read(space, i))
+						j = j + 1
+					else
+						block = block .. table.concat(temp) .. string.pack(pack, read(space, i))
+						temp = {}
+						j = 1
+					end
 				end
 			end
 			block = block .. table.concat(temp)
@@ -154,7 +173,12 @@ function cheatfind.startplugin()
 			if oldstat and newstat then
 				local oldc, newc = old, new
 				local comp = false
-				local addr = olddata.start + i - 1
+				local addr = i - 1
+				if olddata.shift ~= 0 then
+					local s = olddata.shift
+					addr = (s < 0) and addr >> -s or (s > 0) and addr << s
+				end
+				addr = addr + olddata.start
 				if not bcd or (check_bcd(old) and check_bcd(new)) then
 					if bcd then
 						oldc = frombcd(old)
@@ -230,7 +254,7 @@ function cheatfind.startplugin()
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
-	local formtable = { "B", "b", "<H", ">H", "<h", ">h", "<L", ">L", "<l", ">l", "<J", ">J", "<j", ">j" }
+	local formtable = { "I1", "i1", "<I2", ">I2", "<i2", ">i2", "<I4", ">I4", "<i4", ">i4", "<I8", ">I8", "<i8", ">i8" }
 	local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
 			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64" }
 	local width = 1
@@ -270,29 +294,34 @@ function cheatfind.startplugin()
 
 		local space_table = cheat.getspaces()
 		for tag, list in pairs(space_table) do
-			if list.program then
+			for name, space in pairs(list) do
 				local ram = {}
-				for num, entry in pairs(list.program.map) do
+				for num, entry in pairs(space.map) do
 					if entry.writetype == "ram" then
 						ram[#ram + 1] = { offset = entry.offset, size = entry.endoff - entry.offset }
+						if space.shift > 0 then
+							ram[#ram].size = ram[#ram].size >> space.shift
+						elseif space.shift < 0 then
+							ram[#ram].size = ram[#ram].size << -space.shift
+						end
 					end
 				end
 				if next(ram) then
-					if tag == ":maincpu" then
-						table.insert(devtable, 1, { tag = tag, space = list.program, ram = ram })
+					if tag == ":maincpu" and name == "program" then
+						table.insert(devtable, 1, { name = tag .. ", " .. name, tag = tag, sname = name, space = space, ram = ram })
 					else
-						devtable[#devtable + 1] = { tag = tag, space = list.program, ram = ram }
+						devtable[#devtable + 1] = { name = tag .. ", " .. name, tag = tag, sname = name, space = space, ram = ram }
 					end
 				end
 			end
 		end
 		space_table = cheat.getram()
 		for tag, ram in pairs(space_table) do
-			devtable[#devtable + 1] = { tag = tag, space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
+			devtable[#devtable + 1] = { tag = tag, name = "ram", space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
 		end
 		space_table = cheat.getshares()
 		for tag, share in pairs(space_table) do
-			devtable[#devtable + 1] = { tag = tag, space = share, ram = {{ offset = 0, size = share.size }} }
+			devtable[#devtable + 1] = { tag = tag, name = tag, space = share, ram = {{ offset = 0, size = share.size }} }
 		end
 	end
 
@@ -389,17 +418,18 @@ function cheatfind.startplugin()
 						if file then
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
-							if not getmetatable(devtable[devcur].space).__name:match("device_t") then -- no xml or simple for ram_device cheat
+							-- xml or simple are program space only
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()
 								file = io.open(cheat_save.path .. "/cheat.simple", "a")
 								file:write(string.format(cheat_save.simple, desc))
 								file:close()
-								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), cheat_save.filename))
+								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), filename))
 							end
 							written = true
-						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") then
+						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 							file = io.open(cheat_save.path .. "/cheat.simple", "a")
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
@@ -423,7 +453,7 @@ function cheatfind.startplugin()
 		end
 
 		menu[#menu + 1] = function()
-			local m = { _("CPU or RAM"), devtable[devsel].tag, 0 }
+			local m = { _("CPU or RAM"), devtable[devsel].name, 0 }
 			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
@@ -503,7 +533,7 @@ function cheatfind.startplugin()
 								count = count + #matches[#matches][num]
 							end
 						end
-						manager:machine():popmessage(count .. _(" total matches found"))
+						manager:machine():popmessage(string.format(_("%d total matches found"), count))
 						matches[#matches].count = count
 						matchpg = 0
 						devsel = devcur
@@ -644,12 +674,12 @@ function cheatfind.startplugin()
 					end
 					return mpairs_it, list, 0
 				end
-				local bitwidth = formtable[width]:sub(2, 2):lower()
-				if bitwidth == "h" then
+				local bitwidth = formtable[width]:sub(3, 3):lower()
+				if bitwidth == "2" then
 					bitwidth = " %04x"
-				elseif bitwidth == "l" then
+				elseif bitwidth == "4" then
 					bitwidth = " %08x"
-				elseif bitwidth == "j" then
+				elseif bitwidth == "8" then
 					bitwidth = " %016x"
 				else
 					bitwidth = " %02x"
@@ -658,18 +688,18 @@ function cheatfind.startplugin()
 				local function match_exec(match)
 					local dev = devtable[devcur]
 					local cheat = { desc = string.format(_("Test cheat at addr %08X"), match.addr), script = {} }
-					local wid = formtable[width]:sub(2, 2):lower()
+					local wid = formtable[width]:sub(3, 3):lower()
 					local widchar
 					local form
-					if wid == "h" then
+					if wid == "2" then
 						wid = "u16"
 						form = "%08x %04x"
 						widchar = "w"
-					elseif wid == "l" then
+					elseif wid == "4" then
 						wid = "u32"
 						form = "%08x %08x"
 						widchart = "d"
-					elseif wid == "j" then
+					elseif wid == "8" then
 						wid = "u64"
 						form = "%08x %016x"
 						widchar = "q"
@@ -684,8 +714,8 @@ function cheatfind.startplugin()
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 					else
-						cheat.space = { cpu = { tag = dev.tag, type = "program" } }
-						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
+						cheat.space = { cpu = { tag = dev.tag, type = dev.sname } }
+						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					end
 					if match.mode == 1 then
 						if not _G.ce then
@@ -700,9 +730,13 @@ function cheatfind.startplugin()
 						menu_type = 1
 						local setname = emu.romname()
 						if emu.softname() ~= "" then
-							for name, image in pairs(manager:machine().images) do
-								if image:exists() and image:software_list_name() ~= "" then
-									setname = image:software_list_name() .. "/" .. emu.softname()
+							if emu.softname():find(":") then
+								filename = emu.softname():gsub(":", "/")
+							else
+								for name, image in pairs(manager:machine().images) do
+									if image:exists() and image:software_list_name() ~= "" then
+										setname = image:software_list_name() .. "/" .. emu.softname()
+									end
 								end
 							end
 						end

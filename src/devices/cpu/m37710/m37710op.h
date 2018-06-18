@@ -2523,7 +2523,6 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 					break;
 
 				case ASSERT_LINE:
-				case PULSE_LINE:
 				case HOLD_LINE:
 					LINE_IRQ |= (1 << line);
 					if (m37710_irq_levels[line])

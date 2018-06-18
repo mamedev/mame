@@ -279,7 +279,7 @@ function simple.conv_cheat(data)
 		local set, cputag, offset, size, val, desc = line:match('([^,]+),([^,]+),([^,]+),?([^,]*),?([^,]*),(.*)')
 		if set == simple.romset then
 			local cheat
-			if cputag.sub(1,1) ~= ":" then
+			if cputag:sub(1,1) ~= ":" then
 				local list, name = set:match('([^/]+)/(.+)')
 				local func = list .. "_" .. cputag
 				if list and desc and codefuncs[func] then
@@ -300,12 +300,12 @@ function simple.conv_cheat(data)
 				else
 					size = 8
 				end
-				addr = tonumber(addr, 16)
+				offset = tonumber(offset, 16)
 				val = tonumber(val, 16)
 				if manager:machine().devices[cputag] then
-					cheat = prepare_ram_cheat(desc, cputag, addr, val, size)
+					cheat = prepare_ram_cheat(desc, cputag, offset, val, size)
 				else
-					cheat = prepare_rom_cheat(desc, cputag, addr, val, size)
+					cheat = prepare_rom_cheat(desc, cputag, offset, val, size)
 				end
 			end
 			if cheat then

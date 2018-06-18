@@ -24,9 +24,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-MACHINE_CONFIG_EXTERN( mod4oki );
-MACHINE_CONFIG_EXTERN( bwboki );
-MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
@@ -43,7 +40,7 @@ INPUT_PORTS_EXTERN( mpu4 );
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BIGMT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bigmt,     0,          "bigm1320",     0x0000, 0x010000, CRC(a5085347) SHA1(93a7f7656e53461270e04190ff538959d6c917c1), "Bwb","The Big Match (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bigmt__a,  m4bigmt,    "tb_20___.7_1", 0x0000, 0x010000, CRC(22fae0f0) SHA1(a875adccf96fbbff69f5fe76720514767cdcae66), "Bwb","The Big Match (Bwb) (MPU4) (set 2)" )
@@ -64,7 +61,7 @@ GAME_CUSTOM( 199?, m4bigmt__f,  m4bigmt,    "tbi20___.7_1", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGBL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4bingbl,       0,          "bb_20a__.8_1", 0x0000, 0x010000, CRC(10f29ba3) SHA1(739b413f35676834ebafeb121c6059759586ec72), "Bwb","Bingo Belle (Bwb) (MPU4) (set 1)" )
@@ -86,7 +83,7 @@ GAME_CUSTOM( 199?, m4bingbl__g,    m4bingbl,   "bbi20___.8_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGBS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingbs,       0,          "bp_20a__.2_1", 0x0000, 0x010000, CRC(ca005003) SHA1(271ff0dbee529ca15c79c9aa1047efa8993ea073), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingbs__a,    m4bingbs,   "bp_20bg_.2_1", 0x0000, 0x010000, CRC(1b59c32f) SHA1(0c7df33f921639bfedbddd969dcbcd62e38ff912), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 2)" )
@@ -106,7 +103,7 @@ GAME_CUSTOM( 199?, m4bingbs__f,    m4bingbs,   "bp_20sk_.2_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingcl,       0,          "bc_xe___.2_1", 0x0000, 0x010000, CRC(3abbc215) SHA1(b5e59b30c07c4ffef69c5729f1a28d7ee55636bd), "Bwb","Bingo Club (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingcl__a,    m4bingcl,   "bc_xe_b_.2_1", 0x0000, 0x010000, CRC(3e11c5c0) SHA1(2d9bc987fed040664f211bb9d13984b6cba5e25f), "Bwb","Bingo Club (Bwb) (MPU4) (set 2)" )
@@ -125,7 +122,7 @@ GAME_CUSTOM( 199?, m4bingcl__b,    m4bingcl,   "bc_xe_d_.2_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLSBYS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,bwboki  ,mpu4 , mpu4_state,m_blsbys ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki, mpu4, mpu4_state, init_m_blsbys, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4blsbys,       0,          "bbprog.bin",   0x0000, 0x020000, CRC(c262cfda) SHA1(f004895e0dd3f8420683927915554e19e41bd20b), "Bwb","Blues Boys (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4blsbys__a,    m4blsbys,   "bf_20a__.3_1", 0x0000, 0x020000, CRC(fca7764f) SHA1(a88378247b6710d6122c515c31c39c5cd9678ce2), "Bwb","Blues Boys (Bwb) (MPU4) (set 2)" )
@@ -183,7 +180,7 @@ GAME_CUSTOM( 199?, m4blsbys__ad,   m4blsbys,   "bsix3___.2v1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLUESN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CRC(c1395649) SHA1(3cd0eed1f966f5391fe5de496dc747385ebfb556), "Bwb","Blues Boys (Nova) (MPU4)" )
 
 
@@ -200,7 +197,7 @@ GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CSOC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4csoc,       0,      "chsoc8ac",     0x0000, 0x040000, CRC(8e0471ba) SHA1(3b7e6edbb3490e99af148c0cfe8d39c13c282880), "Bwb","Championship Soccer (Bwb) (MPU4) (set 1)" )
@@ -227,7 +224,7 @@ GAME_CUSTOM( 199?, m4csoc__j,    m4csoc, "ch_socc.5",    0x0000, 0x040000, CRC(1
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CPFINL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4cpfinl,       0,          "cu_10___.5_1", 0x0000, 0x010000, CRC(47a85443) SHA1(d308b9a6dcb0200f72d5c5b380907d2d55f3e40d), "Bwb","Cup Final (Bwb) (MPU4) (set 1)" )
@@ -254,7 +251,7 @@ GAME_CUSTOM( 199?, m4cpfinl__k,    m4cpfinl,   "cui20_k_.5_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DANCED_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4danced,       0,          "dd_22bg_.2_1", 0x0000, 0x020000, CRC(f79525a1) SHA1(babfbf8beae423626057235bcad5eae18531160e), "Bwb","Dancing Diamonds (Bwb) (MPU4) (set 1)" )
@@ -293,7 +290,7 @@ GAME_CUSTOM( 199?, m4danced__w,    m4danced,   "dd_sja__.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DAYTN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -328,7 +325,7 @@ GAME_CUSTOM( 199?, m4daytn__n,  m4daytn,    "da_92_d_.1_0", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXCAL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4excal,     0,          "ex_05a__.6_1", 0x0000, 0x020000, CRC(317fa289) SHA1(8a0e83a764e2a04285367e0f7ebb814fedc81400), "Bwb","Excalibur (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4excal__a,  m4excal,    "ex_20a_6.6_1", 0x0000, 0x020000, CRC(284937c8) SHA1(3be8bf21ab0ff97f67ce170cee48cd08ea325571), "Bwb","Excalibur (Bwb) (MPU4) (set 2)" )
@@ -353,7 +350,7 @@ GAME_CUSTOM( 199?, m4excal__j,  m4excal,    "ex_20sd8.6_1", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXOTIC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4exotic,       0,          "eo_49bg_.2_0", 0x0000, 0x020000, CRC(c3bf2286) SHA1(74090fd0a103a6c311d426f4aae8e7af8b1d3bc0), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4exotic__a,    m4exotic,   "eo_49bm_.2_0", 0x0000, 0x020000, CRC(c748c4ca) SHA1(7d0d498f9edd792ed861c8bf9cf1bb03698d144d), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 2)" )
@@ -376,7 +373,7 @@ GAME_CUSTOM( 199?, m4exotic__e,    m4exotic,   "eo_sja__.2_0", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FIRICE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4firice,       0,          "fi_20__d.5_0", 0x0000, 0x040000, CRC(ab46574c) SHA1(d233b137f8f42b9b644b34a627fbcc5b662e8ae1), "Bwb","Fire & Ice (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4firice__a,    m4firice,   "fi_20_bd.5_0", 0x0000, 0x040000, CRC(9b2bc052) SHA1(34b970659218fde097238b852dadedcb928f69fd), "Bwb","Fire & Ice (Bwb) (MPU4) (set 2)" )
@@ -402,7 +399,7 @@ GAME_CUSTOM( 199?, m4firice__j,    m4firice,   "fi_sja__.e_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HARLE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4harle,     0,          "hq_20a__.1_1", 0x0000, 0x010000, CRC(b8ae3025) SHA1(94a449eff103bf6ba1fc6e85b03061b9ce658ae0), "Bwb","Harlequin (Bwb) (MPU4) (set 1)" )
@@ -444,7 +441,7 @@ GAME_CUSTOM( 199?, m4harle__x,  m4harle,    "ph_20sk_.1_1", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HVHEL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4hvhel,     0,          "hh_20__d.2_0",     0x0000, 0x040000, CRC(801de788) SHA1(417b985714d8f0ebed93b65a3f865e03474ce9e5), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4hvhel__a,  m4hvhel,    "hh_20a_d.2_0",     0x0000, 0x040000, CRC(ea4e7876) SHA1(5bf711c2bdff50fe745edefa0eebf719824d9e5b), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4hvhel__b,  m4hvhel,    "hh_20s_d.2_0",     0x0000, 0x040000, CRC(a519a441) SHA1(f3c19d316c82d1ebbcfdabb6d4eaa6cfa369d287), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 3)" )
@@ -472,7 +469,7 @@ GAME_CUSTOM( 199?, m4hvhel__h,  m4hvhel,    "h_hell._pound5",   0x0000, 0x040000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4INDYCR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4indycr,       0,          "ic_sj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), "Bwb","Indy Cars (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4indycr__a,    m4indycr,   "ic_sj___.2_0", 0x0000, 0x040000, CRC(6d0ddf54) SHA1(0985aa9fddb71a499d266c12893aabbab8755319), "Bwb","Indy Cars (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4indycr__b,    m4indycr,   "ic_sj_b_.1_0", 0x0000, 0x040000, CRC(4bc0cb73) SHA1(d4c048ba9578add0104f0c529f20356c3502ea71), "Bwb","Indy Cars (Bwb) (MPU4) (set 3)" )
@@ -494,7 +491,7 @@ GAME_CUSTOM( 199?, m4indycr__f,    m4indycr,   "ic_sjs__.1_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JAKJOK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4jakjok,       0,          "jj_sj___.6_0", 0x0000, 0x040000, CRC(7bc45b0e) SHA1(f30fef8fccdac04859f1ff93198a497eff723020), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jakjok__a,    m4jakjok,   "jj_sj_k_.3_0", 0x0000, 0x040000, CRC(c33dd82f) SHA1(c1f3f6ca1c45503b7f71e897e5c27368f5efb439), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 2)" )
@@ -513,7 +510,7 @@ GAME_CUSTOM( 199?, m4jakjok__c,    m4jakjok,   "jj_vc___.7_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JAKJOKA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4jakjoka, m4jakjok,   "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431), "Bwb","Jackpot Jokers (alt) (Bwb) (MPU4)" )
 
 
@@ -527,7 +524,7 @@ GAME_CUSTOM( 199?, m4jakjoka, m4jakjok,   "j_joker", 0x0000, 0x040000, CRC(4f0c7
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JFLASH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4jflash,       0,          "jf_25__c.2_1", 0x0000, 0x020000, CRC(4d5f1a12) SHA1(c25b6d899b74231da505bde7b671be001bdcea5d), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jflash__a,    m4jflash,   "jf_25a_c.2_1", 0x0000, 0x020000, CRC(76722e15) SHA1(4bd107049ad98b848cdaba3a1318373bbd06ab9f), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4jflash__b,    m4jflash,   "jf_25b_c.2_1", 0x0000, 0x020000, CRC(35a927c6) SHA1(6776fe77ad8a85feecdedfad0eac89f9cb826fbf), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 3)" )
@@ -550,7 +547,7 @@ GAME_CUSTOM( 199?, m4jflash__i,    m4jflash,   "jf_25sbc.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LN7_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4ln7,     0,      "l7_20a__.1_1", 0x0000, 0x010000, CRC(bfe82d2a) SHA1(4477d737a2326602a355758d8fc06220312fc085), "Bwb","Lucky No7 (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4ln7__a,  m4ln7,  "l7_20s__.1_1", 0x0000, 0x010000, CRC(0037cd57) SHA1(b5882027269cf71878a73009bc3e40d9fcfac60d), "Bwb","Lucky No7 (Bwb) (MPU4) (set 2)" )
@@ -569,7 +566,7 @@ GAME_CUSTOM( 199?, m4ln7__d,  m4ln7,  "l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d21
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADMON_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4madmon,       0,          "mm_20a__.7_1", 0x0000, 0x020000, CRC(7df66388) SHA1(4e5bcbcb2fb08b23989c83f11751400f666bbdc2), "Bwb","Mad Money (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madmon__a,    m4madmon,   "mm_20b__.7_1", 0x0000, 0x020000, CRC(7f592e44) SHA1(05e78347cd09d1e58f0a50a724e0563490ec5185), "Bwb","Mad Money (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4madmon__b,    m4madmon,   "mm_20bg_.7_1", 0x0000, 0x020000, CRC(2cd8dcc2) SHA1(c4a2a423a55c6b0668739429c24c69b25e3824cf), "Bwb","Mad Money (Bwb) (MPU4) (set 3)" )
@@ -594,7 +591,7 @@ GAME_CUSTOM( 199?, m4madmon__k,    m4madmon,   "mm_25bdc.3_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADMNC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4madmnc,       0,          "cm_25__c.3_1", 0x0000, 0x020000, CRC(3d9ff5fe) SHA1(b918bb15251514f50a669216c7d00ecf23e64d1b), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madmnc__a,    m4madmnc,   "cm_25_bc.3_1", 0x0000, 0x020000, CRC(65a7b870) SHA1(58b910d7e002164cbbe1aa32c5e17dfe7cfb507d), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 2)" )
@@ -636,7 +633,7 @@ GAME_CUSTOM( 199?, m4madmnc__w,    m4madmnc,   "cm_49btc.4_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MMM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4mmm,     0,      "mu_sj___.3_0", 0x0000, 0x040000, CRC(abdf9d1c) SHA1(e8c6a056025b44e4ec995b42b2720e6366a97283), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4mmm__a,  m4mmm,  "mu_sja__.3_0", 0x0000, 0x040000, CRC(3d2a9ea4) SHA1(f2ec904c8cef84affaad603edf26a864bd34be29), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4mmm__b,  m4mmm,  "mu_sjk__.3_0", 0x0000, 0x040000, CRC(34e4f8ba) SHA1(606d607faeb43190f5167aa3d10c55d9986b7e58), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 3)" )
@@ -656,9 +653,9 @@ GAME_CUSTOM( 199?, m4mmm__f,  m4mmm,  "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ORLAND_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4orland,       0,          "or 05a v2-1(27c010)",  0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "Bwb","Orlando Magic (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4orland,       0,          "or 05a v2-1,27c010",   0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "Bwb","Orlando Magic (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4orland__a,    m4orland,   "or_05a__.1_1",         0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed), "Bwb","Orlando Magic (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4orland__b,    m4orland,   "or_20a__.7_1",         0x0000, 0x020000, CRC(ae524299) SHA1(3bb2bfe1c0ca0660aca148d6f17b730b7bdc8183), "Bwb","Orlando Magic (Bwb) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4orland__c,    m4orland,   "or_20b__.7_1",         0x0000, 0x020000, CRC(c8a30e2e) SHA1(8abc5437751faf61c12709c963a6819cb0b2b43f), "Bwb","Orlando Magic (Bwb) (MPU4) (set 4)" )
@@ -679,7 +676,7 @@ GAME_CUSTOM( 199?, m4orland__h,    m4orland,   "or_20sd_.7_1",         0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PZBING_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4pzbing,       0,          "pb_20a__.4_1", 0x0000, 0x010000, CRC(52aa92e5) SHA1(3dc20e521677e829967e1d689c9905fb96aee639), "Bwb","Prize Bingo (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4pzbing__a,    m4pzbing,   "pb_20ad_.4_1", 0x0000, 0x010000, CRC(f6bd6ad0) SHA1(092cb895c576ed2e995b62aba21851af6fb90959), "Bwb","Prize Bingo (Bwb) (MPU4) (set 2)" )
@@ -700,7 +697,7 @@ GAME_CUSTOM( 199?, m4pzbing__e,    m4pzbing,   "pb_20sb_.4_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4QUIDIN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -719,7 +716,7 @@ GAME_CUSTOM( 199?, m4quidin__b,    m4quidin,   "qi_20sb_.3_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4QUIDIS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4quidis,       0,          "pq_20a__.3_1", 0x0000, 0x010000, CRC(7eb762a1) SHA1(4546a7bf43f8ab6eb9713348e3f919de7532eed2), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4quidis__a,    m4quidis,   "pq_20s__.3_1", 0x0000, 0x010000, CRC(71360992) SHA1(0b64f27f0edfdebca41552181ff0f2b5491ec308), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 2)" )
@@ -740,7 +737,7 @@ GAME_CUSTOM( 199?, m4quidis__d,    m4quidis,   "pq_20sk_.3_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RACKEM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4rackem,       0,          "re_sj___.2_0", 0x0000, 0x040000, CRC(e36d3f86) SHA1(a5f522c86482517b8dc735b1012f8f7668c2f18d), "Bwb","Rack Em Up (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rackem__a,    m4rackem,   "re_sj___.3_0", 0x0000, 0x040000, CRC(2f463d2f) SHA1(3410cc8a6d097a4edfcb4c57c237d1d514b507ba), "Bwb","Rack Em Up (Bwb) (MPU4) (set 2)" )
@@ -760,7 +757,7 @@ GAME_CUSTOM( 199?, m4rackem__d,    m4rackem,   "re_sjsw_.2_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RBGOLD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4rbgold,       0,          "rb_20a_p.2a1", 0x0000, 0x010000, CRC(d7e6e514) SHA1(25645b69e86335622df43113908ed88a21f27e30), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rbgold__a,    m4rbgold,   "rb_20a_p.2f1", 0x0000, 0x010000, CRC(62af6db6) SHA1(0dcb679c05f090f8dab7228009a700c31f0179d8), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rbgold__b,    m4rbgold,   "rb_20sbp.2a1", 0x0000, 0x010000, CRC(ba4c2e74) SHA1(fcc325754f96e742998373c6c5c13a8509f48cd5), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 3)" )
@@ -794,7 +791,7 @@ GAME_CUSTOM( 199?, m4rbgold__q,    m4rbgold,   "rbixe___.2s1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHFEV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4rhfev,     0,          "rt_sj___.7_0", 0x0000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhfev__a,  m4rhfev,    "rt_sja__.7_0", 0x0000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 2)" )
@@ -815,7 +812,7 @@ GAME_CUSTOM( 199?, m4rhfev__d,  m4rhfev,    "rt_vc_d_.1_0", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbd,     0,          "sd_20__c.1_1",         0x0000, 0x020000, CRC(28cd336e) SHA1(45bdf5403c04b7d3a3645b6b44ac3d12e6463a55), "Bwb","Sinbad (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sinbd__a,  m4sinbd,    "sd_20a__.4_1",         0x0000, 0x020000, CRC(12b8f629) SHA1(c8540ecb217cf0615d7a8d080136926646ca8497), "Bwb","Sinbad (Bwb) (MPU4) (set 2)" )
@@ -854,7 +851,7 @@ GAME_CUSTOM( 199?, m4sinbd__x,  m4sinbd,    "sinbadbwb1_1game.bin", 0x0000, 0x02
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SKY_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sky,     0,      "sk_s____.3_1", 0x0000, 0x040000, CRC(749af008) SHA1(036514f2bcb84193cfa84313f0617f3196aea73e), "Bwb","Sky Sports (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sky__a,  m4sky,  "sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8), "Bwb","Sky Sports (Bwb) (MPU4) (set 2)" )
@@ -875,7 +872,7 @@ GAME_CUSTOM( 199?, m4sky__d,  m4sky,  "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SOULS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4souls,     0,          "ss_06a__.4_1", 0x0000, 0x020000, CRC(00390a21) SHA1(d31d1307301fa4e8cf0ce3677e68a4c1723e4404), "Bwb","Soul Sister (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4souls__a,  m4souls,    "ss_16a__.4_1", 0x0000, 0x020000, CRC(b9ab9612) SHA1(ad30916a0f2cc745741c99d23c23192ae4088daf), "Bwb","Soul Sister (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4souls__b,  m4souls,    "ss_26a__.2_1", 0x0000, 0x020000, CRC(bf9acf05) SHA1(13698b453e975a1801631163d06468f07c181b48), "Bwb","Soul Sister (Bwb) (MPU4) (set 3)" )
@@ -896,7 +893,7 @@ GAME_CUSTOM( 199?, m4souls__f,  m4souls,    "ss_26sk_.2_1", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SPINBT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4spinbt,       0,          "sn_37ad_.5_0", 0x0000, 0x040000, CRC(42d6faaa) SHA1(3789e85981b33ffae7c50ccca3278ae62974972d), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4spinbt__a,    m4spinbt,   "sn_37b__.5_0", 0x0000, 0x040000, CRC(3a259a6f) SHA1(1acabb9e725ae1374b87808c4b3d06a329c824d0), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 2)" )
@@ -917,7 +914,7 @@ GAME_CUSTOM( 199?, m4spinbt__g,    m4spinbt,   "sn_s7s__.5_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4STARST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4starst,       0,          "sr_20__d.3_0", 0x0000, 0x040000, CRC(98f6619b) SHA1(fc0a568e6695c9ad0fda7bc6703c752af26a7777), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4starst__a,    m4starst,   "sr_20_bd.3_0", 0x0000, 0x040000, CRC(ff8209de) SHA1(41a4c20c89b3a04612ad6298276472b888915c89), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4starst__b,    m4starst,   "sr_20_kd.3_0", 0x0000, 0x040000, CRC(4c9a53d5) SHA1(43ebf6c06db58de9c3934e2dbba0d8126f3e2dda), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 3)" )
@@ -943,7 +940,7 @@ GAME_CUSTOM( 199?, m4starst__j,    m4starst,   "sr_sjs__.5_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPLEG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4supleg,       0,          "sl_sj.hex",    0x0000, 0x040000, CRC(254835f7) SHA1(2fafaa3da747edd27d393ad106008e898e465283), "Bwb","Super League (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4supleg__a,    m4supleg,   "sl_sjs.hex",   0x0000, 0x040000, CRC(98942cd3) SHA1(858fde0a350159d089c6a0e0cc2e2eed6ab2092c), "Bwb","Super League (Bwb) (MPU4) (set 2)" )
@@ -963,7 +960,7 @@ GAME_CUSTOM( 199?, m4supleg__d,    m4supleg,   "sls.hex",      0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPLEGW_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4suplegw, m4supleg,   "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283), "Bwb","Super League (Whitbread / Bwb) (MPU4)" ) //Whitbread?
 
 
@@ -979,7 +976,7 @@ GAME_CUSTOM( 199?, m4suplegw, m4supleg,   "s_leag._pound5", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPSCR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4supscr,       0,          "multistakesoccer.bin", 0x0000, 0x040000, CRC(ce27b6a7) SHA1(f9038336137b0642da4d1520b5d71a047d8fbe12), "Bwb","Super Soccer (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4supscr__a,    m4supscr,   "sm_78___.6_0",         0x0000, 0x040000, CRC(e7022c44) SHA1(da3a5b9954f7e50dce73aeb9c46bd4631c8350d5), "Bwb","Super Soccer (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4supscr__b,    m4supscr,   "sm_78_d_.6_0",         0x0000, 0x040000, CRC(4dbe6a87) SHA1(fe2ce1fca7105afbf459ee6558744f8fee417169), "Bwb","Super Soccer (Bwb) (MPU4) (set 3)" )
@@ -1006,7 +1003,7 @@ GAME_CUSTOM( 199?, m4supscr__n,    m4supscr,   "sm_90_d_.6_0",         0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SURE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4sure,       0,      "su_xf___.3_1", 0x0000, 0x010000, CRC(f85dae5c) SHA1(4c761c355fb6651f1e0cb041342f8a2ff510dfd2), "Bwb","Sure Thing (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sure__a,    m4sure, "su_xf_b_.3_1", 0x0000, 0x010000, CRC(9a760e0f) SHA1(fdacdae0e2322daa004b2385616dd34626814d42), "Bwb","Sure Thing (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4sure__b,    m4sure, "su_xf_d_.3_1", 0x0000, 0x010000, CRC(5c4a5669) SHA1(55e1e853fdfdbb43e7b61b59ab642fb013a0db0e), "Bwb","Sure Thing (Bwb) (MPU4) (set 3)" )
@@ -1024,7 +1021,7 @@ GAME_CUSTOM( 199?, m4sure__c,    m4sure, "suixf___.3_1", 0x0000, 0x010000, CRC(c
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TREX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4trex,       0,      "tr_20a__.2_1", 0x0000, 0x010000, CRC(21150b8e) SHA1(1531bc6fdb8b787fed6f4f98c6463313c55efc3c), "Bwb","Trex (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4trex__a,    m4trex, "tr_20a_p.2_1", 0x0000, 0x010000, CRC(ec1b35bc) SHA1(944959c6d1f8e9b0bb33c659b7c515cb7585fed0), "Bwb","Trex (Bwb) (MPU4) (set 2)" )
@@ -1055,7 +1052,7 @@ GAME_CUSTOM( 199?, m4trex__l,    m4trex, "tr_20skp.2_1", 0x0000, 0x010000, CRC(9
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VOLCAN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4volcan,       0,          "vo_sj___.5_0",         0x0000, 0x040000, CRC(78096ebf) SHA1(96915bc2eca00fbd82fab8b3f62e697da118acdd), "Bwb","Volcano (Bwb) (MPU4) (set 1)" )
@@ -1080,7 +1077,7 @@ GAME_CUSTOM( 199?, m4volcan__g,    m4volcan,   "volcano_bwb_2-0.bin",  0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VDEXPR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4vdexpr,       0,          "vd_sj___.2_0", 0x0000, 0x040000, CRC(03efd2a5) SHA1(4fc3695c24335aef11ba168f660fb519d8c9d473), "Bwb","Voodoo Express (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4vdexpr__a,    m4vdexpr,   "vd_sj_d_.2_0", 0x0000, 0x040000, CRC(5073b98e) SHA1(66b020b8c096e78e1c9694f1cbc139e97314ab48), "Bwb","Voodoo Express (Bwb) (MPU4) (set 2)" )
@@ -1099,7 +1096,7 @@ GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr,   "vd_vc___.1_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4XCH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4xch,     0,      "ec_25b__.b_0", 0x0000, 0x020000, CRC(cec9e836) SHA1(460ec38566d7608e51b62f1ffebc18a395002ed4), "Bwb","X-change (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xch__a,  m4xch,  "ec_36bg_.bv0", 0x0000, 0x020000, CRC(c5d1523a) SHA1(813916008d7e7576e4594a6eb79a76c514470f31), "Bwb","X-change (Bwb) (MPU4) (set 2)" )
@@ -1125,7 +1122,7 @@ GAME_CUSTOM( 199?, m4xch__k,  m4xch,  "xchange.bin",  0x0000, 0x010000, CRC(c96c
 		ROM_LOAD( name, offset, length, hash ) \
 		M4XS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4xs,       0,      "es_39b__.3_0", 0x0000, 0x020000, CRC(ba478372) SHA1(c13f9cc4261e91119aa694ec3ac81d94d9f32d22), "Bwb","X-s (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xs__a,    m4xs,   "es_39bg_.3_0", 0x0000, 0x020000, CRC(b689f14f) SHA1(0c3253e1f747a979f55d53fe637fc61cf50e01a3), "Bwb","X-s (Bwb) (MPU4) (set 2)" )
@@ -1146,7 +1143,7 @@ GAME_CUSTOM( 199?, m4xs__f,    m4xs,   "es_sja__.3_0", 0x0000, 0x020000, CRC(590
 		ROM_LOAD( name, offset, length, hash ) \
 		M4XTRM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4xtrm,       0,      "et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9), "Bwb","X-treme (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xtrm__a,    m4xtrm, "et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85), "Bwb","X-treme (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, "et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38), "Bwb","X-treme (Bwb) (MPU4) (set 3)" )
@@ -1162,7 +1159,7 @@ GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, "et_sja__.2_0", 0x0000, 0x020000, CRC(8
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CFINLN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4cfinln,       m4cpfinl,   "cfd_7_1.bin",  0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945), "Bwb","Cup Final (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef), "Bwb","Cup Final (Nova) (MPU4) (set 2)" )
@@ -1177,7 +1174,7 @@ GAME_CUSTOM( 199?, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ABRA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4abra,       0,      "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "Bwb","Abracadabra (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4abra__a,    m4abra, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "Bwb","Abracadabra (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4abra__b,    m4abra, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "Bwb","Abracadabra (Bwb) (MPU4) (set 3)" )
@@ -1193,7 +1190,7 @@ GAME_CUSTOM( 199?, m4abra__c,    m4abra, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(1
 		ROM_LOAD( name, offset, length, hash ) \
 		M4WCNOV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11de) SHA1(ece14fd5f56da8cc788c53d5c1404275e9000b65), "Bwb","World Cup (Nova) (MPU4)" )
 
 #define M4EXCALN_EXTRA_ROMS \
@@ -1206,7 +1203,7 @@ GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXCALN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4excaln,   m4excal,    "exdsx___.6_0", 0x0000, 0x080000, CRC(fcdc703c) SHA1(927870723106aebbb2b492ce9bfebe4aa25d0325), "Bwb","Excalibur (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4excaln__a,m4excal,    "exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d), "Bwb","Excalibur (Nova) (MPU4) (set 2)" )
@@ -1222,7 +1219,7 @@ GAME_CUSTOM( 199?, m4excaln__a,m4excal,    "exdsx_e_.6_0", 0x0000, 0x080000, CRC
 		ROM_LOAD( name, offset, length, hash ) \
 		M4OLYGN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4olygn,     0,          "ogdsx___.8_0", 0x0000, 0x040000, CRC(b51a2538) SHA1(d54f37dc14c44ab66e6d6ba6e2df8bc9ed003054), "Bwb","Olympic Gold (German) (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4olygn__a,  m4olygn,    "ogdsxe__.8_0", 0x0000, 0x040000, CRC(13aa70aa) SHA1(3878c181ec07e24060935bec96e5128e6e4baf31), "Bwb","Olympic Gold (German) (Nova) (MPU4) (set 2)" )
 
@@ -1237,7 +1234,7 @@ GAME_CUSTOM( 199?, m4olygn__a,  m4olygn,    "ogdsxe__.8_0", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FTLADN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4ftladn,   0,      "fidse___.5_0", 0x00000, 0x20000, CRC(62347bbf) SHA1(2b1cd5adda831a8c74c9484ee1b616259d3e3981), "Bwb","Find the Lady (Nova) (MPU4)" )
 
 #define M4SINBDN_EXTRA_ROMS \
@@ -1250,7 +1247,7 @@ GAME_CUSTOM( 199?, m4ftladn,   0,      "fidse___.5_0", 0x00000, 0x20000, CRC(623
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBDN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbdn,       0,          "sbds3___.a_1", 0x0000, 0x020000, CRC(9bff0e40) SHA1(f8a1263a58f828554e9df77ed0db78e627666fb5), "Bwb","Sinbad (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sinbdn__a,    m4sinbdn,   "sbds3___.7w1", 0x0000, 0x020000, CRC(23bc9ce0) SHA1(f750de2b781bc902c65de7109e10a5fc2d4e1c61), "Bwb","Sinbad (Nova) (MPU4) (set 2)" )

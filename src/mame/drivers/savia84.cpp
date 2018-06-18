@@ -41,6 +41,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ppi8255(*this, "ppi8255")
+		, m_digits(*this, "digit%u", 0U)
 		{ }
 
 	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
@@ -48,28 +49,35 @@ public:
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
 
+	void savia84(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_kbd;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	uint8_t m_digit_last;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
+	output_finder<9> m_digits;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, savia84_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the CPU
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void savia84_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7fff); // A15 not connected at the CPU
+	map(0x0000, 0x07ff).rom();
+	map(0x1800, 0x1fff).ram();
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, savia84_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB
-ADDRESS_MAP_END
+void savia84_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x07);
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write)); // ports F8-FB
+}
 
 /* Input ports */
 static INPUT_PORTS_START( savia84 )
@@ -133,7 +141,8 @@ void savia84_state::machine_reset()
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
 	m_segment = ~data & 0x7f;
-	if (m_digit && (m_digit != m_digit_last)) output().set_digit_value(m_digit, m_segment);
+	if (m_digit && (m_digit != m_digit_last))
+		m_digits[m_digit] = m_segment;
 	m_digit_last = m_digit;
 }
 
@@ -170,21 +179,21 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 		return 0xff;
 }
 
-static MACHINE_CONFIG_START( savia84 )
+MACHINE_CONFIG_START(savia84_state::savia84)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_savia84)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(savia84_state, savia84_8255_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(savia84_state, savia84_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(savia84_state, savia84_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(savia84_state, savia84_8255_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, savia84_state, savia84_8255_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, savia84_state, savia84_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, savia84_state, savia84_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, savia84_state, savia84_8255_portc_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -198,5 +207,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, 0,    "JT Hyan", "Savia 84", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "JT Hyan", "Savia 84", MACHINE_NO_SOUND_HW)

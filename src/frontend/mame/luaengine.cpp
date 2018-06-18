@@ -229,11 +229,9 @@ namespace sol
 //-------------------------------------------------
 
 template <typename T>
-T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
+T lua_engine::addr_space::mem_read(offs_t address)
 {
 	T mem_content = 0;
-	if(!shift.as<bool>())
-		address = space.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
 			mem_content = space.read_byte(address);
@@ -272,10 +270,8 @@ T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
 //-------------------------------------------------
 
 template <typename T>
-void lua_engine::addr_space::mem_write(offs_t address, T val, sol::object shift)
+void lua_engine::addr_space::mem_write(offs_t address, T val)
 {
-	if(!shift.as<bool>())
-		address = space.address_to_byte(address);
 	switch(sizeof(val) * 8) {
 		case 8:
 			space.write_byte(address, val);
@@ -317,7 +313,6 @@ T lua_engine::addr_space::log_mem_read(offs_t address)
 	T mem_content = 0;
 	if(!dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		return 0;
-	address = space.address_to_byte(address);
 
 	switch(sizeof(mem_content) * 8) {
 		case 8:
@@ -361,7 +356,6 @@ void lua_engine::addr_space::log_mem_write(offs_t address, T val)
 {
 	if(!dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		return;
-	address = space.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
@@ -406,7 +400,7 @@ T lua_engine::addr_space::direct_mem_read(offs_t address)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if(!base)
 			continue;
 		mem_content <<= 8;
@@ -431,7 +425,7 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if(!base)
 			continue;
 		if(space.endianness() == ENDIANNESS_BIG)
@@ -805,10 +799,15 @@ void lua_engine::initialize()
 	emu["wait"] = lua_CFunction([](lua_State *L) {
 			lua_engine *engine = mame_machine_manager::instance()->lua();
 			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
+			int ret = lua_pushthread(L);
+			if(ret == 1)
+				return luaL_error(L, "cannot wait from outside coroutine");
+			int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
 			return lua_yield(L, 0);
 		});
 	emu["lang_translate"] = &lang_translate;
+	emu["pid"] = &osd_getpid;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
@@ -1187,11 +1186,10 @@ void lua_engine::initialize()
 				}),
 			"screens", sol::property([this](running_machine &r) {
 					sol::table table = sol().create_table();
-					for(device_t *dev = r.first_screen(); dev != nullptr; dev = dev->next())
+					for (screen_device &sc : screen_device_iterator(r.root_device()))
 					{
-						screen_device *sc = dynamic_cast<screen_device *>(dev);
-						if (sc && sc->configured() && sc->started() && sc->type())
-							table[sc->tag()] = sc;
+						if (sc.configured() && sc.started() && sc.type())
+							table[sc.tag()] = &sc;
 					}
 					return table;
 				}),
@@ -1238,16 +1236,13 @@ void lua_engine::initialize()
 			"visible_cpu", sol::property([](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
 				[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }),
 			"execution_state", sol::property([](debugger_manager &debug) {
-					int execstate = debug.cpu().execution_state();
-					if(execstate == 0)
-						return "stop";
-					return "run";
+					return debug.cpu().is_stopped() ? "stop" : "run";
 				},
 				[](debugger_manager &debug, const std::string &state) {
-					int execstate = 1;
 					if(state == "stop")
-						execstate = 0;
-					debug.cpu().set_execution_state(execstate);
+						debug.cpu().set_execution_stopped();
+					else
+						debug.cpu().set_execution_running();
 				}));
 
 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
@@ -1447,15 +1442,17 @@ void lua_engine::initialize()
 			"write_direct_u32", &addr_space::direct_mem_write<uint32_t>,
 			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
 			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
-			"name", sol::property(&addr_space::name),
+			"name", sol::property([](addr_space &sp) { return sp.space.name(); }),
+			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
+			"index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }),
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
 					for (address_map_entry &entry : space.map()->m_entrylist)
 					{
 						sol::table mapentry = sol().create_table();
-						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.addrmask();
-						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.addrmask();
+						mapentry["offset"] = entry.m_addrstart & space.addrmask();
+						mapentry["endoff"] = entry.m_addrend & space.addrmask();
 						mapentry["readtype"] = entry.m_read.m_type;
 						mapentry["writetype"] = entry.m_write.m_type;
 						map.add(mapentry);
@@ -1496,10 +1493,21 @@ void lua_engine::initialize()
 			"field", &ioport_port::field,
 			"fields", sol::property([this](ioport_port &p){
 					sol::table f_table = sol().create_table();
+					// parse twice for custom and default names, default has priority
 					for(ioport_field &field : p.fields())
 					{
 						if (field.type_class() != INPUT_CLASS_INTERNAL)
 							f_table[field.name()] = &field;
+					}
+					for(ioport_field &field : p.fields())
+					{
+						if (field.type_class() != INPUT_CLASS_INTERNAL)
+						{
+							if(field.specific_name())
+								f_table[field.specific_name()] = &field;
+							else
+								f_table[field.manager().type_name(field.type(), field.player())] = &field;
+						}
 					}
 					return f_table;
 				}));
@@ -1511,6 +1519,9 @@ void lua_engine::initialize()
 			"set_value", &ioport_field::set_value,
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
+			"default_name", sol::property([](ioport_field &f) {
+					return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
+				}),
 			"player", sol::property(&ioport_field::player, &ioport_field::set_player),
 			"mask", sol::property(&ioport_field::mask),
 			"defvalue", sol::property(&ioport_field::defvalue),
@@ -1529,8 +1540,15 @@ void lua_engine::initialize()
 			"analog_invert", sol::property(&ioport_field::analog_invert),
 			"impulse", sol::property(&ioport_field::impulse),
 			"type", sol::property(&ioport_field::type),
+			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
 			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+
+/* field.live
+ */
+
+	sol().registry().new_usertype<ioport_field_live>("ioport_field_live", "new", sol::no_constructor,
+			"name", &ioport_field_live::name);
 
 /* machine:parameters()
  * parameter:add(tag, val) - add tag = val parameter
@@ -1949,9 +1967,9 @@ void lua_engine::initialize()
 
 	sol().registry().new_usertype<output_manager>("output", "new", sol::no_constructor,
 			"set_value", &output_manager::set_value,
-			"set_indexed_value", &output_manager::set_indexed_value,
+			"set_indexed_value", [](output_manager &o, char const *basename, int index, int value) { o.set_value(util::string_format("%s%d", basename, index).c_str(), value); },
 			"get_value", &output_manager::get_value,
-			"get_indexed_value", &output_manager::get_indexed_value,
+			"get_indexed_value", [](output_manager &o, char const *basename, int index) { return o.get_value(util::string_format("%s%d", basename, index).c_str()); },
 			"name_to_id", &output_manager::name_to_id,
 			"id_to_name", &output_manager::id_to_name);
 
@@ -2009,13 +2027,16 @@ void lua_engine::close()
 
 void lua_engine::resume(void *ptr, int nparam)
 {
-	lua_State *L = static_cast<lua_State *>(ptr);
+	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
+	lua_State *L = lua_tothread(m_lua_state, -1);
+	lua_pop(m_lua_state, 1);
 	int stat = lua_resume(L, nullptr, 0);
 	if((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
 void lua_engine::run(sol::load_result res)

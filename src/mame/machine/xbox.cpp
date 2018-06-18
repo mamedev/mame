@@ -19,16 +19,16 @@ const xbox_base_state::debugger_constants xbox_base_state::debugp[] = {
 	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }
 };
 
-int xbox_base_state::find_bios_index(running_machine &mach)
+int xbox_base_state::find_bios_index()
 {
-	u8 sb = mach.driver_data()->system_bios();
+	u8 sb = system_bios();
 	return sb;
 }
 
-bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &crc32)
+bool xbox_base_state::find_bios_hash(int bios, uint32_t &crc32)
 {
 	uint32_t crc = 0;
-	const std::vector<rom_entry> &rev = mach.root_device().rom_region_vector();
+	const std::vector<rom_entry> &rev = rom_region_vector();
 
 	for (rom_entry const &re : rev)
 	{
@@ -49,14 +49,14 @@ bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &
 	return false;
 }
 
-void xbox_base_state::find_debug_params(running_machine &mach)
+void xbox_base_state::find_debug_params()
 {
 	uint32_t crc;
 	int sb;
 
-	sb = (int)find_bios_index(machine());
+	sb = (int)find_bios_index();
 	debugc_bios = debugp;
-	if (find_bios_hash(machine(), sb - 1, crc) == true)
+	if (find_bios_hash(sb - 1, crc) == true)
 	{
 		for (int n = 0; n < 2; n++)
 			if (debugp[n].id == crc)
@@ -773,8 +773,8 @@ WRITE8_MEMBER(xbox_base_state::superiors232_write)
 
 void xbox_base_state::machine_start()
 {
-	find_debug_params(machine());
-	nvidia_nv2a = machine().device<nv2a_gpu_device>(":pci:1e.0:00.0")->debug_get_renderer();
+	find_debug_params();
+	nvidia_nv2a = subdevice<nv2a_gpu_device>("pci:1e.0:00.0")->debug_get_renderer();
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
 	pic16lc_buffer[4] = 0; // A/V connector, 0=scart 2=vga 4=svideo 7=none
@@ -783,7 +783,7 @@ void xbox_base_state::machine_start()
 	pic16lc_buffer[0x1d] = 0x0d;
 	pic16lc_buffer[0x1e] = 0x0e;
 	pic16lc_buffer[0x1f] = 0x0f;
-	mcpx_smbus_device *smbus = machine().device<mcpx_smbus_device>(":pci:01.1");
+	mcpx_smbus_device *smbus = subdevice<mcpx_smbus_device>("pci:01.1");
 	smbus->register_device(0x10,
 		[&](int command, int rw, int data)
 	{
@@ -802,15 +802,15 @@ void xbox_base_state::machine_start()
 		return smbus_eeprom(command, rw, data);
 	}
 	);
-	xbox_base_devs.pic8259_1 = machine().device<pic8259_device>("pic8259_1");
-	xbox_base_devs.pic8259_2 = machine().device<pic8259_device>("pic8259_2");
-	xbox_base_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
+	xbox_base_devs.pic8259_1 = subdevice<pic8259_device>("pic8259_1");
+	xbox_base_devs.pic8259_2 = subdevice<pic8259_device>("pic8259_2");
+	xbox_base_devs.ide = subdevice<bus_master_ide_controller_device>("ide");
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
 	}
-	machine().device<mcpx_ohci_device>(":pci:02.0")->set_hack_callback(
+	subdevice<mcpx_ohci_device>("pci:02.0")->set_hack_callback(
 		[&](void)
 	{
 		hack_usb();
@@ -826,83 +826,85 @@ void xbox_base_state::machine_start()
 	save_item(NAME(pic16lc_buffer));
 }
 
-ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
-	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM // 128 megabytes
+void xbox_base_state::xbox_base_map(address_map &map)
+{
+	map(0x00000000, 0x07ffffff).ram(); // 128 megabytes
 #if 0
-	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
-	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
-	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(ohci_usb_r, ohci_usb_w)
-	AM_RANGE(0xfed08000, 0xfed083ff) AM_READWRITE(ohci_usb2_r, ohci_usb2_w)
-	AM_RANGE(0xfe800000, 0xfe87ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
-	AM_RANGE(0xfec00000, 0xfec00fff) AM_READWRITE(audio_ac93_r, audio_ac93_w)
-	AM_RANGE(0xfef00000, 0xfef003ff) AM_READWRITE(network_r, network_w)
+	map(0xf0000000, 0xf7ffffff).ram().share("nv2a_share"); // 3d accelerator wants this
+	map(0xfd000000, 0xfdffffff).ram().rw(FUNC(xbox_base_state::geforce_r), FUNC(xbox_base_state::geforce_w));
+	map(0xfed00000, 0xfed003ff).rw(FUNC(xbox_base_state::ohci_usb_r), FUNC(xbox_base_state::ohci_usb_w));
+	map(0xfed08000, 0xfed083ff).rw(FUNC(xbox_base_state::ohci_usb2_r), FUNC(xbox_base_state::ohci_usb2_w));
+	map(0xfe800000, 0xfe87ffff).rw(FUNC(xbox_base_state::audio_apu_r), FUNC(xbox_base_state::audio_apu_w));
+	map(0xfec00000, 0xfec00fff).rw(FUNC(xbox_base_state::audio_ac93_r), FUNC(xbox_base_state::audio_ac93_w));
+	map(0xfef00000, 0xfef003ff).rw(FUNC(xbox_base_state::network_r), FUNC(xbox_base_state::network_w));
 #endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
-	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x002c, 0x002f) AM_READWRITE8(superio_read, superio_write, 0xffff0000)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(":pci:09.0:ide", bus_master_ide_controller_device, read_cs0, write_cs0)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(superiors232_read, superiors232_write, 0xffffffff)
+void xbox_base_state::xbox_base_map_io(address_map &map)
+{
+	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x002e, 0x002f).rw(FUNC(xbox_base_state::superio_read), FUNC(xbox_base_state::superio_write));
+	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x01f0, 0x01f7).rw(":pci:09.0:ide", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
+	map(0x03f8, 0x03ff).rw(FUNC(xbox_base_state::superiors232_read), FUNC(xbox_base_state::superiors232_write));
 #if 0
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w) // lpc bridge
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(smbus_r, smbus_w)
-	AM_RANGE(0xc200, 0xc21f) AM_READWRITE(smbus2_r, smbus2_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_NOP // ac97
-	AM_RANGE(0xd200, 0xd27f) AM_NOP // ac97
-	AM_RANGE(0xe000, 0xe007) AM_READWRITE(networkio_r, networkio_w)
-	AM_RANGE(0xff60, 0xff6f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	map(0x8000, 0x80ff).rw(FUNC(xbox_base_state::dummy_r), FUNC(xbox_base_state::dummy_w)); // lpc bridge
+	map(0xc000, 0xc00f).rw(FUNC(xbox_base_state::smbus_r), FUNC(xbox_base_state::smbus_w));
+	map(0xc200, 0xc21f).rw(FUNC(xbox_base_state::smbus2_r), FUNC(xbox_base_state::smbus2_w));
+	map(0xd000, 0xd0ff).noprw(); // ac97
+	map(0xd200, 0xd27f).noprw(); // ac97
+	map(0xe000, 0xe007).rw(FUNC(xbox_base_state::networkio_r), FUNC(xbox_base_state::networkio_w));
+	map(0xff60, 0xff6f).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 #endif
-ADDRESS_MAP_END
+}
 
-MACHINE_CONFIG_START(xbox_base)
+MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
-	MCFG_CPU_PROGRAM_MAP(xbox_base_map)
-	MCFG_CPU_IO_MAP(xbox_base_map_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(xbox_base_state, irq_callback)
+	MCFG_DEVICE_ADD(m_maincpu, PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
+	MCFG_DEVICE_PROGRAM_MAP(xbox_base_map)
+	MCFG_DEVICE_IO_MAP(xbox_base_map_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(xbox_base_state, irq_callback)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_PCI_ROOT_ADD(  ":pci")
-	MCFG_NV2A_HOST_ADD( ":pci:00.0", "maincpu")
-	MCFG_PCI_DEVICE_ADD(":pci:00.3", NV2A_RAM, 0x10de02a6, 0, 0, 0)
-	MCFG_PCI_DEVICE_ADD(":pci:01.0", MCPX_LPC, 0x10de01b2, 0xb4, 0, 0) // revision id must be at least 0xb4, otherwise usb will require a hub
-	MCFG_PCI_DEVICE_ADD(":pci:01.1", MCPX_SMBUS, 0x10de01b4, 0, 0, 0)
-	MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(DEVWRITELINE(":", xbox_base_state, xbox_smbus_interrupt_changed))
-	MCFG_PCI_DEVICE_ADD(":pci:02.0", MCPX_OHCI, 0x10de01c2, 0, 0, 0)
-	MCFG_MCPX_OHCI_INTERRUPT_HANDLER(DEVWRITELINE(":", xbox_base_state, xbox_ohci_usb_interrupt_changed))
-	MCFG_PCI_DEVICE_ADD(":pci:03.0", MCPX_OHCI, 0x10de01c2, 0, 0, 0)
-	MCFG_PCI_DEVICE_ADD(":pci:04.0", MCPX_ETH, 0x10de01c3, 0, 0, 0)
-	MCFG_MCPX_APU_ADD(  ":pci:05.0", "maincpu")
-	MCFG_PCI_DEVICE_ADD(":pci:06.0", MCPX_AC97_AUDIO, 0x10de01b1, 0, 0, 0)
-	MCFG_PCI_DEVICE_ADD(":pci:06.1", MCPX_AC97_MODEM, 0x10de01c1, 0, 0, 0)
-	MCFG_PCI_BRIDGE_ADD(":pci:08.0", 0x10de01b8, 0)
-	MCFG_PCI_DEVICE_ADD(":pci:09.0", MCPX_IDE, 0x10de01bc, 0, 0, 0)
-	MCFG_MCPX_IDE_INTERRUPT_HANDLER(DEVWRITELINE(":pic8259_2", pic8259_device, ir6_w))
-	MCFG_AGP_BRIDGE_ADD(":pci:1e.0", NV2A_AGP, 0x10de01b7, 0)
-	MCFG_PCI_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0x10de02a0, 0, 0, 0)
-	MCFG_MCPX_NV2A_GPU_CPU("maincpu")
-	MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(DEVWRITELINE(":", xbox_base_state, xbox_nv2a_interrupt_changed))
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
+	MCFG_DEVICE_ADD(":pci:00.0", NV2A_HOST, 0, m_maincpu)
+	MCFG_DEVICE_ADD(":pci:00.3", NV2A_RAM, 0)
+	MCFG_DEVICE_ADD(":pci:01.0", MCPX_LPC, 0)
+	MCFG_DEVICE_ADD(":pci:01.1", MCPX_SMBUS, 0)
+	MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_smbus_interrupt_changed))
+	MCFG_DEVICE_ADD(":pci:02.0", MCPX_OHCI, 0)
+	MCFG_MCPX_OHCI_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_ohci_usb_interrupt_changed))
+	MCFG_DEVICE_ADD(":pci:03.0", MCPX_OHCI, 0)
+	MCFG_DEVICE_ADD(":pci:04.0", MCPX_ETH, 0)
+	MCFG_DEVICE_ADD(":pci:05.0", MCPX_APU, 0, m_maincpu)
+	MCFG_DEVICE_ADD(":pci:06.0", MCPX_AC97_AUDIO, 0)
+	MCFG_DEVICE_ADD(":pci:06.1", MCPX_AC97_MODEM, 0)
+	MCFG_DEVICE_ADD(":pci:08.0", PCI_BRIDGE, 0, 0x10de01b8, 0)
+	MCFG_DEVICE_ADD(":pci:09.0", MCPX_IDE, 0)
+	MCFG_MCPX_IDE_INTERRUPT_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_DEVICE_ADD(":pci:1e.0", NV2A_AGP, 0, 0x10de01b7, 0)
+	MCFG_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0)
+	MCFG_MCPX_NV2A_GPU_CPU(m_maincpu)
+	MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_nv2a_interrupt_changed))
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(xbox_base_state, xbox_pic8259_1_set_int_line))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, xbox_base_state, xbox_pic8259_1_set_int_line))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(xbox_base_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, xbox_base_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir2_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir2_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(1125000) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(xbox_base_state, xbox_pit8254_out0_changed))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, xbox_base_state, xbox_pit8254_out0_changed))
 	MCFG_PIT8253_CLK1(1125000) /* (unused) dram refresh */
 	MCFG_PIT8253_CLK2(1125000) /* (unused) pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(xbox_base_state, xbox_pit8254_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, xbox_base_state, xbox_pit8254_out2_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -911,5 +913,5 @@ MACHINE_CONFIG_START(xbox_base)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(xbox_base_state, screen_update_callback)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xbox_base_state, vblank_callback))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xbox_base_state, vblank_callback))
 MACHINE_CONFIG_END

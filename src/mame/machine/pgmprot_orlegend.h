@@ -16,13 +16,13 @@ public:
 	uint16_t        m_asic3_hilo;
 	uint16_t        m_asic3_hold;
 
-	DECLARE_DRIVER_INIT(orlegend);
+	void init_orlegend();
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
+	void pgm_asic3(machine_config &config);
 };
 
 INPUT_PORTS_EXTERN( orlegend );
 INPUT_PORTS_EXTERN( orlegendt );
 INPUT_PORTS_EXTERN( orlegendk );
-MACHINE_CONFIG_EXTERN( pgm_asic3 );

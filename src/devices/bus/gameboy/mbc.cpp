@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(GB_ROM_LICHENG,  gb_rom_licheng_device,     "gb_rom_licheng",
 DEFINE_DEVICE_TYPE(GB_ROM_DIGIMON,  gb_rom_digimon_device,     "gb_rom_digimon",  "GB Digimon")
 DEFINE_DEVICE_TYPE(GB_ROM_ROCKMAN8, gb_rom_rockman8_device,    "gb_rom_rockman8", "GB MBC1 Rockman 8")
 DEFINE_DEVICE_TYPE(GB_ROM_SM3SP,    gb_rom_sm3sp_device,       "gb_sm3sp",        "GB MBC1 Super Mario 3 Special")
+DEFINE_DEVICE_TYPE(GB_ROM_CAMERA,   gb_rom_camera_device,      "gb_rom_camera",   "GB Camera")
 
 
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -145,6 +146,11 @@ gb_rom_rockman8_device::gb_rom_rockman8_device(const machine_config &mconfig, co
 
 gb_rom_sm3sp_device::gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gb_rom_mbc_device(mconfig, GB_ROM_SM3SP, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0), m_mode(0)
+{
+}
+
+gb_rom_camera_device::gb_rom_camera_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gb_rom_mbc_device(mconfig, GB_ROM_CAMERA, tag, owner, clock)
 {
 }
 
@@ -322,6 +328,18 @@ void gb_rom_chongwu_device::device_reset()
 {
 	shared_reset();
 	m_protection_checked = 0;
+}
+
+void gb_rom_camera_device::device_start()
+{
+	shared_start();
+	save_item(NAME(m_camera_regs));
+}
+
+void gb_rom_camera_device::device_reset()
+{
+	shared_reset();
+	memset(m_camera_regs, 0, sizeof(m_camera_regs));
 }
 
 
@@ -600,7 +618,7 @@ WRITE8_MEMBER(gb_rom_mbc6_device::write_bank)
 {
 	if (offset < 0x2000)
 	{
-		logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", space.device().safe_pc(), offset, data );
+		logerror( "%s write to mbc6 ram enable area: %04X <- 0x%02X\n", machine().describe_context(), offset, data );
 	}
 	else if (offset < 0x3000)
 	{
@@ -647,18 +665,18 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_bank)
 	if (offset < 0x2000)
 	{
 		// FIXME: Add RAM enable support
-		logerror("0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", space.device().safe_pc( ), offset, data);
+		logerror("%s Write to ram enable register 0x%04X <- 0x%02X\n", machine().describe_context(), offset, data);
 	}
 	else if (offset < 0x3000)
 	{
-		logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x2000 + offset, data );
+		logerror( "%s write to mbc7 rom select register: 0x%04X <- 0x%02X\n", machine().describe_context(), 0x2000 + offset, data );
 		/* Bit 12 must be set for writing to the mbc register */
 		if (offset & 0x0100)
 			m_latch_bank2 = data;
 	}
 	else
 	{
-		logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x3000 + offset, data );
+		logerror( "%s write to mbc7 rom area: 0x%04X <- 0x%02X\n", machine().describe_context(), 0x3000 + offset, data );
 		/* Bit 12 must be set for writing to the mbc register */
 		if (offset & 0x0100)
 		{
@@ -1057,26 +1075,26 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 		switch (m_sintax_mode & 0x0f)
 		{
 			case 0x0d:
-				data = BITSWAP8(data, 1,0,7,6,5,4,3,2);
+				data = bitswap<8>(data, 1,0,7,6,5,4,3,2);
 				break;
 			case 0x09:
-				//data = BITSWAP8(data, 3,2,5,4,0,1,6,7); // Monkey..no
-				data = BITSWAP8(data, 4,5,2,3,0,1,6,7);
+				//data = bitswap<8>(data, 3,2,5,4,0,1,6,7); // Monkey..no
+				data = bitswap<8>(data, 4,5,2,3,0,1,6,7);
 				break;
 			case 0x00: // 0x10=lion 0x00 hmmmmm // 1 and 0 unconfirmed
-				data = BITSWAP8(data, 7,0,5,6,3,4,1,2);
+				data = bitswap<8>(data, 7,0,5,6,3,4,1,2);
 				break;
 			case 0x01:
-				data = BITSWAP8(data, 0,1,6,7,4,5,2,3);
+				data = bitswap<8>(data, 0,1,6,7,4,5,2,3);
 				break;
 			case 0x05:
-				data = BITSWAP8(data, 7,6,1,0,3,2,5,4); // Not 100% on this one
+				data = bitswap<8>(data, 7,6,1,0,3,2,5,4); // Not 100% on this one
 				break;
 			case 0x07:
-				data = BITSWAP8(data, 2,0,3,1,5,4,7,6); // 5 and 7 unconfirmed
+				data = bitswap<8>(data, 2,0,3,1,5,4,7,6); // 5 and 7 unconfirmed
 				break;
 			case 0x0b:
-				data = BITSWAP8(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
+				data = bitswap<8>(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
 				break;
 		}
 		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;
@@ -1350,4 +1368,73 @@ WRITE8_MEMBER(gb_rom_sm3sp_device::write_ram)
 {
 	if (!m_ram.empty())
 		m_ram[offset] = data;
+}
+
+void gb_rom_camera_device::update_camera()
+{
+	m_camera_regs[0] &= ~0x1;
+}
+
+READ8_MEMBER(gb_rom_camera_device::read_rom)
+{
+	if (offset < 0x4000)
+		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
+	else
+		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(gb_rom_camera_device::write_bank)
+{
+	if (offset < 0x2000)
+		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
+	else if (offset < 0x4000)
+	{
+		// 7bits
+		data &= 0x7f;
+		/* Selecting bank 0 == selecting bank 1 */
+		if (data == 0)
+			data = 1;
+
+		m_latch_bank2 = data;
+	}
+	else if (offset < 0x6000)
+	{
+		m_ram_bank = data & 0x1f;
+	}
+}
+
+READ8_MEMBER(gb_rom_camera_device::read_ram)
+{
+	if ((m_ram_bank & 0x10) != 0)
+		return (offset == 0) ? (m_camera_regs[0] & 0x7) : 0;
+	if (!m_ram.empty() && (m_camera_regs[0] & 0x1) == 0)
+	{
+		/* Use first saved image as the snapshot. Top and bottom of snapshot are not saved. */
+		if (m_ram_bank == 0 && offset >= 0x100 && offset < 0xf00)
+			return m_ram[0x1f00 + offset];
+		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
+	}
+	return 0;
+}
+
+WRITE8_MEMBER(gb_rom_camera_device::write_ram)
+{
+	if ((m_ram_bank & 0x10) != 0)
+	{
+		if (offset == 0)
+		{
+			m_camera_regs[0] = data & 0x7;
+			if (data & 0x1) update_camera();
+		}
+		else if (offset < 54)
+		{
+			m_camera_regs[offset] = data;
+		}
+	}
+	else if (m_ram_enable && (m_camera_regs[0] & 0x1) == 0)
+	{
+		// RAM
+		if (!m_ram.empty())
+			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
+	}
 }

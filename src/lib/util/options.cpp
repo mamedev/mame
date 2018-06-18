@@ -431,7 +431,7 @@ void core_options::add_entry(entry::shared_ptr &&entry, const char *after_header
 
 void core_options::add_to_entry_map(std::string &&name, entry::shared_ptr &entry)
 {
-	// it is illegal to call this method for something that already ex0ists
+	// it is illegal to call this method for something that already exists
 	assert(m_entrymap.find(name) == m_entrymap.end());
 
 	// append the entry

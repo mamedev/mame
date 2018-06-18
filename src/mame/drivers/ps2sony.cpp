@@ -158,6 +158,7 @@ iLinkSGUID=0x--------
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -171,6 +172,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void ps2sony(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -186,19 +189,20 @@ uint32_t ps2sony_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 32, ps2sony_state)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ps2sony_state::mem_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM
+	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
+}
 
 static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ps2sony )
-	MCFG_CPU_ADD("maincpu", R5000LE, 294'912'000) // actually R5900
+MACHINE_CONFIG_START(ps2sony_state::ps2sony)
+	MCFG_DEVICE_ADD("maincpu", R5000LE, 294'912'000) // actually R5900
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -335,4 +339,4 @@ ROM_START( ps2 )
 	ROM_LOAD( "scph_bios_v15_jap_220.bin", 0x000000, 0x400000, CRC(493c1e58) SHA1(d9a7537fa463fcdd3e270af14a93731736cafc4a) )
 ROM_END
 
-CONS(2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, 0, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )
+CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )

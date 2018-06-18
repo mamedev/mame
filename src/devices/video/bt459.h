@@ -179,16 +179,7 @@ public:
 		CR4241_7PIX = 0x06  // cross hair thickness 7 pixels
 	};
 
-	DECLARE_ADDRESS_MAP(map, 8);
-
-	DECLARE_READ8_MEMBER(address_lo_r);
-	DECLARE_WRITE8_MEMBER(address_lo_w);
-	DECLARE_READ8_MEMBER(address_hi_r);
-	DECLARE_WRITE8_MEMBER(address_hi_w);
-	DECLARE_READ8_MEMBER(register_r);
-	DECLARE_WRITE8_MEMBER(register_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	void map(address_map &map);
 
 	void screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *pixel_data);
 
@@ -203,6 +194,15 @@ private:
 	u8 get_component(rgb_t *arr, int index);
 	void set_component(rgb_t *arr, int index, u8 data);
 	u32 get_rgb(u8 data, u8 mask) const { return m_palette_ram[data & mask]; }
+
+	DECLARE_READ8_MEMBER(address_lo_r);
+	DECLARE_WRITE8_MEMBER(address_lo_w);
+	DECLARE_READ8_MEMBER(address_hi_r);
+	DECLARE_WRITE8_MEMBER(address_hi_w);
+	DECLARE_READ8_MEMBER(register_r);
+	DECLARE_WRITE8_MEMBER(register_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
 
 	// device state in memory map order
 	u16 m_address;

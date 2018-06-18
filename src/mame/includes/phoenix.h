@@ -6,6 +6,7 @@
 #pragma once
 
 #include "audio/pleiads.h"
+#include "emupal.h"
 
 class phoenix_state : public driver_device
 {
@@ -27,9 +28,9 @@ public:
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
-	DECLARE_DRIVER_INIT(oneprom);
-	DECLARE_DRIVER_INIT(coindsw);
-	DECLARE_DRIVER_INIT(oneprom_coindsw);
+	void init_oneprom();
+	void init_coindsw();
+	void init_oneprom_coindsw();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_RESET(phoenix);
@@ -41,6 +42,13 @@ public:
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 
+	void condor(machine_config &config);
+	void phoenix(machine_config &config);
+	void survival(machine_config &config);
+	void pleiads(machine_config &config);
+	void phoenix_memory_map(address_map &map);
+	void pleiads_memory_map(address_map &map);
+	void survival_memory_map(address_map &map);
 protected:
 	required_device<cpu_device>             m_maincpu;
 	optional_device<pleiads_sound_device>   m_pleiads_custom;
@@ -63,7 +71,7 @@ protected:
 
 /*----------- video timing  -----------*/
 
-#define MASTER_CLOCK            XTAL_11MHz
+#define MASTER_CLOCK            XTAL(11'000'000)
 
 #define PIXEL_CLOCK             (MASTER_CLOCK/2)
 #define CPU_CLOCK               (PIXEL_CLOCK)

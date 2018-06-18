@@ -30,6 +30,7 @@ Other outs:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -56,6 +57,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void headonb(machine_config &config);
+	void headonb_io_map(address_map &map);
+	void headonb_map(address_map &map);
 };
 
 
@@ -95,16 +99,18 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( headonb_map, AS_PROGRAM, 8, headonb_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0xff00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void headonb_state::headonb_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().mirror(0x4000);
+	map(0xe000, 0xe3ff).ram().w(FUNC(headonb_state::video_ram_w)).share("video_ram");
+	map(0xff00, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( headonb_io_map, AS_IO, 8, headonb_state )
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void headonb_state::headonb_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN0");
+	map(0x04, 0x04).portr("IN1");
+}
 
 
 /***************************************************************************
@@ -153,17 +159,17 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( headonb )
+static GFXDECODE_START( gfx_headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( headonb )
+MACHINE_CONFIG_START(headonb_state::headonb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20MHz / 10) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(headonb_map)
-	MCFG_CPU_IO_MAP(headonb_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(headonb_map)
+	MCFG_DEVICE_IO_MAP(headonb_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -174,7 +180,7 @@ static MACHINE_CONFIG_START( headonb )
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_headonb)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -205,4 +211,4 @@ ROM_START( headonb )
 ROM_END
 
 
-GAME( 1979, headonb, headon, headonb, headonb, headonb_state, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonb, headon, headonb, headonb, headonb_state, empty_init, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

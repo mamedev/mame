@@ -25,6 +25,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,11 +59,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_DRIVER_INIT(metlfrzr);
+	void init_metlfrzr();
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
+	void metlfrzr(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void metlfrzr_map(address_map &map);
 };
 
 
@@ -175,39 +179,41 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 //  popmessage("%02x %02x",m_fg_tilebank,data & 3);
 }
 
-static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0xd200, 0xd3ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
+void metlfrzr_state::metlfrzr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("vram");
+	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0xd200, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write_indirect_ext)).share("palette_ext");
 
-	AM_RANGE(0xd400, 0xd47f) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
+	map(0xd400, 0xd47f).rw("t5182", FUNC(t5182_device::sharedram_r), FUNC(t5182_device::sharedram_w));
 
-	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("P1")
-	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("P2")
-	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("START")
-	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd604, 0xd604) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd600, 0xd61f) AM_RAM AM_SHARE("vregs") // TODO: write-only, debug
+	map(0xd600, 0xd600).portr("P1");
+	map(0xd601, 0xd601).portr("P2");
+	map(0xd602, 0xd602).portr("START");
+	map(0xd603, 0xd603).portr("DSW1");
+	map(0xd604, 0xd604).portr("DSW2");
+	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	AM_RANGE(0xd700, 0xd700) AM_WRITE(output_w)
-	AM_RANGE(0xd710, 0xd710) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0xd711, 0xd711) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
+	map(0xd700, 0xd700).w(FUNC(metlfrzr_state::output_w));
+	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
+	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist
-	AM_RANGE(0xd712, 0xd712) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd713, 0xd713) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
+	map(0xd712, 0xd712).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0xd713, 0xd713).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram")
-ADDRESS_MAP_END
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("wram");
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, metlfrzr_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram") // executes code at 0xf5d5
-ADDRESS_MAP_END
+void metlfrzr_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xf000, 0xffff).ram().share("wram"); // executes code at 0xf5d5
+}
 
 
 static INPUT_PORTS_START( metlfrzr )
@@ -239,7 +245,7 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPNAME( 0x04, 0x04, "2-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "2-2" )
+	PORT_DIPNAME( 0x08, 0x08, "2-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
@@ -338,7 +344,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START(metlfrzr)
+static GFXDECODE_START(gfx_metlfrzr)
 	GFXDECODE_ENTRY("gfx1", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx2", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx3", 0, sprite_layout, 0, 16)
@@ -357,12 +363,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START(metlfrzr)
+MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(metlfrzr_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -371,7 +377,7 @@ static MACHINE_CONFIG_START(metlfrzr)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlfrzr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlfrzr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -383,10 +389,10 @@ static MACHINE_CONFIG_START(metlfrzr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz / 4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)    /* 3.579545 MHz */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -429,7 +435,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
+void metlfrzr_state::init_metlfrzr()
 {
 	// same as cshooter.cpp
 	uint8_t *rom = memregion("maincpu")->base();
@@ -449,17 +455,17 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 			m_decrypted_opcodes[A] ^= 0x02;
 
 		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
-			m_decrypted_opcodes[A] = BITSWAP8(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
+			m_decrypted_opcodes[A] = bitswap<8>(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
 
 		/* decode the data */
 		if (BIT(A,5))
 			rom[A] ^= 0x40;
 
 		if (BIT(A,9) || !BIT(A,5))
-			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
+			rom[A] = bitswap<8>(rom[A],7,6,1,4,3,2,5,0);
 	}
 }
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state, init_metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

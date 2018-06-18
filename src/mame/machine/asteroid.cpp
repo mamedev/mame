@@ -19,21 +19,29 @@ INTERRUPT_GEN_MEMBER(asteroid_state::asteroid_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (!(ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::asterock_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if ((ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (ioport("IN0")->read() & 0x02)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+WRITE_LINE_MEMBER(asteroid_state::cocktail_inv_w)
+{
+	// Inverter circuit is only hooked up for Cocktail Asteroids
+	int flip = state && m_cocktail->read();
+	m_dvg->set_flip_x(flip);
+	m_dvg->set_flip_y(flip);
 }
 
 READ8_MEMBER(asteroid_state::asteroid_IN0_r)
@@ -84,36 +92,26 @@ READ8_MEMBER(asteroid_state::asteroid_IN1_r)
 
 READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
 {
-	int res;
-	int res1;
+	// 765432--  not used
+	// ------1-  ls253 dsw selector 2y
+	// -------0  ls253 dsw selector 1y
 
-	res1 = ioport("DSW1")->read();
+	uint8_t val = m_dsw1->read();
 
-	res = 0xfc | ((res1 >> (2 * (3 - (offset & 0x3)))) & 0x3);
-	return res;
+	m_dsw_sel->i3a_w(BIT(val, 0));
+	m_dsw_sel->i3b_w(BIT(val, 1));
+	m_dsw_sel->i2a_w(BIT(val, 2));
+	m_dsw_sel->i2b_w(BIT(val, 3));
+	m_dsw_sel->i1a_w(BIT(val, 4));
+	m_dsw_sel->i1b_w(BIT(val, 5));
+	m_dsw_sel->i0a_w(BIT(val, 6));
+	m_dsw_sel->i0b_w(BIT(val, 7));
+
+	m_dsw_sel->s_w(space, 0, offset & 0x03);
+
+	return 0xfc | (m_dsw_sel->zb_r() << 1) | m_dsw_sel->za_r();
 }
 
-
-WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
-{
-	int bank = BIT(data, 2);
-	m_ram1->set_entry(bank);
-	m_ram2->set_entry(bank);
-
-	output().set_led_value(0, ~data & 0x02);
-	output().set_led_value(1, ~data & 0x01);
-}
-
-
-WRITE_LINE_MEMBER(asteroid_state::start1_led_w)
-{
-	output().set_led_value(0, state ? 0 : 1);
-}
-
-WRITE_LINE_MEMBER(asteroid_state::start2_led_w)
-{
-	output().set_led_value(1, state ? 0 : 1);
-}
 
 void asteroid_state::machine_start()
 {

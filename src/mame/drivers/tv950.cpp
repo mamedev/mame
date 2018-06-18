@@ -37,6 +37,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"
@@ -50,7 +51,7 @@
 #define RS232A_TAG  "rs232a"
 #define RS232B_TAG  "rs232b"
 
-#define MASTER_CLOCK XTAL_23_814MHz
+#define MASTER_CLOCK XTAL(23'814'000)
 
 class tv950_state : public driver_device
 {
@@ -74,6 +75,8 @@ public:
 	DECLARE_WRITE8_MEMBER(row_addr_w);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
+	void tv950(machine_config &config);
+	void tv950_mem(address_map &map);
 private:
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
@@ -89,19 +92,20 @@ private:
 	int m_row;
 };
 
-static ADDRESS_MAP_START(tv950_mem, AS_PROGRAM, 8, tv950_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("vram") // VRAM
-	AM_RANGE(0x8100, 0x8100) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, status_r, address_w)
-	AM_RANGE(0x8101, 0x8101) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, register_r, register_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(row_addr_w)
-	AM_RANGE(0x9300, 0x9303) AM_DEVREADWRITE(ACIA1_TAG, mos6551_device, read, write)
-	AM_RANGE(0x9500, 0x9503) AM_DEVREADWRITE(ACIA2_TAG, mos6551_device, read, write)
-	AM_RANGE(0x9900, 0x9903) AM_DEVREADWRITE(ACIA3_TAG, mos6551_device, read, write)
-	AM_RANGE(0xb100, 0xb10f) AM_DEVREADWRITE(VIA_TAG, via6522_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tv950_state::tv950_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x3fff).ram().share("vram"); // VRAM
+	map(0x8100, 0x8100).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
+	map(0x8101, 0x8101).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
+	map(0x9000, 0x9000).w(FUNC(tv950_state::row_addr_w));
+	map(0x9300, 0x9303).rw(ACIA1_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x9500, 0x9503).rw(ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x9900, 0x9903).rw(ACIA3_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xb100, 0xb10f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
+}
 
 
 /* Input ports */
@@ -266,10 +270,10 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	m_row = (m_row + 1) % 250;
 }
 
-static MACHINE_CONFIG_START( tv950 )
+MACHINE_CONFIG_START(tv950_state::tv950)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/14)
-	MCFG_CPU_PROGRAM_MAP(tv950_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/14)
+	MCFG_DEVICE_PROGRAM_MAP(tv950_mem)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )   // not real values
@@ -281,17 +285,17 @@ static MACHINE_CONFIG_START( tv950 )
 	MCFG_MC6845_CHAR_WIDTH(14)
 	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
-	MCFG_MC6845_OUT_HSYNC_CB(DEVWRITELINE(VIA_TAG, via6522_device, write_pb6))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tv950_state, crtc_vs_w))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(VIA_TAG, via6522_device, write_pb6))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv950_state, crtc_vs_w))
 	MCFG_VIDEO_SET_SCREEN(nullptr)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(tv950_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(tv950_state, via_b_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8(tv950_state, via_b_r))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(tv950_state, via_crtc_reset_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(tv950_state, via_blink_rate_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, tv950_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, tv950_state, via_b_w))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, tv950_state, via_b_r))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, tv950_state, via_crtc_reset_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, tv950_state, via_blink_rate_w))
 
 	MCFG_DEVICE_ADD(ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
@@ -301,6 +305,8 @@ static MACHINE_CONFIG_START( tv950 )
 
 	MCFG_DEVICE_ADD(ACIA3_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+
+	MCFG_DEVICE_ADD("kbd", I8748, XTAL(5'714'300))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -313,20 +319,18 @@ ROM_START( tv950 )
 	ROM_LOAD16_BYTE( "180000-002a_a33_9294.bin", 0x000001, 0x001000, CRC(eaf4f346) SHA1(b4c531626846f3f055ddc086ac24fdb1b34f3f8e) )
 	ROM_LOAD16_BYTE( "180000-003a_a32_7ebf.bin", 0x000000, 0x001000, CRC(783ca0b6) SHA1(1cec9a9a56ef5795809f7ca7cd2e3f61b27e698d) )
 
-	ROM_REGION(0x1000, "kbd", 0)
+	ROM_REGION(0x400, "kbd", 0)
 	ROM_LOAD( "950kbd_8748_pn52080723-02.bin", 0x000000, 0x000400, CRC(11c8f22c) SHA1(99e73e9c74b10055733e89b92adbc5bf7f4ff338) )
 
 	ROM_REGION(0x10000, "user1", 0)
 	// came with "tv950.zip"
-	ROM_LOAD( "tv-043h.rom",  0x0000, 0x1000, CRC(89b826be) SHA1(fd5575be04317682d0c9062702b5932b46f89926) )
-	ROM_LOAD( "tv-044h.rom",  0x0000, 0x1000, CRC(24b0383d) SHA1(71cabb7f3da8652a36afdf3d505ab8a41651e801) )
-	ROM_LOAD( "180000-43i_a25_05ce.bin", 0x0000, 0x1000, CRC(ac6f0bfc) SHA1(2a3863700405fbb9e510613559d78fceee3544e8) )
-	ROM_LOAD( "180000-44i_a20_689e.bin", 0x0000, 0x1000, CRC(db91a727) SHA1(e94724ed1a563fb846f4203ae6523ee6b4c6577f) )
+	ROM_LOAD( "180000-43i.a25", 0x0000, 0x1000, CRC(ac6f0bfc) SHA1(2a3863700405fbb9e510613559d78fceee3544e8) )
+	ROM_LOAD( "180000-44i.a20", 0x0000, 0x1000, CRC(db91a727) SHA1(e94724ed1a563fb846f4203ae6523ee6b4c6577f) )
 	// came with "tv950kbd.zip"
-	ROM_LOAD( "tv950_a32_1800000-003a.bin", 0x0000, 0x1000, CRC(eaef0138) SHA1(7198851299fce07c95d18e32cbfbe936c0dbec2a) )
-	ROM_LOAD( "tv950_a33_1800000-002a.bin", 0x0000, 0x1000, CRC(856dd85c) SHA1(e2570017e098b0e1ead7749e9c2ac40be2367433) )
+	ROM_LOAD( "1800000-003a.a32", 0x0000, 0x1000, CRC(eaef0138) SHA1(7198851299fce07c95d18e32cbfbe936c0dbec2a) )
+	ROM_LOAD( "1800000-002a.a33", 0x0000, 0x1000, CRC(856dd85c) SHA1(e2570017e098b0e1ead7749e9c2ac40be2367433) )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "Model 950 Video Display Terminal",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME                            FLAGS
+COMP( 1981, tv950, 0,      0,      tv950,   tv950, tv950_state, empty_init, "TeleVideo", "Model 950 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

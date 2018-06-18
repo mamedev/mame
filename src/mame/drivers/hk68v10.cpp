@@ -168,6 +168,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/vme/vme.h"
 #include "machine/z80scc.h"
+#include "machine/z8536.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
@@ -185,7 +186,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
+#define BAUDGEN_CLOCK 19.6608_MHz_XTAL /* Raltron */
 #define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
 
 class hk68v10_state : public driver_device
@@ -208,6 +209,8 @@ DECLARE_WRITE16_MEMBER (bootvect_w);
 virtual void machine_start () override;
 virtual void machine_reset () override;
 
+void hk68v10(machine_config &config);
+void hk68v10_mem(address_map &map);
 protected:
 
 private:
@@ -219,21 +222,22 @@ required_device<scc8530_device> m_sccterm;
 	uint16_t  m_sysram[4];
 };
 
-static ADDRESS_MAP_START (hk68v10_mem, AS_PROGRAM, 16, hk68v10_state)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just durin reset */
-AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
-AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
-AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
-AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */
-AM_RANGE (0xFE9000, 0xFE9009) AM_RAM //AM_DEVREADWRITE8("scc", scc8530_device, ba_cd_r, ba_cd_w, 0xffff) /* Z80-PIO? */
-AM_RANGE (0xFEA000, 0xFEA001) AM_DEVREADWRITE8("scc", scc8530_device, ca_r, ca_w, 0xff00) /* Dual serial port Z80-SCC */
-AM_RANGE (0xFEA002, 0xFEA003) AM_DEVREADWRITE8("scc", scc8530_device, cb_r, cb_w, 0xff00) /* Dual serial port Z80-SCC */
-AM_RANGE (0xFEA004, 0xFEA005) AM_DEVREADWRITE8("scc", scc8530_device, da_r, da_w, 0xff00) /* Dual serial port Z80-SCC */
-AM_RANGE (0xFEA006, 0xFEA007) AM_DEVREADWRITE8("scc", scc8530_device, db_r, db_w, 0xff00) /* Dual serial port Z80-SCC */
+void hk68v10_state::hk68v10_mem(address_map &map)
+{
+map.unmap_value_high();
+map(0x000000, 0x000007).ram().w(FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
+map(0x000000, 0x000007).rom().r(FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
+map(0x000008, 0x1fffff).ram(); /* 2 Mb RAM */
+map(0xFC0000, 0xFC3fff).rom(); /* System EPROM Area 16Kb HBUG */
+map(0xFC4000, 0xFDffff).rom(); /* System EPROM Area an additional 112Kb for System ROM */
+map(0xFE9000, 0xFE9007).rw("cio", FUNC(z8536_device::read), FUNC(z8536_device::write)).umask16(0xff00);
+map(0xfea000, 0xfea000).rw(m_sccterm, FUNC(scc8530_device::ca_r), FUNC(scc8530_device::ca_w)); /* Dual serial port Z80-SCC */
+map(0xfea002, 0xfea002).rw(m_sccterm, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w)); /* Dual serial port Z80-SCC */
+map(0xfea004, 0xfea004).rw(m_sccterm, FUNC(scc8530_device::da_r), FUNC(scc8530_device::da_w)); /* Dual serial port Z80-SCC */
+map(0xfea006, 0xfea006).rw(m_sccterm, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w)); /* Dual serial port Z80-SCC */
 //AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START (hk68v10)
@@ -277,8 +281,8 @@ READ16_MEMBER (hk68v10_state::bootvect_r){
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
@@ -326,68 +330,71 @@ WRITE16_MEMBER (hk68v10_state::vme_a16_w){
  * Original HBUG configuration word: 0x003D = 0000 0000 0011 1101
  */
 
-static SLOT_INTERFACE_START(hk68_vme_cards)
-SLOT_INTERFACE_END
+static void hk68_vme_cards(device_slot_interface &device)
+{
+}
 
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (hk68v10)
+MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
-	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
+	MCFG_DEVICE_ADD("maincpu", M68010, 10_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP (hk68v10_mem)
+
+	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)
 
 	/* Terminal Port config */
-	MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("scc", SCC8530N, SCC_CLOCK)
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsa_w))
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, hk68_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (hk68v10)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 
-ROM_LOAD16_BYTE ("hk68kv10U23.bin", 0xFC0001, 0x2000, CRC (632aa026) SHA1 (f2b1ed0cc38dfbeb1602c013e00757015400720d))
-ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e68699965645f0ce53de47625163c3eb02c8b727))
-/*
- * System ROM information
- *
- * The ROMs contains HBUG v1.8, known commands from different sources:
- *
- *  'uc'       Print HK68 Configuration
- *  'um'       Perform RAM test
- *  'dm adrs'  Display Memory
- *  'sb adrs'  Substitute Byte at adrs
- *  'c adrs'   Call Routine at adrs
- *  'bw'       Boot from Winchester
- *  'bf'       Boot from floppy (MIO, SBX-FDIO)
- *  'bsf'      Boot from floppy (SCSI)
- *
- * Setup sequence channel B
- * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity
- * :scc B Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
- * :scc B Reg 03 <- e1 Setting up the receiver, Receiver Enable 1, Auto Enables 1, Receiver Bits/Character 8
- * :scc B Reg 09 <- 00 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0 Vector generated
- * :scc B Reg 01 <- 00 Ext INT:0 Tx INT:0 Parity SC:0 Wait/Ready Enable:0 as Wait on Transmit, Rx INT:0
- * :scc B Reg 0b <- 56 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=BRG - not_implemented
- * :scc B Reg 0c <- 0b Low byte of Time Constant for Baudrate generator -> 38400 baud
- * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
- * :scc B Reg 0e <- 03 Misc Control Bits DPLL NULL Command, BRG enabled SRC=PCLK, BRG SRC bps=307200=PCLK 4915200/16, BRG OUT 9600=307200/16(32)
- *  Repeated for :scc A
- * :scc B Reg 0c <- 0e Low byte of Time Constant for Baudrate generator -> 9600 baud
- * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
- *  Repeated for :scc A
- */
+	ROM_LOAD16_BYTE ("hk68kv10.u23.bin", 0xFC0001, 0x2000, CRC (632aa026) SHA1 (f2b1ed0cc38dfbeb1602c013e00757015400720d))
+	ROM_LOAD16_BYTE ("hk68kv10.u12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e68699965645f0ce53de47625163c3eb02c8b727))
+	/*
+	 * System ROM information
+	 *
+	 * The ROMs contains HBUG v1.8, known commands from different sources:
+	 *
+	 *  'uc'       Print HK68 Configuration
+	 *  'um'       Perform RAM test
+	 *  'dm adrs'  Display Memory
+	 *  'sb adrs'  Substitute Byte at adrs
+	 *  'c adrs'   Call Routine at adrs
+	 *  'bw'       Boot from Winchester
+	 *  'bf'       Boot from floppy (MIO, SBX-FDIO)
+	 *  'bsf'      Boot from floppy (SCSI)
+	 *
+	 * Setup sequence channel B
+	 * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity
+	 * :scc B Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
+	 * :scc B Reg 03 <- e1 Setting up the receiver, Receiver Enable 1, Auto Enables 1, Receiver Bits/Character 8
+	 * :scc B Reg 09 <- 00 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0 Vector generated
+	 * :scc B Reg 01 <- 00 Ext INT:0 Tx INT:0 Parity SC:0 Wait/Ready Enable:0 as Wait on Transmit, Rx INT:0
+	 * :scc B Reg 0b <- 56 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=BRG - not_implemented
+	 * :scc B Reg 0c <- 0b Low byte of Time Constant for Baudrate generator -> 38400 baud
+	 * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+	 * :scc B Reg 0e <- 03 Misc Control Bits DPLL NULL Command, BRG enabled SRC=PCLK, BRG SRC bps=307200=PCLK 4915200/16, BRG OUT 9600=307200/16(32)
+	 *  Repeated for :scc A
+	 * :scc B Reg 0c <- 0e Low byte of Time Constant for Baudrate generator -> 9600 baud
+	 * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+	 *  Repeated for :scc A
+	 */
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY                  FULLNAME    FLAGS */
-COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                 FULLNAME    FLAGS */
+COMP( 1985, hk68v10, 0,      0,      hk68v10, hk68v10, hk68v10_state, empty_init, "Heurikon Corporation", "HK68/V10", MACHINE_NO_SOUND_HW )

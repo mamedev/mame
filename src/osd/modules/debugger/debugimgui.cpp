@@ -959,7 +959,10 @@ void debug_imgui::mount_image()
 		{
 			case file_entry_type::DRIVE:
 			case file_entry_type::DIRECTORY:
-				err = util::zippath_opendir(m_selected_file->fullpath.c_str(), nullptr);
+				{
+					util::zippath_directory::ptr dir;
+					err = util::zippath_directory::open(m_selected_file->fullpath.c_str(), dir);
+				}
 				if(err == osd_file::error::NONE)
 				{
 					m_filelist_refresh = true;
@@ -994,22 +997,19 @@ void debug_imgui::create_image()
 
 void debug_imgui::refresh_filelist()
 {
-	int x;
-	osd_file::error err;
-	util::zippath_directory* dir = nullptr;
-	const char *volume_name;
-	const osd::directory::entry *dirent;
 	uint8_t first = 0;
 
 	// todo
 	m_filelist.clear();
 	m_filelist_refresh = false;
 
-	err = util::zippath_opendir(m_path,&dir);
+	util::zippath_directory::ptr dir;
+	osd_file::error const err = util::zippath_directory::open(m_path,dir);
 	if(err == osd_file::error::NONE)
 	{
-		x = 0;
+		int x = 0;
 		// add drives
+		const char *volume_name;
 		while((volume_name = osd_get_volume_name(x))!=nullptr)
 		{
 			file_entry temp;
@@ -1020,7 +1020,8 @@ void debug_imgui::refresh_filelist()
 			x++;
 		}
 		first = m_filelist.size();
-		while((dirent = util::zippath_readdir(dir)) != nullptr)
+		const osd::directory::entry *dirent;
+		while((dirent = dir->readdir()) != nullptr)
 		{
 			file_entry temp;
 			switch(dirent->type)
@@ -1039,8 +1040,7 @@ void debug_imgui::refresh_filelist()
 			m_filelist.emplace_back(std::move(temp));
 		}
 	}
-	if (dir != nullptr)
-		util::zippath_closedir(dir);
+	dir.reset();
 
 	// sort file list, as it is not guaranteed to be in any particular order
 	std::sort(m_filelist.begin()+first,m_filelist.end(),[](file_entry x, file_entry y) { return x.basename < y.basename; } );

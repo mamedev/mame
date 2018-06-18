@@ -226,7 +226,7 @@ void tms99xx_device::device_start()
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_state_any = 0;
 	PC = 0;
@@ -421,7 +421,7 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	uint16_t value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
 	m_icount = temp;
 	return value;
@@ -430,7 +430,7 @@ uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	m_prgspace->write_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe, data);
 	m_icount = temp;
 }
@@ -1504,7 +1504,7 @@ void tms99xx_device::acquire_instruction()
 	{
 		decode(m_current_value);
 		if (TRACE_EXEC) logerror("%04x: %04x (%s)\n", PC, IR, opname[m_command]);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
 		// IAQ will be cleared in the main loop
 	}
@@ -2753,10 +2753,10 @@ uint32_t tms99xx_device::execute_input_lines() const
 
 // device_disasm_interface overrides
 
-util::disasm_interface *tms99xx_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms99xx_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9900_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9900_ID);
 }
 
 
-DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "TMS9900")
+DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "Texas Instruments TMS9900")

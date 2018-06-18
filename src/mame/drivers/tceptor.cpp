@@ -15,6 +15,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
@@ -40,14 +41,6 @@ WRITE8_MEMBER(tceptor_state::m68k_shared_w)
 
 /*******************************************************************/
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m6809_vb_interrupt)
-{
-	if (m_m6809_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
-	else
-		m_m6809_irq_enable = 1;
-}
-
 WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
 {
 	m_m6809_irq_enable = 1;
@@ -59,25 +52,11 @@ WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
 }
 
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m68k_vb_interrupt)
-{
-	if (m_m68k_irq_enable)
-		device.execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
-}
-
 WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
 {
 	m_m68k_irq_enable = data;
 }
 
-
-INTERRUPT_GEN_MEMBER(tceptor_state::mcu_vb_interrupt)
-{
-	if (m_mcu_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
-	else
-		m_mcu_irq_enable = 1;
-}
 
 WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
 {
@@ -145,84 +124,86 @@ READ8_MEMBER(tceptor_state::input1_r)
 
 /*******************************************************************/
 
-static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_SHARE("tile_ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_SHARE("tile_attr")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_SHARE("bg_ram")  // background (VIEW RAM)
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(tceptor2_shutter_w)
-	AM_RANGE(0x4f00, 0x4f00) AM_READNOP             // unknown
-	AM_RANGE(0x4f01, 0x4f01) AM_READ_PORT("PEDAL")          // analog input (accel)
-	AM_RANGE(0x4f02, 0x4f02) AM_READ_PORT("STICKX")         // analog input (left/right)
-	AM_RANGE(0x4f03, 0x4f03) AM_READ_PORT("STICKY")         // analog input (up/down)
-	AM_RANGE(0x4f00, 0x4f03) AM_WRITENOP                // analog input control?
-	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)  // bg scroll
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("m68k_shared_ram") // COM RAM
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(m6809_irq_enable_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tceptor_state::m6809_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();
+	map(0x1800, 0x1bff).ram().w(FUNC(tceptor_state::tceptor_tile_ram_w)).share("tile_ram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(tceptor_state::tceptor_tile_attr_w)).share("tile_attr");
+	map(0x2000, 0x3fff).ram().w(FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram");  // background (VIEW RAM)
+	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
+	map(0x4800, 0x4800).w(FUNC(tceptor_state::tceptor2_shutter_w));
+	map(0x4f00, 0x4f07).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
+	map(0x5000, 0x5006).w(FUNC(tceptor_state::tceptor_bg_scroll_w));  // bg scroll
+	map(0x6000, 0x7fff).ram().share("m68k_shared_ram"); // COM RAM
+	map(0x8000, 0x8000).w(FUNC(tceptor_state::m6809_irq_disable_w));
+	map(0x8800, 0x8800).w(FUNC(tceptor_state::m6809_irq_enable_w));
+	map(0x8000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8, tceptor_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x0100, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAM
-	AM_RANGE(0x0300, 0x030f) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x3c01, 0x3c01) AM_WRITEONLY
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tceptor_state::m6502_a_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("share2");
+	map(0x0100, 0x01ff).ram();
+	map(0x0200, 0x02ff).ram();
+	map(0x0300, 0x030f).ram();
+	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x3000, 0x30ff).ram().share("share3");
+	map(0x3c01, 0x3c01).writeonly();
+	map(0x8000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x0100, 0x01ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY           // voice ctrl??
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tceptor_state::m6502_b_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("share2");
+	map(0x0100, 0x01ff).ram();
+	map(0x4000, 0x4000).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x5000, 0x5000).writeonly();           // voice ctrl??
+	map(0x8000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM         // M68K ERROR 1
-	AM_RANGE(0x100000, 0x10ffff) AM_ROM         // not sure
-	AM_RANGE(0x200000, 0x203fff) AM_RAM         // M68K ERROR 0
-	AM_RANGE(0x300000, 0x300001) AM_WRITEONLY
-	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_SHARE("sprite_ram")
-	AM_RANGE(0x500000, 0x51ffff) AM_DEVWRITE("c45_road", namco_c45_road_device, write)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(m68k_irq_enable_w)    // not sure
-	AM_RANGE(0x700000, 0x703fff) AM_READWRITE8(m68k_shared_r, m68k_shared_w, 0x00ff)
-ADDRESS_MAP_END
+void tceptor_state::m68k_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();         // M68K ERROR 1
+	map(0x100000, 0x10ffff).rom();         // not sure
+	map(0x200000, 0x203fff).ram();         // M68K ERROR 0
+	map(0x300000, 0x300001).writeonly();
+	map(0x400000, 0x4001ff).writeonly().share("sprite_ram");
+	map(0x500000, 0x51ffff).w(m_c45_road, FUNC(namco_c45_road_device::write));
+	map(0x600000, 0x600001).w(FUNC(tceptor_state::m68k_irq_enable_w));    // not sure
+	map(0x700000, 0x703fff).rw(FUNC(tceptor_state::m68k_shared_r), FUNC(tceptor_state::m68k_shared_w)).umask16(0x00ff);
+}
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
-	AM_RANGE(0x1400, 0x154d) AM_RAM
-	AM_RANGE(0x17c0, 0x17ff) AM_RAM
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x2100, 0x2100) AM_READ(dsw0_r)
-	AM_RANGE(0x2101, 0x2101) AM_READ(dsw1_r)
-	AM_RANGE(0x2200, 0x2200) AM_READ(input0_r)
-	AM_RANGE(0x2201, 0x2201) AM_READ(input1_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(mcu_irq_disable_w)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(mcu_irq_enable_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("nvram")   // Battery Backup
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tceptor_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
+	map(0x1400, 0x154d).ram();
+	map(0x17c0, 0x17ff).ram();
+	map(0x2000, 0x20ff).ram().share("share3");
+	map(0x2100, 0x2100).r(FUNC(tceptor_state::dsw0_r));
+	map(0x2101, 0x2101).r(FUNC(tceptor_state::dsw1_r));
+	map(0x2200, 0x2200).r(FUNC(tceptor_state::input0_r));
+	map(0x2201, 0x2201).r(FUNC(tceptor_state::input1_r));
+	map(0x8000, 0x8000).w(FUNC(tceptor_state::mcu_irq_disable_w));
+	map(0x8800, 0x8800).w(FUNC(tceptor_state::mcu_irq_enable_w));
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xdfff).ram().share("nvram");   // Battery Backup
+	map(0xf000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, tceptor_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITENOP
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITENOP
-ADDRESS_MAP_END
+void tceptor_state::mcu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(M6801_PORT1, M6801_PORT1).nopw();
+	map(M6801_PORT2, M6801_PORT2).nopw();
+}
 
 
 
@@ -308,7 +289,7 @@ static const gfx_layout tile_layout =
 	2*8*8
 };
 
-static GFXDECODE_START( tceptor )
+static GFXDECODE_START( gfx_tceptor )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,     0,  256 )
 
 	/* decode in video_start */
@@ -325,6 +306,8 @@ void tceptor_state::machine_start()
 	save_item(NAME(m_m6809_irq_enable));
 	save_item(NAME(m_m68k_irq_enable));
 	save_item(NAME(m_mcu_irq_enable));
+
+	m_shutter.resolve();
 }
 
 
@@ -339,34 +322,37 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor )
+MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32)
-	MCFG_CPU_PROGRAM_MAP(m6809_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m6809_vb_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6809, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(m6809_map)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_49_152MHz/24)
-	MCFG_CPU_PROGRAM_MAP(m6502_a_map)
+	MCFG_DEVICE_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
+	MCFG_DEVICE_PROGRAM_MAP(m6502_a_map)
 
-	MCFG_CPU_ADD("audio2", M65C02, XTAL_49_152MHz/24)
-	MCFG_CPU_PROGRAM_MAP(m6502_b_map)
+	MCFG_DEVICE_ADD("audio2", M65C02, XTAL(49'152'000)/24)
+	MCFG_DEVICE_PROGRAM_MAP(m6502_b_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_49_152MHz/4)
-	MCFG_CPU_PROGRAM_MAP(m68k_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m68k_vb_interrupt)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(m68k_map)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8) // or compatible 6808 with extra instructions
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, mcu_vb_interrupt)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock (needs to >640khz or the wait loop is too fast)
+	MCFG_ADC0808_IN0_CB(NOOP) // unknown
+	MCFG_ADC0808_IN1_CB(IOPORT("PEDAL"))
+	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
+	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))
+
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tceptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tceptor)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INDIRECT_ENTRIES(1024)
 	MCFG_PALETTE_INIT_OWNER(tceptor_state, tceptor)
@@ -380,25 +366,26 @@ static MACHINE_CONFIG_START( tceptor )
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 	MCFG_SCREEN_UPDATE_DRIVER(tceptor_state, screen_update_tceptor)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tceptor_state, screen_vblank_tceptor))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tceptor_state, screen_vblank_tceptor))
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -516,6 +503,6 @@ ROM_START( tceptor2 )
 ROM_END
 
 
-//   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME                 FLAGS )
-GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",        0)
-GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "3-D Thunder Ceptor II", 0, layout_tceptor2)
+//     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY  FULLNAME                 FLAGS )
+GAME(  1986, tceptor,  0,       tceptor, tceptor,  tceptor_state, empty_init, ROT0,    "Namco", "Thunder Ceptor",        0)
+GAMEL( 1986, tceptor2, tceptor, tceptor, tceptor2, tceptor_state, empty_init, ROT0,    "Namco", "3-D Thunder Ceptor II", 0, layout_tceptor2)

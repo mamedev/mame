@@ -2,6 +2,7 @@
 // copyright-holders:BUT
 
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class chaknpop_state : public driver_device
 {
@@ -59,4 +60,6 @@ public:
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mcu_update_seed(uint8_t data);
+	void chaknpop(machine_config &config);
+	void chaknpop_map(address_map &map);
 };

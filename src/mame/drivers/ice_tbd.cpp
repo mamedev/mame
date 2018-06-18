@@ -29,6 +29,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ice_tbd(machine_config &config);
+	void ice_tbd_io_map(address_map &map);
+	void ice_tbd_map(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -37,15 +40,17 @@ private:
 
 
 
-static ADDRESS_MAP_START( ice_tbd_map, AS_PROGRAM, 8, ice_tbd_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-ADDRESS_MAP_END
+void ice_tbd_state::ice_tbd_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+}
 
-static ADDRESS_MAP_START( ice_tbd_io_map, AS_IO, 8, ice_tbd_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void ice_tbd_state::ice_tbd_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 static INPUT_PORTS_START( ice_tbd )
@@ -59,12 +64,12 @@ void ice_tbd_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ice_tbd )
+MACHINE_CONFIG_START(ice_tbd_state::ice_tbd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ice_tbd_map)
-	MCFG_CPU_IO_MAP(ice_tbd_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ice_tbd_map)
+	MCFG_DEVICE_IO_MAP(ice_tbd_io_map)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(NOOP) // ?
@@ -75,8 +80,8 @@ MACHINE_CONFIG_END
 
 ROM_START( ice_tbd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "TURBO-DR.IVE", 0x0000, 0x4000, CRC(d7c79ac4) SHA1(a01d93411e604e36a3ced58063f2ab81e431b82a) )
+	ROM_LOAD( "turbo-dr.ive", 0x0000, 0x4000, CRC(d7c79ac4) SHA1(a01d93411e604e36a3ced58063f2ab81e431b82a) )
 ROM_END
 
 
-GAME( 1988, ice_tbd,  0,    ice_tbd, ice_tbd, ice_tbd_state,  0, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )

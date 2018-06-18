@@ -34,9 +34,10 @@ FLOPPY_FORMATS_MEMBER( a2bus_corvfdc02_device::corv_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void corv_floppies(device_slot_interface &device)
+{
+	device.option_add("525dsqd", FLOPPY_525_QD);
+}
 
 ROM_START( fdc02 )
 	ROM_REGION(0x20, FDC02_ROM_REGION, 0)
@@ -51,10 +52,10 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_corvfdc02_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_corvfdc02_device::device_add_mconfig)
 	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, intrq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, intrq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":0", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":1", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":2", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
@@ -96,9 +97,6 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc02_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION).c_str())->base();
 
 	m_timer = timer_alloc(0);
@@ -128,15 +126,15 @@ void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, 
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc02_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc02_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0: // 765 FIFO
-			return m_fdc->fifo_r(space, 0);
+			return m_fdc->read_fifo();
 
 		case 1: // 765 MSR
-			return m_fdc->msr_r(space, 0);
+			return m_fdc->read_msr();
 
 		case 2: // buffer address
 			return (m_bufptr>>1) & 0xff;
@@ -164,14 +162,14 @@ uint8_t a2bus_corvfdc02_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_corvfdc02_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_corvfdc02_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
 	switch (offset)
 	{
 		case 0:    // FDC FIFO write
-			m_fdc->fifo_w(space, offset, data);
+			m_fdc->write_fifo(data);
 			break;
 
 		case 1:    // FDC ???
@@ -238,7 +236,7 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, uint8_t offset, ui
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc02_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc02_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset & 0x1f];
 }

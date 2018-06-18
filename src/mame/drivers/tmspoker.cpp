@@ -209,10 +209,11 @@
 #include "cpu/tms9900/tms9980a.h"
 #include "sound/sn76477.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
+#define MASTER_CLOCK    XTAL(6'000'000)   /* confirmed */
 
 
 class tmspoker_state : public driver_device
@@ -229,7 +230,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_DRIVER_INIT(bus);
+	void init_bus();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -239,6 +240,9 @@ public:
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void tmspoker(machine_config &config);
+	void tmspoker_cru_map(address_map &map);
+	void tmspoker_map(address_map &map);
 };
 
 
@@ -323,15 +327,16 @@ void tmspoker_state::machine_reset()
 * Memory Map Information *
 *************************/
 //59a
-static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2800, 0x2800) AM_READNOP AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(tmspoker_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM //NVRAM?
-	AM_RANGE(0x2000, 0x20ff) AM_RAM //color RAM?
-ADDRESS_MAP_END
+void tmspoker_state::tmspoker_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).bankr("bank1");
+	map(0x2800, 0x2800).nopr().w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3000, 0x33ff).ram().w(FUNC(tmspoker_state::tmspoker_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram(); //NVRAM?
+	map(0x2000, 0x20ff).ram(); //color RAM?
+}
 
 
 READ8_MEMBER(tmspoker_state::unk_r)
@@ -340,9 +345,10 @@ READ8_MEMBER(tmspoker_state::unk_r)
 	return 0;//0xff;//mame_rand(machine);
 }
 
-static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8, tmspoker_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(unk_r)
-ADDRESS_MAP_END
+void tmspoker_state::tmspoker_cru_map(address_map &map)
+{
+	map(0x0000, 0x07ff).r(FUNC(tmspoker_state::unk_r));
+}
 
 /* I/O byte R/W
 
@@ -541,7 +547,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( tmspoker )
+static GFXDECODE_START( gfx_tmspoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -550,11 +556,11 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( tmspoker )
+MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -565,7 +571,7 @@ static MACHINE_CONFIG_START( tmspoker )
 	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmspoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmspoker)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
@@ -601,7 +607,7 @@ ROM_END
 *       Driver Init        *
 ***************************/
 
-DRIVER_INIT_MEMBER(tmspoker_state,bus)
+void tmspoker_state::init_bus()
 {
 	/* still need to decode the addressing lines */
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
@@ -626,5 +632,5 @@ DRIVER_INIT_MEMBER(tmspoker_state,bus)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY      FULLNAME                      FLAGS
-GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, bus,  ROT0, "<unknown>", "unknown TMS9980 Poker Game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY      FULLNAME                      FLAGS
+GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "<unknown>", "unknown TMS9980 Poker Game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -26,6 +26,16 @@ public:
 	// construction/destruction
 	hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;
 	virtual void ieee488_dav(int state) override;
@@ -35,6 +45,27 @@ public:
 	virtual void ieee488_srq(int state) override;
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ren(int state) override;
+
+private:
+	// PHI write CBs
+	DECLARE_WRITE_LINE_MEMBER(phi_eoi_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_dav_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_nrfd_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_ndac_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_ifc_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_srq_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_atn_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_ren_w);
+
+	// PHI DIO r/w CBs
+	DECLARE_READ8_MEMBER(phi_dio_r);
+	DECLARE_WRITE8_MEMBER(phi_dio_w);
+
+	// PHI IRQ/Z80 NMI
+	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
+
+	// Z80 IRQ
+	DECLARE_WRITE8_MEMBER(z80_m1_w);
 
 	// Floppy interface
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -56,36 +87,8 @@ public:
 	// Floppy drive interface
 	void floppy_ready_cb(floppy_image_device *floppy , int state);
 
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	// PHI write CBs
-	DECLARE_WRITE_LINE_MEMBER(phi_eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_dav_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_srq_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_atn_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_ren_w);
-
-	// PHI DIO r/w CBs
-	DECLARE_READ8_MEMBER(phi_dio_r);
-	DECLARE_WRITE8_MEMBER(phi_dio_w);
-
-	// PHI IRQ/Z80 NMI
-	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
-
-	// Z80 IRQ
-	DECLARE_WRITE16_MEMBER(z80_m1_w);
+	void z80_io_map(address_map &map);
+	void z80_program_map(address_map &map);
 
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;

@@ -648,10 +648,10 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 
 			// Signed Half Word?
 			if (insn & 0x20) {
-				uint32_t databyte = READ16(rnv);
-				uint32_t mask = 0x0000ffff;
-				mask >>= (rnv & 1) ? 8 : 0;
-				newval = databyte | ((databyte & ((mask + 1) >> 1)) ? ~mask : 0);
+				int32_t data = (int32_t)(int16_t)(uint16_t)READ16(rnv & ~1);
+				if ((rnv & 1) && m_archRev < 5)
+					data >>= 8;
+				newval = (uint32_t)data;
 			}
 			// Signed Byte
 			else {

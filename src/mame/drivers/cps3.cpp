@@ -101,8 +101,8 @@ JoJo's Venture                                             JJK98cA0F  CP3000U0G 
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 
-Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN   X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN   X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
 Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990512
 Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990608
 Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE  X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
@@ -773,13 +773,8 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(void)
 {
-	// flash roms
-	for (int simmnum = 0; simmnum < 7; simmnum++)
-		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(string_format("simm%d.%d", simmnum + 1, chipnum).c_str());
-
 	m_eeprom = std::make_unique<uint32_t[]>(0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
+	subdevice<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
 }
 
 
@@ -822,13 +817,13 @@ void cps3_state::init_crypt(uint32_t key1, uint32_t key2, int altEncryption)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
-DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_crypt(0x02203ee3, 0x01301972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_crypt(0xa55432b4, 0x0c129981, 0); }
-DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_crypt(0x23323ee3, 0x03021972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,cps3boot)  { init_crypt((uint32_t)-1,(uint32_t)-1,2); }
+void cps3_state::init_redearth()  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
+void cps3_state::init_sfiii()     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
+void cps3_state::init_sfiii2()    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
+void cps3_state::init_jojo()      { init_crypt(0x02203ee3, 0x01301972, 0); }
+void cps3_state::init_sfiii3()    { init_crypt(0xa55432b4, 0x0c129981, 0); }
+void cps3_state::init_jojoba()    { init_crypt(0x23323ee3, 0x03021972, 0); }
+void cps3_state::init_cps3boot()  { init_crypt((uint32_t)-1,(uint32_t)-1,2); }
 
 
 
@@ -1410,8 +1405,8 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 	uint32_t result = 0;
 	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
 
-	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
-	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
+	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1].target();
+	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1].target();
 	if (chip0 == nullptr || chip1 == nullptr)
 		return 0xffffffff;
 
@@ -1420,22 +1415,22 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1));
-		result |= chip0->read( (offset<<1) ) << 24;
+		result |= chip0->read(space, (offset<<1)) << 24;
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1));
-		result |= chip1->read( (offset<<1) ) << 16;
+		result |= chip1->read(space, (offset<<1)) << 16;
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1)+1);
-		result |= chip0->read( (offset<<1)+0x1 ) << 8;
+		result |= chip0->read(space, (offset<<1)+0x1) << 8;
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
 		//logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1)+1);
-		result |= chip1->read( (offset<<1)+0x1 ) << 0;
+		result |= chip1->read(space, (offset<<1)+0x1) << 0;
 	}
 
 	//printf("read GFX flash chips addr %02x returning %08x mem_mask %08x crambank %08x gfxbank %08x\n", offset*2, result,mem_mask,  m_cram_bank, m_cram_gfxflash_bank  );
@@ -1460,25 +1455,25 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 	{
 		command = (data >> 24) & 0xff;
 		//logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1), command);
-		chip0->write( (offset<<1), command);
+		chip0->write(space, (offset<<1), command);
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		//logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1), command);
-		chip1->write( (offset<<1), command);
+		chip1->write(space, (offset<<1), command);
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
 		//logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1)+1, command);
-		chip0->write( (offset<<1)+0x1, command);
+		chip0->write(space, (offset<<1)+0x1, command);
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//if ( ((offset<<1)+1) != 0x555) printf("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1)+1, command);
-		chip1->write( (offset<<1)+0x1, command);
+		chip1->write(space, (offset<<1)+0x1, command);
 	}
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
@@ -1501,7 +1496,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 
 
-uint32_t cps3_state::cps3_flashmain_r(address_space &space, int which, uint32_t offset, uint32_t mem_mask)
+uint32_t cps3_state::cps3_flashmain_r(int which, uint32_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -1511,22 +1506,22 @@ uint32_t cps3_state::cps3_flashmain_r(address_space &space, int which, uint32_t 
 	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+0, offset*4 );
-		result |= (m_simm[which][0]->read(offset)<<24);
+		result |= (m_simm[which][0]->read(machine().dummy_space(), offset)<<24);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+1, offset*4 );
-		result |= (m_simm[which][1]->read(offset)<<16);
+		result |= (m_simm[which][1]->read(machine().dummy_space(), offset)<<16);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+2, offset*4 );
-		result |= (m_simm[which][2]->read(offset)<<8);
+		result |= (m_simm[which][2]->read(machine().dummy_space(), offset)<<8);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 1
 	{
 		//logerror("read flash chip %d addr %02x\n", base+3, offset*4 );
-		result |= (m_simm[which][3]->read(offset)<<0);
+		result |= (m_simm[which][3]->read(machine().dummy_space(), offset)<<0);
 	}
 
 //  if (base==4) logerror("read flash chips addr %02x returning %08x\n", offset*4, result );
@@ -1538,7 +1533,7 @@ uint32_t cps3_state::cps3_flashmain_r(address_space &space, int which, uint32_t 
 
 READ32_MEMBER(cps3_state::cps3_flash1_r)
 {
-	uint32_t retvalue = cps3_flashmain_r(space, 0, offset,mem_mask);
+	uint32_t retvalue = cps3_flashmain_r(0, offset, mem_mask);
 
 	if (m_altEncryption) return retvalue;
 
@@ -1548,7 +1543,7 @@ READ32_MEMBER(cps3_state::cps3_flash1_r)
 
 READ32_MEMBER(cps3_state::cps3_flash2_r)
 {
-	uint32_t retvalue = cps3_flashmain_r(space, 1, offset,mem_mask);
+	uint32_t retvalue = cps3_flashmain_r(1, offset, mem_mask);
 
 	if (m_altEncryption) return retvalue;
 
@@ -1567,25 +1562,25 @@ void cps3_state::cps3_flashmain_w(int which, uint32_t offset, uint32_t data, uin
 	{
 		command = (data >> 24) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag(), offset, command);
-		m_simm[which][0]->write(offset, command);
+		m_simm[which][0]->write(machine().dummy_space(), offset, command);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag(), offset, command);
-		m_simm[which][1]->write(offset, command);
+		m_simm[which][1]->write(machine().dummy_space(), offset, command);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 2
 	{
 		command = (data >> 8) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag(), offset, command);
-		m_simm[which][2]->write(offset, command);
+		m_simm[which][2]->write(machine().dummy_space(), offset, command);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag(), offset, command);
-		m_simm[which][3]->write(offset, command);
+		m_simm[which][3]->write(machine().dummy_space(), offset, command);
 	}
 
 	/* copy data into regions to execute from */
@@ -2147,77 +2142,79 @@ WRITE32_MEMBER(cps3_state::cps3_colourram_w)
 
 
 /* there are more unknown writes, but you get the idea */
-static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("bios", 0) // Bios ROM
-	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_SHARE("mainram") // Main RAM
+void cps3_state::cps3_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
+	map(0x02000000, 0x0207ffff).ram().share("mainram"); // Main RAM
 
-	AM_RANGE(0x03000000, 0x030003ff) AM_RAM // 'FRAM' (SFIII memory test mode ONLY)
+	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (SFIII memory test mode ONLY)
 
 //  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
-	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM
+	map(0x04000000, 0x0407ffff).ram().share("spriteram");//AM_WRITEONLY // Sprite RAM
 
-	AM_RANGE(0x04080000, 0x040bffff) AM_READWRITE(cps3_colourram_r, cps3_colourram_w) AM_SHARE("colourram")  // Colour RAM (jojoba tests this size) 0x20000 colours?!
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::cps3_colourram_r), FUNC(cps3_state::cps3_colourram_w)).share("colourram");  // Colour RAM (jojoba tests this size) 0x20000 colours?!
 
 	// video registers of some kind probably
-	AM_RANGE(0x040C0000, 0x040C0003) AM_READ(cps3_40C0000_r)//?? every frame
-	AM_RANGE(0x040C0004, 0x040C0007) AM_READ(cps3_40C0004_r)//AM_READ(cps3_40C0004_r) // warzard reads this!
+	map(0x040C0000, 0x040C0003).r(FUNC(cps3_state::cps3_40C0000_r));//?? every frame
+	map(0x040C0004, 0x040C0007).r(FUNC(cps3_state::cps3_40C0004_r));//AM_READ(cps3_40C0004_r) // warzard reads this!
 //  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITENOP//??
-	AM_RANGE(0x040C000c, 0x040C000f) AM_READ(cps3_vbl_r)// AM_WRITENOP/
+	map(0x040C000c, 0x040C000f).r(FUNC(cps3_state::cps3_vbl_r));// AM_WRITENOP/
 
-	AM_RANGE(0x040C0000, 0x040C001f) AM_WRITE(cps3_unk_vidregs_w)
-	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITEONLY AM_SHARE("tmap20_regs")
-	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITEONLY AM_SHARE("tmap30_regs")
-	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITEONLY AM_SHARE("tmap40_regs")
-	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITEONLY AM_SHARE("tmap50_regs")
+	map(0x040C0000, 0x040C001f).w(FUNC(cps3_state::cps3_unk_vidregs_w));
+	map(0x040C0020, 0x040C002b).writeonly().share("tmap20_regs");
+	map(0x040C0030, 0x040C003b).writeonly().share("tmap30_regs");
+	map(0x040C0040, 0x040C004b).writeonly().share("tmap40_regs");
+	map(0x040C0050, 0x040C005b).writeonly().share("tmap50_regs");
 
-	AM_RANGE(0x040C0060, 0x040C007f) AM_RAM AM_SHARE("fullscreenzoom")
-
-
-	AM_RANGE(0x040C0094, 0x040C009b) AM_WRITE(cps3_characterdma_w)
+	map(0x040C0060, 0x040C007f).ram().share("fullscreenzoom");
 
 
-	AM_RANGE(0x040C00a0, 0x040C00af) AM_WRITE(cps3_palettedma_w)
+	map(0x040C0094, 0x040C009b).w(FUNC(cps3_state::cps3_characterdma_w));
 
 
-	AM_RANGE(0x040C0084, 0x040C0087) AM_WRITE(cram_bank_w)
-	AM_RANGE(0x040C0088, 0x040C008b) AM_WRITE(cram_gfxflash_bank_w)
+	map(0x040C00a0, 0x040C00af).w(FUNC(cps3_state::cps3_palettedma_w));
 
-	AM_RANGE(0x040e0000, 0x040e02ff) AM_DEVREADWRITE("cps3sound", cps3_sound_device, cps3_sound_r, cps3_sound_w)
 
-	AM_RANGE(0x04100000, 0x041fffff) AM_READWRITE(cram_data_r, cram_data_w)
-	AM_RANGE(0x04200000, 0x043fffff) AM_READWRITE(cps3_gfxflash_r, cps3_gfxflash_w) // GFX Flash ROMS
+	map(0x040C0084, 0x040C0087).w(FUNC(cps3_state::cram_bank_w));
+	map(0x040C0088, 0x040C008b).w(FUNC(cps3_state::cram_gfxflash_bank_w));
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x05000004, 0x05000007) AM_READ_PORT("EXTRA")
+	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::cps3_sound_r), FUNC(cps3_sound_device::cps3_sound_w));
 
-	AM_RANGE(0x05000008, 0x0500000b) AM_WRITENOP // ?? every frame
+	map(0x04100000, 0x041fffff).rw(FUNC(cps3_state::cram_data_r), FUNC(cps3_state::cram_data_w));
+	map(0x04200000, 0x043fffff).rw(FUNC(cps3_state::cps3_gfxflash_r), FUNC(cps3_state::cps3_gfxflash_w)); // GFX Flash ROMS
 
-	AM_RANGE(0x05000a00, 0x05000a1f) AM_READ(cps3_unk_io_r ) // ?? every frame
+	map(0x05000000, 0x05000003).portr("INPUTS");
+	map(0x05000004, 0x05000007).portr("EXTRA");
 
-	AM_RANGE(0x05001000, 0x05001203) AM_READWRITE(cps3_eeprom_r, cps3_eeprom_w )
+	map(0x05000008, 0x0500000b).nopw(); // ?? every frame
 
-	AM_RANGE(0x05040000, 0x0504ffff) AM_READWRITE(cps3_ssram_r,cps3_ssram_w) // 'SS' RAM (Score Screen) (text tilemap + toles)
+	map(0x05000a00, 0x05000a1f).r(FUNC(cps3_state::cps3_unk_io_r)); // ?? every frame
+
+	map(0x05001000, 0x05001203).rw(FUNC(cps3_state::cps3_eeprom_r), FUNC(cps3_state::cps3_eeprom_w));
+
+	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::cps3_ssram_r), FUNC(cps3_state::cps3_ssram_w)); // 'SS' RAM (Score Screen) (text tilemap + toles)
 	//0x25050020
-	AM_RANGE(0x05050020, 0x05050023) AM_WRITE(cps3_ss_bank_base_w )
-	AM_RANGE(0x05050024, 0x05050027) AM_WRITE(cps3_ss_pal_base_w )
+	map(0x05050020, 0x05050023).w(FUNC(cps3_state::cps3_ss_bank_base_w));
+	map(0x05050024, 0x05050027).w(FUNC(cps3_state::cps3_ss_pal_base_w));
 
-	AM_RANGE(0x05100000, 0x05100003) AM_WRITE(cps3_irq12_ack_w )
-	AM_RANGE(0x05110000, 0x05110003) AM_WRITE(cps3_irq10_ack_w )
+	map(0x05100000, 0x05100003).w(FUNC(cps3_state::cps3_irq12_ack_w));
+	map(0x05110000, 0x05110003).w(FUNC(cps3_state::cps3_irq10_ack_w));
 
-	AM_RANGE(0x05140000, 0x05140003) AM_DEVREADWRITE8("wd33c93", wd33c93_device, read, write, 0x00ff00ff )
+	map(0x05140000, 0x05140003).rw("wd33c93", FUNC(wd33c93_device::read), FUNC(wd33c93_device::write)).umask32(0x00ff00ff);
 
-	AM_RANGE(0x06000000, 0x067fffff) AM_READWRITE(cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
-	AM_RANGE(0x06800000, 0x06ffffff) AM_READWRITE(cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
+	map(0x06000000, 0x067fffff).rw(FUNC(cps3_state::cps3_flash1_r), FUNC(cps3_state::cps3_flash1_w)); /* Flash ROMs simm 1 */
+	map(0x06800000, 0x06ffffff).rw(FUNC(cps3_state::cps3_flash2_r), FUNC(cps3_state::cps3_flash2_w)); /* Flash ROMs simm 2 */
 
-	AM_RANGE(0x07ff0048, 0x07ff004b) AM_WRITENOP // bit 0 toggles during programming
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE(cps3_0xc0000000_ram_w ) AM_SHARE("0xc0000000_ram") /* Executes code from here */
-ADDRESS_MAP_END
+	map(0x07ff0048, 0x07ff004b).nopw(); // bit 0 toggles during programming
+	map(0xc0000000, 0xc00003ff).ram().w(FUNC(cps3_state::cps3_0xc0000000_ram_w)).share("0xc0000000_ram"); /* Executes code from here */
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 32, cps3_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("bios", 0) // Bios ROM
-	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_SHARE("decrypted_gamerom")
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_ROM AM_SHARE("0xc0000000_ram_decrypted")
-ADDRESS_MAP_END
+void cps3_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
+	map(0x06000000, 0x06ffffff).rom().share("decrypted_gamerom");
+	map(0xc0000000, 0xc00003ff).rom().share("0xc0000000_ram_decrypted");
+}
 
 static INPUT_PORTS_START( cps3 )
 	PORT_START("INPUTS")
@@ -2438,7 +2435,7 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 	}
 	else
 	{
-		//printf("%s :src %08x, dst %08x, returning %08x\n", machine().describe_context(), src, dst, data);
+		//printf("%s :src %08x, dst %08x, returning %08x\n", machine().describe_context().c_str(), src, dst, data);
 	}
 
 	/* I doubt this is endian safe.. needs checking / fixing */
@@ -2456,21 +2453,21 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 }
 
 
-static MACHINE_CONFIG_START( simm1_64mbit )
+MACHINE_CONFIG_START(cps3_state::simm1_64mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm1.0")
 	MCFG_FUJITSU_29F016A_ADD("simm1.1")
 	MCFG_FUJITSU_29F016A_ADD("simm1.2")
 	MCFG_FUJITSU_29F016A_ADD("simm1.3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm2_64mbit )
+MACHINE_CONFIG_START(cps3_state::simm2_64mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm2.0")
 	MCFG_FUJITSU_29F016A_ADD("simm2.1")
 	MCFG_FUJITSU_29F016A_ADD("simm2.2")
 	MCFG_FUJITSU_29F016A_ADD("simm2.3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm3_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm3_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm3.0")
 	MCFG_FUJITSU_29F016A_ADD("simm3.1")
 	MCFG_FUJITSU_29F016A_ADD("simm3.2")
@@ -2481,7 +2478,7 @@ static MACHINE_CONFIG_START( simm3_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm3.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm4_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm4_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm4.0")
 	MCFG_FUJITSU_29F016A_ADD("simm4.1")
 	MCFG_FUJITSU_29F016A_ADD("simm4.2")
@@ -2492,7 +2489,7 @@ static MACHINE_CONFIG_START( simm4_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm4.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm5_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm5_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm5.0")
 	MCFG_FUJITSU_29F016A_ADD("simm5.1")
 	MCFG_FUJITSU_29F016A_ADD("simm5.2")
@@ -2503,12 +2500,12 @@ static MACHINE_CONFIG_START( simm5_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm5.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm5_32mbit )
+MACHINE_CONFIG_START(cps3_state::simm5_32mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm5.0")
 	MCFG_FUJITSU_29F016A_ADD("simm5.1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm6_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm6_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm6.0")
 	MCFG_FUJITSU_29F016A_ADD("simm6.1")
 	MCFG_FUJITSU_29F016A_ADD("simm6.2")
@@ -2519,13 +2516,13 @@ static MACHINE_CONFIG_START( simm6_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm6.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cps3 )
+MACHINE_CONFIG_START(cps3_state::cps3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
-	MCFG_CPU_PROGRAM_MAP(cps3_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
+	MCFG_DEVICE_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
+	MCFG_DEVICE_PROGRAM_MAP(cps3_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
 	MCFG_SH2_DMA_KLUDGE_CB(cps3_state, dma_callback)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
@@ -2536,7 +2533,7 @@ static MACHINE_CONFIG_START( cps3 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(cps3_state, screen_update_cps3)
 /*
     Measured clocks:
@@ -2552,63 +2549,70 @@ static MACHINE_CONFIG_START( cps3 )
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("cps3sound", CPS3, MASTER_CLOCK / 3)
+	MCFG_DEVICE_ADD("cps3sound", CPS3, MASTER_CLOCK / 3)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 /* individual configs for each machine, depending on the SIMMs installed */
-MACHINE_CONFIG_DERIVED( redearth, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::redearth)
+	cps3(config);
+	simm1_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( sfiii, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii)
+	cps3(config);
+	simm1_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( sfiii2, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii2)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( jojo, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::jojo)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( sfiii3, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
-	MCFG_FRAGMENT_ADD(simm6_128mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii3)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
+	simm6_128mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( jojoba, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
+MACHINE_CONFIG_START(cps3_state::jojoba)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
 MACHINE_CONFIG_END
 
 
@@ -2781,6 +2785,22 @@ ROM_END
 ROM_START( sfiii3ur1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
+ROM_END
+
+ROM_START( sfiii3j )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) )
+ROM_END
+
+ROM_START( sfiii3jr1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
@@ -3661,7 +3681,7 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "UniCD-CPS3_for_standard_SH2_V4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
+	DISK_IMAGE_READONLY( "unicd-cps3_for_standard_sh2_v4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
 ROM_END
 
 ROM_START( cps3booto ) // for cart with standard SH2
@@ -3701,7 +3721,7 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "UniCD-CPS3_for_custom_SH2_V5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
+	DISK_IMAGE_READONLY( "unicd-cps3_for_custom_sh2_v5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
 ROM_END
 
 ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
@@ -3864,12 +3884,12 @@ ROM_END
 /* Red Earth / Warzard */
 
 // 961121
-GAME( 1996, redearth,  0,        redearth, cps3_re, cps3_state,   redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, warzard,   redearth, redearth, cps3_re, cps3_state,   redearth, ROT0, "Capcom", "Warzard (Japan 961121)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", MACHINE_IMPERFECT_GRAPHICS )
 
 // 961023
-GAME( 1996, redearthr1,redearth, redearth, cps3_re, cps3_state,   redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, warzardr1, redearth, redearth, cps3_re, cps3_state,   redearth, ROT0, "Capcom", "Warzard (Japan 961023)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* Street Fighter III: New Generation */
 
@@ -3880,13 +3900,13 @@ GAME( 1996, warzardr1, redearth, redearth, cps3_re, cps3_state,   redearth, ROT0
 // not dumped
 
 // 970204
-GAME( 1997, sfiii,     0,        sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiiu,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiia,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiij,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiih,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiin,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiina,   sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* Street Fighter III 2nd Impact: Giant Attack */
 
@@ -3894,63 +3914,65 @@ GAME( 1997, sfiiina,   sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0
 // not dumped
 
 // 970930
-GAMEL(1997, sfiii2,    0,        sfiii2,   cps3, cps3_state,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 ) // layout is for widescreen support
-GAMEL(1997, sfiii2j,   sfiii2,   sfiii2,   cps3, cps3_state,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 )
-GAMEL(1997, sfiii2n,   sfiii2,   sfiii2,   cps3, cps3_state,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 )
+GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 ) // layout is for widescreen support
+GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 )
+GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 )
 
 /* JoJo's Venture / JoJo no Kimyou na Bouken */
 
 // 990128
-GAME( 1998, jojo,      0,        jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoj,     jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojon,     jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // 990108
-GAME( 1998, jojor1,    jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojojr1,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojonr1,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // 981202
-GAME( 1998, jojor2,    jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojojr2,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojonr2,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* Street Fighter III 3rd Strike: Fight for the Future */
 
 // 990608
-GAME( 1999, sfiii3,    0,        sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3u,   sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3n,   sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // 990512
-GAME( 1999, sfiii3r1,  sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3ur1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3nr1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
 // 990927
-GAME( 1999, jojoba,    0,        jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojoban,   jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobane,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // 990913
-GAME( 1999, jojobar1,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // bootlegs, hold START1 during bootup to change games
 
 // newest revision, fixes some issues with Warzard decryption.
-GAME( 1999, cps3boot,    0,        sfiii3,   cps3, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
-GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack
+GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack

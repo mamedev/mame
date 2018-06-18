@@ -86,13 +86,15 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn)
+uint32_t ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip)
 {
+	tc0100scn_device *tc0100scn = m_tc0100scn[chip];
+	xoffs *= chip;
 	uint8_t layer[3], nodraw;
 
 	tc0100scn->tilemap_update();
 
-	layer[0] = m_tc0100scn_1->bottomlayer();
+	layer[0] = m_tc0100scn[0]->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
@@ -117,6 +119,6 @@ uint32_t ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint32_t ninjaw_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0, m_tc0100scn_1); }
-uint32_t ninjaw_state::screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1, m_tc0100scn_2); }
-uint32_t ninjaw_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2, m_tc0100scn_3); }
+uint32_t ninjaw_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8, 0); }
+uint32_t ninjaw_state::screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8, 1); }
+uint32_t ninjaw_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8, 2); }

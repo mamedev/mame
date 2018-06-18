@@ -4485,7 +4485,10 @@ end_of_list:
 
 	/* check free node count */
 	if (freeNodes != actualFreeNodes)
-		return IMGTOOLERR_CORRUPTIMAGE;
+	{
+		err = IMGTOOLERR_CORRUPTIMAGE;
+		goto bail;
+	}
 
 bail:
 	/* free buffers */

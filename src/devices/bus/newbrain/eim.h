@@ -58,10 +58,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
 
-	ADC0808_ANALOG_READ_CB(adc_vref_pos_r);
-	ADC0808_ANALOG_READ_CB(adc_vref_neg_r);
-	ADC0808_ANALOG_READ_CB(adc_input_r);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
 
 	required_device<z80ctc_device> m_ctc;
@@ -76,7 +72,6 @@ private:
 
 
 // device type definition
-extern const device_type NEWBRAIN_EIM;
 DECLARE_DEVICE_TYPE(NEWBRAIN_EIM, newbrain_eim_device)
 
 #endif // MAME_BUS_NEWBRAIN_EIM_H

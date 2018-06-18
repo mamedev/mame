@@ -291,7 +291,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_11_289MHz
+#define MASTER_CLOCK    XTAL(11'289'000)
 
 /* Change to 1 to allow fake debug buttons */
 #define NIBBLER_HACK    0
@@ -330,11 +330,6 @@ void snk6502_state::sasuke_start_counter()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(snk6502_state::snk6502_music0_r)
-{
-	return (m_sound->music0_playing() ? 0x01 : 0x00);
-}
-
 CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
 {
 	return (m_sasuke_counter >> 4);
@@ -347,105 +342,110 @@ CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4000, 0x8fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("snk6502", snk6502_sound_device, sasuke_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
-	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
-	AM_RANGE(0xb006, 0xb006) AM_READ_PORT("DSW")
-	AM_RANGE(0xb007, 0xb007) AM_READ_PORT("IN2")
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snk6502_state::sasuke_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x4000, 0x8fff).rom();
+	map(0xb000, 0xb001).w("snk6502", FUNC(sasuke_sound_device::sound_w));
+	map(0xb002, 0xb002).w(FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
+	map(0xb003, 0xb003).w(FUNC(snk6502_state::satansat_backcolor_w));
+	map(0xb004, 0xb004).portr("IN0");
+	map(0xb005, 0xb005).portr("IN1");
+	map(0xb006, 0xb006).portr("DSW");
+	map(0xb007, 0xb007).portr("IN2");
+	map(0xf800, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("snk6502", snk6502_sound_device, satansat_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
-	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
-	AM_RANGE(0xb006, 0xb006) AM_READ_PORT("DSW")
-	AM_RANGE(0xb007, 0xb007) AM_READ_PORT("IN2")
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snk6502_state::satansat_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x4000, 0x9fff).rom();
+	map(0xb000, 0xb001).w("snk6502", FUNC(satansat_sound_device::sound_w));
+	map(0xb002, 0xb002).w(FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
+	map(0xb003, 0xb003).w(FUNC(snk6502_state::satansat_backcolor_w));
+	map(0xb004, 0xb004).portr("IN0");
+	map(0xb005, 0xb005).portr("IN1");
+	map(0xb006, 0xb006).portr("DSW");
+	map(0xb007, 0xb007).portr("IN2");
+	map(0xf800, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x3100, 0x3102) AM_DEVWRITE("snk6502", snk6502_sound_device, vanguard_sound_w)
-	AM_RANGE(0x3103, 0x3103) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x3104, 0x3104) AM_READ_PORT("IN0")
-	AM_RANGE(0x3105, 0x3105) AM_READ_PORT("IN1")
-	AM_RANGE(0x3106, 0x3106) AM_READ_PORT("DSW")
-	AM_RANGE(0x3107, 0x3107) AM_READ_PORT("IN2")
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(scrollx_w)
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(scrolly_w)
-	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("snk6502", snk6502_sound_device, vanguard_speech_w) // speech
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void snk6502_state::vanguard_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x3100, 0x3102).w("snk6502", FUNC(vanguard_sound_device::sound_w));
+	map(0x3103, 0x3103).w(FUNC(snk6502_state::flipscreen_w));
+	map(0x3104, 0x3104).portr("IN0");
+	map(0x3105, 0x3105).portr("IN1");
+	map(0x3106, 0x3106).portr("DSW");
+	map(0x3107, 0x3107).portr("IN2");
+	map(0x3200, 0x3200).w(FUNC(snk6502_state::scrollx_w));
+	map(0x3300, 0x3300).w(FUNC(snk6502_state::scrolly_w));
+	map(0x3400, 0x3400).w("snk6502", FUNC(vanguard_sound_device::speech_w)); // speech
+	map(0x4000, 0xbfff).rom();
+	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
-static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2100, 0x2102) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_sound_w)
-	AM_RANGE(0x2103, 0x2103) AM_WRITE(fantasy_flipscreen_w) // affects both video and sound
-	AM_RANGE(0x2104, 0x2104) AM_READ_PORT("IN0")
-	AM_RANGE(0x2105, 0x2105) AM_READ_PORT("IN1")
-	AM_RANGE(0x2106, 0x2106) AM_READ_PORT("DSW")
-	AM_RANGE(0x2107, 0x2107) AM_READ_PORT("IN2")
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(scrollx_w)
-	AM_RANGE(0x2300, 0x2300) AM_WRITE(scrolly_w)
-	AM_RANGE(0x2400, 0x2400) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_speech_w)  // speech
-	AM_RANGE(0x3000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fantasy_state::fantasy_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(fantasy_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
+	map(0x2000, 0x2000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2001, 0x2001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x2100, 0x2102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
+	map(0x2103, 0x2103).w(FUNC(fantasy_state::fantasy_flipscreen_w)); // affects both video and sound
+	map(0x2104, 0x2104).portr("IN0");
+	map(0x2105, 0x2105).portr("IN1");
+	map(0x2106, 0x2106).portr("DSW");
+	map(0x2107, 0x2107).portr("IN2");
+	map(0x2200, 0x2200).w(FUNC(fantasy_state::scrollx_w));
+	map(0x2300, 0x2300).w(FUNC(fantasy_state::scrolly_w));
+	map(0x2400, 0x2400).w("snk6502", FUNC(fantasy_sound_device::speech_w));  // speech
+	map(0x3000, 0xbfff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( pballoon_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xb100, 0xb102) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_sound_w)
-	AM_RANGE(0xb103, 0xb103) AM_WRITE(fantasy_flipscreen_w) // affects both video and sound
-	AM_RANGE(0xb104, 0xb104) AM_READ_PORT("IN0")
-	AM_RANGE(0xb105, 0xb105) AM_READ_PORT("IN1")
-	AM_RANGE(0xb106, 0xb106) AM_READ_PORT("DSW")
-	AM_RANGE(0xb107, 0xb107) AM_READ_PORT("IN2")
-	AM_RANGE(0xb200, 0xb200) AM_WRITE(scrollx_w)
-	AM_RANGE(0xb300, 0xb300) AM_WRITE(scrolly_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fantasy_state::pballoon_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(fantasy_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
+	map(0x3000, 0x9fff).rom();
+	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xb100, 0xb102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
+	map(0xb103, 0xb103).w(FUNC(fantasy_state::fantasy_flipscreen_w)); // affects both video and sound
+	map(0xb104, 0xb104).portr("IN0");
+	map(0xb105, 0xb105).portr("IN1");
+	map(0xb106, 0xb106).portr("DSW");
+	map(0xb107, 0xb107).portr("IN2");
+	map(0xb200, 0xb200).w(FUNC(fantasy_state::scrollx_w));
+	map(0xb300, 0xb300).w(FUNC(fantasy_state::scrolly_w));
+	map(0xf000, 0xffff).rom();
+}
 
 
 /*************************************
@@ -529,12 +529,12 @@ static INPUT_PORTS_START( satansat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, nullptr)     /* music0 playing */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("snk6502:custom", snk6502_sound_device,music0_playing, nullptr)     /* music0 playing */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, snk6502_state,coin_inserted, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                         /* NC */
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,sasuke_count_r, nullptr)       /* connected to a binary counter */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,sasuke_count_r, nullptr)       /* connected to a binary counter */
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!1")
@@ -594,7 +594,7 @@ static INPUT_PORTS_START( vanguard )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL  /* fire left */
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, nullptr)     /* music0 playing */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("snk6502:custom", snk6502_sound_device,music0_playing, nullptr)     /* music0 playing */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantasy )
@@ -750,17 +750,17 @@ static const gfx_layout charlayout_memory =
 };
 
 
-static GFXDECODE_START( sasuke )
+static GFXDECODE_START( gfx_sasuke )
 	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( satansat )
+static GFXDECODE_START( gfx_satansat )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( vanguard )
+static GFXDECODE_START( gfx_vanguard )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
@@ -792,33 +792,7 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
 
 MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 {
-	m_sound->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
-
-	// adjusted (measured through audio recording of pcb)
-	m_sound->set_music_freq(35300);
-
 	sasuke_start_counter();
-}
-
-MACHINE_RESET_MEMBER(snk6502_state,satansat)
-{
-	// same as sasuke (assumption?)
-	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
-	m_sound->set_music_freq(38000);
-
-	sasuke_start_counter();
-}
-
-MACHINE_RESET_MEMBER(snk6502_state,vanguard)
-{
-	// 41.6 Hz update (measured)
-	m_sound->set_music_clock(1 / 41.6);
-}
-
-MACHINE_RESET_MEMBER(snk6502_state,pballoon)
-{
-	// 40.3 Hz update (measured)
-	m_sound->set_music_clock(1 / 40.3);
 }
 
 
@@ -828,12 +802,12 @@ MACHINE_RESET_MEMBER(snk6502_state,pballoon)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sasuke )
+MACHINE_CONFIG_START(snk6502_state::sasuke)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
-	MCFG_CPU_PROGRAM_MAP(sasuke_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
+	MCFG_DEVICE_PROGRAM_MAP(sasuke_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
@@ -847,7 +821,7 @@ static MACHINE_CONFIG_START( sasuke )
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sasuke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sasuke)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
@@ -860,118 +834,31 @@ static MACHINE_CONFIG_START( sasuke )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(sasuke_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-
-	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
-	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_K(150), CAP_P(4700)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(22))                    // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(10))     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(100))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res: N/C
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(0, RES_K(10))                // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(2.2), RES_K(100))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn76477.2", SN76477, 0)
-	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
-	MCFG_SN76477_NOISE_PARAMS(RES_K(340), RES_K(47), CAP_P(100)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(470))                   // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(4.7), RES_K(10))    // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(100))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_P(220), RES_K(1000))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(0, RES_K(220))               // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(22), RES_K(47))    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(1)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn76477.3", SN76477, 0)
-	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
-	MCFG_SN76477_NOISE_PARAMS(RES_K(330), RES_K(47), CAP_P(100)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(1))                     // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(1))              // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(100))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_P(1000), RES_K(1000)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1), RES_K(10))         // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(2.2), RES_K(150))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(1, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_ADD("snk6502", SASUKE_SOUND, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( satansat, sasuke )
+MACHINE_CONFIG_START(snk6502_state::satansat)
+	sasuke(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(satansat_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", satansat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("samples")
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(vanguard_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
-	// ???      GND: 2,26,27        +5V: 15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_REMOVE("sn76477.2")
-	MCFG_DEVICE_REMOVE("sn76477.3")
+	MCFG_DEVICE_REPLACE("snk6502", SATANSAT_SOUND, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vanguard )
+MACHINE_CONFIG_START(snk6502_state::vanguard)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
 
-	MCFG_CPU_PROGRAM_MAP(vanguard_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
-
-	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,vanguard)
+	MCFG_DEVICE_PROGRAM_MAP(vanguard_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
 	// video hardware
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -980,7 +867,7 @@ static MACHINE_CONFIG_START( vanguard )
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vanguard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vanguard)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
@@ -991,102 +878,38 @@ static MACHINE_CONFIG_START( vanguard )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(vanguard_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
-	// SHOT A   GND: 2,9,26,27  +5V: 15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(4.7))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn76477.2", SN76477, 0)
-	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
-	MCFG_SN76477_NOISE_PARAMS(RES_K(10), RES_K(30), 0)   // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(4.7))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DEVICE_ADD("snk6502", VANGUARD_SOUND, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fantasy, vanguard )
+MACHINE_CONFIG_START(fantasy_state::fantasy)
+	vanguard(config);
+
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fantasy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fantasy_map)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("samples")
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(fantasy_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
-	// BOMB     GND:    2,9,26,27       +5V: 15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(470))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(4.7))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	// schematic does not show pin 1 grounded, but it must be.
-	// otherwise it is using the VCO for the envelope, but the VCO is not hooked up
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(0)                               // enable
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(fantasy)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_DEVICE_REMOVE("sn76477.2")
+	MCFG_DEVICE_REPLACE("snk6502", FANTASY_SOUND, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nibbler, fantasy )
+MACHINE_CONFIG_START(fantasy_state::nibbler)
+	fantasy(config);
 
 	// sound hardware
-	MCFG_DEVICE_REMOVE("samples")
+	MCFG_DEVICE_REPLACE("snk6502", NIBBLER_SOUND, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pballoon, nibbler )
+MACHINE_CONFIG_START(fantasy_state::pballoon)
+	nibbler(config);
+
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pballoon_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pballoon_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,pballoon)
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon)
 
-	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon )
+	// sound hardware
+	MCFG_DEVICE_REPLACE("snk6502", PBALLOON_SOUND, 0)
 MACHINE_CONFIG_END
 
 
@@ -1392,6 +1215,40 @@ ROM_START( fantasyg )
 	ROM_LOAD( "fs_f_11.bin",  0x5000, 0x0800, CRC(3a352e1f) SHA1(af880ce3daed0877d454421bd08c86ff71f6bf72) )
 ROM_END
 
+// SK-7A and SK-6 PCBs
+ROM_START( fantasyg2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ts5.bin",     0x3000, 0x1000, CRC(6edca14e) SHA1(d9152e212f2b3cdb6e7968e4e7638454ea02c4a5) )
+	ROM_LOAD( "fs1.bin",     0x4000, 0x1000, CRC(d99656e8) SHA1(6f5febaeca2ec167523f48361ae2395772bcef53) )
+	ROM_LOAD( "ts2.bin",     0x5000, 0x1000, CRC(2db6ce28) SHA1(18cced543f27664b3eaddf103a41580a905ffae1) )
+	ROM_LOAD( "ts3.bin",     0x6000, 0x1000, CRC(1a0aa7c5) SHA1(c8f34618ffc98c73db7067851de24f245b8988ad) )
+	ROM_LOAD( "fs4.bin",     0x7000, 0x1000, CRC(c02ad442) SHA1(a90b2d04fc2e8b2dda634c18eafb88007eaedc67) )
+	ROM_LOAD( "fs6.bin",     0x8000, 0x1000, CRC(e5b91bc2) SHA1(85515eb57c8040fc95a9c62706e1a504e6749f66) )
+	ROM_RELOAD(              0xf000, 0x1000 )  /* for the reset and interrupt vectors */
+	ROM_LOAD( "fs7.bin",     0x9000, 0x1000, CRC(cc18428e) SHA1(c7c0a031434cf9ce3c450b0c5dc2b154b08d19cf) )
+	ROM_LOAD( "fs8.bin",     0xa000, 0x1000, CRC(371129fe) SHA1(c21759222aebcc9ea1292e367a41ac43a4dd3554) )
+	ROM_LOAD( "fs9.bin",     0xb000, 0x1000, CRC(49574d4a) SHA1(37cae0df7e8705c300f684b3351b5bdba5e44ea2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "fs10.bin", 0x0000, 0x1000, CRC(86a801c3) SHA1(c040b5807c25823072f7e8ceab57b95d4bed89fe) )
+	ROM_LOAD( "fs11.bin", 0x1000, 0x1000, CRC(9dfff71c) SHA1(7a7c017170f2ea903a730a4e5ab69db379a4fc61) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "fantasy.ic7",  0x0000, 0x0020, CRC(361a5e99) SHA1(b9777ce658549c03971bd476482d5cc0be27d3a9) ) /* foreground colors */
+	ROM_LOAD( "fantasy.ic6",  0x0020, 0x0020, CRC(33d974f7) SHA1(a6f6a531dec3f454b477bfdda8e213e9cad42748) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
+	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
+	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
+	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
+
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
+	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
+	ROM_LOAD( "fs_d_7.bin",   0x4000, 0x0800, CRC(a7ef4cc6) SHA1(8df71cb18fcfe9a2f592f83bc01cf2314ae30e32) )
+	ROM_LOAD( "fs_e_8.bin",   0x4800, 0x0800, CRC(19b8fb3e) SHA1(271c76f68866c28bc6755238a71970d5f7c81ecb) )
+	ROM_LOAD( "fs_f_11.bin",  0x5000, 0x0800, CRC(3a352e1f) SHA1(af880ce3daed0877d454421bd08c86ff71f6bf72) )
+ROM_END
+
 ROM_START( fantasyj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fs5jic12.bin", 0x3000, 0x1000, CRC(dd1eac89) SHA1(d63078d4666e3c6db0c9b3f8b45ef81606ed5a4f) )
@@ -1665,23 +1522,24 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, 0, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, 0, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, 0, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, 0, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, 0, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
-GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pballoon,    0,        pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )

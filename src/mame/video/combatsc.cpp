@@ -95,7 +95,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 {
-	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(6);
 	uint8_t attributes = m_page[0][tile_index];
 	int bank = 4 * ((m_vreg & 0x0f) - 1);
 	int number, color;
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 {
-	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(6);
 	uint8_t attributes = m_page[1][tile_index];
 	int bank = 4 * ((m_vreg >> 4) - 1);
 	int number, color;
@@ -363,8 +363,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
 void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask )
 {
 	k007121_device *k007121 = circuit ? m_k007121_2 : m_k007121_1;
-	address_space &space = machine().dummy_space();
-	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(space, 6) & 0x10) * 2;
+	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(6) & 0x10) * 2;
 
 	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), *m_palette, source, base_color, 0, 0, priority_bitmap, pri_mask);
 }
@@ -374,8 +373,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 {
 	int i;
 
-	address_space &space = machine().dummy_space();
-	if (m_k007121_1->ctrlram_r(space, 1) & 0x02)
+	if (m_k007121_1->ctrlram_r(1) & 0x02)
 	{
 		m_bg_tilemap[0]->set_scroll_rows(32);
 		for (i = 0; i < 32; i++)
@@ -384,10 +382,10 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	else
 	{
 		m_bg_tilemap[0]->set_scroll_rows(1);
-		m_bg_tilemap[0]->set_scrollx(0, m_k007121_1->ctrlram_r(space, 0) | ((m_k007121_1->ctrlram_r(space, 1) & 0x01) << 8));
+		m_bg_tilemap[0]->set_scrollx(0, m_k007121_1->ctrlram_r(0) | ((m_k007121_1->ctrlram_r(1) & 0x01) << 8));
 	}
 
-	if (m_k007121_2->ctrlram_r(space, 1) & 0x02)
+	if (m_k007121_2->ctrlram_r(1) & 0x02)
 	{
 		m_bg_tilemap[1]->set_scroll_rows(32);
 		for (i = 0; i < 32; i++)
@@ -396,11 +394,11 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	else
 	{
 		m_bg_tilemap[1]->set_scroll_rows(1);
-		m_bg_tilemap[1]->set_scrollx(0, m_k007121_2->ctrlram_r(space, 0) | ((m_k007121_2->ctrlram_r(space, 1) & 0x01) << 8));
+		m_bg_tilemap[1]->set_scrollx(0, m_k007121_2->ctrlram_r(0) | ((m_k007121_2->ctrlram_r(1) & 0x01) << 8));
 	}
 
-	m_bg_tilemap[0]->set_scrolly(0, m_k007121_1->ctrlram_r(space, 2));
-	m_bg_tilemap[1]->set_scrolly(0, m_k007121_2->ctrlram_r(space, 2));
+	m_bg_tilemap[0]->set_scrolly(0, m_k007121_1->ctrlram_r(2));
+	m_bg_tilemap[1]->set_scrolly(0, m_k007121_2->ctrlram_r(2));
 
 	screen.priority().fill(0, cliprect);
 
@@ -430,7 +428,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);
 	}
 
-	//if (m_k007121_1->ctrlram_r(space, 1) & 0x08)
+	//if (m_k007121_1->ctrlram_r(1) & 0x08)
 	{
 		rectangle clip;
 		clip = cliprect;
@@ -447,12 +445,12 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 			clip.max_y = clip.min_y + 7;
 
 			// bit 3 of reg [1] selects if tiles are opaque or have transparent pen.
-			m_textlayer->draw(screen, bitmap, clip, m_k007121_1->ctrlram_r(space, 1) & 0x08 ? TILEMAP_DRAW_OPAQUE : 0, 0);
+			m_textlayer->draw(screen, bitmap, clip, m_k007121_1->ctrlram_r(1) & 0x08 ? TILEMAP_DRAW_OPAQUE : 0, 0);
 		}
 	}
 
 	/* chop the extreme columns if necessary */
-	if (m_k007121_1->ctrlram_r(space, 3) & 0x40)
+	if (m_k007121_1->ctrlram_r(3) & 0x40)
 	{
 		rectangle clip;
 

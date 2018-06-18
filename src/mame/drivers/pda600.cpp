@@ -59,6 +59,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -78,25 +79,30 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *     m_video_ram;
+	void pda600(machine_config &config);
+	void pda600_io(address_map &map);
+	void pda600_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+void pda600_state::pda600_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).rom();
 	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
-	AM_RANGE(0xa0000, 0xa7fff) AM_RAM   AM_REGION("videoram", 0)
-	AM_RANGE(0xe0000, 0xfffff) AM_RAM   AM_REGION("mainram", 0)     AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xa0000, 0xa7fff).ram().region("videoram", 0);
+	map(0xe0000, 0xfffff).ram().region("mainram", 0).share("nvram");
+}
 
-static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
+void pda600_state::pda600_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x3f).noprw(); /* Z180 internal registers */
 	//AM_RANGE(0x40, 0x7f) AM_NOP   /* Z180 internal registers */
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", hd64610_device, read, write)
+	map(0x80, 0x8f).rw("rtc", FUNC(hd64610_device::read), FUNC(hd64610_device::write));
 	//AM_RANGE(0xC0, 0xC1) AM_NOP   /* LCD */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pda600 )
@@ -187,7 +193,7 @@ static const gfx_layout pda600_charlayout_19a =
 	8*19
 };
 
-static GFXDECODE_START( pda600 )
+static GFXDECODE_START( gfx_pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x45cd, pda600_charlayout_19, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4892, pda600_charlayout_19a, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4d73, pda600_charlayout_8, 0, 1 )
@@ -196,11 +202,11 @@ static GFXDECODE_START( pda600 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pda600 )
+MACHINE_CONFIG_START(pda600_state::pda600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
-	MCFG_CPU_PROGRAM_MAP(pda600_mem)
-	MCFG_CPU_IO_MAP(pda600_io)
+	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(pda600_mem)
+	MCFG_DEVICE_IO_MAP(pda600_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -211,14 +217,14 @@ static MACHINE_CONFIG_START( pda600 )
 	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", HD64610, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", HD64610, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -235,5 +241,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY        FULLNAME          FLAGS */
-COMP( 1993, pda600,  0,      0,      pda600,    pda600,  pda600_state,  0,    "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME          FLAGS */
+COMP( 1993, pda600, 0,      0,      pda600,  pda600, pda600_state, empty_init, "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

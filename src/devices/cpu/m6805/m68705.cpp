@@ -88,10 +88,10 @@ constexpr u16 M68705_INT_MASK           = 0x03;
  * Global variables
  ****************************************************************************/
 
-DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "MC68705P3")
-DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "MC68705P5")
-DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "MC68705R3")
-DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "MC68705U3")
+DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "Motorola MC68705P3")
+DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "Motorola MC68705P5")
+DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "Motorola MC68705R3")
+DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "Motorola MC68705U3")
 
 
 /****************************************************************************
@@ -193,7 +193,7 @@ m68705_device::m68705_device(
 		u32 clock,
 		device_type type,
 		u32 addr_width,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m6805_base_device(
 			mconfig,
 			tag,
@@ -647,28 +647,29 @@ void m68705_device::add_eprom_state()
  * M68705Px family
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( p_map, 8, m68705p_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x07ff)
-	ADDRESS_MAP_UNMAP_HIGH
+void m68705p_device::p_map(address_map &map)
+{
+	map.global_mask(0x07ff);
+	map.unmap_value_high();
 
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port_r<0>, port_latch_w<0>)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port_r<1>, port_latch_w<1>)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port_r<2>, port_latch_w<2>)
+	map(0x0000, 0x0000).rw(FUNC(m68705p_device::port_r<0>), FUNC(m68705p_device::port_latch_w<0>));
+	map(0x0001, 0x0001).rw(FUNC(m68705p_device::port_r<1>), FUNC(m68705p_device::port_latch_w<1>));
+	map(0x0002, 0x0002).rw(FUNC(m68705p_device::port_r<2>), FUNC(m68705p_device::port_latch_w<2>));
 	// 0x0003 not used (no port D)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(port_ddr_w<0>)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
+	map(0x0004, 0x0004).w(FUNC(m68705p_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(FUNC(m68705p_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(FUNC(m68705p_device::port_ddr_w<2>));
 	// 0x0007 not used (no port D)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(tdr_r, tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(tcr_r, tcr_w)
+	map(0x0008, 0x0008).rw(FUNC(m68705p_device::tdr_r), FUNC(m68705p_device::tdr_w));
+	map(0x0009, 0x0009).rw(FUNC(m68705p_device::tcr_r), FUNC(m68705p_device::tcr_w));
 	// 0x000a not used
-	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
+	map(0x000b, 0x000b).rw(FUNC(m68705p_device::pcr_r), FUNC(m68705p_device::pcr_w));
 	// 0x000c-0x000f not used
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0784) AM_READWRITE(eprom_r<0x0080>, eprom_w<0x0080>) // User EPROM
-	AM_RANGE(0x0785, 0x07f7) AM_ROM AM_REGION("bootstrap", 0)
-	AM_RANGE(0x07f8, 0x07ff) AM_READWRITE(eprom_r<0x07f8>, eprom_w<0x07f8>) // Interrupt vectors
-ADDRESS_MAP_END
+	map(0x0010, 0x007f).ram();
+	map(0x0080, 0x0784).rw(FUNC(m68705p_device::eprom_r<0x0080>), FUNC(m68705p_device::eprom_w<0x0080>)); // User EPROM
+	map(0x0785, 0x07f7).rom().region("bootstrap", 0);
+	map(0x07f8, 0x07ff).rw(FUNC(m68705p_device::eprom_r<0x07f8>), FUNC(m68705p_device::eprom_w<0x07f8>)); // Interrupt vectors
+}
 
 m68705p_device::m68705p_device(
 		machine_config const &mconfig,
@@ -676,7 +677,7 @@ m68705p_device::m68705p_device(
 		device_t *owner,
 		u32 clock,
 		device_type type)
-	: m68705_device(mconfig, tag, owner, clock, type, 11, address_map_delegate(FUNC(m68705p_device::p_map), this))
+	: m68705_device(mconfig, tag, owner, clock, type, 11, address_map_constructor(FUNC(m68705p_device::p_map), this))
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 	set_port_mask<2>(0xf0);         // Port C is four bits wide
@@ -698,9 +699,9 @@ void m68705p_device::device_start()
 	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
-util::disasm_interface *m68705p_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705p_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705p_syms);
+	return std::make_unique<m6805_disassembler>(m68705p_syms);
 }
 
 
@@ -708,29 +709,30 @@ util::disasm_interface *m68705p_device::create_disassembler()
  * M68705Ux family
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( u_map, 8, m68705u_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
-	ADDRESS_MAP_UNMAP_HIGH
+void m68705u_device::u_map(address_map &map)
+{
+	map.global_mask(0x0fff);
+	map.unmap_value_high();
 
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port_r<0>, port_latch_w<0>)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port_r<1>, port_latch_w<1>)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port_r<2>, port_latch_w<2>)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port_r<3>, port_latch_w<3>)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(port_ddr_w<0>)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
+	map(0x0000, 0x0000).rw(FUNC(m68705u_device::port_r<0>), FUNC(m68705u_device::port_latch_w<0>));
+	map(0x0001, 0x0001).rw(FUNC(m68705u_device::port_r<1>), FUNC(m68705u_device::port_latch_w<1>));
+	map(0x0002, 0x0002).rw(FUNC(m68705u_device::port_r<2>), FUNC(m68705u_device::port_latch_w<2>));
+	map(0x0003, 0x0003).rw(FUNC(m68705u_device::port_r<3>), FUNC(m68705u_device::port_latch_w<3>));
+	map(0x0004, 0x0004).w(FUNC(m68705u_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(FUNC(m68705u_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(FUNC(m68705u_device::port_ddr_w<2>));
 	// 0x0007 not used (port D is input only)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(tdr_r, tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(tcr_r, tcr_w)
-	AM_RANGE(0x000a, 0x000a) AM_READWRITE(misc_r, misc_w)
-	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
+	map(0x0008, 0x0008).rw(FUNC(m68705u_device::tdr_r), FUNC(m68705u_device::tdr_w));
+	map(0x0009, 0x0009).rw(FUNC(m68705u_device::tcr_r), FUNC(m68705u_device::tcr_w));
+	map(0x000a, 0x000a).rw(FUNC(m68705u_device::misc_r), FUNC(m68705u_device::misc_w));
+	map(0x000b, 0x000b).rw(FUNC(m68705u_device::pcr_r), FUNC(m68705u_device::pcr_w));
 	// 0x000c-0x000f not used
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0f38) AM_READWRITE(eprom_r<0x0080>, eprom_w<0x0080>) // User EPROM
+	map(0x0010, 0x007f).ram();
+	map(0x0080, 0x0f38).rw(FUNC(m68705u_device::eprom_r<0x0080>), FUNC(m68705u_device::eprom_w<0x0080>)); // User EPROM
 	// 0x0f39-0x0f7f not used
-	AM_RANGE(0x0f80, 0x0ff7) AM_ROM AM_REGION("bootstrap", 0)
-	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(eprom_r<0x0ff8>, eprom_w<0x0ff8>) // Interrupt vectors
-ADDRESS_MAP_END
+	map(0x0f80, 0x0ff7).rom().region("bootstrap", 0);
+	map(0x0ff8, 0x0fff).rw(FUNC(m68705u_device::eprom_r<0x0ff8>), FUNC(m68705u_device::eprom_w<0x0ff8>)); // Interrupt vectors
+}
 
 m68705u_device::m68705u_device(
 		machine_config const &mconfig,
@@ -738,7 +740,7 @@ m68705u_device::m68705u_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m68705_device(mconfig, tag, owner, clock, type, 12, internal_map)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
@@ -750,7 +752,7 @@ m68705u_device::m68705u_device(
 		device_t *owner,
 		u32 clock,
 		device_type type)
-	: m68705u_device(mconfig, tag, owner, clock, type, address_map_delegate(FUNC(m68705u_device::u_map), this))
+	: m68705u_device(mconfig, tag, owner, clock, type, address_map_constructor(FUNC(m68705u_device::u_map), this))
 {
 }
 
@@ -772,9 +774,9 @@ void m68705u_device::device_start()
 	// TODO: MISC register
 }
 
-util::disasm_interface *m68705u_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705u_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705u_syms);
+	return std::make_unique<m6805_disassembler>(m68705u_syms);
 }
 
 
@@ -782,31 +784,32 @@ util::disasm_interface *m68705u_device::create_disassembler()
  * M68705Rx family
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( r_map, 8, m68705r_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
-	ADDRESS_MAP_UNMAP_HIGH
+void m68705r_device::r_map(address_map &map)
+{
+	map.global_mask(0x0fff);
+	map.unmap_value_high();
 
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port_r<0>, port_latch_w<0>)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port_r<1>, port_latch_w<1>)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port_r<2>, port_latch_w<2>)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port_r<3>, port_latch_w<3>)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(port_ddr_w<0>)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
+	map(0x0000, 0x0000).rw(FUNC(m68705r_device::port_r<0>), FUNC(m68705r_device::port_latch_w<0>));
+	map(0x0001, 0x0001).rw(FUNC(m68705r_device::port_r<1>), FUNC(m68705r_device::port_latch_w<1>));
+	map(0x0002, 0x0002).rw(FUNC(m68705r_device::port_r<2>), FUNC(m68705r_device::port_latch_w<2>));
+	map(0x0003, 0x0003).rw(FUNC(m68705r_device::port_r<3>), FUNC(m68705r_device::port_latch_w<3>));
+	map(0x0004, 0x0004).w(FUNC(m68705r_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(FUNC(m68705r_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(FUNC(m68705r_device::port_ddr_w<2>));
 	// 0x0007 not used (port D is input only)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(tdr_r, tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(tcr_r, tcr_w)
-	AM_RANGE(0x000a, 0x000a) AM_READWRITE(misc_r, misc_w)
-	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
+	map(0x0008, 0x0008).rw(FUNC(m68705r_device::tdr_r), FUNC(m68705r_device::tdr_w));
+	map(0x0009, 0x0009).rw(FUNC(m68705r_device::tcr_r), FUNC(m68705r_device::tcr_w));
+	map(0x000a, 0x000a).rw(FUNC(m68705r_device::misc_r), FUNC(m68705r_device::misc_w));
+	map(0x000b, 0x000b).rw(FUNC(m68705r_device::pcr_r), FUNC(m68705r_device::pcr_w));
 	// 0x000c-0x000d not used
-	AM_RANGE(0x000e, 0x000e) AM_READWRITE(acr_r, acr_w)
-	AM_RANGE(0x000f, 0x000f) AM_READWRITE(arr_r, arr_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0f38) AM_READWRITE(eprom_r<0x0080>, eprom_w<0x0080>) // User EPROM
+	map(0x000e, 0x000e).rw(FUNC(m68705r_device::acr_r), FUNC(m68705r_device::acr_w));
+	map(0x000f, 0x000f).rw(FUNC(m68705r_device::arr_r), FUNC(m68705r_device::arr_w));
+	map(0x0010, 0x007f).ram();
+	map(0x0080, 0x0f38).rw(FUNC(m68705r_device::eprom_r<0x0080>), FUNC(m68705r_device::eprom_w<0x0080>)); // User EPROM
 	// 0x0f39-0x0f7f not used
-	AM_RANGE(0x0f80, 0x0ff7) AM_ROM AM_REGION("bootstrap", 0)
-	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(eprom_r<0x0ff8>, eprom_w<0x0ff8>) // Interrupt vectors
-ADDRESS_MAP_END
+	map(0x0f80, 0x0ff7).rom().region("bootstrap", 0);
+	map(0x0ff8, 0x0fff).rw(FUNC(m68705r_device::eprom_r<0x0ff8>), FUNC(m68705r_device::eprom_w<0x0ff8>)); // Interrupt vectors
+}
 
 m68705r_device::m68705r_device(
 		machine_config const &mconfig,
@@ -814,7 +817,7 @@ m68705r_device::m68705r_device(
 		device_t *owner,
 		u32 clock,
 		device_type type)
-	: m68705u_device(mconfig, tag, owner, clock, type, address_map_delegate(FUNC(m68705r_device::r_map), this))
+	: m68705u_device(mconfig, tag, owner, clock, type, address_map_constructor(FUNC(m68705r_device::r_map), this))
 {
 }
 
@@ -825,9 +828,9 @@ void m68705r_device::device_start()
 	// TODO: ADC
 }
 
-util::disasm_interface *m68705r_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705r_syms);
+	return std::make_unique<m6805_disassembler>(m68705r_syms);
 }
 
 /****************************************************************************

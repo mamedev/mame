@@ -24,6 +24,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
+
 
 class intv_state : public driver_device
 {
@@ -102,9 +104,9 @@ public:
 	int m_tape_interrupts_enabled;
 	int m_tape_motor_mode;
 
-	DECLARE_DRIVER_INIT(intvecs);
-	DECLARE_DRIVER_INIT(intvkbd);
-	DECLARE_DRIVER_INIT(intv);
+	void init_intvecs();
+	void init_intvkbd();
+	void init_intv();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -117,6 +119,17 @@ public:
 	TIMER_CALLBACK_MEMBER(intv_interrupt_complete);
 	TIMER_CALLBACK_MEMBER(intv_btb_fill);
 
+	void intvkbd(machine_config &config);
+	void intv2(machine_config &config);
+	void intvoice(machine_config &config);
+	void intvecs(machine_config &config);
+	void intv(machine_config &config);
+	void intv2_mem(address_map &map);
+	void intv_mem(address_map &map);
+	void intvecs_mem(address_map &map);
+	void intvkbd2_mem(address_map &map);
+	void intvkbd_mem(address_map &map);
+	void intvoice_mem(address_map &map);
 protected:
 	int m_is_keybd;
 

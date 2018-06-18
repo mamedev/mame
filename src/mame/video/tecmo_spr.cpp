@@ -35,25 +35,6 @@ void tecmo_spr_device::device_reset()
 }
 
 
-void tecmo_spr_device::set_gfx_region(device_t &device, int gfxregion)
-{
-	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
-	dev.m_gfxregion = gfxregion;
-}
-
-void tecmo_spr_device::set_bootleg(device_t &device, int bootleg)
-{
-	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
-	dev.m_bootleg = bootleg;
-}
-
-void tecmo_spr_device::set_yoffset(device_t &device, int yoffset)
-{
-	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
-	dev.m_yoffset = yoffset;
-}
-
-
 static const uint8_t layout[8][8] =
 {
 	{ 0, 1, 4, 5, 16, 17, 20, 21 },

@@ -123,13 +123,13 @@ Notes:
 
 
 /* master clocks vary based on game */
-#define SLOW_MASTER_CLOCK       XTAL_40MHz      /* "slow" == smashtv, trog, hiimpact */
-#define FAST_MASTER_CLOCK       XTAL_48MHz      /* "fast" == narc, mk, totcarn, strkforc */
-#define FASTER_MASTER_CLOCK     XTAL_50MHz      /* "faster" == term2 */
+#define SLOW_MASTER_CLOCK       XTAL(40'000'000)      /* "slow" == smashtv, trog, hiimpact */
+#define FAST_MASTER_CLOCK       XTAL(48'000'000)      /* "fast" == narc, mk, totcarn, strkforc */
+#define FASTER_MASTER_CLOCK     XTAL(50'000'000)      /* "faster" == term2 */
 
 /* pixel clocks are 48MHz (narc) or 24MHz (all others) regardless */
-#define MEDRES_PIXEL_CLOCK      (XTAL_48MHz / 6)
-#define STDRES_PIXEL_CLOCK      (XTAL_24MHz / 6)
+#define MEDRES_PIXEL_CLOCK      (XTAL(48'000'000) / 6)
+#define STDRES_PIXEL_CLOCK      (XTAL(24'000'000) / 6)
 
 
 
@@ -178,29 +178,31 @@ CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midyunit_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_READWRITE(midyunit_vram_r, midyunit_vram_w)
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x01400000, 0x0140ffff) AM_READWRITE(midyunit_cmos_r, midyunit_cmos_w)
-	AM_RANGE(0x01800000, 0x0181ffff) AM_RAM_WRITE(midyunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x01a00000, 0x01a0009f) AM_MIRROR(0x00080000) AM_READWRITE(midyunit_dma_r, midyunit_dma_w)
-	AM_RANGE(0x01c00000, 0x01c0005f) AM_READ(midyunit_input_r)
-	AM_RANGE(0x01c00060, 0x01c0007f) AM_READWRITE(midyunit_protection_r, midyunit_cmos_enable_w)
-	AM_RANGE(0x01e00000, 0x01e0001f) AM_WRITE(midyunit_sound_w)
-	AM_RANGE(0x01f00000, 0x01f0001f) AM_WRITE(midyunit_control_w)
-	AM_RANGE(0x02000000, 0x05ffffff) AM_READ(midyunit_gfxrom_r) AM_SHARE("gfx_rom")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void midyunit_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rw(FUNC(midyunit_state::midyunit_vram_r), FUNC(midyunit_state::midyunit_vram_w));
+	map(0x01000000, 0x010fffff).ram().share("mainram");
+	map(0x01400000, 0x0140ffff).rw(FUNC(midyunit_state::midyunit_cmos_r), FUNC(midyunit_state::midyunit_cmos_w));
+	map(0x01800000, 0x0181ffff).ram().w(FUNC(midyunit_state::midyunit_paletteram_w)).share("paletteram");
+	map(0x01a00000, 0x01a0009f).mirror(0x00080000).rw(FUNC(midyunit_state::midyunit_dma_r), FUNC(midyunit_state::midyunit_dma_w));
+	map(0x01c00000, 0x01c0005f).r(FUNC(midyunit_state::midyunit_input_r));
+	map(0x01c00060, 0x01c0007f).rw(FUNC(midyunit_state::midyunit_protection_r), FUNC(midyunit_state::midyunit_cmos_enable_w));
+	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
+	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
+	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
+	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xff800000, 0xffffffff).rom().region("user1", 0);
+}
 
 
-static ADDRESS_MAP_START( yawdim_sound_map, AS_PROGRAM, 8, midyunit_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(yawdim_oki_bank_w)
-	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa7ff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void midyunit_state::yawdim_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x97ff).w(FUNC(midyunit_state::yawdim_oki_bank_w));
+	map(0x9800, 0x9fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa7ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 
@@ -240,7 +242,7 @@ static INPUT_PORTS_START( narc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_strobe_r, nullptr)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_strobe_r, nullptr)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED ) /* memory protect interlock */
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -256,7 +258,7 @@ static INPUT_PORTS_START( narc )
 */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_data_r, nullptr)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_data_r, nullptr)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -723,7 +725,7 @@ static INPUT_PORTS_START( mkla2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Block 2") PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Low Punch") PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Low Kick") PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Block 2") PORT_PLAYER(1)
 
 	PORT_START("IN2")
@@ -815,7 +817,7 @@ static INPUT_PORTS_START( mkla4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Block 2") PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Low Punch") PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Low Kick") PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Block 2") PORT_PLAYER(1)
 
 	PORT_START("IN2")
@@ -907,7 +909,7 @@ static INPUT_PORTS_START( term2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -1008,7 +1010,7 @@ static INPUT_PORTS_START( totcarn )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED ) /* video freeze */
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x3c00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -1097,11 +1099,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( zunit )
+MACHINE_CONFIG_START(midyunit_state::zunit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MEDRES_PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
@@ -1125,8 +1127,9 @@ static MACHINE_CONFIG_START( zunit )
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("narcsnd", WILLIAMS_NARC_SOUND, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("narcsnd", WILLIAMS_NARC_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1139,11 +1142,11 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(STDRES_PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
@@ -1166,14 +1169,15 @@ static MACHINE_CONFIG_START( yunit_core )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
+	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1183,13 +1187,14 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
+	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1199,10 +1204,11 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
+	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1212,13 +1218,14 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
+	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1228,13 +1235,14 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
+	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FASTER_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FASTER_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1244,7 +1252,8 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( term2, yunit_adpcm_6bit_faster )
+MACHINE_CONFIG_START(midyunit_state::term2)
+	yunit_adpcm_6bit_faster(config);
 	MCFG_ADC0844_ADD("adc") // U2 on Coil Lamp Driver Board (A-14915)
 	MCFG_ADC0844_CH1_CB(IOPORT("STICK0_X"))
 	MCFG_ADC0844_CH2_CB(IOPORT("STICK0_Y"))
@@ -1253,12 +1262,13 @@ static MACHINE_CONFIG_DERIVED( term2, yunit_adpcm_6bit_faster )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
+MACHINE_CONFIG_START(midyunit_state::mkyawdim)
+	yunit_core(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(yawdim_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1269,7 +1279,7 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -3052,59 +3062,59 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, narc,     0,        zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 7.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, narc3,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 3.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, narc2,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 2.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc,       0,        zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 7.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc3,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 3.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc2,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 2.00)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, trog,     0,        yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trog4,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trog3,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trogpa6,  trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trogpa4,  trog,     yunit_cvsd_4bit_slow,  trogpa4, midyunit_state,  trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog,       0,        yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog4,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog3,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa6,    trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa4,    trog,     yunit_cvsd_4bit_slow,    trogpa4,  midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, smashtv,  0,        yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv6, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv3, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv,    0,        yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv6,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv5,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv4,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv3,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) /* See notes about factory restore above */
+GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) /* See notes about factory restore above */
 
-GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, midyunit_state, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkforc,   0,        yunit_cvsd_4bit_fast,    strkforc, midyunit_state, init_strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, term2,    0,        term2,                   term2, midyunit_state,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la3, term2,    term2,                   term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la2, term2,    term2,                   term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la1, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2pa2, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2lg1, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2,      0,        term2,                   term2,    midyunit_state, init_term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la3,   term2,    term2,                   term2,    midyunit_state, init_term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la2,   term2,    term2,                   term2,    midyunit_state, init_term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la1,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2pa2,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2lg1,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla2,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla1,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot9,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot8,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot4,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyturbo, mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyturboe,mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkrep,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, mkyawdim, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim3,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim4,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkla4,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla3,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla2,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla1,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot9,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot8,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot4,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturbo,   mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturboe,  mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty666, mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkrep,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, mkyawdim,   mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim2,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 
-GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarnp,   totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )

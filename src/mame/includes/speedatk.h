@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Pierpaolo Prazzoli
+
 #include "video/mc6845.h"
+#include "emupal.h"
 
 class speedatk_state : public driver_device
 {
@@ -44,4 +46,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
+	void speedatk(machine_config &config);
+	void speedatk_io(address_map &map);
+	void speedatk_mem(address_map &map);
 };

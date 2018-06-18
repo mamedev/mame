@@ -258,7 +258,7 @@ void gamecom_state::recompute_lcd_params()
 
 	H_timing = ((m_lch_reg & 0x1f) + 1) * 200/4;
 	V_timing = (m_lcv_reg & 0x1f);
-	pixel_clock = (XTAL_11_0592MHz / 2); // TODO: divisor actually settable
+	pixel_clock = (XTAL(11'059'200) / 2).value(); // TODO: divisor actually settable
 
 	rectangle visarea(0, 200-1, 0, 160-1); // TODO: check settings
 
@@ -266,7 +266,7 @@ void gamecom_state::recompute_lcd_params()
 	hblank_period = (H_timing + 200);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
-	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
+	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 
 WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
@@ -621,7 +621,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 	}
 }
 
-DRIVER_INIT_MEMBER(gamecom_state,gamecom)
+void gamecom_state::init_gamecom()
 {
 	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
 	m_sound0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound0_timer_callback),this));

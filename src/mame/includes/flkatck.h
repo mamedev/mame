@@ -60,4 +60,7 @@ public:
 	uint32_t screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(flkatck_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void flkatck(machine_config &config);
+	void flkatck_map(address_map &map);
+	void flkatck_sound_map(address_map &map);
 };

@@ -35,6 +35,9 @@ public:
 		xbox_base_state(mconfig, type, tag)
 	{ }
 
+	void xbox(machine_config &config);
+	void xbox_map(address_map &map);
+	void xbox_map_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -52,14 +55,16 @@ void xbox_state::video_start()
 {
 }
 
-static ADDRESS_MAP_START(xbox_map, AS_PROGRAM, 32, xbox_state)
-	AM_IMPORT_FROM(xbox_base_map)
-	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f00000)
-ADDRESS_MAP_END
+void xbox_state::xbox_map(address_map &map)
+{
+	xbox_base_map(map);
+	map(0xff000000, 0xff0fffff).rom().region("bios", 0).mirror(0x00f00000);
+}
 
-static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, xbox_state)
-	AM_IMPORT_FROM(xbox_base_map_io)
-ADDRESS_MAP_END
+void xbox_state::xbox_map_io(address_map &map)
+{
+	xbox_base_map_io(map);
+}
 
 static INPUT_PORTS_START( xbox )
 	/* dummy active high structure */
@@ -153,19 +158,22 @@ void xbox_state::machine_reset()
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
 
-SLOT_INTERFACE_START(usb_xbox)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_xbox(device_slot_interface &device)
+{
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
-SLOT_INTERFACE_START(xbox_ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void xbox_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
-static MACHINE_CONFIG_DERIVED(xbox, xbox_base)
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xbox_map)
-	MCFG_CPU_IO_MAP(xbox_map_io)
+MACHINE_CONFIG_START(xbox_state::xbox)
+	xbox_base(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xbox_map)
+	MCFG_DEVICE_IO_MAP(xbox_map_io)
 
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
@@ -178,8 +186,8 @@ static MACHINE_CONFIG_DERIVED(xbox, xbox_base)
 	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
 
 /* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
@@ -192,7 +200,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 ROM_START( xbox )
 	ROM_REGION( 0x400, "mcpx", 0 )
@@ -233,4 +241,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

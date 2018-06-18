@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#include <glm/glm/geometric.hpp>
+#include <glm/geometric.hpp>
 
 #include "emu.h"
 #include "cpu/mb86233/mb86233.h"
@@ -471,7 +471,7 @@ void model1_state::unsort_quads() const
 
 void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	view_t *view = m_view;
+	view_t *view = m_view.get();
 	int count = m_quadpt - m_quaddb;
 
 	/* clip to the cliprect */
@@ -598,7 +598,7 @@ void model1_state::fclip_push_quad_next(int level, quad_t& q, point_t *p1, point
 
 void model1_state::fclip_push_quad(int level, quad_t& q)
 {
-	view_t *view = m_view;
+	view_t *view = m_view.get();
 
 	if (level == 4)
 	{
@@ -764,7 +764,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 	if (poly_adr & 0x800000)
 		poly_data = (float *)m_poly_ram.get();
 	else
-		poly_data = (float *)m_poly_rom;
+		poly_data = (float *)m_poly_rom.target();
 
 	poly_adr &= 0x7fffff;
 #if 0
@@ -1564,9 +1564,8 @@ void model1_state::tgp_scan()
 
 VIDEO_START_MEMBER(model1_state, model1)
 {
-	m_view = auto_alloc_clear(machine(), <model1_state::view_t>());
+	m_view = std::make_unique<model1_state::view_t>();
 
-	m_poly_rom = (uint32_t *)memregion("user1")->base();
 	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
 	m_pointdb = auto_alloc_array_clear(machine(), model1_state::point_t, 1000000*2);
@@ -1593,7 +1592,7 @@ VIDEO_START_MEMBER(model1_state, model1)
 
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	model1_state::view_t *view = m_view;
+	model1_state::view_t *view = m_view.get();
 #if 0
 	{
 		bool mod = false;

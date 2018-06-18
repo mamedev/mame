@@ -17,6 +17,7 @@
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "video/t6a04.h"
+#include "emupal.h"
 
 
 /* model */
@@ -71,7 +72,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ti8x_link_port_device> m_link_port;
 	optional_shared_ptr<uint8_t> m_nvram;
-	optional_device<intelfsh_device> m_flash;
+	optional_device<intelfsh8_device> m_flash;
 	optional_device<address_map_bank_device> m_membank1;
 	optional_device<address_map_bank_device> m_membank2;
 	optional_device<address_map_bank_device> m_membank3;
@@ -211,7 +212,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
 	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
-
+	DECLARE_READ8_MEMBER(ti83p_membank2_r);
+	DECLARE_READ8_MEMBER(ti83p_membank3_r);
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();
@@ -225,6 +227,32 @@ public:
 
 	ti83pse_timer m_ctimer[3];
 
+	void ti83(machine_config &config);
+	void ti82(machine_config &config);
+	void ti83p(machine_config &config);
+	void ti81v2(machine_config &config);
+	void ti73(machine_config &config);
+	void ti85d(machine_config &config);
+	void ti83pse(machine_config &config);
+	void ti84pse(machine_config &config);
+	void ti86(machine_config &config);
+	void ti81(machine_config &config);
+	void ti85(machine_config &config);
+	void ti84p(machine_config &config);
+	void ti81_io(address_map &map);
+	void ti81_mem(address_map &map);
+	void ti81v2_io(address_map &map);
+	void ti82_io(address_map &map);
+	void ti83_io(address_map &map);
+	void ti83p_asic_mem(address_map &map);
+	void ti83p_banked_mem(address_map &map);
+	void ti83p_io(address_map &map);
+	void ti83pse_banked_mem(address_map &map);
+	void ti83pse_io(address_map &map);
+	void ti84p_banked_mem(address_map &map);
+	void ti85_io(address_map &map);
+	void ti86_io(address_map &map);
+	void ti86_mem(address_map &map);
 	//address_space &asic;
 };
 

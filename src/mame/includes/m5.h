@@ -70,8 +70,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	DECLARE_DRIVER_INIT(pal);
-	DECLARE_DRIVER_INIT(ntsc);
+	void init_pal();
+	void init_ntsc();
 	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
 
 	// memory
@@ -80,6 +80,13 @@ public:
 	DECLARE_WRITE8_MEMBER( mem64KBF_w );
 	DECLARE_WRITE8_MEMBER( mem64KRX_w );
 
+	void m5(machine_config &config);
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void fd5_io(address_map &map);
+	void fd5_mem(address_map &map);
+	void m5_io(address_map &map);
+	void m5_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -146,10 +153,13 @@ public:
 //  DECLARE_WRITE_LINE_MEMBER( wd2797_index_callback);
 
 	//required_device<ram_device> m_ramdisk;
-	DECLARE_DRIVER_INIT(brno);
+	void init_brno();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( brno );
 //  DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
 
+void brno(machine_config &config);
+void brno_io(address_map &map);
+void m5_mem_brno(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

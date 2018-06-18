@@ -163,7 +163,7 @@ WRITE8_MEMBER( cosmicos_state::segment_w )
 
 	if ((m_counter > 0) && (m_counter < 9))
 	{
-		output().set_digit_value(10 - m_counter, data);
+		m_digits[10 - m_counter] = data;
 	}
 }
 
@@ -179,20 +179,22 @@ WRITE8_MEMBER( cosmicos_state::display_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cosmicos_mem, AS_PROGRAM, 8, cosmicos_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void cosmicos_state::cosmicos_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(cosmicos_state::read), FUNC(cosmicos_state::write));
+}
 
-static ADDRESS_MAP_START( cosmicos_io, AS_IO, 8, cosmicos_state )
+void cosmicos_state::cosmicos_io(address_map &map)
+{
 //  AM_RANGE(0x00, 0x00)
-	AM_RANGE(0x01, 0x01) AM_READ(video_on_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(video_off_r, audio_latch_w)
+	map(0x01, 0x01).r(FUNC(cosmicos_state::video_on_r));
+	map(0x02, 0x02).rw(FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
 //  AM_RANGE(0x03, 0x03)
 //  AM_RANGE(0x04, 0x04)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(hex_keyboard_r, hex_keylatch_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(reset_counter_r, segment_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(data_r, display_w)
-ADDRESS_MAP_END
+	map(0x05, 0x05).rw(FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
+	map(0x06, 0x06).rw(FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
+	map(0x07, 0x07).rw(FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
+}
 
 /* Input Ports */
 
@@ -206,7 +208,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::data )
 		if (!BIT(data, i))
 		{
 			m_data |= (1 << i);
-			output().set_led_value(LED_D0 - i, 1);
+			m_leds[LED_D0 - i] = 1;
 		}
 	}
 }
@@ -226,29 +228,29 @@ INPUT_CHANGED_MEMBER( cosmicos_state::single_step )
 
 void cosmicos_state::set_cdp1802_mode(int mode)
 {
-	output().set_led_value(LED_RUN, 0);
-	output().set_led_value(LED_LOAD, 0);
-	output().set_led_value(LED_PAUSE, 0);
-	output().set_led_value(LED_RESET, 0);
+	m_leds[LED_RUN] = 0;
+	m_leds[LED_LOAD] = 0;
+	m_leds[LED_PAUSE] = 0;
+	m_leds[LED_RESET] = 0;
 
 	switch (mode)
 	{
 	case MODE_RUN:
-		output().set_led_value(LED_RUN, 1);
+		m_leds[LED_RUN] = 1;
 
 		m_wait = 1;
 		m_clear = 1;
 		break;
 
 	case MODE_LOAD:
-		output().set_led_value(LED_LOAD, 1);
+		m_leds[LED_LOAD] = 1;
 
 		m_wait = 0;
 		m_clear = 0;
 		break;
 
 	case MODE_PAUSE:
-		output().set_led_value(LED_PAUSE, 1);
+		m_leds[LED_PAUSE] = 1;
 
 		m_wait = 1;
 		m_clear = 0;
@@ -262,7 +264,7 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 		m_clear = 0;
 		m_boot = 1;
 
-		output().set_led_value(LED_RESET, 1);
+		m_leds[LED_RESET] = 1;
 		break;
 	}
 }
@@ -280,7 +282,7 @@ void cosmicos_state::clear_input_data()
 
 	for (i = 0; i < 8; i++)
 	{
-		output().set_led_value(LED_D0 - i, 0);
+		m_leds[LED_D0 - i] = 0;
 	}
 }
 
@@ -356,9 +358,11 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
-	m_digit = !m_digit;
+// commented this out because (a) m_digit isn't initialised anywhere,
+// and (b) writing to a negative digit is not a good idea.
+//  m_digit = !m_digit;
 
-	output().set_digit_value(m_digit, m_segment);
+//  m_digits[m_digit] = m_segment;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
@@ -400,7 +404,7 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 	uint8_t special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
 
-	output().set_led_value(LED_CASSETTE, casin);
+	m_leds[LED_CASSETTE] = casin;
 
 	return BIT(special, 1) | BIT(special, 3) | casin;
 }
@@ -458,6 +462,9 @@ WRITE8_MEMBER( cosmicos_state::sc_w )
 
 void cosmicos_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
+
 	/* initialize LED display */
 	m_led->rbi_w(1);
 
@@ -499,20 +506,20 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( cosmicos )
+MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
-	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
-	MCFG_CPU_IO_MAP(cosmicos_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(cosmicos_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cosmicos_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(cosmicos_state, ef1_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(cosmicos_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(cosmicos_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(cosmicos_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cosmicos_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(cosmicos_state, dma_r))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(cosmicos_state, sc_w))
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(cosmicos_mem)
+	MCFG_DEVICE_IO_MAP(cosmicos_io)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, cosmicos_state, wait_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cosmicos_state, clear_r))
+	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, cosmicos_state, ef1_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, cosmicos_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, cosmicos_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, cosmicos_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cosmicos_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, cosmicos_state, dma_r))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, cosmicos_state, sc_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
@@ -520,16 +527,16 @@ static MACHINE_CONFIG_START( cosmicos )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
 
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL_1_75MHz, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(cosmicos_state, dmaout_w), WRITELINE(cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(*this, cosmicos_state, dmaout_w), WRITELINE(*this, cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
 	MCFG_CDP1864_CHROMINANCE(RES_K(2), 0, 0, 0) // R2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -549,14 +556,14 @@ MACHINE_CONFIG_END
 ROM_START( cosmicos )
 	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "hex", "Hex Monitor" )
-	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
-	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(0) ) // typed in from manual
+	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(0) ) // typed in from manual
 	ROM_SYSTEM_BIOS( 1, "ascii", "ASCII Monitor" )
-	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(1) )
 ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME    FLAGS
-COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state, 0,    "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME    FLAGS
+COMP( 1979, cosmicos, 0,      0,      cosmicos, cosmicos, cosmicos_state, empty_init, "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

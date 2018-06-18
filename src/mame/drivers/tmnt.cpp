@@ -327,8 +327,8 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 			return data;
 
 		default:
-			popmessage("%06x: unknown protection read",space.device().safe_pc());
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",space.device().safe_pc(),(uint32_t)space.device().state().state_int(M68K_D7),cmd,data);
+			popmessage("%06x: unknown protection read",m_maincpu->pc());
+			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",m_maincpu->pc(),(uint32_t)m_maincpu->state_int(M68K_D7),cmd,data);
 			return 0xffff;
 	}
 }
@@ -469,105 +469,110 @@ WRITE8_MEMBER(tmnt_state::cuebrick_nvbank_w)
 	membank("nvrambank")->set_entry(data);
 }
 
-static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM /* main RAM */
-	AM_RANGE(0x060000, 0x063fff) AM_RAM /* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_RAMBANK("nvrambank")
-	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE8(cuebrick_nvbank_w, 0xff00)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0xff00)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
-	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
-ADDRESS_MAP_END
+void tmnt_state::cuebrick_main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x043fff).ram(); /* main RAM */
+	map(0x060000, 0x063fff).ram(); /* main RAM */
+	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0002, 0x0a0003).portr("P1");
+	map(0x0a0004, 0x0a0005).portr("P2");
+	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0012, 0x0a0013).portr("DSW1");
+	map(0x0a0018, 0x0a0019).portr("DSW3");
+	map(0x0b0000, 0x0b03ff).bankrw("nvrambank");
+	map(0x0b0400, 0x0b0400).w(FUNC(tmnt_state::cuebrick_nvbank_w));
+	map(0x0c0000, 0x0c0003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0xff00);
+	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
+	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
+}
 
 
-static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM /* main RAM */
-	AM_RANGE(0x060000, 0x063fff) AM_RAM /* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
+void tmnt_state::mia_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram(); /* main RAM */
+	map(0x060000, 0x063fff).ram(); /* main RAM */
+	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0002, 0x0a0003).portr("P1");
+	map(0x0a0004, 0x0a0005).portr("P2");
+	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0a0010, 0x0a0011).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0012, 0x0a0013).portr("DSW2");
+	map(0x0a0018, 0x0a0019).portr("DSW3");
 #if 0
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
+	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
 #endif
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
+	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
-	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
-	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
+	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
+}
 
 
-static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM /* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0a0014, 0x0a0015) AM_READ_PORT("P4")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
+void tmnt_state::tmnt_main_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x063fff).ram(); /* main RAM */
+	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0002, 0x0a0003).portr("P1");
+	map(0x0a0004, 0x0a0005).portr("P2");
+	map(0x0a0006, 0x0a0007).portr("P3");
+	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0a0010, 0x0a0011).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0012, 0x0a0013).portr("DSW2");
+	map(0x0a0014, 0x0a0015).portr("P4");
+	map(0x0a0018, 0x0a0019).portr("DSW3");
+	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
+	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
-	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
-	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
+	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
+}
 
 
-static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM /* main RAM */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("DSW1/DSW2")
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("COINS/DSW3")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P3/P4")
-	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P1/P2")
-	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(punkshot_0a0020_w)
-	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x0a0080, 0x0a0081) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
-	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
-	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
-	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
-ADDRESS_MAP_END
+void tmnt_state::punkshot_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x083fff).ram(); /* main RAM */
+	map(0x090000, 0x090fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0a0000, 0x0a0001).portr("DSW1/DSW2");
+	map(0x0a0002, 0x0a0003).portr("COINS/DSW3");
+	map(0x0a0004, 0x0a0005).portr("P3/P4");
+	map(0x0a0006, 0x0a0007).portr("P1/P2");
+	map(0x0a0020, 0x0a0021).w(FUNC(tmnt_state::punkshot_0a0020_w));
+	map(0x0a0040, 0x0a0043).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0a0080, 0x0a0081).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::punkshot_k052109_word_noA12_w));
+	map(0x110000, 0x110007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
+	map(0x110400, 0x1107ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
+	map(0xfffffc, 0xffffff).r(FUNC(tmnt_state::punkshot_kludge_r));
+}
 
-static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x090000, 0x093fff) AM_RAM /*main RAM */
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS")
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_WRITE(lgtnfght_0a0018_w)
-	AM_RANGE(0x0a0020, 0x0a0023) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x0a0028, 0x0a0029) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-ADDRESS_MAP_END
+void tmnt_state::lgtnfght_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x090000, 0x093fff).ram(); /*main RAM */
+	map(0x0a0000, 0x0a0001).portr("COINS");
+	map(0x0a0002, 0x0a0003).portr("P1");
+	map(0x0a0004, 0x0a0005).portr("P2");
+	map(0x0a0006, 0x0a0007).portr("DSW1");
+	map(0x0a0008, 0x0a0009).portr("DSW2");
+	map(0x0a0010, 0x0a0011).portr("DSW3");
+	map(0x0a0018, 0x0a0019).w(FUNC(tmnt_state::lgtnfght_0a0018_w));
+	map(0x0a0020, 0x0a0023).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x0a0028, 0x0a0029).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0b0000, 0x0b3fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x0c0000, 0x0c001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+}
 
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
@@ -575,25 +580,26 @@ WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
-	AM_RANGE(0x204000, 0x207fff) AM_RAM /* main RAM */
-	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
-	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")
-	AM_RANGE(0x700004, 0x700005) AM_READ(blswhstl_coin_r)
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
-	AM_RANGE(0x700300, 0x700301) AM_WRITE(blswhstl_700300_w)
-	AM_RANGE(0x700400, 0x700401) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0x780600, 0x780603) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-ADDRESS_MAP_END
+void tmnt_state::blswhstl_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x180000, 0x183fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
+	map(0x204000, 0x207fff).ram(); /* main RAM */
+	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x700000, 0x700001).portr("P1");
+	map(0x700002, 0x700003).portr("P2");
+	map(0x700004, 0x700005).r(FUNC(tmnt_state::blswhstl_coin_r));
+	map(0x700006, 0x700007).portr("EEPROM");
+	map(0x700200, 0x700201).w(FUNC(tmnt_state::blswhstl_eeprom_w));
+	map(0x700300, 0x700301).w(FUNC(tmnt_state::blswhstl_700300_w));
+	map(0x700400, 0x700401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0x780600, 0x780603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x780604, 0x780605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
+	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+}
 
 WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 {
@@ -616,51 +622,51 @@ WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 	}
 }
 
-static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)  /* 053936? */
-	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
-	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
-	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_device, msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
-	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
-	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
-	AM_RANGE(0x120004, 0x120005) AM_READ_PORT("COINS/DSW3")
-	AM_RANGE(0x120006, 0x120007) AM_READ_PORT("DSW1/DSW2")
-	AM_RANGE(0x121000, 0x121001) AM_READ(glfgreat_ball_r)   /* returns the color of the center pixel of the roz layer */
-	AM_RANGE(0x122000, 0x122001) AM_WRITE(glfgreat_122000_w)
-	AM_RANGE(0x124000, 0x124001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x125000, 0x125003) AM_DEVREAD8("k053260", k053260_device, main_read, 0xff00) AM_WRITE8(glfgreat_sound_w, 0xff00)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x300000, 0x3fffff) AM_READ(glfgreat_rom_r)
-ADDRESS_MAP_END
+void tmnt_state::glfgreat_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram(); /* main RAM */
+	map(0x104000, 0x107fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));  /* 053936? */
+	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
+	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x120000, 0x120001).portr("P1/P2");
+	map(0x120002, 0x120003).portr("P3/P4");
+	map(0x120004, 0x120005).portr("COINS/DSW3");
+	map(0x120006, 0x120007).portr("DSW1/DSW2");
+	map(0x121000, 0x121001).r(FUNC(tmnt_state::glfgreat_ball_r));   /* returns the color of the center pixel of the roz layer */
+	map(0x122000, 0x122001).w(FUNC(tmnt_state::glfgreat_122000_w));
+	map(0x124000, 0x124001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x125000, 0x125003).r(m_k053260, FUNC(k053260_device::main_read)).umask16(0xff00).w(FUNC(tmnt_state::glfgreat_sound_w)).umask16(0xff00);
+	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x300000, 0x3fffff).r(FUNC(tmnt_state::glfgreat_rom_r));
+}
 
-static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
-	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
-	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
-	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_device, msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
-	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
-	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
-	AM_RANGE(0x12100c, 0x12100d) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x12100e, 0x12100f) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x121014, 0x121015) AM_DEVREAD8("soundlatch3", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0x122000, 0x122001) AM_WRITE(prmrsocr_eeprom_w)    /* EEPROM + video control */
-	AM_RANGE(0x123000, 0x123001) AM_WRITE(prmrsocr_sound_irq_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x300000, 0x33ffff) AM_READ(prmrsocr_rom_r)
-ADDRESS_MAP_END
+void tmnt_state::prmrsocr_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram(); /* main RAM */
+	map(0x104000, 0x107fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
+	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
+	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x120000, 0x120001).portr("P1/COINS");
+	map(0x120002, 0x120003).portr("P2/EEPROM");
+	map(0x12100d, 0x12100d).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x12100f, 0x12100f).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x121015, 0x121015).r("soundlatch3", FUNC(generic_latch_8_device::read));
+	map(0x122000, 0x122001).w(FUNC(tmnt_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
+	map(0x123000, 0x123001).w(FUNC(tmnt_state::prmrsocr_sound_irq_w));
+	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x280000, 0x280001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x300000, 0x33ffff).r(FUNC(tmnt_state::prmrsocr_rom_r));
+}
 
 
 #if 1
@@ -899,160 +905,171 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 }
 #endif
 
-static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("tmnt2_rom")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("sunset_104000")   /* main RAM */
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(k053245_scattered_word_w) AM_SHARE("spriteram")   // k053245_scattered_word_r
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
-	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
-	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P3")
-	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("P4")
-	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("COINS")
-	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
-	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE(ssriders_eeprom_w)    /* EEPROM and gfx control */
-	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
-	AM_RANGE(0x1c0400, 0x1c0401) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM /* TMNT2 only (1J) unknown, mostly MCU blit offsets */
+void tmnt_state::tmnt2_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().share("tmnt2_rom");
+	map(0x104000, 0x107fff).ram().share("sunset_104000");   /* main RAM */
+	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x183fff).ram().w(FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");   // k053245_scattered_word_r
+	map(0x1c0000, 0x1c0001).portr("P1");
+	map(0x1c0002, 0x1c0003).portr("P2");
+	map(0x1c0004, 0x1c0005).portr("P3");
+	map(0x1c0006, 0x1c0007).portr("P4");
+	map(0x1c0100, 0x1c0101).portr("COINS");
+	map(0x1c0102, 0x1c0103).r(FUNC(tmnt_state::ssriders_eeprom_r));
+	map(0x1c0200, 0x1c0201).w(FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
+	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
+	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown, mostly MCU blit offsets */
 //  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
-	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE(tmnt2_1c0800_w) AM_SHARE("tmnt2_1c0800")  /* protection device */
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
-ADDRESS_MAP_END
+	map(0x1c0800, 0x1c081f).w(FUNC(tmnt_state::tmnt2_1c0800_w)).share("tmnt2_1c0800");  /* protection device */
+	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
+}
 
-static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x104000, 0x107fff) AM_RAM /* main RAM */
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
-	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
-	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P3")
-	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("P4")
-	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("COINS")
-	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
-	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE(ssriders_eeprom_w)    /* EEPROM and gfx control */
-	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
-	AM_RANGE(0x1c0400, 0x1c0401) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM /* TMNT2 only (1J) unknown */
-	AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r)
-	AM_RANGE(0x1c0800, 0x1c0803) AM_WRITE(ssriders_protection_w)
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
-ADDRESS_MAP_END
+void tmnt_state::ssriders_main_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
+	map(0x104000, 0x107fff).ram(); /* main RAM */
+	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x1c0000, 0x1c0001).portr("P1");
+	map(0x1c0002, 0x1c0003).portr("P2");
+	map(0x1c0004, 0x1c0005).portr("P3");
+	map(0x1c0006, 0x1c0007).portr("P4");
+	map(0x1c0100, 0x1c0101).portr("COINS");
+	map(0x1c0102, 0x1c0103).r(FUNC(tmnt_state::ssriders_eeprom_r));
+	map(0x1c0200, 0x1c0201).w(FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
+	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
+	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown */
+	map(0x1c0800, 0x1c0801).r(FUNC(tmnt_state::ssriders_protection_r));
+	map(0x1c0800, 0x1c0803).w(FUNC(tmnt_state::ssriders_protection_w));
+	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
+}
 
-static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x104000, 0x107fff) AM_RAM /* main RAM */
-	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x184000, 0x18ffff) AM_RAM
-	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
-	AM_RANGE(0x1c0400, 0x1c0401) AM_WRITENOP
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
-	AM_RANGE(0x604020, 0x60402f) AM_WRITENOP    /* written every frame */
-	AM_RANGE(0x604200, 0x604201) AM_WRITENOP    /* watchdog */
-	AM_RANGE(0x6119e2, 0x6119e3) AM_WRITENOP    /* written a lot in some test menus (PC=18204) */
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("P1")
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P2")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("P3")
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("P4")
-	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(ssriders_eeprom_w)    /* EEPROM and gfx control */
-	AM_RANGE(0xc00404, 0xc00405) AM_READ_PORT("COINS")
-	AM_RANGE(0xc00406, 0xc00407) AM_READ(sunsetbl_eeprom_r)
-	AM_RANGE(0xc00600, 0xc00601) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x75d288, 0x75d289) AM_READNOP // read repeatedly in some test menus (PC=181f2)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
-	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
-	AM_RANGE(0x500200, 0x500201) AM_READ_PORT("P1/COINS")
-	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)
-	AM_RANGE(0x500300, 0x500301) AM_WRITENOP    /* watchdog reset? irq enable? */
-	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
-	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
-ADDRESS_MAP_END
+void tmnt_state::sunsetbl_main_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
+	map(0x104000, 0x107fff).ram(); /* main RAM */
+	map(0x14c000, 0x14cfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x184000, 0x18ffff).ram();
+	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
+	map(0x1c0400, 0x1c0401).nopw();
+	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
+	map(0x604020, 0x60402f).nopw();    /* written every frame */
+	map(0x604200, 0x604201).nopw();    /* watchdog */
+	map(0x6119e2, 0x6119e3).nopw();    /* written a lot in some test menus (PC=18204) */
+	map(0xc00000, 0xc00001).portr("P1");
+	map(0xc00002, 0xc00003).portr("P2");
+	map(0xc00004, 0xc00005).portr("P3");
+	map(0xc00006, 0xc00007).portr("P4");
+	map(0xc00200, 0xc00201).w(FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
+	map(0xc00404, 0xc00405).portr("COINS");
+	map(0xc00406, 0xc00407).r(FUNC(tmnt_state::sunsetbl_eeprom_r));
+	map(0xc00601, 0xc00601).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x75d288, 0x75d289).nopr(); // read repeatedly in some test menus (PC=181f2)
+}
 
 
-static ADDRESS_MAP_START( mia_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-ADDRESS_MAP_END
+void tmnt_state::thndrx2_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram(); /* main RAM */
+	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
+	map(0x500200, 0x500201).portr("P1/COINS");
+	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
+	map(0x500300, 0x500301).nopw();    /* watchdog reset? irq enable? */
+	map(0x600000, 0x607fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x700000, 0x700007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
+	map(0x700400, 0x7007ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
+}
 
 
-static ADDRESS_MAP_START( tmnt_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w) /* title music & UPD7759C reset */
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(tmnt_upd_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ(tmnt_upd_busy_r)
-ADDRESS_MAP_END
+void tmnt_state::mia_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+}
 
 
-static ADDRESS_MAP_START( punkshot_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-ADDRESS_MAP_END
+void tmnt_state::tmnt_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xe000, 0xe000).w(FUNC(tmnt_state::tmnt_upd_start_w));
+	map(0xf000, 0xf000).r(FUNC(tmnt_state::tmnt_upd_busy_r));
+}
 
 
-static ADDRESS_MAP_START( lgtnfght_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xc02f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-ADDRESS_MAP_END
+void tmnt_state::punkshot_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc2f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
+}
 
 
-static ADDRESS_MAP_START( glfgreat_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf82f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-ADDRESS_MAP_END
+void tmnt_state::lgtnfght_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc000, 0xc02f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
+}
 
 
-static ADDRESS_MAP_START( ssriders_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
-ADDRESS_MAP_END
+void tmnt_state::glfgreat_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf82f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
+	map(0xfa00, 0xfa00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+}
 
 
-static ADDRESS_MAP_START( thndrx2_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x0010) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-ADDRESS_MAP_END
+void tmnt_state::ssriders_audio_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa2f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
+	map(0xfc00, 0xfc00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+}
+
+
+void tmnt_state::thndrx2_audio_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).mirror(0x0010).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc2f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
+}
 
 
 READ8_MEMBER(tmnt_state::k054539_ctrl_r)
@@ -1065,17 +1082,18 @@ WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
 	m_k054539->write(space, 0x200 + offset, data, 0xff);
 }
 
-static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8, tmnt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xe100, 0xe12f) AM_READWRITE(k054539_ctrl_r, k054539_ctrl_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(prmrsocr_audio_bankswitch_w)
-ADDRESS_MAP_END
+void tmnt_state::prmrsocr_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe0ff).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe100, 0xe12f).rw(FUNC(tmnt_state::k054539_ctrl_r), FUNC(tmnt_state::k054539_ctrl_w));
+	map(0xf000, 0xf000).w("soundlatch3", FUNC(generic_latch_8_device::write));
+	map(0xf002, 0xf002).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf003, 0xf003).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xf800).w(FUNC(tmnt_state::prmrsocr_audio_bankswitch_w));
+}
 
 
 static INPUT_PORTS_START( cuebrick )
@@ -1540,8 +1558,8 @@ static INPUT_PORTS_START( blswhstl )
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
@@ -1684,8 +1702,8 @@ static INPUT_PORTS_START( ssriders )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: OBJMPX */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")  /* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: IPL0 */
@@ -1790,8 +1808,8 @@ static INPUT_PORTS_START( qgakumon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: OBJMPX */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")  /* ?? TMNT2: NVBLK (needs to be ACTIVE_HIGH to avoid problems) */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: IPL0 */
@@ -1818,8 +1836,8 @@ static INPUT_PORTS_START( thndrx2 )
 
 	PORT_START("P2/EEPROM")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* VBLK?? */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1849,8 +1867,8 @@ static INPUT_PORTS_START( prmrsocr )
 
 	PORT_START("P2/EEPROM")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1892,12 +1910,12 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 }
 
 
-static MACHINE_CONFIG_START( cuebrick )
+MACHINE_CONFIG_START(tmnt_state::cuebrick)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(cuebrick_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cuebrick_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -1935,24 +1953,24 @@ static MACHINE_CONFIG_START( cuebrick )
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mia )
+MACHINE_CONFIG_START(tmnt_state::mia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
-	MCFG_CPU_PROGRAM_MAP(mia_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(mia_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(mia_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(mia_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -1987,16 +2005,16 @@ static MACHINE_CONFIG_START( mia )
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(tmnt_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -2009,15 +2027,15 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 	m_upd7759->reset_w(1);
 }
 
-static MACHINE_CONFIG_START( tmnt )
+MACHINE_CONFIG_START(tmnt_state::tmnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
-	MCFG_CPU_PROGRAM_MAP(tmnt_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(tmnt_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(tmnt_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(tmnt_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,tmnt)
@@ -2053,38 +2071,38 @@ static MACHINE_CONFIG_START( tmnt )
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(tmnt_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.33)
 	MCFG_SOUND_ROUTE(1, "mono", 0.33)
 
-	MCFG_SOUND_ADD("upd", UPD7759, XTAL_640kHz)
+	MCFG_DEVICE_ADD("upd", UPD7759, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1) /* 1 channel for the title music */
 	MCFG_SAMPLES_START_CB(tmnt_state, tmnt_decode_sample)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( punkshot )
+MACHINE_CONFIG_START(tmnt_state::punkshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
-	MCFG_CPU_PROGRAM_MAP(punkshot_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(punkshot_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(punkshot_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(punkshot_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2119,26 +2137,26 @@ static MACHINE_CONFIG_START( punkshot )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lgtnfght )
+MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
-	MCFG_CPU_PROGRAM_MAP(lgtnfght_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(lgtnfght_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2174,33 +2192,34 @@ static MACHINE_CONFIG_START( lgtnfght )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blswhstl )
+MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(blswhstl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(blswhstl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2212,7 +2231,7 @@ static MACHINE_CONFIG_START( blswhstl )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tmnt_state, screen_vblank_blswhstl))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tmnt_state, screen_vblank_blswhstl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2235,13 +2254,14 @@ static MACHINE_CONFIG_START( blswhstl )
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)   /* fixed inverted stereo channels */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -2260,19 +2280,19 @@ static const gfx_layout zoomlayout =
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	16*64
 };
-static GFXDECODE_START( glfgreat )
+static GFXDECODE_START( gfx_glfgreat )
 	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( glfgreat )
+MACHINE_CONFIG_START(tmnt_state::glfgreat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(glfgreat_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(glfgreat_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(glfgreat_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(glfgreat_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2290,7 +2310,7 @@ static MACHINE_CONFIG_START( glfgreat )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glfgreat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -2315,9 +2335,10 @@ static MACHINE_CONFIG_START( glfgreat )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2330,21 +2351,21 @@ MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( prmrsocr )
+MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(prmrsocr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(prmrsocr_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_audio_map)
 								/* NMIs are generated by the 054539 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,prmrsocr)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2358,7 +2379,7 @@ static MACHINE_CONFIG_START( prmrsocr )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glfgreat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -2382,38 +2403,39 @@ static MACHINE_CONFIG_START( prmrsocr )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tmnt2 )
+MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
-	MCFG_CPU_PROGRAM_MAP(tmnt2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(tmnt2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
 						/* access. Access speed of ROM/RAM used on the machine is 150ns, */
 						/* without the wait, they cannot run on 8MHz.                    */
 						/* We are not emulating the wait state, so the ROM test ends at  */
 						/* 02 instead of 00. */
-	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2446,33 +2468,34 @@ static MACHINE_CONFIG_START( tmnt2 )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ssriders )
+MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
-	MCFG_CPU_PROGRAM_MAP(ssriders_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2505,29 +2528,30 @@ static MACHINE_CONFIG_START( ssriders )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sunsetbl )
+MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(sunsetbl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sunsetbl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2556,28 +2580,29 @@ static MACHINE_CONFIG_START( sunsetbl )
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( thndrx2 )
+MACHINE_CONFIG_START(tmnt_state::thndrx2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(thndrx2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thndrx2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(thndrx2_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(thndrx2_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2607,13 +2632,14 @@ static MACHINE_CONFIG_START( thndrx2 )
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -4098,13 +4124,13 @@ static void chunky_to_planar(memory_region *rgn)
 	for (int i = 0; i < len; i++)
 	{
 		uint32_t data = little_endianize_int32(ROM[i]);
-		data = BITSWAP32(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
+		data = bitswap<32>(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
 		ROM[i] = little_endianize_int32(data);
 	}
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, mia)
+void tmnt_state::init_mia()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4120,16 +4146,16 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 		int B = A & 0x3ff00;
 
 		if ((A & 0x3c000) == 0x3c000)
-			B |= BITSWAP8(A,7,6,4,2,1,0,5,3);
+			B |= bitswap<8>(A,7,6,4,2,1,0,5,3);
 		else
-			B |= BITSWAP8(A,6,4,2,1,0,7,5,3);
+			B |= bitswap<8>(A,6,4,2,1,0,7,5,3);
 
 		gfxdata[A] = temp[B];
 	}
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, tmnt)
+void tmnt_state::init_tmnt()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4191,78 +4217,78 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
+void tmnt_state::init_cuebrick()
 {
 	membank("nvrambank")->configure_entries(0, 0x20, m_cuebrick_nvram, 0x400);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cuebrick_nvram, sizeof(m_cuebrick_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_cuebrick_nvram, sizeof(m_cuebrick_nvram));
 
 	save_item(NAME(m_cuebrick_nvram));
 }
 
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE       INIT      MONITOR COMPANY    FULLNAME,FLAGS
-GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, cuebrick, ROT0,   "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, init_cuebrick,ROT0,  "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, mia,      ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, mia,      ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (Asia)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    tmnt_state, 0,        ROT90,  "Konami",  "Trigon (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    tmnt_state, empty_init,  ROT90,  "Konami",  "Trigon (Japan)",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Bells & Whistles (World, version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (World, version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, 0,        ROT0,   "Konami",  "Golfing Greats",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, 0,        ROT0,   "Konami",  "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, 0,        ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, empty_init,  ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver EAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssriderseaa, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver EAA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver EBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver EBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UDA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UAB)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver UBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver ADD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver ABD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjad, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver JAD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjac, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver JAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver JBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, 0,        ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, 0,        ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver EAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriderseaa, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver EAA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver EBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver EBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver UDA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver UAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver UAB)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver UBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver ADD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver ABD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjad, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver JAD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjac, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver JAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver JBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  tmnt_state, 0,        ROT0,   "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  tmnt_state, 0,        ROT0,   "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  tmnt_state, empty_init,  ROT0,   "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  tmnt_state, empty_init,  ROT0,   "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )

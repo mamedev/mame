@@ -21,6 +21,12 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	void jvh2(machine_config &config);
+	void jvh(machine_config &config);
+	void escape_io(address_map &map);
+	void jvh_map(address_map &map);
+	void jvh_sub_map(address_map &map);
+	void movmastr_io(address_map &map);
 protected:
 
 	// devices
@@ -29,17 +35,19 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(jvh);
+	void init_jvh();
 };
 
 
 
-static ADDRESS_MAP_START( jvh_map, AS_PROGRAM, 8, jvh_state )
-	AM_RANGE(0x0000, 0x3bff) AM_ROM
-	AM_RANGE(0x3c00, 0x3cff) AM_RAM
-ADDRESS_MAP_END
+void jvh_state::jvh_map(address_map &map)
+{
+	map(0x0000, 0x3bff).rom();
+	map(0x3c00, 0x3cff).ram();
+}
 
-static ADDRESS_MAP_START( escape_io, AS_IO, 8, jvh_state )
+void jvh_state::escape_io(address_map &map)
+{
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x06, 0x07) AM_READ(sw6_r)
@@ -62,9 +70,10 @@ static ADDRESS_MAP_START( escape_io, AS_IO, 8, jvh_state )
 	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b_w)
 	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a_w)
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START( movmastr_io, AS_IO, 8, jvh_state )
+void jvh_state::movmastr_io(address_map &map)
+{
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x08, 0x09) AM_READ(sw6_r)
@@ -90,13 +99,14 @@ static ADDRESS_MAP_START( movmastr_io, AS_IO, 8, jvh_state )
 	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b2_w)
 	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a2_w)
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START( jvh_sub_map, AS_PROGRAM, 8, jvh_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
-ADDRESS_MAP_END
+void jvh_state::jvh_sub_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x0080, 0x008f).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xdfff).mirror(0x2000).rom();
+}
 
 static INPUT_PORTS_START( jvh )
 INPUT_PORTS_END
@@ -105,29 +115,29 @@ void jvh_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(jvh_state,jvh)
+void jvh_state::init_jvh()
 {
 }
 
-static MACHINE_CONFIG_START( jvh )
+MACHINE_CONFIG_START(jvh_state::jvh)
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4) // MC6802 E clock
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4) // MC6802 E clock
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jvh2 )
+MACHINE_CONFIG_START(jvh_state::jvh2)
 	// CPU TMS9980At; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
@@ -158,5 +168,5 @@ ROM_START(movmastr)
 ROM_END
 
 
-GAME(1987,  escape,    0,  jvh,  jvh, jvh_state,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??,  movmastr,  0,  jvh2, jvh, jvh_state,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, escape,   0, jvh,  jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)

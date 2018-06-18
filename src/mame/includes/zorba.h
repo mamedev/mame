@@ -16,6 +16,8 @@
 
 #include "video/i8275.h"
 
+#include "emupal.h"
+
 
 class zorba_state : public driver_device
 {
@@ -42,9 +44,15 @@ public:
 	{
 	}
 
-public:
-	DECLARE_DRIVER_INIT(zorba);
-	DECLARE_MACHINE_RESET(zorba);
+	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
+	void zorba(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void zorba_io(address_map &map);
+	void zorba_mem(address_map &map);
 
 	// Memory banking control
 	DECLARE_READ8_MEMBER(ram_r);
@@ -78,7 +86,6 @@ public:
 	// Printer port glue
 	DECLARE_WRITE_LINE_MEMBER(printer_fault_w);
 	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
-	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
 
 private:
 	required_ioport                     m_config_port;

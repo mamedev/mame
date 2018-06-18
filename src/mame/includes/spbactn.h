@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
+#include "emupal.h"
 #include "screen.h"
 
 class spbactn_state : public driver_device
@@ -85,4 +86,10 @@ public:
 	{
 		return 0xffff;
 	}
+	void spbactn(machine_config &config);
+	void spbactnp(machine_config &config);
+	void spbactn_map(address_map &map);
+	void spbactn_sound_map(address_map &map);
+	void spbactnp_extra_map(address_map &map);
+	void spbactnp_map(address_map &map);
 };
