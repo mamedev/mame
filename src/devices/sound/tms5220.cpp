@@ -374,7 +374,7 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 /* 5220 only; above dumps the data written to the tms52xx to stdout, useful
    for making logged data dumps for real hardware tests */
 #define LOG_FIFO (1 << 2)
-// 5220 only; above debugs fifo stuff: writes, reads and flag updates
+// 5220 only; above debugs FIFO stuff: writes, reads and flag updates
 #define LOG_PARSE_FRAME_DUMP_BIN (1 << 3)
 // dumps each speech frame as binary
 #define LOG_PARSE_FRAME_DUMP_HEX (1 << 4)
@@ -667,7 +667,7 @@ void tms5220_device::data_write(int data)
 		else
 		{
 			LOGMASKED(LOG_FIFO, "data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
-			// at this point, /READY should remain HIGH/inactive until the fifo has at least one byte open in it.
+			// at this point, /READY should remain HIGH/inactive until the FIFO has at least one byte open in it.
 		}
 
 
@@ -702,11 +702,11 @@ void tms5220_device::data_write(int data)
 
 void tms5220_device::update_fifo_status_and_ints()
 {
-	/* update 52xx fifo flags and set ints if needed */
+	/* update 52xx FIFO flags and set ints if needed */
 	if (!TMS5220_IS_52xx) return; // bail out if not a 52xx chip
 	update_ready_state();
 
-	/* BL is set if neither byte 9 nor 8 of the fifo are in use; this
+	/* BL is set if neither byte 9 nor 8 of the FIFO are in use; this
 	translates to having fifo_count (which ranges from 0 bytes in use to 16
 	bytes used) being less than or equal to 8. Victory/Victorba depends on this. */
 	if (m_fifo_count <= 8)
@@ -721,7 +721,7 @@ void tms5220_device::update_fifo_status_and_ints()
 	else
 		m_buffer_low = false;
 
-	/* BE is set if neither byte 15 nor 14 of the fifo are in use; this
+	/* BE is set if neither byte 15 nor 14 of the FIFO are in use; this
 	translates to having fifo_count equal to exactly 0
 	*/
 	if (m_fifo_count == 0)
@@ -770,7 +770,7 @@ int tms5220_device::extract_bits(int count)
 			if (m_fifo_bits_taken >= 8)
 			{
 				m_fifo_count--;
-				m_fifo[m_fifo_head] = 0; // zero the newly depleted fifo head byte
+				m_fifo[m_fifo_head] = 0; // zero the newly depleted FIFO head byte
 				m_fifo_head = (m_fifo_head + 1) % FIFO_SIZE;
 				m_fifo_bits_taken = 0;
 				update_fifo_status_and_ints();
@@ -841,10 +841,21 @@ uint8_t tms5220_device::status_read(bool clear_int)
 
 bool tms5220_device::ready_read()
 {
-	LOGMASKED(LOG_PIN_READS, "ready_read: ready pin read, io_ready is %d, fifo count is %d, DDIS(speak external) is %d\n", m_io_ready, m_fifo_count, m_DDIS);
-	// if m_true_timing is NOT set (we're in 'hacky instant write mode'), the m_timer_io_ready doesn't run and will never de-assert m_io_ready if the fifo is full, so we need to explicitly check for fifo full here and return the proper value.
+	LOGMASKED(LOG_PIN_READS, "ready_read: ready pin read, io_ready is %d, FIFO count is %d, DDIS(speak external) is %d\n", m_io_ready, m_fifo_count, m_DDIS);
+	/* if m_true_timing is NOT set (we're in 'hacky instant write mode'), the
+	   m_timer_io_ready timer doesn't run and will never de-assert m_io_ready
+	   if the FIFO is full, so we need to explicitly check for FIFO full here
+	   and return the proper value.
+
+	   SEVERE CAVEAT: This makes the assumption that the ready_read was after
+	   wsq was 'virtually asserted', so if the FIFO has no room in it ready
+	   will always return inactive, even if no write happened! i.e., after a
+	   read command when the FIFO was exactly filled, but no write attempted
+	   to overfill it. This behavior is inaccurate to hardware and may cause
+	   issues! You have been warned!
+	*/
 	if (!m_true_timing)
-		return ((m_fifo_count < FIFO_SIZE)||(!m_DDIS)) && m_io_ready; // SEVERE CAVEAT: this makes the assumption that the ready_read was after wsq was 'virtually asserted', so if the fifo has no room in it ready will always return inactive, even if no write happened (i.e., after a read command when the fifo was exactly filled but no write attempted to overfill it) which is inaccurate to hardware and may cause issues! you have been warned!
+		return ((m_fifo_count < FIFO_SIZE)||(!m_DDIS)) && m_io_ready;
 	else
 		return m_io_ready;
 }
@@ -1161,7 +1172,10 @@ int16_t tms5220_device::clip_analog(int16_t cliptemp) const
 {
 	/* clipping, just like the patent shows:
 	 * the top 10 bits of this result are visible on the digital output IO pin.
-	 * next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
+	 * next, if the top 3 bits of the 14 bit result are all the same, the
+	 * lowest of those 3 bits plus the next 7 bits are the signed analog
+	 * output, otherwise the low bits are all forced to match the inverse of
+	 * the topmost bit, i.e.:
 	 * 1x xxxx xxxx xxxx -> 0b10000000
 	 * 11 1bcd efgh xxxx -> 0b1bcdefgh
 	 * 00 0bcd efgh xxxx -> 0b0bcdefgh
@@ -1223,7 +1237,9 @@ int32_t tms5220_device::lattice_filter()
 {
 	// Lattice filter here
 	// Aug/05/07: redone as unrolled loop, for clarity - LN
-	/* Originally Copied verbatim from table I in US patent 4,209,804, now updated to be in same order as the actual chip does it, not that it matters.
+	/* Originally Copied verbatim from table I in US patent 4,209,804, now
+	  updated to be in same order as the actual chip does it, not that it matters.
+
 	  notation equivalencies from table:
 	  Yn(i) == m_u[n-1]
 	  Kn = m_current_k[n-1]
@@ -1235,7 +1251,9 @@ int32_t tms5220_device::lattice_filter()
 	    for (int i = 0; i < 10; i++)
 	    {
 	        int ii = 10-i; // for m = 10, this would be 11 - i, and since i is from 1 to 10, then ii ranges from 10 to 1
-	        //int jj = ii+1; // this variable, even on the fortran version, is never used. it probably was intended to be used on the two lines below the next one to save some redundant additions on each.
+	        // int jj = ii+1; // this variable, even on the fortran version, is
+	        // never used. It probably was intended to be used on the two lines
+	        // below the next one to save some redundant additions on each.
 	        ep = ep - (((m_current_k[ii-1] * m_x[ii-1])>>9)|1); // subtract reflection from lower stage 'top of lattice'
 	         m_u[ii-1] = ep;
 	        m_x[ii] = m_x[ii-1] + (((m_current_k[ii-1] * ep)>>9)|1); // add reflection from upper stage 'bottom of lattice'
@@ -1437,11 +1455,21 @@ void tms5220_device::parse_frame()
 	m_old_uv_zpar = m_uv_zpar;
 	m_old_zpar = m_zpar;
 #endif
-	// since we're parsing a frame, we must be talking, so clear zpar here
-	// before we start parsing a frame, the P=0 and E=0 latches were both reset by RESETL4, so clear m_uv_zpar here
+	/* Since we're parsing a frame, we must be talking, so clear zpar here.
+	Also, before we started parsing a frame, the P=0 and E=0 latches were both
+	reset by RESETL4, so clear m_uv_zpar here.
+	*/
 	m_uv_zpar = m_zpar = 0;
 
-	// We actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
+	/* We actually don't care how many bits are left in the FIFO here;
+	the frame subpart will be processed normally, and any bits extracted
+	'past the end' of the FIFO will be read as zeroes; the FIFO being emptied
+	will set the /BE latch which will halt speech exactly as if a stop frame
+	had been encountered (instead of whatever partial frame was read).
+	The same exact circuitry is used for both functions on the real chip, see
+	us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b
+	(decode /BE plus DDIS (decode disable) which is active during speak external).
+	*/
 
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
 	has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
@@ -1721,7 +1749,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			case 0x02:
 				/* Write */
 				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Attempting to service write...\n");
-				if ((m_fifo_count >= FIFO_SIZE) && m_DDIS) // if fifo is full and we're in speak external mode
+				if ((m_fifo_count >= FIFO_SIZE) && m_DDIS) // if FIFO is full and we're in speak external mode
 				{
 					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: in SPKEXT and FIFO was full! cannot service write now, delaying 16 cycles...\n");
 					m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
@@ -1852,7 +1880,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 			SET RATE (5220C and CD2501ECD only): ? cycles (probably ~16)
 			*/
 			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-			m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+			m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for FIFO writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }
@@ -1908,7 +1936,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				SET RATE (5220C and CD2501ECD only): ? cycles (probably ~16)
 				*/
 				// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-				m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+				m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for FIFO writes, TODO: but actually depends on what command is written if in command mode
 				return;
 			case 1: // /RS active, /WS not
 				/* check for falling or rising edge */
