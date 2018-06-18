@@ -38,6 +38,11 @@
 #define MCFG_FLOPPY_DRIVE_SOUND(_doit) \
 	static_cast<floppy_connector *>(device)->enable_sound(_doit);
 
+// Add a spinup delay. This should better become a property of a selected drive.
+// Default is 0
+#define MCFG_FLOPPY_DRIVE_SPINUP_TIME(_time) \
+	static_cast<floppy_connector *>(device)->set_spinup_time(_time);
+
 #define DECLARE_FLOPPY_FORMATS(_name) \
 	static const floppy_format_type _name []
 
@@ -149,6 +154,7 @@ public:
 
 	// Enable sound
 	void    enable_sound(bool doit) { m_make_sound = doit; }
+	void    set_spinup_time(int ms) { m_spinup_time = ms; }
 
 protected:
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -170,6 +176,7 @@ protected:
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
 	emu_timer             *index_timer;
+	emu_timer             *spinup_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
 	int tracks; /* addressable tracks */
@@ -224,6 +231,10 @@ protected:
 	// Sound
 	bool    m_make_sound;
 	floppy_sound_device* m_sound_out;
+
+	// Spinup
+	bool    m_spun_up;
+	int     m_spinup_time;
 };
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
@@ -322,6 +333,7 @@ public:
 	void set_formats(const floppy_format_type *formats);
 	floppy_image_device *get_device();
 	void enable_sound(bool doit) { m_enable_sound = doit; }
+	void set_spinup_time(int ms) { m_spinup_time = ms; }
 
 protected:
 	virtual void device_start() override;
@@ -330,6 +342,7 @@ protected:
 private:
 	const floppy_format_type *formats;
 	bool m_enable_sound;
+	int  m_spinup_time;
 };
 
 

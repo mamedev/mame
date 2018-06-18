@@ -13,13 +13,16 @@
 #include "formats/imageutl.h"
 #include "zippath.h"
 
-/*
-    Debugging flags. Set to 0 or 1.
-*/
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_STEP        (1U<<2)   // Step motor operation
+#define LOG_MOTOR       (1U<<3)   // Spindle motor operation
+#define LOG_AUDIO       (1U<<4)   // Audio output
+#define LOG_READY       (1U<<5)   // Drive ready
+#define LOG_SPINUP      (1U<<6)   // Drive still spinning up
 
-// Show step operation
-#define TRACE_STEP 0
-#define TRACE_AUDIO 0
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+
+#include "logmacro.h"
 
 #define PITCH_SEEK_SAMPLES 1
 
@@ -137,7 +140,8 @@ floppy_connector::floppy_connector(const machine_config &mconfig, const char *ta
 	device_t(mconfig, FLOPPY_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
-	m_enable_sound(false)
+	m_enable_sound(false),
+	m_spinup_time(0)
 {
 }
 
@@ -161,6 +165,7 @@ void floppy_connector::device_config_complete()
 	{
 		dev->set_formats(formats);
 		dev->enable_sound(m_enable_sound);
+		dev->set_spinup_time(m_spinup_time);
 	}
 }
 
@@ -182,6 +187,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		image(nullptr),
 		fif_list(nullptr),
 		index_timer(nullptr),
+		spinup_timer(nullptr),
 		tracks(0),
 		sides(0),
 		form_factor(0),
@@ -198,7 +204,9 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		image_dirty(false),
 		ready_counter(0),
 		m_make_sound(false),
-		m_sound_out(nullptr)
+		m_sound_out(nullptr),
+		m_spun_up(true),
+		m_spinup_time(0)
 {
 	extension_list[0] = '\0';
 	m_err = IMAGE_ERROR_INVALIDIMAGE;
@@ -338,6 +346,7 @@ void floppy_image_device::device_start()
 	wpt = 0;
 	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(0);
+	spinup_timer = timer_alloc(1);
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
@@ -368,7 +377,18 @@ void floppy_image_device::device_reset()
 
 void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	index_resync();
+	switch (id)
+	{
+	case 0:
+		index_resync();
+		break;
+	case 1:
+		LOGMASKED(LOG_MOTOR, "Speed reached\n");
+		m_spun_up = true;
+		break;
+	default:
+		break;
+	}
 }
 
 floppy_image_format_t *floppy_image_device::identify(std::string filename)
@@ -541,6 +561,7 @@ void floppy_image_device::mon_w(int state)
 	/* off -> on */
 	if (!mon && image)
 	{
+		LOGMASKED(LOG_MOTOR, "Motor on, spinup time %d\n", m_spinup_time);
 		revolution_start_time = machine().time();
 		if (motor_always_on) {
 			// Drives with motor that is always spinning are immediately ready when a disk is loaded
@@ -550,15 +571,24 @@ void floppy_image_device::mon_w(int state)
 			ready_counter = 2;
 		}
 		index_resync();
+		if (m_spinup_time > 0)
+		{
+			m_spun_up = false;
+			spinup_timer->adjust(attotime::from_msec(m_spinup_time));
+		}
+		else
+			m_spun_up = true;
 	}
 
 	/* on -> off */
 	else {
+		LOGMASKED(LOG_MOTOR, "Motor off\n");
 		if(image_dirty)
 			commit_image();
 		revolution_start_time = attotime::never;
 		index_timer->adjust(attotime::zero);
 		set_ready(true);
+		m_spun_up = false;
 	}
 
 	// Create a motor sound (loaded or empty)
@@ -605,7 +635,7 @@ void floppy_image_device::index_resync()
 		if(idx && ready) {
 			ready_counter--;
 			if(!ready_counter) {
-				// logerror("Drive spun up\n");
+				LOGMASKED(LOG_READY, "Drive ready\n");
 				set_ready(false);
 			}
 		}
@@ -668,7 +698,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != cyl)
 			{
-				if (TRACE_STEP) logerror("track %d\n", cyl);
+				LOGMASKED(LOG_STEP, "track %d\n", cyl);
 				// Do we want a stepper sound?
 				// We plan for 5 zones with possibly specific sounds
 				if (m_make_sound) m_sound_out->step(cyl*5/tracks);
@@ -715,8 +745,8 @@ void floppy_image_device::seek_phase_w(int phases)
 	cyl = next_pos >> 2;
 	subcyl = next_pos & 3;
 
-	if(TRACE_STEP && (next_pos != cur_pos))
-		logerror("track %d.%d\n", cyl, subcyl);
+	if (next_pos != cur_pos)
+		LOGMASKED(LOG_STEP, "track %d.%d\n", cyl, subcyl);
 
 	/* Update disk detection if applicable */
 	if (exists() && !dskchg_writable)
@@ -788,6 +818,18 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
 	if(!image || mon)
 		return attotime::never;
+
+	// (mz) If the drive is still spinning up, pretend that no transitions
+	//   will come
+	//
+	//   Should be solved with a proper ramp, but for now suffice it to use
+	//   a static config line to set a spinup time in msec.
+	//   The default is 0, which means m_spun_up is true at all times.
+	//   tandy2k has issues with too long spinup times
+	if (!m_spun_up) {
+		LOGMASKED(LOG_SPINUP, "Spinning up...");
+		return attotime::never;
+	}
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 	uint32_t cells = buf.size();
@@ -1223,7 +1265,7 @@ void floppy_sound_device::step(int zone)
 			// Changing the pitch does not always sound convincing
 			if (!PITCH_SEEK_SAMPLES) m_seek_pitch = 1;
 
-			if (TRACE_AUDIO) logerror("Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
+			LOGMASKED(LOG_AUDIO, "Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
 
 			// Set the timeout for the seek sound. When it expires,
 			// we assume that the seek process is over, and we'll play the
