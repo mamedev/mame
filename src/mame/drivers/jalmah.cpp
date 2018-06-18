@@ -320,7 +320,6 @@ void urashima_state::video_start()
 
 	for(int i=0;i<2;i++)
 		m_layer[i]->set_transparent_pen(15);
-
 }
 
 
