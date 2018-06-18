@@ -5664,6 +5664,24 @@ ROM_START( pstone2 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000b8dc0" )
 ROM_END
 
+// Bootleg, PCB have populated: Actel A54SX16A FPGA, 10x 64MBit Flash ROMs, 28MHz oscillator.
+// 2nd half of ic1 contain decrypted protection data (probably supplied to game by FPGA), the rest of code/data same as original game.
+ROM_START( pstone2b )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x5000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("00.ic1",  0x0000000, 0x0800000, CRC(3175e60f) SHA1(2b4a03aee6fcf133496d5661b7ae9d468fef79c3) )
+	ROM_LOAD("01.ic2",  0x0800000, 0x0800000, CRC(c69f3c3c) SHA1(e96ad24473197f8581f5e4398244b9b76957bfdd) )
+	ROM_LOAD("02.ic3",  0x1000000, 0x0800000, CRC(a80d444d) SHA1(a7d2a5831412134a26ba37bf83e5ce38eb9f3928) )
+	ROM_LOAD("03.ic4",  0x1800000, 0x0800000, CRC(c285dd64) SHA1(e64507caedb9f312ab291b41b8d7fe8922eb434e) )
+	ROM_LOAD("04.ic5",  0x2000000, 0x0800000, CRC(1f3f6505) SHA1(da5eb3b9b5c85f5f0b4afe0c0ee8d034108300a2) )
+	ROM_LOAD("05.ic6",  0x2800000, 0x0800000, CRC(5e403a12) SHA1(e71c15e63c30e60b6db1fcd2841f66490f31579a) )
+	ROM_LOAD("06.ic7",  0x3000000, 0x0800000, CRC(4b71078b) SHA1(f3ed39402f585ae5cf6f8987bf6be6c6d46eafa1) )
+	ROM_LOAD("07.ic8",  0x3800000, 0x0800000, CRC(508c0207) SHA1(e50d97a17cdd6771fbc63a254a4d638e7daa8f57) )
+	ROM_LOAD("08.ic9",  0x4000000, 0x0800000, CRC(b9938bbc) SHA1(d55d7adecb5a5a4a276a5a17c12808085d980fd9) )
+	ROM_LOAD("09.ic10", 0x4800000, 0x0800000, CRC(fbb0325b) SHA1(21b965519d7508d84344641d43e8af2c3ca29ba4) )
+ROM_END
 
 /*
 
@@ -10560,6 +10578,7 @@ ROM_END
 /* 0007-01 */    GAME( 2000, mvsc2u,    mvsc2,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA, Rev A)", GAME_FLAGS)
 /* 0007-02 -03 */GAME( 2000, mvsc2,     naomi,    naomim1, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea, Rev A)", GAME_FLAGS)
 /* 0008 */       GAME( 2000, pstone2,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone 2", GAME_FLAGS )
+/* 0008 */       GAME( 2000, pstone2b,  pstone2,  naomi,   naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone 2 (bootleg)", GAME_FLAGS )
 /* 0011 */       GAME( 2000, capsnk,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev C)", GAME_FLAGS )
 /* 0011 */       GAME( 2000, capsnka,   capsnk,   naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev A)", GAME_FLAGS )
 /* 0011 */       GAME( 2000, capsnkb,   capsnk,   naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000", GAME_FLAGS )
