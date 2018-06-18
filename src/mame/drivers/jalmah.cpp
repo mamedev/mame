@@ -290,7 +290,7 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 	int region = (TileChip == 0) ? m_tile_bank : 3;
 
 //	if (TileChip == 0)
-//		tile = (tile & 0x800) ? ((m_tile_bank+1) << 11) | (tile & 0x7ff) : tile;
+//		tile = (tile & 0x800) ? tile + (m_tile_bank << 11) : tile;
 
 	SET_TILE_INFO_MEMBER(region,//TileChip,
 			tile,
