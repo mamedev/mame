@@ -10,13 +10,12 @@
 #define MCFG_TC0180VCU_INTL_CALLBACK(_write) \
 	devcb = &downcast<tc0180vcu_device &>(*device).set_intl_callback(DEVCB_##_write);
 
-class tc0180vcu_device : public device_t, public device_video_interface
+class tc0180vcu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_fb_colorbase(int color) { m_fb_color_base = color * 16; }
 	void set_bg_colorbase(int color) { m_bg_color_base = color; }
 	void set_fg_colorbase(int color) { m_fg_color_base = color; }
@@ -69,7 +68,8 @@ private:
 	int            m_fg_color_base;
 	int            m_tx_color_base;
 
-	required_device<gfxdecode_device> m_gfxdecode;
+	static const gfx_layout charlayout, tilelayout;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	devcb_write_line m_inth_callback;
 	devcb_write_line m_intl_callback;
@@ -95,8 +95,5 @@ DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
 
 #define MCFG_TC0180VCU_TX_COLORBASE(_color) \
 	downcast<tc0180vcu_device &>(*device).set_tx_colorbase(_color);
-
-#define MCFG_TC0180VCU_GFXDECODE(_gfxtag) \
-	downcast<tc0180vcu_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0180VCU_H

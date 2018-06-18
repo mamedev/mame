@@ -10,6 +10,32 @@
 //#define TC0180VCU_RAM_SIZE          0x10000
 //#define TC0180VCU_SCROLLRAM_SIZE    0x0800
 
+const gfx_layout tc0180vcu_device::charlayout =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	16*8
+};
+
+const gfx_layout tc0180vcu_device::tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
+	{ STEP8(0,1), STEP8(8*8*2,1) },
+	{ STEP8(0,8*2), STEP8(8*8*2*2,8*2) },
+	64*8
+};
+
+GFXDECODE_MEMBER( tc0180vcu_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, charlayout,  0, 256 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, tilelayout,  0, 256 )
+GFXDECODE_END
 
 void tc0180vcu_device::tc0180vcu_memrw(address_map &map)
 {
@@ -23,8 +49,9 @@ void tc0180vcu_device::tc0180vcu_memrw(address_map &map)
 
 DEFINE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device, "tc0180vcu", "Taito TC0180VCU")
 
-tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0180VCU, tag, owner, clock),
+tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TC0180VCU, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
 	device_video_interface(mconfig, *this),
 	m_spriteram(*this, "spriteram"),
 	m_vram(*this, "vram"),
@@ -39,7 +66,6 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *ta
 	m_bg_color_base(0),
 	m_fg_color_base(0),
 	m_tx_color_base(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_inth_callback(*this),
 	m_intl_callback(*this),
 	m_intl_timer(nullptr)
@@ -64,12 +90,9 @@ void tc0180vcu_device::device_resolve_objects()
 
 void tc0180vcu_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
@@ -474,7 +497,7 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 
 		if ( zoomx || zoomy )
 		{
-			m_gfxdecode->gfx(1)->zoom_transpen_raw(bitmap,cliprect,
+			gfx(1)->zoom_transpen_raw(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -483,7 +506,7 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 		}
 		else
 		{
-			m_gfxdecode->gfx(1)->transpen_raw(bitmap,cliprect,
+			gfx(1)->transpen_raw(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
