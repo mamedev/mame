@@ -4540,12 +4540,12 @@ M68KMAKE_OP(divs, 16, ., d)
 
 	if(src != 0)
 	{
+		m_c_flag = CFLAG_CLEAR;
 		if((uint32_t)*r_dst == 0x80000000 && src == -1)
 		{
 			m_not_z_flag = 0;
 			m_n_flag = NFLAG_CLEAR;
 			m_v_flag = VFLAG_CLEAR;
-			m_c_flag = CFLAG_CLEAR;
 			*r_dst = 0;
 			return;
 		}
@@ -4558,7 +4558,6 @@ M68KMAKE_OP(divs, 16, ., d)
 			m_not_z_flag = quotient;
 			m_n_flag = NFLAG_16(quotient);
 			m_v_flag = VFLAG_CLEAR;
-			m_c_flag = CFLAG_CLEAR;
 			*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
 			return;
 		}
@@ -4578,12 +4577,12 @@ M68KMAKE_OP(divs, 16, ., .)
 
 	if(src != 0)
 	{
+		m_c_flag = CFLAG_CLEAR;
 		if((uint32_t)*r_dst == 0x80000000 && src == -1)
 		{
 			m_not_z_flag = 0;
 			m_n_flag = NFLAG_CLEAR;
 			m_v_flag = VFLAG_CLEAR;
-			m_c_flag = CFLAG_CLEAR;
 			*r_dst = 0;
 			return;
 		}
@@ -4596,7 +4595,6 @@ M68KMAKE_OP(divs, 16, ., .)
 			m_not_z_flag = quotient;
 			m_n_flag = NFLAG_16(quotient);
 			m_v_flag = VFLAG_CLEAR;
-			m_c_flag = CFLAG_CLEAR;
 			*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
 			return;
 		}
@@ -4614,6 +4612,7 @@ M68KMAKE_OP(divu, 16, ., d)
 
 	if(src != 0)
 	{
+		m_c_flag = CFLAG_CLEAR;
 		uint32_t quotient = *r_dst / src;
 		uint32_t remainder = *r_dst % src;
 
@@ -4622,7 +4621,6 @@ M68KMAKE_OP(divu, 16, ., d)
 			m_not_z_flag = quotient;
 			m_n_flag = NFLAG_16(quotient);
 			m_v_flag = VFLAG_CLEAR;
-			m_c_flag = CFLAG_CLEAR;
 			*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
 			return;
 		}
@@ -4640,6 +4638,7 @@ M68KMAKE_OP(divu, 16, ., .)
 
 	if(src != 0)
 	{
+		m_c_flag = CFLAG_CLEAR;
 		uint32_t quotient = *r_dst / src;
 		uint32_t remainder = *r_dst % src;
 
@@ -4648,7 +4647,6 @@ M68KMAKE_OP(divu, 16, ., .)
 			m_not_z_flag = quotient;
 			m_n_flag = NFLAG_16(quotient);
 			m_v_flag = VFLAG_CLEAR;
-			m_c_flag = CFLAG_CLEAR;
 			*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
 			return;
 		}

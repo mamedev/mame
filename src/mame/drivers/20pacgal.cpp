@@ -45,6 +45,7 @@
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
+		* Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
 
 +-------------------------------------------------------+
 |                        +-------------+                |
@@ -146,8 +147,12 @@ WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
 
 WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 {
-	m_game_selected = data & 1;
-	membank("bank1")->set_entry(m_game_selected);
+	if (m_game_selected != (data & 1))
+	{
+		m_game_selected = data & 1;
+		m_mainbank->set_entry(m_game_selected);
+		get_pens();
+	}
 }
 
 WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
@@ -194,7 +199,7 @@ void _25pacman_state::_25pacman_map(address_map &map)
 	map(0x04800, 0x05fff).ram();
 	map(0x06000, 0x06fff).writeonly().share("char_gfx_ram");
 	map(0x07000, 0x0717f).w(FUNC(_25pacman_state::sprite_ram_w));
-//  AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)
+//  map(0x08000, 0x09fff).bankr("mainbank").w(FUNC(_20pacgal_state::ram_48000_w));
 	map(0x08000, 0x09fff).nopw();
 	map(0x0a000, 0x0bfff).w(FUNC(_25pacman_state::sprite_gfx_w));
 	map(0x0c000, 0x0dfff).nopw(); // is this the sound waveforms in a different format?
@@ -215,7 +220,7 @@ void _20pacgal_state::_20pacgal_map(address_map &map)
 	map(0x45f00, 0x45fff).w("namco", FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x46000, 0x46fff).writeonly().share("char_gfx_ram");
 	map(0x47100, 0x47100).ram();   /* leftover from original Galaga code */
-	map(0x48000, 0x49fff).bankr("bank1").w(FUNC(_20pacgal_state::ram_48000_w));  /* this should be a mirror of 08000-09fff */
+	map(0x48000, 0x49fff).bankr("mainbank").w(FUNC(_20pacgal_state::ram_48000_w));  /* this should be a mirror of 08000-09fff */
 	map(0x4c000, 0x4dfff).w(FUNC(_20pacgal_state::sprite_gfx_w));
 	map(0x4e000, 0x4e17f).w(FUNC(_20pacgal_state::sprite_ram_w));
 	map(0x4e180, 0x4feff).nopw();
@@ -360,12 +365,11 @@ INPUT_PORTS_END
 
 void _20pacgal_state::common_save_state()
 {
+	m_ram_48000 = make_unique_clear<uint8_t[]>(0x2000);
+
 	save_item(NAME(m_game_selected));
-	save_item(NAME(m_ram_48000));
+	save_pointer(NAME(m_ram_48000.get()), 0x2000);
 	save_item(NAME(m_irq_mask));
-	save_item(NAME(m_sprite_gfx_ram));
-	save_item(NAME(m_sprite_ram));
-	save_item(NAME(m_sprite_color_lookup));
 }
 
 void _20pacgal_state::machine_start()
@@ -373,8 +377,8 @@ void _20pacgal_state::machine_start()
 	common_save_state();
 
 	// membank currently used only by 20pacgal
-	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x08000);
-	membank("bank1")->configure_entry(1, m_ram_48000);
+	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x08000);
+	m_mainbank->configure_entry(1, m_ram_48000.get());
 }
 
 void _25pacman_state::machine_start()
