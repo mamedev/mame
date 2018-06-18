@@ -8185,9 +8185,9 @@ M68KMAKE_OP(pack, 16, mm, ay7)
 		uint32_t ea_src = EA_A7_PD_8();
 		uint32_t src = m68ki_read_8(ea_src);
 		ea_src = EA_A7_PD_8();
-		src = ((src << 8) | m68ki_read_8(ea_src)) + OPER_I_16();
+		src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
 
-		m68ki_write_8(EA_AX_PD_8(), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
+		m68ki_write_8(EA_AX_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x00f));
 		return;
 	}
 	m68ki_exception_illegal();
@@ -8201,9 +8201,9 @@ M68KMAKE_OP(pack, 16, mm, axy7)
 		uint32_t ea_src = EA_A7_PD_8();
 		uint32_t src = m68ki_read_8(ea_src);
 		ea_src = EA_A7_PD_8();
-		src = ((src << 8) | m68ki_read_8(ea_src)) + OPER_I_16();
+		src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
 
-		m68ki_write_8(EA_A7_PD_8(), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
+		m68ki_write_8(EA_A7_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x000f));
 		return;
 	}
 	m68ki_exception_illegal();
@@ -8218,9 +8218,9 @@ M68KMAKE_OP(pack, 16, mm, .)
 		uint32_t ea_src = EA_AY_PD_8();
 		uint32_t src = m68ki_read_8(ea_src);
 		ea_src = EA_AY_PD_8();
-		src = ((src << 8) | m68ki_read_8(ea_src)) + OPER_I_16();
+		src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
 
-		m68ki_write_8(EA_AX_PD_8(), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
+		m68ki_write_8(EA_AX_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x000f));
 		return;
 	}
 	m68ki_exception_illegal();
