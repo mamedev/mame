@@ -501,7 +501,8 @@ Protection file start
 /* RAM-based protection handlings (input) */
 // TODO: unemulated polling mode for player 2 ingame, is it even used?
 // TODO: urashima (at least) reads upper byte of the workram buffer, perhaps for checking previous frame input
-// TODO: no idea about what RBSDTL inputs refers to in 1st MCU games. Doesn't help the different hookup ingame.
+// TODO: RBSDTL in 1st version MCU stands for Bet/Big/Small/Double Up/Take Score/Last Chance
+//      (not hooked up cause none of the dumped games actually uses it)
 void jalmah_state::mcu_fetch_input_polling(required_ioport_array <3> port, uint16_t workram_offset)	
 {
 	MCU_READ(1, 0x0001, workram_offset, 0x00);        /*FF (correct?) */
@@ -739,11 +740,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ctrl_mj1 )
 	PORT_START("P1_KEY0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // (S) Small
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // (R) Bet?
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) // (B) Big?
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0xe9fb, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xe8ea, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_KEY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
@@ -751,22 +755,25 @@ static INPUT_PORTS_START( ctrl_mj1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) // (D) Double Up
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0xe1e0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xe0e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_KEY2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // (T) Take Score
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) // (L) Last Chance
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0xe1e1, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xe0e0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ctrl_mj2 )
