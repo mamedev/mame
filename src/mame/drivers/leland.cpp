@@ -2223,8 +2223,8 @@ ROM_START( offroad )
 	ROM_LOAD( "03-22102-01.u69",  0x08000, 0x4000, CRC(c3f2e443) SHA1(82f22dabc99b3aaa94acaa303735a155ac13e592) )
 	/* 91 = empty */
 	/* 68 = empty */
-	ROM_LOAD( "03-22103-01.u90",  0x14000, 0x4000, CRC(2266757a) SHA1(22aaf4b14f11198ffd14c9830c7997fd47ee14b6) ) /* Also known to labeled as revision 02 */
-	ROM_LOAD( "03-22101-01.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) ) /* Also known to labeled as revision 02 */
+	ROM_LOAD( "03-22103-02.u90",  0x14000, 0x4000, CRC(2266757a) SHA1(22aaf4b14f11198ffd14c9830c7997fd47ee14b6) )
+	ROM_LOAD( "03-22101-02.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) ) /* Also known to labeled as revision 01 */
 	/* 89 = empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -2273,8 +2273,8 @@ ROM_START( offroad3 )
 	ROM_LOAD( "03-22102-01.u69",  0x08000, 0x4000, CRC(c3f2e443) SHA1(82f22dabc99b3aaa94acaa303735a155ac13e592) )
 	/* 91 = empty */
 	/* 68 = empty */
-	ROM_LOAD( "03-22103-01.u90",  0x14000, 0x4000, CRC(2266757a) SHA1(22aaf4b14f11198ffd14c9830c7997fd47ee14b6) ) /* Also known to labeled as revision 02 */
-	ROM_LOAD( "03-22101-01.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) ) /* Also known to labeled as revision 02 */
+	ROM_LOAD( "03-22103-02.u90",  0x14000, 0x4000, CRC(2266757a) SHA1(22aaf4b14f11198ffd14c9830c7997fd47ee14b6) )
+	ROM_LOAD( "03-22101-02.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) ) /* Also known to labeled as revision 01 */
 	/* 89 = empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
