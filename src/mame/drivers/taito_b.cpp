@@ -1735,32 +1735,6 @@ static GFXDECODE_START( gfx_taito_b )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
-static const gfx_layout rambo3_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-static const gfx_layout rambo3_tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ STEP8(0,1), STEP8(8*8,1) },
-	{ STEP8(0,8), STEP8(8*8*2,8) },
-	32*8
-};
-
-static GFXDECODE_START( gfx_rambo3 )
-	GFXDECODE_ENTRY( "gfx1", 0, rambo3_charlayout,  0, 256 )  /* text */
-	GFXDECODE_ENTRY( "gfx1", 0, rambo3_tilelayout,  0, 256 )  /* sprites & playfield */
-GFXDECODE_END
-
 
 /*
     Games that use the mb87078 are: pbobble, spacedx and qzshowby
