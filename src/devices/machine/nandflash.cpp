@@ -287,7 +287,7 @@ WRITE8_MEMBER( nandflash_device::flash_addr_w )
 	if (!m_flash_enab)
 		return;
 
-	uint32_t const max = 0x100 << (1<<m_flash_addr_seq);
+	uint32_t const max = (m_flash_addr_seq < 2) ? 0 : (1 << ((m_flash_addr_seq-1)*8));
 	//logerror("%08x FLASH: addr = %02X (seq = %02X)\n", m_maincpu->pc(), data, m_flash_addr_seq);
 
 	switch( m_flash_addr_seq++ )
@@ -309,9 +309,10 @@ WRITE8_MEMBER( nandflash_device::flash_addr_w )
 			break;
 	}
 	if (m_flash_row_num <= max)
+	{
+		m_flash_row &= (m_flash_row_num-1);
 		m_flash_addr_seq = 0;
-
-	m_flash_row &= (m_flash_row_num-1);
+	}
 }
 
 READ8_MEMBER( nandflash_device::flash_io_r )
@@ -416,7 +417,7 @@ WRITE8_MEMBER(nandflash_device::n3d_flash_addr_w)
 {
 //  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 
-	uint32_t const max = 0x100 << (1<<m_flash_addr_seq);
+	uint32_t const max = (m_flash_addr_seq < 2) ? 0 : (1 << ((m_flash_addr_seq-1)*8));
 	m_flash_addr_seq++;
 
 	if (m_flash_addr_seq==3)
@@ -432,7 +433,7 @@ WRITE8_MEMBER(nandflash_device::n3d_flash_addr_w)
 	{
 		m_flash_addr_seq = 0;
 		m_flash_page_addr = 0;
+//		m_flash_addr &= (m_flash_row_num-1); acheart NAND size is 0x10800898
 		logerror("set flash block to %08x\n", m_flash_addr);
 	}
-	m_flash_addr &= (m_flash_row_num-1);
 }
