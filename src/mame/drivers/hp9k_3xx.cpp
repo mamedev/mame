@@ -165,7 +165,16 @@ public:
 	void hp9k3xx_common(address_map &map);
 	void iocpu_map(address_map &map);
 private:
+
+	static constexpr uint8_t HIL_CS = 0x01;
+	static constexpr uint8_t HIL_WE = 0x02;
+	static constexpr uint8_t HIL_OE = 0x04;
+	static constexpr uint8_t LATCH_EN = 0x08;
+	static constexpr uint8_t KBD_RESET = 0x40;
+	static constexpr uint8_t SN76494_EN = 0x80;
+
 	bool m_hil_read;
+	bool m_kbd_nmi;
 	uint8_t m_hil_data;
 	uint8_t m_latch_data;
 	uint32_t m_lastpc;
@@ -208,7 +217,6 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
 	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
-
 }
 
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
@@ -347,6 +355,8 @@ READ8_MEMBER(hp9k3xx_state::gpib_r)
 	case 2:
 		/* Address */
 		data = (m_tms9914->cont_r() ? 0x0 : 0x40) | 0x81;
+		if (m_kbd_nmi)
+			data |= 0x04;
 		break;
 	}
 	LOG("gpib_r: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
@@ -395,12 +405,6 @@ WRITE8_MEMBER(hp9k3xx_state::iocpu_port1_w)
 	m_hil_data = data;
 }
 
-static constexpr uint8_t HIL_CS = 0x01;
-static constexpr uint8_t HIL_WE = 0x02;
-static constexpr uint8_t HIL_OE = 0x04;
-static constexpr uint8_t LATCH_EN = 0x08;
-static constexpr uint8_t SN76494_EN = 0x80;
-
 WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 {
 	if ((data & (HIL_CS|HIL_WE)) == 0)
@@ -415,6 +419,14 @@ WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 		m_latch_data = m_hil_data;
 
 	m_maincpu->set_input_line(M68K_IRQ_1, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
+
+	if (!(data & KBD_RESET)) {
+		m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
+		m_kbd_nmi = true;
+	} else {
+		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+		m_kbd_nmi = false;
+	}
 }
 
 READ8_MEMBER(hp9k3xx_state::iocpu_port1_r)
