@@ -175,7 +175,7 @@ Common game codes:
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
 #include "machine/rtc9701.h"
-#include "machine/serflash.h"
+#include "machine/nandflash.h"
 #include "sound/ymz770.h"
 #include "video/epic12.h"
 
@@ -193,7 +193,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_blitter(*this, "blitter"),
-		m_serflash(*this, "game"),
+		m_nandflash(*this, "game"),
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "mainram"),
 		m_rombase(*this, "rombase"),
@@ -205,7 +205,7 @@ public:
 
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
-	required_device<serflash_device> m_serflash;
+	required_device<nandflash_device> m_nandflash;
 	required_device<rtc9701_device> m_eeprom;
 
 	required_shared_ptr<uint64_t> m_ram;
@@ -260,7 +260,7 @@ uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 READ64_MEMBER( cv1k_state::flash_port_e_r )
 {
-	return ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
+	return ((m_nandflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
@@ -281,7 +281,7 @@ READ8_MEMBER( cv1k_state::flash_io_r )
 			return 0xff;
 
 		case 0x00:
-			return m_serflash->flash_io_r(space,offset);
+			return m_nandflash->flash_io_r(space,offset);
 	}
 }
 
@@ -295,15 +295,15 @@ WRITE8_MEMBER( cv1k_state::flash_io_w )
 			break;
 
 		case 0x00:
-			m_serflash->flash_data_w(space, offset, data);
+			m_nandflash->flash_data_w(space, offset, data);
 			break;
 
 		case 0x01:
-			m_serflash->flash_cmd_w(space, offset, data);
+			m_nandflash->flash_cmd_w(space, offset, data);
 			break;
 
 		case 0x2:
-			m_serflash->flash_addr_w(space, offset, data);
+			m_nandflash->flash_addr_w(space, offset, data);
 			break;
 	}
 }
@@ -332,7 +332,7 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 			m_eepromout->write(data, 0xff);
 			break;
 		case 0x03:
-			m_serflash->flash_enab_w(space,offset,data);
+			m_nandflash->flash_enab_w(space,offset,data);
 			break;
 
 		default:
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_RTC9701_ADD("eeprom")
-	MCFG_SERFLASH_ADD("game")
+	MCFG_DEVICE_ADD("game", NANDFLASH)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

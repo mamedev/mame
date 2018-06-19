@@ -1,19 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia
-/* Serial Flash */
+/* NAND Flash */
 
-#ifndef MAME_MACHINE_SERFLASH_H
-#define MAME_MACHINE_SERFLASH_H
+#ifndef MAME_MACHINE_NANDFLASH_H
+#define MAME_MACHINE_NANDFLASH_H
 
 #pragma once
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SERFLASH_ADD(_tag) \
-		MCFG_DEVICE_ADD(_tag, SERFLASH, 0)
 
 
 //**************************************************************************
@@ -21,17 +13,17 @@
 //**************************************************************************
 
 
-// ======================> serflash_device
+// ======================> nandflash_device
 
-class serflash_device : public device_t, public device_nvram_interface
+class nandflash_device : public device_t, public device_nvram_interface
 {
 public:
 	// custom initialization for default state
-	typedef device_delegate<void (serflash_device &, void *, size_t)> init_delegate;
+	typedef device_delegate<void (nandflash_device &, void *, size_t)> init_delegate;
 
 
 	// construction/destruction
-	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nandflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER( flash_ready_r );
 	DECLARE_READ8_MEMBER( flash_io_r );
@@ -76,7 +68,9 @@ protected:
 	uint8_t m_flash_addr_seq;
 	uint8_t m_flash_read_seq;
 
-	uint16_t m_flash_row, m_flash_col;
+	uint32_t m_flash_row_num;
+	uint32_t m_flash_row;
+	uint16_t m_flash_col;
 	int m_flash_page_addr;
 	uint16_t m_flash_page_index;
 
@@ -92,6 +86,6 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(SERFLASH, serflash_device)
+DECLARE_DEVICE_TYPE(NANDFLASH, nandflash_device)
 
-#endif // MAME_MACHINE_SERFLASH_H
+#endif // MAME_MACHINE_NANDFLASH_H

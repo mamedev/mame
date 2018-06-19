@@ -2506,13 +2506,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
+--@src/devices/machine/nandflash.h,MACHINES["NANDFLASH"] = true
 ---------------------------------------------------
 
-if (MACHINES["SERFLASH"]~=null) then
+if (MACHINES["NANDFLASH"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/serflash.cpp",
-		MAME_DIR .. "src/devices/machine/serflash.h",
+		MAME_DIR .. "src/devices/machine/nandflash.cpp",
+		MAME_DIR .. "src/devices/machine/nandflash.h",
 	}
 end
 

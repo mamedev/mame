@@ -1,36 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia
-/* Serial Flash Device */
+/* NAND Flash Device */
 
 /* todo: cleanup, refactor etc. */
 /* ghosteo.c is similar? */
 
 #include "emu.h"
-#include "machine/serflash.h"
+#include "machine/nandflash.h"
 
 
-ALLOW_SAVE_TYPE(serflash_device::flash_state_t);
+ALLOW_SAVE_TYPE(nandflash_device::flash_state_t);
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(SERFLASH, serflash_device, "serflash", "Serial Flash")
+DEFINE_DEVICE_TYPE(NANDFLASH, nandflash_device, "nandflash", "NAND Flash")
 
 //-------------------------------------------------
-//  serflash_device - constructor
+//  nandflash_device - constructor
 //-------------------------------------------------
 
-serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SERFLASH, tag, owner, clock)
+nandflash_device::nandflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NANDFLASH, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_length(0)
 	, m_region(nullptr)
 	, m_flash_state()
 	, m_flash_enab(0)
 	, m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0)
-	, m_flash_row(0), m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
+	, m_flash_row_num(0), m_flash_row(0), m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
 {
 }
 
@@ -40,13 +40,14 @@ serflash_device::serflash_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void serflash_device::device_start()
+void nandflash_device::device_start()
 {
 	m_length = machine().root_device().memregion(tag())->bytes();
 	m_region = machine().root_device().memregion(tag())->base();
 
-	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
-	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);
+	m_flash_row_num = m_length / FLASH_PAGE_SIZE;
+	m_flashwritemap.resize(m_flash_row_num);
+	memset(&m_flashwritemap[0], 0, m_flash_row_num);
 
 	save_item(NAME(m_flash_state));
 	save_item(NAME(m_flash_enab));
@@ -64,7 +65,7 @@ void serflash_device::device_start()
 	save_item(NAME(m_flash_page_data));
 }
 
-void serflash_device::device_reset()
+void nandflash_device::device_reset()
 {
 	m_flash_enab = 0;
 	flash_hard_reset();
@@ -77,25 +78,24 @@ void serflash_device::device_reset()
 }
 
 //-------------------------------------------------
-//  serflash_default - called to initialize SERFLASH to
+//  nandflash_default - called to initialize NANDFLASH to
 //  its default state
 //-------------------------------------------------
 
-void serflash_device::nvram_default()
+void nandflash_device::nvram_default()
 {
 }
 
 
 //-------------------------------------------------
-//  nvram_read - called to read SERFLASH from the
+//  nvram_read - called to read NANDFLASH from the
 //  .nv file
 //-------------------------------------------------
 
-void serflash_device::nvram_read(emu_file &file)
+void nandflash_device::nvram_read(emu_file &file)
 {
 	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
-	int size = m_length / FLASH_PAGE_SIZE;
-
+	int size = m_flash_row_num;
 
 	if (file.is_open())
 	{
@@ -108,19 +108,18 @@ void serflash_device::nvram_read(emu_file &file)
 			file.read(&page, 4);
 		}
 	}
-
 }
 
 
 //-------------------------------------------------
-//  nvram_write - called to write SERFLASH to the
+//  nvram_write - called to write NANDFLASH to the
 //  .nv file
 //-------------------------------------------------
 
-void serflash_device::nvram_write(emu_file &file)
+void nandflash_device::nvram_write(emu_file &file)
 {
 	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
-	int size = m_length / FLASH_PAGE_SIZE;
+	int size = m_flash_row_num;
 
 	uint32_t page = 0;
 	while (page < size)
@@ -135,7 +134,7 @@ void serflash_device::nvram_write(emu_file &file)
 	file.write(&page, 4);
 }
 
-void serflash_device::flash_hard_reset()
+void nandflash_device::flash_hard_reset()
 {
 //  logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
 
@@ -155,13 +154,13 @@ void serflash_device::flash_hard_reset()
 	m_flash_page_index = 0;
 }
 
-WRITE8_MEMBER( serflash_device::flash_enab_w )
+WRITE8_MEMBER( nandflash_device::flash_enab_w )
 {
 	//logerror("%08x FLASH: enab = %02X\n", m_maincpu->pc(), data);
 	m_flash_enab = data;
 }
 
-void serflash_device::flash_change_state(flash_state_t state)
+void nandflash_device::flash_change_state(flash_state_t state)
 {
 	m_flash_state = state;
 
@@ -174,7 +173,7 @@ void serflash_device::flash_change_state(flash_state_t state)
 	//logerror("flash_change_state - FLASH: state = %s\n", m_flash_state_name[state]);
 }
 
-WRITE8_MEMBER( serflash_device::flash_cmd_w )
+WRITE8_MEMBER( nandflash_device::flash_cmd_w )
 {
 	if (!m_flash_enab)
 		return;
@@ -273,7 +272,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 	}
 }
 
-WRITE8_MEMBER( serflash_device::flash_data_w )
+WRITE8_MEMBER( nandflash_device::flash_data_w )
 {
 	if (!m_flash_enab)
 		return;
@@ -283,11 +282,12 @@ WRITE8_MEMBER( serflash_device::flash_data_w )
 	m_flash_page_addr++;
 }
 
-WRITE8_MEMBER( serflash_device::flash_addr_w )
+WRITE8_MEMBER( nandflash_device::flash_addr_w )
 {
 	if (!m_flash_enab)
 		return;
 
+	uint32_t const max = 0x100 << (1<<m_flash_addr_seq);
 	//logerror("%08x FLASH: addr = %02X (seq = %02X)\n", m_maincpu->pc(), data, m_flash_addr_seq);
 
 	switch( m_flash_addr_seq++ )
@@ -299,16 +299,22 @@ WRITE8_MEMBER( serflash_device::flash_addr_w )
 			m_flash_col = (m_flash_col & 0x00ff) | (data << 8);
 			break;
 		case 2:
-			m_flash_row = (m_flash_row & 0xff00) | data;
+			m_flash_row = (m_flash_row & ~0xff) | data;
 			break;
 		case 3:
-			m_flash_row = (m_flash_row & 0x00ff) | (data << 8);
-			m_flash_addr_seq = 0;
+			m_flash_row = (m_flash_row & ~0xff00) | (data << 8);
+			break;
+		case 4:
+			m_flash_row = (m_flash_row & ~0xff0000) | (data << 16);
 			break;
 	}
+	if (m_flash_row_num <= max)
+		m_flash_addr_seq = 0;
+
+	m_flash_row &= (m_flash_row_num-1);
 }
 
-READ8_MEMBER( serflash_device::flash_io_r )
+READ8_MEMBER( nandflash_device::flash_io_r )
 {
 	uint8_t data = 0x00;
 //  uint32_t old;
@@ -367,14 +373,14 @@ READ8_MEMBER( serflash_device::flash_io_r )
 	return data;
 }
 
-READ8_MEMBER( serflash_device::flash_ready_r )
+READ8_MEMBER( nandflash_device::flash_ready_r )
 {
 	return 1;
 }
 
 
 
-READ8_MEMBER(serflash_device::n3d_flash_r)
+READ8_MEMBER(nandflash_device::n3d_flash_r)
 {
 	if (m_last_flash_cmd==0x70) return 0xe0;
 
@@ -395,7 +401,7 @@ READ8_MEMBER(serflash_device::n3d_flash_r)
 }
 
 
-WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
+WRITE8_MEMBER(nandflash_device::n3d_flash_cmd_w)
 {
 	logerror("n3d_flash_cmd_w %02x %02x\n", offset, data);
 	m_last_flash_cmd = data;
@@ -403,30 +409,30 @@ WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
 	if (data==0x00)
 	{
 		memcpy(m_flash_page_data, m_region + m_flash_addr * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
-
 	}
-
 }
 
-WRITE8_MEMBER(serflash_device::n3d_flash_addr_w)
+WRITE8_MEMBER(nandflash_device::n3d_flash_addr_w)
 {
 //  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 
+	uint32_t const max = 0x100 << (1<<m_flash_addr_seq);
 	m_flash_addr_seq++;
 
 	if (m_flash_addr_seq==3)
-		m_flash_addr = (m_flash_addr & 0xffff00) | data;
+		m_flash_addr = (m_flash_addr & ~0xff) | data;
 
 	if (m_flash_addr_seq==4)
-		m_flash_addr = (m_flash_addr & 0xff00ff) | data << 8;
+		m_flash_addr = (m_flash_addr & ~0xff00) | data << 8;
 
 	if (m_flash_addr_seq==5)
-		m_flash_addr = (m_flash_addr & 0x00ffff) | data << 16;
+		m_flash_addr = (m_flash_addr & ~0xff0000) | data << 16;
 
-	if (m_flash_addr_seq==5)
+	if (m_flash_row_num <= max)
 	{
 		m_flash_addr_seq = 0;
 		m_flash_page_addr = 0;
 		logerror("set flash block to %08x\n", m_flash_addr);
 	}
+	m_flash_addr &= (m_flash_row_num-1);
 }

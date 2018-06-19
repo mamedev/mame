@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/serflash.h"
+#include "machine/nandflash.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -31,12 +31,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
-		m_serflash(*this, "flash")
+		m_nandflash(*this, "flash")
 	{ }
 
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<cpu_device> m_maincpu;
-	required_device<serflash_device> m_serflash;
+	required_device<nandflash_device> m_nandflash;
 
 	DECLARE_READ32_MEMBER(nexus3d_unk_r);
 //  DECLARE_READ32_MEMBER(nexus3d_unk2_r);
@@ -86,9 +86,9 @@ void nexus3d_state::nexus3d_map(address_map &map)
 	map(0x00400000, 0x01ffffff).ram(); // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
 
 	// flash
-	map(0x9C000000, 0x9C000003).r(m_serflash, FUNC(serflash_device::n3d_flash_r));
-	map(0x9C000010, 0x9C000013).w(m_serflash, FUNC(serflash_device::n3d_flash_cmd_w));
-	map(0x9C000018, 0x9C00001b).w(m_serflash, FUNC(serflash_device::n3d_flash_addr_w));
+	map(0x9C000000, 0x9C000003).r(m_nandflash, FUNC(nandflash_device::n3d_flash_r));
+	map(0x9C000010, 0x9C000013).w(m_nandflash, FUNC(nandflash_device::n3d_flash_cmd_w));
+	map(0x9C000018, 0x9C00001b).w(m_nandflash, FUNC(nandflash_device::n3d_flash_addr_w));
 
 	// lots of accesses in this range
 	// 0xc00018xx seems CRTC related
@@ -134,7 +134,7 @@ MACHINE_CONFIG_START(nexus3d_state::nexus3d)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_SERFLASH_ADD("flash")
+	MCFG_DEVICE_ADD("flash", NANDFLASH)
 
 MACHINE_CONFIG_END
 
