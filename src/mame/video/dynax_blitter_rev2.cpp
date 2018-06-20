@@ -33,7 +33,7 @@
 #include "emu.h"
 #include "dynax_blitter_rev2.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 

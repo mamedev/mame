@@ -202,7 +202,6 @@ public:
 	int debug_mask();
 	int debug_viewer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void dynax_common_reset();
-	void tenkai_update_irq();
 	void tenkai_show_6c();
 	void mjfriday(machine_config &config);
 	void yarunara(machine_config &config);
@@ -283,7 +282,6 @@ protected:
 	std::unique_ptr<uint8_t[]>  m_pixmap[8][2];
 
 	/* irq */
-	bool m_blitter_irq;
 	bool m_blitter_irq_mask;
 	bool m_blitter2_irq_mask;
 

@@ -123,10 +123,7 @@ WRITE_LINE_MEMBER(dynax_state::blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
 	if (!m_blitter_irq_mask)
-	{
-		m_blitter_irq = 0;
 		m_mainirq->rst4_w(0);
-	}
 }
 
 WRITE_LINE_MEMBER(dynax_state::sprtmtch_vblank_w)
@@ -4129,7 +4126,6 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	m_blitter_irq_mask = 1;
 	m_blitter2_irq_mask = 1;
 
-	save_item(NAME(m_blitter_irq));
 	save_item(NAME(m_blitter_irq_mask));
 	save_item(NAME(m_blitter2_irq_mask));
 
@@ -4155,8 +4151,6 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 {
 	if (m_msm != nullptr)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
-
-	m_blitter_irq = 0;
 
 	m_input_sel = 0;
 	m_dsw_sel = 0;
@@ -4870,16 +4864,7 @@ MACHINE_CONFIG_END
 WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_irq_w)
 {
 	if (state && m_blitter_irq_mask)
-	{
-		m_blitter_irq = 1;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
-	}
-}
-
-void dynax_state::tenkai_update_irq()
-{
-	if (m_blitter_irq_mask)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
@@ -4887,12 +4872,7 @@ WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 	m_blitter_irq_mask = state;
 
 	if (!m_blitter_irq_mask)
-	{
-		m_blitter_irq = 0;
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
-	else
-		tenkai_update_irq();
 }
 
 
