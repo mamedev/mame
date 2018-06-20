@@ -4303,7 +4303,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_blit_romregion_w)
 void ddenlovr_state::htengoku_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x07).w(FUNC(ddenlovr_state::dynax_blitter_rev2_w));       // Blitter
+	map(0x01, 0x07).w("blitter", FUNC(dynax_blitter_rev2_device::regs_w));       // Blitter
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::htengoku_select_w));      // Controls
 	map(0x21, 0x21).w(FUNC(ddenlovr_state::htengoku_coin_w));        //
 	map(0x22, 0x22).r(FUNC(ddenlovr_state::htengoku_coin_r));         //
@@ -4326,7 +4326,7 @@ void ddenlovr_state::htengoku_io_map(address_map &map)
 	map(0xc0, 0xc0).w(FUNC(ddenlovr_state::dynax_extra_scrollx_w));  // screen scroll X
 	map(0xc1, 0xc1).w(FUNC(ddenlovr_state::dynax_extra_scrolly_w));  // screen scroll Y
 	map(0xc3, 0xc3).w(FUNC(ddenlovr_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
-	map(0xc4, 0xc4).w(FUNC(ddenlovr_state::dynax_blit_pen_w));       // Destination Pen
+	map(0xc4, 0xc4).w("blitter", FUNC(dynax_blitter_rev2_device::pen_w));       // Destination Pen
 	map(0xc5, 0xc5).w(FUNC(ddenlovr_state::dynax_blit_dest_w));      // Destination Layer
 	map(0xc6, 0xc6).w(FUNC(ddenlovr_state::htengoku_blit_romregion_w));  // Blitter ROM bank
 	map(0xe0, 0xe7).w(m_mainlatch, FUNC(ls259_device::write_d1));
@@ -4388,6 +4388,12 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, sprtmtch_vblank_w))
+
+	MCFG_DEVICE_ADD("blitter", DYNAX_BLITTER_REV2, 0)
+	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
+	MCFG_DYNAX_BLITTER_REV2_SCROLLX_CB(WRITE8(*this, dynax_state, dynax_blit_scrollx_w))
+	MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(WRITE8(*this, dynax_state, dynax_blit_scrolly_w))
+	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE(*this, dynax_state, sprtmtch_blitter_irq_w))
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -13036,20 +13042,16 @@ ROM_START( htengoku )
 	ROM_LOAD( "6501.4b", 0x00000, 0x40000, CRC(29a7fc83) SHA1(5d3cf0a72918e58b5b60f7c978e559c7c1306bce) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    // blitter data
-	ROM_LOAD( "6506.4c",  0x00000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
-
-	ROM_REGION( 0xc0000, "gfx2", 0 )    // blitter data
-	ROM_LOAD( "6507.5c", 0x00000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
-	ROM_LOAD( "6508.6c", 0x20000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
-	ROM_LOAD( "6505.2b", 0x40000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
-	ROM_LOAD( "6504.1b", 0x60000, 0x20000, CRC(b2ca9838) SHA1(7104697802a0466fab40414a467146a224eb6a74) )
-	ROM_LOAD( "6503.2a", 0x80000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
-	ROM_LOAD( "6502.1a", 0xa0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
-
-	ROM_REGION( 0xa0000, "gfx3", 0 )    // blitter data
-	ROM_LOAD( "6509.10b", 0x00000, 0x80000, CRC(f8524c28) SHA1(d50b99664c9f0735838adb55aa7db53e58a43f99) )
-	ROM_LOAD( "6510.11b", 0x80000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
+	ROM_REGION( 0x300000, "blitter", 0 )    // blitter data
+	ROM_LOAD( "6506.4c",  0x000000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
+	ROM_LOAD( "6507.5c",  0x100000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
+	ROM_LOAD( "6508.6c",  0x120000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
+	ROM_LOAD( "6505.2b",  0x140000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
+	ROM_LOAD( "6504.1b",  0x160000, 0x20000, CRC(b2ca9838) SHA1(7104697802a0466fab40414a467146a224eb6a74) )
+	ROM_LOAD( "6503.2a",  0x180000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
+	ROM_LOAD( "6502.1a",  0x1a0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
+	ROM_LOAD( "6509.10b", 0x200000, 0x80000, CRC(f8524c28) SHA1(d50b99664c9f0735838adb55aa7db53e58a43f99) )
+	ROM_LOAD( "6510.11b", 0x280000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
 GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)

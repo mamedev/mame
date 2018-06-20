@@ -12,6 +12,7 @@
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "machine/74259.h"
+#include "video/dynax_blitter_rev2.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -31,14 +32,9 @@ public:
 		, m_mainirq(*this, "mainirq")
 		, m_soundirq(*this, "soundirq")
 		, m_soundlatch(*this, "soundlatch")
-		, m_gfx_region1(*this, "gfx1")
-		, m_gfx_region2(*this, "gfx2")
-		, m_gfx_region3(*this, "gfx3")
-		, m_gfx_region4(*this, "gfx4")
-		, m_gfx_region5(*this, "gfx5")
-		, m_gfx_region6(*this, "gfx6")
-		, m_gfx_region7(*this, "gfx7")
-		, m_gfx_region8(*this, "gfx8")
+		, m_blitter(*this, "blitter")
+		, m_blitter2(*this, "blitter2")
+		, m_blitter_gfx(*this, "blitter")
 		, m_led(*this, "led0")
 	{
 	}
@@ -47,9 +43,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(sprtmtch_blitter_irq_w);
 	DECLARE_WRITE8_MEMBER(jantouki_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter2_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter2_irq_w);
 	DECLARE_WRITE8_MEMBER(jantouki_sound_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(coincounter_0_w);
 	DECLARE_WRITE_LINE_MEMBER(coincounter_1_w);
@@ -110,14 +109,12 @@ public:
 	DECLARE_WRITE8_MEMBER(gekisha_p4_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_pen_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit2_pen_w);
+	//DECLARE_WRITE8_MEMBER(dynax_blit_pen_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_dest_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(mjembase_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_backpen_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_flags_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette01_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_palette01_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette45_w);
@@ -138,14 +135,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_romregion_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_scroll_w);
-	DECLARE_WRITE8_MEMBER(tenkai_blit_scroll_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit2_scroll_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev2_w);
-	DECLARE_WRITE8_MEMBER(tenkai_blitter_rev2_w);
-	DECLARE_WRITE8_MEMBER(cdracula_blitter_rev2_w);
-	DECLARE_WRITE8_MEMBER(jantouki_blitter_rev2_w);
-	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
+	DECLARE_WRITE8_MEMBER(hanamai_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(cdracula_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(hnoridur_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(drgpunch_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(jantouki_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(jantouki_blit2_pixel_w);
+	DECLARE_WRITE8_MEMBER(mjdialq2_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_scrollx_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_scrolly_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_scrollx_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_scrolly_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blit_scrollx_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blit_scrolly_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
 	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
@@ -179,6 +181,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
 	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
 	DECLARE_READ8_MEMBER(tenkai_dsw_r);
+	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_ack_w);
 	DECLARE_MACHINE_RESET(dynax);
 	DECLARE_MACHINE_START(dynax);
@@ -198,20 +201,13 @@ public:
 	DECLARE_VIDEO_START(neruton);
 	DECLARE_VIDEO_START(tenkai);
 
-	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
-	int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
-	void dynax_blitter_start( int flags );
-	void jantouki_blitter_start( int flags );
-	void jantouki_blitter2_start( int flags );
+	//int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y );
 	void mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 	int debug_mask();
 	int debug_viewer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void dynax_common_reset();
-	void sprtmtch_update_irq();
-	void jantouki_update_irq();
-	void mjelctrn_update_irq();
 	void tenkai_update_irq();
 	void tenkai_show_6c();
 	void mjfriday(machine_config &config);
@@ -284,26 +280,17 @@ protected:
 	optional_device<rst_pos_buffer_device> m_mainirq;
 	optional_device<rst_pos_buffer_device> m_soundirq;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_region_ptr<uint8_t> m_gfx_region1;
-	optional_region_ptr<uint8_t> m_gfx_region2;
-	optional_region_ptr<uint8_t> m_gfx_region3;
-	optional_region_ptr<uint8_t> m_gfx_region4;
-	optional_region_ptr<uint8_t> m_gfx_region5;
-	optional_region_ptr<uint8_t> m_gfx_region6;
-	optional_region_ptr<uint8_t> m_gfx_region7;
-	optional_region_ptr<uint8_t> m_gfx_region8;
+	optional_device<dynax_blitter_rev2_device> m_blitter;
+	optional_device<dynax_blitter_rev2_device> m_blitter2;
+	optional_region_ptr<uint8_t> m_blitter_gfx;
 	output_finder<> m_led;
-
-	memory_region * m_gfxregions[8];
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<uint8_t[]>  m_pixmap[8][2];
 
 	/* irq */
-	irq_func m_update_irq_func;
 	bool m_blitter_irq;
 	bool m_blitter_irq_mask;
-	bool m_blitter2_irq;
 	bool m_blitter2_irq_mask;
 
 	/* blitters */
@@ -311,20 +298,8 @@ protected:
 	int m_blit2_scroll_x;
 	int m_blit_scroll_y;
 	int m_blit2_scroll_y;
-	int m_blit_wrap_enable;
-	int m_blit2_wrap_enable;
-	int m_blit_x;
-	int m_blit_y;
-	int m_blit2_x;
-	int m_blit2_y;
-	int m_blit_src;
-	int m_blit2_src;
-	int m_blit_romregion;
-	int m_blit2_romregion;
 	int m_blit_dest;
 	int m_blit2_dest;
-	int m_blit_pen;
-	int m_blit2_pen;
 	int m_blit_palbank;
 	int m_blit2_palbank;
 	int m_blit_palettes;
