@@ -1078,10 +1078,10 @@ void urashima_state::machine_reset()
 	
 	// initialize tilemap vram to sane defaults (test mode cares)
 	for(int i=0;i<0x4000/2;i++)
-	{
 		m_videoram[0][i] = 0xffff;
+
+	for(int i=0;i<0x2000/2;i++)
 		m_videoram[1][i] = 0xffff;
-	}
 	
 	mcu_check_test_mode();
 }
