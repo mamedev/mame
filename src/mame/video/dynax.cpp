@@ -636,13 +636,6 @@ VIDEO_START_MEMBER(dynax_state,neruton)
 //  m_priority_table = priority_mjelctrn;
 }
 
-VIDEO_START_MEMBER(dynax_state,tenkai)
-{
-	VIDEO_START_CALL_MEMBER(hnoridur);
-
-	m_priority_table = priority_mjelctrn;
-}
-
 /***************************************************************************
 
 

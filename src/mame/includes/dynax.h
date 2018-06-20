@@ -39,8 +39,6 @@ public:
 	{
 	}
 
-	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't
-
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(sprtmtch_blitter_irq_w);
@@ -81,8 +79,6 @@ public:
 	DECLARE_WRITE8_MEMBER(jantouki_soundlatch_w);
 	DECLARE_READ8_MEMBER(jantouki_blitter_busy_r);
 	DECLARE_WRITE8_MEMBER(jantouki_rombank_w);
-	DECLARE_WRITE8_MEMBER(jantouki_soundlatch_ack_w);
-	DECLARE_READ8_MEMBER(jantouki_soundlatch_r);
 	DECLARE_READ8_MEMBER(jantouki_soundlatch_status_r);
 	DECLARE_READ8_MEMBER(mjelctrn_keyboard_1_r);
 	DECLARE_READ8_MEMBER(mjelctrn_dsw_r);
@@ -102,7 +98,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tenkai_6c_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_70_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_romregion_w);
-	DECLARE_WRITE8_MEMBER(tenkai_mainlatch_w);
 	DECLARE_READ8_MEMBER(gekisha_keyboard_0_r);
 	DECLARE_READ8_MEMBER(gekisha_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(gekisha_hopper_w);
@@ -199,7 +194,6 @@ public:
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
 	DECLARE_VIDEO_START(neruton);
-	DECLARE_VIDEO_START(tenkai);
 
 	//int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y );

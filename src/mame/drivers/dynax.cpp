@@ -4947,7 +4947,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
-	MCFG_VIDEO_START_OVERRIDE(dynax_state,tenkai)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
