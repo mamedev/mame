@@ -1022,7 +1022,7 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
 	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
 	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:!5,!6,!7")
