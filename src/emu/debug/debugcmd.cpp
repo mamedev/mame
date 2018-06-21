@@ -156,6 +156,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("gv",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1, _2));
 	m_console.register_command("gint",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
 	m_console.register_command("gi",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
+	m_console.register_command("gex",       CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
+	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
@@ -863,6 +865,21 @@ void debugger_commands::execute_go_interrupt(int ref, const std::vector<std::str
 		return;
 
 	m_cpu.get_visible_cpu()->debug()->go_interrupt(irqline);
+}
+
+/*-------------------------------------------------
+    execute_go_exception - execute the goex command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_exception(int ref, const std::vector<std::string> &params)
+{
+	u64 exception = -1;
+
+	/* if we have a parameter, use it instead */
+	if (params.size() > 0 && !validate_number_parameter(params[0], exception))
+		return;
+
+	m_cpu.get_visible_cpu()->debug()->go_exception(exception);
 }
 
 
