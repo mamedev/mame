@@ -14,11 +14,12 @@
     Pictures:
     Original EchoII card, S/N 789 with ?original? TMS5200: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/SEC%20-%20Echo%20II%20rev.A%20-%20Front.jpg
     Original EchoII card, S/N 103, with a much later 1987 non-original TSP5220C installed: https://upload.wikimedia.org/wikipedia/en/e/ee/Echo2Card.jpg
-    Later EchoII without the VSM socket footprints, and with the 'FREQ' potentiometer: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/Echo%20II%20-%20Front.jpg
-    EchoIIb, similar to later EchoII but without the 'FREQ' potentiometer and with the 74LS92 clock divider: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/Echo%20IIb%20-%20Front.jpg
+    Later EchoII, S/N 1793, with original TMS5220, no VSM socket footprints, and with the 'FREQ' potentiometer: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/Echo%20II%20-%20Front.jpg
+    EchoIIb, similar to later EchoII but with soldered-down original TMS5220C, no 'FREQ' potentiometer and with the 74LS92 clock divider: http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Speech/Street%20Echo%20II/Photos/Echo%20IIb%20-%20Front.jpg
 
     TODO: separate cards for the EchoII(both the freq adjustable and the older non-adjustable version, and maybe a tms5200 version?), EchoIIb (tms5220c)
-    TODO: echo+ is in a2mockinboard.cpp and really should be a sub-device inherited from here, to reduce duplicated code.
+    TODO: echo+ is in a2mockingboard.cpp and really should be a sub-device inherited from here, to reduce duplicated code.
+    TODO: find a hi-res picture of an echo+ card
 *********************************************************************/
 
 #include "emu.h"
@@ -26,9 +27,12 @@
 #include "sound/tms5220.h"
 #include "speaker.h"
 
-#undef DEBUG_ECHOII_READYQ
-#undef DEBUG_ECHOII_READ
-#undef DEBUG_ECHOII_WRITE
+#define LOG_READYQ (1 << 0)
+#define LOG_READ (1 << 1)
+#define LOG_WRITE (1 << 2)
+
+//#define VERBOSE (LOG_READYQ | LOG_READ | LOG_WRITE)
+#include "logmacro.h"
 
 
 /***************************************************************************
@@ -110,16 +114,12 @@ WRITE_LINE_MEMBER(a2bus_echoii_device::tms_readyq_callback)
 {
 	if (state == ASSERT_LINE)
 	{
-#ifdef DEBUG_ECHOII_READYQ
-		logerror("ReadyQ callback called with state of %d! NOT READY\n", state);
-#endif
+		LOGMASKED(LOG_READYQ,"ReadyQ callback called with state of %d! NOT READY\n", state);
 		// the rising edge of /READY doesn't really do anything.
 	}
 	else
 	{
-#ifdef DEBUG_ECHOII_READYQ
-		logerror("ReadyQ callback called with state of %d! READY\n", state);
-#endif
+		LOGMASKED(LOG_READYQ,"ReadyQ callback called with state of %d! READY\n", state);
 		m_writelatch_flag = true;
 		m_tms->wsq_w(m_writelatch_flag);
 	}
@@ -127,21 +127,17 @@ WRITE_LINE_MEMBER(a2bus_echoii_device::tms_readyq_callback)
 
 uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 {
-	// offset is completely ignored, the same register maps to the entire space.
+	// offset is completely ignored on the echoii (but not so on the echo+), so the same register maps to the entire space.
 	uint8_t retval = 0xff; // pull-up resistor pack on the tms5220 bus
 
 	// upon the falling edge of /DEVREAD, the active part of the read...
 	if (m_readlatch_flag == false) // /RS was low, so we need to return a value from the tms5220
 	{
 		retval = 0x1f | m_tms->status_r(machine().dummy_space(), 0, 0xff);
-#ifdef DEBUG_ECHOII_READ
-		logerror("Returning status of speech chip, which is %02x\n", retval);
+		LOGMASKED(LOG_READ,"Returning status of speech chip, which is %02x\n", retval);
 	}
 	else
-	{
-		logerror("chip status read on odd cycle, returning pull-up value of %02x\n", retval);
-#endif
-	}
+		LOGMASKED(LOG_READ,"chip status read on odd cycle, returning pull-up value of %02x\n", retval);
 
 	// upon the rising edge of /DEVREAD, i.e. after the read has finished (so no updating retval after this)
 	m_readlatch_flag = (!m_readlatch_flag); // latch inverts itself upon each read...
@@ -151,13 +147,12 @@ uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 
 void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	// offset is completely ignored, the same register maps to the entire space.
+	// offset is completely ignored on the echoii (but not so on the echo+), so the same register maps to the entire space.
 	if (m_writelatch_flag == false)
 		logerror("Data in echoii latch (%02x) was clobbered with new write (%02x) before being read by speech chip!\n", m_writelatch_data, data);
-#ifdef DEBUG_ECHOII_WRITE
 	else
-		logerror("Data written to latch of %02x\n", data);
-#endif
+		LOGMASKED(LOG_WRITE,"Data written to latch of %02x\n", data);
+
 	m_writelatch_data = data;
 
 	m_writelatch_flag = false; // /DEVWRITE clears the latch on its falling edge
