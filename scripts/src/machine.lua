@@ -2256,7 +2256,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/pla.h,MACHINES["PXA255"] = true
+--@src/devices/machine/pxa255.h,MACHINES["PXA255"] = true
 ---------------------------------------------------
 
 if (MACHINES["PXA255"]~=null) then
