@@ -106,10 +106,12 @@ private:
 	int m_previous_power;
 	int m_cnt;
 
+#if USE_MSM
 	uint32_t m_adpcm_pos;
 	uint8_t m_adpcm_idle;
 	uint8_t m_trigger;
 	uint8_t m_adpcm_data;
+#endif
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start() override;
