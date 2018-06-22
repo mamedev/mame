@@ -308,8 +308,8 @@ uint32_t istrebiteli_state::moto_screen_update(screen_device &screen, bitmap_ind
 	// port 38 m_spr_ctrl[0] bits
 	//   0123 - sprite 1 (player) idx
 	//   4    - road row scroll enable
-	//   5    - ? 1 during game mode, 0 in atract \
-	//   6    - ? 1 during atract mode, 0 in game / one of these is coin lock, other unknown
+	//   5    - ? 1 during game mode, 0 in atract |
+	//   6    - ? 1 during atract mode, 0 in game | one of these is coin lock, other unknown
 	//   7    - sprites/road enable
 	// port 39 m_spr_ctrl[1] bits
 	//   0123 - sprite 2 idx
