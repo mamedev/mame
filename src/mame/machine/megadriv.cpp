@@ -703,7 +703,7 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 		case 0x15:
 		case 0x17:
 			// accessed by either segapsg_device or sn76496_device
-			m_snsnd->write(data);
+			m_vdp->vdp_w(space, offset >> 1, data, 0x00ff);
 			break;
 
 		default:
@@ -899,12 +899,14 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 
 	megadriv_timers(config);
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(false)
 	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_sndirqline_callback_genesis_z80));
 	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv6irqline_callback_genesis_68k));
 	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -923,11 +925,6 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv_base)
@@ -956,12 +953,14 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 
 	megadriv_timers(config);
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_PAL, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(true)
 	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_sndirqline_callback_genesis_z80));
 	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv6irqline_callback_genesis_68k));
 	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -980,11 +979,6 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_PAL/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
 

@@ -820,6 +820,9 @@ zx.cpp
 //3do.cpp
 -3dobios
 -orbatak
+-alg3do
+-md23do
+-sht3do
 //cps1.cpp
 +wofch
 +sfzch
