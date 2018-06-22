@@ -30375,6 +30375,9 @@ olybossd                        // Olympia BOSS D
 bossa85                         // Olympia BOSS A 8085
 bossb85                         // Olympia BOSS B 8085
 
+@source:olytext.cpp
+olytext                         // Olympia Olytext 20
+
 @source:omegrace.cpp
 deltrace                        // bootleg
 omegrace                        // (c) 1981 Midway
