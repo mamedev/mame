@@ -1448,22 +1448,6 @@ protected:
 	virtual void video_start() override;
 };
 
-#define VERBOSE_LEVEL ( 5 )
-
-static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-		//printf( "%s: %s", device.machine().describe_context().c_str(), buf );
-	}
-}
-
 
 void zaurus_state::video_start()
 {
